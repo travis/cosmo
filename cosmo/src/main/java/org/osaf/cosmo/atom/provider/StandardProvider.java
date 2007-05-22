@@ -35,6 +35,7 @@ import org.apache.abdera.protocol.server.provider.BaseResponseContext;
 import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.provider.Target;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -43,9 +44,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
-import org.osaf.cosmo.atom.generator.FeedGenerator;
+import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.ServiceGenerator;
+import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
 import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.atom.processor.ContentProcessor;
@@ -93,7 +95,8 @@ public class StandardProvider extends AbstractProvider
             ItemTarget itemTarget =
                 new ItemTarget(request, item, PROJECTION_FULL, null);
             ServiceLocator locator = createServiceLocator(request);
-            FeedGenerator generator = createFeedGenerator(itemTarget, locator);
+            ItemFeedGenerator generator =
+                createItemFeedGenerator(itemTarget, locator);
             entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
@@ -173,7 +176,8 @@ public class StandardProvider extends AbstractProvider
 
             target = new ItemTarget(request, item, PROJECTION_FULL, null);
             ServiceLocator locator = createServiceLocator(request);
-            FeedGenerator generator = createFeedGenerator(target, locator);
+            ItemFeedGenerator generator =
+                createItemFeedGenerator(target, locator);
             entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
@@ -278,14 +282,42 @@ public class StandardProvider extends AbstractProvider
     }
 
     public ResponseContext getFeed(RequestContext request) {
-        CollectionTarget target = (CollectionTarget) request.getTarget();
+        Target target = request.getTarget();
+        if (target instanceof SubscribedTarget)
+            return getSubscribedFeed(request, (SubscribedTarget)target);
+        return getCollectionFeed(request, (CollectionTarget)target);
+    }
+
+    private ResponseContext getSubscribedFeed(RequestContext request,
+                                              SubscribedTarget target) {
+        User user = target.getUser();
+        if (log.isDebugEnabled())
+            log.debug("getting subscribed feed for user " + user.getUsername());
+
+        try {
+            ServiceLocator locator = createServiceLocator(request);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(target, locator);
+            Feed feed = generator.generateFeed(user);
+
+            return createResponseContext(feed.getDocument());
+        } catch (GeneratorException e) {
+            String reason = "Unknown feed generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        }
+    }
+
+    private ResponseContext getCollectionFeed(RequestContext request,
+                                              CollectionTarget target) {
         CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
             log.debug("getting feed for collection " + collection.getUid());
 
         try {
             ServiceLocator locator = createServiceLocator(request);
-            FeedGenerator generator = createFeedGenerator(target, locator);
+            ItemFeedGenerator generator =
+                createItemFeedGenerator(target, locator);
             generator.setFilter(QueryBuilder.buildFilter(request));
             Feed feed = generator.generateFeed(collection);
 
@@ -316,7 +348,8 @@ public class StandardProvider extends AbstractProvider
 
         try {
             ServiceLocator locator = createServiceLocator(request);
-            FeedGenerator generator = createFeedGenerator(target, locator);
+            ItemFeedGenerator generator =
+                createItemFeedGenerator(target, locator);
             Entry entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
@@ -454,12 +487,19 @@ public class StandardProvider extends AbstractProvider
         return generatorFactory.createServiceGenerator(locator);
     }
 
-    protected FeedGenerator createFeedGenerator(BaseItemTarget target,
-                                                ServiceLocator locator)
+    protected ItemFeedGenerator createItemFeedGenerator(BaseItemTarget target,
+                                                        ServiceLocator locator)
         throws UnsupportedProjectionException, UnsupportedFormatException {
-        return generatorFactory.createFeedGenerator(target.getProjection(),
-                                                    target.getFormat(),
-                                                    locator);
+        return generatorFactory.createItemFeedGenerator(target.getProjection(),
+                                                        target.getFormat(),
+                                                        locator);
+    }
+
+    protected SubscriptionFeedGenerator
+        createSubscriptionFeedGenerator(SubscribedTarget target,
+                                        ServiceLocator locator) {
+        return generatorFactory.
+            createSubscriptionFeedGenerator(locator);
     }
 
     protected ContentProcessor createContentProcessor(Entry entry)

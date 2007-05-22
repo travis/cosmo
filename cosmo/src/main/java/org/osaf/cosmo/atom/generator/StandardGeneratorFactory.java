@@ -44,18 +44,18 @@ public class StandardGeneratorFactory
     /**
      * Creates an instance of <code>ServiceGenerator</code>.
      *
-     * @param serviceLocator the service locator from which collection
+     * @param locator the service locator from which collection
      * URLs are calculated
      * @return the service generator
      */
     public ServiceGenerator
-        createServiceGenerator(ServiceLocator serviceLocator) {
-        return new StandardServiceGenerator(this, serviceLocator,
+        createServiceGenerator(ServiceLocator locator) {
+        return new StandardServiceGenerator(this, locator,
                                             contentService);
     }
 
     /**
-     * Creates an instance of <code>FeedGenerator</code> that can
+     * Creates an instance of <code>ItemFeedGenerator</code> that can
      * service the given projection and format.
      * <p>
      * The following feed generators are supported:
@@ -83,23 +83,28 @@ public class StandardGeneratorFactory
      *
      * @param projection the projection name
      * @param format the format name
-     * @param serviceLocator the service locator from which feed URLs
+     * @param locator the service locator from which feed URLs
      * are calculated
      * @return the feed generator, or null if no generator is
      * supported for the named projection
      */
-    public FeedGenerator createFeedGenerator(String projection,
-                                             String format,
-                                             ServiceLocator serviceLocator)
+    public ItemFeedGenerator createItemFeedGenerator(String projection,
+                                                     String format,
+                                                     ServiceLocator locator)
         throws UnsupportedProjectionException, UnsupportedFormatException {
         if (projection == null ||
             projection.equals(PROJECTION_BASIC))
-            return new BasicFeedGenerator(this, serviceLocator);
+            return new BasicFeedGenerator(this, locator);
         if (projection.equals(PROJECTION_FULL))
-            return new FullFeedGenerator(this, serviceLocator, format);
+            return new FullFeedGenerator(this, locator, format);
         if (projection.equals(PROJECTION_DETAILS))
-            return new DetailsFeedGenerator(this, serviceLocator);
+            return new DetailsFeedGenerator(this, locator);
         throw new UnsupportedProjectionException(projection);
+    }
+
+    public SubscriptionFeedGenerator
+        createSubscriptionFeedGenerator(ServiceLocator locator) {
+        return new StandardSubscriptionFeedGenerator(this, locator);
     }
 
     // our methods

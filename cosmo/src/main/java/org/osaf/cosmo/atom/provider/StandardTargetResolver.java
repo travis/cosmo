@@ -76,11 +76,16 @@ public class StandardTargetResolver implements TargetResolver {
         if (ip != null)
             return createItemTarget(context, ip);
 
-        UserPath up = UserPath.parse(uri);
+        UserPath up = UserPath.parse(uri, true);
         if (up != null) {
+            if (up.getPathInfo() != null &&
+                up.getPathInfo().equals("/subscribed"))
+                return createSubscribedTarget(context, up);
+
             SubscriptionPathInfo spi = SubscriptionPathInfo.parse(up);
             if (spi != null)
                 return createSubscriptionTarget(context, spi);
+
             return createUserTarget(context, up);
         }
 
@@ -133,8 +138,18 @@ public class StandardTargetResolver implements TargetResolver {
     }
 
     /**
-     * Creates a target representing one or all of a user's
-     * subscriptions.
+     * Creates a target representing the subscribed service.
+     */
+    protected Target createSubscribedTarget(RequestContext context,
+                                            UserPath path) {
+        User user = userService.getUser(path.getUsername());
+        if (user == null)
+            return null;
+        return new SubscribedTarget(context, user);
+    }
+
+    /**
+     * Creates a target representing a collection subscription.
      */
     protected Target createSubscriptionTarget(RequestContext context,
                                               SubscriptionPathInfo pathInfo) {
@@ -142,15 +157,11 @@ public class StandardTargetResolver implements TargetResolver {
         if (user == null)
             return null;
 
-        if (pathInfo.getDisplayName() != null) {
-            CollectionSubscription sub =
-                user.getSubscription(pathInfo.getDisplayName());
-            if (sub == null)
-                return null;
-            return new SubscriptionTarget(context, user, sub);
-        }
-
-        return new SubscriptionTarget(context, user);
+        CollectionSubscription sub =
+            user.getSubscription(pathInfo.getDisplayName());
+        if (sub == null)
+            return null;
+        return new SubscriptionTarget(context, user, sub);
     }
 
     /**

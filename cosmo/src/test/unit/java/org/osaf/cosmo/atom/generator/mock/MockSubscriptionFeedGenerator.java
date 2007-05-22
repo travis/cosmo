@@ -17,57 +17,52 @@ package org.osaf.cosmo.atom.generator.mock;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.atom.generator.FeedGenerator;
+
 import org.osaf.cosmo.atom.generator.GeneratorException;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
+import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
- * Mock implementation of {@link FeedGenerator} that generates dummy
- * feeds for use with atom unit tests.
+ * Mock implementation of {@link SubscriptionFeedGenerator} that
+ * generates dummy feeds for use with atom unit tests.
  *
  * @see MockGeneratorFactory
  * @see Feed
- * @see CollectionItem
+ * @see CollectionSubscription
+ * @see User
  */
-public class MockFeedGenerator implements FeedGenerator {
-    private static final Log log = LogFactory.getLog(MockFeedGenerator.class);
+public class MockSubscriptionFeedGenerator
+    implements SubscriptionFeedGenerator {
+    private static final Log log =
+        LogFactory.getLog(MockSubscriptionFeedGenerator.class);
 
     private MockGeneratorFactory factory;
     private String projection;
     private String format;
     private ServiceLocator locator;
-    private ItemFilter filter;
 
     /** */
-    public MockFeedGenerator(MockGeneratorFactory factory,
-                             String projection,
-                             String format,
-                             ServiceLocator locator) {
+    public MockSubscriptionFeedGenerator(MockGeneratorFactory factory,
+                                         ServiceLocator locator) {
         this.factory = factory;
-        this.projection = projection;
-        this.format = format;
         this.locator = locator;
     }
 
-    // FeedGenerator methods
+    // SubscriptionFeedGenerator methods
 
-    public void setFilter(ItemFilter filter) {
-        this.filter = filter;
-    }
-
-    public Feed generateFeed(CollectionItem item)
+    public Feed generateFeed(User user)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
         return factory.getAbdera().getFactory().newFeed();
     }
 
-    public Entry generateEntry(NoteItem item)
+    public Entry generateEntry(CollectionSubscription sub)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
@@ -77,7 +72,7 @@ public class MockFeedGenerator implements FeedGenerator {
 
             // when writing entries, we need self links to generate
             // location response headers
-            entry.addLink("urn:uid:" + item.getUid(), "self");
+            entry.addLink("urn:uid:" + sub.getDisplayName(), "self");
 
             return entry;
         } catch (Exception e) {

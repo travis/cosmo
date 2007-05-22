@@ -23,9 +23,10 @@ import org.apache.abdera.Abdera;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.generator.FeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
+import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.ServiceGenerator;
+import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
 import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -57,37 +58,50 @@ public class MockGeneratorFactory implements GeneratorFactory {
     /**
      * Creates an instance of <code>Generator</code>.
      *
-     * @param serviceLocator the service locator from which service
+     * @param locator the service locator from which service
      * URLs are calculated
      * @return the service generator
      */
+
     public ServiceGenerator
-        createServiceGenerator(ServiceLocator serviceLocator) {
-        return new MockServiceGenerator(this, serviceLocator);
+        createServiceGenerator(ServiceLocator locator) {
+        return new MockServiceGenerator(this, locator);
     }
 
     /**
-     * Creates an instance of <code>MockFeedGenerator</code> based on
+     * Creates an instance of <code>MockItemFeedGenerator</code> based on
      * the given projection and format. Projection is mandatory but
      * format is optional. The projection, and format if given, must
      * already be known by the factory.
      *
      * @param projection the projection name
      * @param format the format name
-     * @param serviceLocator the service locator from which feed URLs
+     * @param locator the service locator from which feed URLs
      * are calculated
      * @return the feed generator
      */
-    public FeedGenerator createFeedGenerator(String projection,
-                                             String format,
-                                             ServiceLocator serviceLocator)
+    public ItemFeedGenerator createItemFeedGenerator(String projection,
+                                                     String format,
+                                                     ServiceLocator locator)
         throws UnsupportedProjectionException, UnsupportedFormatException {
         // projection is required
         if (projection == null || ! projections.contains(projection))
             throw new UnsupportedProjectionException(projection);
         if (format != null && ! formats.contains(format))
             throw new UnsupportedFormatException(format);
-        return new MockFeedGenerator(this, projection, format, serviceLocator);
+        return new MockItemFeedGenerator(this, projection, format, locator);
+    }
+
+    /**
+     * Creates an instance of <code>SubscriptionFeedGenerator</code>.
+     *
+     * @param locator the service locator from which feed URLs
+     * are calculated
+     * @return the feed generator
+     */
+    public SubscriptionFeedGenerator
+        createSubscriptionFeedGenerator(ServiceLocator locator) {
+        return new MockSubscriptionFeedGenerator(this, locator);
     }
 
     // our methods

@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
@@ -24,41 +23,21 @@ import org.osaf.cosmo.model.User;
 
 /**
  * <p>
- * A target that identifies the subscriptions for a user, or one
- * particular subscription.
- * </p>
- * <p>
- * A target with a null subscription is considered to identify all of
- * a user's subscriptions.
+ * A target that identifies a particular collection subscription.
  * </p>
  */
-public class SubscriptionTarget extends AbstractTarget {
+public class SubscriptionTarget extends SubscribedTarget {
 
-    private User user;
     private CollectionSubscription subscription;
-
-    public SubscriptionTarget(RequestContext request,
-                              User user) {
-        this(request, user, null);
-    }
 
     public SubscriptionTarget(RequestContext request,
                               User user,
                               CollectionSubscription subscription) {
-        super(determineTargetType(subscription), request);
-        this.user = user;
+        super(TargetType.TYPE_ENTRY, request, user);
         this.subscription = subscription;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public CollectionSubscription getSubscription() {
         return subscription;
-    }
-
-    private static TargetType determineTargetType(CollectionSubscription sub) {
-        return sub != null ? TargetType.TYPE_ENTRY : TargetType.TYPE_COLLECTION;
     }
 }

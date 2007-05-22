@@ -30,22 +30,29 @@ import org.osaf.cosmo.model.User;
 public interface ServiceGenerator {
 
     public static final String WORKSPACE_HOME = "home";
-    public static final String WORKSPACE_LOCAL = "local";
+    public static final String WORKSPACE_META = "meta";
+    public static final String COLLECTION_SUBSCRIBED = "subscribed";
 
     /**
      * <p>
      * Generates a service containing the following workspaces
      * describing the collections accessible for a user:
      * </p>
+     * <h2><code>home</code> Workspace</h2>
+     * <p>
+     * This workspace contains an Atom collection for each of the
+     * collections published by the user into his home collection (not
+     * including any sub-collections).
+     * </p>
+     * <h2><code>meta</code> Workspace</h2>
+     * <p>
+     * This workspace contains Atom collections providing access to
+     * various "meta" information about the user, including his
+     * subscriptions and preferences. These collections include:
+     * </p>
      * <dl>
-     * <dt>{@link #WORKSPACE_HOME}</dt>
-     * <dd>Contains an Atom collection for each of the collections in
-     * the user's home collection (not including any
-     * sub-collections).</dd>
-     * <dt>{@link @WORKSPACE_LOCAL}</dt>
-     * <dd>Contains an Atom collection for each of the local
-     * collections (those on the same server) to which the user is
-     * subscribed.
+     * <dt><code>subscribed</code></dt>
+     * <dd>Lists the user's collection subscriptions.</dd>
      * </dl>
      *
      * @param the user

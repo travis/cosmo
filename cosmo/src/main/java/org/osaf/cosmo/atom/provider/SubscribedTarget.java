@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.EntityTag;
-import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 
@@ -24,30 +22,19 @@ import org.osaf.cosmo.model.User;
 
 /**
  * <p>
- * A target that identifies a particular user.
+ * A target that identifies the "subscribed collections" service.
  * </p>
  */
-public class UserTarget extends AbstractTarget {
+public class SubscribedTarget extends UserTarget {
 
-    private User user;
-
-    /**
-     * Constructs a <code>UserTarget</code> of type
-     * {@link TargetType.TYPE_SERVICE}.
-     */
-    public UserTarget(RequestContext request,
-                      User user) {
-        this(TargetType.TYPE_SERVICE, request, user);
+    public SubscribedTarget(RequestContext request,
+                            User user) {
+        this(TargetType.TYPE_COLLECTION, request, user);
     }
 
-    public UserTarget(TargetType type,
-                      RequestContext request,
-                      User user) {
-        super(type, request);
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
+    public SubscribedTarget(TargetType type,
+                            RequestContext request,
+                            User user) {
+        super(type, request, user);
     }
 }

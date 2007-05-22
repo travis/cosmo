@@ -17,46 +17,37 @@ package org.osaf.cosmo.atom.generator;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.User;
 
 /**
  * An interface for classes that generate Atom feeds and entries
- * representing Cosmo collections and items.
+ * representing collection subscriptions.
  *
  * @see Entry
  * @see Feed
- * @see CollectionItem
- * @see NoteItem
+ * @see CollectionSubscription
+ * @see User
  */
-public interface FeedGenerator {
+public interface SubscriptionFeedGenerator {
 
     /**
-     * Sets a query filter used by the generator to find the specific
-     * items that will be represented in the feed.
+     * Generates an Atom feed containing entries for a user's
+     * collection subscriptions.
      *
-     * @param filter the query filter
-     */
-    public void setFilter(ItemFilter filter);
-
-    /**
-     * Generates an Atom feed containing entries for items in a
-     * collection. If a query filter has been set, it is used to
-     * determine which items are included in the feed.
-     *
-     * @param collection the collection on which the feed is based
+     * @param user the user
      * @throws GeneratorException
      */
-    public Feed generateFeed(CollectionItem item)
+    public Feed generateFeed(User user)
         throws GeneratorException;
 
     /**
-     * Generates an Atom entry representing an item.
+     * Generates an Atom entry representing a specific collection
+     * subscription.
      *
-     * @param item the item which the entry describes
+     * @param sub the subscription
      * @throws GeneratorException
      */
-    public Entry generateEntry(NoteItem item)
+    public Entry generateEntry(CollectionSubscription sub)
         throws GeneratorException;
 }

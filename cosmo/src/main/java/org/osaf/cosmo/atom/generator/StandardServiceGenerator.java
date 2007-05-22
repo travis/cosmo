@@ -91,11 +91,11 @@ public class StandardServiceGenerator
                 hw.addCollection(createCollection((CollectionItem)child));
         }
 
-        Workspace lw = createLocalWorkspace();
-        service.addWorkspace(lw);
+        Workspace mw = createMetaWorkspace();
+        service.addWorkspace(mw);
 
-        for (CollectionSubscription sub : user.getCollectionSubscriptions())
-            lw.addCollection(createCollection(sub));
+        mw.addCollection(createSubscribedCollection(user));
+        // XXX: add preferences collection
 
         return service;
     }
@@ -141,10 +141,10 @@ public class StandardServiceGenerator
      *
      * @throws GeneratorException
      */
-    protected Workspace createLocalWorkspace()
+    protected Workspace createMetaWorkspace()
         throws GeneratorException {
         Workspace workspace = factory.getAbdera().getFactory().newWorkspace();
-        workspace.setTitle(WORKSPACE_LOCAL);
+        workspace.setTitle(WORKSPACE_META);
         return workspace;
     }
 
@@ -165,6 +165,31 @@ public class StandardServiceGenerator
             collection.setAccept("entry");
             collection.setHref(href);
             collection.setTitle(item.getDisplayName());
+        } catch (IRISyntaxException e) {
+            throw new GeneratorException("Attempted to set invalid collection href " + href, e);
+        }
+
+        return collection;
+    }
+
+    /**
+     * Creates the <code>subscribed Collection</code> describing the
+     * user's collection subscriptions.
+     *
+     * @param collection the collection item described by the atom
+     * collection
+     * @throws GeneratorException
+     */
+    protected Collection createSubscribedCollection(User user)
+        throws GeneratorException {
+        Collection collection =
+            factory.getAbdera().getFactory().newCollection();
+        String href = serviceLocator.getAtomUrl(user, false) + "/subscribed";
+
+        try {
+            collection.setAccept("entry");
+            collection.setHref(href);
+            collection.setTitle(COLLECTION_SUBSCRIBED);
         } catch (IRISyntaxException e) {
             throw new GeneratorException("Attempted to set invalid collection href " + href, e);
         }

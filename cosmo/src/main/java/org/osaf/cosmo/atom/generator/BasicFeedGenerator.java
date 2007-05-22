@@ -33,13 +33,13 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see Feed
  * @see CollectionItem
  */
-public class BasicFeedGenerator extends BaseFeedGenerator {
+public class BasicFeedGenerator extends BaseItemFeedGenerator {
     private static final Log log = LogFactory.getLog(BasicFeedGenerator.class);
 
     /** */
     public BasicFeedGenerator(StandardGeneratorFactory factory,
-                              ServiceLocator serviceLocator) {
-        super(factory, serviceLocator);
+                              ServiceLocator locator) {
+        super(factory, locator);
     }
 
     /**

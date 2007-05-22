@@ -39,7 +39,7 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see Feed
  * @see CollectionItem
  */
-public class DetailsFeedGenerator extends BaseFeedGenerator {
+public class DetailsFeedGenerator extends BaseItemFeedGenerator {
     private static final Log log =
         LogFactory.getLog(DetailsFeedGenerator.class);
 

@@ -17,6 +17,7 @@ dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Delta");
+dojo.require("cosmo.util.uuid");
 
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
@@ -26,6 +27,8 @@ cosmo.model.TRIAGE_LATER = 200;
 cosmo.model.TRIAGE_DONE = 300;
 
 cosmo.model._stampRegistry = {};
+
+cosmo.model.uuidGenerator = new cosmo.util.uuid.RandomGenerator();
    
 cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations, kwArgs){
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
@@ -105,7 +108,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
 
 cosmo.model.declare("cosmo.model.Item", null, 
     //declare the dynamically generated properties
-   [["uid", {"default": null}],
+   [["uid", {"default": dojo.lang.hitch(cosmo.model.uuidGenerator, cosmo.model.uuidGenerator.generate)}],
     ["displayName", {"default": null} ],
     ["version", {"default": null} ],
     ["creationDate", {"default": cosmo.model.NEW_DATESTAMP}],

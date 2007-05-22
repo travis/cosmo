@@ -28,7 +28,6 @@ dojo.require("cosmo.model.*");
 dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.datetime.serialize");
 dojo.require("cosmo.util.html");
-dojo.require("cosmo.util.uuid");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     
@@ -46,8 +45,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }}
     },
     
-    uuidGenerator: new cosmo.util.uuid.RandomGenerator(),
-    
     translateGetCollection: function (atomXml){
         return atomXml;
     },
@@ -62,7 +59,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var collectionElements = workspace.getElementsByTagName("collection");
             
             for (var j = 0; j < collectionElements.length; j++){
-         
                 collections.push(this.collectionXmlToCollection(collectionElements[j]));
             }
         }
@@ -253,10 +249,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     itemToAtomEntry: function (object){
-         // If the item doesn't have a uid, give it one.
-         if (!object.getUid()){
-             object.setUid(this.uuidGenerator.generate());
-         }
          var jsonObject = this.noteToRecordSet(object);
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
          '<title>' + object.getDisplayName() + '</title>' +

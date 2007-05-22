@@ -25,7 +25,6 @@
  *
  */
 dojo.provide("cosmo.service.conduits.common");
-dojo.require("dojo.uuid.RandomGenerator");
 
 dojo.declare("cosmo.service.conduits.Conduit", null, {
 
@@ -36,21 +35,12 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     initializer: function (transport, translator){
         this._transport = transport;
         this._translator = translator;
-        this.translateGetItems = dojo.lang.hitch(this, function (obj, xhr){
-            return this._translator.translateGetItems(obj);
-        });
-        this.translateGetCollections = dojo.lang.hitch(this, function (obj, xhr){
-            return this._translator.translateGetCollections(obj);
-        });
-        this.translateGetCollection = dojo.lang.hitch(this, function (obj, xhr){
-            return this._translator.translateGetCollection(obj);
-        });
     },
 
     getCollections: function (kwArgs){
         var deferred = this._transport.getCollections(kwArgs);
 
-        deferred.addCallback(this.translateGetCollections);
+        this._addTranslation(deferred, "translateGetCollections");
         return deferred;
     },
     
@@ -67,7 +57,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         var deferred = this._transport.getCollection(collectionUid, kwArgs);
 
-        deferred.addCallback(this.translateGetCollection);
+        this._addTranslation(deferred, "translateGetCollection");
         
         //TODO: do topic notifications
         return deferred;
@@ -77,10 +67,19 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         if (!kwArgs) kwArgs = {};
         kwArgs.ticketKey = collection.getTicketKey() || undefined;
         var deferred = this._transport.getItems(collection.getUid(), searchCriteria, kwArgs);
-
-        deferred.addCallback(this.translateGetItems);
+        
+        this._addTranslation(deferred, "translateGetItems");
 
         // do topic notifications
+        return deferred;
+    },
+
+    getItem: function(uid, kwArgs){
+        if (!kwArgs)   kwArgs = {};
+        var deferred = this._transport.getItem(uid, kwArgs);
+
+        this._addTranslation(deferred, "translateGetItems");
+        
         return deferred;
     },
 
@@ -141,6 +140,21 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         },null];
         
         return fakeDeferred;
+    },
+    
+    _addTranslation: function (deferred, translationFunction){
+        deferred.addCallback(
+            dojo.lang.hitch(this._translator, function (obj, xhr){
+                return this[translationFunction](obj);
+            })
+        );
+        
+        deferred.addErrback(function (e, xhr){
+            dojo.debug("Translation error:")
+            dojo.debug(e);
+            return e;
+        });
+        
     }
     
 });

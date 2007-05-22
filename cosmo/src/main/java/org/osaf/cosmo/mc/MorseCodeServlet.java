@@ -37,6 +37,7 @@ import org.osaf.cosmo.eim.eimml.EimmlStreamException;
 import org.osaf.cosmo.eim.eimml.EimmlStreamReader;
 import org.osaf.cosmo.eim.eimml.EimmlStreamReaderIterator;
 import org.osaf.cosmo.eim.eimml.EimmlStreamWriter;
+import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.UidInUseException;
@@ -383,6 +384,12 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                    root.getMessage());
                     return;
                 }
+                if (root != null && root instanceof EimSchemaException) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                                   "Unable to process EIM records: " +
+                                   root.getMessage());
+                    return;
+                }
                 log.error("Error updating collection " + cp.getUid(), e);
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                "Error updating collection: " + e.getMessage());
@@ -491,6 +498,12 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                     log.warn("Unable to read EIM stream", root);
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                    "Unable to read EIM stream: " +
+                                   root.getMessage());
+                    return;
+                }
+                if (root != null && root instanceof EimSchemaException) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                                   "Unable to process EIM records: " +
                                    root.getMessage());
                     return;
                 }

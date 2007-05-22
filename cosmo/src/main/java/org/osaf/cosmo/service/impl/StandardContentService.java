@@ -343,12 +343,12 @@ public class StandardContentService implements ContentService {
         }
         
         // add CalendarCollectionStamp if parent is the home collection
-        if(parent instanceof HomeCollectionItem) {
-            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
-                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
-                collection.addStamp(ccs);
-            }
-        }
+//        if(parent instanceof HomeCollectionItem) {
+//            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
+//                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+//                collection.addStamp(ccs);
+//            }
+//        }
         
         return contentDao.createCollection(parent, collection);
     }
@@ -377,12 +377,12 @@ public class StandardContentService implements ContentService {
         Set<CollectionItem> locks = acquireLocks(collection, children);
         
         // add CalendarCollectionStamp if parent is the home collection
-        if(parent instanceof HomeCollectionItem) {
-            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
-                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
-                collection.addStamp(ccs);
-            }
-        }
+//        if(parent instanceof HomeCollectionItem) {
+//            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
+//                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+//                collection.addStamp(ccs);
+//            }
+//        }
         
         try {
             // Create the new collection

@@ -107,7 +107,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     var eventStamp = note.getEventStamp()
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();
-    
+
     var strtime = dojo.date.strftime(startDate, '%I:%M%p');
     // Trim leading zero if need be
     strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
@@ -352,7 +352,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.useLightColor = function (ev) {
         // 'FYI' events
         case (status && status == cosmo.model.EventStatus.FYI):
         // @-time events
-        
+
         case (!allDay && (startDate.equals(endDate))):
         // Anytime events
         case (anyTime):
@@ -610,7 +610,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     var eventStamp = ev.data.getEventStamp();
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();
-    
+
     if (ev.startsBeforeViewRange()) {
         startDay = 0;
         this.startsBeforeViewRange = true;

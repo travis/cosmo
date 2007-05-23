@@ -78,7 +78,8 @@ public class MockItemFeedGenerator implements ItemFeedGenerator {
 
             // when writing entries, we need self links to generate
             // location response headers
-            entry.addLink("urn:uid:" + item.getUid(), "self");
+            String href= "urn:uid:" + item.getUid().replaceAll("\\s", "_");;
+            entry.addLink(href, "self");
 
             return entry;
         } catch (Exception e) {

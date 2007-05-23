@@ -35,11 +35,6 @@ cosmo.model.declare("cosmo.model.RecurrenceRule", null,
         
         isSupported: function (){
             return this.getIsSupported();  
-        },
-    
-        equals: function(other){
-            //TODO
-            dojo.unimplemented();
         }
     },
     {

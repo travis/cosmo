@@ -102,8 +102,13 @@ public class StandardProvider extends AbstractProvider
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument(), 201, "Created");
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLocation(entry.getSelfLink().toString());
-            rc.setContentLocation(entry.getSelfLink().toString());
+
+            try {
+                rc.setLocation(entry.getSelfLink().getHref().toString());
+                rc.setContentLocation(entry.getSelfLink().getHref().toString());
+            } catch (Exception e) {
+                throw new RuntimeException("Error parsing self link href", e);
+            }
 
             return rc;
         } catch (ParseException e) {

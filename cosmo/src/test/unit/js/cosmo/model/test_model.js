@@ -118,6 +118,7 @@ test_equals : function(){
     try {
         equals(1, "1");
     } catch (e){
+        //operands must be of the same type
         caught = true;
     }
     jum.assertTrue(caught);
@@ -145,8 +146,20 @@ test_stampInheritance : function(){
 
     occurStamp.setLocation("Yo");
     jum.assertEquals(occurStamp.getLocation(), "Yo");
-    
-    
+}, 
+
+test_hasRecurrence: function(){
+    var note = new cosmo.model.Note({
+        body: "body",
+        uid: "123",
+        displayName: "display"
+    });
+    assertFalse(note.hasRecurrence());
+    var stamp = note.getEventStamp(true);
+    stamp.setRrule(new cosmo.model.RecurrenceRule({frequency:cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY}));
+    assertTrue(note.hasRecurrence());
+    var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
+    assertTrue(occurrence.hasRecurrence());
 }
 
 });

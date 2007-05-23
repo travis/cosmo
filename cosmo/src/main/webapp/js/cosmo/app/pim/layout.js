@@ -157,8 +157,8 @@ cosmo.app.pim.layout.LeftSidebar = function (p) {
     var vp = new cosmo.ui.resize.Viewport(d)
     // add scaling
     // (screenwidth, screenheight, left,top,right,botton)
-    vp.setMinSize([300,300,0,0,172,300]);
-    vp.setMaxSize([1600,1200,0,0,172,1200]);
+    vp.setMinSize([300,300,0,0,LEFT_SIDEBAR_WIDTH,300]);
+    vp.setMaxSize([1600,1200,0,0,LEFT_SIDEBAR_WIDTH,1200]);
     vp.addResize("renderSelf",this.renderSelf);
     /*
     var h = new cosmo.ui.resize.Handle(handle);
@@ -187,8 +187,9 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
     //viewport fun
     var vp = new cosmo.ui.resize.Viewport(d)
     // add scaling
-    vp.setMinSize([500,300,173,0,300,300]);
-    vp.setMaxSize([1600,1200,173,0,1600,1200]);
+    var w = LEFT_SIDEBAR_WIDTH + 1;
+    vp.setMinSize([500,300,w,0,300,300]);
+    vp.setMaxSize([1600,1200,w,0,1600,1200]);
     vp.addResize("renderSelf",this.renderSelf)    ;
 };
 cosmo.app.pim.layout.CenterColumn.prototype =
@@ -221,8 +222,8 @@ cosmo.app.pim.layout.RightSidebar = function (p) {
     this.children = [];
     //viewport fun
     var vp = new cosmo.ui.resize.Viewport(d);
-    vp.setMinSize([300,300,43,0,300,300]);
-    vp.setMaxSize([1600,1200,1343,0,1600,1200]);
+    vp.setMinSize([300,300,(299 - RIGHT_SIDEBAR_WIDTH),0,300,300]);
+    vp.setMaxSize([1600,1200,(1599 - RIGHT_SIDEBAR_WIDTH),0,1600,1200]);
     vp.addResize("renderSelf",this.renderSelf);
     /*
     var h = new cosmo.ui.resize.Handle(handle);

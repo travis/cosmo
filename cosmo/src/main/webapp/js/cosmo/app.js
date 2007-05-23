@@ -247,12 +247,14 @@ cosmo.app = new function () {
     };
 
     this.updateUIFromPrefs = function (/*cosmo.topics.PreferencesUpdatedMessage*/ message){
+        /*
         if (message.preferences[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true'){
             $('accountBrowserLink').style.display = 'inline';
 }
         else {
             $('accountBrowserLink').style.display = 'none';
         }
+        */
     };
 
 }

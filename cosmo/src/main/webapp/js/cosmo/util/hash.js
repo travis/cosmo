@@ -93,6 +93,12 @@ cosmo.util.hash.Hash = function() {
         var lookup = this.items[this.order[pos]];
         return typeof lookup != 'undefined' ? lookup : false;
     };
+    this.insertAtPos = function(pos, key, val) {
+        this.order.splice(pos, 0, key);
+        this.items[key] = val;
+        this.length++;
+        return true;
+    };
     this.removeAtPos = function(pos) {
         var ret = this.items[this.order[pos]];
         if (typeof ret != 'undefined') {
@@ -104,6 +110,10 @@ cosmo.util.hash.Hash = function() {
         else {
             return false;
         }
+    };
+    this.insertAfter = function (refKey, key, val) {
+        var pos = this.getPos(refKey);
+        this.insertAtPos(pos, key, val);
     };
     this.getFirst = function() {
         return this.items[this.order[0]];

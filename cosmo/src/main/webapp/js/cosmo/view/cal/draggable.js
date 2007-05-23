@@ -39,16 +39,18 @@ dojo.require("cosmo.app.pim.layout");
  * @object An event lozenge being dragged or resized
  */
 cosmo.view.cal.draggable.Draggable = function (id) {
+
     // Unused -- TO-DO: Get rid of this property
     this.id = id;
     // Unused -- TO-DO: Get rid of this property
     this.div = null;
     // Dragged/resized or not
     this.dragged = false;
+    // Vertical offset of the hosting div for calc'ing Y pos
+    this.vertOffset = 0;
     // Used in calcluations for resizing
     this.height = 0;
-    // The top of the lozenge being dragged -- essentially div.offsetTop
-    // because now cosmo.app.pim.top is always set to zero
+    // The top of the lozenge being dragged
     this.absTop = 0;
     // The offset of the left/top edges of the dragged lozenge from the
     // mouse click position -- lets you keep the lozenge a fixed pos
@@ -74,11 +76,11 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * to be shared between the sub-classes
      */
     this.init = function (dragMode) {
-        // Reference to the main lozenge and div for this Draggable
         var ev = cosmo.view.cal.canvas.getSelectedEvent();
         var lozenge = ev.lozenge;
         var div = lozenge.div;
-
+        this.vertOffset = cosmo.app.pim.baseLayout.mainApp.top +
+            cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.timedScrollingMainDiv.top;
         this.dragMode = dragMode;
         // Snapshot measurements
         this.origDivLeft = div.offsetLeft;
@@ -86,7 +88,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         this.plantonicLozengeLeft = lozenge.getPlatonicLeft();
         this.platonicLozengeWidth = lozenge.getPlatonicWidth();
         this.height = div.offsetHeight;
-        this.absTop = div.offsetTop + cosmo.app.pim.top;
+        this.absTop = div.offsetTop + this.vertOffset;
         this.bottom = div.offsetTop + this.height;
         this.min = this.bottom-(HOUR_UNIT_HEIGHT/2)+2;
         this.clickOffsetX = xPos - this.origDivLeft;
@@ -417,7 +419,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.getBLimit = function (movelo
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.setDragWidth = function () {}
 
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.getLocalMouseYPos = function (y) {
-    var localY = (y - cosmo.app.pim.top) + this.scrollOffset;
+    var localY = (y - this.vertOffset) + this.scrollOffset;
     return localY;
 };
 

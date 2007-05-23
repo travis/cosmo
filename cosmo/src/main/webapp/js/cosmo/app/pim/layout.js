@@ -257,15 +257,11 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         'currentCollection': cosmo.app.pim.currentCollection,
         'ticketKey': cosmo.app.pim.ticketKey }, d, 'last');
 
-    // Minical -- minical obj is just glued to an empty generic
-    // ContentBox; need to make minical a properly subclassed
-    // ContentBox
+    // Minical -- subclassed ContentBox 
     var d = _createElem('div');
-    d.id = 'miniCalDiv';
-    var cB = new cosmo.ui.ContentBox({ domNode: d, id: d.id });
+    d.id = 'miniCal';
+    cB = new cosmo.ui.minical.MiniCal({ domNode: d, currDate: cosmo.app.pim.currDate });
     this.baseLayout.mainApp.leftSidebar.addChild(cB);
-    cB.renderSelf = cosmo.ui.minical.MiniCal.render;
-    cosmo.ui.minical.MiniCal.init(cosmo.app.pim, cB.domNode, cB.parent);
     this.baseLayout.mainApp.leftSidebar.minical = cB;
 
     var d = _createElem('div');

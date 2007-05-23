@@ -249,3 +249,14 @@ cosmo.util.html.getElementsByTagName = function(parent, namespace, tagName, kwAr
     
 };
 
+/**
+ * Sets the text in a text input, may add grayed-out CSS class,
+ * or disabled, based on passed params
+ */
+cosmo.util.html.setTextInput = function (textbox, textValue, isDefaultText, 
+    disabled) {
+    textbox.className = isDefaultText ? 'inputTextDim' : 'inputText';
+    textbox.value = textValue;
+    textbox.disabled = disabled;
+};
+

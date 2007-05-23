@@ -1087,9 +1087,9 @@ cosmo.view.cal = new function () {
     };
     
     this.triggerLoadEvents = function (o) {
-        var opts = o;
+        var opts = {};
         var collection = opts.collection;
-        var goTo = opts.goTo;
+        var goTo = o.goTo;
         
         // Changing collection
         // --------
@@ -1121,16 +1121,11 @@ cosmo.view.cal = new function () {
             collection: cosmo.app.pim.currentCollection,
             viewStart: cosmo.view.cal.viewStart,
             viewEnd: cosmo.view.cal.viewEnd,
-            currDate: cosmo.app.pim.currDate
+            currDate: cosmo.app.pim.currDate,
         }
+        // Pass along the original opts
+        for (var n in o) { opts[n] = o[n]; }
 
-        // If we're looking at different dates, have to re-render
-        // the base canvas with the new date range
-        //if (goTo) {
-        //    dojo.event.topic.publish('/calEvent', {
-        //        action: 'eventsLoadPrepare', data: {}, opts: opts });
-        //}
-        // Load and display events
         self.loadEvents(opts);
     };
     /**

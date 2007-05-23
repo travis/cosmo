@@ -893,13 +893,24 @@ td.dataDisplayLabel {
 
 /* Minical styles
  * --------------------- */
-#miniCalDiv {
+#miniCal {
+    position: absolute;
     border: 0px;
-    left: 15px;
+    text-align: center;
+}
+#goToDateNode {
+    position: relative;
+    text-align: left;
+    margin: auto;
+    width: 100%;
+    height: 28px;
+}
+#miniCalNode {
+    position: relative;
+    text-align: left;
+    margin: auto;
     width: 140px;
     border: 1px solid #cccccc;
-    position: relative;
-    visibility: hidden;
 }
 #miniCalNavPanel td {
     font-size: 0.9em;

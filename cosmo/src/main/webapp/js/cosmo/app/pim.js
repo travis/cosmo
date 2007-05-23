@@ -47,8 +47,6 @@ yPos = 0;
  * @object The Cal singleton
  */
 cosmo.app.pim = new function () {
-
-
     var self = this;
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
@@ -125,45 +123,11 @@ cosmo.app.pim = new function () {
             $('maskDiv').style.display = 'none';
         }
 
-        // FIXME: Use script to build this conditionally
-        // not hide after the fact
-        // Only in logged-in view
-        //if (params.authAccess) {
-        //    cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage,
-        //        [cosmo.account.preferences.getPreferences()]);
-        //}
-
         // Load data
         // ===============================
         // Load items and publish success to UI components
         cosmo.view.cal.loadEvents({ collection: self.currentCollection,
             viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
-
-        return;
-
-        // Go-to date
-        var d = _createElem('div');
-        d.id = 'jumpToDateDiv';
-        var cB = new cosmo.ui.ContentBox({ domNode: d, id: d.id });
-        this.baseLayout.mainApp.leftSidebar.addChild(cB);
-
-
-        // Place jump-to date based on mini-cal pos
-        //if (cosmo.ui.minical.MiniCal.init(cosmo.app.pim, mcDiv)) {
-           //this.calForm.addJumpToDate(jpDiv);
-        //}
-        // Top menubar setup and positioning
-        if (this.setUpMenubar()) {
-            this.positionMenubarElements.apply(this);
-        }
-        // Add event listeners for form-element behaviors
-        //this.calForm.setEventListeners();
-
-        // Final stuff / cleanup
-        // ===============================
-
-        // Hide the UI mask
-        this.uiMask.hide();
 
         // Show errors for deleted subscriptions -- deletedSubscriptions
         // is a private var populated in the loadCollections method
@@ -173,220 +137,11 @@ cosmo.app.pim = new function () {
                     deletedSubscriptions[x].displayName));
             }
         }
-
     };
 
     // ==========================
-    // GUI element display
+    // Localization
     // ==========================
-    /**
-     * Performs the absolute placement of the UI elements based
-     * on the client window size
-     */
-    this.placeUI = function () {
-        var _c = cosmo.ui.ContentBox;
-        var uiMain = new _c('calDiv');
-        //var uiProcessing = new _c('processingDiv');
-        var menuBar = new _c('menuBarDiv');
-        var leftSidebar = new _c('leftSidebarDiv');
-        var rightSidebar = new _c('rightSidebarDiv');
-        var topNav = new _c('calTopNavDiv');
-        var dayList = new _c('dayListDiv');
-        var timedMain = new _c('timedScrollingMainDiv');
-        var timedContent = new _c('timedContentDiv');
-        var timedHourList = new _c('timedHourListDiv');
-        var eventInfo = new _c('eventInfoDiv');
-        var allDayMain = new _c('allDayResizeMainDiv');
-        var allDayResize = new _c('allDayResizeHandleDiv');
-        var allDayContent = new _c('allDayContentDiv');
-        var allDaySpacer = new _c('allDayHourSpacerDiv');
-        var vOffset = 0;
-        var calcHeight = 0;
-        var viewport = dojo.html.getViewport();
-        var winwidth = viewport.width;
-        var winheight = viewport.height;
-
-        this.uiMask = new _c('maskDiv');
-
-        // Pare width and height down to avoid stupid scrollbars showing up
-        winwidth-=3;
-        winheight-=3;
-
-       // Calculate position values for main UI display, set properties
-        this.height = parseInt(winheight*DISPLAY_WIDTH_PERCENT) - TOP_MENU_HEIGHT;
-        this.width = parseInt(winwidth*DISPLAY_HEIGHT_PERCENT);
-        this.top = TOP_MENU_HEIGHT;
-        this.left = 0;
-
-        // Width for middle column area
-        this.midColWidth = (this.width - LEFT_SIDEBAR_WIDTH - RIGHT_SIDEBAR_WIDTH);
-
-        // Position UI elements
-        // =========================
-        // Menubar
-        menuBar.setPosition(0, 0);
-        menuBar.setSize(this.width, TOP_MENU_HEIGHT-1);
-
-        // Main UI
-        uiMain.setPosition(this.top, this.left);
-        uiMain.setSize(this.width, this.height);
-
-        // Left sidebar
-        leftSidebar.setPosition(0, 0);
-        leftSidebar.setSize(LEFT_SIDEBAR_WIDTH, this.height);
-        // Right sidebar
-        rightSidebar.setPosition(0, LEFT_SIDEBAR_WIDTH + this.midColWidth);
-        rightSidebar.setSize(RIGHT_SIDEBAR_WIDTH, this.height);
-
-        // Center column
-        // Top nav
-        vOffset = 0;
-        // 1px for border per retarded CSS spec
-        topNav.setSize(this.midColWidth-2, CAL_TOP_NAV_HEIGHT-1);
-        topNav.setPosition(vOffset, LEFT_SIDEBAR_WIDTH);
-        // Day listing
-        vOffset += CAL_TOP_NAV_HEIGHT;
-        dayList.setSize(this.midColWidth-2, DAY_LIST_DIV_HEIGHT);
-        dayList.setPosition(vOffset, LEFT_SIDEBAR_WIDTH);
-        // No-time event area
-        vOffset += DAY_LIST_DIV_HEIGHT;
-        allDayMain.setSize((this.midColWidth-2), ALL_DAY_RESIZE_AREA_HEIGHT);
-        allDayMain.setPosition(vOffset, LEFT_SIDEBAR_WIDTH);
-        // Resize handle
-        vOffset += ALL_DAY_RESIZE_AREA_HEIGHT;
-        allDayResize.setSize(this.midColWidth-1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
-        allDayResize.setPosition(vOffset, LEFT_SIDEBAR_WIDTH);
-
-        allDayContent.setSize((this.midColWidth - SCROLLBAR_SPACER_WIDTH - HOUR_LISTING_WIDTH), '100%');
-        allDayContent.setPosition(0, (HOUR_LISTING_WIDTH + 1));
-
-        allDaySpacer.setSize((HOUR_LISTING_WIDTH - 1), '100%');
-        allDaySpacer.setPosition(0, 0);
-
-        // Scrollable view area
-        vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
-        calcHeight = this.height-vOffset;
-        timedMain.setSize(this.midColWidth-2, calcHeight); // Variable height area
-        timedMain.setPosition(vOffset, LEFT_SIDEBAR_WIDTH);
-        timedContent.setSize((this.midColWidth - HOUR_LISTING_WIDTH), VIEW_DIV_HEIGHT);
-        timedContent.setPosition(0, (HOUR_LISTING_WIDTH + 1));
-        timedHourList.setSize(HOUR_LISTING_WIDTH - 1, VIEW_DIV_HEIGHT);
-        timedHourList.setPosition(0, 0);
-
-        // Set vertical offset for scrollable area
-        this.viewOffset = vOffset;
-
-        // Event detail form
-        vOffset += calcHeight;
-        // Variable height area
-        eventInfo.setPosition(0, 0);
-
-        // Set cal day column width
-        cosmo.view.cal.canvas.dayUnitWidth = parseInt(
-            (this.midColWidth - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );
-
-        // Kill and DOM-elem references to avoid IE memleak issues --
-        // leave UI Mask ref
-        uiMain.cleanup(); uiMain = null;
-        //uiProcessing.cleanup(); uiProcessing = null;
-        leftSidebar.cleanup(); leftSidebar = null;
-        rightSidebar.cleanup(); rightSidebar = null;
-        topNav.cleanup(); topNav = null;
-        dayList.cleanup(); dayList = null;
-        timedMain.cleanup(); timedMain = null;
-        eventInfo.cleanup(); eventInfo = null;
-        allDayMain.cleanup(); allDayMain = null;
-        allDayResize.cleanup(); allDayResize = null;
-
-    };
-    this.setUpMenubar = function (ticketKey) {
-        // Logged-in view -- nothing to do
-        if (this.authAccess) {
-            return true;
-        }
-        // Add the collection subscription selector in ticket view
-        else {
-            var menuBarDiv = $('menuBarDiv');
-            var s = _createElem('div');
-            s.id = 'subscribeSelector';
-            var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
-            clientOpts.unshift({ text: 'Subscribe with ...', value: '' });
-            var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
-               options: clientOpts, className: 'selectElem' };
-            var subscrSel = cosmo.util.html.createSelect(selOpts);
-            var f = function (e) {
-                // Show the subcription dialog if the empty "Subscribe with ..."
-                // option is not the one selected
-                var sel = e.target;
-                if (sel.selectedIndex != 0) {
-                //XINT
-                cosmo.app.showDialog(
-                    cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                        self.currentCollection.collection,
-                        sel.options[sel.selectedIndex].value));
-                }
-            };
-            dojo.event.connect(subscrSel, 'onchange', f);
-            s.appendChild(subscrSel);
-            menuBarDiv.appendChild(s);
-
-            var signupDiv = _createElem('div');
-            signupDiv.id = 'signupGraphic';
-
-            var w = 0;
-            var p = 0;
-            signupDiv.style.position = 'absolute';
-            var i = cosmo.util.html.createRollOverMouseDownImage(
-                    cosmo.env.getImagesUrl() + "signup.png");
-            i.style.cursor = 'pointer';
-            dojo.event.connect(i, 'onclick', cosmo.account.create.showForm);
-            signupDiv.appendChild(i);
-            menuBarDiv.appendChild(signupDiv);
-        }
-        return true;
-    };
-    this.positionMenubarElements = function () {
-        var menuNav = $('menuNavItems')
-        // Ticket view only
-        if (!this.authAccess) {
-            // Signup graphic
-            // position right side of center col, and bottom align
-            var signupDiv = $('signupGraphic');
-            var w = signupDiv.offsetWidth + 24;
-            var p = self.midColWidth  + LEFT_SIDEBAR_WIDTH - w;
-            signupDiv.style.left = p + 'px';
-            signupDiv.style.top = (TOP_MENU_HEIGHT - signupDiv.offsetHeight - 5) + 'px';
-            // Subscription select box
-            var subscribeSelector = $('subscribeSelector');
-            subscribeSelector.style.position = 'absolute';
-            subscribeSelector.style.left = (LEFT_SIDEBAR_WIDTH + this.midColWidth) + 'px';
-            subscribeSelector.style.top = (TOP_MENU_HEIGHT - subscribeSelector.offsetHeight - 5) + 'px';
-
-        }
-        // Bottom-align menu text
-        menuNav.style.top = (TOP_MENU_HEIGHT - menuNav.offsetHeight - 5) + 'px';
-        $('menuBarDiv').style.visibility = 'visible';
-    };
-    /**
-     * Set skin-specific images
-     */
-    this.setImagesForSkin =  function () {
-        var logoDiv = $('smallLogoDiv');
-
-        // Resize handle for all-day area
-        var i = _createElem('img');
-        i.src = cosmo.env.getImagesUrl() + 'resize_handle_image.gif';
-        $('allDayResizeHandleDiv').appendChild(i);
-
-        // Cosmo logo
-        logoDiv.style.background =
-            'url(' + cosmo.env.getImagesUrl() + LOGO_GRAPHIC_SM + ')';
-        // Wheeeee, IE6 resets background tiling when you set an image background
-        if (document.all && (navigator.appVersion.indexOf('MSIE 7') == -1)) {
-            logoDiv.style.backgroundRepeat = 'no-repeat';
-        }
-
-    };
     /**
      * Loads localized datetime info for the UI
      */

@@ -173,9 +173,27 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         isOccurrence: function (){
             return false;
         },
+        
+        isFirstOccurrence: function (){
+            throw new Error("This is the master event, not an occurrence!");
+        },
       
         getMaster: function (){
             return this;
+        },
+        
+        isMaster: function (){
+            return true;
+        },
+        
+        hasRecurrence: function (){
+            var stamp = this.getMaster().getEventStamp();
+
+            if (!stamp){
+                return false;
+            }  
+            
+            return !!stamp.getRrule();
         },
 
         removeStamp: function (/*String*/ stampName){
@@ -224,6 +242,10 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     
     isOccurrence: function (){
         return true;
+    },
+    
+    isMaster: function(){
+        return false;  
     },
     
     getMaster: function (){
@@ -294,6 +316,10 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
 
     getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){
         this._throwOnlyMaster();
+    },
+    
+    isFirstOccurrence: function(){
+        return this.getMaster().getEventStamp().getStartDate().equals(this.recurrenceId);  
     }
     
 });

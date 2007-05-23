@@ -64,13 +64,13 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
         var viewport = dojo.html.getViewport();
         var w = viewport.width;
         var h = viewport.height;
-        // Pare width and height down to avoid 
+        // Pare width and height down to avoid
         // stupid scrollbars showing up
         w -= 2;
         h -= 2;
         this.width = w;
         this.height = h;
-        this.menuBar.update({ 
+        this.menuBar.update({
             top: 0, left: 0,
             width: this.width, height: (TOP_MENU_HEIGHT - 1) });
         this.mainApp.update({
@@ -81,17 +81,17 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
         cosmo.ui.resize.Viewports.resize();
     }
 };
-cosmo.app.pim.layout.BaseLayout.prototype = 
+cosmo.app.pim.layout.BaseLayout.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.MenuBar = function (p) {
     var params = p || {}
     for (var n in params) { this[n] = params[n]; }
-    
+
     var d = _createElem('div');
     d.id = 'menuBar';
     this.parent.domNode.appendChild(d);
-    
+
     this.domNode = d;
     this.children = [];
     this.renderSelf = function () {
@@ -103,17 +103,17 @@ cosmo.app.pim.layout.MenuBar = function (p) {
         }
     }
 };
-cosmo.app.pim.layout.MenuBar.prototype = 
+cosmo.app.pim.layout.MenuBar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.MainApp = function (p) {
-        
+
     var params = p || {}
     for (var n in params) { this[n] = params[n]; }
-    
+
     var d = _createElem('div');
     d.id = 'mainApp';
-    
+
     this.domNode = d;
     this.centerColumn = new cosmo.app.pim.layout.CenterColumn({ parent: this });
     this.leftSidebar = new cosmo.app.pim.layout.LeftSidebar({ parent: this });
@@ -123,8 +123,8 @@ cosmo.app.pim.layout.MainApp = function (p) {
         this.setPosition();
         this.setSize();
         this.leftSidebar.update({ height: this.height });
-        this.centerColumn.update({ width: 
-            (this.width - LEFT_SIDEBAR_WIDTH - RIGHT_SIDEBAR_WIDTH), 
+        this.centerColumn.update({ width:
+            (this.width - LEFT_SIDEBAR_WIDTH - RIGHT_SIDEBAR_WIDTH),
             height: this.height });
         if (!this.hasBeenRendered) {
             this.parent.domNode.appendChild(this.domNode);
@@ -132,13 +132,13 @@ cosmo.app.pim.layout.MainApp = function (p) {
         }
     }
 };
-cosmo.app.pim.layout.MainApp.prototype = 
+cosmo.app.pim.layout.MainApp.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.LeftSidebar = function (p) {
     var params = p || {}
     for (var n in params) { this[n] = params[n]; }
-    
+
     // create domNodes
     var d = _createElem('div');
     d.id = 'leftSidebar';
@@ -167,7 +167,7 @@ cosmo.app.pim.layout.LeftSidebar = function (p) {
     h.addCollapse(d.id,"left");
     */
 };
-cosmo.app.pim.layout.LeftSidebar.prototype = 
+cosmo.app.pim.layout.LeftSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.CenterColumn = function (p) {
@@ -178,7 +178,7 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
     d.id = 'centerColumn';
     d.className = "viewport"
     this.parent.domNode.appendChild(d);
-    
+
     this.domNode = d;
     this.children = [];
     this.renderSelf = function () {
@@ -191,19 +191,19 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
     vp.setMaxSize([1600,1200,173,0,1600,1200]);
     vp.addResize("renderSelf",this.renderSelf)    ;
 };
-cosmo.app.pim.layout.CenterColumn.prototype = 
+cosmo.app.pim.layout.CenterColumn.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.RightSidebar = function (p) {
     var params = p || {}
     for (var n in params) { this[n] = params[n]; }
-    
+
     var d = _createElem('div');
     d.id = 'rightSidebar';
     d.className = "viewport";
     this.parent.domNode.appendChild(d);
     /*
-    var handle = _createElem('a'); 
+    var handle = _createElem('a');
     handle.className = "l-rHandle";
     with (handle.style) {
         left = "0px";
@@ -231,7 +231,7 @@ cosmo.app.pim.layout.RightSidebar = function (p) {
     h.addCollapse(d.id,"right");
     */
 };
-cosmo.app.pim.layout.RightSidebar.prototype = 
+cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
@@ -257,7 +257,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         'currentCollection': cosmo.app.pim.currentCollection,
         'ticketKey': cosmo.app.pim.ticketKey }, d, 'last');
 
-    // Minical -- subclassed ContentBox 
+    // Minical -- subclassed ContentBox
     var d = _createElem('div');
     d.id = 'miniCal';
     cB = new cosmo.ui.minical.MiniCal({ domNode: d, currDate: cosmo.app.pim.currDate });
@@ -270,7 +270,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     this.baseLayout.menuBar.addChild(cB);
     this.baseLayout.menuBar.mainMenu = cB;
     cB.render();
-    
+
     // Subscription selector thinger -- show only in anon view
     if (!cosmo.app.initParams.authAccess) {
         var s = _createElem('span');

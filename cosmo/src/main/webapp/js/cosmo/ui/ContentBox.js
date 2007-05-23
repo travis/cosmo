@@ -50,40 +50,32 @@ cosmo.ui.ContentBox.prototype.setSize =  function (width, height) {
 };
 cosmo.ui.ContentBox.prototype.setTop =  function (top) {
     if (typeof top != 'undefined') {
-        n = top;
+        this.top = top;
     }
-    else {
-        n = this.top;
-    }
+    n = this.top;
     this.domNode.style.top = parseInt(n) + 'px';
 };
 cosmo.ui.ContentBox.prototype.setLeft =  function (left) {
     if (typeof left != 'undefined') {
-        n = left;
+        this.left = left;
     }
-    else {
-        n = this.left;
-    }
+    n = this.left;
     this.domNode.style.left = parseInt(n) + 'px';
 };
 cosmo.ui.ContentBox.prototype.setWidth =  function (width) {
     if (typeof width != 'undefined') {
-        n = width;
+        this.width = width;
     }
-    else {
-        n = this.width;
-    }
+    n = this.width;
     n = n.toString();
     n = n.indexOf('%') > -1 ? n : parseInt(n) + 'px';
     this.domNode.style.width = n;
 };
 cosmo.ui.ContentBox.prototype.setHeight =  function (height) {
     if (typeof height != 'undefined') {
-        n = height;
+        this.height = height;
     }
-    else {
-        n = this.height;
-    }
+    n = this.height;
     n = n.toString();
     n = n.indexOf('%') > -1 ? n : parseInt(n) + 'px';
     this.domNode.style.height = n;

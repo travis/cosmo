@@ -15,11 +15,14 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.osaf.cosmo.dao.ContentDao;
+import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
@@ -164,8 +167,8 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         content.getParents().add(parent);
           
         // Set mock id
-        if(content instanceof MockContentItem)
-            ((MockContentItem) content).setMockId(System.currentTimeMillis());
+        setMockId(content);
+        
         getStorage().storeItem((Item)content);
 
         return content;
@@ -188,8 +191,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new ConcurrencyFailureException("fail!");
         
         // Set mock id
-        if(content instanceof MockContentItem)
-            ((MockContentItem) content).setMockId(System.currentTimeMillis());
+        setMockId(content);
         getStorage().storeItem((Item)content);
 
         return content;
@@ -293,8 +295,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         content.getParents().addAll(parents);
           
         // Set mock id
-        if(content instanceof MockContentItem)
-            ((MockContentItem) content).setMockId(System.currentTimeMillis());
+        setMockId(content);
         getStorage().storeItem((Item)content);
 
         return content;
@@ -337,6 +338,19 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         return items;
     }
     
-    
+    private void setMockId(Item item) {
+        
+        if(item instanceof MockContentItem) {
+            ((MockContentItem) item).setMockId(System.currentTimeMillis());
+        }
+            
+        try {
+            Method m = BaseModelObject.class.getDeclaredMethod("setId", Long.class);
+            m.setAccessible(true);
+            m.invoke(item, new Long(System.currentTimeMillis()));
+        } catch (Exception e) {
+            throw new RuntimeException("unable to set item id");
+        }
+    }
     
 }

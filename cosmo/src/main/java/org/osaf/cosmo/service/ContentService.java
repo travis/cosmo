@@ -15,11 +15,9 @@
  */
 package org.osaf.cosmo.service;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
@@ -27,7 +25,6 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -233,6 +230,34 @@ public interface ContentService extends Service {
                                      ContentItem content);
 
     /**
+     * Create new content items in a parent collection.
+     * 
+     * @param parent
+     *            parent collection of content items.
+     * @param contentItems
+     *            content items to create
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if parent CollectionItem is locked
+     */
+    public void createContentItems(CollectionItem parent,
+                                     Set<ContentItem> contentItems);
+    
+    /**
+     * Update content items.  This includes creating new items, removing
+     * existing items, and updating existing items.  ContentItem deletion is
+     * represented by setting ContentItem.isActive to false.  ContentItem deletion
+     * removes item from system, not just from the parent collections.
+     * ContentItem creation adds the item to the specified parent collections.
+     * 
+     * @param parents
+     *            parents that new conten items will be added to.
+     * @param contentItems to update
+     * @throws org.osaf.cosmo.model.CollectionLockedException
+     *         if parent CollectionItem is locked
+     */
+    public void updateContentItems(Set<CollectionItem> parents, Set<ContentItem> contentItems);
+    
+    /**
      * Update an existing content item.
      * 
      * @param content
@@ -357,29 +382,4 @@ public interface ContentService extends Service {
      */
     public void removeTicket(String path,
                              String key);
-    
-    /**
-     * Create a new event based on an ical4j Calendar.  This will 
-     * create the master NoteItem and any modification NoteItem's 
-     * for each VEVENT modification.
-     * 
-     * @param parent parent collection
-     * @param masterNote master note item
-     * @param calendar Calendar containing master/override VEVENTs
-     * @return newly created master note item
-     */
-    public NoteItem createEvent(CollectionItem parent, NoteItem masterNote,
-            Calendar calendar);
-    
-    /**
-     * Update existing event (NoteItem with EventStamp) based on 
-     * an ical4j Calendar.  This will update the master NoteItem and 
-     * any modification NoteItem's for each VEVENT modification, including
-     * removing/adding modification NoteItems.
-     * 
-     * @param note master note item to update
-     * @param calendar Calendar containing master/override VEVENTs
-     * @return updated master note item
-     */
-    public NoteItem updateEvent(NoteItem note, Calendar calendar);
 }

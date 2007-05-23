@@ -62,6 +62,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModelConversionException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.service.util.EventUtils;
 
 /**
  * Extends <code>DavCollection</code> to adapt the Cosmo
@@ -155,7 +156,6 @@ public class DavCalendarCollection extends DavCollection
         Set<DavCalendarResource> members =
             new HashSet<DavCalendarResource>();
         CollectionItem collection = (CollectionItem) getItem();
-        CalendarCollectionStamp calendar = getCalendarCollectionStamp();
         for (ContentItem memberItem :
                  getContentService().findEvents(collection, filter)) {
             String memberPath = getResourcePath() + "/" + memberItem.getName();
@@ -170,7 +170,6 @@ public class DavCalendarCollection extends DavCollection
             
             if(member!=null)
                 members.add(member);
-            members.add(member);
         }
 
         return members;
@@ -371,7 +370,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("updating event " + member.getResourcePath());
 
             try {
-                content = getContentService().updateEvent((NoteItem) content, event.getEventCalendar());
+                EventUtils.updateEvent(getContentService(), (NoteItem) content, event.getEventCalendar());
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             } catch (CollectionLockedException e) {
@@ -382,7 +381,7 @@ public class DavCalendarCollection extends DavCollection
                 log.debug("creating event " + member.getResourcePath());
 
             try {
-                content = getContentService().createEvent(collection, (NoteItem) content, event.getEventCalendar());
+                content = EventUtils.createEvent(getContentService(), collection, (NoteItem) content, event.getEventCalendar());
             } catch (DuplicateEventUidException e) {
                 throw new DavException(DavServletResponse.SC_CONFLICT, "Uid already in use");
             } catch (CollectionLockedException e) {

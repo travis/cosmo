@@ -16,10 +16,7 @@
 package org.osaf.cosmo.dav.impl;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VEvent;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
@@ -72,25 +69,6 @@ public class DavEvent extends DavCalendarResource {
     }
 
     protected void setCalendar(Calendar calendar) {
-        NoteItem noteItem = (NoteItem) getItem();
         getEventStamp().setCalendar(calendar);
-
-        VEvent event = getEventStamp().getMasterEvent();
-
-        // set display name of content item to be summary of event
-        Property summary =
-            event.getProperties().getProperty(Property.SUMMARY);
-        if (summary != null)
-            noteItem.setDisplayName(StringUtils.substring(summary.getValue(),0,255));
-        
-        // set NoteItem props (icaluid and body)
-        noteItem.setIcalUid(getEventStamp().getIcalUid());
-        
-        // Set body of note to be description of event
-        Property description = 
-            event.getProperties().getProperty(Property.DESCRIPTION);
-        if(description != null)
-            noteItem.setBody(description.getValue());
-        
     }    
 }

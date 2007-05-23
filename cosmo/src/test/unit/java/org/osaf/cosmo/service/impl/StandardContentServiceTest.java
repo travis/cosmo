@@ -46,6 +46,7 @@ import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
+import org.osaf.cosmo.service.util.EventUtils;
 
 /**
  * Test Case for <code>StandardContentService</code> which uses mock
@@ -290,7 +291,7 @@ public class StandardContentServiceTest extends TestCase {
         masterNote.addStamp(eventStamp);
         contentDao.createContent(rootCollection, masterNote);
         
-        service.updateEvent(masterNote, calendar);
+        EventUtils.updateEvent(service, masterNote, calendar);
         
         Calendar masterCal = eventStamp.getEventCalendar();
         VEvent masterEvent = eventStamp.getMasterEvent();
@@ -322,7 +323,7 @@ public class StandardContentServiceTest extends TestCase {
         
         // now update
         calendar = getCalendar("event_with_exceptions2.ics"); 
-        service.updateEvent(masterNote, calendar);
+        EventUtils.updateEvent(service, masterNote, calendar);
         
         // should have removed 1, added 2 so that makes 4-1+2=5
         Assert.assertEquals(masterNote.getModifications().size(), 5);

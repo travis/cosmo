@@ -130,12 +130,11 @@ public class MockDaoStorage {
         if (item.getName() == null)
             throw new IllegalArgumentException("name cannot be null");
        
-        Item parentItem = item.getParent();
-        
         if (item.getOwner() == null)
             throw new IllegalArgumentException("owner cannot be null");
 
-        item.setUid(calculateUid());
+        if(item.getUid()==null)
+            item.setUid(calculateUid());
         item.setCreationDate(new Date());
         item.setModifiedDate(item.getCreationDate());
 

@@ -16,6 +16,7 @@
 package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -173,6 +174,10 @@ public class InstanceList extends HashMap {
             Instance instance = new Instance(comp, start, end);
             put(instance.getRid().toString(), instance);
         }
+        
+        // Adjust startRange to account for instances that occur before
+        // the startRange, and end after it
+        rangeStart = adjustStartRangeIfNecessary(rangeStart, start, duration);
 
         // recurrence dates..
         PropertyList rDates = comp.getProperties()
@@ -493,5 +498,39 @@ public class InstanceList extends HashMap {
             }    
         }
         return date;
+    }
+    
+    /**
+     * Adjust startRange to account for instances that begin before the given
+     * startRange, but end after. For example if you have a daily recurring event
+     * at 8am lasting for an hour and your startRange is 8:01am, then you 
+     * want to adjust the range back an hour to catch the instance that is
+     * already occurring.
+     */
+    private Date adjustStartRangeIfNecessary(Date startRange, Date start, Dur dur) {
+        // If startRange is not the event start, no adjustment necessary
+        if(!startRange.after(start))
+            return startRange;
+        
+        // Need to adjust startRange back one duration to account for instances
+        // that occur before the startRange, but end after the startRange
+        Dur negatedDur = dur.negate();
+       
+        Calendar cal = Dates.getCalendarInstance(startRange);
+        cal.setTime(negatedDur.getTime(startRange));
+       
+        // Add a second or day so that adjusted range is just short of the 
+        // event duration.  Otherwise we could match an instance that starts and
+        // ends before the orignal startRange.
+        if(start instanceof DateTime)
+            cal.add(Calendar.SECOND, 1);
+        else
+            cal.add(Calendar.DAY_OF_WEEK, 1);
+        
+        // Return new startRange only if it is before the original startRange 
+        if(cal.getTime().before(startRange))
+            return org.osaf.cosmo.calendar.util.Dates.getInstance(cal.getTime(), startRange);
+        
+        return startRange;
     }
 }

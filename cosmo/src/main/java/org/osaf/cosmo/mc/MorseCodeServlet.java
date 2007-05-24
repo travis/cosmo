@@ -350,8 +350,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 return;
             } catch (EimmlStreamException e) {
                 log.warn("Unable to read EIM stream", e);
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Unable to read EIM stream: " + e.getMessage());
+                Throwable cause = e.getCause();
+                String msg = "Unable to read EIM stream: " + e.getMessage();
+                msg += cause != null ? ": " + cause.getMessage() : "";
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
                 return;
             } catch (UnknownCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -464,8 +466,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 return;
             } catch (EimmlStreamException e) {
                 log.warn("Unable to read EIM stream", e);
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Unable to read EIM stream: " + e.getMessage());
+                Throwable cause = e.getCause();
+                String msg = "Unable to read EIM stream: " + e.getMessage();
+                msg += cause != null ? ": " + cause.getMessage() : "";
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
                 return;
             } catch (UidInUseException e) {
                 resp.sendError(HttpServletResponse.SC_CONFLICT, "Uid in use");

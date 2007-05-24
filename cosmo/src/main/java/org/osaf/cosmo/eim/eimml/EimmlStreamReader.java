@@ -15,13 +15,11 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -33,7 +31,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.BlobField;
 import org.osaf.cosmo.eim.BytesField;
 import org.osaf.cosmo.eim.ClobField;
@@ -44,6 +41,8 @@ import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
+
+import com.ctc.wstx.exc.WstxLazyException;
 
 /**
  * Provides forward, read-only access to an EIMML stream.
@@ -96,6 +95,8 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             readCollection();
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Unable to read EIM records", e);
+        } catch (WstxLazyException e) {
+            throw new EimmlStreamException("Unable to read EIM records", e);
         }
     }
 
@@ -140,6 +141,9 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         try {
             return readNextRecordSet();
         } catch (XMLStreamException e) {
+            close();
+            throw new EimmlStreamException("Error reading next recordset", e);
+        } catch (WstxLazyException e) {
             close();
             throw new EimmlStreamException("Error reading next recordset", e);
         }

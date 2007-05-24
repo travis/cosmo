@@ -39,7 +39,7 @@ import org.hibernate.validator.NotNull;
 @Table(name="subscription", uniqueConstraints = {
         @UniqueConstraint(columnNames={"ownerid", "displayname"})})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class CollectionSubscription extends BaseModelObject {
+public class CollectionSubscription extends AuditableObject {
 
     /**
      * 

@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -31,6 +30,7 @@ import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -122,7 +122,7 @@ public abstract class BaseItemFeedGenerator
      */
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
         TreeSet<NoteItem> contents =
-            new TreeSet<NoteItem>(new ItemModifiedComparator(true));
+            new TreeSet<NoteItem>(new AuditableComparator(true));
 
         // XXX sort
         // XXX page
@@ -370,36 +370,5 @@ public abstract class BaseItemFeedGenerator
 
     public ItemFilter getFilter() {
         return filter;
-    }
-
-    private class ItemModifiedComparator implements Comparator<NoteItem> {
-        private boolean reverse;
-
-        public ItemModifiedComparator() {
-            this.reverse = false;
-        }
-
-        public ItemModifiedComparator(boolean reverse) {
-            this.reverse = reverse;
-        }
-
-        public int compare(NoteItem o1,
-                           NoteItem o2) {
-            // use item equality for equals
-            if(o1.equals(o2))
-                return 0;
-            // otherwise use modifedDate for ordering
-            if (o1.getModifiedDate().after(o2.getModifiedDate()))
-                return reverse ? -1 : 1;
-            return reverse ? 1 : -1;
-        }
-
-        public boolean equals(Object obj) {
-            if (obj == null)
-                return false;
-            if (obj instanceof ItemModifiedComparator)
-                return true;
-            return super.equals(obj);
-        }
     }
 }

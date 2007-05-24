@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.i18n.iri.IRISyntaxException;
@@ -28,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 
@@ -37,7 +41,7 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see Feed
  * @see Entry
  */
-public abstract class BaseFeedGenerator {
+public abstract class BaseFeedGenerator implements AtomConstants {
     private static final Log log = LogFactory.getLog(BaseFeedGenerator.class);
 
     private StandardGeneratorFactory factory;
@@ -180,6 +184,17 @@ public abstract class BaseFeedGenerator {
     }
 
     /**
+     * Creates a self <code>Link</code> for the given IRI.
+     *
+     * @param iri the iri
+     * @throws GeneratorException
+     */
+    protected Link newSelfLink(String iri)
+        throws GeneratorException {
+        return newLink(Link.REL_SELF, MEDIA_TYPE_ATOM, iri);
+    }
+
+    /**
      * Returns the IRI of the given user. Requesting this IRI returns
      * a service document describing the user.
      *
@@ -195,7 +210,11 @@ public abstract class BaseFeedGenerator {
      * @param uuid the uuid
      */
     protected String uuid2Iri(String uuid) {
-        return "urn:uuid:" + uuid;
+        try {
+            return "urn:uuid:" + URLEncoder.encode(uuid, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Could not encode uuid " + uuid, e);
+        }
     }
 
     public StandardGeneratorFactory getFactory() {

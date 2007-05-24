@@ -15,12 +15,20 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -35,7 +43,8 @@ import org.osaf.cosmo.server.ServiceLocator;
  * @see User
  */
 public class StandardSubscriptionFeedGenerator
-    extends BaseFeedGenerator implements SubscriptionFeedGenerator {
+    extends BaseFeedGenerator
+    implements SubscriptionFeedGenerator, AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardSubscriptionFeedGenerator.class);
 
@@ -43,6 +52,8 @@ public class StandardSubscriptionFeedGenerator
                                              ServiceLocator locator) {
         super(factory, locator);
     }
+
+    // SubscriptionFeedGenerator methods
 
     /**
      * Generates an Atom feed containing entries for a user's
@@ -53,7 +64,12 @@ public class StandardSubscriptionFeedGenerator
      */
     public Feed generateFeed(User user)
         throws GeneratorException {
-        return newFeed(user.getUsername());
+        Feed feed = createFeed(user);
+
+        for (CollectionSubscription sub : findSubscriptions(user))
+            feed.addEntry(createEntry(sub));
+
+        return feed;
     }
 
     /**
@@ -65,9 +81,121 @@ public class StandardSubscriptionFeedGenerator
      */
     public Entry generateEntry(CollectionSubscription sub)
         throws GeneratorException {
-        // XXX: not universally unique .. prefix with username?
-        return newEntry(sub.getDisplayName(), false);
+        return createEntry(sub, true);
     }
 
-    // XXX: perhaps override uuid2uri
+    // our methods
+
+    /**
+     * <p>
+     * Returns a sorted set of collection subscriptions to include as
+     * entries in the feed.
+     * </p>
+     * <p>
+     * This implementation returns all of the user's subscriptions
+     * sorted with the most recently modified subscription first.
+     * </p>
+     *
+     * @param user the user whose subscriptions are to be listed
+     */
+    protected SortedSet<CollectionSubscription> findSubscriptions(User user) {
+        // XXX sort
+        // XXX page
+
+        TreeSet<CollectionSubscription> subs =
+            new TreeSet<CollectionSubscription>(new AuditableComparator(true));
+
+        for (CollectionSubscription sub : user.getCollectionSubscriptions())
+            subs.add(sub);
+
+        return subs;
+    }
+
+    /**
+     * Creates a <code>Feed</code> with attributes set based on the
+     * given user.
+     *
+     * @param subscription the subscription on which the feed is based
+     * @throws GeneratorException
+     */
+    protected Feed createFeed(User user)
+        throws GeneratorException {
+        Feed feed = newFeed(user.getUsername()); // XXX: sufficiently unique?
+
+        String title = user.getUsername() + "'s Subscriptions"; // XXX: i18n
+        feed.setTitle(title);
+        feed.setUpdated(new Date());
+        feed.setGenerator(newGenerator());
+        feed.addAuthor(newPerson(user));
+        feed.addLink(newSelfLink(subscribedIri(user)));
+
+        return feed;
+    }
+
+    /**
+     * Creates a <code>Entry</code> with attributes and content based
+     * on the given subscription. The entry does not represent a
+     * document but is meant to be added to a <code>Feed</code>.
+     *
+     * @param sub the subscription on which the entry is based
+     * @throws GeneratorException
+     */
+    protected Entry createEntry(CollectionSubscription sub)
+        throws GeneratorException {
+        return createEntry(sub, false);
+    }
+
+    /**
+     * Creates a <code>Entry</code> with attributes and content based
+     * on the given subscription.
+     *
+     * @param sub the subscription on which the entry is based
+     * @param isDocument whether or not the entry represents an entire
+     * document or is attached to a feed document
+     * @throws GeneratorException
+     */
+    protected Entry createEntry(CollectionSubscription sub,
+                                boolean isDocument)
+        throws GeneratorException {
+        String uid = sub.getOwner().getUsername() + "-" + sub.getDisplayName();
+        Entry entry = newEntry(uid, isDocument);
+
+        entry.setTitle(sub.getDisplayName());
+        entry.setUpdated(sub.getModifiedDate());
+        entry.setPublished(sub.getCreationDate());
+        entry.addLink(newSelfLink(subscriptionIri(sub)));
+        if (isDocument)
+            entry.addAuthor(newPerson(sub.getOwner()));
+
+        // XXX: add ticket and collection uid
+
+        return entry;
+    }
+
+    /**
+     * Returns the IRI of the given user's subscribed collection.
+     *
+     * @param user the user
+     */
+    protected String subscribedIri(User user) {
+        StringBuffer iri = new StringBuffer(personIri(user));
+        iri.append("/subscribed");
+        return iri.toString();
+    }
+
+    /**
+     * Returns the IRI of the given subscription.
+     *
+     * @param sub the subscription
+     */
+    protected String subscriptionIri(CollectionSubscription sub) {
+        try {
+            StringBuffer iri = new StringBuffer(personIri(sub.getOwner()));
+            iri.append("/subscription/");
+            iri.append(URLEncoder.encode(sub.getDisplayName(), "UTF-8"));
+            return iri.toString();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Could not encode subscription display name " + sub.getDisplayName(), e);
+        }
+    }
 }

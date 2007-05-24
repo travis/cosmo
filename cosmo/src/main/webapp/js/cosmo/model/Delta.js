@@ -20,6 +20,8 @@ dojo.declare("cosmo.model.Delta", null, {
     initializer: function(/*cosmo.model.Note | cosmo.model.NoteOccurrence */ note){
         this._stampProps = {}
         this._propertyProps = {};
+        this._addedStamps = {};
+        this._deletedStamps = {};
         this._note = note;
     },
     
@@ -47,9 +49,24 @@ dojo.declare("cosmo.model.Delta", null, {
     
     isStampPropertyChanged: function(stampName, propertyName){
         return typeof(this.getStampProperty(stampName, propertyName)) != "undefined";
-        
     },
     
+    getAddedStamps: function(){
+        return this._addedStamps;
+    },
+    
+    addAddedStamp: function(stampName){
+        this._addedStamps[stampName] = true;
+    },
+    
+    getDeletedStamps: function(){
+        return this._deletedStamps;
+    },
+    
+    addDeletedStamp: function(stampName){
+        this._deletedStamps[stampName] = true;
+    },
+        
     deltafy: function (){
         // summary: removes all properties which are the same as its note
         // description: removes all properties from the delta which are the same
@@ -86,7 +103,14 @@ dojo.declare("cosmo.model.Delta", null, {
         if (!this._note.hasRecurrence()){
             return {master:true};
         }
+         
+        var eventStampDeleted = this._deletedStamps["event"];
 
+        //if the eventStamp has been deleted, change can only apply to master. 
+        if (eventStampDeleted){
+            return {master:true};
+        }
+        
         var rruleChanged = this.isStampPropertyChanged("event", "rrule");
         //if recurrence rule has changed...
         
@@ -139,6 +163,97 @@ dojo.declare("cosmo.model.Delta", null, {
        if (!note.hasRecurrence()){
            return false;
        } 
+    },
+    
+    applyToMaster: function(){
+        this._apply("master");
+    },
+
+    applyToOccurrence: function(){
+        this._apply("occurrence");
+    },
+
+    applyToOccurrenceAndFuture: function(){
+        var occurrence = this._note;
+        var master = occurrence.getMaster();
+
+        //create a new note from a clone of the old occurence's master.
+        var newNote = master.clone();
+        newNote.setUid(cosmo.model.uuidGenerator.generate());
+        
+        //set the new note's start date to the old occurrence's start date.
+        newNote.getEventStamp().setStartDate(this._note.getStartDate());
+        
+        //set the old note's rrule end date to just before the break.
+        var newEndDate = occurrence.getStartDate().clone();
+        newEndDate.add(dojo.date.dateParts.HOUR, -1);
+        var oldRrule = master.getEventStamp().getRrule();
+
+        //we have to make a new RRule object, since we can't change them, since they
+        //are immutable.
+        var newRrule = new cosmo.model.RecurrenceRule({
+            frequency: oldRule.getFrequency(),
+            endDate: newEndDate,
+            isSupported: oldRule.isSupported(),
+            unsupportedRule: oldRule.getUnsupportedRule()
+        });
+        master.getEventStamp().setRrule(newRrule);
+        
+        //now we have to go through the modifications in the original master 
+        //event and get of any that occur on or past the split date from the original,
+        //and get rid of any that occur before from the new one
+        var splitUTC = newNote.getEventStamp().getStartDate();
+        for (var rid in master._modifications){
+            var mod = master._modifications[rid];
+            var ridDate = mod.getRecurrenceId();
+            var ridUTC = ridDate.toUTC();
+            if (splitUTC >= ridUTC){
+                delete master._modifications[rid];
+            } else {
+                delete newNote._modifications[rid];
+            }
+        }
+        
+        
+        //now the split has happened and we can FINALLY apply the changes.
+        //note that we apply a "master" type of delta to the new note
+        this._apply("master", newNote);
+        
+        return newNote;
+
+        //HACK - this might break with custom recurrence rules
+    },
+    
+    _apply: function(type, note){
+        note = note || this._note;
+        for (var stampName in this._deletedStamps){
+            note.removeStamp(stampName);
+        }
+        
+        for (var stampName in this._addedStamps){
+            note.getStamp(stampName, true);
+        }
+        
+        this._addProperties(this._note, this._propertyProps);
+        
+        for (var stampName in this._stampProps){
+            var stampChanges = this._stampProps[stampName];
+            if (stampChanges == null){
+                continue;
+            }
+            
+            //create the stamp if it doesn't exist yet
+            var stamp = note.getStamp(stampName,true);
+            
+            this._addProperties(stamp, stampChanges, type);
+        }
+    },
+    
+   _addProperties: function(original,changes, type){
+        for (var propName in changes){
+           var changeValue = changes[propName];
+           original.apply(propName, changeValue, type);
+        }
     },
     
     _filterOutEqualProperties: function (original, changes){

@@ -22,6 +22,7 @@ dojo.provide("cosmo.service.translators.eim");
 
 dojo.require("dojo.date.serialize");
 dojo.require("dojo.lang.*");
+dojo.require("dojo.json");
 
 dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model.*");

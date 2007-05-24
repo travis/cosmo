@@ -36,7 +36,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
          * summary: Return request populated with attributes common to all CMP calls.
          */
         getDefaultRequest: function (/*dojo.Deferred*/deferred,
-                                     /*boolean?*/ sync){
+                                     /*Object*/ kwArgs){
             
             // Add error for transport layer problems
             deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
@@ -48,7 +48,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             request.error = this.errorCallback(deferred);
             request.transport = "XMLHTTPTransport";
             request.contentType =  'text/xml';
-            request.sync = sync;
+            request.sync = kwArgs.sync;
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
             // Fight the dark powers of IE's evil caching mechanism

@@ -134,7 +134,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "POST";
-
         dojo.io.bind(r);
         return deferred;
         

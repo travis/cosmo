@@ -541,6 +541,8 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateFromEvent = function (ev) 
     this.height = height - 3;
     this.width = width - 3;
 
+    // FIXME: This should never happen
+    this.width = this.width < 0 ? 0 : this.width;
 }
 
 /**

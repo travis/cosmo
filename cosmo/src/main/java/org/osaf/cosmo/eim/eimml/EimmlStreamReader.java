@@ -42,8 +42,6 @@ import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 
-import com.ctc.wstx.exc.WstxLazyException;
-
 /**
  * Provides forward, read-only access to an EIMML stream.
  *
@@ -95,8 +93,12 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
             readCollection();
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Unable to read EIM records", e);
-        } catch (WstxLazyException e) {
-            throw new EimmlStreamException("Unable to read EIM records", e);
+        } catch (RuntimeException e) {
+            Throwable t = e.getCause();
+            if(t!=null && t instanceof XMLStreamException)
+                throw new EimmlStreamException("Error reading next recordset", t);
+            
+            throw e;
         }
     }
 
@@ -143,9 +145,13 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
         } catch (XMLStreamException e) {
             close();
             throw new EimmlStreamException("Error reading next recordset", e);
-        } catch (WstxLazyException e) {
+        } catch (RuntimeException e) {
             close();
-            throw new EimmlStreamException("Error reading next recordset", e);
+            Throwable t = e.getCause();
+            if(t!=null && t instanceof XMLStreamException)
+                throw new EimmlStreamException("Error reading next recordset", t);
+            
+            throw e;
         }
     }
 

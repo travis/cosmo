@@ -39,6 +39,7 @@ import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.MissingStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.filter.StampFilter;
 import org.osaf.cosmo.model.filter.TextAttributeFilter;
@@ -157,7 +158,18 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         for(StampFilter stampFilter: filter.getStampFilters()) {
             if(stampFilter instanceof EventStampFilter)
                 handleEventStampFilter(selectBuf, whereBuf, params, (EventStampFilter) stampFilter);
+            else if(stampFilter instanceof MissingStampFilter)
+                handleMissingStampFilter(selectBuf, whereBuf, params, (MissingStampFilter) stampFilter);
         }
+    }
+    
+    private void handleMissingStampFilter(StringBuffer selectBuf,
+            StringBuffer whereBuf, HashMap<String, Object> params,
+            MissingStampFilter filter) {
+        
+        String toAppend = "not exists (select s.id from Stamp s where s.item=i and s.class="
+                + filter.getMissingStampClass().getSimpleName() + ")";
+        appendWhere(whereBuf, toAppend);
     }
     
     private void handleEventStampFilter(StringBuffer selectBuf,
@@ -182,9 +194,25 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         selectBuf.append("select i from NoteItem i");
         handleItemFilter(selectBuf, whereBuf, params, filter);
         
+        // filter by icaluid
         if(filter.getIcalUid()!=null) {
             appendWhere(whereBuf, "i.icalUid=:icaluid");
             params.put("icaluid", filter.getIcalUid());
+        }
+        
+        // filter modifications
+        if(filter.getIsModification()!=null) {
+            if(filter.getIsModification().booleanValue()==true)
+                appendWhere(whereBuf,"i.modifies is not null");
+            else
+                appendWhere(whereBuf,"i.modifies is null");
+        }
+        
+        if(filter.getHasModifications()!=null) {
+            if(filter.getHasModifications().booleanValue()==true)
+                appendWhere(whereBuf,"size(i.modifications) > 0");
+            else
+                appendWhere(whereBuf,"size(i.modifications) = 0");
         }
     }
     

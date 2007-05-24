@@ -24,9 +24,12 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
 import org.hibernate.Query;
 import org.osaf.cosmo.dao.hibernate.AbstractHibernateDaoTestCase;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.MissingStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 
 
@@ -83,6 +86,25 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setBody("body");
         Query query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2 where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and i.icalUid=:icaluid", query.getQueryString());
+        
+        filter = new NoteItemFilter();
+        filter.setIsModification(true);
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where i.modifies is not null", query.getQueryString());
+       
+        filter.setIsModification(false);
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where i.modifies is null", query.getQueryString());
+       
+        filter.setIsModification(null);
+        
+        filter.setHasModifications(true);
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where size(i.modifications) > 0", query.getQueryString());
+        
+        filter.setHasModifications(false);
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where size(i.modifications) = 0", query.getQueryString());
     }
     
     public void testEventStampQuery() throws Exception {
@@ -110,6 +132,14 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and es.item=i and ((es.timeRangeIndex.dateStart < case when es.timeRangeIndex.isFloating=true then '20070101T040000' else '20070101T100000Z' end and es.timeRangeIndex.dateEnd > case when es.timeRangeIndex.isFloating=true then '20070101T040000' else '20070101T100000Z' end) or (es.timeRangeIndex.dateStart >= case when es.timeRangeIndex.isFloating=true then '20070101T040000' else '20070101T100000Z' end and es.timeRangeIndex.dateStart < case when es.timeRangeIndex.isFloating=true then '20070201T040000' else '20070201T100000Z' end))", query.getQueryString());
+    }
+    
+    public void testMissingStampQuery() throws Exception {
+        NoteItemFilter filter = new NoteItemFilter();
+        MissingStampFilter missingFilter = new MissingStampFilter(EventStamp.class);
+        filter.getStampFilters().add(missingFilter);
+        Query query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where not exists (select s.id from Stamp s where s.item=i and s.class=EventStamp)", query.getQueryString());
     }
 
 }

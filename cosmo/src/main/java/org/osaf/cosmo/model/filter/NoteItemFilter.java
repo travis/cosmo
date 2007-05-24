@@ -22,7 +22,10 @@ import org.osaf.cosmo.model.NoteItem;
  * Matches only NoteItem instances.
  */
 public class NoteItemFilter extends ItemFilter {
-    public String icalUid = null;
+    private String icalUid = null;
+    
+    private Boolean hasModifications = null;
+    private Boolean isModification = null;
     
     public NoteItemFilter() {}
     
@@ -53,5 +56,31 @@ public class NoteItemFilter extends ItemFilter {
      */
     public void setIcalUid(String icalUid) {
         this.icalUid = icalUid;
+    }
+
+    public Boolean getHasModifications() {
+        return hasModifications;
+    }
+
+    /**
+     * Matches notes with or without modifications.
+     * @param hasModifications if present, matches notes with or without
+     *                         modifications
+     */
+    public void setHasModifications(Boolean hasModifications) {
+        this.hasModifications = hasModifications;
+    }
+
+    public Boolean getIsModification() {
+        return isModification;
+    }
+
+    /**
+     * Matches notes that are or are not a modification
+     * @param isModification if present, matches notes that are or are not
+     *                        a modification
+     */
+    public void setIsModification(Boolean isModification) {
+        this.isModification = isModification;
     }
 }

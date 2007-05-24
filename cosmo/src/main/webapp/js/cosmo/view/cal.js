@@ -1121,7 +1121,7 @@ cosmo.view.cal = new function () {
             collection: cosmo.app.pim.currentCollection,
             viewStart: cosmo.view.cal.viewStart,
             viewEnd: cosmo.view.cal.viewEnd,
-            currDate: cosmo.app.pim.currDate,
+            currDate: cosmo.app.pim.currDate
         }
         // Pass along the original opts
         for (var n in o) { opts[n] = o[n]; }

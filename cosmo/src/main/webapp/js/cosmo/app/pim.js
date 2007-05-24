@@ -116,16 +116,13 @@ cosmo.app.pim = new function () {
 
         // Base layout
         // ===============================
-        // FIXME: IE6 -- Need to hide selectors until the whole UI is rendered
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
-        if (this.baseLayout = cosmo.app.pim.layout.initBaseLayout({
-            domNode: $('baseLayout') })) {
-            $('maskDiv').style.display = 'none';
-        }
+        this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
 
-        // Load data
+        //cosmo.app.showHideSelectBoxes(false);
+
+        // Load data -- successful load triggers render of UI widgets
         // ===============================
-        // Load items and publish success to UI components
         cosmo.view.cal.loadEvents({ collection: self.currentCollection,
             viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
 

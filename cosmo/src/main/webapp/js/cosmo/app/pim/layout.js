@@ -46,6 +46,11 @@ cosmo.app.pim.layout = new function () {
         this.baseLayout = new cosmo.app.pim.layout.BaseLayout(node);
         this.baseLayout.render();
         this.populateBaseLayout();
+        // Hide select boxes in IE before rendering the UI widgets
+        // so they don't bleed through the mask
+        // cosmo.app.hideMask will show them again after the mask
+        // goes away
+        cosmo.app.showHideSelectBoxes(false); 
         return this.baseLayout;
     };
 };

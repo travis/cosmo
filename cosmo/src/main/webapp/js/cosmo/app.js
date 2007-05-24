@@ -31,31 +31,30 @@ cosmo.app = new function () {
     // App section code to run on init
     this.initObj = {};
     this.initParams = {};
-
     // warnings / confirmations
     this.modalDialog = null;
-
+    // Full-screen div for masking while UI renders
+    this.maskNode = null;
     // The item in the UI being dragged
     this.dragItem = null;
-
     // List of any queued-up error messages
     this.errorList = [];
-
     //select boxes to show/hide when displaying modal dialog box
     this._selectBoxIds = {};
 
     this.init = function () {
+        self.maskNode = $('maskDiv');
+        self.showMask();
         // Set up the modal dialog box for the app
         self.modalDialog = dojo.widget.createWidget(
             'cosmo:ModalDialog', {}, document.body, 'last');
-
         dojo.event.topic.subscribe(
             cosmo.topics.PreferencesUpdatedMessage.topicName, self, 'updateUIFromPrefs');
-        
         // Initialize the default view
         if (typeof self.initObj.init == 'function') { 
             self.initObj.init(self.initParams);
         };
+        self.hideMask();
     }
 
     // ==========================
@@ -144,6 +143,26 @@ cosmo.app = new function () {
             this.modalDialog.defaultAction = self.hideDialog;
             this.modalDialog.content = msg;
             this.showDialog();
+        }
+    };
+    /**
+     * Displays the mask that covers the entire browser window
+     * until the UI is completely rendered
+     */
+    this.showMask = function () {
+        if (this.maskNode) {
+            this.showHideSelectBoxes(false);
+            this.maskNode.style.display = 'block';
+        }
+    };
+    /**
+     * Hides the mask that covers the entire browser window
+     * once the UI is completely rendered
+     */
+    this.hideMask = function () {
+        if (this.maskNode) {
+            this.maskNode.style.display = 'none';
+            this.showHideSelectBoxes(true);
         }
     };
     /**
@@ -245,16 +264,4 @@ cosmo.app = new function () {
            selectBoxVisibility = {};
         }
     };
-
-    this.updateUIFromPrefs = function (/*cosmo.topics.PreferencesUpdatedMessage*/ message){
-        /*
-        if (message.preferences[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true'){
-            $('accountBrowserLink').style.display = 'inline';
-}
-        else {
-            $('accountBrowserLink').style.display = 'none';
-        }
-        */
-    };
-
-}
+};

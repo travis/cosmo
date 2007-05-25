@@ -26,7 +26,6 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
-dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.topics");
 
 dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog", "html",

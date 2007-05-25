@@ -106,23 +106,29 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             uuid = unescape(uuid.firstChild.nodeValue.substring(9));
             if (!uuid.split(":")[1]){
                 items[uuid] = this.entryToItem(entry, uuid)
-                if (!items[uuid].getEventStamp()) { dojo.debug(uuid)}
             }
             else {
-//                mods[uuid] = entry;
+                mods[uuid] = entry;
             }
         }
+        
+        // Remove the master events at the end, cause they're returned as occurrences
+        var masterRemoveList = {};
 
         for (var uuid in mods){
-            var masterItem = items[uuid.split("::")[0]];
-            if (!masterItem) throw new 
-              cosmo.service.translators.ParseError(
+            var masterUuid = uuid.split(":")[0];
+            var masterItem = items[uuid.split(":")[0]];
+            if (!masterItem) throw new cosmo.service.translators.ParseError(
               "Could not find master event for modification " +
               "with uuid " + uuid);
-              
+
             items[uuid] = this.entryToItem(mods[uuid], uuid, masterItem);
-            //this.addModificationRecordSet(items, eval("(" + mods[i] + ")"));
+            masterRemoveList[masterUuid] = true;
         }
+        for (var uuid in masterRemoveList){
+            delete items[uuid];
+        }
+        
         var itemArray = [];
         for (var uid in items){
             itemArray.push(items[uid]);
@@ -208,7 +214,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
      * 
      */
     recordSetToModification: function (recordSet, masterItem){
-        var uidParts = recordSet.uuid.split("::");
+        var uidParts = recordSet.uuid.split(":");
 
         var modifiedProperties = {};
         var modifiedStamps = {};
@@ -235,7 +241,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                }
             }
         }
-        
         var recurrenceId = this.recurrenceIdToDate(uidParts[1])
         
         if (!dojo.lang.isEmpty(modifiedProperties)
@@ -247,14 +252,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     "modifiedStamps": modifiedStamps
                 }
             );
-    
             masterItem.addModification(mod);
         }
         return masterItem.getNoteOccurrence(recurrenceId);
     },
     
     recurrenceIdToDate: function (/*String*/ rid){
-         return cosmo.datetime.fromIso8601(rid.split(":")[1]);
+         return cosmo.datetime.fromIso8601(rid);
     },
 
     itemToAtomEntry: function (object){
@@ -405,17 +409,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
 
-         return {
-            startDate: record.fields.dtstart? this.fromEimDate(record.fields.dtstart[1]): undefined,
-            duration: record.fields.duration?
-                new cosmo.model.Duration(record.fields.duration[1]) : undefined,
-            anyTime: dateParams.anyTime,
-            allDay: dateParams.allDay,
-            location: record.fields.location? record.fields.location[1] : undefined,
-            rrule: record.fields.rrule? this.parseRRule(record.fields.rrule[1]): undefined,
-            exdates: null, //TODO
-            status: record.fields.status? record.fields.status[1]: undefined
-         }
+        var properties = {};
+        if (record.fields.dtstart != undefined) properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
+        if (record.fields.duration != undefined) properties.duration=
+                new cosmo.model.Duration(record.fields.duration[1]);
+        if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
+        if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
+        if (record.fields.location != undefined) properties.location = record.fields.location[1];
+        if (record.fields.rrule != undefined) properties.rrule = this.parseRRule(record.fields.rrule[1]);
+        if (record.fields.exdates != undefined) properties.exdates = record.fields.exdates; //TODO
+        if (record.fields.status != undefined) properties.status = record.fields.status[1];
+        return properties;
+
     },
 
     getTaskStampProperties: function (record){

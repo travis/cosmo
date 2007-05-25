@@ -332,6 +332,9 @@ cosmo.model.declare("cosmo.model.Modification", null,
     ["modifiedProperties", {"default": cosmo.model.NEW_OBJECT}],
     ["modifiedStamps", {"default": cosmo.model.NEW_OBJECT}]],
     {
+        initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+        }
     });
 
 cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item, 

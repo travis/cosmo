@@ -22,7 +22,8 @@ cosmo.service.eim.constants = {
         NOTE: "note",
         EVENT: "event",
         TASK: "task",
-        MODBY: "modby"
+        MODBY: "modby",
+        OCCURRENCE: "occurrence"
     },
     
     ns: {
@@ -30,7 +31,8 @@ cosmo.service.eim.constants = {
         NOTE: "http://osafoundation.org/eim/note/0",
         EVENT: "http://osafoundation.org/eim/event/0",
         TASK: "http://osafoundation.org/eim/task/0",
-        MODBY: "http://osafoundation.org/eim/modby/0"
+        MODBY: "http://osafoundation.org/eim/modby/0",
+        OCCURRENCE: "http://osafoundation.org/eim/occurrence/0"
     },
         
     type: {

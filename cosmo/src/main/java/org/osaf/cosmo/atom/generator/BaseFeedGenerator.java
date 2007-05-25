@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.i18n.iri.IRISyntaxException;
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Generator;
@@ -32,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 
@@ -192,6 +194,35 @@ public abstract class BaseFeedGenerator implements AtomConstants {
     protected Link newSelfLink(String iri)
         throws GeneratorException {
         return newLink(Link.REL_SELF, MEDIA_TYPE_ATOM, iri);
+    }
+
+    /**
+     * <p>
+     * Creates a ticket extension <code>Element</code> for the given
+     * ticket key based on the provided ticket.
+     * </p>
+     * <p>
+     * If the ticket is null then the element has an
+     * <code>exists</code> attribute is with value
+     * <code>false</code>. Otherwise the element has a
+     * <code>type</code> attribute with a standard ticket type value.
+     *
+     * @param key the ticket key
+     * @param the ticket described by the element; may be null
+     * @throws GeneratorException
+     */
+    protected Element newTicket(String key,
+                                Ticket ticket)
+        throws GeneratorException {
+        Element extension = getFactory().getAbdera().getFactory().
+            newExtensionElement(QN_TICKET);
+        if (ticket != null)
+            extension.setAttributeValue(QN_TYPE, ticket.getType().toString());
+        else
+            extension.setAttributeValue(QN_EXISTS, "false");
+        extension.setText(key);
+
+        return extension;
     }
 
     /**

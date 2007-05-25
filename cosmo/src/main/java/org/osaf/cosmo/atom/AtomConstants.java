@@ -87,6 +87,9 @@ public interface AtomConstants {
     public static final QName QN_TICKET =
         new QName(NS_COSMO, "ticket", PRE_COSMO);
     /** */
+    public static final QName QN_COLLECTION =
+        new QName(NS_COSMO, "collection", PRE_COSMO);
+    /** */
     public static final QName QN_TYPE =
         new QName(NS_COSMO, "type", PRE_COSMO);
     /** */

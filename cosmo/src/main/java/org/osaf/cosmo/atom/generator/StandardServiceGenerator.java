@@ -17,7 +17,6 @@ package org.osaf.cosmo.atom.generator;
 
 import org.apache.abdera.i18n.iri.IRISyntaxException;
 import org.apache.abdera.model.Collection;
-import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Workspace;
 
@@ -29,10 +28,8 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
-import org.osaf.cosmo.service.ContentService;
 
 /**
  * Standard implementation of {@link ServiceGenerator}.
@@ -48,14 +45,11 @@ public class StandardServiceGenerator
 
     private StandardGeneratorFactory factory;
     private ServiceLocator serviceLocator;
-    private ContentService contentService;
 
     public StandardServiceGenerator(StandardGeneratorFactory factory,
-                                    ServiceLocator serviceLocator,
-                                    ContentService contentService) {
+                                    ServiceLocator serviceLocator) {
         this.factory = factory;
         this.serviceLocator = serviceLocator;
-        this.contentService = contentService;
     }
 
     /**
@@ -85,7 +79,8 @@ public class StandardServiceGenerator
         Workspace hw = createHomeWorkspace();
         service.addWorkspace(hw);
 
-        HomeCollectionItem home = contentService.getRootItem(user);
+        HomeCollectionItem home =
+            factory.getContentService().getRootItem(user);
         for (Item child : home.getChildren()) {
             if (child instanceof CollectionItem)
                 hw.addCollection(createCollection((CollectionItem)child));
@@ -197,65 +192,11 @@ public class StandardServiceGenerator
         return collection;
     }
 
-    /**
-     * Creates a <code>Collection</code> based on a collection
-     * subscription.
-     *
-     * @param sub the collection subscription described by the atom
-     * collection
-     * @throws GeneratorException
-     */
-    protected Collection createCollection(CollectionSubscription sub)
-        throws GeneratorException {
-        Collection collection =
-            factory.getAbdera().getFactory().newCollection();
-
-        CollectionItem ci = (CollectionItem)
-            contentService.findItemByUid(sub.getCollectionUid());
-        Ticket ticket = ci != null ?
-            contentService.getTicket(ci, sub.getTicketKey()) :
-            null;
-
-        String href =
-            serviceLocator.getAtomCollectionUrl(sub.getCollectionUid(), false);
-
-        try {
-            collection.setAccept("entry");
-            collection.setHref(href);
-            collection.setTitle(sub.getDisplayName());
-            if (ci == null)
-                collection.setAttributeValue(QN_EXISTS, "false");
-            addTicket(collection, sub.getTicketKey(), ticket);
-        } catch (IRISyntaxException e) {
-            throw new GeneratorException("Attempted to set invalid collection href " + href, e);
-        }
-
-        return collection;
-    }
-
-    private void addTicket(Collection collection,
-                           String ticketKey,
-                           Ticket ticket)
-        throws GeneratorException {
-        Element extension = getFactory().getAbdera().getFactory().
-            newExtensionElement(QN_TICKET);
-        if (ticket != null)
-            extension.setAttributeValue(QN_TYPE, ticket.getType().toString());
-        else
-            extension.setAttributeValue(QN_EXISTS, "false");
-        extension.setText(ticketKey);
-        collection.addExtension(extension);
-    }
-
     public StandardGeneratorFactory getFactory() {
         return factory;
     }
 
     public ServiceLocator getServiceLocator() {
         return serviceLocator;
-    }
-
-    public ContentService getContentService() {
-        return contentService;
     }
 }

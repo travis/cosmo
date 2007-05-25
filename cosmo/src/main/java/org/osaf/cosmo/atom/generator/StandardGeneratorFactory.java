@@ -50,8 +50,7 @@ public class StandardGeneratorFactory
      */
     public ServiceGenerator
         createServiceGenerator(ServiceLocator locator) {
-        return new StandardServiceGenerator(this, locator,
-                                            contentService);
+        return new StandardServiceGenerator(this, locator);
     }
 
     /**

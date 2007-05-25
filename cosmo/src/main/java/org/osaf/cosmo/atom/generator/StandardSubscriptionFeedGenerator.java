@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 
@@ -30,8 +31,11 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.service.ContentService;
 
 /**
  * An interface for classes that generate Atom feeds and entries
@@ -160,6 +164,13 @@ public class StandardSubscriptionFeedGenerator
         String uid = sub.getOwner().getUsername() + "-" + sub.getDisplayName();
         Entry entry = newEntry(uid, isDocument);
 
+        CollectionItem collection = (CollectionItem)
+            getFactory().getContentService().
+            findItemByUid(sub.getCollectionUid());
+        Ticket ticket = collection != null ?
+            getFactory().getContentService()
+            .getTicket(collection, sub.getTicketKey()) : null;
+
         entry.setTitle(sub.getDisplayName());
         entry.setUpdated(sub.getModifiedDate());
         entry.setPublished(sub.getCreationDate());
@@ -167,9 +178,40 @@ public class StandardSubscriptionFeedGenerator
         if (isDocument)
             entry.addAuthor(newPerson(sub.getOwner()));
 
-        // XXX: add ticket and collection uid
+        // Cosmo extensions
+
+        entry.addExtension(newCollection(sub.getCollectionUid(), collection));
+        entry.addExtension(newTicket(sub.getTicketKey(), ticket));
 
         return entry;
+    }
+
+    /**
+     * <p>
+     * Creates a collection extension <code>Element</code> for the given
+     * collection uid based on the provided collection.
+     * </p>
+     * <p>
+     * If the collection is null then the element has an
+     * <code>exists</code> attribute with value
+     * <code>false</code>.
+     *
+     * @param uid the collection uid
+     * @param the collection described by the element; may be null
+     * @throws GeneratorException
+     */
+    protected Element newCollection(String uid,
+                                    CollectionItem collection)
+        throws GeneratorException {
+        Element extension = getFactory().getAbdera().getFactory().
+            newExtensionElement(QN_COLLECTION);
+        if (collection == null)
+            extension.setAttributeValue(QN_EXISTS, "false");
+        String href = getLocator().getAtomCollectionUrl(uid, false);
+        extension.setAttributeValue("href", href);
+        extension.setText(uid);
+
+        return extension;
     }
 
     /**

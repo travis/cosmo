@@ -40,6 +40,7 @@ dojo.require("cosmo.view.cal.canvas");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.model.common");
+dojo.require("cosmo.service.exception");
 
 dojo.provide("cosmo.ui.cal_form");
 

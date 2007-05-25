@@ -225,6 +225,7 @@ dojo.declare("cosmo.model.Delta", null, {
     },
     
     _apply: function(type, note){
+        dojo.debug("_apply:" + type);
         note = note || this._note;
         for (var stampName in this._deletedStamps){
             note.removeStamp(stampName);
@@ -234,7 +235,7 @@ dojo.declare("cosmo.model.Delta", null, {
             note.getStamp(stampName, true);
         }
         
-        this._addProperties(this._note, this._propertyProps);
+        this._applyProperties(note, this._propertyProps, type);
         
         for (var stampName in this._stampProps){
             var stampChanges = this._stampProps[stampName];
@@ -245,14 +246,16 @@ dojo.declare("cosmo.model.Delta", null, {
             //create the stamp if it doesn't exist yet
             var stamp = note.getStamp(stampName,true);
             
-            this._addProperties(stamp, stampChanges, type);
+            this._applyProperties(stamp, stampChanges, type);
         }
     },
     
-   _addProperties: function(original,changes, type){
+   _applyProperties: function(original,changes, type){
+       dojo.debug("in apply props. type: " + type);
         for (var propName in changes){
+           dojo.debug("propName: "+ propName);
            var changeValue = changes[propName];
-           original.apply(propName, changeValue, type);
+           original.applyChange(propName, changeValue, type);
         }
     },
     

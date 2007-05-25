@@ -131,12 +131,10 @@ test_stampInheritance : function(){
         uid: "123",
         displayName: "display"
     });
-    
     var date = new cosmo.datetime.Date(2000,0,1);
 
     var eventStamp  = note.getEventStamp(true);
     eventStamp.setLocation("loco");
-
     var noteOccurrence = note.getNoteOccurrence(date);
 
     var occurStamp = noteOccurrence.getEventStamp();

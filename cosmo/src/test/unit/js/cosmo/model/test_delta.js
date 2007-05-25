@@ -135,8 +135,39 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
         delta.addStampProperty("event", "startDate", new cosmo.datetime.Date(2001,1,2,13,0));
         jum.assertTrue("just moving the start date up a tad, ALL change types should be allowed.", 
             setEquals({ master:true, occurrenceAndFuture:true, occurrence:true}, delta.getApplicableChangeTypes()));
-   }
+   },
  
+   test_applyDeltaToMaster: function(){
+       //creates a basic event, recurs daily, starts on 1/1/2000 12pm
+       var getBaseNote = function(){
+           var note = getSimpleEventNote();
+           var stamp = note.getEventStamp(true);
+           stamp.setStartDate(new cosmo.datetime.Date(2000,0,1,12,0));
+           stamp.setEndDate(new cosmo.datetime.Date(2000,0,1,13,0));
+           stamp.setRrule(new cosmo.model.RecurrenceRule({
+               frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY
+           }));
+           return note;
+       }
+       //first test that setting a properties on the base object and stamps works.
+       var note = getBaseNote();
+       var delta = new cosmo.model.Delta(note);
+       delta.addProperty("body", "newBody");
+       delta.addStampProperty("event", "location", "loco");
+       delta.deltafy();
+       delta.applyToMaster();
+       jum.assertEquals("Applying a master change to a master object.", "newBody",  note.getBody() );     
+       jum.assertEquals("Applying a master change to a master object.", "loco",  note.getEventStamp().getLocation() );     
+       
+       
+   }
+   
+   //test adding stamp to master (from a occurrence delta)
+   //test adding stamp to occurrence
+   //test editing start date on master, from an occurrence delta
+   //test editing end date on master, from an occurrence delta
+   //test editing occurrence end date
+   //test editing occurrence start date
 });
 
     

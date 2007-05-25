@@ -70,6 +70,10 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArr
         getMaster: function (){
             return this._master;
         },
+        
+        isOccurrenceStamp: function(){
+            return true;
+        },
     
         _getMasterProperty: function (propertyName){
             if (this._masterPropertyGetters && this._masterPropertyGetters[propertyName]){
@@ -121,8 +125,7 @@ cosmo.model.declare("cosmo.model.Item", null,
   {
       initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
-      }
-      
+      }      
   });
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
@@ -405,6 +408,10 @@ dojo.declare("cosmo.model.BaseStamp", null, {
         if (kwArgs){
             this.item = kwArgs.item;
         }
+    },
+    
+    isOccurrenceStamp: function (){
+        return false;
     }
     
 });
@@ -416,3 +423,29 @@ cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
             this.initializeProperties(kwArgs);
         }
     });
+
+//stuff that note and stamp has in common.
+cosmo.model._noteStampCommon = {
+        applyChange: function(propertyName, changeValue, type){
+          var getterAndSetter = cosmo.model.util.getGetterAndSetterName(propertyName);
+          var setterName = getterAndSetter[1];
+          if (type =="occurrence"){
+              this[setterName](changeValue);
+          } else if (type == "master"){
+              var masterObject = this;
+              if (this instanceof cosmo.model.BaseStamp){
+                  if (this.isOccurrenceStamp()){
+                      masterObject = this.getMaster().getStamp(this.stampName, true);
+                  }
+              } else {
+                 if (this.isOccurrence()){
+                     masterObject = this.getMaster();
+                 }                  
+              }
+              masterObject[setterName](changeValue);
+          }
+        }
+}
+
+dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._noteStampCommon);
+dojo.lang.mixin(cosmo.model.BaseStamp.prototype, cosmo.model._noteStampCommon);

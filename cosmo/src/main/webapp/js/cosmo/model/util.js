@@ -211,29 +211,11 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
           var getterName = cosmo.model.util.getGetterAndSetterName(propertyName)[0];
           var origProperty = this[getterName]();
           return !cosmo.model.util.equals(origProperty, changedProperty);
-    }
-    
-});
-
-//instantiate the singleton 
-cosmo.model.util.simplePropertyApplicator = new cosmo.model.util.SimplePropertyApplicator();
-
-dojo.declare("cosmo.model.util.InheritingSubclassCreator", null, {
-    createSubClass: function(parentConstructor, childConstructorName,kwArgs, propertyArgsMap){
-        dojo.declare(childConstructorName, parentConstructor, {
-        });
     },
     
-    //default functions
-    _getParentDefault: function(){
-       return this.parent;  
-    }, 
-    
-    _getterDefault: function(){
-        
-    }
-    
-}); 
+});
+//instantiate the singleton 
+cosmo.model.util.simplePropertyApplicator = new cosmo.model.util.SimplePropertyApplicator();
 
 cosmo.model.util.equals = function (a,b){
     var type = typeof (a);
@@ -261,7 +243,7 @@ cosmo.model.util.equals = function (a,b){
     return a == b;
 }   
 
-  cosmo.model._occurrenceGetProperty =  function (propertyName){
+  cosmo.model._occurrenceGetProperty = function (propertyName){
         //get the master version
         var master = this.getMaster();
         var masterProperty = this._getMasterProperty(propertyName);

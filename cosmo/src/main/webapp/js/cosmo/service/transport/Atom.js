@@ -47,7 +47,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         
         r.url = cosmo.env.getBaseUrl() +
           "/atom/collection/" + collectionUid + "/details";
-        
+        dojo.io.bind(r);
         return deferred;    
     },
 

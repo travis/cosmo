@@ -103,12 +103,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 throw new cosmo.service.translators.
                    ParseError("Could not find id element for entry " + (i+1));
             }
-            uuid = uuid.firstChild.nodeValue.substring(9);
-            if (!uuid.split("::")[1]){
+            uuid = unescape(uuid.firstChild.nodeValue.substring(9));
+            if (!uuid.split(":")[1]){
                 items[uuid] = this.entryToItem(entry, uuid)
+                if (!items[uuid].getEventStamp()) { dojo.debug(uuid)}
             }
             else {
-                mods[uuid] = entry;
+//                mods[uuid] = entry;
             }
         }
 
@@ -132,8 +133,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     entryToItem: function (/*XMLElement*/entry, /*String*/uuid, 
         /*cosmo.model.Item*/ masterItem){
-            var uuidParts = uuid.split("::");
-            var uidParts = uuidParts[0].split(":");
+            var uuidParts = uuid.split(":");
+            var uidParts = uuidParts.slice(2);
             try {
                 var c = entry.getElementsByTagName("content")[0];
             } catch (e){

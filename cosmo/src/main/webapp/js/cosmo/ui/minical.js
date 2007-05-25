@@ -272,7 +272,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         function setContainerSize() {
             var h = self.navPanel.offsetHeight;
             h += self.goToDateNode.offsetHeight;
-            c = 40; // A bit of spacing
+            c = 60; // A bit of spacing
             for (var i = 0; i < self.months.length; i++) {
                 if (h + self.months[i].offsetHeight < (self.parent.height - c)) {
                     h += self.months[i].offsetHeight;

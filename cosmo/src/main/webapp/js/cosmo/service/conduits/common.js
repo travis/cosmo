@@ -40,7 +40,13 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     getCollections: function (kwArgs){
         var deferred = this._transport.getCollections(kwArgs);
 
-        this._addTranslation(deferred, "translateGetCollections");
+        this._addTranslation(deferred, "translateGetCollections", 
+        {
+            getDetails: dojo.lang.hitch(this, function (){
+                return this.getCollection(collection.getUid(), {sync: true}).results[0];
+            })
+        } );
+
         return deferred;
     },
     
@@ -142,10 +148,10 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return fakeDeferred;
     },
     
-    _addTranslation: function (deferred, translationFunction){
+    _addTranslation: function (deferred, translationFunction, kwArgs){
         deferred.addCallback(
             dojo.lang.hitch(this._translator, function (obj, xhr){
-                return this[translationFunction](obj);
+                return this[translationFunction](obj, kwArgs);
             })
         );
         

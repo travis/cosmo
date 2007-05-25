@@ -37,6 +37,7 @@ import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.provider.Target;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
+import org.apache.abdera.util.Constants;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -101,6 +102,7 @@ public class StandardProvider extends AbstractProvider
 
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument(), 201, "Created");
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
 
             try {
@@ -187,6 +189,7 @@ public class StandardProvider extends AbstractProvider
 
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument());
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
 
             return rc;
@@ -360,6 +363,7 @@ public class StandardProvider extends AbstractProvider
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument());
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             return rc;
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";

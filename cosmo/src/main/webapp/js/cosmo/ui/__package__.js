@@ -18,7 +18,7 @@ dojo.provide("cosmo.ui.*");
 
 dojo.kwCompoundRequire({
 	common: ["cosmo.ui.button",
-		"cosmo.ui.cal_form",
+		"cosmo.ui.detail",
 		"cosmo.ui.conf",
 		"cosmo.ui.contentcontainer",
 		"cosmo.ui.login",

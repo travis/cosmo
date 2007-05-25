@@ -38,6 +38,7 @@ dojo.require("cosmo.ui.widget.CollectionSelector");
 // --
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.menu");
+dojo.require("cosmo.ui.detail");
 
 
 cosmo.app.pim.layout = new function () {
@@ -56,7 +57,7 @@ cosmo.app.pim.layout = new function () {
 };
 
 cosmo.app.pim.layout.BaseLayout = function (p) {
-    var params = p || {}
+    var params = p || {};
     this.top = 0;
     this.left = 0;
     this.width = 0;
@@ -90,7 +91,7 @@ cosmo.app.pim.layout.BaseLayout.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.MenuBar = function (p) {
-    var params = p || {}
+    var params = p || {};
     for (var n in params) { this[n] = params[n]; }
 
     var d = _createElem('div');
@@ -113,7 +114,7 @@ cosmo.app.pim.layout.MenuBar.prototype =
 
 cosmo.app.pim.layout.MainApp = function (p) {
 
-    var params = p || {}
+    var params = p || {};
     for (var n in params) { this[n] = params[n]; }
 
     var d = _createElem('div');
@@ -141,7 +142,7 @@ cosmo.app.pim.layout.MainApp.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.LeftSidebar = function (p) {
-    var params = p || {}
+    var params = p || {};
     for (var n in params) { this[n] = params[n]; }
 
     // create domNodes
@@ -176,7 +177,7 @@ cosmo.app.pim.layout.LeftSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.CenterColumn = function (p) {
-    var params = p || {}
+    var params = p || {};
     for (var n in params) { this[n] = params[n]; }
     this.children = [];
     var d = _createElem('div');
@@ -201,7 +202,7 @@ cosmo.app.pim.layout.CenterColumn.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.RightSidebar = function (p) {
-    var params = p || {}
+    var params = p || {};
     for (var n in params) { this[n] = params[n]; }
 
     var d = _createElem('div');
@@ -275,7 +276,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top: (TOP_MENU_HEIGHT - 20) });
     this.baseLayout.menuBar.addChild(cB);
     this.baseLayout.menuBar.mainMenu = cB;
-    cB.render();
+    cB.render(); // Go ahead and render the menubar -- no waiting for data
 
     // Subscription selector thinger -- show only in anon view
     if (!cosmo.app.initParams.authAccess) {
@@ -306,5 +307,13 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         // Add to the menu area in the first position
         d.insertBefore(s, d.firstChild);
     }
+    
+    // Detail-view form
+    var d = _createElem('div');
+    d.id = 'detailViewForm';
+    var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: d, id: d.id, top: 0 });
+    this.baseLayout.mainApp.rightSidebar.addChild(cB);
+    this.baseLayout.mainApp.rightSidebar.detailViewForm = cB;
+    this.baseLayout.mainApp.rightSidebar.render();
 
 };

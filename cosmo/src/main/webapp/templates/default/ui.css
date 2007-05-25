@@ -34,10 +34,6 @@ hr {
     background: #cccccc;
 }
 
-a:visited {
-    color: #5555bb;
-}
-
 a span, a{
     color: #333399;
     text-decoration: none;
@@ -551,10 +547,9 @@ td.dataDisplayLabel {
     font-weight: bold;
     text-align: right;
 }
-/* Give menu links an underline whether or not
+/* Menu links should look clickable whether
  * they have an href prop or not */
 #menuNavItems a.menuBarLink {
-    text-decoration: underline;
     cursor: pointer;
 }
 /* The pipe character between links */
@@ -1143,3 +1138,36 @@ td.dataDisplayLabel {
     left: -30px;
     top: -30px;            
 }
+/* Expando detail-view form */
+.expando {
+    width: 100%;
+}
+.expandoHead {
+    width: 100%;
+    height: 20px;
+    background: #ddd;
+    text-align: right;
+    vertical-align: middle;
+    line-height: 20px;
+    cursor: pointer;
+}
+.expandoEnableCheckbox {
+    padding-right: 6px;
+}
+.expandoTriangle {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+.expandoIcon {
+    padding-right: 8px;
+}
+.expandoTitle {
+    padding-right: 8px;
+}
+.expandoBody {
+    width: 100%;
+    top: 20px;
+    background: #eee;
+    overflow: hidden;
+}
+

@@ -32,7 +32,6 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
-dojo.require("cosmo.ui.cal_form");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require('cosmo.view.cal');
@@ -81,9 +80,6 @@ cosmo.app.pim = new function () {
     this.ticketKey = null;
     // Create the 'Welcome to Cosmo' event?
     this.createWelcomeItem = false;
-
-    //A handle to the collection selector widget
-    this._collectionSelector = null;
 
     // ==========================
     // Init

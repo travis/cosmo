@@ -91,7 +91,7 @@
 -->
         <Valve className="org.apache.catalina.valves.AccessLogValve"
                directory="../logs" prefix="access." suffix=".log"
-               pattern="%h %l %{COSMO_PRINCIPAL}r %t %r %s %b %{Referer}i %{User-Agent}i" 
+               pattern="%h %l %{COSMO_PRINCIPAL}r %t &quot;%r&quot; %s %b &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"
                resolveHosts="false"/>
                
         <Context path="" docBase="ROOT" reloadable="false"/>

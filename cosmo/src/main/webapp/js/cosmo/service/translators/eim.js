@@ -47,37 +47,44 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     translateGetCollection: function (atomXml){
-        return atomXml;
+        var collection = new cosmo.model.CollectionDetails(
+            {uid: atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9)
+            }
+            );
+        return collection;
+        
     },
           
-    translateGetCollections: function (atomXml){
+    translateGetCollections: function (atomXml, kwArgs){
         var workspaces = atomXml.getElementsByTagName("workspace");
         var collections = [];
         for (var i = 0; i < workspaces.length; i++){
             var workspace = workspaces[i];
             
             var title = cosmo.util.html.getElementsByTagName(workspace, "atom", "title")[0];
+
+            if (title.firstChild.nodeValue == "meta") continue;
+
             var collectionElements = workspace.getElementsByTagName("collection");
             
             for (var j = 0; j < collectionElements.length; j++){
-                collections.push(this.collectionXmlToCollection(collectionElements[j]));
+                var collection = this.collectionXmlToCollection(collectionElements[j]);
+                collection.getDetails = kwArgs.getDetails;
+                collections.push(collection);
             }
         }
         return collections;
     },
     
     collectionXmlToCollection: function (collectionXml){
-        var collection = new cosmo.model.Collection(
+        return collection = new cosmo.model.Collection(
             {
                 //TODO: replace this with the correct uid grabbing code
                 uid: collectionXml.getAttribute("href").split("/")[1],
                 displayName: cosmo.util.html.getElementsByTagName(collectionXml, "atom", "title")
-                    [0].firstChild.nodeValue,
-                ticket: "",
-                writable: true
+                    [0].firstChild.nodeValue
             }
         );
-        return collection;
     },
 
     translateGetItems: function (atomXml){

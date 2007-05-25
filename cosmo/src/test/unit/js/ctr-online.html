@@ -10,6 +10,7 @@ For use with the JsUnit from www.jsunit.net
   <link rel="stylesheet" type="text/css" href="jsunit/css/jsUnitStyle.css">
   <!-- hack so we can get somewhere loading this file standalone without error -->
   <script language="JavaScript" type="text/javascript">
+
       var xbDEBUG = ''; xbDEBUG.on = false;
       var djConfig = {isDebug: true, debugContainerId:"output"};
   </script>
@@ -21,14 +22,12 @@ For use with the JsUnit from www.jsunit.net
 
   <!-- dojo setup stuff -->
   <script language="JavaScript" type="text/javascript">
-
       dojo.require("dojo.widget.*");
       dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);      
       dojo.registerModulePath("cosmotest", "../../../test/unit/js/cosmo")
       dojo.require("cosmo.env");
       dojo.require("cosmotest.testutils");
       cosmo.env.setBaseUrl("/cosmo");
-
   </script>
 
   <!-- jsunit api wrapper -->
@@ -57,7 +56,7 @@ For use with the JsUnit from www.jsunit.net
   	
   </tbody>
   </table>
-<script type="text/javascript" src="setupTester.js" language="JavaScript"/>
+<script type="text/javascript" src="setupTester.js" language="JavaScript"></script>
  
    <button id="run_tests" onclick="run_tests()">Run Tests</button>
   <br />

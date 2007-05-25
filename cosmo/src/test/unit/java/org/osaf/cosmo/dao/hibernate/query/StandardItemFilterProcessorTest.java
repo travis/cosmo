@@ -16,7 +16,6 @@
 package org.osaf.cosmo.dao.hibernate.query;
 
 import junit.framework.Assert;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
@@ -24,9 +23,10 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
 import org.hibernate.Query;
 import org.osaf.cosmo.dao.hibernate.AbstractHibernateDaoTestCase;
-import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.MissingStampFilter;
@@ -77,6 +77,15 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals("select i from Item i join i.parents parent where parent=:parent and i.displayName like :displayName", query.getQueryString());
     }
     
+    public void testContentItemQuery() throws Exception {
+        ContentItemFilter filter = new ContentItemFilter();
+        CollectionItem parent = new CollectionItem();
+        filter.setParent(parent);
+        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        Query query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:triageStatus", query.getQueryString());
+    }
+    
     public void testNoteItemQuery() throws Exception {
         NoteItemFilter filter = new NoteItemFilter();
         CollectionItem parent = new CollectionItem();
@@ -84,8 +93,10 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setDisplayName("test");
         filter.setIcalUid("icaluid");
         filter.setBody("body");
+        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2 where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2 where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and i.triageStatus.code=:triageStatus and i.icalUid=:icaluid", query.getQueryString());
         
         filter = new NoteItemFilter();
         filter.setIsModification(true);

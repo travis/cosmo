@@ -31,9 +31,11 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.MissingStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 
 /**
@@ -82,7 +84,14 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         note.setBody("find me");
         note.setIcalUid("find me");
         note.setDisplayName("find me");
+        note.getTriageStatus().setCode(TriageStatus.CODE_DONE);
+        
         note = (NoteItem) contentDao.createContent(calendar1, note);
+        
+        NoteItem noteMod = generateNote("testnotemod", "testuser");
+        noteMod.setUid(NOTE_UID + ":mod");
+        noteMod.setModifies(note);
+        noteMod = (NoteItem) contentDao.createContent(calendar1, noteMod);
         
         for (int i = 1; i <= 3; i++) {
             ContentItem event = generateEvent("test" + i + ".ics", "eventwithtimezone"
@@ -90,6 +99,8 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
             event.setUid("calendar2_" + i);
             contentDao.createContent(calendar2, event);
         }
+        
+        
     }
 
     public void testFilterByUid() throws Exception {
@@ -103,7 +114,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     public void testNoteFilter() throws Exception {
         NoteItemFilter filter = new NoteItemFilter();
         Set<Item> results = contentDao.findItems(filter);
-        Assert.assertEquals(9, results.size());
+        Assert.assertEquals(10, results.size());
         
         filter.setIcalUid("icaluid1");
         results = contentDao.findItems(filter);
@@ -126,6 +137,29 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter.setBody("find me");
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
+        
+        // find master items only
+        filter = new NoteItemFilter();
+        filter.setIsModification(false);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(9, results.size());
+        
+        // find master items with modifications only
+        filter.setIsModification(null);
+        filter.setHasModifications(true);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(1, results.size());
+        
+        // find triageStatus==DONE only, which should match one
+        filter = new NoteItemFilter();
+        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(1, results.size());
+        
+        // find triageStatus==LATER only, which should match none
+        filter.setTriageStatus(TriageStatus.CODE_LATER);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(0, results.size()); 
     }
     
     public void testFilterByParent() throws Exception {
@@ -134,7 +168,18 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter.setParent(calendar1);
         
         Set<Item> results = contentDao.findItems(filter);
-        Assert.assertEquals(6, results.size());
+        Assert.assertEquals(7, results.size());
+    }
+    
+    public void testFilterByNoStamp() throws Exception {
+        CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
+        ItemFilter filter = new NoteItemFilter();
+        filter.setParent(calendar1);
+        filter.getStampFilters().add(new MissingStampFilter(EventStamp.class));
+        
+        Set<Item> results = contentDao.findItems(filter);
+        Assert.assertEquals(2, results.size());
+        verifyItemInSet(results, NOTE_UID);
     }
     
     public void testFilterByEventStamp() throws Exception {

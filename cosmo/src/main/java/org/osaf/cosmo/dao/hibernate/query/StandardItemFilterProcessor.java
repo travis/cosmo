@@ -37,6 +37,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.AttributeFilter;
+import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.MissingStampFilter;
@@ -85,7 +86,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         
         if(filter instanceof NoteItemFilter)
             handleNoteItemFilter(selectBuf, whereBuf, params, (NoteItemFilter) filter);
-        else
+        else if(filter instanceof ContentItemFilter)
+            handleContentItemFilter(selectBuf, whereBuf, params, (ContentItemFilter) filter);
+        else    
             handleItemFilter(selectBuf, whereBuf, params, filter);
         
         selectBuf.append(whereBuf);
@@ -193,6 +196,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             NoteItemFilter filter) {
         selectBuf.append("select i from NoteItem i");
         handleItemFilter(selectBuf, whereBuf, params, filter);
+        handleContentItemFilter(selectBuf, whereBuf, params, filter);
         
         // filter by icaluid
         if(filter.getIcalUid()!=null) {
@@ -215,6 +219,23 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
                 appendWhere(whereBuf,"size(i.modifications) = 0");
         }
     }
+    
+    private void handleContentItemFilter(StringBuffer selectBuf,
+            StringBuffer whereBuf, HashMap<String, Object> params,
+            ContentItemFilter filter) {
+        
+        if("".equals(selectBuf.toString())) {
+            selectBuf.append("select i from ContentItem i");
+            handleItemFilter(selectBuf, whereBuf, params, filter);
+        }
+        
+        // handle triageStatus filter
+        if(filter.getTriageStatus()!=null) {
+            appendWhere(whereBuf,"i.triageStatus.code=:triageStatus");
+            params.put("triageStatus", filter.getTriageStatus());
+        }
+    }
+    
     
     private void appendWhere(StringBuffer whereBuf, String toAppend) {
         if("".equals(whereBuf.toString()))

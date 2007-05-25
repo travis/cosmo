@@ -21,7 +21,7 @@ import org.osaf.cosmo.model.NoteItem;
  * Adds NoteItem specific criteria to ItemFilter.
  * Matches only NoteItem instances.
  */
-public class NoteItemFilter extends ItemFilter {
+public class NoteItemFilter extends ContentItemFilter {
     private String icalUid = null;
     
     private Boolean hasModifications = null;

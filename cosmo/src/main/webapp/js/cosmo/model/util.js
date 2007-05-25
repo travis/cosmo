@@ -208,9 +208,9 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     },
           
     _genericIsChanged: function(propertyName, changedProperty){
-          var getterName = cosmo.model.util.getGetterAndSetterName(propertyName)[0];
-          var origProperty = this[getterName]();
-          return !cosmo.model.util.equals(origProperty, changedProperty);
+        var getterName = cosmo.model.util.getGetterAndSetterName(propertyName)[0];
+        var origProperty = this[getterName]();
+        return !cosmo.model.util.equals(origProperty, changedProperty);
     }
     
 });

@@ -24,7 +24,7 @@ dojo.declare("cosmo.model.Delta", null, {
         this._deletedStamps = {};
         this._note = note;
     },
-    
+
     addStampProperty: function (stampName, propertyName, value){
         var stamp = this._getStamp(stampName);
         stamp[propertyName] = value;
@@ -225,7 +225,6 @@ dojo.declare("cosmo.model.Delta", null, {
     },
     
     _apply: function(type, note){
-        dojo.debug("_apply:" + type);
         note = note || this._note;
         for (var stampName in this._deletedStamps){
             note.removeStamp(stampName);
@@ -246,17 +245,30 @@ dojo.declare("cosmo.model.Delta", null, {
             //create the stamp if it doesn't exist yet
             var stamp = note.getStamp(stampName,true);
             
-            this._applyProperties(stamp, stampChanges, type);
+            if (stampName == "event"){
+                this._applyPropertiesToEventStamp(stamp, stampChanges, type);
+            } else {
+                this._applyProperties(stamp, stampChanges, type);
+            }
         }
     },
     
    _applyProperties: function(original,changes, type){
-       dojo.debug("in apply props. type: " + type);
         for (var propName in changes){
-           dojo.debug("propName: "+ propName);
            var changeValue = changes[propName];
            original.applyChange(propName, changeValue, type);
         }
+    },
+    
+    _applyPropertiesToEventStamp: function(original, changes, type){
+        //start date must be applied first so that duration can be calculate
+        //properly
+        if (changes["startDate"]){
+           var changeValue = changes["startDate"];
+           original.applyChange("startDate", changeValue, type);
+           delete changes["startDate"];
+        }
+        this._applyProperties(original, changes, type);
     },
     
     _filterOutEqualProperties: function (original, changes){

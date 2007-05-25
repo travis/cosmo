@@ -76,7 +76,31 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
                    this.item.addModification(mod);
                }
            }
-           
+        },
+        
+        applyChange: function(propertyName, changeValue, type){
+            //TODO - make sure to fix the rId....
+            
+            //this handles the case of setting the master start date or end date 
+            // from an occurrence
+            if ( (propertyName == "startDate" || propertyName =="endDate") 
+                    && type == "master" 
+                    && this.isOccurrenceStamp()){
+                var getterAndSetter = cosmo.model.util.getGetterAndSetterName(propertyName);
+                var getterName = getterAndSetter[0];
+                var setterName = getterAndSetter[1];
+                
+                var diff =  dojo.date.diff(this[getterName]().toUTC(), 
+                            changeValue.toUTC(), 
+                            dojo.date.dateParts.SECOND);
+                
+                var masterDate = this.getMaster().getEventStamp()[getterName]();
+                var newDate = masterDate.clone();
+                newDate.add(dojo.date.dateParts.SECOND, diff);
+                this.getMaster().getEventStamp()[setterName](newDate);
+                return;  
+            }
+            this._inherited("applyChange", arguments);
         }
     },
     //mixins for occurrence stamps

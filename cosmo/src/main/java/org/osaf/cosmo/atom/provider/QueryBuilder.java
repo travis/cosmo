@@ -73,7 +73,7 @@ public class QueryBuilder {
         NoteItemFilter itemFilter = new NoteItemFilter();
         EventStampFilter eventFilter = new EventStampFilter();
         eventFilter.setTimeRange(start, end);
-        eventFilter.setExpandRecurringEvents(true);
+        //eventFilter.setExpandRecurringEvents(true);
 
         itemFilter.getStampFilters().add(eventFilter);
         

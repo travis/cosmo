@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
@@ -38,6 +39,7 @@ public class StandardGeneratorFactory
     private Abdera abdera;
     private ContentFactory contentFactory;
     private ContentService contentService;
+    private CosmoSecurityManager securityManager;
 
     // GeneratorFactory methods
 
@@ -132,6 +134,14 @@ public class StandardGeneratorFactory
         contentService = service;
     }
 
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    public void setSecurityManager(CosmoSecurityManager manager) {
+        this.securityManager = manager;
+    }
+
     public void init() {
         if (abdera == null)
             throw new IllegalStateException("abdera is required");
@@ -139,5 +149,7 @@ public class StandardGeneratorFactory
             throw new IllegalStateException("contentFactory is required");
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+        if (securityManager == null)
+            throw new IllegalStateException("securityManager is required");
     }
 }

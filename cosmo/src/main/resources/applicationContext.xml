@@ -479,7 +479,7 @@
     <property name="abdera"><ref local="abdera"/></property>
     <property name="providerManager">
       <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager"
-         init-method="init">
+            init-method="init">
         <property name="provider">
           <bean class="org.osaf.cosmo.atom.provider.StandardProvider"
                 init-method="init">
@@ -494,6 +494,9 @@
                 </property>
                 <property name="contentService">
                   <ref local="contentService"/>
+                </property>
+                <property name="securityManager">
+                  <ref local="securityManager"/>
                 </property>
               </bean>
             </property>

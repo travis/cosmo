@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -67,8 +68,7 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
         feed.addLink(newDavLink(collection));
         feed.addLink(newWebcalLink(collection));
 
-        // XXX should be only visible tickets
-        for (Ticket ticket : collection.getTickets())
+        for (Ticket ticket : visibleTickets(collection))
             addTicket(feed, ticket);
 
         return feed;
@@ -96,6 +96,11 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
      */
     protected String getProjection() {
         return PROJECTION_DETAILS;
+    }
+
+    private Set<Ticket> visibleTickets(CollectionItem collection) {
+        return getFactory().getSecurityManager().getSecurityContext().
+            findVisibleTickets(collection);
     }
 
     private void addTicket(Feed feed,

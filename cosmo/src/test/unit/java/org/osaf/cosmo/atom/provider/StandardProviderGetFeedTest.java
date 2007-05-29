@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.Ticket;
 
 /**
  * Test class for {@link StandardProvider#getFeed()} tests.
@@ -30,7 +32,7 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
     private static final Log log =
         LogFactory.getLog(StandardProviderGetFeedTest.class);
 
-    public void testGetFeed() throws Exception {
+    public void testGetCollectionFeed() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET",
                                                              "yyz", "eff");
@@ -39,6 +41,16 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
+    }
+
+    public void testGetSubscriptionFeed() throws Exception {
+        RequestContext req = helper.createSubscribedRequestContext();
+
+        ResponseContext res = provider.getFeed(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+        // subscribed feeds have no etag
+        assertNull("Invalid etag", res.getEntityTag());
     }
 
     public void testUnsupportedProjection() throws Exception {

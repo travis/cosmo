@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -30,10 +31,20 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
     private static final Log log =
         LogFactory.getLog(StandardProviderGetEntryTest.class);
 
-    public void testGetEntry() throws Exception {
+    public void testGetItemEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "GET",
                                                               "yyz", "eff");
+
+        ResponseContext res = provider.getEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+        assertNotNull("Null etag", res.getEntityTag());
+    }
+
+    public void testGetSubscriptionEntry() throws Exception {
+        CollectionSubscription sub = helper.makeAndStoreDummySubscription();
+        RequestContext req = helper.createSubscriptionRequestContext(sub);
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);

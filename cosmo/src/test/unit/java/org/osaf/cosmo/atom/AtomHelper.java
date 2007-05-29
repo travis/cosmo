@@ -40,8 +40,10 @@ import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockProviderManager;
 import org.osaf.cosmo.atom.provider.mock.MockServiceRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockSubscribedRequestContext;
+import org.osaf.cosmo.atom.provider.mock.MockSubscriptionRequestContext;
 import org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -140,6 +142,14 @@ public class AtomHelper extends MockHelper {
         throws IOException {
         MockSubscribedRequestContext rc =
             new MockSubscribedRequestContext(serviceContext, getUser());
+        return rc;
+    }
+
+    public RequestContext
+        createSubscriptionRequestContext(CollectionSubscription sub)
+        throws IOException {
+        MockSubscriptionRequestContext rc =
+            new MockSubscriptionRequestContext(serviceContext, getUser(), sub);
         return rc;
     }
 

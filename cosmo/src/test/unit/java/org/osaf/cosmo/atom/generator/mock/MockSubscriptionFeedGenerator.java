@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.generator.mock;
 
+import java.net.URLEncoder;
+
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 
@@ -72,7 +74,12 @@ public class MockSubscriptionFeedGenerator
 
             // when writing entries, we need self links to generate
             // location response headers
-            entry.addLink("urn:uid:" + sub.getDisplayName(), "self");
+            try {
+                String encodedUuid = URLEncoder.encode(sub.getDisplayName());
+                entry.addLink("urn:uid:" + encodedUuid, "self");
+            } catch (Exception e) {
+                throw new RuntimeException("Could not encode display name " + sub.getDisplayName(), e);
+            }
 
             return entry;
         } catch (Exception e) {

@@ -48,6 +48,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.NoteItem;
@@ -74,6 +75,7 @@ public class TestHelper {
     static int iseq = 0;
     static int lseq = 0;
     static int rseq = 0;
+    static int sseq = 0;
     static int tseq = 0;
     static int useq = 0;
 
@@ -199,6 +201,26 @@ public class TestHelper {
         String serial = new Integer(++useq).toString();
         String username = "dummy" + serial;
         return makeDummyUser(username, username);
+    }
+
+    /** */
+    public CollectionSubscription
+        makeDummySubscription(CollectionItem collection,
+                              Ticket ticket) {
+        if (collection == null)
+            throw new IllegalArgumentException("collection required");
+        if (ticket == null)
+            throw new IllegalArgumentException("ticket required");
+
+        String serial = new Integer(++sseq).toString();
+        String displayName = "dummy sub " + serial;
+
+        CollectionSubscription sub = new CollectionSubscription();
+        sub.setDisplayName(displayName);
+        sub.setTicketKey(ticket.getKey());
+        sub.setCollectionUid(collection.getUid());
+
+        return sub;
     }
 
     /**

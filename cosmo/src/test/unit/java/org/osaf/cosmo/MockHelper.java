@@ -25,6 +25,7 @@ import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -173,6 +174,30 @@ public class MockHelper extends TestHelper {
         throws Exception {
         NoteItem i = makeDummyItem(user);
         return (NoteItem) contentService.createContent(parent, i);
+    }
+
+    public Ticket makeAndStoreDummyTicket(CollectionItem collection)
+        throws Exception {
+        Ticket ticket = makeDummyTicket(user);
+        contentService.createTicket(collection, ticket);
+        return ticket;
+    }
+
+    public CollectionSubscription makeAndStoreDummySubscription()
+        throws Exception {
+        CollectionItem collection = makeAndStoreDummyCollection();
+        Ticket ticket = makeAndStoreDummyTicket(collection);
+        return makeAndStoreDummySubscription(collection, ticket);
+    }
+
+    public CollectionSubscription
+        makeAndStoreDummySubscription(CollectionItem collection,
+                                      Ticket ticket)
+        throws Exception {
+        CollectionSubscription sub = makeDummySubscription(collection, ticket);
+        user.addSubscription(sub);
+        userService.updateUser(user);
+        return sub;
     }
 
     public NoteItem findItem(String uid) {

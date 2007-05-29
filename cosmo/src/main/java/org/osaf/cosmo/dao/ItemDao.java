@@ -214,4 +214,12 @@ public interface ItemDao extends Dao {
      * @return set of items matching ItemFilter
      */
     public Set<Item> findItems(ItemFilter filter);
+    
+    /**
+     * Find a set of items using a set of ItemFilters.  The set of items
+     * returned includes all items that match any of the filters.
+     * @param filters criteria to filter items by
+     * @return set of items matching any of the filters
+     */
+    public Set<Item> findItems(ItemFilter[] filters);
 }

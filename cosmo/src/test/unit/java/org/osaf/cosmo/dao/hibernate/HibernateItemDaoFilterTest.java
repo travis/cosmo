@@ -249,6 +249,28 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals(1, results.size());
     }
     
+    public void testMultipleFilters() throws Exception {
+        CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
+ 
+        NoteItemFilter filter1 = new NoteItemFilter();
+        EventStampFilter eventFilter = new EventStampFilter();
+        filter1.getStampFilters().add(eventFilter);
+        filter1.setParent(calendar1);
+        
+        NoteItemFilter filter2 = new NoteItemFilter();
+        filter2.setParent(calendar1);
+        filter2.setIsModification(false);
+        
+        MissingStampFilter missingFilter = new MissingStampFilter(EventStamp.class);
+        filter2.setParent(calendar1);
+        filter2.getStampFilters().add(missingFilter);
+        
+        ItemFilter[] filters = new ItemFilter[] {filter1, filter2};
+        
+        Set<Item> results = contentDao.findItems(filters);
+        Assert.assertEquals(6, results.size());
+    }
+    
     private User getUser(UserDao userDao, String username) {
         return helper.getUser(userDao, contentDao, username);
     }

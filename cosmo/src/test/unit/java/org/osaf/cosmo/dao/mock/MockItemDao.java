@@ -375,6 +375,11 @@ public class MockItemDao implements ItemDao {
         // do nothing for now
         return null;
     }
+    
+    public Set<Item> findItems(ItemFilter[] filters) {
+        // do nothing for now
+        return null;
+    }
 
     // Dao methods
     /**

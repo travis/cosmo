@@ -38,6 +38,8 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     getCollections: function (kwArgs){
+        kwArgs = kwArgs || {};
+
         var deferred = this._transport.getCollections(kwArgs);
 
         this._addTranslation(deferred, "translateGetCollections", 
@@ -51,6 +53,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
     
     getSubscriptions: function (kwArgs){
+        kwArgs = kwArgs || {};
 
         var deferred = this._transport.getSubscriptions(kwArgs);
         return deferred;
@@ -60,6 +63,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
      * returns: dojo.Deferred with callbac that returns XML Document object.
      */
     getCollection: function(collectionUid, kwArgs){
+        kwArgs = kwArgs || {};
 
         var deferred = this._transport.getCollection(collectionUid, kwArgs);
 
@@ -70,7 +74,8 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     getItems: function (collection, searchCriteria, kwArgs){
-        if (!kwArgs) kwArgs = {};
+        kwArgs = kwArgs || {};
+
         kwArgs.ticketKey = collection.getTicketKey() || undefined;
         var deferred = this._transport.getItems(collection.getUid(), searchCriteria, kwArgs);
         
@@ -81,7 +86,8 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     getItem: function(uid, kwArgs){
-        if (!kwArgs)   kwArgs = {};
+        kwArgs = kwArgs || {};
+
         var deferred = this._transport.getItem(uid, kwArgs);
 
         this._addTranslation(deferred, "translateGetItems");
@@ -90,6 +96,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     saveItem: function(item, kwArgs){
+        kwArgs = kwArgs || {};
 
         // do topic notifications
         return this._transport.saveItem(item, this._translator.itemToAtomEntry(item), kwArgs);
@@ -97,12 +104,15 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
     
     createItem: function(item, parentCollection, kwArgs){
+        kwArgs = kwArgs || {};
+
         return this._transport.createItem(item, this._translator.itemToAtomEntry(item), 
                                           parentCollection.getUid(), kwArgs);
         
     },
 
     removeItem: function(collection, item, kwArgs){
+        kwArgs = kwArgs || {};
 
         // add object translator to callback chain
 

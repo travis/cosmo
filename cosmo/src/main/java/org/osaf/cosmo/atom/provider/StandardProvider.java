@@ -58,6 +58,7 @@ import org.osaf.cosmo.atom.processor.UnsupportedMediaTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
@@ -349,10 +350,39 @@ public class StandardProvider extends AbstractProvider
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        ItemTarget target = (ItemTarget) request.getTarget();
+        Target target = request.getTarget();
+        if (target instanceof SubscriptionTarget)
+            return getSubscriptionEntry(request, (SubscriptionTarget)target);
+        return getItemEntry(request, (ItemTarget)target);
+    }
+
+    private ResponseContext getSubscriptionEntry(RequestContext request,
+                                                 SubscriptionTarget target) {
+        User user = target.getUser();
+        CollectionSubscription sub = target.getSubscription();
+        if (log.isDebugEnabled())
+            log.debug("getting entry for subscription " +
+                      sub.getDisplayName() + " for user " + user.getUsername());
+
+        try {
+            ServiceLocator locator = createServiceLocator(request);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(target, locator);
+            Entry entry = generator.generateEntry(sub);
+
+            return createResponseContext(entry.getDocument());
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(abdera, request, reason, e);
+        }
+    }
+
+    private ResponseContext getItemEntry(RequestContext request,
+                                         ItemTarget target) {
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
-            log.debug("getting feed for item " + item.getUid());
+            log.debug("getting entry for item " + item.getUid());
 
         try {
             ServiceLocator locator = createServiceLocator(request);

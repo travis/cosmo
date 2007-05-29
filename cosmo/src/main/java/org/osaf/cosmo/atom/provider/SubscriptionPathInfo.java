@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -28,17 +30,12 @@ import org.osaf.cosmo.server.UserPath;
 /**
  * <p>
  * This class represents the path info portion of a user URL that
- * addresses one or all of the user's subscriptions.
+ * addresses a particular subscription.
  * </p>
  * <p>
- * A subscription path info matches one of these two possibilities:
+ * A subscription path info matches the pattern
+ * <code>/subscription/&lt;display name&gt;</code>.
  * </p>
- * <ul>
- * <li><code>/subscriptions</code></li>
- * <li><code>/subscription/&lt;display name&gt;</code></li>
- * </ul>
- *
- * @see UserPath
  */
 public class SubscriptionPathInfo {
     private static final Log log =
@@ -65,12 +62,14 @@ public class SubscriptionPathInfo {
         this.userPath = userPath;
 
         Matcher matcher = ONE_PATTERN.matcher(userPath.getPathInfo());
-        if (matcher.matches())
-            this.displayName = matcher.group(1);
-        else if (userPath.getPathInfo().equals("/subscriptions"))
-            ; // all subscriptions
-        else
+        if (! matcher.matches())
             throw new IllegalStateException("not a subscription path info");
+
+        try {
+            this.displayName = URLDecoder.decode(matcher.group(1), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Can't decode path info in UTF-8", e);
+        }
     }
 
     /** */

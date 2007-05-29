@@ -15,10 +15,13 @@
  */
 package org.osaf.cosmo.model;
 
+import java.security.MessageDigest;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+
+import org.apache.commons.codec.binary.Base64;
 
 import org.hibernate.annotations.Type;
 
@@ -28,6 +31,17 @@ import org.hibernate.annotations.Type;
  */
 @MappedSuperclass
 public abstract class AuditableObject extends BaseModelObject {
+
+    private static final MessageDigest etagDigest;
+    private static final Base64 etagEncoder = new Base64();
+
+    static {
+        try {
+            etagDigest = MessageDigest.getInstance("sha1");
+        } catch (Exception e) {
+            throw new RuntimeException("Platform does not support sha1?", e);
+        }
+    }
 
     private Date creationDate;
     private Date modifiedDate;
@@ -64,5 +78,9 @@ public abstract class AuditableObject extends BaseModelObject {
      */
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    protected String encodeEntityTag(byte[] bytes) {
+        return new String(etagEncoder.encode(etagDigest.digest(bytes)));
     }
 }

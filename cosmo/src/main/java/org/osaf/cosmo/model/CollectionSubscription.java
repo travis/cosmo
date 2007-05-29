@@ -21,6 +21,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
@@ -116,5 +117,16 @@ public class CollectionSubscription extends AuditableObject {
     
     public void setTicket(Ticket ticket) {
         this.ticketKey = ticket.getKey();
+    }
+
+    @Transient
+    public String getEntityTag() {
+        // subscription is unique by name for its owner
+        String uid = (getOwner() != null && getOwner().getUid() != null) ?
+            getOwner().getUid() : "-";
+        String modTime = getModifiedDate() != null ?
+            new Long(getModifiedDate().getTime()).toString() : "-";
+        String etag = uid + ":" + modTime;
+        return encodeEntityTag(etag.getBytes());
     }
 }

@@ -309,6 +309,7 @@ public class StandardProvider extends AbstractProvider
                 createSubscriptionFeedGenerator(target, locator);
             Feed feed = generator.generateFeed(user);
 
+            // no entity tag for this synthetic feed
             return createResponseContext(feed.getDocument());
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
@@ -370,7 +371,13 @@ public class StandardProvider extends AbstractProvider
                 createSubscriptionFeedGenerator(target, locator);
             Entry entry = generator.generateEntry(sub);
 
-            return createResponseContext(entry.getDocument());
+            AbstractResponseContext rc =
+                createResponseContext(entry.getDocument());
+            rc.setEntityTag(new EntityTag(sub.getEntityTag()));
+            // override Abdera which sets content type to include the
+            // type attribute because IE chokes on it
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+            return rc;
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -393,6 +400,8 @@ public class StandardProvider extends AbstractProvider
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument());
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            // override Abdera which sets content type to include the
+            // type attribute because IE chokes on it
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             return rc;
         } catch (UnsupportedProjectionException e) {

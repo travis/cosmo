@@ -23,7 +23,7 @@ dojo.require("cosmo.util.auth");
 cosmotest.service.conduits.test_conduits = {
     test_Note: function(){
         try{
-        
+
             var user = cosmotest.service.conduits.test_conduits.createTestAccount();
             
             // test getCollections
@@ -38,7 +38,6 @@ cosmotest.service.conduits.test_conduits = {
             var collectionDetails = conduit.getCollection(c0.getUid(), {sync: true});
     
             jum.assertTrue("collectionDetails", !!collectionDetails)
-            
             
             // Test createItem
             var newItemDisplayName = "Testing display name";
@@ -57,7 +56,7 @@ cosmotest.service.conduits.test_conduits = {
            );
 
             conduit.createItem(newItem, c0, {sync: true});
-            
+
             var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             
             jum.assertEquals("new item display name", newItemDisplayName, item0.getDisplayName());
@@ -83,7 +82,7 @@ cosmotest.service.conduits.test_conduits = {
             }
             ), c0, {sync: true});
 
-            var items = conduit.getItems(c0, {sync: true}).results[0];
+            var items = conduit.getItems(c0, {}, {sync: true}).results[0];
             jum.assertTrue("items", !!items);
             jum.assertEquals("items length", 2, items.length);
             
@@ -140,26 +139,29 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertEquals("status", stat, item0.getEventStamp().getStatus());
             
             item0.getEventStamp().setAnyTime(true);
-            conduit.saveItem(item0, c0, {sync: true});
+            item0.getEventStamp().setLocation("My place");
+            conduit.saveItem(item0, {sync: true});
             
             startDate.setHours(0);
             startDate.setMinutes(0);
             startDate.setSeconds(0);
-            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
 
+            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
+            
+            item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             jum.assertTrue("post-anytime start date", startDate.equals(item0.getEventStamp().getStartDate()));
+            jum.assertEquals("location", "My place", item0.getEventStamp().getLocation());
             jum.assertTrue("anytime", item0.getEventStamp().getAnyTime());
             
             item0.getEventStamp().setAllDay(true);
             item0.getEventStamp().setAnyTime(false);
-            conduit.saveItem(item0, c0, {sync: true});
+            conduit.saveItem(item0, {sync: true});
             var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             jum.assertTrue("post-allday start date", startDate.equals(item0.getEventStamp().getStartDate()));
             jum.assertTrue("allday", item0.getEventStamp().getAllDay());
             
-            
         } finally {
-            cosmotest.service.conduits.test_conduits.cleanup(user);            
+           cosmotest.service.conduits.test_conduits.cleanup(user);            
         }
     },
     
@@ -171,14 +173,19 @@ cosmotest.service.conduits.test_conduits = {
        var success = false;
        
        var i = 0;
-       while (!success && i < 1000){
-           var un = "user" + i;
+       while (!success && i < 10){
+           var un = "user0";
            user.username = un;
            user.firstName = un;
            user.lastName = un;
            user.email = un + "@cosmotesting.osafoundation.org";
            
-           cosmo.cmp.signup(user, {load: function(){success = true}, error: function(){i++}}, true);
+           cosmo.cmp.signup(user, {
+               load: function(){success = true}, 
+               error: function(){
+                  cosmotest.service.conduits.test_conduits.cleanup(user);
+                  i++;
+           }}, true);
        }
        cosmo.util.auth.setCred(user.username, user.password);
        

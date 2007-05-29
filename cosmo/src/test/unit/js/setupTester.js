@@ -1,7 +1,6 @@
   var bu_alert = dojo.hostenv.println;
   var print = dojo.hostenv.println;
 
-
   var test_names = jum.alltests_.group_names_;
   var test_menu = document.getElementById("test-menu");
   for (var i in test_names) {

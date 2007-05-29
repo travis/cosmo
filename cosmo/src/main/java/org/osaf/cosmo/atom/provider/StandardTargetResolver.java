@@ -86,6 +86,10 @@ public class StandardTargetResolver implements TargetResolver {
             if (spi != null)
                 return createSubscriptionTarget(context, spi);
 
+            // we don't know about any other path infos
+            if (up.getPathInfo() != null)
+                return null;
+
             return createUserTarget(context, up);
         }
 
@@ -161,6 +165,7 @@ public class StandardTargetResolver implements TargetResolver {
             user.getSubscription(pathInfo.getDisplayName());
         if (sub == null)
             return null;
+
         return new SubscriptionTarget(context, user, sub);
     }
 

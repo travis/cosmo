@@ -96,7 +96,7 @@
         <dependency>
             <groupId>net.fortuna</groupId>
             <artifactId>ical4j</artifactId>
-            <version>1.0-beta3-SNAPSHOT</version>
+            <version>1.0-beta4-SNAPSHOT</version>
         </dependency>
         <!-- required by jcr-server -->
         <!-- XXX: should be 1.0 release version -->

@@ -58,6 +58,18 @@
               <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>modularity releases</id>
+            <name>Modularity Release Repository</name>
+            <url>http://m2.modularity.net.au/releases</url>
+            <releases>
+              <enabled>true</enabled>
+            </releases>
+            <snapshots>
+              <enabled>false</enabled>
+              <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>

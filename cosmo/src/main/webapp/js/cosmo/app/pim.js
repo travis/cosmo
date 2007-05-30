@@ -37,11 +37,16 @@ dojo.require("cosmo.ui.ContentBox");
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.service.conduits.common');
+dojo.require('cosmo.app.pim.layout');
 
 // Global variables for X and Y position for mouse
 xPos = 0;
 yPos = 0;
 
+
+if (cosmo.app.pim) {
+    cosmo.app.old_pim = cosmo.app.pim;
+}
 /**
  * @object The Cal singleton
  */
@@ -88,10 +93,6 @@ cosmo.app.pim = new function () {
      * Main function
      */
     this.init = function (p) {
-
-        // Load some dependencies
-        dojo.require("cosmo.app.pim.layout");
-
         var params = p || {};
         var collectionUid = params.collectionUid;
 
@@ -224,7 +225,7 @@ cosmo.app.pim = new function () {
         // If we received a ticket, just grab the specified collection
         if (ticketKey) {
             try {
-               var collection = this.serv.getCollection(collectionUid, {ticket:ticketKey});
+               var collection = this.serv.getCollection(collectionUid, {ticketKey:ticketKey, sync:true}).results[0];
             }
             catch(e) {
                 cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
@@ -277,7 +278,7 @@ cosmo.app.pim = new function () {
         // If we received a collectionUid, select that collection
         if (collectionUid){
             for (var i = 0; i < this.currentCollections.length; i++){
-                if (this.currentCollections[i].collection.getUid() == collectionUid){
+                if (this.currentCollections[i].getUid() == collectionUid){
                     this.currentCollection = this.currentCollections[i];
                     break;
                 }
@@ -339,6 +340,10 @@ cosmo.app.pim = new function () {
         }
         this.allDayArea = null;
     };
+}
+if (cosmo.app.old_pim){
+    dojo.lang.mixin(cosmo.app.pim, cosmo.app.old_pim);
+    delete cosmo.app.old_pim;
 }
 
 Cal = cosmo.app.pim;

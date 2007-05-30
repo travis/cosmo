@@ -188,16 +188,16 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
                 // Collection name label
                 // ---
-                var displ = curr.displayName;
+                var displayName = curr.getDisplayName();
                 var d = _createElem("div");
                 d.id = 'collectionLabelName';
                 d.className = 'floatLeft labelTextHoriz';
-                if (displ.length > 13) {
-                    var textNode = _createText(displ.substr(0, 12) + '\u2026');
+                if (displayName.length > 13) {
+                    var textNode = _createText(displayName.substr(0, 12) + '\u2026');
                     d.title = curr.displayName;
                 }
                 else {
-                    var textNode = _createText(displ);
+                    var textNode = _createText(displayName);
                 }
                 d.appendChild(textNode);
                 d.style.height = self.verticalHeight + 'px';

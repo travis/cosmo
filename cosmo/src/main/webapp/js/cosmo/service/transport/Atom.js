@@ -42,11 +42,12 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     getCollection: function(collectionUid, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
-        
+
         var query = this._generateAuthQuery(kwArgs);
         
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/collection/" + collectionUid + "/details";
+          "/atom/collection/" + collectionUid + "/details" + 
+          this.queryHashToString(query);
         dojo.io.bind(r);
         return deferred;    
     },

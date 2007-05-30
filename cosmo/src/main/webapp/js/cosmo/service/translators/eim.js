@@ -47,10 +47,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     translateGetCollection: function (atomXml){
+        var ticketKey;
+        var ticketElement = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket")[0];
+        if (ticketElement) ticketKey = ticketElement.firstChild.nodeValue;
+        
         var collection = new cosmo.model.CollectionDetails(
-            {uid: atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9)
+            {uid: atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9),
+             displayName: cosmo.util.html.getElementsByTagName(atomXml, "title")[0].firstChild.nodeValue,
+             ticketKey: ticketKey
             }
             );
+
         return collection;
         
     },
@@ -361,9 +368,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     dateToEimDtstart: function (start, allDay, anyTime){
-        return [";VALUE=",
+        return [(anyTime? ";X-OSAF-ANYTIME=TRUE" : ""),
+                ";VALUE=",
                 ((allDay || anyTime)? "DATE" : "DATE-TIME"),
-                (anyTime? ";X-OSAF-ANYTIME=TRUE" : ""),
                 ":",
                 ((allDay || anyTime)?
                     start.strftime("%Y%m%d"):

@@ -48,6 +48,14 @@
                     <include>**/*</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>release-0.4.1/release/dojo/nls</directory>
+                <targetPath>/dojo/nls</targetPath>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
         </resources>
     </build>
     <profiles>

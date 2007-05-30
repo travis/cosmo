@@ -287,6 +287,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         };
 
         if (note.getEventStamp()) records.event = this.noteToEventRecord(note);
+        if (note.getTaskStamp()) records.event = this.noteToTaskRecord(note);
         
         return {
             uuid: note.getUid(),
@@ -344,6 +345,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var stat = stamp.getStatus();
         var loc = stamp.getLocation();
         var duration = stamp.getDuration();
+        var exdates = stamp.getExdates();
 
         with (cosmo.service.eim.constants){
             var fields = {};
@@ -354,8 +356,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (loc) fields.location = [type.TEXT, loc];
             if (duration) fields.duration = [type.TEXT, duration.toIso8601()];
             if (rrule) fields.rrule = [type.TEXT, this.rruleToICal(rrule)];
+            if (exdates) fields.exdates = [type.TEXT, this.exdatesToEim(exdates)];
             
-            return {
+           return {
                 prefix: prefix.EVENT,
                 ns: ns.EVENT,
                 keys: {
@@ -365,6 +368,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }
         }
 
+    },
+    
+    exdatesToEim: function(exdates){
+        return ";VALUE=DATE-TIME:" + dojo.lang.map(
+                exdates,
+                function(date){return date.strftime("%Y%m%dT%H%M%S");}
+            ).join(",");
     },
     
     dateToEimDtstart: function (start, allDay, anyTime){
@@ -424,7 +434,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
         if (record.fields.location != undefined) properties.location = record.fields.location[1];
         if (record.fields.rrule != undefined) properties.rrule = this.parseRRule(record.fields.rrule[1]);
-        if (record.fields.exdates != undefined) properties.exdates = record.fields.exdates; //TODO
+        if (record.fields.exrule != undefined) properties.rrule = this.parseRRule(record.fields.exrule[1]);
+        if (record.fields.exdate != undefined) properties.exdates = this.parseExdate(record.fields.exdate[1]);
         if (record.fields.status != undefined) properties.status = record.fields.status[1];
         return properties;
 
@@ -521,6 +532,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return null;
         }
         return this.rPropsToRRule(this.parseRRuleToHash(rule));
+    },
+    
+    parseExdate: function (exdate){
+        if (!exdate) return null;
+        return dojo.lang.map(
+                exdate.split(":")[1].split(","),
+                cosmo.datetime.fromIso8601
+         );
     },
 
     //Snagged from dojo.cal.iCalendar

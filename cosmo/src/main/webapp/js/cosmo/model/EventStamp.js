@@ -45,13 +45,10 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
         },
 
         setEndDate: function (/*CosmoDate*/ endDate){
-            dojo.debug("setEndDate: " +endDate);
             endDate = endDate.clone();
             if (this.getAnyTime() || this.getAllDay()){
-                dojo.debug("setEndDate: allDay:" + this.getAllDay());
                 endDate.add(dojo.date.dateParts.DAY, +1);
             }
-            dojo.debug("setEndDate: changed:  " + endDate)
             var duration = new cosmo.model.Duration(this.getStartDate(), endDate);
             this.setDuration(duration);
         },

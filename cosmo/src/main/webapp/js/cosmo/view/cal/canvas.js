@@ -1335,7 +1335,6 @@ cosmo.view.cal.canvas = new function () {
         eventStamp.setAllDay(allDay);
         eventStamp.setEndDate(end);
         ev.data = note;
-        xxx = note; 
         
         // Register the new event in the event list
         // ================================

@@ -445,6 +445,10 @@ cosmo.view.cal = new function () {
                     break;
 
                 // Default -- nothing to do
+                case 'new':
+                    dojo.debug("doSaveChanges: new")
+                    f = function () { doSaveEvent(ev, { 'saveType': 'singleEvent', 'new': true } ) };
+                    break;
                 default:
                     break;
             }
@@ -463,23 +467,32 @@ cosmo.view.cal = new function () {
      * async service call that saves the changes to the event.
      * Response to the async request is handled by handleSaveEvent.
      * @param ev A CalEvent object, the event to be saved.
-     * @param opts A JS Object, options for the save operation.
+     * @param opts An Object, options for the save operation.
      */
      //XINT
     function doSaveEvent(ev, opts) {
+        dojo.debug("doSaveEvent");
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
 
         var f = function (newEvId, err, reqId) {
-
-            handleSaveEvent(ev, newEvId, err, reqId, opts); };
+            handleSaveEvent(ev, newEvId, err, reqId, opts); 
+        };
+        
+        var deferred = null;
         var requestId = null;
-
-        requestId = //cosmo.service.atom.saveEvent(ev, {load: f});
-            cosmo.app.pim.currentCollection.conduit.saveEvent(
-            cosmo.app.pim.currentCollection.collection.uid, ev.data,
-            cosmo.app.pim.currentCollection.transportInfo, f);
-
+        var newItem = opts['new'] || false;
+        var note = ev.data;
+        
+        if (newItem){
+            deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection,{});
+        } else {
+            deferred = cosmo.app.pim.serv.saveItem(note);
+        }
+        deferred.addCallback(f);
+        
+        requestId = deferred.id;
+        
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
         self.processingQueue.push(requestId);
@@ -501,6 +514,7 @@ cosmo.view.cal = new function () {
             self.lastSent = ev;
         }
     }
+    
     /**
      * Call the service to break a recurrence and save a new
      * event. The new event may or may not itself have recurrence.

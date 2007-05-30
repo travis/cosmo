@@ -645,17 +645,19 @@ cosmo.view.cal.canvas = new function () {
                 // plaforms, overflow of 'auto' in underlying divs causes
                 // carets/cursors in textboxes to disappear. This is a verified
                 // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
-                if (cmd.isDisplayed) {
-                    if (dojo.render.html.mozilla) {
-                        timedScrollingMainDiv.style.overflow = "hidden";
+                if (typeof timedScrollingMainDiv != 'undefined' && timedScrollingMainDiv) {
+                    if (cmd.isDisplayed) {
+                        if (dojo.render.html.mozilla) {
+                            timedScrollingMainDiv.style.overflow = "hidden";
+                        }
                     }
-                }
-                else {
-                   if (dojo.render.html.mozilla) {
-                       timedScrollingMainDiv.style.overflow = "auto";
-                       timedScrollingMainDiv.style.overflowY = "auto";
-                       timedScrollingMainDiv.style.overflowX = "hidden";
-                   }
+                    else {
+                       if (dojo.render.html.mozilla) {
+                           timedScrollingMainDiv.style.overflow = "auto";
+                           timedScrollingMainDiv.style.overflowY = "auto";
+                           timedScrollingMainDiv.style.overflowX = "hidden";
+                       }
+                    }
                 }
                 break;
         }

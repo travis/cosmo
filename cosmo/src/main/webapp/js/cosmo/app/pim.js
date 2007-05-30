@@ -43,14 +43,10 @@ dojo.require('cosmo.app.pim.layout');
 xPos = 0;
 yPos = 0;
 
-
-if (cosmo.app.pim) {
-    cosmo.app.old_pim = cosmo.app.pim;
-}
 /**
  * @object The Cal singleton
  */
-cosmo.app.pim = new function () {
+dojo.lang.mixin(cosmo.app.pim, new function () {
     var self = this;
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
@@ -120,7 +116,7 @@ cosmo.app.pim = new function () {
 
         // Load data -- successful load triggers render of UI widgets
         // ===============================
-        cosmo.view.cal.loadEvents({ collection: self.currentCollection,
+        cosmo.view.cal.loadEvents({ collection: this.currentCollection,
             viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
 
         // Show errors for deleted subscriptions -- deletedSubscriptions
@@ -237,7 +233,6 @@ cosmo.app.pim = new function () {
         // Otherwise, get all collections for this user
         else {
             var userCollections = this.serv.getCollections({sync: true}).results[0];
-
             for (var i = 0; i < userCollections.length; i++){
                 var collection = userCollections[i];
                 this.currentCollections.push(collection);
@@ -340,11 +335,7 @@ cosmo.app.pim = new function () {
         }
         this.allDayArea = null;
     };
-}
-if (cosmo.app.old_pim){
-    dojo.lang.mixin(cosmo.app.pim, cosmo.app.old_pim);
-    delete cosmo.app.old_pim;
-}
+});
 
 Cal = cosmo.app.pim;
 

@@ -51,6 +51,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // Set local currentCollection var
             var c = this.collections[t.selectedIndex];
             this.currentCollection = c;
+            cosmo.app.pim.currentCollection = c;
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection', opts: { collection: c }, data: {}
             });

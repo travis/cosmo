@@ -26,12 +26,11 @@ import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
 
 /**
- * Test class for {@link StandardProvider#createEntry()} tests.
+ * Test class for {@link ItemProvider#createEntry()} tests.
  */
-public class StandardProviderCreateEntryTest extends BaseProviderTestCase
+public class CreateItemTest extends BaseItemProviderTestCase
     implements AtomConstants {
-    private static final Log log =
-        LogFactory.getLog(StandardProviderCreateEntryTest.class);
+    private static final Log log = LogFactory.getLog(CreateItemTest.class);
 
     public void testCreateEntry() throws Exception {
         CollectionItem item = helper.makeAndStoreDummyCollection();

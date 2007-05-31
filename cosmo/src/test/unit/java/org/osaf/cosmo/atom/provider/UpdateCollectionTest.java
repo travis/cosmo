@@ -25,12 +25,12 @@ import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
 
 /**
- * Test class for {@link StandardProvider#updateCollection()} tests.
+ * Test class for {@link ItemProvider#updateCollection()} tests.
  */
-public class StandardProviderUpdateCollectionTest extends BaseProviderTestCase
+public class UpdateCollectionTest extends BaseItemProviderTestCase
     implements AtomConstants {
     private static final Log log =
-        LogFactory.getLog(StandardProviderUpdateCollectionTest.class);
+        LogFactory.getLog(UpdateCollectionTest.class);
 
     public void testUpdateCollection() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();

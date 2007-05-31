@@ -22,17 +22,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.CollectionSubscription;
-import org.osaf.cosmo.model.Ticket;
 
 /**
- * Test class for {@link StandardProvider#getFeed()} tests.
+ * Test class for {@link ItemProvider#getFeed()} tests.
  */
-public class StandardProviderGetFeedTest extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(StandardProviderGetFeedTest.class);
+public class GetCollectionTest extends BaseItemProviderTestCase {
+    private static final Log log = LogFactory.getLog(GetCollectionTest.class);
 
-    public void testGetCollectionFeed() throws Exception {
+    public void testGetFeed() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET",
                                                              "yyz", "eff");
@@ -41,16 +38,6 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
-    }
-
-    public void testGetSubscriptionFeed() throws Exception {
-        RequestContext req = helper.createSubscribedRequestContext();
-
-        ResponseContext res = provider.getFeed(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 200, res.getStatus());
-        // subscribed feeds have no etag
-        assertNull("Invalid etag", res.getEntityTag());
     }
 
     public void testUnsupportedProjection() throws Exception {
@@ -62,7 +49,6 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
-        log.error(helper.getContent(res));
     }
 
     public void testUnsupportedFormat() throws Exception {
@@ -74,7 +60,6 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
-        log.error(helper.getContent(res));
     }
 
     public void testGenerationError() throws Exception {
@@ -86,7 +71,6 @@ public class StandardProviderGetFeedTest extends BaseProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
-        log.error(helper.getContent(res));
     }
 
     protected void setUp() throws Exception {

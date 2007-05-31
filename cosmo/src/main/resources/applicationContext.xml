@@ -474,6 +474,29 @@
 
   <bean id="abdera" class="org.apache.abdera.Abdera"/>
 
+  <bean id="baseProvider" class="org.osaf.cosmo.atom.provider.BaseProvider"
+        init-method="init" abstract="true">
+    <property name="abdera"><ref local="abdera"/></property>
+    <property name="generatorFactory">
+      <bean class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory"
+            init-method="init">
+        <property name="abdera"><ref local="abdera"/></property>
+        <property name="contentFactory">
+          <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>
+        </property>
+        <property name="contentService">
+          <ref local="contentService"/>
+        </property>
+        <property name="securityManager">
+          <ref local="securityManager"/>
+        </property>
+      </bean>
+    </property>
+    <property name="serviceLocatorFactory">
+      <ref local="serviceLocatorFactory"/>
+    </property>
+  </bean>
+
   <bean id="atomServiceContext"
         class="org.osaf.cosmo.atom.StandardServiceContext">
     <property name="abdera"><ref local="abdera"/></property>
@@ -481,41 +504,32 @@
       <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager"
             init-method="init">
         <property name="provider">
-          <bean class="org.osaf.cosmo.atom.provider.StandardProvider"
-                init-method="init">
-            <property name="abdera"><ref local="abdera"/></property>
-            <property name="generatorFactory">
-              <bean
-                 class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory"
-                 init-method="init">
-                <property name="abdera"><ref local="abdera"/></property>
-                <property name="contentFactory">
-                  <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>
+          <bean class="org.osaf.cosmo.atom.provider.ProviderProxy"
+                init-method="init" parent="baseProvider">
+            <property name="itemProvider">
+              <bean class="org.osaf.cosmo.atom.provider.ItemProvider"
+                    init-method="init" parent="baseProvider">
+                <property name="processorFactory">
+                  <bean class="org.osaf.cosmo.atom.processor.StandardProcessorFactory"/>
                 </property>
                 <property name="contentService">
                   <ref local="contentService"/>
                 </property>
-                <property name="securityManager">
-                  <ref local="securityManager"/>
-                </property>
               </bean>
             </property>
-            <property name="processorFactory">
-              <bean class="org.osaf.cosmo.atom.processor.StandardProcessorFactory"/>
-            </property>
-            <property name="contentService">
-              <ref local="contentService"/>
-            </property>
-            <property name="userService">
-              <ref local="userService"/>
-            </property>
-            <property name="serviceLocatorFactory">
-              <ref local="serviceLocatorFactory"/>
+            <property name="subscriptionProvider">
+              <bean class="org.osaf.cosmo.atom.provider.SubscriptionProvider"
+                    init-method="init" parent="baseProvider">
+                <property name="userService">
+                  <ref local="userService"/>
+                </property>
+              </bean>
             </property>
           </bean>
         </property>
       </bean>
     </property>
+        
     <property name="requestHandlerManager">
       <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager"
             init-method="init">

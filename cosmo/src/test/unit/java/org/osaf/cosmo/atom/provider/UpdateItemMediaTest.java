@@ -24,11 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
- * Test class for {@link StandardProvider#updateMedia()} tests.
+ * Test class for {@link ItemProvider#updateMedia()} tests.
  */
-public class StandardProviderUpdateMediaTest extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(StandardProviderUpdateMediaTest.class);
+public class UpdateItemMediaTest extends BaseItemProviderTestCase {
+    private static final Log log = LogFactory.getLog(UpdateItemMediaTest.class);
 
     public void testUpdateMedia() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();

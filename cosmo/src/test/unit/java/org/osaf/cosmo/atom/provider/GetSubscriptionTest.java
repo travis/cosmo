@@ -22,34 +22,30 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionSubscription;
-import org.osaf.cosmo.model.NoteItem;
 
 /**
- * Test class for {@link StandardProvider#deleteEntry()} tests.
+ * Test class for {@link SubscriptionProvider#getEntry()} tests.
  */
-public class StandardProviderDeleteEntryTest extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(StandardProviderDeleteEntryTest.class);
+public class GetSubscriptionTest extends BaseSubscriptionProviderTestCase {
+    private static final Log log = LogFactory.getLog(GetSubscriptionTest.class);
 
-    public void testDeleteItemEntry() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "DELETE");
+    public void testGetSubscriptionEntry() throws Exception {
+        CollectionSubscription sub = helper.makeAndStoreDummySubscription();
+        RequestContext req = helper.createSubscriptionRequestContext(sub);
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-        assertNull("Item not removed", helper.findItem(item.getUid()));
+        assertEquals("Incorrect response status", 200, res.getStatus());
+        assertNotNull("Null etag", res.getEntityTag());
     }
 
-    public void testDeleteSubscriptionntry() throws Exception {
+    public void testGenerationError() throws Exception {
         CollectionSubscription sub = helper.makeAndStoreDummySubscription();
-        RequestContext req =
-            helper.createSubscriptionRequestContext(sub, "DELETE");
+        RequestContext req = helper.createSubscriptionRequestContext(sub);
+        helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-        assertNull("Subscription not removed",
-                   helper.findSubscription(sub.getDisplayName()));
+        assertEquals("Incorrect response status", 500, res.getStatus());
     }
 }

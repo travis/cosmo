@@ -15,29 +15,20 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.server.provider.Provider;
-import org.apache.abdera.protocol.server.provider.ProviderManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class StandardProviderManager implements ProviderManager {
+/**
+ * Base class for for {@link SubscriptionProvider} tests.
+ */
+public abstract class BaseSubscriptionProviderTestCase
+    extends BaseProviderTestCase {
+    private static final Log log =
+        LogFactory.getLog(BaseSubscriptionProviderTestCase.class);
 
-    private Provider provider;
-
-    // ProviderManager methods
-
-    public Provider getProvider() {
+    protected BaseProvider createProvider() {
+        SubscriptionProvider provider = new SubscriptionProvider();
+        provider.setUserService(helper.getUserService());
         return provider;
-    }
-
-    public void release(Provider provider) {}
-
-    // our methods
-
-    public void setProvider(Provider provider) {
-        this.provider = provider;
-    }
-
-    public void init() {
-        if (provider == null)
-            throw new IllegalStateException("provider is required");
     }
 }

@@ -21,30 +21,18 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
- * Test class for {@link StandardProvider#getEntry()} tests.
+ * Test class for {@link ItemProvider#getEntry()} tests.
  */
-public class StandardProviderGetEntryTest extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(StandardProviderGetEntryTest.class);
+public class GetItemTest extends BaseItemProviderTestCase {
+    private static final Log log = LogFactory.getLog(GetItemTest.class);
 
-    public void testGetItemEntry() throws Exception {
+    public void testGetEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "GET",
                                                               "yyz", "eff");
-
-        ResponseContext res = provider.getEntry(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 200, res.getStatus());
-        assertNotNull("Null etag", res.getEntityTag());
-    }
-
-    public void testGetSubscriptionEntry() throws Exception {
-        CollectionSubscription sub = helper.makeAndStoreDummySubscription();
-        RequestContext req = helper.createSubscriptionRequestContext(sub);
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
@@ -61,7 +49,6 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
-        log.error(helper.getContent(res));
     }
 
     public void testUnsupportedFormat() throws Exception {
@@ -73,7 +60,6 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
-        log.error(helper.getContent(res));
     }
 
     public void testGenerationError() throws Exception {
@@ -85,7 +71,6 @@ public class StandardProviderGetEntryTest extends BaseProviderTestCase {
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
-        log.error(helper.getContent(res));
     }
 
     protected void setUp() throws Exception {

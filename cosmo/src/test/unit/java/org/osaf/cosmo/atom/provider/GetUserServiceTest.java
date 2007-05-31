@@ -21,14 +21,12 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.CollectionItem;
 
 /**
- * Test class for {@link StandardProvider#getService()} tests.
+ * Test class for {@link ProviderProxy#getService()} tests.
  */
-public class StandardProviderGetServiceTest extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(StandardProviderGetServiceTest.class);
+public class GetUserServiceTest extends BaseProviderProxyTestCase {
+    private static final Log log = LogFactory.getLog(GetUserServiceTest.class);
 
     public void testGetService() throws Exception {
         helper.makeAndStoreDummyCollection();

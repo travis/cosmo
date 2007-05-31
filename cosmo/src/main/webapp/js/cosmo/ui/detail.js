@@ -28,6 +28,7 @@ dojo.require("dojo.lfx.*");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
+dojo.require('cosmo.datetime.timezone');
 
 cosmo.ui.detail.DetailViewForm = function (p) {
     var self = this;
@@ -43,6 +44,12 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     var a = new cosmo.ui.detail.StampSection({ parent: this,
         domNode: d,
         stampType: 'Address', title: 'Address' });
+    this.children = [a];
+    this.formNode.appendChild(a.domNode);
+    var d = _createElem('div');
+    var a = new cosmo.ui.detail.StampSection({ parent: this,
+        domNode: d,
+        stampType: 'Event', title: 'Event' });
     this.children = [a];
     this.formNode.appendChild(a.domNode);
 };
@@ -88,7 +95,7 @@ cosmo.ui.detail.StampSection = function (p) {
     d = _createElem('div');
     d.className = 'expandoTriangle floatLeft';
     d.id = id + 'Expander';
-    d.innerHTML = 'V';
+    d.innerHTML = 'v';
     header.appendChild(d);
     // Stamp icon
     d = _createElem('div');
@@ -123,6 +130,9 @@ cosmo.ui.detail.StampSection = function (p) {
     body.id = id + 'Body';
     body.className = 'expandoBody';
     this.formSection = cosmo.ui.detail.getFormElementsForStamp(this.stampType);
+    if (!this.formSection.domNode) {
+       throw('Form section for ' + this.stampType + ' has no DOM node.');
+    }
     body.appendChild(this.formSection.domNode);
     this.bodyNode = body;
     this.domNode.appendChild(body);
@@ -155,7 +165,6 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (e) {
 }
 
 cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e) {
-
     // Don't pass click event along to the expando
     e.stopPropagation();
 
@@ -229,6 +238,7 @@ cosmo.ui.detail.getFormElementsForStamp = function (stampType) {
     return new cosmo.ui.detail[stampType + 'FormElements']();
 };
 cosmo.ui.detail.AddressFormElements = function () {
+    var _html = cosmo.util.html;
     var d = _createElem('div');
     var table = _createElem('table');
     var tbody = _createElem('tbody');
@@ -240,10 +250,17 @@ cosmo.ui.detail.AddressFormElements = function () {
         td.style.width = '56px';
         td.style.textAlign = 'right';
         td.innerHTML = label + ':&nbsp;';
+        td.className = 'labelTextHoriz';
         tr.appendChild(td);
         td = _createElem('td');
-        td.innerHTML = '<input type="text" name="address' + name +
-            '" id="address' + name + '" value=""/>';
+        var elem = _html.createInput({ type: 'text',
+            id: 'address' + name,
+            name: 'address' + name,
+            size: 20,
+            maxlength: 100,
+            value: '',
+            className: 'inputText' });
+        td.appendChild(elem);
         tr.appendChild(td);
         return tr;
     }
@@ -255,13 +272,257 @@ cosmo.ui.detail.AddressFormElements = function () {
     table.cellSpacing = '0px';
     table.appendChild(tbody);
 
-    tbody.appendChild(addressRow('from', 'From'));
-    tbody.appendChild(addressRow('to', 'To'));
-    tbody.appendChild(addressRow('cc', 'Cc'));
+    tbody.appendChild(addressRow('Fr', 'From'));
+    tbody.appendChild(addressRow('To', 'To'));
+    tbody.appendChild(addressRow('Cc', 'Cc'));
     this.toggleEnabled(false);
 };
 cosmo.ui.detail.AddressFormElements.prototype = new cosmo.ui.detail.StampFormElements();
 
-cosmo.ui.detail.EventFormElements= function () {};
+cosmo.ui.detail.EventFormElements= function () {
+    var _html = cosmo.util.html;
+    var d = _createElem('div');
+
+    var createDateTimeInputs = function (label, name) {
+        var d = _createElem('div');
+        var t = cosmo.ui.detail.createLabelDiv(_(
+            'Main.DetailForm.' + label));
+        d.appendChild(t);
+        var elem = _html.createInput({ type: 'text',
+            id: name + 'date',
+            name: name + 'date',
+            size: 10,
+            maxlength: 10,
+            value: '',
+            className: 'inputText' });
+        var t = cosmo.ui.detail.createFormElemDiv(elem);
+        t.style.whiteSpace = 'nowrap';
+        t.appendChild(_html.nbsp());
+        t.appendChild(_createText(
+            _('Main.DetailForm.At')));
+        t.appendChild(_html.nbsp());
+        var elem = _html.createInput({ type: 'text',
+            id: name + 'time',
+            name:name + 'time',
+            size: 5,
+            maxlength: 5,
+            value: '',
+            className: 'inputText' });
+        t.appendChild(elem);
+        t.appendChild(_html.nbsp());
+        var elem = _html.createInput({ type: 'radio',
+            id: name + 'ap0',
+            name: name + 'ap',
+            value: 1 });
+        t.appendChild(elem);
+        t.appendChild(_html.nbsp());
+        t.appendChild(_createText(
+            _('App.PM')));
+        d.appendChild(t);
+        return d;
+    };
+
+    var getTimezoneRegionOptions = function (){
+        var options = [];
+        var option = {opt: null,
+                     text: _("Main.DetailForm.Region")};
+        options.push(option);
+        var regions = cosmo.datetime.timezone.REGIONS;
+        for (var x = 0; x < regions.length; x++){
+            option = { text: regions[x], value: regions[x]};
+            options.push(option);
+        }
+        return options;
+    };
+
+    var getTimezoneIdOptions = function (region){
+        var tzIds = region ? cosmo.datetime.timezone.getTzIdsForRegion(
+            region).sort() : null;
+        var options = [{
+            text: _("Main.DetailForm.TimezoneSelector.None"),
+            value: "" }];
+        if (tzIds){
+            dojo.lang.map(tzIds, function (tzId) {
+                // Strip off the Region, turn underscores into spaces for display
+                options.push({text:tzId.substr(
+                    tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
+            });
+        }
+        return options;
+    };
+
+    var getStatusOpt = function () {
+        var statusOpt = [];
+        var opt = null;
+        var str = '';
+
+        for (var i in cosmo.model.EventStatus) {
+            opt = new Object();
+            str = cosmo.model.EventStatus[i];
+            if(str == cosmo.model.EventStatus.FYI) {
+                opt.text = i;
+            }
+            else {
+                opt.text = dojo.string.capitalize(i.toLowerCase());
+            }
+            opt.value = str;
+            statusOpt.push(opt);
+        }
+        return statusOpt;
+    };
+    var getRecurOpt = function () {
+        var recurOpt = [];
+        var opt = null;
+        var str = '';
+
+        opt = new Object();
+        opt.text = 'Once';
+        opt.value = '';
+        recurOpt.push(opt);
+        for (var i in cosmo.model.RRULE_FREQUENCIES) {
+            opt = new Object();
+            str = cosmo.model.RRULE_FREQUENCIES[i];
+            opt.text = dojo.string.capitalize(str);
+            opt.value = str;
+            recurOpt.push(opt);
+        }
+        return recurOpt;
+    };
+
+    d.id = 'eventFormSection';
+    d.style.padding = '8px 12px 24px 8px';
+    this.domNode = d;
+
+    // Event title
+    var t = cosmo.ui.detail.createLabelDiv(_(
+        'Main.DetailForm.Title'));
+    d.appendChild(t);
+    var elem = _html.createInput({ type: 'text',
+        id: 'eventtitle',
+        name: 'eventtitle',
+        size: 28,
+        maxlenght: 100,
+        value: '',
+        className: 'inputText' });
+    var t =  cosmo.ui.detail.createFormElemDiv(elem);
+    d.appendChild(t);
+    // Location
+    var t = cosmo.ui.detail.createLabelDiv(_(
+        'Main.DetailForm.Location'));
+    d.appendChild(t);
+    var elem = _html.createInput({ type: 'text',
+        id: 'eventlocation',
+        name: 'eventlocation',
+        size: 28,
+        maxlength: 100,
+        value: '',
+        className: 'inputText' });
+    var t =  cosmo.ui.detail.createFormElemDiv(elem);
+    d.appendChild(t);
+    // All-day checkbox
+    var elem = _html.createInput({ type: 'checkbox',
+        id: 'eventallday',
+        name: 'eventallday',
+        value: 'true' });
+    var t =  cosmo.ui.detail.createFormElemDiv(elem);
+    t.appendChild(_html.nbsp());
+    t.appendChild(_createText('All day'));
+    d.appendChild(t);
+    // Event start
+    var t = createDateTimeInputs('Starts', 'start');
+    d.appendChild(t);
+    // Event end
+    var t = createDateTimeInputs('Ends', 'end');
+    d.appendChild(t);
+    // Timezone
+    var t = cosmo.ui.detail.createLabelDiv(_(
+        'Main.DetailForm.Timezone'));
+    t.style.whiteSpace = 'nowrap';
+    t.className += ' formElem';
+    t.appendChild(_html.nbsp());
+    var elem = _html.createSelect({ id: 'tzRegion',
+        name: 'tzRegion',
+        multiple: false,
+        className: 'selectElem',
+        options: getTimezoneRegionOptions() });
+    t.appendChild(_html.nbsp());
+    t.appendChild(elem);
+    t.appendChild(_html.nbsp());
+    var elem = _html.createSelect({ id: 'tzId',
+        name: 'tzId',
+        multiple: false,
+        className: 'selectElem',
+        options: getTimezoneIdOptions(null) });
+    elem.style.width = '100px';
+    t.appendChild(elem);
+    d.appendChild(t);
+    // Event status
+    var t = cosmo.ui.detail.createLabelDiv(_(
+        'Main.DetailForm.Status'));
+    t.className += ' formElem';
+    t.appendChild(_html.nbsp());
+    var elem = _html.createSelect({ id: 'status',
+        name: 'status',
+        multi: false,
+        options: getStatusOpt(),
+        className: 'selectElem' });
+    t.appendChild(_html.nbsp());
+    t.appendChild(elem);
+    d.appendChild(t);
+    // Recurrence
+    var t = cosmo.ui.detail.createLabelDiv(_(
+        'Main.DetailForm.Occurs'));
+    t.className += ' formElem';
+    t.style.whiteSpace = 'nowrap';
+    var elem = _html.createSelect({ id: 'recurrence',
+        name: 'recurrence',
+        multi: false,
+        options: getRecurOpt(),
+        className: 'selectElem' });
+    t.appendChild(_html.nbsp());
+    t.appendChild(elem);
+    t.appendChild(_html.nbsp());
+    t.appendChild(_createText(_('Main.DetailForm.Ending')));
+    t.appendChild(_html.nbsp());
+    var elem = _html.createInput({ type: 'text',
+        id: 'recurend',
+        name: 'recurend',
+        size: 10,
+        maxlength: 10,
+        value: '',
+        className: 'inputText' });
+    t.appendChild(elem);
+    d.appendChild(t);
+
+    var t = cosmo.ui.detail.createLabelDiv(_(
+        'Main.DetailForm.Description'));
+    d.appendChild(t);
+    var elem = _createElem('textarea');
+    elem.className = 'inputText';
+    elem.id = 'eventdescr';
+    elem.name = 'eventdescr';
+    elem.cols = '28';
+    elem.rows = '4';
+    elem.style.width = '220px';
+    var t = cosmo.ui.detail.createFormElemDiv(elem);
+    d.appendChild(t);
+
+    this.toggleEnabled(false);
+};
 cosmo.ui.detail.EventFormElements.prototype = new cosmo.ui.detail.StampFormElements();
+
+// Utility functions
+cosmo.ui.detail.createLabelDiv = function (str) {
+    var d = _createElem('div');
+    d.className = 'labelTextVert';
+    d.appendChild(_createText((str)));
+    return d;
+};
+
+cosmo.ui.detail.createFormElemDiv = function (elem) {
+    var d = _createElem('div');
+    d.className = 'formElem';
+    d.appendChild(elem);
+    return d;
+};
 

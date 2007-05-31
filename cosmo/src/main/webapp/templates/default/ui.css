@@ -305,13 +305,13 @@ body.adminPage {
  * --------------------- */
 /* Label appearing above form inputs */
 .labelTextVert {
-    color: #333333;
+    color: #999;
     font-weight: bold;
     margin-bottom: 2px;
 }
 /* Label appearing to left of form inputs */
 .labelTextHoriz {
-    color: #333333;
+    color: #999;
     font-weight: bold;
 }
 /* Add right align and padding */
@@ -325,8 +325,7 @@ body.adminPage {
 .labelTextXL {
     font-size: 14px;
     font-weight: bold;
-    color: #333333;
-    color: #333333;
+    color: #999;
 }
 /* For block elements containing form inputs */
 .formElem {
@@ -1145,7 +1144,7 @@ td.dataDisplayLabel {
 .expandoHead {
     width: 100%;
     height: 20px;
-    background: #ddd;
+    background: #eee;
     text-align: right;
     vertical-align: middle;
     line-height: 20px;
@@ -1167,7 +1166,6 @@ td.dataDisplayLabel {
 .expandoBody {
     width: 100%;
     top: 20px;
-    background: #eee;
     overflow: hidden;
 }
 

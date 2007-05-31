@@ -57,7 +57,9 @@ cosmo.util.html.createSelect = function (id, name, size,
         }
     }
     // Add the options for the select
-    cosmo.util.html.setSelectOptions(sel, options);
+    if (options) {
+        cosmo.util.html.setSelectOptions(sel, options);
+    }
     
     // Append the select if passed somewhere to put it
     if (appendElem) {

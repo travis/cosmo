@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -30,7 +31,7 @@ public class StandardProviderDeleteEntryTest extends BaseProviderTestCase {
     private static final Log log =
         LogFactory.getLog(StandardProviderDeleteEntryTest.class);
 
-    public void testDeleteEntry() throws Exception {
+    public void testDeleteItemEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = helper.createEntryRequestContext(item, "DELETE");
 
@@ -38,5 +39,17 @@ public class StandardProviderDeleteEntryTest extends BaseProviderTestCase {
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Item not removed", helper.findItem(item.getUid()));
+    }
+
+    public void testDeleteSubscriptionntry() throws Exception {
+        CollectionSubscription sub = helper.makeAndStoreDummySubscription();
+        RequestContext req =
+            helper.createSubscriptionRequestContext(sub, "DELETE");
+
+        ResponseContext res = provider.deleteEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 204, res.getStatus());
+        assertNull("Subscription not removed",
+                   helper.findSubscription(sub.getDisplayName()));
     }
 }

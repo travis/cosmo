@@ -203,4 +203,8 @@ public class MockHelper extends TestHelper {
     public NoteItem findItem(String uid) {
         return (NoteItem) contentService.findItemByUid(uid);
     }
+
+    public CollectionSubscription findSubscription(String displayName) {
+        return user.getSubscription(displayName);
+    }
 }

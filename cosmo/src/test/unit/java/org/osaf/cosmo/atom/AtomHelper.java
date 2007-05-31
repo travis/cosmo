@@ -148,8 +148,16 @@ public class AtomHelper extends MockHelper {
     public RequestContext
         createSubscriptionRequestContext(CollectionSubscription sub)
         throws IOException {
+        return createSubscriptionRequestContext(sub, "GET");
+    }
+
+    public RequestContext
+        createSubscriptionRequestContext(CollectionSubscription sub,
+                                         String method)
+        throws IOException {
         MockSubscriptionRequestContext rc =
-            new MockSubscriptionRequestContext(serviceContext, getUser(), sub);
+            new MockSubscriptionRequestContext(serviceContext, getUser(), sub,
+                                               method);
         return rc;
     }
 

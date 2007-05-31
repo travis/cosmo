@@ -41,6 +41,7 @@ public class BaseProviderTestCase extends TestCase {
         provider.setGeneratorFactory(helper.getGeneratorFactory());
         provider.setProcessorFactory(helper.getProcessorFactory());
         provider.setContentService(helper.getContentService());
+        provider.setUserService(helper.getUserService());
         provider.setServiceLocatorFactory(helper.getServiceLocatorFactory());
         provider.init();
 

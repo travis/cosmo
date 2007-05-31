@@ -65,6 +65,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.UserService;
 
 public class StandardProvider extends AbstractProvider
     implements AtomConstants, ExtendedProvider {
@@ -74,6 +75,7 @@ public class StandardProvider extends AbstractProvider
     private GeneratorFactory generatorFactory;
     private ProcessorFactory processorFactory;
     private ContentService contentService;
+    private UserService userService;
     private ServiceLocatorFactory serviceLocatorFactory;
 
     // Provider methods
@@ -149,7 +151,28 @@ public class StandardProvider extends AbstractProvider
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
-        ItemTarget target = (ItemTarget) request.getTarget();
+        Target target = request.getTarget();
+        if (target instanceof SubscriptionTarget)
+            return deleteSubscriptionEntry(request, (SubscriptionTarget)target);
+        return deleteItemEntry(request, (ItemTarget)target);
+    }
+
+    private ResponseContext deleteSubscriptionEntry(RequestContext request,
+                                                    SubscriptionTarget target) {
+        User user = target.getUser();
+        CollectionSubscription sub = target.getSubscription();
+        if (log.isDebugEnabled())
+            log.debug("deleting entry for subscription " +
+                      sub.getDisplayName() + " for user " + user.getUsername());
+
+        user.removeSubscription(sub);
+        userService.updateUser(user);
+
+        return createResponseContext(204);
+    }
+  
+    private ResponseContext deleteItemEntry(RequestContext request,
+                                            ItemTarget target) {
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
             log.debug("deleting entry for item " + item.getUid());
@@ -509,6 +532,14 @@ public class StandardProvider extends AbstractProvider
         this.contentService = contentService;
     }
 
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
     public ServiceLocatorFactory getServiceLocatorFactory() {
         return serviceLocatorFactory;
     }
@@ -526,6 +557,8 @@ public class StandardProvider extends AbstractProvider
             throw new IllegalStateException("processorFactory is required");
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+        if (userService == null)
+            throw new IllegalStateException("userService is required");
         if (serviceLocatorFactory == null)
             throw new IllegalStateException("serviceLocatorFactory is required");
     }

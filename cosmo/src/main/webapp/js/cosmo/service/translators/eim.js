@@ -267,7 +267,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     itemToAtomEntry: function (object){
-         var jsonObject = this.noteToRecordSet(object);
+         var jsonObject = this.objectToRecordSet(object);
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
          '<title>' + object.getDisplayName() + '</title>' +
          '<id>urn:uuid:' + object.getUid() + '</id>' +
@@ -277,7 +277,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '</entry>'
     },
 
-    noteToRecordSet: function (note){
+    objectToRecordSet: function (note){
+        if (note instanceof cosmo.model.Note){
+            return this.noteToRecordSet(note);
+        } else if (note instanceof cosmo.model.NoteOccurrence){
+            
+        } else {
+            throw new cosmo.service.translators.exception.ModelToRecordSetException(
+                "note is neither a Note nor a NoteOccurrence, don't know how to translate."
+            )
+        }
+    },
+    
+    noteToRecordSet: function(note){
         var records = {
             item: this.noteToItemRecord(note),
             note: this.noteToNoteRecord(note),
@@ -287,11 +299,20 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (note.getEventStamp()) records.event = this.noteToEventRecord(note);
         if (note.getTaskStamp()) records.event = this.noteToTaskRecord(note);
         
-        return {
+        var recordSet =  {
             uuid: note.getUid(),
-            records: records
+            records: records,
+        };
+        var deletedStamps = note.getDeletedStamps();
+        if (deletedStamps.length > 0){
+            recordSet.deletedRecords = deletedStamps;
         }
+        
+        return recordSet;
+    },
 
+    noteOccurrenceToRecordSet: function(noteOccurrence){
+        
     },
 
     noteToItemRecord: function(note){

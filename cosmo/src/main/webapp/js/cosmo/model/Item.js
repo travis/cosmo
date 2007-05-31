@@ -120,7 +120,7 @@ cosmo.model.declare("cosmo.model.Item", null,
     ["triageStatus", {"default": 100}],
     ["autoTriage", {"default": false}],
     ["rank", {"default": 0}]
-   ], 
+   ],
    //declare other properties
   {
       initializer: function(kwArgs){
@@ -135,6 +135,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
          OCCURRENCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
         
         _stamps: null,
+        _deletedStamps: [],
         
         initializer: function(){
             this._stamps = {};
@@ -201,6 +202,11 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
 
         removeStamp: function (/*String*/ stampName){
             delete this._stamps[stampName];
+            this._deletedStamps.push(stampName);
+        },
+        
+        getDeletedStamps: function(){
+            return this._deletedStamps;  
         },
         
         getEventStamp: function (/*Boolean?*/ createIfDoesntExist, /*Object?*/initialProps){
@@ -359,8 +365,14 @@ cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item,
             return this.setTicketKey();
         },
 
+        getProtocolUrls: function(){
+            this.wrapCollectionDetails(this.getDetails());
+            return this.getTicketKey();
+        },
+
         wrapCollectionDetails: function(collectionDetails){
             this.isWriteable = dojo.lang.hitch(collectionDetails, collectionDetails.isWriteable);
+            this.getProtocolUrls = dojo.lang.hitch(collectionDetails, collectionDetails.getProtocolUrls);
             this.getTicketKey = dojo.lang.hitch(collectionDetails, collectionDetails.getTicketKey);
             this.setTicketKey = dojo.lang.hitch(collectionDetails, collectionDetails.setTicketKey);
         }
@@ -373,7 +385,8 @@ function(){}, {});
     
 cosmo.model.declare("cosmo.model.CollectionDetails", cosmo.model.Item,
     [["ticketKey", {"default": null}],
-     ["writeable", {"default": true}]
+     ["writeable", {"default": true}],
+     ["protocolUrls", {"default": cosmo.model.NEW_OBJECT}]
      ],
      {
          isWriteable: function (){
@@ -382,9 +395,24 @@ cosmo.model.declare("cosmo.model.CollectionDetails", cosmo.model.Item,
      }
 );
 
-cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Collection,
-    [],
+cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
+    [["ticketKey", {"default": null}],
+     ["writeable", {"default": true}]
+     ],
+
     {
+        
+        getDetails: function(collection){
+            throw new cosmo.model.GetDetailsNotSet();
+        },
+        
+        getProtocolUrls: function(){
+            this.wrapCollectionDetails(this.getDetails());
+            return this.getProtocolUrls();
+        },
+        wrapCollectionDetails: function(collectionDetails){
+            this.getProtocolUrls = dojo.lang.hitch(collectionDetails, collectionDetails.getProtocolUrls);
+        }    
            
     }
 );

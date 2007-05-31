@@ -35,14 +35,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     initializer: function (){
         with (this.rruleConstants) {
         with (cosmo.model.RRULE_FREQUENCIES){
-            this.rruleFrequenciesToRruleConstants =
-            {
-                FREQUENCY_DAILY: DAILY,
-                FREQUENCY_WEEKLY: WEEKLY,
-                FREQUENCY_BIWEEKLY: WEEKLY + ";INTERVAL=2",
-                FREQUENCY_MONTHLY: MONTHLY,
-                FREQUENCY_YEARLY: YEARLY
-            }     
+            this.rruleFrequenciesToRruleConstants = {};
+            this.rruleFrequenciesToRruleConstants[FREQUENCY_DAILY] = DAILY;
+            this.rruleFrequenciesToRruleConstants[FREQUENCY_WEEKLY] = WEEKLY;
+            this.rruleFrequenciesToRruleConstants[FREQUENCY_BIWEEKLY] = WEEKLY + ";INTERVAL=2";
+            this.rruleFrequenciesToRruleConstants[FREQUENCY_MONTHLY] = MONTHLY;
+            this.rruleFrequenciesToRruleConstants[FREQUENCY_YEARLY] = YEARLY;
         }}
     },
     
@@ -424,14 +422,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     getEventStampProperties: function (record){
 
-        var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
-
         var properties = {};
-        if (record.fields.dtstart != undefined) properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
+        if (record.fields.dtstart != undefined){
+            properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
+            var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
+            if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
+            if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
+        }
+
         if (record.fields.duration != undefined) properties.duration=
                 new cosmo.model.Duration(record.fields.duration[1]);
-        if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
-        if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
         if (record.fields.location != undefined) properties.location = record.fields.location[1];
         if (record.fields.rrule != undefined) properties.rrule = this.parseRRule(record.fields.rrule[1]);
         if (record.fields.exrule != undefined) properties.rrule = this.parseRRule(record.fields.exrule[1]);
@@ -494,10 +494,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     rruleToICal: function (rrule){
         if (rrule.isSupported()){
+            dojo.debug(rrule.getFrequency())
+            dojo.debugShallow(this.rruleFrequenciesToRruleConstants);
             return [
                 ";FREQ=",
                 this.rruleFrequenciesToRruleConstants[rrule.getFrequency()],
-                ";UNTIL",
+                ";UNTIL=",
                 dojo.date.strftime(rrule.getEndDate().getUTCDateProxy(), "%Y%m%dT%H%M%SZ")
             ].join("");
         } 

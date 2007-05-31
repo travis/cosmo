@@ -200,24 +200,24 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         // Make backup snapshot of event data in case save/remove
         // operation fails
         selEv.makeSnapshot();
-        // Update the event properties based on the lozenge pos/size
-        if (selEv.lozenge.updateEvent(selEv, this.dragMode)) {
+        // Get the delta for 
+        dojo.debug("before update event");
+        var delta = selEv.lozenge.getDelta(selEv, this.dragMode);
+        if (delta.hasChanges()) {
             // Check against the backup to make sure the event has
             // actually been edited
-            if (selEv.hasChanged().count > 0) {
-                //selEv.setInputDisabled(true); // Disable input while processing
-                // Save the changes
-                // ==========================
-                dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'data': selEv });
-            }
+            //selEv.setInputDisabled(true); // Disable input while processing
+            // Save the changes
+            // ==========================
+            dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':selEv});
+        } else {
             // If no real edit, then just reposition the lozenge
             // With conflict calculations and snap-to
-            else {
-                selEv.lozenge.updateFromEvent(selEv);
-                selEv.lozenge.updateElements();
-            }
+            selEv.lozenge.updateFromEvent(selEv);
+            selEv.lozenge.updateElements();
         }
     };
+    
     /**
      * Abort if the Draggable object does not point to an actual div
      * or doesn't have a valid dragMode

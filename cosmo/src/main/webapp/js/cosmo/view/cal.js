@@ -45,9 +45,9 @@ cosmo.view.cal = new function () {
     this.viewEnd = null;
     // Options for saving/removing recurring events
     this.recurringEventOptions = {
-        ALL_EVENTS: 'allEvents',
-        ALL_FUTURE_EVENTS: 'allFuture',
-        ONLY_THIS_EVENT: 'onlyThis'
+        ALL_EVENTS: 'master',
+        ALL_FUTURE_EVENTS: 'occurrenceAndFuture',
+        ONLY_THIS_EVENT: 'occurrence'
     };
     // How many updates/removals are in-flight
     this.processingQueue = [];
@@ -64,128 +64,27 @@ cosmo.view.cal = new function () {
      * For normal events, this simply passes through to saveEventChanges
      * @param ev A CalEvent object, the event to be saved.
      */
-     //XINT
-    function saveEventChangesConfirm(ev) {
-
-        var changedProps = null;
-        var changedBasicProps = false;
-        var changedRecur = false;
-        var recur = ev.dataOrig.recurrenceRule;
-        var qual = '';
-
-        // Returns either false or an array of changes properties
-        // with name, new value, and original value
-        changedProps = ev.hasChanged();
-
-        // Don't bother going through the edit process if nothing
-        // has actually changed
-        if (changedProps.count == 0) {
-            return false;
-        }
-
-        // Has the recurrence rule changed, or just
-        // basic event properties
-        if (typeof changedProps.changes['recurrenceRule'] == 'undefined') {
-            changedBasicProps = true;
-        }
-        else {
-            changedRecur = true;
-        }
-
-        // *** Changing recurrence
-        // This means all changes will have to apply either to the entire
-        // recurrence, or we're ending the recurrence and creating a new
-        // event -- the user gets no dialog, and we go straight to saving
-        // --------------
-        if (changedRecur) {
-            // Event with existing recurrence
-            // *** Change/remove ***
-            if (recur) {
-                // Removing recurrence from a master event
-                if (!ev.data.recurrenceRule && ev.data.masterEvent) {
-                    saveEventChanges(ev, 'recurrenceMasterRemoveRecurrence');
-                }
-                // Changing recurrence for master, or
-                // changing or 'removing' recurrence from an instance (this
-                // actually means ending the current recurrence and creating
-                // a new event)
-                else {
-                    var opts = self.recurringEventOptions;
-                    // Only changing end date -- this can only apply to a master event
-                    if (ev.data.recurrenceRule &&
-                        (ev.data.recurrenceRule.frequency == ev.dataOrig.recurrenceRule.frequency)) {
-                        qual = opts.ALL_EVENTS;
-                    }
-                    // Otherwise figure out if it's a master or instance
-                    else {
-                        qual = ev.data.masterEvent ? opts.ALL_EVENTS : opts.ALL_FUTURE_EVENTS
-                    }
-                    dojo.event.topic.publish('/calEvent', { 'action': 'save',
-                        'qualifier': qual, data: ev });
-                }
-            }
-            // One-shot event -- save a RecurrenceRule
-            // *** Add ***
-            //
-            // -------
-            else {
-                dojo.event.topic.publish('/calEvent', { action: 'save',
-                    qualifier: 'singleEventAddRecurrence', data: ev });
+    function saveEventChangesConfirm(ev, delta) {
+        var changeTypes = delta.getApplicableChangeTypes();
+        var size = 0;
+        var change = null;
+        for (change in changeTypes){
+            if (changeTypes[change]){
+                size++;
             }
         }
-        // *** No recurrence change, editing normal event properties
-        // If event has recurrence, give the user a choice of how to
-        // apply the changes
-        // --------------
-        else {
-            // Recurring event
-            // -------
-            if (recur) {
-                var freq = recur.frequency;
-                var opts = {};
-                opts.instanceOnly = false;
-                opts.masterEvent = false;
-                opts.recurrenceMod = false;
-
-                // Check to see if editing a recurrence instance to go
-                // beyond the recurrence interval -- in that case, the
-                // 'All Events' option is not possible -- dim that button out
-                function isOutOfIntervalRange() {
-                    var ret = false;
-                    var dt = ev.data.start;
-                    var dtOrig = ev.dataOrig.start;
-                    var origDate = new Date(dtOrig.getFullYear(), dtOrig.getMonth(),
-                        dtOrig.getDate());
-                    var newDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-                    var unit = ranges[freq][0];
-                    var bound = ranges[freq][1];
-                    var diff = cosmo.datetime.Date.diff(unit, origDate, newDate);
-                    ret = (diff >= bound || diff <= (bound * -1)) ? true : false;
-                    return ret;
-                }
-
-                // Change to master event in recurrence
-                if (ev.data.masterEvent) {
-                    opts.masterEvent = true;
-                }
-                // Change to instance event
-                else {
-                    opts.instanceOnly = isOutOfIntervalRange();
-                }
-
-                opts.recurrenceMod = recur.getModification(ev.data.instanceDate) != null;
-
-                // Show the confirmation dialog
-                cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
-            }
-            // One-shot event -- this is easy, just save the event
-            // -------
-            else {
-                dojo.event.topic.publish('/calEvent', { action: 'save',
-                    qualifier: null, data: ev });
-            }
+        
+        //only one type of change
+        if (size == 1){
+            delta.applyChangeType(change);
+            dojo.event.topic.publish('/calEvent', {action:'save', data:ev});
+        } else {
+          cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
         }
+        
+        
     }
+    
     /**
      * Called for after passthrough from saveEventChangesConfirm. Routes to
      * the right save operation (i.e., for recurring events, 'All Future,'
@@ -1028,7 +927,8 @@ cosmo.view.cal = new function () {
                 break;
             case 'saveConfirm':
                 var confirmEv = cmd.data;
-                saveEventChangesConfirm(confirmEv);
+                var delta = cmd.delta;
+                saveEventChangesConfirm(confirmEv, delta);
                 break;
             case 'save':
                 var saveEv = cmd.data;

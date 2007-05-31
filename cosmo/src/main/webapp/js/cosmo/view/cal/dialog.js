@@ -128,21 +128,24 @@ cosmo.view.cal.dialog = new function() {
     // Public methods
     // ********************
     this.getProps = function(key, optsParam) {
+        var OPTIONS = cosmo.view.cal.recurringEventOptions;
         var p = props[key]();
         var opts = optsParam || {};
         if (key == 'saveRecurConfirm') {
             p.btnsRight = [];
-            if (opts.instanceOnly || opts.recurrenceMod) {
+            if (!opts.ALL_EVENTS){
                 p.btnsRight.push(buttons.allEventsDisabled());
+            } else {
+                p.btnsRight.push(buttons.saveAllEvents());
+            }
+            
+            if (opts.ALL_FUTURE_EVENTS){
                 p.btnsRight.push(buttons.saveFutureEvents());
             }
-            else {
-                p.btnsRight.push(buttons.saveAllEvents());
-                if (!opts.masterEvent) {
-                    p.btnsRight.push(buttons.saveFutureEvents());
-                }
+            
+            if (opts.ONLY_THIS_EVENT){
+                p.btnsRight.push(buttons.saveOnlyThisEvent());
             }
-            p.btnsRight.push(buttons.saveOnlyThisEvent());
         }
         else if (key == 'removeRecurConfirm') {
             p.btnsRight = [];

@@ -66,7 +66,36 @@ dojo.declare("cosmo.model.Delta", null, {
     addDeletedStamp: function(stampName){
         this._deletedStamps[stampName] = true;
     },
+    
+    hasChanges: function(){
+        if (!this._isEmpty(this._propertyProps)){
+            return true;
+        }
         
+        for (var stampName in this._stampProps){
+            if (!this._isEmpty(this._stampProps[stampName])){
+                return true;
+            }
+        }
+        
+        if (!this._isEmpty(this._deletedStamps)){
+            return true;
+        }
+
+        if (!this._isEmpty(this._addedStamps)){
+            return true;
+        }
+
+        return false;
+    },
+    
+    _isEmpty: function(object){
+        for (var x in object){
+            return false;
+        }
+        return true;
+    },
+      
     deltafy: function (){
         // summary: removes all properties which are the same as its note
         // description: removes all properties from the delta which are the same
@@ -164,6 +193,18 @@ dojo.declare("cosmo.model.Delta", null, {
            return false;
        } 
     },
+    
+    applyChangeType: function(changeType){
+        if (changeType == "master"){
+            this.applyToMaster();
+        } else if (changeType == "occurrenceAndFuture"){
+            this.applyToOccurrenceAndFuture();
+        } else if (changeType == "occurrence"){
+            this.applyToOccurrence();
+        } else {
+            throw new Error("Invalid Change Type: " + changeType);
+        }
+    }, 
     
     applyToMaster: function(){
         this._apply("master");

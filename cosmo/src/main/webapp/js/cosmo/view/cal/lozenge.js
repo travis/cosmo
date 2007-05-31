@@ -546,14 +546,10 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateFromEvent = function (ev) 
 }
 
 /**
- * Update an event from changes to the lozenge -- usually called
+ * Returns the Delta based on changes to the lozenge -- usually called
  * when an event lozenge is dragged or resized
- * The updated event is then passed back to the backend for saving
- * If the save operation fails, the event can be restored from
- * the backup copy of the CalEventData in the event's dataOrig property
  */
-cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
-
+cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMode) {
     var evStart = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     var diff = this.auxDivList.length;
     var evEnd = cosmo.datetime.Date.add(evStart, dojo.date.dateParts.DAY, diff);
@@ -571,8 +567,8 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, drag
 
     // If the event was originally less than the minimum *visible* lozenge
     // height, preserve the original times when editing
-    var startDate = ev.dataOrig.getEventStamp().getStartDate();
-    var endDate = ev.dataOrig.getEventStamp().getEndDate();
+    var startDate = ev.dataOrig.getEventStamp().getStartDate().clone();
+    var endDate = ev.dataOrig.getEventStamp().getEndDate().clone();
     var origLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
         startDate, endDate);
     var newLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
@@ -587,8 +583,13 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateEvent = function (ev, drag
     // Update cosmo.datetime.Date with new UTC values
     startDate.updateFromUTC(evStart.getTime());
     endDate.updateFromUTC(evEnd.getTime());
-    ev.dataOrig.getEventStamp().setEndDate(endDate);
-    return true;
+    
+    var delta = new cosmo.model.Delta(ev.data);
+    delta.addStampProperty("event","startDate", startDate);
+    delta.addStampProperty("event","endDate", endDate);
+    delta.deltafy();
+    
+    return delta;
 }
 
 /**

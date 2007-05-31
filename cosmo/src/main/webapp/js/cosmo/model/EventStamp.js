@@ -115,6 +115,5 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
         setStartDate: function (newStartDate){
            this.__setProperty("startDate", newStartDate);
         }
-    
     }
 );

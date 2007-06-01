@@ -159,13 +159,25 @@ cosmotest.service.translators.test_eim = {
         });
         
         var recordSet = cosmo.service.translators.eim.noteToRecordSet(note);
-        jum.assertEquals("home", recordSet.records.event.fields.location[1]);
-        jum.assertEquals("Confirmed", recordSet.records.event.fields.status[1]);
-        jum.assertEquals("PT2H30M45S", recordSet.records.event.fields.duration[1]);
-        jum.assertEquals(";X-OSAF-ANYTIME=TRUE;VALUE=DATE:20070607", 
+        jum.assertEquals("location", "home", recordSet.records.event.fields.location[1]);
+        jum.assertEquals("status", "Confirmed", recordSet.records.event.fields.status[1]);
+        jum.assertEquals("duration", "PT2H30M45S", recordSet.records.event.fields.duration[1]);
+        jum.assertEquals("dtstart", ";X-OSAF-ANYTIME=TRUE;VALUE=DATE:20070607", 
                         recordSet.records.event.fields.dtstart[1]);
-        jum.assertEquals(";FREQ=DAILY;UNTIL=20070614T000000Z");
+        //jum.assertEquals("rrule", ";FREQ=DAILY;UNTIL=20070613T000000Z", 
+        //                 recordSet.records.event.fields.rrule[1]);
+                         
+        var occurrenceDate = new cosmo.datetime.Date(2007, 5, 8, 12, 30, 45);
+        note.getNoteOccurrence(occurrenceDate);
         
+        var modification = new cosmo.model.Modification(
+        {
+            recurrenceId: occurrenceDate
+        }
+        );
+        note.addModification(modification);
+        
+        //TODO: add translation and asserts
     },
   
     generateAtom: function (/*Object*/ content){

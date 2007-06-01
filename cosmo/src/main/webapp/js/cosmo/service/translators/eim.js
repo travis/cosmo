@@ -44,6 +44,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }}
     },
     
+    RID_FMT: "%Y%m%dT%H%M%S",
+    
     translateGetCollection: function (atomXml){
         var ticketKey;
         var ticketElement = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket")[0];
@@ -203,10 +205,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                this.addNoteRecord(record, note);
                break;
            case prefix.EVENT:
-               note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
+               var props = this.getEventStampProperties(record)
+               note.getStamp(prefix.EVENT, true, props);
                break;
            case prefix.TASK:
-               note.getStamp(prefix.TASK, true, this.getTaskStampProperties(record));
+              note.getStamp(prefix.TASK, true, this.getTaskStampProperties(record));
                break;
            }
         }
@@ -270,18 +273,27 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          var jsonObject = this.objectToRecordSet(object);
          return '<entry xmlns="http://www.w3.org/2005/Atom">' +
          '<title>' + object.getDisplayName() + '</title>' +
-         '<id>urn:uuid:' + object.getUid() + '</id>' +
+         '<id>urn:uuid:' + this.getUid(object) + '</id>' +
          '<updated>' + dojo.date.toRfc3339(new Date()) + '</updated>' +
          '<author><name>' + cosmo.util.auth.getUsername() + '</name></author>' +
          '<content type="application/eim+json">' + dojo.json.serialize(jsonObject) + '</content>' +
          '</entry>'
     },
+    
+    
+    getUid: function (/*cosmo.model.Note*/ note){
+        if (note instanceof cosmo.model.NoteOccurrence){
+            return note.getUid() + ":" + note.recurrenceId.strftime(this.RID_FMT);
+        } else {
+            return note.getUid();
+        }
+    },
 
     objectToRecordSet: function (note){
-        if (note instanceof cosmo.model.Note){
+        if (note instanceof cosmo.model.NoteOccurrence){
+            return this.noteOccurrenceToRecordSet(note);
+        } else if (note instanceof cosmo.model.Note){
             return this.noteToRecordSet(note);
-        } else if (note instanceof cosmo.model.NoteOccurrence){
-            
         } else {
             throw new cosmo.service.translators.exception.ModelToRecordSetException(
                 "note is neither a Note nor a NoteOccurrence, don't know how to translate."
@@ -297,11 +309,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         };
 
         if (note.getEventStamp()) records.event = this.noteToEventRecord(note);
-        if (note.getTaskStamp()) records.event = this.noteToTaskRecord(note);
+        if (note.getTaskStamp()) records.task = this.noteToTaskRecord(note);
         
         var recordSet =  {
-            uuid: note.getUid(),
-            records: records,
+            uuid: this.getUid(note),
+            records: records
         };
         var deletedStamps = note.getDeletedStamps();
         if (deletedStamps.length > 0){
@@ -312,42 +324,91 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     noteOccurrenceToRecordSet: function(noteOccurrence){
+        var modification = noteOccurrence.getMaster().getModification(noteOccurrence.recurrenceId);
+        var records = {
+            modby: this.noteToModbyRecord(noteOccurrence)
+        }
+        if (this.modificationHasItemModifications(modification))  
+            records.item =  this.modificationToItemRecord(modification);
+        if (this.modificationHasNoteModifications(modification))
+            records.note = this.modificationToNoteRecord(modification);
         
+        if (modification.getModifiedStamps().event){
+            records.event = this.modificationToEventRecord(modification)
+        }
+        var recordSet =  {
+            uuid: this.getUid(noteOccurrence),
+            records: records
+        };
+        
+        return recordSet;
+        
+    },
+    
+    modificationHasItemModifications: function (modification){
+        var props = modification.getModifiedProperties();
+        return (props.title || props.triageRank || props.triageStatus || props.autoTriage)    
     },
 
     noteToItemRecord: function(note){
-        var title = note.getDisplayName();
-        var triageRank = note.getRank();
-        var triageStatus = note.getTriageStatus();
-        var autoTriage = note.getAutoTriage();
+        var props = {};
+        props.title = note.getDisplayName();
+        props.triageRank = note.getRank();
+        props.triageStatus = note.getTriageStatus();
+        props.autoTriage = note.getAutoTriage();
+        props.uuid = this.getUid(note);
+        return this.propsToItemRecord(props);
+    },
+    
+    modificationToItemRecord: function(modification){
+        return this.propsToItemRecord(modification.getModifiedProperties());
+    },
+    
+    propsToItemRecord: function(props){
         var fields = {};
         with (cosmo.service.eim.constants){
         
-            if (title) fields.title = [type.TEXT, title];
-            if (triageRank || triageRank || autoTriage)
-                fields.triage =  [type.TEXT, [triageStatus, triageRank, autoTriage? 1 : 0].join(" ")];
+            if (props.title) fields.title = [type.TEXT, props.title];
+            if (props.triageRank || props.triageRank || props.autoTriage)
+                fields.triage =  [type.TEXT, [props.triageStatus, props.triageRank, props.autoTriage? 1 : 0].join(" ")];
             
             return {
                 prefix: prefix.ITEM,
                 ns: ns.ITEM,
                 keys: {
-                    uuid: [type.TEXT, note.getUid()]
+                    uuid: [type.TEXT, props.uuid]
                 },
                 fields: fields
             }
         }
+    
     },
 
     noteToNoteRecord: function(note){
-        var body = note.getBody();
+        var props = {}
+        props.body = note.getBody();
+        props.uuid = this.getUid(note);
+        return this.propsToNoteRecord(props);
+    },
+    
+    modificationHasNoteModifications: function (modification){
+        return !!modification.getModifiedProperties().body;
+    },
+    
+    
+    modificationToNoteRecord: function(modification){
+        return this.propsToNoteRecord(modification.getModifiedProperties());
+    },
+    
+    propsToNoteRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (body) fields.body = [type.CLOB, body];
+            if (props.body) fields.body = [type.CLOB, props.body];
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
                 keys: {
-                    uuid: [type.TEXT, note.getUid()]
+                    uuid: [type.TEXT, props.uuid]
                 },
                 fields: fields
             }
@@ -355,38 +416,47 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     noteToEventRecord: function(note){
+        var props = {};
+        stamp = note.getEventStamp();
+        props.allDay = stamp.getAllDay();
+        props.anyTime = stamp.getAnyTime();
+        props.startDate = stamp.getStartDate();
+        props.rrule = stamp.getRrule();
+        props.stat = stamp.getStatus();
+        props.location = stamp.getLocation();
+        props.duration = stamp.getDuration();
+        props.exdates = stamp.getExdates();
+        props.uuid = this.getUid(note);
+        return this.propsToEventRecord(props);
 
-        var stamp = note.getEventStamp();
-        var allDay = stamp.getAllDay();
-        var anyTime = stamp.getAnyTime();
-        var start = stamp.getStartDate();
-        var rrule = stamp.getRrule();
-        var stat = stamp.getStatus();
-        var loc = stamp.getLocation();
-        var duration = stamp.getDuration();
-        var exdates = stamp.getExdates();
+    },
 
+    modificationToEventRecord: function(modification){
+        return this.propsToEventRecord(modification.getModifiedStamps().event);
+    },
+    
+    propsToEventRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (start) fields.dtstart = 
-                [type.TEXT, this.dateToEimDtstart(start, allDay, anyTime)];
-            if (rrule) fields.rrule = [type.TEXT, rrule.toString()];
-            if (stat) fields.status = [type.TEXT, stat];
-            if (loc) fields.location = [type.TEXT, loc];
-            if (duration) fields.duration = [type.TEXT, duration.toIso8601()];
-            if (rrule) fields.rrule = [type.TEXT, this.rruleToICal(rrule)];
-            if (exdates) fields.exdates = [type.TEXT, this.exdatesToEim(exdates)];
+            if (props.startDate) fields.dtstart = 
+                [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
+            if (props.stat) fields.status = [type.TEXT, props.stat];
+            if (props.location) fields.location = [type.TEXT, props.location];
+            if (props.duration) fields.duration = [type.TEXT, props.duration.toIso8601()];
+            if (props.rrule) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
+            if (props.exdates) fields.exdates = [type.TEXT, this.exdatesToEim(props.exdates)];
             
            return {
                 prefix: prefix.EVENT,
                 ns: ns.EVENT,
                 keys: {
-                    uuid: [type.TEXT, note.getUid()]
+                    uuid: [type.TEXT, props.uuid]
                 },
                 fields: fields
             }
         }
 
+        
     },
     
     exdatesToEim: function(exdates){
@@ -417,7 +487,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 prefix: prefix.TASK,
                 ns: ns.TASK,
                 keys: {
-                    uuid: [type.TEXT, note.getUid()]
+                    uuid: [type.TEXT, this.getUid(note)]
                 },
                 fields: {}
 
@@ -432,7 +502,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 prefix: prefix.MODBY,
                 ns: ns.MODBY,
                 keys:{
-                    uuid: [type.TEXT, note.getUid()],
+                    uuid: [type.TEXT, this.getUid(note)],
                     userid: [type.TEXT, ""],
                     action: [type.INTEGER, 100], //TODO: figure this out
                     timestamp: [type.DECIMAL, new Date().getTime()]
@@ -455,7 +525,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 new cosmo.model.Duration(record.fields.duration[1]);
         if (record.fields.location != undefined) properties.location = record.fields.location[1];
         if (record.fields.rrule != undefined) properties.rrule = this.parseRRule(record.fields.rrule[1]);
-        if (record.fields.exrule != undefined) properties.rrule = this.parseRRule(record.fields.exrule[1]);
+        if (record.fields.exrule != undefined) properties.exrule = this.parseRRule(record.fields.exrule[1]);
         if (record.fields.exdate != undefined) properties.exdates = this.parseExdate(record.fields.exdate[1]);
         if (record.fields.status != undefined) properties.status = record.fields.status[1];
         return properties;
@@ -515,14 +585,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     rruleToICal: function (rrule){
         if (rrule.isSupported()){
-            dojo.debug(rrule.getFrequency())
-            dojo.debugShallow(this.rruleFrequenciesToRruleConstants);
-            return [
-                ";FREQ=",
-                this.rruleFrequenciesToRruleConstants[rrule.getFrequency()],
-                ";UNTIL=",
-                dojo.date.strftime(rrule.getEndDate().getUTCDateProxy(), "%Y%m%dT%H%M%SZ")
-            ].join("");
+            var recurrenceRuleList = [
+               ";FREQ=",
+                this.rruleFrequenciesToRruleConstants[rrule.getFrequency()]
+             ]
+             var endDate = rrule.getEndDate();
+             if (endDate){
+                recurrenceRuleList.push(";UNTIL=");
+                recurrenceRuleList.push(dojo.date.strftime(rrule.getEndDate().getUTCDateProxy(), "%Y%m%dT%H%M%SZ"));
+             }
+            
+            return recurrenceRuleList.join("");
         } 
         else {
             return rrulePropsToICal(rrule.getUnsupportedRule());

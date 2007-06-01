@@ -117,7 +117,7 @@ cosmotest.service.conduits.test_conduits = {
             }
             );
             
-            var startDate = new cosmo.datetime.Date();
+            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45);
             startDate.setMilliseconds(0);
 
             var duration = new cosmo.model.Duration({hour: 1});
@@ -146,8 +146,6 @@ cosmotest.service.conduits.test_conduits = {
             startDate.setMinutes(0);
             startDate.setSeconds(0);
 
-            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
-            
             item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             jum.assertTrue("post-anytime start date", startDate.equals(item0.getEventStamp().getStartDate()));
             jum.assertEquals("location", "My place", item0.getEventStamp().getLocation());
@@ -156,9 +154,46 @@ cosmotest.service.conduits.test_conduits = {
             item0.getEventStamp().setAllDay(true);
             item0.getEventStamp().setAnyTime(false);
             conduit.saveItem(item0, {sync: true});
-            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
+            item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
             jum.assertTrue("post-allday start date", startDate.equals(item0.getEventStamp().getStartDate()));
             jum.assertTrue("allday", item0.getEventStamp().getAllDay());
+            
+            // Test recurrence
+            item0.getEventStamp().setAllDay(false);
+            item0.getEventStamp().setRrule(
+               new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY})
+            );
+            conduit.saveItem(item0, {sync: true});
+
+            var item0Occurrences = conduit.getItems(c0, 
+               {start: new cosmo.datetime.Date(2007, 5, 10),
+                end: new cosmo.datetime.Date(2007, 5, 17)}, 
+               {sync: true}
+            ).results[0];
+            jum.assertTrue("no rrule", !!item0Occurrences[0].getMaster().getEventStamp().getRrule())            
+            jum.assertEquals("wrong nmber of occurrences", 7, item0Occurrences.length);
+            
+            var item4 = item0Occurrences[3];
+            var item4Rid = item4.recurrenceId;
+            var item4Modification = new cosmo.model.Modification({
+                recurrenceId: item4.recurrenceId,
+                modifiedProperties: {displayName: "Ze Modification"}
+            });
+            item4.getMaster().addModification(item4Modification);
+            jum.assertEquals("modification display name wrong", "Ze Modification", item4.getDisplayName());
+            conduit.createItem(item4, c0, {sync:true});
+            
+            // Make sure changes stuck
+            item0Occurrences = conduit.getItems(c0, 
+               {start: new cosmo.datetime.Date(2007, 5, 10),
+                end: new cosmo.datetime.Date(2007, 5, 17)}, 
+               {sync: true}
+            ).results[0];
+            
+            item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
+//            jum.assertEquals("modfication display name didn't save", "Ze Modificaiton", item4.getDisplayName());
+            
+
             
         } finally {
            cosmotest.service.conduits.test_conduits.cleanup(user);            

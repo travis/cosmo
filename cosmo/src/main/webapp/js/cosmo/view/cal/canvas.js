@@ -955,7 +955,7 @@ cosmo.view.cal.canvas = new function () {
         var opts = data.opts;
         var h = null;
         var idArr = [];
-
+    
         // Copy the eventRegistry to remove any recurrence
         // instances associated with the edit
         h = self.eventRegistry.clone();
@@ -1285,6 +1285,7 @@ cosmo.view.cal.canvas = new function () {
         var min = 0;
         var start = null;
         var end = null;
+        var id = cosmo.view.cal.generateTempId(); //this is NOTthe uid of the object!
 
         var note = new cosmo.model.Note();
         var eventStamp = note.getEventStamp(true);
@@ -1297,7 +1298,7 @@ cosmo.view.cal.canvas = new function () {
         // Create the lozenge
         if (evType =='normal') {
             dojo.debug("insertCalEventNew 3");
-            lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(note.getUid());
+            lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(id);
             allDay = false;
             startstr = getIndexFromHourDiv(evParam);
             dayind = extractDayIndexFromId(startstr);
@@ -1313,7 +1314,7 @@ cosmo.view.cal.canvas = new function () {
             end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         }
         else if (evType == 'allDayMain') {
-            lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(note.getUid());
+            lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(id);
             allDay = true;
             dayind = getIndexFromAllDayDiv(evParam);
             start = calcDateFromIndex(dayind);
@@ -1327,7 +1328,7 @@ cosmo.view.cal.canvas = new function () {
         
 
         // Create the CalEvent, connect it to its lozenge
-        ev = new CalEvent(note.getUid(), lozenge);
+        ev = new CalEvent(id, lozenge);
 
         // Set CalEventData start and end calculated from click position
         // --------
@@ -1340,15 +1341,15 @@ cosmo.view.cal.canvas = new function () {
         
         // Register the new event in the event list
         // ================================
-        cosmo.view.cal.canvas.eventRegistry.setItem(note.getUid(), ev);
+        cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
 
         // Update the lozenge
         // ================================
-        if (lozenge.insert(note.getUid())) { // Insert the lozenge on the view
+        if (lozenge.insert(id)) { // Insert the lozenge on the view
             // Save new event
             dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev, 'qualifier': 'new' })
         }
-        return cosmo.view.cal.canvas.eventRegistry.getItem(note.getUid());
+        return cosmo.view.cal.canvas.eventRegistry.getItem(id);
     };
     /**
      * Takes the ID of any of the component DOM elements that collectively make up

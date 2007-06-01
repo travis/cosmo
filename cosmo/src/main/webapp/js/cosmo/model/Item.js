@@ -216,6 +216,10 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         getTaskStamp: function (/*Boolean*/ createIfDoesntExist, /*Object?*/initialProps){
             return this.getStamp("task", createIfDoesntExist, initialProps);
         },
+
+        getMessageStamp: function (/*Boolean*/ createIfDoesntExist, /*Object?*/initialProps){
+            return this.getStamp("message", createIfDoesntExist, initialProps);
+        },
         
         getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){
             return new cosmo.model.NoteOccurrence(this, recurrenceId);
@@ -485,6 +489,24 @@ dojo.declare("cosmo.model.BaseStamp", null, {
 
 cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
     [ ],
+    {
+        initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+        }
+    });
+
+cosmo.model.declareStamp("cosmo.model.MessageStamp", "message",
+    [[ "id", String, {}],
+     [ "headers", [Array, String], {}],
+     [ "from", [Array, String], {}],
+     [ "to", [Array, String], {}],
+     [ "cc", [Array, String], {}],
+     [ "bcc", [Array, String], {}],
+     [ "originators", [Array, String], {}],
+     [ "dateSent", [Array, String], {}],
+     [ "inReplyTo", [Array, String], {}],
+     [ "references", [Array, String], {}]
+     ],
     {
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);

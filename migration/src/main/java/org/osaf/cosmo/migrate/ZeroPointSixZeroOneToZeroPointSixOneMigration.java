@@ -32,12 +32,9 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
@@ -50,7 +47,6 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.calendar.TimeZoneTranslator;
 
 
 /**
@@ -75,7 +71,8 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
 
     @Override
     public String getToVersion() {
-        return "0.6.1";
+        // switching to different schema version format
+        return "100";
     }
 
     

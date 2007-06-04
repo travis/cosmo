@@ -90,7 +90,7 @@ public class StandardServiceGenerator
         service.addWorkspace(mw);
 
         mw.addCollection(createSubscribedCollection(user));
-        // XXX: add preferences collection
+        mw.addCollection(createPreferencesCollection(user));
 
         return service;
     }
@@ -168,11 +168,10 @@ public class StandardServiceGenerator
     }
 
     /**
-     * Creates the <code>subscribed Collection</code> describing the
+     * Creates the <code>subscribed Collection</code> describing a
      * user's collection subscriptions.
      *
-     * @param collection the collection item described by the atom
-     * collection
+     * @param user the user
      * @throws GeneratorException
      */
     protected Collection createSubscribedCollection(User user)
@@ -185,6 +184,30 @@ public class StandardServiceGenerator
             collection.setAccept("entry");
             collection.setHref(href);
             collection.setTitle(COLLECTION_SUBSCRIBED);
+        } catch (IRISyntaxException e) {
+            throw new GeneratorException("Attempted to set invalid collection href " + href, e);
+        }
+
+        return collection;
+    }
+
+    /**
+     * Creates the <code>preferences Collection</code> describing a
+     * user's preferences.
+     *
+     * @param  user the user
+     * @throws GeneratorException
+     */
+    protected Collection createPreferencesCollection(User user)
+        throws GeneratorException {
+        Collection collection =
+            factory.getAbdera().getFactory().newCollection();
+        String href = serviceLocator.getAtomUrl(user, false) + "/preferences";
+
+        try {
+            collection.setAccept("entry");
+            collection.setHref(href);
+            collection.setTitle(COLLECTION_PREFERENCES);
         } catch (IRISyntaxException e) {
             throw new GeneratorException("Attempted to set invalid collection href " + href, e);
         }

@@ -32,6 +32,7 @@ public interface ServiceGenerator {
     public static final String WORKSPACE_HOME = "home";
     public static final String WORKSPACE_META = "meta";
     public static final String COLLECTION_SUBSCRIBED = "subscribed";
+    public static final String COLLECTION_PREFERENCES = "preferences";
 
     /**
      * <p>
@@ -53,6 +54,8 @@ public interface ServiceGenerator {
      * <dl>
      * <dt><code>subscribed</code></dt>
      * <dd>Lists the user's collection subscriptions.</dd>
+     * <dt><code>preferences</code></dt>
+     * <dd>Lists the user's preferences.</dd>
      * </dl>
      *
      * @param the user

@@ -25,7 +25,7 @@ dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.cal.dialog');
 
-cosmo.view.cal = new function () {
+dojo.lang.mixin(cosmo.view.cal, new function(){
 
     var self = this;
     var ranges = {
@@ -1125,5 +1125,5 @@ cosmo.view.cal = new function () {
             dojo.date.dateParts.WEEK, incr);
         return queryDate;
     };
-};
+});
 

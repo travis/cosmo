@@ -25,7 +25,7 @@ dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.cal.dialog');
 
-dojo.lang.mixin(cosmo.view.cal, new function(){
+cosmo.view.cal = dojo.lang.mixin(new function(){
 
     var self = this;
     var ranges = {
@@ -79,10 +79,9 @@ dojo.lang.mixin(cosmo.view.cal, new function(){
             delta.applyChangeType(change);
             dojo.event.topic.publish('/calEvent', {action:'save', data:ev});
         } else {
+          dojo.debug("ELSE!");
           cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
         }
-        
-        
     }
     
     /**
@@ -1001,6 +1000,7 @@ dojo.lang.mixin(cosmo.view.cal, new function(){
     };
     
     this.triggerLoadEvents = function (o) {
+        dojo.debug("trigger!");
         var opts = {};
         var collection = opts.collection;
         var goTo = o.goTo;
@@ -1015,6 +1015,7 @@ dojo.lang.mixin(cosmo.view.cal, new function(){
         // Changing dates
         // --------
         if (goTo) {
+            dojo.debug("goto");
             // param is 'back' or 'next'
             if (typeof goTo == 'string') {
                 var key = goTo.toLowerCase();
@@ -1069,6 +1070,8 @@ dojo.lang.mixin(cosmo.view.cal, new function(){
         // Load the array of events
         // ======================
         try {
+            dojo.debug("start:" + start);
+            dojo.debug("end:" + end);
             var deferred = cosmo.app.pim.serv.getItems(collection, 
                 { start: start, end: end }, { sync: true });
             eventLoadList = deferred.results[0];
@@ -1103,8 +1106,13 @@ dojo.lang.mixin(cosmo.view.cal, new function(){
      * Eventually this will change depending on what type of view is selected
      */
     this.setQuerySpan = function (dt) {
+        dojo.debug("this? " + this == self);
+        xxx = this;
+        yyy = self;
         this.viewStart = cosmo.datetime.util.getWeekStart(dt);
+        dojo.debug("viewSTart: " + this.viewStart)
         this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
+        dojo.debug("viewEnd: " + this.viewEnd)
         return true;
 };
     /**
@@ -1125,5 +1133,5 @@ dojo.lang.mixin(cosmo.view.cal, new function(){
             dojo.date.dateParts.WEEK, incr);
         return queryDate;
     };
-});
+}, cosmo.view.cal);
 

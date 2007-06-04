@@ -50,11 +50,7 @@ public class MockSubscriptionRequestContext extends BaseMockRequestContext {
 
     private static String toRequestUri(User user,
                                        CollectionSubscription sub) {
-        try {
-            return "/user/" + user.getUsername() + "/subscription/" +
-                URLEncoder.encode(sub.getDisplayName(), "UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException("Could not encode subscription display name" + sub.getDisplayName(), e);
-        }
+        return "/user/" + uriEscape(user.getUsername()) + "/subscription/" +
+            uriEscape(sub.getDisplayName());
     }
 }

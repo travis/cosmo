@@ -15,22 +15,19 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.mock.MockSubscribedRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
 
 /**
  * Test class for {@link SubscriptionProvider#createEntry()} tests.
  */
-public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase
-    implements AtomConstants {
+public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase {
     private static final Log log =
         LogFactory.getLog(CreateSubscriptionTest.class);
 
@@ -84,14 +81,7 @@ public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase
         MockSubscribedRequestContext rc =
             new MockSubscribedRequestContext(helper.getServiceContext(),
                                              helper.getUser(), "POST");
-
-        Entry entry = helper.getAbdera().getFactory().newEntry();
-        entry.setTitle(sub.getDisplayName());
-        entry.addSimpleExtension(QN_TICKET, sub.getTicketKey());
-        entry.addSimpleExtension(QN_COLLECTION, sub.getCollectionUid());
-
-        rc.setContent(entry);
-
+        rc.setContent(serialize(sub));
         return rc;
     }
 }

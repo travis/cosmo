@@ -171,10 +171,13 @@ public class StandardSubscriptionFeedGenerator
             getFactory().getContentService()
             .getTicket(collection, sub.getTicketKey()) : null;
 
+        String iri = subscriptionIri(sub);
+
         entry.setTitle(sub.getDisplayName());
         entry.setUpdated(sub.getModifiedDate());
         entry.setPublished(sub.getCreationDate());
-        entry.addLink(newSelfLink(subscriptionIri(sub)));
+        entry.addLink(newSelfLink(iri));
+        entry.addLink(newEditLink(iri));
         if (isDocument)
             entry.addAuthor(newPerson(sub.getOwner()));
 

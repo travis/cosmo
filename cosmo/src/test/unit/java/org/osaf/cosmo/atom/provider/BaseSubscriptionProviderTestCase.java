@@ -15,14 +15,19 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.model.Entry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.model.CollectionSubscription;
 
 /**
  * Base class for for {@link SubscriptionProvider} tests.
  */
 public abstract class BaseSubscriptionProviderTestCase
-    extends BaseProviderTestCase {
+    extends BaseProviderTestCase implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(BaseSubscriptionProviderTestCase.class);
 
@@ -30,5 +35,13 @@ public abstract class BaseSubscriptionProviderTestCase
         SubscriptionProvider provider = new SubscriptionProvider();
         provider.setUserService(helper.getUserService());
         return provider;
+    }
+
+    protected Entry serialize(CollectionSubscription sub) {
+        Entry entry = helper.getAbdera().getFactory().newEntry();
+        entry.setTitle(sub.getDisplayName());
+        entry.addSimpleExtension(QN_TICKET, sub.getTicketKey());
+        entry.addSimpleExtension(QN_COLLECTION, sub.getCollectionUid());
+        return entry;
     }
 }

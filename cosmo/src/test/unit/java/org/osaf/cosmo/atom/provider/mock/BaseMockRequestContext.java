@@ -15,8 +15,13 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.abdera.protocol.server.ServiceContext;
+import org.apache.abdera.util.Constants;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +32,8 @@ import org.springframework.mock.web.MockServletContext;
 /**
  * Mock implementation of {@link RequestContext}.
  */
-public class BaseMockRequestContext extends HttpServletRequestContext {
+public class BaseMockRequestContext extends HttpServletRequestContext
+    implements Constants {
     private static final Log log =
         LogFactory.getLog(BaseMockRequestContext.class);
 
@@ -45,5 +51,36 @@ public class BaseMockRequestContext extends HttpServletRequestContext {
 
     public MockHttpServletRequest getMockRequest() {
         return (MockHttpServletRequest) getRequest();
+    }
+
+    public void setContent(Entry entry)
+        throws IOException {
+        String xml = (String)
+            context.getAbdera().getWriterFactory().getWriter().write(entry);
+        getMockRequest().setContent(xml.getBytes());
+        getMockRequest().setContentType(ATOM_MEDIA_TYPE);
+        getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);
+    }
+
+    public void setContentAsEntry(String content)
+        throws IOException {
+        Entry entry = context.getAbdera().getFactory().newEntry();
+        entry.setContent(content);
+        setContent(entry);
+    }
+
+    public void setContentAsText(String content)
+        throws IOException {
+        getMockRequest().setContent(content.getBytes());
+        getMockRequest().setContentType("text/plain");
+        getMockRequest().addHeader("Content-Type", "text/plain");
+    }
+
+    protected static String uriEscape(String str) {
+        try {
+            return URLEncoder.encode(str, "UTF-8");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not escape " + str, e);
+        }
     }
 }

@@ -197,6 +197,17 @@ public abstract class BaseFeedGenerator implements AtomConstants {
     }
 
     /**
+     * Creates a edit <code>Link</code> for the given IRI.
+     *
+     * @param iri the iri
+     * @throws GeneratorException
+     */
+    protected Link newEditLink(String iri)
+        throws GeneratorException {
+        return newLink(Link.REL_EDIT, MEDIA_TYPE_ATOM, iri);
+    }
+
+    /**
      * <p>
      * Creates a ticket extension <code>Element</code> for the given
      * ticket key based on the provided ticket.

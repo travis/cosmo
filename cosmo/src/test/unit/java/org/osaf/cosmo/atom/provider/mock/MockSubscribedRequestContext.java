@@ -15,9 +15,6 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import java.io.IOException;
-
-import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.ServiceContext;
 
 import org.apache.commons.logging.Log;
@@ -47,13 +44,6 @@ public class MockSubscribedRequestContext extends BaseMockRequestContext {
     }
 
     private static String toRequestUri(User user) {
-        return "/user/" + user.getUsername() + "/subscribed";
-    }
-
-    public void setContent(Entry entry)
-        throws IOException {
-        String xml = (String)
-            context.getAbdera().getWriterFactory().getWriter().write(entry);
-        getMockRequest().setContent(xml.getBytes());
+        return "/user/" + uriEscape(user.getUsername()) + "/subscribed";
     }
 }

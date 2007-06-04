@@ -113,7 +113,7 @@ public class AtomHelper extends MockHelper {
                                              method);
         if (method.equals("POST")) {
             NoteItem item = makeDummyItem(collection.getOwner());
-            rc.setEntryContent(item.getName());
+            rc.setContentAsEntry(item.getName());
         }
         return rc;
     }
@@ -128,7 +128,7 @@ public class AtomHelper extends MockHelper {
                                              method, projection, format);
         if (method.equals("POST")) {
             NoteItem item = makeDummyItem(collection.getOwner());
-            rc.setEntryContent(item.getName());            
+            rc.setContentAsEntry(item.getName());            
         }
         return rc;
     }
@@ -175,7 +175,7 @@ public class AtomHelper extends MockHelper {
         MockItemRequestContext rc =
             new MockItemRequestContext(serviceContext, item, method, null);
         if (method.equals("PUT"))
-            rc.setEntryContent(item);
+            rc.setContentAsEntry(item);
         return rc;
     }
 
@@ -188,7 +188,7 @@ public class AtomHelper extends MockHelper {
             new MockItemRequestContext(serviceContext, item, method, null,
                                        projection, format);
         if (method.equals("PUT"))
-            rc.setEntryContent(item);
+            rc.setContentAsEntry(item);
         return rc;
     }
 
@@ -205,7 +205,7 @@ public class AtomHelper extends MockHelper {
             new MockItemRequestContext(serviceContext, item, method,
                                        "text/plain");
         if (method.equals("PUT"))
-            rc.setTextContent(item);
+            rc.setContentAsText(item);
         return rc;
     }
 

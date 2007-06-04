@@ -62,7 +62,7 @@ public class MockItemRequestContext extends BaseMockRequestContext
                                   String uid,
                                   String method,
                                   String contentType) {
-        this(context, makeItem(uid), method, contentType);
+        this(context, newItem(uid), method, contentType);
     }
 
     public MockItemRequestContext(ServiceContext context,
@@ -71,32 +71,26 @@ public class MockItemRequestContext extends BaseMockRequestContext
                                   String contentType,
                                   String projection,
                                   String format) {
-        this(context, makeItem(uid), method, contentType, projection, format);
+        this(context, newItem(uid), method, contentType, projection, format);
     }
 
     private static String toRequestUri(String uid) {
         return "/item/" + uid;
     }
 
-    private static NoteItem makeItem(String uid) {
+    private static NoteItem newItem(String uid) {
         NoteItem item = new NoteItem();
         item.setUid(uid);
         return item;
     }
 
-    public void setEntryContent(NoteItem item)
+    public void setContentAsEntry(NoteItem item)
         throws IOException {
-        String content = "this is item " + item.getUid();
-        Entry entry = context.getAbdera().getFactory().newEntry();
-        entry.setContent(content);
-        String xml = (String)
-            context.getAbdera().getWriterFactory().getWriter().write(entry);
-        getMockRequest().setContent(xml.getBytes());
+        setContentAsEntry("this is item " + item.getUid());
     }
 
-    public void setTextContent(NoteItem item)
+    public void setContentAsText(NoteItem item)
         throws IOException {
-        String content = "this is item " + item.getUid();
-        getMockRequest().setContent(content.getBytes());
+        setContentAsText("this is item " + item.getUid());
     }
 }

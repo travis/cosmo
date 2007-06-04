@@ -116,7 +116,52 @@ public class SubscriptionProvider extends BaseProvider
     }
 
     public ResponseContext updateEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        SubscriptionTarget target = (SubscriptionTarget) request.getTarget();
+        User user = target.getUser();
+        CollectionSubscription sub = target.getSubscription();
+        if (log.isDebugEnabled())
+            log.debug("upudating subscription " + sub.getDisplayName() +
+                      " for user " + user.getUsername());
+
+        // XXX: check write preconditions?
+
+        try {
+            Entry entry = (Entry) request.getDocument().getRoot();
+            CollectionSubscription newsub = readSubscription(entry);
+
+            if (user.getSubscription(newsub.getDisplayName()) != null &&
+                ! user.getSubscription(newsub.getDisplayName()).equals(sub))
+                return conflict(getAbdera(), request,
+                                "Named subscription exists");
+
+            sub.setDisplayName(newsub.getDisplayName());
+            sub.setCollectionUid(newsub.getCollectionUid());
+            sub.setTicketKey(newsub.getTicketKey());
+
+            user = userService.updateUser(user);
+
+            SubscriptionTarget subTarget =
+                new SubscriptionTarget(request, user, sub);
+            ServiceLocator locator = createServiceLocator(request);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(subTarget, locator);
+            entry = generator.generateEntry(sub);
+
+            AbstractResponseContext rc =
+                createResponseContext(entry.getDocument());
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+            rc.setEntityTag(new EntityTag(sub.getEntityTag()));
+
+            return rc;
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        }
     }
   
     public ResponseContext updateMedia(RequestContext request) {

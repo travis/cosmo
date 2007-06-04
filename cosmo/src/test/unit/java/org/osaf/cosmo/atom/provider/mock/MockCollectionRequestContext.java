@@ -62,34 +62,16 @@ public class MockCollectionRequestContext extends BaseMockRequestContext
                                         String method,
                                         String projection,
                                         String format) {
-        this(context, makeCollection(uid), method, projection, format);
+        this(context, newCollection(uid), method, projection, format);
     }
 
     private static String toRequestUri(String uid) {
         return "/collection/" + uid;
     }
 
-    private static CollectionItem makeCollection(String uid) {
+    private static CollectionItem newCollection(String uid) {
         CollectionItem collection = new CollectionItem();
         collection.setUid(uid);
         return collection;
-    }
-
-    public void setEntryContent(String content)
-        throws IOException {
-        Entry entry = context.getAbdera().getFactory().newEntry();
-        entry.setContent(content);
-        String xml = (String)
-            context.getAbdera().getWriterFactory().getWriter().write(entry);
-        getMockRequest().setContent(xml.getBytes());
-        getMockRequest().setContentType(ATOM_MEDIA_TYPE);
-        getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);
-    }
-
-    public void setTextContent(String content)
-        throws IOException {
-        getMockRequest().setContent(content.getBytes());
-        getMockRequest().setContentType("text/plain");
-        getMockRequest().addHeader("Content-Type", "text/plain");
     }
 }

@@ -178,22 +178,6 @@ dojo.declare("cosmo.model.Delta", null, {
         return { master:true, occurrenceAndFuture:true, occurrence:true};
     },
     
-    isApplicableToMaster: function(){
-        return true;        
-    }, 
-    
-    isApplicableToThisAndFuture: function(){
-       if (!note.hasRecurrence()){
-           return false;
-       } 
-    }, 
-    
-    isApplicableToOccurence: function(){
-       if (!note.hasRecurrence()){
-           return false;
-       } 
-    },
-    
     applyChangeType: function(changeType){
         if (changeType == "master"){
             this.applyToMaster();

@@ -109,7 +109,14 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.makeSnapshot = function () {
         // Make backup snapshot before saving
         // ================
-        this.dataOrig = this.data.clone();
+        if (this.data.isMaster()){
+            this.dataOrig = this.data.clone();
+            this.occurrence = false;
+        } else {
+            this.dataOrig = this.data.getMaster();
+            this.occurrence = true;
+            this.recurrenceId = this.data.recurrenceId
+        }
         return true;
     };
     /**
@@ -120,7 +127,11 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.restoreFromSnapshot = function () {
         // Restore from backup snapshot
         // ================
-        this.data = this.dataOrig.clone();
+        if (!this.occurrence){
+            this.data = this.dataOrig.clone();
+        } else {
+            this.data = this.dataOrig.getNoteOccurrence(this.recurrenceId);
+        }
         return true;
     };
     /**

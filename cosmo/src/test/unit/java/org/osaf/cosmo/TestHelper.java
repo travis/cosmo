@@ -223,6 +223,18 @@ public class TestHelper {
         return sub;
     }
 
+    /** */
+    public CollectionSubscription
+        makeDummySubscription(User user) {
+        CollectionItem collection = makeDummyCollection(user);
+        Ticket ticket = makeDummyTicket(user);
+
+        CollectionSubscription sub = makeDummySubscription(collection, ticket);
+        sub.setOwner(user);
+
+        return sub;
+    }
+
     /**
      */
     public Principal makeDummyUserPrincipal() {
@@ -305,6 +317,7 @@ public class TestHelper {
         String name = "test collection " + serial;
 
         CollectionItem collection = new CollectionItem();
+        collection.setUid(serial);
         collection.setName(name);
         collection.setDisplayName(name);
         collection.setOwner(user);

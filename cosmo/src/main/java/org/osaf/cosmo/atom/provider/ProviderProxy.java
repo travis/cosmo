@@ -118,6 +118,8 @@ public class ProviderProxy extends BaseProvider {
     // ExtendedProvider methods
 
     public ResponseContext updateCollection(RequestContext request) {
+        if (request.getTarget() instanceof CollectionTarget)
+            return itemProvider.updateCollection(request);
         throw new UnsupportedOperationException();
     }
 

@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.io.IOException;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -45,7 +46,55 @@ public class SubscriptionProvider extends BaseProvider
     // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        SubscribedTarget target = (SubscribedTarget) request.getTarget();
+        User user = target.getUser();
+
+        // XXX: check write preconditions?
+
+        try {
+            Entry entry = (Entry) request.getDocument().getRoot();
+            CollectionSubscription sub = readSubscription(entry);
+
+            if (user.getSubscription(sub.getDisplayName()) != null)
+                return conflict(getAbdera(), request,
+                                "Named subscription exists");
+
+            if (log.isDebugEnabled())
+                log.debug("creating subscription " + sub.getDisplayName() +
+                          " for user " + user.getUsername());
+
+            user.addSubscription(sub);
+            user = userService.updateUser(user);
+
+            SubscriptionTarget subTarget =
+                new SubscriptionTarget(request, user, sub);
+            ServiceLocator locator = createServiceLocator(request);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(subTarget, locator);
+            entry = generator.generateEntry(sub);
+
+            AbstractResponseContext rc =
+                createResponseContext(entry.getDocument(), 201, "Created");
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+            rc.setEntityTag(new EntityTag(sub.getEntityTag()));
+
+            try {
+                rc.setLocation(entry.getSelfLink().getHref().toString());
+                rc.setContentLocation(entry.getSelfLink().getHref().toString());
+            } catch (Exception e) {
+                throw new RuntimeException("Error parsing self link href", e);
+            }
+
+            return rc;
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        }
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
@@ -170,5 +219,15 @@ public class SubscriptionProvider extends BaseProvider
                                         ServiceLocator locator) {
         return getGeneratorFactory().
             createSubscriptionFeedGenerator(locator);
+    }
+
+    private CollectionSubscription readSubscription(Entry entry) {
+        CollectionSubscription sub = new CollectionSubscription();
+
+        sub.setDisplayName(entry.getTitle());
+        sub.setTicketKey(entry.getSimpleExtension(QN_TICKET));
+        sub.setCollectionUid(entry.getSimpleExtension(QN_COLLECTION));
+
+        return sub;
     }
 }

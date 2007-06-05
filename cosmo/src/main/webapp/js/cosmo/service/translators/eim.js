@@ -154,17 +154,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 throw new cosmo.service.translators.
                    ParseError("Could not find content element for entry " + (i+1));
             }
-            var content = c.firstChild.nodeValue;
+            var content = c.innerText || c.textContent;
             var item;
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
             if (masterItem){
-                item = this.recordSetToModification(eval("(" + content + ")"), masterItem); 
+                item = this.recordSetToModification(dojo.json.evalJson(content), masterItem); 
             }
             else {
-                item = this.recordSetToObject(eval("(" + content + ")"))
+                item = this.recordSetToObject(dojo.json.evalJson(content));
             }
-            
             var links = cosmo.util.html.getElementsByTagName(entry, "link");
             for (var j = 0; j < links.length; j++){
                 var link = links[j];
@@ -190,7 +189,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
              uid: recordSet.uuid
          }
         );
-
         for (recordName in recordSet.records){
         with (cosmo.service.eim.constants){
 
@@ -205,14 +203,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                this.addNoteRecord(record, note);
                break;
            case prefix.EVENT:
-               var props = this.getEventStampProperties(record)
-               note.getStamp(prefix.EVENT, true, props);
+               note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
                break;
            case prefix.TASK:
               note.getStamp(prefix.TASK, true, this.getTaskStampProperties(record));
                break;
+           case prefix.MAIL:
+              note.getStamp(prefix.MAIL, true, this.getMailStampProperties(record));
+              break;
            }
         }
+
         }
         return note;
 
@@ -245,6 +246,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                    break;
                case prefix.TASK:
                    modifiedStamps[prefix.TASK] = this.getTaskStampProperties(record);
+                   break;
+               case prefix.MAIL:
+                   modifiedStamps[prefix.MAIL] = this.getMailStampProperties(record);
                    break;
                }
             }
@@ -310,6 +314,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         if (note.getEventStamp()) records.event = this.noteToEventRecord(note);
         if (note.getTaskStamp()) records.task = this.noteToTaskRecord(note);
+        if (note.getMailStamp()) records.mail = this.noteToMailRecord(note);
         
         var recordSet =  {
             uuid: this.getUid(note),
@@ -335,6 +340,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
         if (modification.getModifiedStamps().event){
             records.event = this.modificationToEventRecord(modification)
+        }
+        if (modification.getModifiedStamps().task){
+            records.task = this.modificationToTaskRecord(modification)
+        }
+        if (modification.getModifiedStamps().MAIL){
+            records.mail = this.modificationToMailRecord(modification)
         }
         var recordSet =  {
             uuid: this.getUid(noteOccurrence),
@@ -375,7 +386,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return {
                 prefix: prefix.ITEM,
                 ns: ns.ITEM,
-                keys: {
+                key: {
                     uuid: [type.TEXT, props.uuid]
                 },
                 fields: fields
@@ -407,7 +418,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
-                keys: {
+                key: {
                     uuid: [type.TEXT, props.uuid]
                 },
                 fields: fields
@@ -415,6 +426,54 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
+    noteToMailRecord: function(note){
+        var props = {};
+        stamp = note.getMailStamp();
+        props.messageId = stamp.getMessageId();
+        props.headers = stamp.getHeaders();
+        props.fromAddress = stamp.getFromAddress();
+        props.toAddress = stamp.getToAddress();
+        props.ccAddress = stamp.getCcAddress();
+        props.bccAddress = stamp.getBccAddress();
+        props.originators = stamp.getOriginators();
+        props.dateSent = stamp.getDateSent();
+        props.inReplyTo = stamp.getInReplyTo();
+        props.references = stamp.getReferences();
+        props.uuid = this.getUid(note);
+        return this.propsToMailRecord(props);
+
+    },
+
+    modificationToMailRecord: function(modification){
+        return this.propsToMailRecord(modification.getModifiedStamps().mail);
+    },
+    
+    propsToMailRecord: function(props){
+        with (cosmo.service.eim.constants){
+            var fields = {};
+            if (props.messageId) fields.messageId = [type.TEXT, props.messageId];
+            if (props.headers) fields.headers = [type.CLOB, props.headers];
+            if (props.fromAddress) fields.fromAddress = [type.TEXT, props.fromAddress.join(",")];
+            if (props.toAddress) fields.toAddress = [type.TEXT, props.toAddress.join(",")];
+            if (props.ccAddress) fields.ccAddress = [type.TEXT, props.ccAddress.join(",")];
+            if (props.bccAddress) fields.bccAddress = [type.TEXT, props.bccAddress.join(",")];
+            if (props.originators) fields.originators = [type.TEXT, props.originators.join(",")];
+
+            if (props.dateSent) fields.dateSent = [type.TEXT, props.dateSent];
+            if (props.inReplyTo) fields.inReplyTo = [type.TEXT, props.inReplyTo];
+            if (props.references) fields.references = [type.CLOB, props.references];
+            
+           return {
+                prefix: prefix.MAIL,
+                ns: ns.MAIL,
+                key: {
+                    uuid: [type.TEXT, props.uuid]
+                },
+                fields: fields
+            }
+        }   
+    },
+    
     noteToEventRecord: function(note){
         var props = {};
         stamp = note.getEventStamp();
@@ -449,7 +508,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
            return {
                 prefix: prefix.EVENT,
                 ns: ns.EVENT,
-                keys: {
+                key: {
                     uuid: [type.TEXT, props.uuid]
                 },
                 fields: fields
@@ -458,7 +517,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         
     },
-    
+
     exdatesToEim: function(exdates){
         return ";VALUE=DATE-TIME:" + dojo.lang.map(
                 exdates,
@@ -486,7 +545,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return {
                 prefix: prefix.TASK,
                 ns: ns.TASK,
-                keys: {
+                key: {
                     uuid: [type.TEXT, this.getUid(note)]
                 },
                 fields: {}
@@ -501,7 +560,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return {
                 prefix: prefix.MODBY,
                 ns: ns.MODBY,
-                keys:{
+                key:{
                     uuid: [type.TEXT, this.getUid(note)],
                     userid: [type.TEXT, ""],
                     action: [type.INTEGER, 100], //TODO: figure this out
@@ -514,20 +573,20 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     getEventStampProperties: function (record){
 
         var properties = {};
-        if (record.fields.dtstart != undefined){
+        if (record.fields.dtstart){
             properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
             var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
             if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
             if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
         }
 
-        if (record.fields.duration != undefined) properties.duration=
+        if (record.fields.duration) properties.duration=
                 new cosmo.model.Duration(record.fields.duration[1]);
-        if (record.fields.location != undefined) properties.location = record.fields.location[1];
-        if (record.fields.rrule != undefined) properties.rrule = this.parseRRule(record.fields.rrule[1]);
-        if (record.fields.exrule != undefined) properties.exrule = this.parseRRule(record.fields.exrule[1]);
-        if (record.fields.exdate != undefined) properties.exdates = this.parseExdate(record.fields.exdate[1]);
-        if (record.fields.status != undefined) properties.status = record.fields.status[1];
+        if (record.fields.location) properties.location = record.fields.location[1];
+        if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1]);
+        if (record.fields.exrule) properties.exrule = this.parseRRule(record.fields.exrule[1]);
+        if (record.fields.exdate) properties.exdates = this.parseExdate(record.fields.exdate[1]);
+        if (record.fields.status) properties.status = record.fields.status[1];
         return properties;
 
     },
@@ -535,6 +594,26 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     getTaskStampProperties: function (record){
 
         return {};
+    },
+
+    getMailStampProperties: function (record){
+        var properties = {};
+        if (record.fields.messageId) properties.messageId = record.fields.messageId[1];
+        if (record.fields.headers) properties.headers = record.fields.headers[1];
+        if (record.fields.fromAddress) properties.fromAddress = this.parseList(record.fields.fromAddress[1]);
+        if (record.fields.toAddress) properties.toAddress = this.parseList(record.fields.toAddress[1]);
+        if (record.fields.ccAddress) properties.ccAddress = this.parseList(record.fields.ccAddress[1]);
+        if (record.fields.bccAddress) properties.bccAddress = this.parseList(record.fields.bccAddress[1]);
+        if (record.fields.originators) properties.originators = this.parseList(record.fields.originators[1]);
+        if (record.fields.dateSent) properties.dateSent = record.fields.dateSent[1]; //TODO: parse
+        if (record.fields.inReplyTo) properties.inReplyTo = record.fields.inReplyTo[1];
+        if (record.fields.references) properties.references = record.fields.references[1];
+        return properties;
+    },
+    
+    parseList: function(listString){
+       if (!listString) return listString;
+       else return listString.split(",");
     },
 
     addItemRecord: function (record, object){

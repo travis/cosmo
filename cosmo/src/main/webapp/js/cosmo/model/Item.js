@@ -217,8 +217,8 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             return this.getStamp("task", createIfDoesntExist, initialProps);
         },
 
-        getMessageStamp: function (/*Boolean*/ createIfDoesntExist, /*Object?*/initialProps){
-            return this.getStamp("message", createIfDoesntExist, initialProps);
+        getMailStamp: function (/*Boolean*/ createIfDoesntExist, /*Object?*/initialProps){
+            return this.getStamp("mail", createIfDoesntExist, initialProps);
         },
         
         getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){
@@ -499,17 +499,17 @@ cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
         }
     });
 
-cosmo.model.declareStamp("cosmo.model.MessageStamp", "message",
-    [[ "id", String, {}],
-     [ "headers", [Array, String], {}],
-     [ "from", [Array, String], {}],
-     [ "to", [Array, String], {}],
-     [ "cc", [Array, String], {}],
-     [ "bcc", [Array, String], {}],
+cosmo.model.declareStamp("cosmo.model.MailStamp", "mail",
+    [[ "messageId", String, {}],
+     [ "headers", String, {}],
+     [ "fromAddress", [Array, String], {}],
+     [ "toAddress", [Array, String], {}],
+     [ "ccAddress", [Array, String], {}],
+     [ "bccAddress", [Array, String], {}],
      [ "originators", [Array, String], {}],
-     [ "dateSent", [Array, String], {}],
-     [ "inReplyTo", [Array, String], {}],
-     [ "references", [Array, String], {}]
+     [ "dateSent", String, {}],
+     [ "inReplyTo", String, {}],
+     [ "references", String, {}]
      ],
     {
         initializer: function(kwArgs){

@@ -200,6 +200,63 @@ cosmotest.service.conduits.test_conduits = {
         }
     },
     
+    test_Mail: function(){
+        try {
+            var user = cosmotest.service.conduits.test_conduits.createTestAccount();
+            
+            var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
+            var collections = conduit.getCollections({sync: true}).results[0];
+            
+            var c0 = collections[0];
+            
+            var newItem = new cosmo.model.Note(
+            {
+                displayName: "Test Message"
+            }
+            );
+            var messageId = "12345";
+            var heads = "headers headers headers";
+            var to = ["foo@bar.com","bar@foo.com"];
+            var cc = ["moo@cow.com"];
+            var bcc = ["loo@loo.net"];
+            var from = ["mom@mom.com"];
+            var originators = ["me", "mom"];
+            var dateSent = "date foo";
+            var inReplyTo = "nothing";
+            var references = "farf";
+            newItem.getMailStamp(true, {
+                messageId: messageId,
+                headers: heads,
+                toAddress: to,
+                ccAddress: cc,
+                bccAddress: bcc,
+                fromAddress: from,
+                originators: originators,
+                dateSent: dateSent,
+                inReplyTo: inReplyTo,
+                references: references
+                
+            });
+            conduit.createItem(newItem, c0, {sync: true});
+
+            var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0][0];
+            var mStamp = item0.getMailStamp();
+            jum.assertEquals("messageId doesn't match", messageId, mStamp.getMessageId());
+            jum.assertEquals("headers doesn't match", heads, mStamp.getHeaders());
+            jum.assertEquals("to doesn't match", to, mStamp.getToAddress());
+            jum.assertEquals("cc doesn't match", cc, mStamp.getCcAddress());
+            jum.assertEquals("bcc doesn't match", bcc, mStamp.getBccAddress());
+            jum.assertEquals("from doesn't match", from, mStamp.getFromAddress());
+            jum.assertEquals("originators doesn't match", originators, mStamp.getOriginators());
+            jum.assertEquals("dateSent doesn't match", dateSent, mStamp.getDateSent());
+            jum.assertEquals("inReplyTo doesn't match", inReplyTo, mStamp.getInReplyTo());
+            jum.assertEquals("references doesn't match", references, mStamp.getReferences());
+    
+        } finally {
+           cosmotest.service.conduits.test_conduits.cleanup(user);            
+        }
+    },
+    
     createTestAccount: function(){
        cosmo.util.auth.clearAuth();
        var user = {

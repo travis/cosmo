@@ -1142,19 +1142,18 @@ td.dataDisplayLabel {
 }
 .expandoHead {
     width: 100%;
-    height: 20px;
-    background: #eee;
+    border-top: 1px solid #ccc;
+    height: 21px;
     text-align: right;
     vertical-align: middle;
-    line-height: 20px;
-    cursor: pointer;
+    line-height: 21px;
 }
 .expandoEnableCheckbox {
+    padding-left: 4px;
     padding-right: 6px;
 }
 .expandoTriangle {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-right: 4px;
 }
 .expandoIcon {
     padding-right: 8px;

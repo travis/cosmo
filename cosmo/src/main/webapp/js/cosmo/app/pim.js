@@ -46,7 +46,7 @@ yPos = 0;
 /**
  * @object The Cal singleton
  */
-dojo.lang.mixin(cosmo.app.pim, new function () {
+cosmo.app.pim = dojo.lang.mixin(new function () {
     var self = this;
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
@@ -335,7 +335,7 @@ dojo.lang.mixin(cosmo.app.pim, new function () {
         }
         this.allDayArea = null;
     };
-});
+}, cosmo.app.pim);
 
 Cal = cosmo.app.pim;
 

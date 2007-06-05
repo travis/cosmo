@@ -34,15 +34,6 @@ hr {
     background: #cccccc;
 }
 
-a span, a{
-    color: #333399;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #9999cc;
-}
-
 /* Set default font size here
  * height of 100% ensures that IE can get an accurate measure
  * of the window height */
@@ -74,16 +65,21 @@ div {
  * generally color for text of active buttons should match */
 a {
     color: #333399;
-}
-.jsLink {
     cursor: pointer;
 }
+a span, a{
+    color: #333399;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #9999cc;
+}
+
 /* Invisible elements */
 .invisible {
     display: none;
 }
-
-
 
 /*************************************************
  * Admin UI Styles                               *
@@ -326,6 +322,9 @@ body.adminPage {
     font-size: 14px;
     font-weight: bold;
     color: #999;
+}
+.disabledText {
+    color: #ccc;
 }
 /* For block elements containing form inputs */
 .formElem {

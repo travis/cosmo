@@ -259,6 +259,81 @@ cosmo.util.html.setTextInput = function (textbox, textValue, isDefaultText,
     disabled) {
     textbox.className = isDefaultText ? 'inputTextDim' : 'inputText';
     textbox.value = textValue;
-    textbox.disabled = disabled;
+    if (typeof disabled == 'boolean') {
+        textbox.disabled = disabled;
+    }
 };
+
+cosmo.util.html.clearFormElem = function (elem, elemType) {
+    switch (elemType) {
+        // Note: not doing anything with
+        // hidden form elements here
+        case 'text':
+        case 'password':
+        case 'textarea':
+            elem.value = '';
+            break;
+
+        case 'select-one':
+        case 'select-multiple':
+            elem.selectedIndex = 0;
+            break;
+
+        case 'radio':
+        case 'checkbox':
+            if (elem.length) { 
+                for (var i = 0; i < elem.length; i++) {
+                    elem[i].checked = false;
+                }
+            }
+            else {
+                elem.checked = false;
+            }
+            break;
+    }
+};
+
+cosmo.util.html.enableDisableFormElem = function (elem, elemType, 
+    enabled) {
+    var disabled = !enabled;
+    if (elemType == 'radio' || elemType == 'checkbox') {
+        if (elem.length) { 
+            for (var i = 0; i < elem.length; i++) {
+                elem[i].disabled = disabled;
+            }
+        }
+        else {
+            elem.disabled = disabled;
+        }
+    }
+    else {
+        elem.disabled = disabled;
+    }
+}
+
+cosmo.util.html.enableFormElem = function (elem, elemType) {
+    cosmo.util.html.enableDisableFormElem(elem, elemType, true);
+};
+
+cosmo.util.html.disableFormElem = function (elem, elemType) {
+    cosmo.util.html.enableDisableFormElem(elem, elemType, false);
+};
+
+cosmo.util.html.clearAndDisableFormElem = function (elem, elemType) {
+    cosmo.util.html.clearFormElem(elem, elemType);
+    cosmo.util.html.disableFormElem(elem, elemType);
+};
+
+cosmo.util.html.getFormElemNames = function (form) {
+    var elems = form.elements;
+    var names = {};
+    for (var i = 0; i < elems.length; i++) {
+        var elem = elems[i];
+        var n = elem.name;
+        if (typeof names[n] == 'undefined') {
+            names[n] = elem.type;
+        }
+    }
+    return names;
+}
 

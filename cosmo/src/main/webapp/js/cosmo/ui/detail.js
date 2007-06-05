@@ -25,6 +25,7 @@ dojo.provide("cosmo.ui.detail");
 
 dojo.require("dojo.event.*");
 dojo.require("dojo.lfx.*");
+dojo.require("dojo.html.style");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
@@ -35,23 +36,21 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     var params = p || {};
 
     this.domNode = null;
-    this.formNode = _createElem('form');
 
     for (var n in params) { this[n] = params[n]; }
 
-    this.domNode.appendChild(this.formNode);
     var d = _createElem('div');
     var a = new cosmo.ui.detail.StampSection({ parent: this,
         domNode: d,
         stampType: 'Address', title: 'Address' });
     this.children = [a];
-    this.formNode.appendChild(a.domNode);
+    this.domNode.appendChild(a.domNode);
     var d = _createElem('div');
     var a = new cosmo.ui.detail.StampSection({ parent: this,
         domNode: d,
         stampType: 'Event', title: 'Event' });
     this.children = [a];
-    this.formNode.appendChild(a.domNode);
+    this.domNode.appendChild(a.domNode);
 };
 
 cosmo.ui.detail.DetailViewForm.prototype =
@@ -114,7 +113,9 @@ cosmo.ui.detail.StampSection = function (p) {
     // Enable/disable checkbox
     d = _createElem('div');
     d.id = id + 'Toggle';
-    d.innerHTML = '<input type="checkbox" name="' + id + 'Toggle"/>';
+    // Put the toggling checkbox in its own form -- not related
+    // to the form proper that has actual values for the stamp
+    d.innerHTML = '<form><input type="checkbox" name="' + id + 'Toggle"/></form>';
     d.className = 'expandoEnableCheckbox';
     this.enablerSwitch = d.firstChild;
     header.appendChild(d);
@@ -137,7 +138,7 @@ cosmo.ui.detail.StampSection = function (p) {
     this.bodyNode = body;
     this.domNode.appendChild(body);
 
-    //this.formSection.toggleEnabled(false);
+    this.toggleEnabled(false);
     // Save rendered height
     this.bodyHeight = this.bodyNode.offsetHeight;
     // Attach events
@@ -165,8 +166,6 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (e) {
 }
 
 cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e) {
-    // Don't pass click event along to the expando
-    e.stopPropagation();
 
     // Allow explicit enabled state to be passed
     if (typeof e == 'boolean') {
@@ -174,28 +173,59 @@ cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e) {
     }
     else {
         this.enabled = !this.enabled;
+        // Don't pass click event along to the expando
+        // when enabled/expanded states already match
+        if (this.enabled == this.expanded) { e.stopPropagation(); }
     }
-
-    return;
 
     var s = this.titleNode.className;
     if (this.enabled) {
-        fleegix.css.removeClass(this.titleNode, 'disabledText');
-        fleegix.css.removeClass(this.iconNode, 'disabledText');
+        dojo.html.removeClass(this.titleNode, 'disabledText');
+        dojo.html.removeClass(this.iconNode, 'disabledText');
     }
     else {
-        fleegix.css.addClass(this.titleNode, 'disabledText');
-        fleegix.css.addClass(this.iconNode, 'disabledText');
+        dojo.html.addClass(this.titleNode, 'disabledText');
+        dojo.html.addClass(this.iconNode, 'disabledText');
     }
-    this.form.toggleEnabled(this.enabled);
+    this.formSection.toggleEnabled(this.enabled);
 }
 
+cosmo.ui.detail.getFormElementsForStamp = function (stampType) {
+    return new cosmo.ui.detail[stampType + 'FormElements']();
+};
 
 cosmo.ui.detail.StampFormElements = function () {
-   this.enabled = false;
+    this.domNode = _createElem('div');
+    this.formNode = _createElem('form');
+    this.enabled = false;
+    this.elementDefaultStates = {};
+    // Prevent form submission from hitting Enter key
+    // while in a text box
+    dojo.event.connect(this.formNode, 'onsubmit', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+    });
 }
 
-cosmo.ui.detail.StampFormElements.prototype.toggleEnabled = function (explicit) {
+cosmo.ui.detail.StampFormElemState = function (p) {
+    var params = p || {};
+    // Using typeof tests to see if these are set for a
+    // particular form elem
+    this.disabled = null; // Boolean
+    this.value = null; // String
+    this.hintText = null; // String
+    for (var n in params) { this[n] = params[n]; }
+}
+
+cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
+    = function (explicit) {
+    var toggleText = function (tags, isEnabled) {
+        var key = isEnabled ? 'remove' : 'add';
+        for (var i = 0; i < tags.length; i++) {
+            dojo.html[key + 'Class'](tags[i], 'disabledText');
+        }
+    }
     // If passed explicitly, reset the enabled prop
     if (typeof explicit == 'boolean') {
         this.enabled = explicit;
@@ -204,42 +234,65 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled = function (explicit) 
         this.enabled = !this.enabled;
     }
 
-    return;
-
-    var e = this.enabled;
-    var f = this.formNode;
-    for (var i = 0; i < f.elements.length; i++) {
-        var elem = f.elements[i];
-        elem.disabled = !e;
-        if (!e) {
-           elem.value = '';
-        }
+    // Disable label text
+    var tagTypes = ['td','div','span'];
+    for (var i in tagTypes) {
+        var tags = this.domNode.getElementsByTagName(tagTypes[i]);
+        toggleText(tags, this.enabled);
     }
-    var tags = document.getElementsByTagName('td');
+
+    // Disable/enable form elements
+    var f = this.formNode;
+    var elems = cosmo.util.html.getFormElemNames(f);
+    var d = this.elementDefaultStates;
     if (this.enabled) {
-        for (var i = 0; i < tags.length; i++) {
-            var tag = tags[i];
-            var className = tag.className;
-            className = className.replace(', disabledText', '');
-            tag.className = className;
+        for (var i in elems) {
+            var elem = f[i];
+            var state = d[i];
+            var elemType = elems[i];
+            this.setElemDefaultState(elem, elemType, state);
         }
     }
     else {
-        for (var i = 0; i < tags.length; i++) {
-            var tag = tags[i];
-            var className = tag.className;
-            className += ', disabledText';
-            tag.className = className;
+        for (var i in elems) {
+            var elem = f[i];
+            var elemType = elems[i];
+            cosmo.util.html.clearAndDisableFormElem(elem, elemType);
         }
     }
 };
 
-cosmo.ui.detail.getFormElementsForStamp = function (stampType) {
-    return new cosmo.ui.detail[stampType + 'FormElements']();
+cosmo.ui.detail.StampFormElements.prototype.setElemDefaultState =
+    function (elem, elemType, state) {
+
+    cosmo.util.html.enableFormElem(elem, elemType);
+
+    if (!state) {
+        cosmo.util.html.clearFormElem(elem, elemType);
+    }
+    else {
+        for (var key in state) {
+            var val = state[key];
+            switch (key) {
+                case 'hintText':
+                    if (typeof val == 'string') {
+                        cosmo.util.html.setTextInput(elem, val, true);
+                    }
+                    break;
+                case 'disabled':
+                    if (typeof val == 'boolean') {
+                        elem.disabled = val;
+                    }
+                    break;
+            }
+        }
+    }
 };
+
 cosmo.ui.detail.AddressFormElements = function () {
     var _html = cosmo.util.html;
-    var d = _createElem('div');
+    var d = this.domNode;
+    var f = this.formNode;
     var table = _createElem('table');
     var tbody = _createElem('tbody');
     var addressRow = function (label, name) {
@@ -266,8 +319,6 @@ cosmo.ui.detail.AddressFormElements = function () {
     }
     d.id = 'addressFormSection';
     d.style.padding = '12px 0px 24px 0px';
-    d.appendChild(table);
-    this.domNode = d;
     table.cellPadding = '0px';
     table.cellSpacing = '0px';
     table.appendChild(tbody);
@@ -275,22 +326,25 @@ cosmo.ui.detail.AddressFormElements = function () {
     tbody.appendChild(addressRow('Fr', 'From'));
     tbody.appendChild(addressRow('To', 'To'));
     tbody.appendChild(addressRow('Cc', 'Cc'));
-    this.toggleEnabled(false);
+
+    f.appendChild(table);
+    d.appendChild(f);
 };
-cosmo.ui.detail.AddressFormElements.prototype = new cosmo.ui.detail.StampFormElements();
+cosmo.ui.detail.AddressFormElements.prototype =
+    new cosmo.ui.detail.StampFormElements();
 
 cosmo.ui.detail.EventFormElements= function () {
     var _html = cosmo.util.html;
-    var d = _createElem('div');
-
+    var d = this.domNode;
+    var f = this.formNode;
     var createDateTimeInputs = function (label, name) {
         var d = _createElem('div');
         var t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.' + label));
         d.appendChild(t);
         var elem = _html.createInput({ type: 'text',
-            id: name + 'date',
-            name: name + 'date',
+            id: name + 'Date',
+            name: name + 'Date',
             size: 10,
             maxlength: 10,
             value: '',
@@ -302,8 +356,8 @@ cosmo.ui.detail.EventFormElements= function () {
             _('Main.DetailForm.At')));
         t.appendChild(_html.nbsp());
         var elem = _html.createInput({ type: 'text',
-            id: name + 'time',
-            name:name + 'time',
+            id: name + 'Time',
+            name:name + 'Time',
             size: 5,
             maxlength: 5,
             value: '',
@@ -311,9 +365,18 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         var elem = _html.createInput({ type: 'radio',
-            id: name + 'ap0',
-            name: name + 'ap',
+            id: name + 'Meridian0',
+            name: name + 'Meridian',
             value: 1 });
+        t.appendChild(elem);
+        t.appendChild(_html.nbsp());
+        t.appendChild(_createText(
+            _('App.AM')));
+        t.appendChild(_html.nbsp());
+        var elem = _html.createInput({ type: 'radio',
+            id: name + 'Meridian1',
+            name: name + 'Meridian',
+            value: 2 });
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
@@ -391,49 +454,48 @@ cosmo.ui.detail.EventFormElements= function () {
 
     d.id = 'eventFormSection';
     d.style.padding = '8px 12px 24px 8px';
-    this.domNode = d;
 
-    // Event title
+    // Summary
     var t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Title'));
-    d.appendChild(t);
+    f.appendChild(t);
     var elem = _html.createInput({ type: 'text',
-        id: 'eventtitle',
-        name: 'eventtitle',
+        id: 'noteSummary',
+        name: 'noteSummary',
         size: 28,
         maxlenght: 100,
         value: '',
         className: 'inputText' });
     var t =  cosmo.ui.detail.createFormElemDiv(elem);
-    d.appendChild(t);
+    f.appendChild(t);
     // Location
     var t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Location'));
-    d.appendChild(t);
+    f.appendChild(t);
     var elem = _html.createInput({ type: 'text',
-        id: 'eventlocation',
-        name: 'eventlocation',
+        id: 'eventLocation',
+        name: 'eventLocation',
         size: 28,
         maxlength: 100,
         value: '',
         className: 'inputText' });
     var t =  cosmo.ui.detail.createFormElemDiv(elem);
-    d.appendChild(t);
+    f.appendChild(t);
     // All-day checkbox
     var elem = _html.createInput({ type: 'checkbox',
-        id: 'eventallday',
-        name: 'eventallday',
+        id: 'eventAllDay',
+        name: 'eventAllDay',
         value: 'true' });
     var t =  cosmo.ui.detail.createFormElemDiv(elem);
     t.appendChild(_html.nbsp());
     t.appendChild(_createText('All day'));
-    d.appendChild(t);
+    f.appendChild(t);
     // Event start
     var t = createDateTimeInputs('Starts', 'start');
-    d.appendChild(t);
+    f.appendChild(t);
     // Event end
     var t = createDateTimeInputs('Ends', 'end');
-    d.appendChild(t);
+    f.appendChild(t);
     // Timezone
     var t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Timezone'));
@@ -455,27 +517,27 @@ cosmo.ui.detail.EventFormElements= function () {
         options: getTimezoneIdOptions(null) });
     elem.style.width = '100px';
     t.appendChild(elem);
-    d.appendChild(t);
+    f.appendChild(t);
     // Event status
     var t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Status'));
     t.className += ' formElem';
     t.appendChild(_html.nbsp());
-    var elem = _html.createSelect({ id: 'status',
-        name: 'status',
+    var elem = _html.createSelect({ id: 'eventStatus',
+        name: 'eventStatus',
         multi: false,
         options: getStatusOpt(),
         className: 'selectElem' });
     t.appendChild(_html.nbsp());
     t.appendChild(elem);
-    d.appendChild(t);
+    f.appendChild(t);
     // Recurrence
     var t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Occurs'));
     t.className += ' formElem';
     t.style.whiteSpace = 'nowrap';
-    var elem = _html.createSelect({ id: 'recurrence',
-        name: 'recurrence',
+    var elem = _html.createSelect({ id: 'recurrenceInterval',
+        name: 'recurrenceInterval',
         multi: false,
         options: getRecurOpt(),
         className: 'selectElem' });
@@ -485,29 +547,100 @@ cosmo.ui.detail.EventFormElements= function () {
     t.appendChild(_createText(_('Main.DetailForm.Ending')));
     t.appendChild(_html.nbsp());
     var elem = _html.createInput({ type: 'text',
-        id: 'recurend',
-        name: 'recurend',
+        id: 'recurrenceEnd',
+        name: 'recurrenceEnd',
         size: 10,
         maxlength: 10,
         value: '',
         className: 'inputText' });
     t.appendChild(elem);
-    d.appendChild(t);
+    f.appendChild(t);
 
     var t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Description'));
-    d.appendChild(t);
+    f.appendChild(t);
     var elem = _createElem('textarea');
     elem.className = 'inputText';
-    elem.id = 'eventdescr';
-    elem.name = 'eventdescr';
+    elem.id = 'noteDescription';
+    elem.name = 'noteDescription';
     elem.cols = '28';
     elem.rows = '4';
     elem.style.width = '220px';
     var t = cosmo.ui.detail.createFormElemDiv(elem);
-    d.appendChild(t);
 
-    this.toggleEnabled(false);
+    var _st = cosmo.ui.detail.StampFormElemState;
+    this.elementDefaultStates = {
+        startDate: new _st({ hintText: 'mm/dd/yyyy' }),
+        startTime: new _st({ hintText: 'hh:mm' }),
+        endDate: new _st({ hintText: 'mm/dd/yyyy' }),
+        endTime: new _st({ hintText: 'hh:mm' }),
+        recurrenceEnd: new _st({ disabled: true })
+    };
+
+    // Make hint text in text inputs disappear on focus
+    var func = cosmo.util.html.handleTextInputFocus;
+    var txtIn = ['noteSummary', 'eventLocation', 'startDate',
+        'startTime', 'endDate', 'endTime', 'recurrenceEnd'];
+    for (var el in txtIn) {
+        dojo.event.connect(f[txtIn[el]], 'onfocus', func);
+    }
+
+    var self = this;
+    var func = function (e) {
+        var allDay = e.target.checked;
+        if (allDay) {
+            cosmo.util.html.clearFormElem(f.startTime, 'text');
+            cosmo.util.html.clearFormElem(f.endTime, 'text');
+            cosmo.util.html.clearFormElem(f.startMeridian, 'radio');
+            cosmo.util.html.clearFormElem(f.endMeridian, 'radio');
+        }
+        else {
+            self.setElemDefaultState(f.startTime, 'text', self.elementDefaultStates['startTime']);
+            self.setElemDefaultState(f.endTime, 'text', self.elementDefaultStates['endTime']);
+            self.setElemDefaultState(f.startMeridian, 'radio');
+            self.setElemDefaultState(f.endMeridian, 'radio');
+        }
+    };
+    // All-day event / normal event toggling
+    dojo.event.connect(f.eventAllDay, 'onclick', func);
+
+    // Recurrence -- disable 'ending' text box if event
+    // does not recur
+    var self = this;
+    var elem = f.recurrenceInterval;
+    var func = function () {
+        var txtElem = f.recurrenceEnd;
+        if (elem.selectedIndex == 0) {
+            cosmo.util.html.clearAndDisableFormElem(txtElem, 'text');
+        }
+        else {
+            cosmo.util.html.enableFormElem(txtElem, 'text');
+            cosmo.util.html.setTextInput(txtElem, 'mm/dd/yyyy', true);
+        }
+    }
+    dojo.event.connect(elem, 'onchange', func);
+
+    // Timezone selector -- selecting region should populate the
+    // tz selector
+    var func = function (e) {
+        var r = e.target.value
+        var tzIds = r ? cosmo.datetime.timezone.getTzIdsForRegion(r).sort() : null;
+        var options = [{
+            text: _("Main.DetailForm.TimezoneSelector.None"),
+            value: "" }];
+        if (tzIds){
+            dojo.lang.map(tzIds, function (tzId) {
+                //Strip off the Region, turn underscores into spaces for display
+                options.push({text:tzId.substr(
+                    tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
+            });
+        }
+        _html.setSelectOptions(f.tzId, options);
+    };
+    dojo.event.connect(f.tzRegion, 'onchange', func);
+
+    f.appendChild(t);
+    d.appendChild(f);
 };
 cosmo.ui.detail.EventFormElements.prototype = new cosmo.ui.detail.StampFormElements();
 

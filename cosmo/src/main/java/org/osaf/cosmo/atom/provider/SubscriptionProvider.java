@@ -66,11 +66,9 @@ public class SubscriptionProvider extends BaseProvider
             user.addSubscription(sub);
             user = userService.updateUser(user);
 
-            SubscriptionTarget subTarget =
-                new SubscriptionTarget(request, user, sub);
             ServiceLocator locator = createServiceLocator(request);
             SubscriptionFeedGenerator generator =
-                createSubscriptionFeedGenerator(subTarget, locator);
+                createSubscriptionFeedGenerator(locator);
             entry = generator.generateEntry(sub);
 
             AbstractResponseContext rc =
@@ -140,11 +138,9 @@ public class SubscriptionProvider extends BaseProvider
 
             user = userService.updateUser(user);
 
-            SubscriptionTarget subTarget =
-                new SubscriptionTarget(request, user, sub);
             ServiceLocator locator = createServiceLocator(request);
             SubscriptionFeedGenerator generator =
-                createSubscriptionFeedGenerator(subTarget, locator);
+                createSubscriptionFeedGenerator(locator);
             entry = generator.generateEntry(sub);
 
             AbstractResponseContext rc =
@@ -181,7 +177,7 @@ public class SubscriptionProvider extends BaseProvider
         try {
             ServiceLocator locator = createServiceLocator(request);
             SubscriptionFeedGenerator generator =
-                createSubscriptionFeedGenerator(target, locator);
+                createSubscriptionFeedGenerator(locator);
             Feed feed = generator.generateFeed(user);
 
             // no entity tag for this synthetic feed
@@ -204,7 +200,7 @@ public class SubscriptionProvider extends BaseProvider
         try {
             ServiceLocator locator = createServiceLocator(request);
             SubscriptionFeedGenerator generator =
-                createSubscriptionFeedGenerator(target, locator);
+                createSubscriptionFeedGenerator(locator);
             Entry entry = generator.generateEntry(sub);
 
             AbstractResponseContext rc =
@@ -260,8 +256,7 @@ public class SubscriptionProvider extends BaseProvider
     }
 
     protected SubscriptionFeedGenerator
-        createSubscriptionFeedGenerator(SubscribedTarget target,
-                                        ServiceLocator locator) {
+        createSubscriptionFeedGenerator(ServiceLocator locator) {
         return getGeneratorFactory().
             createSubscriptionFeedGenerator(locator);
     }

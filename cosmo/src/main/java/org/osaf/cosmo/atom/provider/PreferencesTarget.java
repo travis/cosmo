@@ -15,21 +15,20 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.abdera.protocol.server.provider.RequestContext;
+import org.apache.abdera.protocol.server.provider.TargetType;
+
+import org.osaf.cosmo.model.User;
 
 /**
- * Base class for for {@link ProviderProxy} tests.
+ * <p>
+ * A target that identifies the preferences collection.
+ * </p>
  */
-public abstract class BaseProviderProxyTestCase extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(BaseProviderProxyTestCase.class);
+public class PreferencesTarget extends UserTarget {
 
-    protected BaseProvider createProvider() {
-        ProviderProxy provider = new ProviderProxy();
-        provider.setItemProvider(new ItemProvider());
-        provider.setSubscriptionProvider(new SubscriptionProvider());
-        provider.setPreferencesProvider(new PreferencesProvider());
-        return provider;
+    public PreferencesTarget(RequestContext request,
+                             User user) {
+        super(TargetType.TYPE_COLLECTION, request, user);
     }
 }

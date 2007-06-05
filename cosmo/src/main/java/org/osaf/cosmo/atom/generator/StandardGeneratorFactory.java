@@ -103,9 +103,30 @@ public class StandardGeneratorFactory
         throw new UnsupportedProjectionException(projection);
     }
 
+    /**
+     * Creates an instance of
+     * <code>StandardSubscriptionFeedGenerator</code>.
+     *
+     * @param locator the service locator from which feed URLs
+     * are calculated
+     * @return the feed generator
+     */
     public SubscriptionFeedGenerator
         createSubscriptionFeedGenerator(ServiceLocator locator) {
         return new StandardSubscriptionFeedGenerator(this, locator);
+    }
+
+    /**
+     * Creates an instance of
+     * <code>StandardPreferencesFeedGenerator</code>.
+     *
+     * @param locator the service locator from which feed URLs
+     * are calculated
+     * @return the feed generator
+     */
+    public PreferencesFeedGenerator
+        createPreferencesFeedGenerator(ServiceLocator locator) {
+        return new StandardPreferencesFeedGenerator(this, locator);
     }
 
     // our methods

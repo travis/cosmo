@@ -61,4 +61,14 @@ public interface GeneratorFactory {
      */
     public SubscriptionFeedGenerator
         createSubscriptionFeedGenerator(ServiceLocator locator);
+
+    /**
+     * Creates an instance of <code>PreferencesFeedGenerator</code>.
+     *
+     * @param locator the service locator from which feed URLs
+     * are calculated
+     * @return the feed generator
+     */
+    public PreferencesFeedGenerator
+        createPreferencesFeedGenerator(ServiceLocator locator);
 }

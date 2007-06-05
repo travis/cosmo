@@ -15,21 +15,32 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import org.apache.abdera.model.Entry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
+
 /**
- * Base class for for {@link ProviderProxy} tests.
+ * Base class for for {@link PreferencesProvider} tests.
  */
-public abstract class BaseProviderProxyTestCase extends BaseProviderTestCase {
+public abstract class BasePreferencesProviderTestCase
+    extends BaseProviderTestCase implements AtomConstants {
     private static final Log log =
-        LogFactory.getLog(BaseProviderProxyTestCase.class);
+        LogFactory.getLog(BasePreferencesProviderTestCase.class);
 
     protected BaseProvider createProvider() {
-        ProviderProxy provider = new ProviderProxy();
-        provider.setItemProvider(new ItemProvider());
-        provider.setSubscriptionProvider(new SubscriptionProvider());
-        provider.setPreferencesProvider(new PreferencesProvider());
+        PreferencesProvider provider = new PreferencesProvider();
+        provider.setUserService(helper.getUserService());
         return provider;
+    }
+
+    protected Entry serialize(String key,
+                              String value) {
+        Entry entry = helper.getAbdera().getFactory().newEntry();
+        entry.setTitle(key);
+        entry.setContent(value);
+        return entry;
     }
 }

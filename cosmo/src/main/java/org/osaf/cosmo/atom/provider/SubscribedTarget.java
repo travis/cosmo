@@ -22,19 +22,13 @@ import org.osaf.cosmo.model.User;
 
 /**
  * <p>
- * A target that identifies the "subscribed collections" service.
+ * A target that identifies the "subscribed collections" collection.
  * </p>
  */
 public class SubscribedTarget extends UserTarget {
 
     public SubscribedTarget(RequestContext request,
                             User user) {
-        this(TargetType.TYPE_COLLECTION, request, user);
-    }
-
-    public SubscribedTarget(TargetType type,
-                            RequestContext request,
-                            User user) {
-        super(type, request, user);
+        super(TargetType.TYPE_COLLECTION, request, user);
     }
 }

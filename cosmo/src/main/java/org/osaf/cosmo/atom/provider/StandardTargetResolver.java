@@ -86,6 +86,10 @@ public class StandardTargetResolver implements TargetResolver {
             if (spi != null)
                 return createSubscriptionTarget(context, spi);
 
+            if (up.getPathInfo() != null &&
+                up.getPathInfo().equals("/preferences"))
+                return createPreferencesTarget(context, up);
+
             // we don't know about any other path infos
             if (up.getPathInfo() != null)
                 return null;
@@ -142,7 +146,7 @@ public class StandardTargetResolver implements TargetResolver {
     }
 
     /**
-     * Creates a target representing the subscribed service.
+     * Creates a target representing the subscribed collection.
      */
     protected Target createSubscribedTarget(RequestContext context,
                                             UserPath path) {
@@ -167,6 +171,17 @@ public class StandardTargetResolver implements TargetResolver {
             return null;
 
         return new SubscriptionTarget(context, user, sub);
+    }
+
+    /**
+     * Creates a target representing the preferences collection.
+     */
+    protected Target createPreferencesTarget(RequestContext context,
+                                             UserPath path) {
+        User user = userService.getUser(path.getUsername());
+        if (user == null)
+            return null;
+        return new PreferencesTarget(context, user);
     }
 
     /**

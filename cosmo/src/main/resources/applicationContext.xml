@@ -525,6 +525,14 @@
                 </property>
               </bean>
             </property>
+            <property name="preferencesProvider">
+              <bean class="org.osaf.cosmo.atom.provider.PreferencesProvider"
+                    init-method="init" parent="baseProvider">
+                <property name="userService">
+                  <ref local="userService"/>
+                </property>
+              </bean>
+            </property>
           </bean>
         </property>
       </bean>

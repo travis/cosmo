@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.User;
  * A target that identifies a particular collection subscription.
  * </p>
  */
-public class SubscriptionTarget extends SubscribedTarget {
+public class SubscriptionTarget extends UserTarget {
 
     private CollectionSubscription subscription;
 

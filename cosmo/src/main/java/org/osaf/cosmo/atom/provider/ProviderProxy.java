@@ -32,6 +32,7 @@ public class ProviderProxy extends BaseProvider {
 
     private ItemProvider itemProvider;
     private SubscriptionProvider subscriptionProvider;
+    private PreferencesProvider preferencesProvider;
 
     // Provider methods
 
@@ -88,6 +89,8 @@ public class ProviderProxy extends BaseProvider {
     public ResponseContext getFeed(RequestContext request) {
         if (request.getTarget() instanceof SubscribedTarget)
             return subscriptionProvider.getFeed(request);
+        if (request.getTarget() instanceof PreferencesTarget)
+            return preferencesProvider.getFeed(request);
         return itemProvider.getFeed(request);
     }
 
@@ -141,12 +144,22 @@ public class ProviderProxy extends BaseProvider {
         this.subscriptionProvider = provider;
     }
 
+    public PreferencesProvider getPreferencesProvider() {
+        return preferencesProvider;
+    }
+
+    public void setPreferencesProvider(PreferencesProvider provider) {
+        this.preferencesProvider = provider;
+    }
+
     public void init() {
         super.init();
         if (itemProvider == null)
             throw new IllegalStateException("itemProvider is required");
         if (subscriptionProvider == null)
             throw new IllegalStateException("subscriptionProvider is required");
+        if (preferencesProvider == null)
+            throw new IllegalStateException("preferencesProvider is required");
     }
 
     protected ServiceGenerator createServiceGenerator(ServiceLocator locator) {

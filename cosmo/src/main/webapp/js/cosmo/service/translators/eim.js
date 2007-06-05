@@ -155,6 +155,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                    ParseError("Could not find content element for entry " + (i+1));
             }
             var content = c.innerText || c.textContent;
+            if (!content){
+                content = "";
+                for (var i = 0; i < c.childNodes.length; i++){
+                    content += c.childNodes[i].nodeValue;
+                }
+            }
             var item;
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
@@ -271,6 +277,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     recurrenceIdToDate: function (/*String*/ rid){
          return cosmo.datetime.fromIso8601(rid);
+    },
+
+    subscriptionToAtomEntry: function (subscription){
+         return '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:cosmo="http://osafoundation.org/cosmo/Atom">' +
+         '<title>' + subscription.getDisplayName() + '</title>' +
+         '<updated>' + dojo.date.toRfc3339(new Date()) + '</updated>' +
+         '<author><name>' + cosmo.util.auth.getUsername() + '</name></author>' +
+         '<cosmo:ticket>' + subscription.getTicketKey() + '</cosmo:ticket>' +
+         '<cosmo:collection>' + subscription.getUid() + '</cosmo:collection>' +
+         '</entry>'
     },
 
     itemToAtomEntry: function (object){

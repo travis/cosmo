@@ -83,6 +83,30 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
 
+    public void testNoTicketKey() throws Exception {
+        CollectionSubscription sub =
+            helper.makeDummySubscription(helper.getUser());
+        CollectionSubscription newsub = new CollectionSubscription();
+        newsub.setCollectionUid("deadbeef");
+        RequestContext req = createRequestContext(sub, newsub);
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 400, res.getStatus());
+    }
+
+    public void testNoCollectionUid() throws Exception {
+        CollectionSubscription sub =
+            helper.makeDummySubscription(helper.getUser());
+        CollectionSubscription newsub = new CollectionSubscription();
+        newsub.setTicketKey("deadbeef");
+        RequestContext req = createRequestContext(sub, newsub);
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 400, res.getStatus());
+    }
+
     private CollectionSubscription newSubscription() {
         CollectionSubscription sub = new CollectionSubscription();
         sub.setDisplayName("new display name");

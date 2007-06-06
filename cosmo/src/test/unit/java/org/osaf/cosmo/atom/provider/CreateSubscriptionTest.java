@@ -76,6 +76,26 @@ public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
 
+    public void testNoTicketKey() throws Exception {
+        CollectionSubscription sub = new CollectionSubscription();
+        sub.setCollectionUid("deadbeef");
+        RequestContext req = createRequestContext(sub);
+
+        ResponseContext res = provider.createEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 400, res.getStatus());
+    }
+
+    public void testNoCollectionUid() throws Exception {
+        CollectionSubscription sub = new CollectionSubscription();
+        sub.setTicketKey("deadbeef");
+        RequestContext req = createRequestContext(sub);
+
+        ResponseContext res = provider.createEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 400, res.getStatus());
+    }
+
     private RequestContext createRequestContext(CollectionSubscription sub)
         throws Exception {
         MockSubscribedRequestContext rc =

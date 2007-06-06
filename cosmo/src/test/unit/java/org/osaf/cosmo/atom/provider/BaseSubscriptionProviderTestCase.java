@@ -39,9 +39,15 @@ public abstract class BaseSubscriptionProviderTestCase
 
     protected Entry serialize(CollectionSubscription sub) {
         Entry entry = helper.getAbdera().getFactory().newEntry();
+
         entry.setTitle(sub.getDisplayName());
-        entry.addSimpleExtension(QN_TICKET, sub.getTicketKey());
-        entry.addSimpleExtension(QN_COLLECTION, sub.getCollectionUid());
+
+        if (sub.getTicketKey() != null)
+            entry.addSimpleExtension(QN_TICKET, sub.getTicketKey());
+
+        if (sub.getCollectionUid() != null)
+            entry.addSimpleExtension(QN_COLLECTION, sub.getCollectionUid());
+
         return entry;
     }
 }

@@ -25,12 +25,14 @@ import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.util.Constants;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
+import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -88,6 +90,8 @@ public class SubscriptionProvider extends BaseProvider
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (ValidationException e) {
+            return badrequest(getAbdera(), request, "Invalid entry: " + e.getMessage());
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -153,6 +157,8 @@ public class SubscriptionProvider extends BaseProvider
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (ValidationException e) {
+            return badrequest(getAbdera(), request, "Invalid entry: " + e.getMessage());
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -261,12 +267,21 @@ public class SubscriptionProvider extends BaseProvider
             createSubscriptionFeedGenerator(locator);
     }
 
-    private CollectionSubscription readSubscription(Entry entry) {
+    private CollectionSubscription readSubscription(Entry entry)
+        throws ValidationException {
         CollectionSubscription sub = new CollectionSubscription();
 
         sub.setDisplayName(entry.getTitle());
-        sub.setTicketKey(entry.getSimpleExtension(QN_TICKET));
-        sub.setCollectionUid(entry.getSimpleExtension(QN_COLLECTION));
+
+        String ticketKey = entry.getSimpleExtension(QN_TICKET);
+        if (StringUtils.isBlank(ticketKey))
+            throw new ValidationException("No ticket key found");
+        sub.setTicketKey(ticketKey);
+
+        String collectionUid = entry.getSimpleExtension(QN_COLLECTION);
+        if (StringUtils.isBlank(collectionUid))
+            throw new ValidationException("No collection uid found");
+        sub.setCollectionUid(collectionUid);
 
         return sub;
     }

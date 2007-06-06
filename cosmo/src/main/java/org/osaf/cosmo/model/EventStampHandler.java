@@ -16,9 +16,11 @@
 package org.osaf.cosmo.model;
 
 import org.osaf.cosmo.calendar.RecurrenceExpander;
+import org.osaf.cosmo.calendar.util.Dates;
 
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 
 /**
  * StampHandler for EventStamps.
@@ -59,6 +61,17 @@ public class EventStampHandler implements StampHandler {
     private void updateEventStampIndexes(BaseEventStamp eventStamp) {
         Date startDate = eventStamp.getStartDate();
         Date endDate = eventStamp.getEndDate();
+        
+        // Handle "missing" endDate
+        if(endDate==null && (eventStamp instanceof EventExceptionStamp) ) {
+            // For "missing" endDate, get the duration of the master event
+            // and use with the startDate of the modification to calculate
+            // the endDate of the modificaiton
+            EventExceptionStamp exceptionStamp = (EventExceptionStamp) eventStamp;
+            Dur duration = exceptionStamp.getMasterStamp().getDuration();
+            if(duration!=null)
+                endDate = Dates.getInstance(duration.getTime(startDate), startDate);
+        }
         
         if (eventStamp.isRecurring()) {
             RecurrenceExpander expander = new RecurrenceExpander();

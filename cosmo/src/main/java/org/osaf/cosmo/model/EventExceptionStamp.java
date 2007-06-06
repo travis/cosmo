@@ -181,6 +181,17 @@ public class EventExceptionStamp extends BaseEventStamp implements
         return new XParameter(PARAM_X_OSAF_ANYTIME, VALUE_MISSING);
     }
 
+    
+    /**
+     * Get the EventStamp from the parent NoteItem
+     * @return EventStamp of parent NoteItem
+     */
+    @Transient
+    public EventStamp getMasterStamp() {
+        NoteItem note = (NoteItem) getItem();
+        return EventStamp.getStamp(note.getModifies());
+    }
+    
     /**
      * Return EventExceptionStamp from Item
      * @param item

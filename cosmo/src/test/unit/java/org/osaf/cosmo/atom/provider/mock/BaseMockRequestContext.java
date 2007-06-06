@@ -26,6 +26,8 @@ import org.apache.abdera.util.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 
@@ -33,7 +35,7 @@ import org.springframework.mock.web.MockServletContext;
  * Mock implementation of {@link RequestContext}.
  */
 public class BaseMockRequestContext extends HttpServletRequestContext
-    implements Constants {
+    implements AtomConstants, Constants {
     private static final Log log =
         LogFactory.getLog(BaseMockRequestContext.class);
 

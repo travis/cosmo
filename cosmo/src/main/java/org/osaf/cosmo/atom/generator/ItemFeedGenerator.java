@@ -19,7 +19,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.NoteItemFilter;
 
 /**
  * An interface for classes that generate Atom feeds and entries
@@ -38,7 +38,7 @@ public interface ItemFeedGenerator {
      *
      * @param filter the query filter
      */
-    public void setFilter(ItemFilter filter);
+    public void setFilter(NoteItemFilter filter);
 
     /**
      * Generates an Atom feed containing entries for items in a

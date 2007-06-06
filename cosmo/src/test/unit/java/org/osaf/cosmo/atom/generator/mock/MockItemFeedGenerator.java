@@ -23,7 +23,7 @@ import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -42,7 +42,7 @@ public class MockItemFeedGenerator implements ItemFeedGenerator {
     private String projection;
     private String format;
     private ServiceLocator locator;
-    private ItemFilter filter;
+    private NoteItemFilter filter;
 
     /** */
     public MockItemFeedGenerator(MockGeneratorFactory factory,
@@ -57,7 +57,7 @@ public class MockItemFeedGenerator implements ItemFeedGenerator {
 
     // ItemFeedGenerator methods
 
-    public void setFilter(ItemFilter filter) {
+    public void setFilter(NoteItemFilter filter) {
         this.filter = filter;
     }
 

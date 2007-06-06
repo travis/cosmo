@@ -53,7 +53,7 @@ public class QueryBuilder {
      * @throws InvalidQueryException if the required parameters are
      * not found or cannot be parsed
      */
-    public static ItemFilter buildFilter(RequestContext request)
+    public static NoteItemFilter buildFilter(RequestContext request)
         throws InvalidQueryException {
         String isostart = request.getParameter("start-min");
         if (StringUtils.isBlank(isostart))

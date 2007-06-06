@@ -35,7 +35,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -53,7 +53,7 @@ public abstract class BaseItemFeedGenerator
     private static final Log log =
         LogFactory.getLog(BaseItemFeedGenerator.class);
 
-    private ItemFilter filter;
+    private NoteItemFilter filter;
 
     /** */
     public BaseItemFeedGenerator(StandardGeneratorFactory factory,
@@ -69,7 +69,7 @@ public abstract class BaseItemFeedGenerator
      *
      * @param filter the query filter
      */
-    public void setFilter(ItemFilter filter) {
+    public void setFilter(NoteItemFilter filter) {
         this.filter = filter;
     }
 
@@ -166,7 +166,7 @@ public abstract class BaseItemFeedGenerator
             new TreeSet<NoteItem>(new AuditableComparator(true));
 
         if (filter != null) {
-//            filter.setParent(item);     XXX
+            filter.setMasterNoteItem(item);
             for (Item occurrence : getFactory().getContentService().
                      findItems(filter))
                 contents.add((NoteItem)occurrence);
@@ -226,10 +226,12 @@ public abstract class BaseItemFeedGenerator
         entry.setUpdated(item.getClientModifiedDate());
         entry.setPublished(item.getClientCreationDate());
         entry.addLink(newSelfLink(item));
-        if (isDocument)
+        if (isDocument) {
             entry.addAuthor(newPerson(item.getOwner()));
-
-        setEntryContent(entry, item, findOccurrences(item));
+            setEntryContent(entry, item, findOccurrences(item));
+        } else {
+            setEntryContent(entry, item);
+        }
 
         return entry;
     }
@@ -240,7 +242,8 @@ public abstract class BaseItemFeedGenerator
     protected abstract String getProjection();
 
     /**
-     * Sets the entry content based on the given item.
+     * Sets the entry content based on the given recurrence-expanded
+     * item.
      *
      * @param entry the entry
      * @param item the item on which the entry is based
@@ -252,6 +255,19 @@ public abstract class BaseItemFeedGenerator
                                             NoteItem item,
                                             SortedSet<NoteItem> occurrences)
         throws GeneratorException;
+
+    /**
+     * Sets the entry content based on the given non-expanded item.
+     *
+     * @param entry the entry
+     * @param item the item on which the entry is based
+     * @throws GeneratorException
+     */
+    protected void setEntryContent(Entry entry,
+                                   NoteItem item)
+        throws GeneratorException {
+        setEntryContent(entry, item, new TreeSet<NoteItem>());
+    }
 
     /**
      * Creates a <code>Link</code> for the pim IRI of the given item.
@@ -401,7 +417,7 @@ public abstract class BaseItemFeedGenerator
         return iri.toString();
     }
 
-    public ItemFilter getFilter() {
+    public NoteItemFilter getFilter() {
         return filter;
     }
 }

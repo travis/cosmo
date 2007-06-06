@@ -27,6 +27,8 @@ public class NoteItemFilter extends ContentItemFilter {
     private Boolean hasModifications = null;
     private Boolean isModification = null;
     
+    private NoteItem masterNoteItem = null;
+    
     public NoteItemFilter() {}
     
     /**
@@ -82,5 +84,17 @@ public class NoteItemFilter extends ContentItemFilter {
      */
     public void setIsModification(Boolean isModification) {
         this.isModification = isModification;
+    }
+
+    public NoteItem getMasterNoteItem() {
+        return masterNoteItem;
+    }
+
+    /**
+     * Matches the specified NoteItem and any modifications to that NoteItem
+     * @param masterNoteItem
+     */
+    public void setMasterNoteItem(NoteItem masterNoteItem) {
+        this.masterNoteItem = masterNoteItem;
     }
 }

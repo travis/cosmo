@@ -204,6 +204,12 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             params.put("icaluid", filter.getIcalUid());
         }
         
+        //filter by master NoteItem
+        if(filter.getMasterNoteItem()!=null) {
+            appendWhere(whereBuf, "(i=:masterItem or i.modifies=:masterItem)");
+            params.put("masterItem", filter.getMasterNoteItem());
+        }
+        
         // filter modifications
         if(filter.getIsModification()!=null) {
             if(filter.getIsModification().booleanValue()==true)

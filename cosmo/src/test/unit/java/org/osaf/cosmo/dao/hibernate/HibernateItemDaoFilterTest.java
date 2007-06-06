@@ -150,6 +150,13 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         
+        // find specific master and modifications
+        filter = new NoteItemFilter();
+        NoteItem note = (NoteItem) contentDao.findItemByUid(NOTE_UID);
+        filter.setMasterNoteItem(note);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(2, results.size());
+        
         // find triageStatus==DONE only, which should match one
         filter = new NoteItemFilter();
         filter.setTriageStatus(TriageStatus.CODE_DONE);

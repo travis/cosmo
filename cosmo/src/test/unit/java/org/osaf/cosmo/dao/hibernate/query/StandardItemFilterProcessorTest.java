@@ -25,6 +25,7 @@ import org.hibernate.Query;
 import org.osaf.cosmo.dao.hibernate.AbstractHibernateDaoTestCase;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
@@ -116,6 +117,11 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setHasModifications(false);
         query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from NoteItem i where size(i.modifications) = 0", query.getQueryString());
+    
+        filter =  new NoteItemFilter();
+        filter.setMasterNoteItem(new NoteItem());
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where (i=:masterItem or i.modifies=:masterItem)", query.getQueryString());
     }
     
     public void testEventStampQuery() throws Exception {

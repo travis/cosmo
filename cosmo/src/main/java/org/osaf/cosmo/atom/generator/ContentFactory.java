@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.generator;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,12 +25,14 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
+import org.osaf.cosmo.eim.eimml.EimmlStreamException;
 import org.osaf.cosmo.eim.eimml.EimmlStreamWriter;
 import org.osaf.cosmo.eim.json.JsonConstants;
+import org.osaf.cosmo.eim.json.JsonStreamException;
 import org.osaf.cosmo.eim.json.JsonStreamWriter;
 import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * A factory that creates content beans for various data formats.
@@ -66,14 +69,15 @@ public class ContentFactory
      * supported
      */
     public ContentBean createContent(String format,
-                                     Item item)
+                                     NoteItem item,
+                                     SortedSet<NoteItem> occurrences)
         throws UnsupportedFormatException {
         if (format == null)
             throw new IllegalArgumentException("null format");
         if (format.equals(FORMAT_EIM_JSON))
-            return createEimJsonContent(item);
+            return createEimJsonContent(item, occurrences);
         if (format.equals(FORMAT_EIMML))
-            return createEimmlContent(item);
+            return createEimmlContent(item, occurrences);
         if (format.equals(FORMAT_HTML))
             return createHtmlContent(item);
         if (format.equals(FORMAT_TEXT))
@@ -85,14 +89,16 @@ public class ContentFactory
         return (format != null && FORMATS.contains(format));
     }
 
-    private ContentBean createEimJsonContent(Item item) {
+    private ContentBean createEimJsonContent(NoteItem item,
+                                             SortedSet<NoteItem> occurrences) {
         try {
-            ItemTranslator translator = new ItemTranslator(item);
-            EimRecordSet recordset = translator.generateRecords();
-
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             JsonStreamWriter writer = new JsonStreamWriter(out);
-            writer.writeRecordSet(recordset);
+
+            writeJson(writer, item);
+            for (NoteItem occurrence : occurrences)
+                writeJson(writer, occurrence);
+
             writer.close();
 
             ContentBean content = new ContentBean();
@@ -105,15 +111,25 @@ public class ContentFactory
         }
     }
 
-    private ContentBean createEimmlContent(Item item) {
-        try {
-            ItemTranslator translator = new ItemTranslator(item);
-            EimRecordSet recordset = translator.generateRecords();
+    private void writeJson(JsonStreamWriter writer,
+                           NoteItem item)
+        throws JsonStreamException {
+        ItemTranslator translator = new ItemTranslator(item);
+        EimRecordSet recordset = translator.generateRecords();
+        writer.writeRecordSet(recordset);
+    }
 
+    private ContentBean createEimmlContent(NoteItem item,
+                                           SortedSet<NoteItem> occurrences) {
+        try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             EimmlStreamWriter writer = new EimmlStreamWriter(out);
+
             writer.writeCollection(item.getUid(), null);
-            writer.writeRecordSet(recordset);
+            writeEimml(writer, item);
+            for (NoteItem occurrence : occurrences)
+                writeEimml(writer, occurrence);
+
             writer.close();
 
             ContentBean content = new ContentBean();
@@ -126,7 +142,15 @@ public class ContentFactory
         }
     }
 
-    private ContentBean createHtmlContent(Item item) {
+    private void writeEimml(EimmlStreamWriter writer,
+                            NoteItem item)
+        throws EimmlStreamException {
+        ItemTranslator translator = new ItemTranslator(item);
+        EimRecordSet recordset = translator.generateRecords();
+        writer.writeRecordSet(recordset);
+    }
+
+    private ContentBean createHtmlContent(NoteItem item) {
         ContentBean content = new ContentBean();
         content.setMediaType(MEDIA_TYPE_HTML);
 
@@ -138,7 +162,7 @@ public class ContentFactory
         return content;
     }
 
-    private ContentBean createTextContent(Item item) {
+    private ContentBean createTextContent(NoteItem item) {
         ContentBean content = new ContentBean();
         content.setMediaType(MEDIA_TYPE_TEXT);
 

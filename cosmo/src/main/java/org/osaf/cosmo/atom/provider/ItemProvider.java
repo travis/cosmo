@@ -297,6 +297,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             ServiceLocator locator = createServiceLocator(request);
             ItemFeedGenerator generator =
                 createItemFeedGenerator(target, locator);
+            generator.setFilter(QueryBuilder.buildFilter(request));
             Entry entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
@@ -312,6 +313,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         } catch (UnsupportedFormatException e) {
             String reason = "Format " + target.getFormat() + " not supported";
             return badrequest(getAbdera(), request, reason);
+        } catch (InvalidQueryException e) {
+            return badrequest(getAbdera(), request, e.getMessage());
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);

@@ -126,7 +126,6 @@ public abstract class BaseItemFeedGenerator
 
         // XXX sort
         // XXX page
-        // XXX query
 
         if (filter != null) {
             filter.setParent(collection);
@@ -141,6 +140,36 @@ public abstract class BaseItemFeedGenerator
                     continue;
                 contents.add((NoteItem)child);
             }
+        }
+
+        return contents;
+    }
+  
+    /**
+     * <p>
+     * Returns a sorted set of items representing modifications and
+     * occurrences of a recurring event.
+     * </p>
+     * <p>
+     * If a query filter has been provided, this method finds all of
+     * the <code>NoteItem</code>s that match the query
+     * filter. Otherwise, the method returns an empty set.
+     * </p>
+     * <p>
+     * The set is sorted with the most recently modified item first.
+     * </p>
+     *
+     * @param the collection whose contents are to be listed
+     */
+    protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
+        TreeSet<NoteItem> contents =
+            new TreeSet<NoteItem>(new AuditableComparator(true));
+
+        if (filter != null) {
+//            filter.setParent(item);     XXX
+            for (Item occurrence : getFactory().getContentService().
+                     findItems(filter))
+                contents.add((NoteItem)occurrence);
         }
 
         return contents;
@@ -200,7 +229,7 @@ public abstract class BaseItemFeedGenerator
         if (isDocument)
             entry.addAuthor(newPerson(item.getOwner()));
 
-        setEntryContent(entry, item);
+        setEntryContent(entry, item, findOccurrences(item));
 
         return entry;
     }
@@ -213,11 +242,15 @@ public abstract class BaseItemFeedGenerator
     /**
      * Sets the entry content based on the given item.
      *
+     * @param entry the entry
      * @param item the item on which the entry is based
+     * @param occurrences the occurrences and modifications occurring
+     * within a queried time-range, if any
      * @throws GeneratorException
      */
     protected abstract void setEntryContent(Entry entry,
-                                            NoteItem item)
+                                            NoteItem item,
+                                            SortedSet<NoteItem> occurrences)
         throws GeneratorException;
 
     /**

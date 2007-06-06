@@ -30,6 +30,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -198,6 +199,14 @@ public class MockHelper extends TestHelper {
         user.addSubscription(sub);
         userService.updateUser(user);
         return sub;
+    }
+
+    public Preference makeAndStoreDummyPreference()
+        throws Exception {
+        Preference pref = makeDummyPreference();
+        user.addPreference(pref);
+        userService.updateUser(user);
+        return pref;
     }
 
     public NoteItem findItem(String uid) {

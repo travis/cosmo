@@ -31,7 +31,9 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.PreferencesFeedGenerator;
+import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.UserService;
 
@@ -44,7 +46,54 @@ public class PreferencesProvider extends BaseProvider
     // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        PreferencesTarget target = (PreferencesTarget) request.getTarget();
+        User user = target.getUser();
+
+        // XXX: check write preconditions?
+
+        try {
+            Entry entry = (Entry) request.getDocument().getRoot();
+            Preference pref = readPreference(entry);
+
+            if (user.getPreference(pref.getKey()) != null)
+                return conflict(getAbdera(), request, "Preference exists");
+
+            if (log.isDebugEnabled())
+                log.debug("creating preference " + pref.getKey() +
+                          " for user " + user.getUsername());
+
+            user.addPreference(pref);
+            user = userService.updateUser(user);
+
+            ServiceLocator locator = createServiceLocator(request);
+            PreferencesFeedGenerator generator =
+                createPreferencesFeedGenerator(locator);
+            entry = generator.generateEntry(pref);
+
+            AbstractResponseContext rc =
+                createResponseContext(entry.getDocument(), 201, "Created");
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+            rc.setEntityTag(new EntityTag(pref.getEntityTag()));
+
+            try {
+                rc.setLocation(entry.getSelfLink().getHref().toString());
+                rc.setContentLocation(entry.getSelfLink().getHref().toString());
+            } catch (Exception e) {
+                throw new RuntimeException("Error parsing self link href", e);
+            }
+
+            return rc;
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (ValidationException e) {
+            return badrequest(getAbdera(), request, "Invalid preference entry: " + e.getMessage());
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        }
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
@@ -77,7 +126,7 @@ public class PreferencesProvider extends BaseProvider
         try {
             ServiceLocator locator = createServiceLocator(request);
             PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(target, locator);
+                createPreferencesFeedGenerator(locator);
             Feed feed = generator.generateFeed(user);
 
             // no entity tag for this synthetic feed
@@ -132,9 +181,20 @@ public class PreferencesProvider extends BaseProvider
     }
 
     protected PreferencesFeedGenerator
-        createPreferencesFeedGenerator(PreferencesTarget target,
-                                       ServiceLocator locator) {
+        createPreferencesFeedGenerator(ServiceLocator locator) {
         return getGeneratorFactory().
             createPreferencesFeedGenerator(locator);
+    }
+
+    private Preference readPreference(Entry entry)
+        throws ValidationException {
+        Preference pref = new Preference();
+
+        if (entry.getContent() == null)
+            throw new ValidationException("No entry content found");
+
+        pref.setKey(entry.getTitle());
+        pref.setValue(entry.getContent());
+        return pref;
     }
 }

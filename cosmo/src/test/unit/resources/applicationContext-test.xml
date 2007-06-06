@@ -85,6 +85,8 @@
             <value>org.osaf.cosmo.model.MessageStamp</value>
             <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
             <value>org.osaf.cosmo.model.NoteItem</value>
+            <value>org.osaf.cosmo.model.PasswordRecovery</value>
+            <value>org.osaf.cosmo.model.Preference</value>
             <value>org.osaf.cosmo.model.ServerProperty</value>
             <value>org.osaf.cosmo.model.StringAttribute</value>
             <value>org.osaf.cosmo.model.Stamp</value>
@@ -95,7 +97,6 @@
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
             <value>org.osaf.cosmo.model.Tombstone</value>
             <value>org.osaf.cosmo.model.User</value>
-            <value>org.osaf.cosmo.model.PasswordRecovery</value>
         </list>
     </property>
     <property name="entityInterceptor">

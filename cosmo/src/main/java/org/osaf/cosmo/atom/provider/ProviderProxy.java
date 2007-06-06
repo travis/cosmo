@@ -39,6 +39,8 @@ public class ProviderProxy extends BaseProvider {
     public ResponseContext createEntry(RequestContext request) {
         if (request.getTarget() instanceof SubscribedTarget)
             return subscriptionProvider.createEntry(request);
+        if (request.getTarget() instanceof PreferencesTarget)
+            return preferencesProvider.createEntry(request);
         return itemProvider.createEntry(request);
     }
 

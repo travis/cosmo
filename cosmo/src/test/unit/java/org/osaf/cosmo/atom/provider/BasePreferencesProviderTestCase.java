@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.model.Preference;
 
 /**
  * Base class for for {@link PreferencesProvider} tests.
@@ -36,11 +37,11 @@ public abstract class BasePreferencesProviderTestCase
         return provider;
     }
 
-    protected Entry serialize(String key,
-                              String value) {
+    protected Entry serialize(Preference pref) {
         Entry entry = helper.getAbdera().getFactory().newEntry();
-        entry.setTitle(key);
-        entry.setContent(value);
+        entry.setTitle(pref.getKey());
+        if (pref.getValue() != null)
+            entry.setContent(pref.getValue());
         return entry;
     }
 }

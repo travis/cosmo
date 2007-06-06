@@ -25,6 +25,7 @@ import junit.framework.Assert;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
@@ -128,8 +129,8 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertNotNull(queryUser1.getUid());
         verifyUser(user1, queryUser1);
         
-        queryUser1.getPreferences().put("prop1", "value1");
-        queryUser1.getPreferences().put("prop2", "value2");
+        queryUser1.addPreference(new Preference("prop1", "value1"));
+        queryUser1.addPreference(new Preference("prop2", "value2"));
 
         userDao.updateUser(queryUser1);
         
@@ -139,11 +140,13 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         queryUser1 = userDao.getUserByUid(user1.getUid());
         Assert.assertNotNull(queryUser1);
         Assert.assertEquals(2, queryUser1.getPreferences().size());
-        Assert.assertEquals("value1", queryUser1.getPreferences().get("prop1"));
-        Assert.assertEquals("value2", queryUser1.getPreferences().get("prop2"));
+        Assert.assertEquals("value1",
+                            queryUser1.getPreference("prop1").getValue());
+        Assert.assertEquals("value2",
+                            queryUser1.getPreference("prop2").getValue());
         
-        queryUser1.getPreferences().remove("prop2");
-        queryUser1.getPreferences().put("prop1", "value1changed");
+        queryUser1.removePreference("prop2");
+        queryUser1.getPreference("prop1").setValue("value1changed");
         userDao.updateUser(queryUser1);
 
         clearSession();
@@ -151,7 +154,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         queryUser1 = userDao.getUserByUid(user1.getUid());
         Assert.assertNotNull(queryUser1);
         Assert.assertEquals(1, queryUser1.getPreferences().size());
-        Assert.assertEquals("value1changed", queryUser1.getPreferences().get("prop1"));
+        Assert.assertEquals("value1changed", queryUser1.getPreference("prop1").getValue());
         
         userDao.removeUser(queryUser1);
         clearSession();

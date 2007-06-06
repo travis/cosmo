@@ -18,6 +18,7 @@ package org.osaf.cosmo.ui;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.UserService;
@@ -58,13 +59,12 @@ public class ApplicationEntryController extends MultiActionController {
             return new ModelAndView(loginView);
         } else {
             user =  userService.getUser(user.getUsername());
-                
-            String redirectUrl =  
+
+            Preference loginUrlPref =
                 user.getPreference(UIConstants.PREF_KEY_LOGIN_URL);
-        
-            if (redirectUrl == null){
-                redirectUrl = defaultLoggedInRedirect;
-            }
+            String redirectUrl = loginUrlPref != null ?
+                loginUrlPref.getValue() : defaultLoggedInRedirect;
+
             return new ModelAndView("redirect:" + redirectUrl);
         }
     }

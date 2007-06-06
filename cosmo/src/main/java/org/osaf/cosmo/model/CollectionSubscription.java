@@ -124,9 +124,10 @@ public class CollectionSubscription extends AuditableObject {
         // subscription is unique by name for its owner
         String uid = (getOwner() != null && getOwner().getUid() != null) ?
             getOwner().getUid() : "-";
+        String name = getDisplayName() != null ? getDisplayName() : "-";
         String modTime = getModifiedDate() != null ?
             new Long(getModifiedDate().getTime()).toString() : "-";
-        String etag = uid + ":" + modTime;
+        String etag = uid + ":" + name + ":" + modTime;
         return encodeEntityTag(etag.getBytes());
     }
 }

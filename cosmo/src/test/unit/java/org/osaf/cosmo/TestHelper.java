@@ -52,6 +52,7 @@ import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
@@ -74,6 +75,7 @@ public class TestHelper {
     static int eseq = 0;
     static int iseq = 0;
     static int lseq = 0;
+    static int pseq = 0;
     static int rseq = 0;
     static int sseq = 0;
     static int tseq = 0;
@@ -233,6 +235,16 @@ public class TestHelper {
         sub.setOwner(user);
 
         return sub;
+    }
+
+    public Preference makeDummyPreference() {
+        String serial = new Integer(++pseq).toString();
+
+        Preference pref = new Preference();
+        pref.setKey("dummy pref " + serial);
+        pref.setValue(pref.getKey());
+
+        return pref;
     }
 
     /**

@@ -30,11 +30,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.AuditableComparator;
-import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
-import org.osaf.cosmo.service.ContentService;
 
 /**
  * An interface for classes that generate Atom feeds and entries
@@ -68,8 +67,8 @@ public class StandardPreferencesFeedGenerator
         throws GeneratorException {
         Feed feed = createFeed(user);
 
-        for (String key : findPreferences(user))
-            feed.addEntry(createEntry(user, key));
+        for (Preference pref : findPreferences(user))
+            feed.addEntry(createEntry(pref));
 
         return feed;
     }
@@ -78,14 +77,12 @@ public class StandardPreferencesFeedGenerator
      * Generates an Atom entry representing a specific user
      * preference.
      *
-     * @param user the user
-     * @param key the preference key
+     * @param pref the preference
      * @throws GeneratorException
      */
-    public Entry generateEntry(User user,
-                               String key)
+    public Entry generateEntry(Preference pref)
         throws GeneratorException {
-        return createEntry(user, key, true);
+        return createEntry(pref, true);
     }
 
     // our methods
@@ -102,16 +99,17 @@ public class StandardPreferencesFeedGenerator
      *
      * @param user the user whose preferences are to be listed
      */
-    protected SortedSet<String> findPreferences(User user) {
+    protected SortedSet<Preference> findPreferences(User user) {
         // XXX sort
         // XXX page
 
-        TreeSet<String> keys = new TreeSet<String>();
+        TreeSet<Preference> prefs =
+            new TreeSet<Preference>(new AuditableComparator(true));
 
-        for (String key : user.getPreferences().keySet())
-            keys.add(key);
+        for (Preference pref : user.getPreferences())
+            prefs.add(pref);
 
-        return keys;
+        return prefs;
     }
 
     /**
@@ -140,45 +138,41 @@ public class StandardPreferencesFeedGenerator
      * on the given preference. The entry does not represent a
      * document but is meant to be added to a <code>Feed</code>.
      *
-     * @param user the user
-     * @param key the preference key
+     * @param pref the preference
      * @throws GeneratorException
      */
-    protected Entry createEntry(User user,
-                                String key)
+    protected Entry createEntry(Preference pref)
         throws GeneratorException {
-        return createEntry(user, key, false);
+        return createEntry(pref, false);
     }
 
     /**
      * Creates a <code>Entry</code> with attributes and content based
      * on the given preference.
      *
-     * @param user the user
-     * @param key the preference key
+     * @param pref the preference
      * @param isDocument whether or not the entry represents an entire
      * document or is attached to a feed document
      * @throws GeneratorException
      */
-    protected Entry createEntry(User user,
-                                String key,
+    protected Entry createEntry(Preference pref,
                                 boolean isDocument)
         throws GeneratorException {
-        String uid = user.getUsername() + "-" + key;
+        String uid = pref.getUser().getUsername() + "-" + pref.getKey();
         Entry entry = newEntry(uid, isDocument);
 
-        String iri = preferenceIri(user, key);
+        String iri = preferenceIri(pref);
         Date now = new Date();
 
-        entry.setTitle(key);
+        entry.setTitle(pref.getKey());
         entry.setUpdated(now);
         entry.setPublished(now);
         entry.addLink(newSelfLink(iri));
         entry.addLink(newEditLink(iri));
         if (isDocument)
-            entry.addAuthor(newPerson(user));
+            entry.addAuthor(newPerson(pref.getUser()));
 
-        entry.setContent(user.getPreference(key));
+        entry.setContent(pref.getValue());
 
         return entry;
     }
@@ -197,17 +191,16 @@ public class StandardPreferencesFeedGenerator
     /**
      * Returns the IRI of the given preference.
      *
-     * @param sub the preference
+     * @param pref the preference
      */
-    protected String preferenceIri(User user,
-                                   String key) {
+    protected String preferenceIri(Preference pref) {
         try {
-            StringBuffer iri = new StringBuffer(preferencesIri(user));
+            StringBuffer iri = new StringBuffer(preferencesIri(pref.getUser()));
             iri.append("/").
-                append(URLEncoder.encode(key, "UTF-8"));
+                append(URLEncoder.encode(pref.getKey(), "UTF-8"));
             return iri.toString();
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Could not encode preferences display name " + key, e);
+            throw new RuntimeException("Could not encode preferences display name " + pref.getKey(), e);
         }
     }
 }

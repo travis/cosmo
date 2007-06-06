@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.PreferencesFeedGenerator;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.ServiceLocator;
 
@@ -61,8 +62,7 @@ public class MockPreferencesFeedGenerator
         return factory.getAbdera().getFactory().newFeed();
     }
 
-    public Entry generateEntry(User user,
-                               String key)
+    public Entry generateEntry(Preference pref)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");
@@ -73,10 +73,10 @@ public class MockPreferencesFeedGenerator
             // when writing entries, we need self links to generate
             // location response headers
             try {
-                String encodedUuid = URLEncoder.encode(key);
+                String encodedUuid = URLEncoder.encode(pref.getKey());
                 entry.addLink("urn:uid:" + encodedUuid, "self");
             } catch (Exception e) {
-                throw new RuntimeException("Could not encode key" + key, e);
+                throw new RuntimeException("Could not encode key" + pref.getKey(), e);
             }
 
             return entry;

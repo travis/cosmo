@@ -152,7 +152,7 @@ public class User extends BaseModelObject {
     private Boolean oldAdmin;
     private Date dateCreated;
     private Date dateModified;
-    private Map<String, String> preferences = new HashMap<String, String>(0);
+    private Set<Preference> preferences = new HashSet<Preference>(0);
     private Set<CollectionSubscription> subscriptions = 
         new HashSet<CollectionSubscription>(0);
 
@@ -503,41 +503,39 @@ public class User extends BaseModelObject {
         }
     }
 
-    
-    @CollectionOfElements
-    @JoinTable(
-            name="user_preferences",
-            joinColumns = @JoinColumn(name="userid")
-    )
-    @MapKey(columns=@Column(name="preferencename", length=255))
-    @Column(name="preferencevalue", length=255)
-    //@Size(min=0, max=255)
-    public Map<String, String> getPreferences() {
+    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    public Set<Preference> getPreferences() {
         return preferences;
     }
 
-    public void setPreferences(Map<String, String> preferences) {
+    // Used by hibernate
+    private void setPreferences(Set<Preference> preferences) {
         this.preferences = preferences;
     }
-    
-    @Transient
-    public void setMultiplePreferences(Map<String, String> preferences){
-        this.preferences.putAll(preferences);
+
+    public void addPreference(Preference preference) {
+        preference.setUser(this);
+        preferences.add(preference);
     }
-    
+
     @Transient
-    public String getPreference(String key){
-        return preferences.get(key);
+    public Preference getPreference(String key) {
+        for (Preference pref : preferences) {
+            if (pref.getKey().equals(key))
+                return pref;
+        }
+        return null;
     }
-    
-    @Transient
-    public void setPreference(String key, String value){
-        preferences.put(key, value);
+
+    public void removePreference(String key) {
+        removePreference(getPreference(key));
     }
-    
-    @Transient
-    public void removePreference(String key){
-        preferences.remove(key);
+
+    public void removePreference(Preference preference) {
+        if (preference != null)
+            preferences.remove(preference);
     }
     
     @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)

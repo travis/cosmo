@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.generator;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -42,11 +43,9 @@ public interface PreferencesFeedGenerator {
      * Generates an Atom entry representing a specific user
      * preference.
      *
-     * @param user the user
-     * @param key the preference key
+     * @param pref the preference
      * @throws GeneratorException
      */
-    public Entry generateEntry(User user,
-                               String key)
+    public Entry generateEntry(Preference pref)
         throws GeneratorException;
 }

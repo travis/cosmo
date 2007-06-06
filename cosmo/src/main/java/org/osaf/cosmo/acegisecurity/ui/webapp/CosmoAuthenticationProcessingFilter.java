@@ -25,6 +25,7 @@ import org.acegisecurity.ui.webapp.AuthenticationProcessingFilter;
 import org.acegisecurity.context.SecurityContextHolder;
 
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.ui.UIConstants;
 
 import org.springframework.util.Assert;
@@ -92,11 +93,12 @@ public class CosmoAuthenticationProcessingFilter extends
                     null : obtainFullRequestUrl(request);
         } 
         
-        if (targetUrl == null){
-            targetUrl = getRelativeUrl(request, 
-                    ((CosmoUserDetails) currentAuthentication.getPrincipal()).
-                    getUser().getPreferences().get(
-                            UIConstants.PREF_KEY_LOGIN_URL));
+        if (targetUrl == null) {
+            Preference loginUrlPref =
+                ((CosmoUserDetails) currentAuthentication.getPrincipal()).
+                getUser().getPreference(UIConstants.PREF_KEY_LOGIN_URL);
+            if (loginUrlPref != null)
+                targetUrl = getRelativeUrl(request, loginUrlPref.getValue());
         }
 
         if (targetUrl == null) {

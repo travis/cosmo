@@ -28,6 +28,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.tool.hbm2ddl.SchemaValidator;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.hibernate.SimpleConnectionProvider;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.ServerProperty;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ServerPropertyService;
@@ -181,9 +182,10 @@ public class DbInitializer {
         overlord.setPassword("cosmo");
         overlord.setEmail("root@localhost");
         overlord.setAdmin(Boolean.TRUE);
-        
-        overlord.setPreference(UIConstants.PREF_KEY_LOGIN_URL, 
-                               rootLoginUrl);
+
+        Preference loginUrlPref =
+            new Preference(UIConstants.PREF_KEY_LOGIN_URL, rootLoginUrl);
+        overlord.addPreference(loginUrlPref);
 
         userService.createUser(overlord);
     }

@@ -50,7 +50,7 @@ public class MockSubscriptionRequestContext extends BaseMockRequestContext {
 
     private static String toRequestUri(User user,
                                        CollectionSubscription sub) {
-        return "/user/" + uriEscape(user.getUsername()) + "/subscription/" +
-            uriEscape(sub.getDisplayName());
+        return TEMPLATE_SUBSCRIPTION.bind(user.getUsername(),
+                                          sub.getDisplayName());
     }
 }

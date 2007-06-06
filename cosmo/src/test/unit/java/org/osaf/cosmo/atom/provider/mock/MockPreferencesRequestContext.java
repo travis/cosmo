@@ -44,6 +44,6 @@ public class MockPreferencesRequestContext extends BaseMockRequestContext {
     }
 
     private static String toRequestUri(User user) {
-        return "/user/" + uriEscape(user.getUsername()) + "/preferences";
+        return TEMPLATE_PREFERENCES.bind(user.getUsername());
     }
 }

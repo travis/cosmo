@@ -37,6 +37,6 @@ public class MockServiceRequestContext extends BaseMockRequestContext {
     }
 
     private static String toRequestUri(User user) {
-        return "/user/" + uriEscape(user.getUsername());
+        return TEMPLATE_SERVICE.bind(user.getUsername());
     }
 }

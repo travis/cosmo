@@ -50,6 +50,6 @@ public class MockPreferenceRequestContext extends BaseMockRequestContext {
 
     private static String toRequestUri(User user,
                                        Preference pref) {
-        return TEMPLATE_COLLECTION.bind(user.getUsername(), pref.getKey());
+        return TEMPLATE_PREFERENCE.bind(user.getUsername(), pref.getKey());
     }
 }

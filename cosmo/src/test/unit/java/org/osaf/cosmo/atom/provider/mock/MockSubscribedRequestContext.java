@@ -44,6 +44,6 @@ public class MockSubscribedRequestContext extends BaseMockRequestContext {
     }
 
     private static String toRequestUri(User user) {
-        return "/user/" + uriEscape(user.getUsername()) + "/subscribed";
+        return TEMPLATE_SUBSCRIBED.bind(user.getUsername());
     }
 }

@@ -46,7 +46,7 @@ public class MockCollectionRequestContext extends BaseMockRequestContext
                                         String method,
                                         String projection,
                                         String format) {
-        super(context, method, toRequestUri(collection.getUid()));
+        super(context, method, toRequestUri(collection, projection, format));
         this.target = new CollectionTarget(this, collection, projection,
                                            format);
     }
@@ -65,8 +65,11 @@ public class MockCollectionRequestContext extends BaseMockRequestContext
         this(context, newCollection(uid), method, projection, format);
     }
 
-    private static String toRequestUri(String uid) {
-        return "/collection/" + uid;
+    private static String toRequestUri(CollectionItem collection,
+                                       String projection,
+                                       String format) {
+        return TEMPLATE_COLLECTION.bind(collection.getUid(), projection,
+                                        format);
     }
 
     private static CollectionItem newCollection(String uid) {

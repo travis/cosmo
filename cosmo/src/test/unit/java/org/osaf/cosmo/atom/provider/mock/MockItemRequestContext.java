@@ -50,7 +50,7 @@ public class MockItemRequestContext extends BaseMockRequestContext
                                   String contentType,
                                   String projection,
                                   String format) {
-        super(context, method, toRequestUri(item.getUid()));
+        super(context, method, toRequestUri(item, projection, format));
         if (contentType == null)
             contentType = ATOM_MEDIA_TYPE;
         getMockRequest().setContentType(contentType);
@@ -74,8 +74,10 @@ public class MockItemRequestContext extends BaseMockRequestContext
         this(context, newItem(uid), method, contentType, projection, format);
     }
 
-    private static String toRequestUri(String uid) {
-        return "/item/" + uid;
+    private static String toRequestUri(NoteItem item,
+                                       String projection,
+                                       String format) {
+        return TEMPLATE_ITEM.bind(item.getUid(), projection, format);
     }
 
     private static NoteItem newItem(String uid) {

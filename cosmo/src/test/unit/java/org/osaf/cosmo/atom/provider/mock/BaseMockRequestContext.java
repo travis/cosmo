@@ -16,7 +16,6 @@
 package org.osaf.cosmo.atom.provider.mock;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
@@ -76,13 +75,5 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         getMockRequest().setContent(content.getBytes());
         getMockRequest().setContentType("text/plain");
         getMockRequest().addHeader("Content-Type", "text/plain");
-    }
-
-    protected static String uriEscape(String str) {
-        try {
-            return URLEncoder.encode(str, "UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException("Could not escape " + str, e);
-        }
     }
 }

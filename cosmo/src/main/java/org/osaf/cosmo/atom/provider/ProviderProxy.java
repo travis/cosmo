@@ -47,6 +47,8 @@ public class ProviderProxy extends BaseProvider {
     public ResponseContext deleteEntry(RequestContext request) {
         if (request.getTarget() instanceof SubscriptionTarget)
             return subscriptionProvider.deleteEntry(request);
+        if (request.getTarget() instanceof PreferenceTarget)
+            return preferencesProvider.deleteEntry(request);
         return itemProvider.deleteEntry(request);
     }
 

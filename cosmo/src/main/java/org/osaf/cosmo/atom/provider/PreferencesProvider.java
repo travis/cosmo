@@ -97,7 +97,17 @@ public class PreferencesProvider extends BaseProvider
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        PreferenceTarget target = (PreferenceTarget) request.getTarget();
+        User user = target.getUser();
+        Preference pref = target.getPreference();
+        if (log.isDebugEnabled())
+            log.debug("deleting entry for preference " + pref.getKey() +
+                      " for user " + user.getUsername());
+
+        user.removePreference(pref);
+        userService.updateUser(user);
+
+        return createResponseContext(204);
     }
   
     public ResponseContext deleteMedia(RequestContext request) {

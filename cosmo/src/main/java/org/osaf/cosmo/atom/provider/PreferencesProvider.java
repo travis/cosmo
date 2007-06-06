@@ -139,7 +139,29 @@ public class PreferencesProvider extends BaseProvider
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        PreferenceTarget target = (PreferenceTarget) request.getTarget();
+        User user = target.getUser();
+        Preference pref = target.getPreference();
+        if (log.isDebugEnabled())
+            log.debug("getting entry for preference " +
+                      pref.getKey() + " for user " + user.getUsername());
+
+        try {
+            ServiceLocator locator = createServiceLocator(request);
+            PreferencesFeedGenerator generator =
+                createPreferencesFeedGenerator(locator);
+            Entry entry = generator.generateEntry(pref);
+
+            AbstractResponseContext rc =
+                createResponseContext(entry.getDocument());
+            rc.setEntityTag(new EntityTag(pref.getEntityTag()));
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+            return rc;
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        }
     }
   
     public ResponseContext getMedia(RequestContext request) {

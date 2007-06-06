@@ -99,6 +99,8 @@ public class ProviderProxy extends BaseProvider {
     public ResponseContext getEntry(RequestContext request) {
         if (request.getTarget() instanceof SubscriptionTarget)
             return subscriptionProvider.getEntry(request);
+        if (request.getTarget() instanceof PreferenceTarget)
+            return preferencesProvider.getEntry(request);
         return itemProvider.getEntry(request);
     }
   

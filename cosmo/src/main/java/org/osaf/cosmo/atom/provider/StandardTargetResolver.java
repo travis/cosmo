@@ -28,12 +28,14 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
 import org.osaf.cosmo.server.UserPath;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.util.UriTemplate;
 
 /**
  * Resolves the request to a resource target. The request URI can
@@ -42,6 +44,9 @@ import org.osaf.cosmo.service.UserService;
 public class StandardTargetResolver implements TargetResolver {
     private static final Log log =
         LogFactory.getLog(StandardTargetResolver.class);
+
+    private static final UriTemplate TEMPLATE_PREFERENCE =
+        new UriTemplate("/user/{username}/preference/{preference}");
 
     private ContentService contentService;
     private UserService userService;
@@ -75,6 +80,11 @@ public class StandardTargetResolver implements TargetResolver {
         ItemPath ip = ItemPath.parse(uri, true);
         if (ip != null)
             return createItemTarget(context, ip);
+
+        UriTemplate.Match match = TEMPLATE_PREFERENCE.match(uri);
+        if (match != null)
+            return createPreferenceTarget(context, match.get("username"),
+                                          match.get("preference"));
 
         UserPath up = UserPath.parse(uri, true);
         if (up != null) {
@@ -122,7 +132,7 @@ public class StandardTargetResolver implements TargetResolver {
         if (! (item instanceof CollectionItem))
             return null;
 
-        TargetPathInfo info = new TargetPathInfo(path.getPathInfo());
+        ItemPathInfo info = new ItemPathInfo(path.getPathInfo());
 
         return new CollectionTarget(context, (CollectionItem) item,
                                     info.getProjection(), info.getFormat());
@@ -139,7 +149,7 @@ public class StandardTargetResolver implements TargetResolver {
         if (! (item instanceof NoteItem))
             return null;
 
-        TargetPathInfo info = new TargetPathInfo(path.getPathInfo());
+        ItemPathInfo info = new ItemPathInfo(path.getPathInfo());
 
         return new ItemTarget(context, (NoteItem) item,
                               info.getProjection(), info.getFormat());
@@ -185,6 +195,23 @@ public class StandardTargetResolver implements TargetResolver {
     }
 
     /**
+     * Creates a target representing a preference entry.
+     */
+    protected Target createPreferenceTarget(RequestContext context,
+                                            String username,
+                                            String key) {
+        User user = userService.getUser(username);
+        if (user == null)
+            return null;
+
+        Preference pref = user.getPreference(key);
+        if (pref == null)
+            return null;
+
+        return new PreferenceTarget(context, user, pref);
+    }
+
+    /**
      * Creates a target representing a user.
      */
     protected Target createUserTarget(RequestContext context,
@@ -218,11 +245,11 @@ public class StandardTargetResolver implements TargetResolver {
             throw new IllegalStateException("userService is required");
     }
 
-    private class TargetPathInfo {
+    private class ItemPathInfo {
         private String projection;
         private String format;
         
-        public TargetPathInfo(String pathInfo) {
+        public ItemPathInfo(String pathInfo) {
             if (pathInfo != null && pathInfo != "/") {
                 String[] segments = pathInfo.substring(1).split("/");
                 projection = segments[0];

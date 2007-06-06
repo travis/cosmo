@@ -298,7 +298,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
            if (this.getMaster().getStamp(stampName)){
                return new ctr(this);
            } else {
-              var modification = master.getModification(this.recurrenceId);
+              var modification = this.getMaster().getModification(this.recurrenceId);
               if (modification && modification.getModifiedStamps[stampName]){
                   return new ctr(this);
               }                               
@@ -336,7 +336,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     }, 
     
     clone: function(){
-		throw new Error("you cannot clone an occurrence!");
+        throw new Error("you cannot clone an occurrence!");
     }
     
 });

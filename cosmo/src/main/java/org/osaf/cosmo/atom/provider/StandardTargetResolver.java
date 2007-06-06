@@ -24,6 +24,7 @@ import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.Item;
@@ -40,24 +41,9 @@ import org.osaf.cosmo.util.UriTemplate;
 /**
  * Resolves the request to a resource target.
  */
-public class StandardTargetResolver implements TargetResolver {
+public class StandardTargetResolver implements TargetResolver, AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardTargetResolver.class);
-
-    private static final UriTemplate TEMPLATE_COLLECTION =
-        new UriTemplate("/collection/{uid}/{projection}?/{format}?");
-    private static final UriTemplate TEMPLATE_ITEM =
-        new UriTemplate("/item/{uid}/{projection}?/{format}?");
-    private static final UriTemplate TEMPLATE_SUBSCRIBED =
-        new UriTemplate("/user/{username}/subscribed");
-    private static final UriTemplate TEMPLATE_SUBSCRIPTION =
-        new UriTemplate("/user/{username}/subscription/{name}");
-    private static final UriTemplate TEMPLATE_PREFERENCES =
-        new UriTemplate("/user/{username}/preferences");
-    private static final UriTemplate TEMPLATE_PREFERENCE =
-        new UriTemplate("/user/{username}/preference/{name}");
-    private static final UriTemplate TEMPLATE_SERVICE =
-        new UriTemplate("/user/{username}");
 
     private ContentService contentService;
     private UserService userService;

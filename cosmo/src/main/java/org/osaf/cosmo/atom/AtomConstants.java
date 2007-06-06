@@ -17,6 +17,8 @@ package org.osaf.cosmo.atom;
 
 import javax.xml.namespace.QName;
 
+import org.osaf.cosmo.util.UriTemplate;
+
 /**
  */
 public interface AtomConstants {
@@ -95,4 +97,21 @@ public interface AtomConstants {
     /** */
     public static final QName QN_EXISTS =
         new QName(NS_COSMO, "exists", PRE_COSMO);
+
+    // URI constants
+
+    public static final UriTemplate TEMPLATE_COLLECTION =
+        new UriTemplate("/collection/{uid}/{projection}?/{format}?");
+    public static final UriTemplate TEMPLATE_ITEM =
+        new UriTemplate("/item/{uid}/{projection}?/{format}?");
+    public static final UriTemplate TEMPLATE_SUBSCRIBED =
+        new UriTemplate("/user/{username}/subscribed");
+    public static final UriTemplate TEMPLATE_SUBSCRIPTION =
+        new UriTemplate("/user/{username}/subscription/{name}");
+    public static final UriTemplate TEMPLATE_PREFERENCES =
+        new UriTemplate("/user/{username}/preferences");
+    public static final UriTemplate TEMPLATE_PREFERENCE =
+        new UriTemplate("/user/{username}/preference/{name}");
+    public static final UriTemplate TEMPLATE_SERVICE =
+        new UriTemplate("/user/{username}");
 }

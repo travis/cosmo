@@ -409,7 +409,6 @@ cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
      ],
 
     {
-        
         getDetails: function(collection){
             throw new cosmo.model.GetDetailsNotSet();
         },

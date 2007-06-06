@@ -47,15 +47,15 @@ public class UriTemplate {
     private static final Log log = LogFactory.getLog(UriTemplate.class);
 
     private String pattern;
-    private ArrayList<String> segments;
+    private ArrayList<Segment> segments;
 
     public UriTemplate(String pattern) {
         this.pattern = pattern;
-        this.segments = new ArrayList<String>();
+        this.segments = new ArrayList<Segment>();
 
         StrTokenizer tokenizer = new StrTokenizer(pattern, '/');
         while (tokenizer.hasNext())
-            segments.add(tokenizer.nextToken());
+            segments.add(new Segment(tokenizer.nextToken()));
     }
 
     /**
@@ -84,24 +84,31 @@ public class UriTemplate {
         if (log.isDebugEnabled())
             log.debug("matching " + path + " to " + pattern);
 
-        StrTokenizer tokenizer = new StrTokenizer(path, '/');
-        Iterator<String> si = segments.iterator();
-        while (tokenizer.hasNext()) {
-            if (! si.hasNext())
+        StrTokenizer candidate = new StrTokenizer(path, '/');
+        Iterator<Segment> si = segments.iterator();
+
+        while (si.hasNext()) {
+            Segment segment = si.next();
+
+            if (! candidate.hasNext()) {
+                // if the segment is optional, the candidate doesn't
+                // have to have a matching segment
+                if (segment.isOptional())
+                    continue;
+                // mandatory segment - not a match
                 return null;
+            }
 
-            String segment = si.next();
-            String token = tokenizer.nextToken();
+            String token = candidate.nextToken();
 
-            if (segment.startsWith("{") && segment.endsWith("}")) {
+            if (segment.isVariable()) {
                 try {
-                    String key = segment.substring(1, segment.length()-1);
                     String value = URLDecoder.decode(token, "UTF-8");
-                    match.put(key, value);
+                    match.put(segment.getData(), token);
                 } catch (Exception e) {
                     throw new RuntimeException("Cannot decode path segment " + token, e);
                 }
-            } else if (! segment.equals(token)) {
+            } else if (! segment.getData().equals(token)) {
                 // literal segment doesn't match, so path is not a match
                 return null;
             }
@@ -110,21 +117,55 @@ public class UriTemplate {
         return match;
     }
 
-    public class Match {
-        private HashMap<String, String> variables =
-            new HashMap<String, String>();
+    private class Segment {
+        private String data;
+        private boolean variable = false;
+        private boolean optional = false;
+
+        public Segment(String data) {
+            if (data.startsWith("{")) {
+                if (data.endsWith("}?")) {
+                    variable = true;
+                    optional = true;
+                    this.data = data.substring(1, data.length()-2);
+                } else if (data.endsWith("}")) {
+                    variable = true;
+                    this.data = data.substring(1, data.length()-1);
+                }
+            }
+            if (this.data == null)
+                this.data = data;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public boolean isVariable() {
+            return variable;
+        }
+
+        public boolean isOptional() {
+            return optional;
+        }
+    }
+
+    public class Match extends HashMap<String, String> {
 
         public String get(String key) {
-            return variables.get(key);
+            return super.get(key);
         }
 
-        protected void put(String key,
-                           String value) {
-            variables.put(key, value);
-        }
-
-        public String toString() {
-            return variables.toString();
+        /**
+         * Overrides the superclass method to unescape the value.
+         */
+        public String put(String key,
+                          String value) {
+            try {
+                return super.put(key, URLDecoder.decode(value, "UTF-8"));
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot decode variable value " + value, e);
+            }
         }
     }
 }

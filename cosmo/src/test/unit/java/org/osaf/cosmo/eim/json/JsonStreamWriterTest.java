@@ -77,8 +77,9 @@ public class JsonStreamWriterTest extends TestCase
         writer.writeRecordSet(recordset);
         writer.close();
 
-        System.out.println("Printing a single record set");
-        System.out.println(new String(out.toByteArray()));
+        if (log.isDebugEnabled())
+            log.debug("Printing a single record set\n" +
+                      new String(out.toByteArray()));
     }
     
     public void testWriteMultipleRecordSets() throws Exception{
@@ -92,14 +93,18 @@ public class JsonStreamWriterTest extends TestCase
         
         recordset.addRecord(noteRecord);
         
-        EimRecordSet[] sets = new EimRecordSet[]{recordset, recordset, recordset};
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         JsonStreamWriter writer =
             new JsonStreamWriter(out);
-        writer.writeRecordSets(sets);
+        writer.writeContainer();
+        writer.writeRecordSet(recordset);
+        writer.writeRecordSet(recordset);
+        writer.writeRecordSet(recordset);
         writer.close();
-        System.out.println("Printing multiple record sets");
-        System.out.println(new String(out.toByteArray()));
+
+        if (log.isDebugEnabled())
+            log.debug("Printing multiple record sets\n" +
+                      new String(out.toByteArray()));
     }
 
     private ClobField makeClobField() {

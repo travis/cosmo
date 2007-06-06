@@ -50,7 +50,7 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
     private static final XMLOutputFactory XML_OUTPUT_FACTORY =
         XMLOutputFactory.newInstance();
 
-    private boolean writeCharacterData = false;
+    private boolean writeMultiple = false;
     private JSONWriter jsonWriter;
     private OutputStreamWriter writer;
 
@@ -61,15 +61,15 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
         jsonWriter = new JSONWriter(writer);
     }
 
-    public void writeRecordSets(EimRecordSet[] recordsets)
+    public void writeContainer()
         throws JsonStreamException {
         try {
-            doWriteRecordSets(recordsets);
+            jsonWriter.array();
+            writeMultiple = true;
         } catch (JSONException e) {
             close();
-            throw new JsonStreamException("Error writing recordsets", e);
+            throw new JsonStreamException("Error writing container", e);
         }
-        
     }
     
     /** */
@@ -116,32 +116,17 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
         }
     }
 
-    public boolean getWriteCharacterData() {
-        return writeCharacterData;
-    }
-
-    public void setWriteCharacterData(boolean flag) {
-        writeCharacterData = flag;
-    }
-
-    /**
-     * Closes the root element and ends the document.
-     */
+    /** */
     public void close() throws JsonStreamException {
         try {
+            if (writeMultiple)
+                jsonWriter.endArray();
             writer.close();
+        } catch (JSONException e) {
+            throw new JsonStreamException("Error ending array", e);
         } catch (IOException ioe) {
             throw new JsonStreamException("Problem closing writer", ioe);
         }
-    }
-
-    private void doWriteRecordSets(EimRecordSet[] recordsets)
-    throws JsonStreamException, JSONException {
-       jsonWriter.array();
-       for (EimRecordSet recordset :recordsets){
-           writeRecordSet(recordset);
-       }
-       jsonWriter.endArray();
     }
 
     private void doWriteRecordSet(EimRecordSet recordset)

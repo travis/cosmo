@@ -95,6 +95,9 @@ public class ContentFactory
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             JsonStreamWriter writer = new JsonStreamWriter(out);
 
+            if (! occurrences.isEmpty())
+                writer.writeContainer();
+
             writeJson(writer, item);
             for (NoteItem occurrence : occurrences)
                 writeJson(writer, occurrence);

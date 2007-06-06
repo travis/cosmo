@@ -36,6 +36,10 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     var params = p || {};
 
     this.domNode = null;
+    this.mainSection = null;
+    this.mailSection = null;
+    this.eventSection = null;
+    this.taskSection = null;
 
     for (var n in params) { this[n] = params[n]; }
 
@@ -45,14 +49,16 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         domNode: d });
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
+    this.mainSection = c;
 
-    // Address stamp
+    // Mail stamp
     var d = _createElem('div');
     var c = new cosmo.ui.detail.StampSection({ parent: this,
         domNode: d,
-        stampType: 'Address', title: 'Address' });
+        stampType: 'Mail', title: 'Mail' });
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
+    this.mailSection = c;
 
     // Event stamp
     var d = _createElem('div');
@@ -61,10 +67,172 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         stampType: 'Event', title: 'Event' });
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
+    this.eventSection = c;
+
+    // Task stamp
+    var d = _createElem('div');
+    var c = new cosmo.ui.detail.StampSection({ parent: this,
+        domNode: d,
+        stampType: 'Task', title: 'Task', hasBody: false });
+    this.children.push(c);
+    this.domNode.appendChild(c.domNode);
+    this.taskSection = c;
+
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+
+    this.handlePub = function (cmd) {
+        var act = cmd.action;
+        var item = cmd.data;
+        switch (act) {
+            case 'eventsLoadPrepare':
+                //self.clear();
+                break;
+            case 'eventsDisplaySuccess':
+                self.updateFromItem(item);
+                /*
+                self.updateFromEvent(ev);
+                self.setButtons(true, true);
+                toggleReadOnlyIcon();
+                */
+                break;
+            case 'saveFromForm':
+                //saveCalEvent(ev);
+                break;
+            case 'setSelected':
+                self.updateFromItem(item);
+                /*
+                var c = cosmo.view.cal.canvas;
+                self.updateFromEvent(ev);
+                self.setButtons(true, true);
+                */
+                break;
+            case 'saveSuccess':
+                /*
+                // Changes have placed the saved event off-canvas
+                if (!cmd.qualifier.onCanvas) {
+                    self.setButtons(false, false);
+                    self.clear();
+                }
+                // Saved event is still in view
+                else {
+                    self.updateFromEvent(ev);
+                    self.setButtons(true, true);
+                    // If event title is 'New Event', auto-focus/select
+                    // title field to make it easy to give it a real title
+                    if (ev.data.title == _('Main.NewEvent')) {
+                        var f = function () {
+                            self.form.eventtitle.select();
+                            self.form.eventtitle.focus();
+                        }
+                        setTimeout(f, 10);
+                    }
+                }
+                */
+                break;
+            case 'saveFailed':
+                //self.setButtons(true, true);
+                break;
+            case 'noItems':
+                //self.setButtons(false, false);
+                //self.clear();
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+    };
 };
 
 cosmo.ui.detail.DetailViewForm.prototype =
     new cosmo.ui.ContentBox();
+
+cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
+    function (i) {
+
+    var _html = cosmo.util.html;
+    var setTimeElem = function (form, name, time) {
+        var timeElem = null;
+        var meridianElem = null;
+        var strtime = '';
+
+        timeElem = form[name + 'Time'];
+        meridianElem = form[name + 'Meridian'];
+        if (time) {
+            strtime = time.strftime('%I:%M');
+            // Trim leading zero if need be
+            strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
+            meridianElem[1].checked = false;
+            meridianElem[0].checked = false;
+            if (time.getHours() > 11) {
+                meridianElem[1].checked = true;
+            }
+            else {
+                meridianElem[0].checked = true;
+            }
+            _html.setTextInput(timeElem, strtime);
+        }
+        else {
+            meridianElem[1].checked = false;
+            meridianElem[0].checked = false;
+            timeElem.value = '';
+        }
+    };
+
+
+    var item = i || cosmo.view.cal.canvas.getSelectedEvent();
+    var data = item.data;
+    var section = null;
+    var f = null;
+    var stamp = null;
+    f = this.mainSection.formNode;
+    f.noteTitle.value = data.getDisplayName();
+    f.noteDescription.value = data.getBody();
+    stamp = data.getMailStamp();
+    if (stamp) {
+
+    }
+    stamp = data.getEventStamp();
+    if (stamp) {
+        section = this.eventSection;
+        section.toggleEnabled(true);
+        f = section.formSection.formNode;
+        _html.setTextInput(f.eventLocation, stamp.getLocation());
+        var start = stamp.getStartDate();
+        _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
+        setTimeElem(f, 'start', start);
+        var end = stamp.getEndDate();
+        _html.setTextInput(f.endDate, end.strftime('%m/%d/%Y'));
+        setTimeElem(f, 'end', end);
+        /*
+        if (start.tzId){
+            var timezone = cosmo.datetime.timezone.getTimezone(start.tzId);
+            if (!timezone){
+                self.clearTimezone();
+            }
+            else {
+                //we use this tzid in case the event has a "legacy" tzId,
+                //like "US/Pacific" as opposed to "America/Los_angeles"
+                var tzId = timezone.tzId;
+                var region = tzId.split("/")[0];
+                _html.setSelect(f.tzRegion, region);
+                self.populateTimezoneSelector(region);
+                _html.setSelect(f.tzId, tzId);
+            }
+        }
+        else {
+            self.clearTimezone();
+        }
+        */
+        var stat = stamp.getStatus();
+        if (stat) {
+            _html.setSelect(f.eventStatus, stat);
+        }
+        else {
+            _html.setSelect(f.eventStatus, "CONFIRMED");
+        }
+    }
+};
+
 
 cosmo.ui.detail.MainSection = function () {
     var _html = cosmo.util.html;
@@ -113,6 +281,7 @@ cosmo.ui.detail.StampSection = function (p) {
     var self = this;
     var params = p || {};
     this.stampType = '';
+    this.hasBody = true;
     this.id = '';
     this.title = '';
     this.domNode = null; // Main node
@@ -125,9 +294,12 @@ cosmo.ui.detail.StampSection = function (p) {
     this.expanded = true; // Expanded/collapsed
     this.enabled = false; // Enabled/disabled
     this.bodyHeight = null;
+
+    // Override defaults with params passed in
     for (var n in params) { this[n] = params[n] };
+
     // Use the stamp type as a basis for the DOM node ids
-    // e.g., 'addressSectionExpander', 'eventSectionBody', etc.
+    // e.g., 'mailSectionExpander', 'eventSectionBody', etc.
     this.id = 'section' + this.stampType;
 
     var d = null;
@@ -167,16 +339,18 @@ cosmo.ui.detail.StampSection = function (p) {
     d.innerHTML = this.title;
     label.appendChild(d);
     this.titleNode = d;
-    // Show/hide link
-    d = _createElem('div');
-    d.className = 'expandoTriangle';
-    d.id = id + 'Expander';
-    var a = _createElem('a');
-    a.id = id + 'showHideToggle';
-    this.showHideSwitch = a;
-    a.appendChild(_createText('[hide]'));
-    d.appendChild(a);
-    header.appendChild(d);
+    if (this.hasBody) {
+        // Show/hide link
+        d = _createElem('div');
+        d.className = 'expandoTriangle';
+        d.id = id + 'Expander';
+        var a = _createElem('a');
+        a.id = id + 'showHideToggle';
+        this.showHideSwitch = a;
+        a.appendChild(_createText('[hide]'));
+        d.appendChild(a);
+        header.appendChild(d);
+    }
     d = _createElem('div');
     d.className = 'clearBoth';
     header.appendChild(d);
@@ -185,24 +359,28 @@ cosmo.ui.detail.StampSection = function (p) {
 
     // Body
     // ------------------------
-    body = _createElem('div');
-    body.id = id + 'Body';
-    body.className = 'expandoBody';
-    this.formSection = cosmo.ui.detail.getFormElementsForStamp(this.stampType);
-    if (!this.formSection.domNode) {
-       throw('Form section for ' + this.stampType + ' has no DOM node.');
+    if (this.hasBody) {
+        body = _createElem('div');
+        body.id = id + 'Body';
+        body.className = 'expandoBody';
+        this.formSection = cosmo.ui.detail.getFormElementsForStamp(this.stampType);
+        if (!this.formSection.domNode) {
+           throw('Form section for ' + this.stampType + ' has no DOM node.');
+        }
+        body.appendChild(this.formSection.domNode);
+        this.bodyNode = body;
+        this.domNode.appendChild(body);
+        // Save rendered height
+        //this.bodyHeight = this.bodyNode.offsetHeight;
     }
-    body.appendChild(this.formSection.domNode);
-    this.bodyNode = body;
-    this.domNode.appendChild(body);
-
     this.toggleEnabled(false);
-    // Save rendered height
-    this.bodyHeight = this.bodyNode.offsetHeight;
-    // Attach events
-    dojo.event.connect(self.enablerSwitch, 'onclick',
-        self, 'toggleEnabled');
-    dojo.event.connect(this.showHideSwitch, 'onclick', self, 'toggleExpando');
+
+    if (this.hasBody) {
+        // Attach events
+        dojo.event.connect(self.enablerSwitch, 'onclick',
+            self, 'toggleEnabled');
+        dojo.event.connect(this.showHideSwitch, 'onclick', self, 'toggleExpando');
+    }
 }
 
 cosmo.ui.detail.StampSection.prototype =
@@ -230,14 +408,17 @@ cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e) {
     // Allow explicit enabled state to be passed
     if (typeof e == 'boolean') {
         this.enabled = e;
+        this.enablerSwitch.checked = e;
     }
     else {
         this.enabled = !this.enabled;
         // Don't pass click event along to the expando
         // when enabled/expanded states already match
-        if (this.enabled != this.expanded) { this.toggleExpando(); }
+        if (this.hasBody && (this.enabled != this.expanded)) { this.toggleExpando(); }
     }
-    this.formSection.toggleEnabled(this.enabled);
+    if (this.hasBody) {
+        this.formSection.toggleEnabled(this.enabled);
+    }
 }
 
 cosmo.ui.detail.getFormElementsForStamp = function (stampType) {
@@ -339,13 +520,13 @@ cosmo.ui.detail.StampFormElements.prototype.setElemDefaultState =
     }
 };
 
-cosmo.ui.detail.AddressFormElements = function () {
+cosmo.ui.detail.MailFormElements = function () {
     var _html = cosmo.util.html;
     var d = this.domNode;
     var f = this.formNode;
     var table = _createElem('table');
     var tbody = _createElem('tbody');
-    var addressRow = function (label, name) {
+    var mailRow = function (label, name) {
         var tr = null;
         var td = null;
         tr = _createElem('tr');
@@ -358,8 +539,8 @@ cosmo.ui.detail.AddressFormElements = function () {
         td = _createElem('td');
         td.style.padding = '2px';
         var elem = _html.createInput({ type: 'text',
-            id: 'address' + name,
-            name: 'address' + name,
+            id: 'mail' + name,
+            name: 'mail' + name,
             size: 20,
             maxlength: 100,
             value: '',
@@ -368,20 +549,20 @@ cosmo.ui.detail.AddressFormElements = function () {
         tr.appendChild(td);
         return tr;
     }
-    d.id = 'addressFormSection';
+    d.id = 'mailFormSection';
     d.style.padding = '8px';
     table.cellPadding = '0';
     table.cellSpacing = '0';
     table.appendChild(tbody);
 
-    tbody.appendChild(addressRow('Fr', 'From'));
-    tbody.appendChild(addressRow('To', 'To'));
-    tbody.appendChild(addressRow('Cc', 'Cc'));
+    tbody.appendChild(mailRow('Fr', 'From'));
+    tbody.appendChild(mailRow('To', 'To'));
+    tbody.appendChild(mailRow('Cc', 'Cc'));
 
     f.appendChild(table);
     d.appendChild(f);
 };
-cosmo.ui.detail.AddressFormElements.prototype =
+cosmo.ui.detail.MailFormElements.prototype =
     new cosmo.ui.detail.StampFormElements();
 
 cosmo.ui.detail.EventFormElements= function () {
@@ -684,4 +865,5 @@ cosmo.ui.detail.createFormElemDiv = function (elem) {
     d.appendChild(elem);
     return d;
 };
+
 

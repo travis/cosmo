@@ -69,7 +69,8 @@ public class UriTemplate {
      * @param values the (unescaped) values to be bound
      * @return a uri-path with variables replaced by bound values
      * @throws IllegalArgumentException if more or fewer values are
-     * provided than are needed by the template
+     * provided than are needed by the template or if a null value is
+     * provided for a mandatory variable
      */
     public String bind(String... values) {
         StringBuffer buf = new StringBuffer("/");
@@ -82,12 +83,15 @@ public class UriTemplate {
             Segment segment = si.next();
 
             if (segment.isVariable()) {
-                if (! vi.hasNext()) {
+                String value = null;
+                if (vi.hasNext())
+                    value = vi.next();
+                if (value == null) {
                     if (segment.isOptional())
                         continue;
-                    throw new IllegalArgumentException("Not enough variables");
+                    throw new IllegalArgumentException("Not enough values");
                 }
-                buf.append(escape(vi.next()));
+                buf.append(escape(value));
             } else {
                 buf.append(segment.getData());
             }
@@ -97,7 +101,7 @@ public class UriTemplate {
         }
 
         if (vi.hasNext())
-            throw new IllegalArgumentException("Too many variables");
+            throw new IllegalArgumentException("Too many values");
 
         return buf.toString();
     }

@@ -68,10 +68,11 @@ cosmo.util.auth = new function() {
 		return dojo.io.cookie.get(COSMO_AUTH_COOKIE);
     }
 
-    this.getAuthorizedRequest = function(){
+    this.getAuthorizedRequest = function(kwArgs){
     	var req = {};
     	req.headers = {};
-    	if (this.getCred()){
+    	var dontAddCredentials = kwArgs && !kwArgs.addCredentials;
+    	if (this.getCred() && !dontAddCredentials){
     	   	req.headers.Authorization =  "Basic " + this.getCred();
     	}
     	return req;

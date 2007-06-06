@@ -31,7 +31,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
         initializer: function (translator){
 
         },
-
+        
         /**
          * summary: Return request populated with attributes common to all CMP calls.
          */
@@ -42,7 +42,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
                                               dojo.debug(e)
                                               return e;});
-            var request = cosmo.util.auth.getAuthorizedRequest();
+            var request = cosmo.util.auth.getAuthorizedRequest({addCredentials: !kwArgs.ticketKey});
 
             request.load = this.resultCallback(deferred);
             request.error = this.errorCallback(deferred);

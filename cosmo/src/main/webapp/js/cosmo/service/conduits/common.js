@@ -44,18 +44,38 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         this._addTranslation(deferred, "translateGetCollections", 
         {
-            getDetails: dojo.lang.hitch(this, function (){
-                return this.getCollection(collection.getUid(), {sync: true}).results[0];
-            })
+            lazyLoader: this.generateLazyLoader(
+                dojo.lang.hitch(this, 
+                                function (collection){
+                                    return this.getCollection(collection.getUid(), 
+                                                              {sync: true}).results[0];
+                                }
+                )
+                )
         } );
 
         return deferred;
+    },
+    
+    generateLazyLoader: function (getFunction){
+        return function(oldObject, propertyNames){
+            var newObject = getFunction(oldObject);
+            for (var i = 0; i < propertyNames.length; i++){
+                var propertyName = propertyNames[i];
+                var setterName = "set" + dojo.string.capitalize(propertyName);
+                var getterName = "get" + dojo.string.capitalize(propertyName);
+                oldObject[setterName](newObject[getterName]());
+            }
+        }
     },
     
     getSubscriptions: function (kwArgs){
         kwArgs = kwArgs || {};
 
         var deferred = this._transport.getSubscriptions(kwArgs);
+
+        this._addTranslation(deferred, "translateGetSubscriptions");
+
         return deferred;
     },
 
@@ -75,8 +95,9 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     getItems: function (collection, searchCriteria, kwArgs){
         kwArgs = kwArgs || {};
-
-        kwArgs.ticketKey = collection.getTicketKey() || undefined;
+        if (collection.getTicketKey){
+            kwArgs.ticketKey = collection.getTicketKey();
+        }
         var deferred = this._transport.getItems(collection.getUid(), searchCriteria, kwArgs);
         
         this._addTranslation(deferred, "translateGetItems");
@@ -91,6 +112,16 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         var deferred = this._transport.getItem(uid, kwArgs);
 
         this._addTranslation(deferred, "translateGetItems");
+        
+        return deferred;
+    },
+    
+    expandRecurringItem: function(uid, start, end, kwArgs){
+        kwArgs = kwArgs || {};
+
+        var deferred = new dojo.Deferred()//this._transport.getItem(uid, kwArgs);
+
+//        this._addTranslation(deferred, "translateGetItems");
         
         return deferred;
     },
@@ -118,6 +149,15 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         // do topic notifications
         return deferred;
+    },
+    
+    createSubscription: function(subscription, kwArgs){
+        kwArgs = kwArgs || {};
+        
+        return this._transport.createSubscription(subscription, 
+            this._translator.subscriptionToAtomEntry(subscription), 
+            kwArgs);
+            
     },
     
     getPreference: function (key){
@@ -153,7 +193,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             webcal: "http://webcal",
             dav: "http://dav",
             pim: "http://pim"
-        },null];
+        }, null];
         
         return fakeDeferred;
     },

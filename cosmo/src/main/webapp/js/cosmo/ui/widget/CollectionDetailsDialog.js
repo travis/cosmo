@@ -133,7 +133,7 @@ dojo.widget.HtmlWidget, function(){
 
         //XINT
         saveDisplayName: function(){
-            this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
+            //this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
             //TODO - This should not here. The publishing should happen at the service level,
             //otherwise everyone who wants to user a service level method has to publish. Hard to do right
             //now with current RPC setup

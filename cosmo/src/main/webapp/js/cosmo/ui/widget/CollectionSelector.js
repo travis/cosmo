@@ -108,24 +108,31 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         // Action to take after successful auth -- try to add the
                         // collection subscription
                         attemptFunc: function () {
-                            var self = this; // 'self' is CollectionSelector
-                            // Handler function for attempt to add collection
-                            // If it's added successfully, log the user in to look at it
-                            var n = function (nothingParam, err, requestId) {
-                                var msg = self.authAction.successPrompt;
-                                if (err) {
-                                    cosmo.app.hideDialog();
-                                    cosmo.app.showErr(self.strings.collectionAddError, err);
-                                    return false;
-                                }
-                                else {
-                                    // Log the user into Cosmo and display the current collection
-                                    self._showPrompt(msg);
-                                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-                                }
-                            };
-                            cosmo.app.pim.serv.saveSubscription(n, curr.getUid(), passedKey,
-                                curr.getDisplayName())
+
+                            var subscription = new cosmo.model.Subscription({
+                                displayName: curr.getDisplayName(),
+                                uid: curr.getUid(),
+                                ticketKey: passedKey
+                            })
+                            var deferred = cosmo.app.pim.serv.createSubscription(subscription);
+                            deferred.addCallback(dojo.lang.hitch(this, function(x,y,z){
+                                dojo.debug(x)
+                                dojo.debug(y)
+                                dojo.debug(z)
+                                // Log the user into Cosmo and display the current collection
+                                this._showPrompt(this.authAction.successPrompt);
+//                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+                                
+                            }));
+                            deferred.addErrback(dojo.lang.hitch(this, function(err, y, z){
+                                dojo.debug(err)
+                                dojo.debug(y)
+                                dojo.debug(z)
+                                cosmo.app.hideDialog();
+                                cosmo.app.showErr(self.strings.collectionAddError, err);
+                                return false;
+                            }));
+                            
                         },
                         attemptPrompt: strings.attemptPrompt,
                         successPrompt: strings.successPrompt };

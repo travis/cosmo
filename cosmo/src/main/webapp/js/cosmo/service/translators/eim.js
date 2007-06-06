@@ -23,6 +23,7 @@ dojo.provide("cosmo.service.translators.eim");
 dojo.require("dojo.date.serialize");
 dojo.require("dojo.lang.*");
 dojo.require("dojo.json");
+dojo.require("dojo.string");
 
 dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model.*");
@@ -45,21 +46,41 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     RID_FMT: "%Y%m%dT%H%M%S",
+
+    // Wrap each of the specified property's getter with a function
+    // that will call the lazy loader and then revert each
+    // getter.
+    setLazyLoader: function (object, propertyNames, loaderFunction){
+        var oldGetters = {};
+        for (var i = 0; i < propertyNames.length; i++) {
+            var propertyName = propertyNames[i];
+            var getterName = "get" + dojo.string.capitalize(propertyName);
+            var oldGetter = object[getterName];
+            oldGetters[getterName] = oldGetter;
+            object[getterName] = 
+                function(){
+                    loaderFunction(object, propertyNames);
+                    for (var oldGetterName in oldGetters){
+                        object[oldGetterName] = oldGetters[oldGetterName];
+                    }
+                    return object[getterName]();
+                }  
+        }
+    },
     
-    translateGetCollection: function (atomXml){
+    translateGetCollection: function (atomXml, oldCollection){
         var ticketKey;
         var ticketElement = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket")[0];
         if (ticketElement) ticketKey = ticketElement.firstChild.nodeValue;
+        var uid = atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9);
+        var displayName = cosmo.util.html.getElementsByTagName(atomXml, "title")[0].firstChild.nodeValue;
+        var collection = oldCollection || new cosmo.model.Collection();
         
-        var collection = new cosmo.model.CollectionDetails(
-            {uid: atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9),
-             displayName: cosmo.util.html.getElementsByTagName(atomXml, "title")[0].firstChild.nodeValue,
-             ticketKey: ticketKey
-            }
-            );
+        collection.setUid(uid);
+        collection.setDisplayName(uid);
+        if (ticketKey) collection.setTicketKey(uid);
 
         return collection;
-        
     },
           
     translateGetCollections: function (atomXml, kwArgs){
@@ -76,11 +97,34 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             for (var j = 0; j < collectionElements.length; j++){
                 var collection = this.collectionXmlToCollection(collectionElements[j]);
-                collection.getDetails = kwArgs.getDetails;
+                this.setLazyLoader(collection, ["protocolUrls"], kwArgs.lazyLoader);
                 collections.push(collection);
             }
         }
         return collections;
+    },
+    
+    translateGetSubscriptions: function (atomXml, kwArgs){
+        var entries = atomXml.getElementsByTagName("entry");
+        var subscriptions = [];
+        for (var i = 0; i < entries.length; i++){
+            var entry = entries[i];
+            
+            var displayNameEl = cosmo.util.html.getElementsByTagName(entry, "title")[0];
+            var displayName = displayNameEl.firstChild.nodeValue;
+            var ticketEl = cosmo.util.html.getElementsByTagName(entry, "cosmo", "ticket")[0];
+            var ticket = ticketEl.firstChild.nodeValue;
+            var uidEl = cosmo.util.html.getElementsByTagName(entry, "cosmo", "collection")[0];
+            var uid = uidEl.firstChild.nodeValue;
+            var subscription = new cosmo.model.subscription({
+                displayName: displayName,
+                tickeyKey: ticket,
+                uid: uid
+            })
+            this.setLazyLoader(subscription, ["protocolUrls"], kwArgs.lazyLoader);
+          
+        }
+        return subscriptions;
     },
     
     collectionXmlToCollection: function (collectionXml){

@@ -34,9 +34,11 @@ cosmotest.service.conduits.test_conduits = {
             
             var c0 = collections[0];
             
+            // test lazy loading
+            jum.assertTrue("lazy loading broken", !!c0.getProtocolUrls())
+            
             // test getCollection
             var collectionDetails = conduit.getCollection(c0.getUid(), {sync: true});
-    
             jum.assertTrue("collectionDetails", !!collectionDetails)
             
             // Test createItem

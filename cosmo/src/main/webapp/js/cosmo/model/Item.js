@@ -352,75 +352,35 @@ cosmo.model.declare("cosmo.model.Modification", null,
     });
 
 cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item, 
-    [],
+    [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}]
+    ],
     {
-        getDetails: function(collection){
-            throw new cosmo.model.GetDetailsNotSet();
-        },
-        
-        isWriteable: function(){
-            this.wrapCollectionDetails(this.getDetails());
-            return this.isWriteable();
-       },
-        
-        getTicketKey: function(){
-            this.wrapCollectionDetails(this.getDetails());
-            return this.getTicketKey();
-        },
-
-        setTicketKey: function(){
-            this.wrapCollectionDetails(this.getDetails());
-            return this.setTicketKey();
-        },
-
-        getProtocolUrls: function(){
-            this.wrapCollectionDetails(this.getDetails());
-            return this.getTicketKey();
-        },
-
-        wrapCollectionDetails: function(collectionDetails){
-            this.isWriteable = dojo.lang.hitch(collectionDetails, collectionDetails.isWriteable);
-            this.getProtocolUrls = dojo.lang.hitch(collectionDetails, collectionDetails.getProtocolUrls);
-            this.getTicketKey = dojo.lang.hitch(collectionDetails, collectionDetails.getTicketKey);
-            this.setTicketKey = dojo.lang.hitch(collectionDetails, collectionDetails.setTicketKey);
-        }
+       isWriteable: function(){
+          return true;
+       }
     });
     
-dojo.declare("cosmo.model.GetDetailsNotSet", Error,
-    // summary: Thrown if someone tries to get collection details but the getDetails
-    // function is not set
-function(){}, {});
-    
-cosmo.model.declare("cosmo.model.CollectionDetails", cosmo.model.Item,
-    [["ticketKey", {"default": null}],
-     ["writeable", {"default": true}],
-     ["protocolUrls", {"default": cosmo.model.NEW_OBJECT}]
+cosmo.model.declare("cosmo.mode.AnonymousTicketedCollection", cosmo.model.Item,
+     [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}],
+      ["ticketKey", {"default": null}],
+      ["writeable", {"default": true}]
      ],
      {
-         isWriteable: function (){
-            return this.getWriteable();
+         isWriteable: function(){
+             return this.getWriteable();
          }
      }
 );
 
 cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
-    [["ticketKey", {"default": null}],
+    [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}],
+     ["ticketKey", {"default": null}],
      ["writeable", {"default": true}]
      ],
-
     {
-        getDetails: function(collection){
-            throw new cosmo.model.GetDetailsNotSet();
-        },
-        
-        getProtocolUrls: function(){
-            this.wrapCollectionDetails(this.getDetails());
-            return this.getProtocolUrls();
-        },
-        wrapCollectionDetails: function(collectionDetails){
-            this.getProtocolUrls = dojo.lang.hitch(collectionDetails, collectionDetails.getProtocolUrls);
-        }    
-           
+         isWriteable: function(){
+             return this.getWriteable();
+         }
     }
 );
 

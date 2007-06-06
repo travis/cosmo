@@ -48,6 +48,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.url = cosmo.env.getBaseUrl() +
           "/atom/collection/" + collectionUid + "/details" + 
           this.queryHashToString(query);
+          
         dojo.io.bind(r);
         return deferred;    
     },
@@ -64,14 +65,14 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     
     getSubscriptions: function (kwArgs){
         var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+        r.url = cosmo.env.getBaseUrl() +
+          "/atom/user/" + cosmo.util.auth.getUsername() + "/subscribed";
         
-        //TODO
-        deferred.callback([]);
-        
-        return deferred;
-        
+        dojo.io.bind(r);
+        return deferred;    
     },
-
+    
     getItems: function (collectionUid, searchCrit, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
@@ -118,6 +119,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.url = cosmo.env.getBaseUrl() + "/atom/item/" + 
                 uid + "/full/eim-json" + this.queryHashToString(query);
         r.method = "GET";
+        
         dojo.io.bind(r);
         return deferred;
     },
@@ -135,6 +137,24 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "POST";
+        
+        dojo.io.bind(r);
+        return deferred;
+        
+    },
+
+    createSubscription: function(subscription, postContent, kwArgs){
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+        
+        var query = this._generateAuthQuery(kwArgs);
+        
+        r.url = cosmo.env.getBaseUrl() + "/atom/user/" + 
+            cosmo.util.auth.getUsername() + "/subscribed";
+        r.contentType = "application/atom+xml";
+        r.postContent = postContent;
+        r.method = "POST";
+        
         dojo.io.bind(r);
         return deferred;
         

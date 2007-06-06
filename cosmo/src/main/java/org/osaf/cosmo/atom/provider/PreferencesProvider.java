@@ -105,7 +105,50 @@ public class PreferencesProvider extends BaseProvider
     }
 
     public ResponseContext updateEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
+        PreferenceTarget target = (PreferenceTarget) request.getTarget();
+        User user = target.getUser();
+        Preference pref = target.getPreference();
+        if (log.isDebugEnabled())
+            log.debug("upudating preference " + pref.getKey() + " for user " +
+                      user.getUsername());
+
+        // XXX: check write preconditions?
+
+        try {
+            Entry entry = (Entry) request.getDocument().getRoot();
+            Preference newpref = readPreference(entry);
+
+            if (user.getPreference(newpref.getKey()) != null &&
+                ! user.getPreference(newpref.getKey()).equals(pref))
+                return conflict(getAbdera(), request, "Preference exists");
+
+            pref.setKey(newpref.getKey());
+            pref.setValue(newpref.getValue());
+
+            user = userService.updateUser(user);
+
+            ServiceLocator locator = createServiceLocator(request);
+            PreferencesFeedGenerator generator =
+                createPreferencesFeedGenerator(locator);
+            entry = generator.generateEntry(pref);
+
+            AbstractResponseContext rc =
+                createResponseContext(entry.getDocument());
+            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+            rc.setEntityTag(new EntityTag(pref.getEntityTag()));
+
+            return rc;
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (ValidationException e) {
+            return badrequest(getAbdera(), request, "Invalid entry: " + e.getMessage());
+        } catch (GeneratorException e) {
+            String reason = "Unknown entry generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        }
     }
   
     public ResponseContext updateMedia(RequestContext request) {

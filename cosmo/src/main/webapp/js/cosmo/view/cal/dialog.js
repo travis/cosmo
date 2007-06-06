@@ -37,32 +37,49 @@ cosmo.view.cal.dialog = new function() {
     var buttons = {
         'removeAllEvents': function(){
            return new Button('allButtonDialog', btnWideWidth,
-                function() { doPublish('remove', recurOpts.ALL_EVENTS); }, allEventsMsg, true);
+                function() { doPublish('remove', cosmo.view.cal.recurringEventOptions.ALL_EVENTS); }, allEventsMsg, true);
         },
 
         'removeFutureEvents': function(){
             return new Button('allFutureButtonDialog', btnWiderWidth,
-                function() { doPublish('remove', recurOpts.ALL_FUTURE_EVENTS); }, AllFutureMsg, true);
+                function() { doPublish('remove', cosmo.view.cal.recurringEventOptions.ALL_FUTURE_EVENTS); }, AllFutureMsg, true);
         },
 
         'removeOnlyThisEvent': function(){
             return new Button('onlyThisButtonDialog', btnWiderWidth,
-                function() { doPublish('remove', recurOpts.ONLY_THIS_EVENT); }, OnlyThisMsg, true);
+                function() { 
+                    doPublish('remove', cosmo.view.cal.recurringEventOptions.ONLY_THIS_EVENT); 
+                }, 
+                OnlyThisMsg, true);
         },
 
-        'saveAllEvents': function(){
+        'saveAllEvents': function(saveItem, delta){
             return new Button('allButtonDialog', btnWideWidth,
-            function() { doPublish('save', recurOpts.ALL_EVENTS); }, allEventsMsg, true);
+                function() {  
+                    doPublishSave(cosmo.view.cal.recurringEventOptions.ALL_EVENTS,
+                        saveItem, delta)
+                }, 
+                allEventsMsg, 
+                true);
         },
 
-        'saveFutureEvents': function(){
+        'saveFutureEvents': function(saveItem, delta){
             return new Button('allFutureButtonDialog', btnWiderWidth,
-            function() { doPublish('save', recurOpts.ALL_FUTURE_EVENTS); }, AllFutureMsg, true);
+                function() { 
+                    doPublishSave(cosmo.view.cal.recurringEventOptions.ALL_FUTURE_EVENTS,
+                        saveItem, delta); 
+                },
+                AllFutureMsg, true);
         },
 
-        'saveOnlyThisEvent': function(){
+        'saveOnlyThisEvent': function(saveItem, delta){
             return new Button('onlyThisButtonDialog', btnWiderWidth,
-                function() { doPublish('save', recurOpts.ONLY_THIS_EVENT); }, OnlyThisMsg, true);
+                function() { 
+                    doPublishSave(cosmo.view.cal.recurringEventOptions.ONLY_THIS_EVENT,
+                        saveItem, 
+                        delta); 
+                }, 
+                OnlyThisMsg, true);
         },
 
         'allEventsDisabled': function(){
@@ -118,6 +135,11 @@ cosmo.view.cal.dialog = new function() {
         var selEv = cosmo.view.cal.canvas.getSelectedEvent();
         dojo.event.topic.publish('/calEvent', { 'action': act, 'qualifier': qual, data: selEv });
     }
+
+    function doPublishSave(qual, saveItem, delta) {
+        dojo.event.topic.publish('/calEvent', { 'action': 'save', 'qualifier': qual, data:saveItem, delta:delta });
+    }
+
     // Call a method on the currently selected event
     // FIXME: Use topics
     function doEvMethod(key) {
@@ -127,24 +149,27 @@ cosmo.view.cal.dialog = new function() {
 
     // Public methods
     // ********************
-    this.getProps = function(key, optsParam) {
+    this.getProps = function(key, opts) {
         var OPTIONS = cosmo.view.cal.recurringEventOptions;
         var p = props[key]();
-        var opts = optsParam || {};
+        var opts = opts || {};
         if (key == 'saveRecurConfirm') {
+            var changeTypes = opts.changeTypes;
+            var delta = opts.delta;
+            var saveItem = opts.saveItem  //a "CalEvent"
             p.btnsRight = [];
-            if (!opts.ALL_EVENTS){
+            if (!changeTypes[OPTIONS.ALL_EVENTS]){
                 p.btnsRight.push(buttons.allEventsDisabled());
             } else {
-                p.btnsRight.push(buttons.saveAllEvents());
+                p.btnsRight.push(buttons.saveAllEvents(saveItem, delta));
             }
             
-            if (opts.ALL_FUTURE_EVENTS){
-                p.btnsRight.push(buttons.saveFutureEvents());
+            if (changeTypes[OPTIONS.ALL_FUTURE_EVENTS]){
+                p.btnsRight.push(buttons.saveFutureEvents(saveItem, delta));
             }
             
-            if (opts.ONLY_THIS_EVENT){
-                p.btnsRight.push(buttons.saveOnlyThisEvent());
+            if (changeTypes[OPTIONS.ONLY_THIS_EVENT]){
+                p.btnsRight.push(buttons.saveOnlyThisEvent(saveItem, delta));
             }
         }
         else if (key == 'removeRecurConfirm') {

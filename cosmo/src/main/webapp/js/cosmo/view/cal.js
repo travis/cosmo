@@ -69,6 +69,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var size = 0;
         var change = null;
         for (change in changeTypes){
+            dojo.debug("changeType: " +change);
             if (changeTypes[change]){
                 size++;
             }
@@ -79,8 +80,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             delta.applyChangeType(change);
             dojo.event.topic.publish('/calEvent', {action:'save', data:ev});
         } else {
-          dojo.debug("ELSE!");
-          cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', opts));
+          cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', {changeTypes:changeTypes, delta:delta, saveItem:ev}));
         }
     }
     
@@ -94,14 +94,14 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * the two special cases of adding recurrence to a single event or
      * removing recurrence completely from a master event for a recurrence.
      */
-     //XINT
-    function saveEventChanges(ev, qual) {
-
+    function saveEventChanges(ev, qual, delta) {
+        dojo.debug("save event changes...");
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
         // setTimeout to allow the 'processing ...' state to
         // display
         var f = null;
+        
         // A second function object used as a callback from
         // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
@@ -118,34 +118,23 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
 
         /*
         // Lozenge stuff
-        // FIXME: Actually this stuff should be oWnZ0Rd by view.cal.canvas
+        // FIXME: Actually this stuff should be in view.cal.canvas
         // ---------
-        // Reset the lozenge because we may be changing to the new type --
-        // e.g., between all-day and normal, or between normal single
-        // and normal composite
-        if (ev.dataOrig &&
-            !((ev.data.allDay || ev.data.anyTime) &&
-            (ev.dataOrig.allDay || ev.dataOrig.anyTime))) {
-            ev.replaceLozenge();
-        }
-        // Reset the lozenge properties from the event
-        ev.lozenge.updateFromEvent(ev, true);
-        // Do visual updates to size, position
-        ev.lozenge.updateElements();
-        // Display processing animation
-        ev.lozenge.showProcessing();
-        */
-
+*/
         // Recurring event
         if (qual) {
+            //NOTEFROMBOBBY: I am goign to "rework" each one of these "qual" cases individually. Ones 
+            // that have an XINT are NOT done yet.
             switch(qual) {
                 // Adding recurrence to a normal one-shot
+                //XINT
                 case 'singleEventAddRecurrence':
                     f = function () { doSaveEvent(ev, { 'saveType': 'singleEventAddRecurrence',
                         'instanceEvent': ev } ) };
                     break;
 
                 // Removing recurrence from a recurring event (along with other possible edits)
+                //XINT
                 case 'recurrenceMasterRemoveRecurrence':
                     f = function () { doSaveEvent(ev, {
                         'saveType': 'recurrenceMasterRemoveRecurrence', 'instanceEvent': null }) }
@@ -153,120 +142,20 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
 
                 // Changing the master event in the recurring sequence
                 case opts.ALL_EVENTS:
-                    // User is making the edit directly on the master event
-                    // no need to go look it up
-                    if (ev.data.masterEvent) {
-                        f = function () { doSaveEvent(ev, {
-                            'saveType': 'recurrenceMaster', 'instanceEvent': null }) }
-                    }
-                    // User is making the edit from a recurrence instance --
-                    // have to look up the master event. This means two chained
-                    // async calls
-                    else {
-                        h = function (evData, err) {
-                            if (err) {
-                                cosmo.app.showErr('Could not retrieve master event for this recurrence.',
-                                    getErrDetailMessage(err));
-                                // Broadcast failure
-                                dojo.event.topic.publish('/calEvent', { 'action': 'saveFailed',
-                                    'qualifier': 'editExisting', 'data': ev });
-                            }
-                            else {
-                                // Basic properties
-                                // ----------------------
-                                var changedProps = ev.hasChanged(); // Get the list of changed properties
-                                var startOrEndChange = false; // Did the start or end of the event change
-                                for (var p in changedProps.changes) {
-                                    // Changes for start and end have to be calculated relative to
-                                    // the date they're on -- other prop changes can just be copied
-                                    if (p == 'start' || p == 'end') {
-                                        startOrEndChange = true;
-                                    }
-                                    else {
-                                        evData[p] = changedProps.changes[p].newValue;
-                                    }
-                                }
-                                // Start and end
-                                // ----------------------
-                                if (startOrEndChange) {
-                                    var masterStart = evData.start; // The start for the master event
-                                    var masterEnd = null; // An empty date for the new master end
-                                    var origStart = ev.dataOrig.start; // The pre-edit start for the edited instance
-                                    var newStart = ev.data.start; // The start for the edited instance
-                                    // The number of minutes between the start and end for the edited instance
-                                    var minutesToEnd = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
-                                        ev.data.start, ev.data.end);
-                                    // Date parts for the edited instance start
-                                    var mon = newStart.getMonth();
-                                    var dat = newStart.getDate();
-                                    var hou = newStart.getHours();
-                                    var min = newStart.getMinutes();
-
-                                    // Modify the master's start based on values for the edited instance
-                                    switch (ev.data.recurrenceRule.frequency) {
-                                        // Only time can change -- this happens below
-                                        case 'daily':
-                                            // No changes possible
-                                            break;
-                                        // Move the start on the master over the same number of
-                                        // days as the diff between the original and edited values
-                                        // for the instance event
-                                        case 'weekly':
-                                        case 'biweekly':
-                                            var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-                                                origStart, newStart);
-                                            masterStart.setDate(masterStart.getDate() + diff);
-                                            break;
-                                        // Set the date of the month for the master event to the
-                                        // same date as the edited start for the instance
-                                        case 'monthly':
-                                            masterStart.setDate(dat);
-                                            break;
-                                        // Set the month and date of the month for the master to
-                                        // the same values as the edited start for the instance
-                                        case 'yearly':
-                                            masterStart.setMonth(mon);
-                                            masterStart.setDate(dat);
-                                            break;
-                                    }
-                                    // All recurrence frequencies
-                                    // Set the hours/minutes of the master to the same as the
-                                    // values for the edited instance
-                                    masterStart.setHours(hou);
-                                    masterStart.setMinutes(min);
-
-                                    // Calculate the new end for the master -- set the end
-                                    // the same minutes distance from the start as in the original
-                                    masterEnd = cosmo.datetime.Date.clone(masterStart);
-                                    masterEnd = cosmo.datetime.Date.add(masterEnd,
-                                        dojo.date.dateParts.MINUTE, minutesToEnd);
-                                    // Set the values in the original end for the master event
-                                    evData.end.setYear(masterEnd.getFullYear());
-                                    evData.end.setMonth(masterEnd.getMonth());
-                                    evData.end.setDate(masterEnd.getDate());
-                                    evData.end.setHours(masterEnd.getHours());
-                                    evData.end.setMinutes(masterEnd.getMinutes());
-                                }
-
-                                // doSaveEvent expects a CalEvent with attached CalEventData
-                                var saveEv = new CalEvent();
-                                saveEv.data = evData;
-                                doSaveEvent(saveEv, { 'saveType': 'recurrenceMaster',
-                                    'instanceEvent': ev });
-                            }
-                        };
-                        // Look up the master event for the recurrence and pass the result
-                        // on to function h
-                        f = function () {
-                            var reqId = cosmo.app.pim.currentCollection.conduit.getEvent(
-                                cosmo.app.pim.currentCollection.collection.uid, ev.data.id,
-                                cosmo.app.pim.currentCollection.transportInfo, h);
-                            };
-                    }
+                    dojo.debug("ALL_EVENTS");
+                    delta.applyToMaster();
+                    f = function(){
+                        doSaveEvent(ev, 
+                        { 
+                            'saveType': opts.ALL_EVENTS
+                         });
+                    };
                     break;
 
                 // Break the previous recurrence and start a new one
+                //XINT
                 case opts.ALL_FUTURE_EVENTS:
+                    dojo.debug("ALL_FUTURE_EVENTS");
                     var newEv = new CalEvent();
                     var freq = ev.dataOrig.recurrenceRule.frequency;
                     var start = ev.dataOrig.start;
@@ -307,7 +196,9 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                     break;
 
                 // Modifications
+                //XINT
                 case opts.ONLY_THIS_EVENT:
+                    dojo.debug("ONLY_THIS_EVENT");
                     var rrule = ev.data.recurrenceRule;
                     var changedProps = ev.hasChanged(); // The list of what has changed
                     var mod = new Modification(); // New Modification obj to append to the list
@@ -357,6 +248,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         }
 
         // Give a sec for the processing state to show
+        dojo.debug("before set timeout");
         setTimeout(f, 500);
     }
     /**
@@ -367,16 +259,14 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * @param ev A CalEvent object, the event to be saved.
      * @param opts An Object, options for the save operation.
      */
-     //XINT
+     //BOBBYNOTE: Can we collapse this into "saveEventChanges" ?
     function doSaveEvent(ev, opts) {
         dojo.debug("doSaveEvent");
+        var OPTIONS = self.recurringEventOptions;
         // Pass the original event and opts object to the handler function
         // along with the original params passed back in from the async response
 
-        var f = function (newEvId, err, reqId) {
-            handleSaveEvent(ev, newEvId, err, reqId, opts); 
-        };
-        
+
         var deferred = null;
         var requestId = null;
         var newItem = opts['new'] || false;
@@ -384,11 +274,31 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         
         if (newItem){
             deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection,{});
+        } else if (opts.saveType) {
+            dojo.debug("opty! " + opts.saveType );
+            switch(opts.saveType){
+                case OPTIONS.ALL_EVENTS:
+                    dojo.debug("about to save note in ALL EVENTS")
+                    deferred = cosmo.app.pim.serv.saveItem(note.getMaster());
+                    break;
+                case OPTIONS.ALL_FUTURE_EVENTS:
+                    //TODO
+                    break;
+                case OPTIONS.ONLY_THIS_EVENT:
+                    //TODO
+                    break;
+            }
         } else {
+            dojo.debug("normal, non-recurring event")
             deferred = cosmo.app.pim.serv.saveItem(note);
         }
-        deferred.addCallback(f);
+
+        var f = function () {
+            var saveType = newItem ? "new" : opts.saveType;
+            handleSaveEvent(ev, deferred[1], deferred.id, opts.saveType); 
+        };
         
+        deferred.addCallback(f);
         requestId = deferred.id;
         
         // Add to processing queue -- canvas will not re-render until
@@ -451,98 +361,60 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
-     //XINT
-    function handleSaveEvent(ev, newEvId, err, reqId, optsParam) {
-        var saveEv = ev;
-        var opts = optsParam || {};
-        // Simple error message to go along with details from Error obj
+     //XINT - still quite broken
+    function handleSaveEvent(ev, err, reqId, saveType) {
+        dojo.debug("handleSaveEvent");
+        var OPTIONS = self.recurringEventOptions;
+        var ev;
         var errMsg = '';
         var act = '';
-        var qual = {};
 
         qual.saveType = opts.saveType || 'singleEvent'; // Default to single event
 
-        // Failure -- display exception info
-        // ============
         if (err) {
+            dojo.debug("handleSaveEvent: err");
+            // Failure -- display exception info
             act = 'saveFailed';
             // Failed update
-            if ((qual.saveType == 'singleEvent' && saveEv.dataOrig) ||
-                qual.saveType == 'instanceAllFuture' ||
-                qual.saveType == 'recurrenceMaster') {
+            if (saveType != "new") {
                 errMsg = _('Main.Error.EventEditSaveFailed');
-                qual.newEvent = false;
             }
             // Failed create
             else {
                 errMsg = _('Main.Error.EventNewSaveFailed');
-                qual.newEvent = true;
             }
             cosmo.app.showErr(errMsg, getErrDetailMessage(err));
-        }
-        // Success
-        // ============
-        else {
+        } else {
+            // Success
             act = 'saveSuccess';
-            // Set the CalEventData ID from the value returned by server
-            // This is for (1) new event creation (the original saved
-            // event is waiting to get its id from the server) or
-            // (2) new recurring events created by the 'All Future Events'
-            // option -- note that newEvId is actually set for these
-            // events down below after updating the saved event to
-            // point to opts.instanceEvent
-            if (!saveEv.data.id || opts.saveType == 'instanceAllFuture') {
-                qual.newEvent = true;
-                saveEv.data.id = newEvId;
-            }
-            else {
-                qual.newEvent = false;
-            }
-
-            // If the event has been edited such that it is now out of
-            // the viewable range, remove the event from display
-            if (saveEv.isOutOfViewRange()) {
-                qual.onCanvas = false;
-            }
-            // Otherwise update display
-            else {
-                qual.onCanvas = true;
-            }
+            dojo.debug("handleSaveEvent: saveSuccess");
         }
 
         // Success for recurring events -- repaint canvas
-        if (act == 'saveSuccess' &&
-            (opts.saveType == 'recurrenceMaster' ||
-            opts.saveType == 'instanceAllFuture' ||
-            opts.saveType == 'singleEventAddRecurrence')) {
+        if (act == 'saveSuccess' && (ev.data.hasRecurrence() || ev.dataOrig.hasRecurrence()) ) {
+            dojo.debug("handleSaveEvent: saveSucess for recurrence");
+
             // Either (1) single master with recurrence or (2) 'All Future'
             // master/detached-event combo where the new detached event
             // has recurrence -- we need to expand the recurrence(s) by querying the server
-            if (saveEv.data.recurrenceRule) {
-                loadRecurrenceExpansion(this.viewStart, this.viewEnd, saveEv, opts);
-            }
-            // If the 'All Future' detached event has a frequency of 'once,'
-            // it's a one-shot -- so, no need to go to the server for expansion
-            else {
+            if (ev.data.hasRecurrence()) {
+                //BOBBY - this should probably not be here...put it in the topic handling stuff which does the 
+                //redraw maybe? Also, why no "processingQueue.shift() here? Does that happen in loadRecurrenceExpansion?"
+                loadRecurrenceExpansion(this.viewStart, this.viewEnd, ev);
+            } else {
+               // If the 'All Future' detached event has a frequency of 'once,'
+               // it's a one-shot -- so, no need to go to the server for expansion
+                
                 // Remove this request from the processing queue
                 self.processingQueue.shift();
-                // saveEv is the dummy CalEvent obj created for saving
-                // Replace this with the original clicked-on event that
-                // used to be part of the recurrence -- it has an
-                // associated lozenge, etc. -- replace the id (which would
-                // have been the same as the master) the new CalEventData id
-                // from the server
-                // FIXME: Assigning newEvId should probably be done above
-                // like it is for normal new events
-                saveEv = opts.instanceEvent;
-                saveEv.data.id = newEvId;
+
                 dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess',
                    'data': { 'saveEvent': saveEv, 'eventRegistry': null,
                    'opts': opts } });
             }
-        }
-        // Success/failure for all other cases
-        else {
+        } else {
+            dojo.debug("handleSaveEvent: publish topic");
+            // Success/failure for all other cases
             self.processingQueue.shift();
             // Broadcast message for success/failure
             dojo.event.topic.publish('/calEvent', { 'action': act,
@@ -917,6 +789,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var qual = cmd.qualifier || null;
         var data = cmd.data || {};
         var opts = cmd.opts;
+        var delta = cmd.delta;
         switch (act) {
             case 'loadCollection':
                 var f = function () { self.triggerLoadEvents(opts); };
@@ -926,12 +799,11 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                 break;
             case 'saveConfirm':
                 var confirmEv = cmd.data;
-                var delta = cmd.delta;
                 saveEventChangesConfirm(confirmEv, delta);
                 break;
             case 'save':
                 var saveEv = cmd.data;
-                saveEventChanges(saveEv, qual);
+                saveEventChanges(saveEv, qual, delta);
                 break;
             case 'removeConfirm':
                 var confirmEv = cmd.data;

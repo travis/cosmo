@@ -201,7 +201,6 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         // operation fails
         selEv.makeSnapshot();
         // Get the delta for 
-        dojo.debug("before update event");
         var delta = selEv.lozenge.getDelta(selEv, this.dragMode);
         if (delta.hasChanges()) {
             // Check against the backup to make sure the event has

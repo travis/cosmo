@@ -38,15 +38,26 @@ import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.UriTemplate;
 
 /**
- * Resolves the request to a resource target. The request URI can
- * identify either a collection or an item.
+ * Resolves the request to a resource target.
  */
 public class StandardTargetResolver implements TargetResolver {
     private static final Log log =
         LogFactory.getLog(StandardTargetResolver.class);
 
+    private static final UriTemplate TEMPLATE_COLLECTION =
+        new UriTemplate("/collection/{uid}/{projection}?/{format}?");
+    private static final UriTemplate TEMPLATE_ITEM =
+        new UriTemplate("/item/{uid}/{projection}?/{format}?");
+    private static final UriTemplate TEMPLATE_SUBSCRIBED =
+        new UriTemplate("/user/{username}/subscribed");
+    private static final UriTemplate TEMPLATE_SUBSCRIPTION =
+        new UriTemplate("/user/{username}/subscription/{name}");
+    private static final UriTemplate TEMPLATE_PREFERENCES =
+        new UriTemplate("/user/{username}/preferences");
     private static final UriTemplate TEMPLATE_PREFERENCE =
-        new UriTemplate("/user/{username}/preference/{preference}");
+        new UriTemplate("/user/{username}/preference/{name}");
+    private static final UriTemplate TEMPLATE_SERVICE =
+        new UriTemplate("/user/{username}");
 
     private ContentService contentService;
     private UserService userService;
@@ -54,18 +65,19 @@ public class StandardTargetResolver implements TargetResolver {
     // TargetResolver methods
 
     /**
-     * Returns a target representing the type of item addressed by the
-     * request URI.
      * <p>
-     * If the path info parses into a {@link CollectionPath}, then a
-     * {@link CollectionTarget} is returned.
+     * Returns a target representing the resource addressed by the
+     * request.
+     * </p>
      * <p>
-     * If the path info parses into a {@link ItemPath}, then a
-     * {@link ItemTarget} is returned.
-     * <p>
-     * Otherwise, <code>null</code> is returned.
-     * <p>
-     * The context path is not considered during resolution.
+     * Resolution involves matching the request's path info (ignoring
+     * context and servlet path) against known URI templates. If a
+     * match occurs, the corresponding model object is retrieved and a
+     * target is returned.
+     * </p>
+     *
+     * @param context the request context
+     * @return the target of the request, or <code>null</code>
      */
     public Target resolve(RequestContext context) {
         String uri =
@@ -73,39 +85,35 @@ public class StandardTargetResolver implements TargetResolver {
         if (log.isDebugEnabled())
             log.debug("resolving URI " + uri);
 
-        CollectionPath cp = CollectionPath.parse(uri, true);
-        if (cp != null)
-            return createCollectionTarget(context, cp);
+        UriTemplate.Match match = null;
 
-        ItemPath ip = ItemPath.parse(uri, true);
-        if (ip != null)
-            return createItemTarget(context, ip);
-
-        UriTemplate.Match match = TEMPLATE_PREFERENCE.match(uri);
+        match = TEMPLATE_COLLECTION.match(uri);
         if (match != null)
-            return createPreferenceTarget(context, match.get("username"),
-                                          match.get("preference"));
+            return createCollectionTarget(context, match);
 
-        UserPath up = UserPath.parse(uri, true);
-        if (up != null) {
-            if (up.getPathInfo() != null &&
-                up.getPathInfo().equals("/subscribed"))
-                return createSubscribedTarget(context, up);
+        match = TEMPLATE_ITEM.match(uri);
+        if (match != null)
+            return createItemTarget(context, match);
 
-            SubscriptionPathInfo spi = SubscriptionPathInfo.parse(up);
-            if (spi != null)
-                return createSubscriptionTarget(context, spi);
+        match = TEMPLATE_SUBSCRIBED.match(uri);
+        if (match != null)
+            return createSubscribedTarget(context, match);
 
-            if (up.getPathInfo() != null &&
-                up.getPathInfo().equals("/preferences"))
-                return createPreferencesTarget(context, up);
+        match = TEMPLATE_SUBSCRIPTION.match(uri);
+        if (match != null)
+            return createSubscriptionTarget(context, match);
 
-            // we don't know about any other path infos
-            if (up.getPathInfo() != null)
-                return null;
+        match = TEMPLATE_PREFERENCES.match(uri);
+        if (match != null)
+            return createPreferencesTarget(context, match);
 
-            return createUserTarget(context, up);
-        }
+        match = TEMPLATE_PREFERENCE.match(uri);
+        if (match != null)
+            return createPreferenceTarget(context, match);
+
+        match = TEMPLATE_SERVICE.match(uri);
+        if (match != null)
+            return createServiceTarget(context, match);
 
         return null;
     }
@@ -125,42 +133,37 @@ public class StandardTargetResolver implements TargetResolver {
      * type {@ink TargetType.COLLECTION}.
      */
     protected Target createCollectionTarget(RequestContext context,
-                                            CollectionPath path) {
-        Item item = contentService.findItemByUid(path.getUid());
+                                            UriTemplate.Match match) {
+        Item item = contentService.findItemByUid(match.get("uid"));
         if (item == null)
             return null;
         if (! (item instanceof CollectionItem))
             return null;
-
-        ItemPathInfo info = new ItemPathInfo(path.getPathInfo());
-
         return new CollectionTarget(context, (CollectionItem) item,
-                                    info.getProjection(), info.getFormat());
+                                    match.get("projection"),
+                                    match.get("format"));
     }
 
     /**
      * Creates a target representing a non-collection item.
      */
     protected Target createItemTarget(RequestContext context,
-                                      ItemPath path) {
-        Item item = contentService.findItemByUid(path.getUid());
+                                      UriTemplate.Match match) {
+        Item item = contentService.findItemByUid(match.get("uid"));
         if (item == null)
             return null;
         if (! (item instanceof NoteItem))
             return null;
-
-        ItemPathInfo info = new ItemPathInfo(path.getPathInfo());
-
-        return new ItemTarget(context, (NoteItem) item,
-                              info.getProjection(), info.getFormat());
+        return new ItemTarget(context, (NoteItem) item, match.get("projection"),
+                              match.get("format"));
     }
 
     /**
      * Creates a target representing the subscribed collection.
      */
     protected Target createSubscribedTarget(RequestContext context,
-                                            UserPath path) {
-        User user = userService.getUser(path.getUsername());
+                                            UriTemplate.Match match) {
+        User user = userService.getUser(match.get("username"));
         if (user == null)
             return null;
         return new SubscribedTarget(context, user);
@@ -170,16 +173,13 @@ public class StandardTargetResolver implements TargetResolver {
      * Creates a target representing a collection subscription.
      */
     protected Target createSubscriptionTarget(RequestContext context,
-                                              SubscriptionPathInfo pathInfo) {
-        User user = userService.getUser(pathInfo.getUserPath().getUsername());
+                                              UriTemplate.Match match) {
+        User user = userService.getUser(match.get("username"));
         if (user == null)
             return null;
-
-        CollectionSubscription sub =
-            user.getSubscription(pathInfo.getDisplayName());
+        CollectionSubscription sub = user.getSubscription(match.get("name"));
         if (sub == null)
             return null;
-
         return new SubscriptionTarget(context, user, sub);
     }
 
@@ -187,8 +187,8 @@ public class StandardTargetResolver implements TargetResolver {
      * Creates a target representing the preferences collection.
      */
     protected Target createPreferencesTarget(RequestContext context,
-                                             UserPath path) {
-        User user = userService.getUser(path.getUsername());
+                                             UriTemplate.Match match) {
+        User user = userService.getUser(match.get("username"));
         if (user == null)
             return null;
         return new PreferencesTarget(context, user);
@@ -198,25 +198,22 @@ public class StandardTargetResolver implements TargetResolver {
      * Creates a target representing a preference entry.
      */
     protected Target createPreferenceTarget(RequestContext context,
-                                            String username,
-                                            String key) {
-        User user = userService.getUser(username);
+                                            UriTemplate.Match match) {
+        User user = userService.getUser(match.get("username"));
         if (user == null)
             return null;
-
-        Preference pref = user.getPreference(key);
+        Preference pref = user.getPreference(match.get("name"));
         if (pref == null)
             return null;
-
         return new PreferenceTarget(context, user, pref);
     }
 
     /**
-     * Creates a target representing a user.
+     * Creates a target representing the user service.
      */
-    protected Target createUserTarget(RequestContext context,
-                                      UserPath path) {
-        User user = userService.getUser(path.getUsername());
+    protected Target createServiceTarget(RequestContext context,
+                                         UriTemplate.Match match) {
+        User user = userService.getUser(match.get("username"));
         if (user == null)
             return null;
         return new UserTarget(context, user);
@@ -243,27 +240,5 @@ public class StandardTargetResolver implements TargetResolver {
             throw new IllegalStateException("contentService is required");
         if (userService == null)
             throw new IllegalStateException("userService is required");
-    }
-
-    private class ItemPathInfo {
-        private String projection;
-        private String format;
-        
-        public ItemPathInfo(String pathInfo) {
-            if (pathInfo != null && pathInfo != "/") {
-                String[] segments = pathInfo.substring(1).split("/");
-                projection = segments[0];
-                if (segments.length > 1)
-                    format = segments[1];
-            }
-        }
-
-        public String getProjection() {
-            return projection;
-        }
-
-        public String getFormat() {
-            return format;
-        }
     }
 }

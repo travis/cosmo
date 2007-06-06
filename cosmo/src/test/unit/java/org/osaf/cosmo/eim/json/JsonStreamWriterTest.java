@@ -49,10 +49,6 @@ public class JsonStreamWriterTest extends TestCase
 
     /** */
     public void testBasicWrite() throws Exception {
-        // XXX disable until json-rpc is gone
-        if (true)
-            return;
-
         String uuid = "12345-ABCD-12345";
         String eventNs = "http://bobby/event";
         String eventPrefix = "event";
@@ -81,13 +77,34 @@ public class JsonStreamWriterTest extends TestCase
         writer.writeRecordSet(recordset);
         writer.close();
 
-        System.out.print(new String(out.toByteArray()));
-
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-      
+        System.out.println("Printing a single record set");
+        System.out.println(new String(out.toByteArray()));
+    }
+    
+    public void testWriteMultipleRecordSets() throws Exception{
+        String uuid = "12345-ABCD-12345";
+        String noteNs = "http://bobby/note";
+        String notePrefix = "note";
+        
+        EimRecord noteRecord = new EimRecord(notePrefix, noteNs);
+        EimRecordSet recordset = new EimRecordSet();
+        recordset.setUuid(uuid);
+        
+        recordset.addRecord(noteRecord);
+        
+        EimRecordSet[] sets = new EimRecordSet[]{recordset, recordset, recordset};
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JsonStreamWriter writer =
+            new JsonStreamWriter(out);
+        writer.writeRecordSets(sets);
+        writer.close();
+        System.out.println("Printing multiple record sets");
+        System.out.println(new String(out.toByteArray()));
     }
 
     private ClobField makeClobField() {
         return new ClobField("body", new InputStreamReader(testHelper.getInputStream("eimml/jabberwocky.txt")));
     }
+    
+
 }

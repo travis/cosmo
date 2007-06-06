@@ -61,6 +61,17 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
         jsonWriter = new JSONWriter(writer);
     }
 
+    public void writeRecordSets(EimRecordSet[] recordsets)
+        throws JsonStreamException {
+        try {
+            doWriteRecordSets(recordsets);
+        } catch (JSONException e) {
+            close();
+            throw new JsonStreamException("Error writing recordsets", e);
+        }
+        
+    }
+    
     /** */
     public void writeRecordSet(EimRecordSet recordset)
         throws JsonStreamException {
@@ -122,6 +133,15 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
         } catch (IOException ioe) {
             throw new JsonStreamException("Problem closing writer", ioe);
         }
+    }
+
+    private void doWriteRecordSets(EimRecordSet[] recordsets)
+    throws JsonStreamException, JSONException {
+       jsonWriter.array();
+       for (EimRecordSet recordset :recordsets){
+           writeRecordSet(recordset);
+       }
+       jsonWriter.endArray();
     }
 
     private void doWriteRecordSet(EimRecordSet recordset)

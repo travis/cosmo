@@ -138,6 +138,7 @@
   <property name="methodNameResolver"><ref bean="accountBrowsingMethodNameResolver"/></property>
   <property name="browseCollectionView"><value>browse_collection</value></property>
   <property name="browseItemView"><value>browse_item</value></property>
+  <property name="browseModificationView"><value>browse_modification</value></property>
   <property name="eventView"><value>browse_event</value></property>
   <property name="calendarView"><value>browse_calendar</value></property>
   <property name="removeViewBase"><value>redirect:/browse</value></property>

@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ValidationException;
 
 import org.apache.commons.io.IOUtils;
@@ -32,10 +33,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.FileItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.Permission;
@@ -70,6 +74,7 @@ public class AccountBrowsingController extends MultiActionController
     private String eventView;
     private String browseCollectionView;
     private String browseItemView;
+    private String browseModificationView;
     private String removeViewBase;
     private String revokeTicketBaseView;
 
@@ -82,7 +87,7 @@ public class AccountBrowsingController extends MultiActionController
      * <code>Collection</code> request attribute and returns the
      * {@link #browseCollectionView}. Otherwise, sets it into the
      * <code>Item</code> request attribute and returns the
-     * {@link #browseItemView}.
+     * {@link #browseItemView} or {@link #browseModificationView}.
      *
      * @throws ResourceNotFoundException if an item is not found at
      * the given path
@@ -109,6 +114,13 @@ public class AccountBrowsingController extends MultiActionController
         }
 
         request.setAttribute("Item", item);
+
+        if (item instanceof NoteItem) {
+            NoteItem note = (NoteItem) item;
+            if (note.getModifies() != null)
+                return new ModelAndView(browseModificationView);
+        }
+
         return new ModelAndView(browseItemView);
     }
 
@@ -226,8 +238,7 @@ public class AccountBrowsingController extends MultiActionController
             log.debug("downloading item " + item.getUid() + " at " + path);
 
         if (item.getStamp(EventStamp.class) != null) {
-            spoolEvent(EventStamp.getStamp(item), request,
-                       response);
+            spoolEvent(EventStamp.getStamp(item), request, response);
             return null;
         } else if (item instanceof FileItem) {
             spoolItem((FileItem) item, request, response);
@@ -297,6 +308,10 @@ public class AccountBrowsingController extends MultiActionController
 
     public void setBrowseItemView(String browseItemView) {
         this.browseItemView = browseItemView;
+    }
+
+    public void setBrowseModificationView(String browseModificationView) {
+        this.browseModificationView = browseModificationView;
     }
 
     public void setRemoveViewBase(String removeViewBase) {
@@ -375,18 +390,18 @@ public class AccountBrowsingController extends MultiActionController
         response.flushBuffer();
     }
 
-    private void spoolEvent(EventStamp event,
+    private void spoolEvent(EventStamp stamp,
                             HttpServletRequest request,
                             HttpServletResponse response)
         throws IOException, ParserException, ValidationException {
         if (log.isDebugEnabled())
-            log.debug("spooling event " + event.getItem().getUid());
+            log.debug("spooling event " + stamp.getItem().getUid());
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(ICALENDAR_MEDIA_TYPE);
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Disposition",
-                           makeCalendarContentDisposition(event.getItem()));
+                           makeCalendarContentDisposition(stamp.getItem()));
 
         // spool data
         CalendarOutputter outputter = new CalendarOutputter();
@@ -394,7 +409,7 @@ public class AccountBrowsingController extends MultiActionController
         // since the content was validated when the event item was
         // imported, there's no need to do it here
         outputter.setValidating(false);
-        outputter.output(event.getCalendar(), response.getOutputStream());
+        outputter.output(stamp.getCalendar(), response.getOutputStream());
         response.flushBuffer();
     }
     

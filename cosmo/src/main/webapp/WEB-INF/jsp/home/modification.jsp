@@ -2,7 +2,7 @@
 
 <%--
 /*
- * Copyright 2005-2007 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,37 +21,19 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<c:set var="eventstamp" value="${Item.stampMap['event']}" />
+<c:set var="eventstamp" value="${Item.stampMap['eventexception']}" />
 <c:set var="taskstamp" value="${Item.stampMap['task']}" />
 <c:set var="messagestamp" value="${Item.stampMap['message']}" />
-
-<c:if test="${eventstamp != null}">
-  <c:url var="webcalUrl" value="/browse/download/item/${Item.uid}/${Item.displayName}.ics" />
-</c:if>
-<c:url var="downloadUrl" value="/browse/download${Path}" />
 
 <cosmo:standardLayout prefix="HomeDirectory.Item.">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Item.Title">
-      <fmt:param value="${Item.displayName}"/>
+      <fmt:param value="${Item.modifies.displayName} Modification"/>
     </fmt:message>
   </span>
   - <span class="md">${Path}</span>
 </div>
-
-<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem' || eventstamp!=null}">
-<div style="margin-top:12px;">
-<c:choose>
-<c:when test="${eventstamp != null}">
-<a href="${webcalUrl}">[download as iCalendar]</a>
-</c:when>
-<c:otherwise>
-<a href="${downloadUrl}">[download]</a>
-</c:otherwise>
-</c:choose>
-</div>
-</c:if>
 
 <div class="hd" style="margin-top: 12px;">
   Item Properties
@@ -150,49 +132,6 @@
   </table>
 </div>
 
-<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem'}">
-<div class="hd" style="margin-top: 12px;">
-  Content Properties
-</div>
-
-<div style="margin-top:12px;">
-  <table cellpadding="3" cellspacing="1" border="0">
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Size
-      </td>
-      <td class="mdData">
-        <fmt:formatNumber value="${Item.contentLength}"/> b
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Media Type
-      </td>
-      <td class="mdData">
-        ${Item.contentType}
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Encoding
-      </td>
-      <td class="mdData">
-        <c:choose><c:when test="${Item.contentEncoding != null}">${Item.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Language
-      </td>
-      <td class="mdData">
-        <c:choose><c:when test="${Item.contentLanguage != null}">${Item.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
-      </td>
-    </tr>
-  </table>
-</div>
-</c:if>
-
 <c:if test="${eventstamp != null}">
 <div class="hd" style="margin-top: 12px;">
   Event Properties
@@ -200,6 +139,14 @@
 
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Recurrence ID
+      </td>
+      <td class="mdData">
+        <fmt:formatDate value="${eventstamp.recurrenceId}" type="both"/>
+      </td>
+    </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
         UID
@@ -315,10 +262,6 @@
 <c:set var="item" value="${Collection}" scope="request"/>
 <c:set var="path" value="${Path}" scope="request"/>
 
-<jsp:include page="inc-tickets.jsp" />
-
-<jsp:include page="inc-attributes.jsp" />
-
 <c:if test="${eventstamp != null}">
 <div class="hd" style="margin-top: 12px;">
   Original iCalendar
@@ -326,7 +269,7 @@
 
 <pre>
 
-${eventstamp.calendar}
+${eventstamp.eventCalendar}
 </pre>
 
 <jsp:include page="inc-indexes.jsp" />

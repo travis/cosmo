@@ -21,35 +21,17 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<div class="hd" style="margin-top: 12px;">
-  Property Indexes
-</div>
-
-<div style="margin-top:12px;">
-  <table cellpadding="4" cellspacing="1" border="0" width="100%">
-    <tr>
-      <td class="smTableColHead" style="text-align:left;">
-        Name
-      </td>
-      <td class="smTableColHead" style="text-align:left;">
-        Value
-      </td>
-    </tr>
-    <c:forEach var="index" items="${Item.stampMap['event'].propertyIndexes}">
-    <tr>
-      <td class="smTableData" width="50%">
-        ${index.name}
-      </td>
-      <td class="smTableData" width="50%">
-        ${index.value}
-      </td>
-    </tr>
-    </c:forEach>
-  </table>
-</div>
+<c:choose>
+  <c:when test="${not empty Item.stampMap['eventexception']}">
+    <c:set var="index" value="${Item.stampMap['eventexception'].timeRangeIndex}"/>
+  </c:when>
+  <c:otherwise>
+    <c:set var="index" value="${Item.stampMap['event'].timeRangeIndex}"/>
+  </c:otherwise>
+</c:choose>
 
 <div class="hd" style="margin-top: 12px;">
-  Time Range Indexes
+  Time Range Index
 </div>
 
 <div style="margin-top:12px;">
@@ -62,33 +44,19 @@
         End Date
       </td>
       <td class="smTableColHead" style="text-align:left;">
-        Recurring?
-      </td>
-      <td class="smTableColHead" style="text-align:left;">
         Floating?
       </td>
-      <td class="smTableColHead" style="text-align:left;">
-        Type
-      </td>
     </tr>
-    <c:forEach var="index" items="${Item.stampMap['event'].timeRangeIndexes}">
     <tr>
       <td class="smTableData" width="50%">
-        ${index.startDate}
+        ${index.dateStart}
       </td>
       <td class="smTableData" width="50%">
-        <c:choose><c:when test="${index.endDate != null}">${index.endDate}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
-      </td>
-      <td class="smTableData" width="50%">
-        ${index.isRecurring}
+        ${index.dateEnd}
       </td>
       <td class="smTableData" width="50%">
         ${index.isFloating}
       </td>
-      <td class="smTableData" width="50%">
-        ${index.type}
-      </td>
     </tr>
-    </c:forEach>
   </table>
 </div>

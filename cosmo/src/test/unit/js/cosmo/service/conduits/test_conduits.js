@@ -173,8 +173,15 @@ cosmotest.service.conduits.test_conduits = {
                {sync: true}
             ).results[0];
             jum.assertTrue("no rrule", !!item0Occurrences[0].getMaster().getEventStamp().getRrule())            
-            jum.assertEquals("wrong nmber of occurrences", 7, item0Occurrences.length);
+            jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);
             
+            /*item0Occurrences = conduit.expandRecurringItem(item0.getUid(), 
+               new cosmo.datetime.Date(2007, 5, 10),
+               new cosmo.datetime.Date(2007, 5, 17), 
+               {sync: true}
+            ).results[0];
+            jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);*/
+
             var item4 = item0Occurrences[3];
             var item4Rid = item4.recurrenceId;
             var item4Modification = new cosmo.model.Modification({

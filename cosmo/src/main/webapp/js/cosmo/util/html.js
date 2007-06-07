@@ -335,5 +335,16 @@ cosmo.util.html.getFormElemNames = function (form) {
         }
     }
     return names;
+};
+
+cosmo.util.html.getElementTextContent = function (element){
+    var content = element.innerText || element.textContent;
+    if (!content){
+        content = "";
+        for (var i = 0; i < element.childNodes.length; i++){
+            content += element.childNodes[i].nodeValue;
+        }
+    }
+    return content;
 }
 

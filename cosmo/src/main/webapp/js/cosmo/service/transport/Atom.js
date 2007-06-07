@@ -115,6 +115,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
+        dojo.lang.mixin(query, this._generateSearchQuery(kwArgs));
         
         r.url = cosmo.env.getBaseUrl() + "/atom/item/" + 
                 uid + "/full/eim-json" + this.queryHashToString(query);

@@ -137,7 +137,54 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }
         );
     },
+    
+    translateExpandRecurringItem: function(atomXml){
+        if (!atomXml){
+            throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
+        }
+        var entry = atomXml.getElementsByTagName("entry")[0];
+        try {
+            var contentEl = entry.getElementsByTagName("content")[0];
+        } catch (e){
+            throw new cosmo.service.translators.
+               ParseError("Could not find content element for entry " + (i+1));
+        }
+        var content = cosmo.util.html.getElementTextContent(contentEl);
+        
+        var links = cosmo.util.html.getElementsByTagName(entry, "link");
+        var editLink;
+        for (var j = 0; j < links.length; j++){
+            var link = links[j];
+            if (link.getAttribute('rel') == 'edit'){
+                editLink = link.getAttribute('href');
+            };
+        }
+        var recordSets = dojo.json.evalJson(content);
 
+        var masterItem = this.recordSetToObject(recordSets[0]);
+        masterItem.editLink = editLink;
+
+        var items = [];
+        // All record sets after the first are occurrences
+        dojo.debug(recordSets.length)
+        for (var i = 1; i < recordSets.length; i++){
+           var item = this.recordSetToModification(recordSets[i], masterItem)
+           item.editLink = editLink;
+           items.push(item); 
+        }
+        dojo.debug("loo")
+        return items;
+    },
+    
+    translateGetItem: function(atomXml){
+        if (!atomXml){
+            throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
+        }
+        var entry = atomXml.getElementsByTagName("entry")[0];
+        return this.entryToItem(entry);
+          
+    },
+    
     translateGetItems: function (atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
@@ -148,15 +195,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var mods = {};
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
-            try {
-                var uuid = entry.getElementsByTagName("id")[0];
-            } catch (e){
-                throw new cosmo.service.translators.
-                   ParseError("Could not find id element for entry " + (i+1));
-            }
-            uuid = unescape(uuid.firstChild.nodeValue.substring(9));
+            var uuid = this.getEntryUuid(entry);
             if (!uuid.split(":")[1]){
-                items[uuid] = this.entryToItem(entry, uuid)
+                items[uuid] = this.entryToItem(entry)
             }
             else {
                 mods[uuid] = entry;
@@ -173,7 +214,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
               "Could not find master event for modification " +
               "with uuid " + uuid);
 
-            items[uuid] = this.entryToItem(mods[uuid], uuid, masterItem);
+            items[uuid] = this.entryToItem(mods[uuid], masterItem);
             masterRemoveList[masterUuid] = true;
         }
         for (var uuid in masterRemoveList){
@@ -188,23 +229,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return itemArray;
     },
     
-    entryToItem: function (/*XMLElement*/entry, /*String*/uuid, 
-        /*cosmo.model.Item*/ masterItem){
+    entryToItem: function (/*XMLElement*/entry, /*cosmo.model.Item*/ masterItem){
+            var uuid = this.getEntryUuid(entry);
             var uuidParts = uuid.split(":");
             var uidParts = uuidParts.slice(2);
             try {
-                var c = entry.getElementsByTagName("content")[0];
+                var contentElement = entry.getElementsByTagName("content")[0];
             } catch (e){
                 throw new cosmo.service.translators.
                    ParseError("Could not find content element for entry " + (i+1));
             }
-            var content = c.innerText || c.textContent;
-            if (!content){
-                content = "";
-                for (var i = 0; i < c.childNodes.length; i++){
-                    content += c.childNodes[i].nodeValue;
-                }
-            }
+
+            var content = cosmo.util.html.getElementTextContent(contentElement);
+
             var item;
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
@@ -279,6 +316,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var modifiedStamps = {};
         
         for (recordName in recordSet.records){
+            dojo.debug(recordName)
             with (cosmo.service.eim.constants){
     
                var record = recordSet.records[recordName];
@@ -307,6 +345,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
         if (!dojo.lang.isEmpty(modifiedProperties)
             || !dojo.lang.isEmpty(modifiedStamps)){
+            dojo.debug("mod")
             var mod = new cosmo.model.Modification(
                 {
                     "recurrenceId": recurrenceId,
@@ -314,7 +353,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     "modifiedStamps": modifiedStamps
                 }
             );
+            dojo.debug("cod")
             masterItem.addModification(mod);
+            dojo.debug("sod")
         }
         return masterItem.getNoteOccurrence(recurrenceId);
     },
@@ -914,7 +955,22 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return recurrenceRule;
         }
 
+    },
+    
+    getEntryUuid: function (entry){
+        if (entry._cachedUuid) return entry._cachedUuid;
+        try {
+            var uuid = entry.getElementsByTagName("id")[0];
+        } catch (e){
+            throw new cosmo.service.translators.
+               ParseError("Could not find id element for entry " + entry);
+        }
+        uuid = unescape(uuid.firstChild.nodeValue.substring(9));
+        entry._cachedUuid = uuid;
+        return uuid;
     }
+
+    
 
 
 });

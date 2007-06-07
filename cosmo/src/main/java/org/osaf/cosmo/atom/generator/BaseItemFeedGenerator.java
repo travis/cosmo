@@ -21,12 +21,8 @@ import java.util.TreeSet;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-import org.apache.abdera.model.Person;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
@@ -34,7 +30,7 @@ import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
@@ -167,6 +163,10 @@ public abstract class BaseItemFeedGenerator
 
         if (filter != null) {
             filter.setMasterNoteItem(item);
+            // Don't include the master in the result set as we only
+            // want occurences and modifications returned
+            filter.setFilterProperty(
+                    EventStampFilter.PROPERTY_INCLUDE_MASTER_ITEMS, "false");
             for (Item occurrence : getFactory().getContentService().
                      findItems(filter))
                 contents.add((NoteItem)occurrence);

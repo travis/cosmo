@@ -254,6 +254,24 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
+        
+        // test expand recurring events
+        eventFilter.setExpandRecurringEvents(true);
+        
+        start = new DateTime("20080501T010000Z");
+        end = new DateTime("20080601T160000Z");
+        period = new Period(start, end);
+        eventFilter.setPeriod(period);
+        results = contentDao.findItems(filter);
+        // Should be two masters + 32 occurences for the daily + 4 occurences for 
+        // the weekly event
+        Assert.assertEquals(38, results.size());
+        
+        // configure filter to not return master items
+        filter.setFilterProperty(EventStampFilter.PROPERTY_INCLUDE_MASTER_ITEMS, "false");
+        results = contentDao.findItems(filter);
+        // Should just be the occurrences
+        Assert.assertEquals(36, results.size());
     }
     
     public void testMultipleFilters() throws Exception {

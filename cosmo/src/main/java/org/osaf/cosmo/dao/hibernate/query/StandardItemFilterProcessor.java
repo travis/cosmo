@@ -264,11 +264,22 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
      */
     private HashSet<Item> processResults(List<Item> results, ItemFilter itemFilter) {
         boolean hasTimeRangeFilter = false;
+        boolean includeMasterInResults = true;
+        
         HashSet<Item> processedResults = new HashSet<Item>();
         EventStampFilter eventFilter = (EventStampFilter) itemFilter.getStampFilter(EventStampFilter.class);
         
-        if(eventFilter!=null)
-            hasTimeRangeFilter = (eventFilter.getPeriod()!=null);
+        
+        if(eventFilter!=null) {
+            // does eventFilter have timeRange filter?
+            hasTimeRangeFilter = (eventFilter.getPeriod() != null);
+        }
+        
+        // When expanding recurring events do we include the master item in 
+        // the results, or just the expanded occurrences/modifications
+        if(hasTimeRangeFilter && "false".equalsIgnoreCase(itemFilter
+                .getFilterProperty(EventStampFilter.PROPERTY_INCLUDE_MASTER_ITEMS)))
+            includeMasterInResults = false;
         
         for(Item item: results) {
             
@@ -284,13 +295,14 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             // master.
             if(note.getModifies()!=null) {
                 processedResults.add(note);
-                processedResults.add(note.getModifies());
+                if(includeMasterInResults)
+                    processedResults.add(note.getModifies());
             } 
             // If filter doesn't have a timeRange, then we are done
             else if(!hasTimeRangeFilter)
                 processedResults.add(note);
             else {
-                processedResults.addAll(processMasterNote(note, eventFilter));
+                processedResults.addAll(processMasterNote(note, eventFilter, includeMasterInResults));
             }
         }
         
@@ -298,26 +310,29 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     }
     
     private Collection<ContentItem> processMasterNote(NoteItem note,
-            EventStampFilter filter) {
+            EventStampFilter filter, boolean includeMasterInResults) {
         EventStamp eventStamp = EventStamp.getStamp(note);
         ArrayList<ContentItem> results = new ArrayList<ContentItem>();
 
         // If the event is not recurring, then return the
-        // master note.
+        // master note unless filter is configured to not return the master item,
+        // in which case we are done.
         if (!eventStamp.isRecurring()) {
-            results.add(note);
+            if(includeMasterInResults)
+                results.add(note);
             return results;
         }
 
         // Otherwise, expand the recurring item to determine if it actually
-        // occurs
+        // occurs in the time range specified
         RecurrenceExpander expander = new RecurrenceExpander();
         InstanceList instances = expander.getOcurrences(eventStamp
                 .getCalendar(), filter.getPeriod().getStart(), filter
                 .getPeriod().getEnd());
 
-        // If recurring event occurs in range, add master
-        if (instances.size() > 0)
+        // If recurring event occurs in range, add master unless the filter
+        // is configured to not return the master
+        if (instances.size() > 0 && includeMasterInResults)
             results.add(note);
         
         // If were aren't expanding, then return

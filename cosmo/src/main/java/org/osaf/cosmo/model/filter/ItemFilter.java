@@ -16,6 +16,7 @@
 package org.osaf.cosmo.model.filter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.osaf.cosmo.model.CollectionItem;
@@ -39,6 +40,7 @@ public class ItemFilter {
     
     List<AttributeFilter> attributeFilters = new ArrayList<AttributeFilter>();
     List<StampFilter> stampFilters = new ArrayList<StampFilter>();
+    HashMap<String, String> filterProperties = new HashMap<String, String>(); 
     
     public ItemFilter() {
     }
@@ -129,5 +131,24 @@ public class ItemFilter {
      */
     public void setUid(String uid) {
         this.uid = uid;
+    }
+    
+    /**
+     * Set a filter property.  Filter properties can be used by the
+     * filter processor to further filter the results.
+     * @param key key 
+     * @param value value
+     */
+    public void setFilterProperty(String key, String value) {
+        filterProperties.put(key, value);
+    }
+    
+    /**
+     * Get a filter property
+     * @param key key
+     * @return value of property
+     */
+    public String getFilterProperty(String key) {
+        return filterProperties.get(key);
     }
 }

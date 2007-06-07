@@ -26,8 +26,20 @@ import net.fortuna.ical4j.util.Dates;
 /**
  * Adds EventStamp specific criteria to StampFilter.
  * Matches only EventStamp instances.
+ * <p>
+ * The following filter properties are supported:
+ * <ul>
+ * <li>PROPERTY_INCLUDE_MASTER_ITEMS - If set to "false", and there
+ *     is a timeRange specified in the filter, then master items
+ *     that match the timeRange will not be included in the results.
+ *     This is used to only return occurrences and modifications of
+ *     a recurring event, but not the master event item.
+ * </ul>
  */
 public class EventStampFilter extends StampFilter {
+    
+    public static final String PROPERTY_INCLUDE_MASTER_ITEMS = 
+        "cosmo.filter.eventStamp.timeRange.includeMasterItems";
     
     private Period period = null;
     private DateTime dstart, dend, fstart, fend;

@@ -78,7 +78,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         //only one type of change
         if (size == 1){
             delta.applyChangeType(change);
-            dojo.event.topic.publish('/calEvent', {action:'save', data:ev});
+            dojo.event.topic.publish('/calEvent', {action:'save', data:ev, delta:delta});
         } else {
           cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', {changeTypes:changeTypes, delta:delta, saveItem:ev}));
         }
@@ -123,76 +123,34 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
 */
         // Recurring event
         if (qual) {
-            //NOTEFROMBOBBY: I am goign to "rework" each one of these "qual" cases individually. Ones 
+            //BOBBYNOTE: I am goign to "rework" each one of these "qual" cases individually. Ones 
             // that have an XINT are NOT done yet.
             switch(qual) {
-                // Adding recurrence to a normal one-shot
-                //XINT
-                case 'singleEventAddRecurrence':
-                    f = function () { doSaveEvent(ev, { 'saveType': 'singleEventAddRecurrence',
-                        'instanceEvent': ev } ) };
-                    break;
-
-                // Removing recurrence from a recurring event (along with other possible edits)
-                //XINT
-                case 'recurrenceMasterRemoveRecurrence':
-                    f = function () { doSaveEvent(ev, {
-                        'saveType': 'recurrenceMasterRemoveRecurrence', 'instanceEvent': null }) }
-                    break;
-
                 // Changing the master event in the recurring sequence
                 case opts.ALL_EVENTS:
                     dojo.debug("ALL_EVENTS");
                     delta.applyToMaster();
                     f = function(){
                         doSaveEvent(ev, 
-                        { 
-                            'saveType': opts.ALL_EVENTS
+                         { 
+                            'saveType': opts.ALL_EVENTS,
+                            'delta': delta
                          });
                     };
                     break;
 
                 // Break the previous recurrence and start a new one
-                //XINT
                 case opts.ALL_FUTURE_EVENTS:
-                    dojo.debug("ALL_FUTURE_EVENTS");
-                    var newEv = new CalEvent();
-                    var freq = ev.dataOrig.recurrenceRule.frequency;
-                    var start = ev.dataOrig.start;
-                    // The date (no time values ) of the start time for the
-                    // instance being edited -- used to calculate the new end
-                    // date for the current recurrence being ended
-                    var startNoTime = new cosmo.datetime.Date(start.getFullYear(),
-                        start.getMonth(), start.getDate());
-                    // These values will tell us where to end the recurrence
-                    var unit = ranges[freq][0];
-                    var incr = (ranges[freq][1] * -1);
-                    // Instances all have the same id as the master event
-                    var masterEventDataId = ev.data.id;
-
-                    // Calc the new end date for the original recurrence --
-                    // go back 'one recurrence unit' (e.g., go back one day for
-                    // a daily event, one week for a weekly event, etc.)
-                    recurEnd = cosmo.datetime.Date.add(startNoTime, unit, incr);
-
-                    // Pass a CalEvent obj with an attached CalEventData obj
-                    newEv.data = CalEventData.clone(ev.data);
-
-                    // If the original recurrence had an end date, and the new event
-                    // is also recurring, set the end date on the new recurrence
-                    // based on the original end date, relative to the new start of
-                    // the new event -- is this the correct behavior?
-                    if (newEv.data.recurrenceRule && newEv.data.recurrenceRule.endDate) {
-                        var recurEndOrig = newEv.data.recurrenceRule.endDate;
-                        var recurEndDiff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
-                            startNoTime, recurEndOrig);
-                        newEv.data.recurrenceRule.endDate = cosmo.datetime.Date.add(
-                            newEv.data.start, dojo.date.dateParts.DAY, recurEndDiff);
-                    }
-
-                    f = function () { doSaveEventBreakRecurrence(newEv, masterEventDataId,
-                        recurEnd, { 'saveType': 'instanceAllFuture',
-                        'instanceEvent': ev, 'masterEventDataId': masterEventDataId, 'recurEnd': recurEnd }); };
+                    dojo.debug("ALL_FUTURE");
+                    f = function () { 
+                        var newItem  = delta.applyToOccurrenceAndFuture();
+                        doSaveEvent(ev, 
+                        { 
+                          'saveType': opts.ALL_FUTURE_EVENTS,
+                          'delta': delta,
+                          'newItem': newItem 
+                        }); 
+                    };
                     break;
 
                 // Modifications
@@ -236,7 +194,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                 // Default -- nothing to do
                 case 'new':
                     dojo.debug("doSaveChanges: new")
-                    f = function () { doSaveEvent(ev, { 'saveType': 'singleEvent', 'new': true } ) };
+                    f = function () { doSaveEvent(ev, { 'new': true } ) };
                     break;
                 default:
                     break;
@@ -244,7 +202,8 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         }
         // Normal one-shot event
         else {
-            f = function () { doSaveEvent(ev, { 'saveType': 'singleEvent' } ) };
+            dojo.debug("saveEventChanges: normal sone shot event");
+            f = function () { doSaveEvent(ev, { } ) };
         }
 
         // Give a sec for the processing state to show
@@ -263,16 +222,17 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
     function doSaveEvent(ev, opts) {
         dojo.debug("doSaveEvent");
         var OPTIONS = self.recurringEventOptions;
-        // Pass the original event and opts object to the handler function
-        // along with the original params passed back in from the async response
-
 
         var deferred = null;
         var requestId = null;
-        var newItem = opts['new'] || false;
+        var isNew = opts['new'] || false;
         var note = ev.data;
-        
-        if (newItem){
+        var delta = opts.delta;
+        var newItem = opts.newItem;
+        dojo.debug("Do save: savetype: " + opts.saveType)
+        dojo.debug("Do save: iznew: " + isNew)
+
+        if (isNew){
             deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection,{});
         } else if (opts.saveType) {
             dojo.debug("opty! " + opts.saveType );
@@ -282,8 +242,40 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                     deferred = cosmo.app.pim.serv.saveItem(note.getMaster());
                     break;
                 case OPTIONS.ALL_FUTURE_EVENTS:
-                    //TODO
-                    break;
+                    dojo.debug("about to save note in ALL FUTURE EVENTS")
+                    var newItemDeferred = cosmo.app.pim.serv.
+                        createItem(newItem, cosmo.app.pim.currentCollection);
+                    var requestId = newItemDeferred.id;
+                    self.processingQueue.push(requestId);
+                    
+                    newItemDeferred.addCallback(function(){
+                        dojo.debug("in newItemDeferred call back")
+                        if (newItemDeferred.results[1] != null){
+                            //if there was an error, pass it to handleSaveEvent, with the original 
+                            //item
+                            handleSaveEvent(ev, newItemDeferred.results[1], requestId,opts.saveType, delta);
+                        } else {
+                            //get rid of the id from the processing queue
+                            self.processingQueue.shift()
+
+                            //success at saving new item (the one broken off from the original recurrence chain! 
+                            // Now let's save the original.
+                            var originalDeferred = cosmo.app.pim.serv.saveItem(note.getMaster());
+                            originalDeferred.addCallback(function(){
+                                handleSaveEvent(ev,
+                                    originalDeferred.results[1], 
+                                    originalDeferred.id, 
+                                    opts.saveType, 
+                                    delta,
+                                    newItem); 
+                            });
+                            self.processingQueue.push(originalDeferred.id);
+                            self.lastSent = ev;
+                        }
+                    });
+                    
+                    dojo.debug("about to save note in ALL FUTURE EVENTS")
+                    return;
                 case OPTIONS.ONLY_THIS_EVENT:
                     //TODO
                     break;
@@ -294,8 +286,9 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         }
 
         var f = function () {
-            var saveType = newItem ? "new" : opts.saveType;
-            handleSaveEvent(ev, deferred[1], deferred.id, opts.saveType); 
+            var saveType = isNew ? "new" : opts.saveType;
+            dojo.debug("callback: saveType="+ saveType)
+            handleSaveEvent(ev, deferred.results[1], deferred.id, saveType, delta); 
         };
         
         deferred.addCallback(f);
@@ -322,33 +315,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             self.lastSent = ev;
         }
     }
-    
-    /**
-     * Call the service to break a recurrence and save a new
-     * event. The new event may or may not itself have recurrence.
-     * Creates an anonymous function to pass as the callback for the
-     * async service call that saves the changes to the event.
-     * Response to the async request is handled by handleSaveEvent.
-     * @param ev A CalEvent object, the event to be saved.
-     * @param origId String, the id of the event for the original recurrence.
-     * @param recurEnd A cosmo.datetime.Date, the date the original recurrence
-     * should end.
-     * @param opts A JS Object, options for the save operation.
-     */
-     //XINT
-    function doSaveEventBreakRecurrence(ev, origId, recurEnd, opts) {
-        // Pass the original event and opts object to the handler function
-        // along with the original params passed back in from the async response
-        var f = function (newEvId, err, reqId) {
-            handleSaveEvent(ev, newEvId, err, reqId, opts); };
-        var requestId = null;
-        requestId = cosmo.app.pim.currentCollection.conduit.saveNewEventBreakRecurrence(
-            cosmo.app.pim.currentCollection.collection.uid, ev.data, origId, recurEnd,
-            cosmo.app.pim.currentCollection.transportInfo, f);
 
-        self.processingQueue.push(requestId);
-        self.lastSent = null;
-    }
     /**
      * Handles the response from the async call when saving changes
      * to events.
@@ -361,15 +328,11 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
-     //XINT - still quite broken
-    function handleSaveEvent(ev, err, reqId, saveType) {
+    function handleSaveEvent(ev, err, reqId, saveType, delta) {
         dojo.debug("handleSaveEvent");
         var OPTIONS = self.recurringEventOptions;
-        var ev;
         var errMsg = '';
         var act = '';
-
-        qual.saveType = opts.saveType || 'singleEvent'; // Default to single event
 
         if (err) {
             dojo.debug("handleSaveEvent: err");
@@ -390,36 +353,16 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             dojo.debug("handleSaveEvent: saveSuccess");
         }
 
-        // Success for recurring events -- repaint canvas
-        if (act == 'saveSuccess' && (ev.data.hasRecurrence() || ev.dataOrig.hasRecurrence()) ) {
-            dojo.debug("handleSaveEvent: saveSucess for recurrence");
-
-            // Either (1) single master with recurrence or (2) 'All Future'
-            // master/detached-event combo where the new detached event
-            // has recurrence -- we need to expand the recurrence(s) by querying the server
-            if (ev.data.hasRecurrence()) {
-                //BOBBY - this should probably not be here...put it in the topic handling stuff which does the 
-                //redraw maybe? Also, why no "processingQueue.shift() here? Does that happen in loadRecurrenceExpansion?"
-                loadRecurrenceExpansion(this.viewStart, this.viewEnd, ev);
-            } else {
-               // If the 'All Future' detached event has a frequency of 'once,'
-               // it's a one-shot -- so, no need to go to the server for expansion
-                
-                // Remove this request from the processing queue
-                self.processingQueue.shift();
-
-                dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess',
-                   'data': { 'saveEvent': saveEv, 'eventRegistry': null,
-                   'opts': opts } });
-            }
-        } else {
-            dojo.debug("handleSaveEvent: publish topic");
-            // Success/failure for all other cases
-            self.processingQueue.shift();
-            // Broadcast message for success/failure
-            dojo.event.topic.publish('/calEvent', { 'action': act,
-                'qualifier': qual, 'data': saveEv, 'opts': opts });
-        }
+        dojo.debug("handleSaveEvent: publish topic for all other cases");
+        // Success/failure for all other cases
+        self.processingQueue.shift();
+        // Broadcast message for success/failure
+        dojo.event.topic.publish('/calEvent', {
+             'action': act,
+             'data': ev,
+             'saveType': saveType,
+             'delta':delta
+        });
     }
 
     // Remove
@@ -682,8 +625,10 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         // RecurrenceRule to all the other instances on the canvas
         if (syncRecurrence(rruleEv)) {
             // Broadcast success
-            dojo.event.topic.publish('/calEvent', { 'action': act,
-                'data': rruleEv, 'opts': opts, 'qualifier': qual });
+            dojo.event.topic.publish('/calEvent', 
+                { 'action': act,
+                'data': rruleEv, 'opts': opts, 'qualifier': qual 
+                });
         }
     }
 

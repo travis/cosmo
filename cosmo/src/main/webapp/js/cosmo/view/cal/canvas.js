@@ -700,6 +700,7 @@ cosmo.view.cal.canvas = new function () {
         }
         return true;
     }
+    
     /**
      * Remove a cal event object, usually removes the event
      * lozenge as well
@@ -722,7 +723,7 @@ cosmo.view.cal.canvas = new function () {
      * @param rem Boolean, if explicit false is passed,
      * don't remove the lozenges along with the CalEvent objs
      */
-    function removeAllEvents(rem) {
+    function removeAllEvents() {
         self.eventRegistry.each(removeEventFromDisplay);
         self.eventRegistry = new Hash();
         return true;
@@ -895,33 +896,31 @@ cosmo.view.cal.canvas = new function () {
      * event, cmd.data, and the update options, cmd.opts).
      */
     function saveSuccess(cmd) {
+        dojo.debug("saveSuccess: ");
         var ev = cmd.data;
-        var opts = cmd.opts;
-        // Updating existing
-        if (!cmd.qualifier.newEvent) {
-            if (opts.saveType == 'recurrenceMasterRemoveRecurrence') {
-                var h = self.eventRegistry.clone();
-                h = removeEventRecurrenceGroup(h, [ev.data.id], null, ev.id);
-                removeAllEvents();
-                self.eventRegistry = h;
-                self.eventRegistry.each(appendLozenge);
-            }
-
-            // Saved event is still in view
-            if (cmd.qualifier.onCanvas) {
-                ev.lozenge.setInputDisabled(false);
-                ev.lozenge.updateDisplayMain();
-            }
-            // Changes have placed the saved event off-canvas
-            else if (cmd.qualifier.offCanvas) {
-                removeEvent(ev);
-            }
-            // Neither off-canvas nor on-canvas flag set
-            else {
-                // Event has one of either start or end date
-                // off-canvas, but not both
-            }
+        var saveType = cmd.saveType || null;
+        dojo.debug("saveSuccess saveType: " + saveType);
+        var delta = cmd.delta;
+        
+        //XINT
+        if (saveType == 'recurrenceMasterRemoveRecurrence') {
+            var h = self.eventRegistry.clone();
+            h = removeEventRecurrenceGroup(h, [ev.data.id], null, ev.id);
+            removeAllEvents();
+            self.eventRegistry = h;
+            self.eventRegistry.each(appendLozenge);
         }
+
+        // Saved event is still in view
+        var inRange = !ev.isOutOfViewRange(); 
+        if (inRange) {
+            ev.lozenge.setInputDisabled(false);
+            ev.lozenge.updateDisplayMain();
+        } else if (cmd.qualifier.offCanvas) {
+            removeEvent(ev);
+        }
+            
+        
         // Don't re-render when requests are still processing
         if (!cosmo.view.cal.processingQueue.length) {
             if (cmd.qualifier.newEvent ||

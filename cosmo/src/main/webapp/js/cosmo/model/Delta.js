@@ -207,20 +207,20 @@ dojo.declare("cosmo.model.Delta", null, {
         newNote.setUid(cosmo.model.uuidGenerator.generate());
         
         //set the new note's start date to the old occurrence's start date.
-        newNote.getEventStamp().setStartDate(this._note.getStartDate());
+        newNote.getEventStamp().setStartDate(this._note.getEventStamp().getStartDate());
         
         //set the old note's rrule end date to just before the break.
-        var newEndDate = occurrence.getStartDate().clone();
+        var newEndDate = occurrence.getEventStamp().getStartDate().clone();
         newEndDate.add(dojo.date.dateParts.HOUR, -1);
         var oldRrule = master.getEventStamp().getRrule();
 
         //we have to make a new RRule object, since we can't change them, since they
         //are immutable.
         var newRrule = new cosmo.model.RecurrenceRule({
-            frequency: oldRule.getFrequency(),
+            frequency: oldRrule.getFrequency(),
             endDate: newEndDate,
-            isSupported: oldRule.isSupported(),
-            unsupportedRule: oldRule.getUnsupportedRule()
+            isSupported: oldRrule.isSupported(),
+            unsupportedRule: oldRrule.getUnsupportedRule()
         });
         master.getEventStamp().setRrule(newRrule);
         

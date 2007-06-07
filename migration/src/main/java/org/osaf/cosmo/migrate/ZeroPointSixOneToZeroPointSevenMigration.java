@@ -44,6 +44,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
+import org.osaf.cosmo.calendar.util.Dates;
 
 
 /**
@@ -120,6 +121,8 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         
         PreparedStatement stmt = null;
         PreparedStatement updateStmt = null;
+        PreparedStatement selectMasterCalStmt = null;
+        
         ResultSet rs = null;
         
         long count = 0;
@@ -130,22 +133,40 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         log.debug("starting migrateTimeRangeIndexes()");
         
         try {
-            stmt = conn.prepareStatement("select stampid, icaldata from event_stamp");
+            stmt = conn.prepareStatement("select i.modifiesitemid, s.id, es.icaldata from item i, stamp s, event_stamp es where i.id=s.itemid and s.id=es.stampid");
             updateStmt = conn.prepareStatement("update event_stamp set isfloating=?, startdate=?, enddate=? where stampid=?");
+            selectMasterCalStmt = conn.prepareStatement("select es.icaldata from item i, stamp s, event_stamp es where i.id=? and i.id=s.itemid and s.id=es.stampid");
             
             rs = stmt.executeQuery();
             
             while(rs.next()) {
-                long eventId = rs.getLong(1);
-                String icalData = rs.getString(2);
+                long modifiesItemId = rs.getLong(1);
+                long eventId = rs.getLong(2);
+                String icalData = rs.getString(3);
+                
                 Calendar calendar = null;
+                Calendar masterCalendar = null;
+                
                 try {
                     calendar = calBuilder.build(new StringReader(icalData));
                 } catch (ParserException e) {
                     throw e;
                 }
                 
-                Object[] indexes = getIndexValues(calendar);
+                // Get master calendar if event is a modification
+                if(modifiesItemId!=0) {
+                    selectMasterCalStmt.setLong(1, modifiesItemId);
+                    ResultSet masterCalRs = selectMasterCalStmt.executeQuery();
+                    masterCalRs.next();
+                    try {
+                        masterCalendar  = calBuilder.build(new StringReader(masterCalRs.getString(1)));
+                    } catch (ParserException e) {
+                        throw e;
+                    }
+                    masterCalRs.close();
+                }
+                
+                Object[] indexes = getIndexValues(calendar, masterCalendar);
                 updateStmt.setBoolean(1, (Boolean) indexes[2]);
                 updateStmt.setString(2, (String) indexes[0]);
                 updateStmt.setString(3, (String) indexes[1]);
@@ -161,6 +182,8 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
                 stmt.close();
             if(updateStmt!=null)
                 updateStmt.close();
+            if(selectMasterCalStmt!=null)
+                selectMasterCalStmt.close();
         }
         
         log.debug("processed " + count + " event stamps");
@@ -175,13 +198,26 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
      * Object[1] = endDate index
      * Object[2] = isFloating index
      */
-    private Object[] getIndexValues(Calendar calendar) {
+    private Object[] getIndexValues(Calendar calendar, Calendar masterCalendar) {
         ComponentList events = calendar.getComponents().getComponents(
                 Component.VEVENT);
         VEvent event = (VEvent) events.get(0);
         
         Date startDate = getStartDate(event);
         Date endDate = getEndDate(event);
+        
+        // Handle "missing" endDate
+        if(endDate==null && masterCalendar != null) {
+            // For "missing" endDate, get the duration of the master event
+            // and use with the startDate of the modification to calculate
+            // the endDate of the modificaiton
+            ComponentList masterEvents = calendar.getComponents().getComponents(
+                    Component.VEVENT);
+            VEvent masterEvent = (VEvent) masterEvents.get(0);
+            Dur duration = getDuration(masterEvent);
+            if(duration!=null)
+                endDate = Dates.getInstance(duration.getTime(startDate), startDate);
+        }
         
         
         if (isRecurring(event)) {

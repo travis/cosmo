@@ -111,7 +111,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         var deferred = this._transport.getItem(uid, kwArgs);
 
-        this._addTranslation(deferred, "translateGetItems");
+        this._addTranslation(deferred, "translateGetItem");
         
         return deferred;
     },

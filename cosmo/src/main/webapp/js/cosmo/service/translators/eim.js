@@ -166,13 +166,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         var items = [];
         // All record sets after the first are occurrences
-        dojo.debug(recordSets.length)
         for (var i = 1; i < recordSets.length; i++){
            var item = this.recordSetToModification(recordSets[i], masterItem)
            item.editLink = editLink;
            items.push(item); 
         }
-        dojo.debug("loo")
         return items;
     },
     
@@ -316,7 +314,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var modifiedStamps = {};
         
         for (recordName in recordSet.records){
-            dojo.debug(recordName)
             with (cosmo.service.eim.constants){
     
                var record = recordSet.records[recordName];
@@ -345,7 +342,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
         if (!dojo.lang.isEmpty(modifiedProperties)
             || !dojo.lang.isEmpty(modifiedStamps)){
-            dojo.debug("mod")
             var mod = new cosmo.model.Modification(
                 {
                     "recurrenceId": recurrenceId,
@@ -353,9 +349,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     "modifiedStamps": modifiedStamps
                 }
             );
-            dojo.debug("cod")
             masterItem.addModification(mod);
-            dojo.debug("sod")
         }
         return masterItem.getNoteOccurrence(recurrenceId);
     },
@@ -958,7 +952,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     getEntryUuid: function (entry){
-        if (entry._cachedUuid) return entry._cachedUuid;
         try {
             var uuid = entry.getElementsByTagName("id")[0];
         } catch (e){
@@ -966,7 +959,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                ParseError("Could not find id element for entry " + entry);
         }
         uuid = unescape(uuid.firstChild.nodeValue.substring(9));
-        entry._cachedUuid = uuid;
         return uuid;
     }
 

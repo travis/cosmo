@@ -243,7 +243,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                  //XINT
                  throw new Error("No collections!")
             }
-            var subscriptions = this.serv.getSubscriptions().results[0];
+            var subscriptions = this.serv.getSubscriptions({sync:true}).results[0];
             //XINT make sure this still works!
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];

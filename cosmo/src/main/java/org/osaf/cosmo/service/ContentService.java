@@ -88,6 +88,13 @@ public interface ContentService extends Service {
      * @return updated item
      */
     public Item updateItem(Item item);
+    
+    /**
+     * Add an item to a collection.
+     * @param item item to add to collection
+     * @param collection collection to add item to
+     */
+    public void addItemToCollection(Item item, CollectionItem collection);
 
     /**
      * Copy an item to the given path

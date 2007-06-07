@@ -139,6 +139,22 @@ public class StandardContentService implements ContentService {
             return updateCollection((CollectionItem) item);
         return updateContent((ContentItem) item);
     }
+    
+    
+    /**
+     * Add an item to a collection.
+     * @param item item to add to collection
+     * @param collection collection to add item to
+     */
+    public void addItemToCollection(Item item, CollectionItem collection) {
+        if (log.isDebugEnabled()) {
+            log.debug("adding item " + item.getName() + " to collection "
+                    + collection.getName());
+        }
+        
+        contentDao.addItemToCollection(item, collection);
+        contentDao.updateCollectionTimestamp(collection);
+    }
 
     /**
      * Copy an item to the given path
@@ -271,6 +287,7 @@ public class StandardContentService implements ContentService {
         }
         
         contentDao.removeItemFromCollection(item, collection);
+        contentDao.updateCollectionTimestamp(collection);
     }
 
     /**

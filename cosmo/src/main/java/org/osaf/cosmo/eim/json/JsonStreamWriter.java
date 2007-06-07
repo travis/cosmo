@@ -205,8 +205,8 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
         if (!missingFields.isEmpty()) {
             jsonWriter.key(KEY_MISSING_FIELDS);
             jsonWriter.array();
-            for (EimRecordField field : notMissingFields){
-                jsonWriter.value(field.getValue());
+            for (EimRecordField field : missingFields){
+                jsonWriter.value(field.getName());
             }
             jsonWriter.endArray();
         }

@@ -24,6 +24,7 @@ import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -118,21 +119,36 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
         // modifies
         if (child.getUid().
             indexOf(ModificationUid.RECURRENCEID_DELIMITER) > 0) {
-            String masterUid = child.getUid().
-                split(ModificationUid.RECURRENCEID_DELIMITER)[0];
+            ModificationUid modUid = toModificationUid(child.getUid());
+            String masterUid = modUid.getParentUid();
+
+            NoteItem master  = null;
             for (Item sibling : collection.getChildren()) {
                 if (sibling.getUid().equals(masterUid)) {
                     if (! (sibling instanceof NoteItem))
                         throw new ValidationException("Modification master item " + sibling.getUid() + " is not a note item");
-                    child.setModifies((NoteItem)sibling);
                 }
+                master = (NoteItem) sibling;
             }
-             
+
+            if (master != null)
+                child.setModifies(master);
+            else
+                throw new ValidationException("Master item not found for " + child.getUid());
         }     
 
         child.getParents().add(collection);
         collection.getChildren().add(child);
 
         return child;
+    }
+
+    private ModificationUid toModificationUid(String uid)
+        throws ValidationException {
+        try {
+            return new ModificationUid(uid);
+        } catch (ModelValidationException e) {
+            throw new ValidationException("Invalid modification uid " + uid);
+        }
     }
 }

@@ -23,10 +23,24 @@
 
 <c:choose>
   <c:when test="${property eq 'code'}">
-    ${cosmoui:triageStatusLabel(value.code)}
+    <c:choose>
+      <c:when test="${value.code != null}">
+        ${cosmoui:triageStatusLabel(value.code)}
+      </c:when>
+      <c:otherwise>
+        -
+      </c:otherwise>
+    </c:choose>
   </c:when>
   <c:when test="${property eq 'rank'}">
-    ${value.rank}
+    <c:choose>
+      <c:when test="${value.code != null}">
+        ${value.rank}
+      </c:when>
+      <c:otherwise>
+        -
+      </c:otherwise>
+    </c:choose>
   </c:when>
   <c:when test="${property eq 'auto'}">
     <c:choose><c:when test="${value.autoTriage}">Yes</c:when><c:otherwise>No</c:otherwise></c:choose>

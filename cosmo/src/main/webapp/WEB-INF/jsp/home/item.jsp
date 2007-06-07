@@ -150,11 +150,11 @@
   </table>
 </div>
 
+<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem'}">
 <div class="hd" style="margin-top: 12px;">
   Content Properties
 </div>
 
-<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem'}">
 <div style="margin-top:12px;">
   <table cellpadding="3" cellspacing="1" border="0">
     <tr>

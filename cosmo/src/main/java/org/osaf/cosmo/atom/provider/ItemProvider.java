@@ -132,11 +132,23 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     public ResponseContext deleteEntry(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();
+
         if (log.isDebugEnabled())
             log.debug("deleting entry for item " + item.getUid());
 
         try {
-            contentService.removeItem(item);
+            String uuid = request.getParameter("uuid");
+            if (! StringUtils.isBlank(uuid)) {
+                Item collection = contentService.findItemByUid(uuid);
+                if (collection == null)
+                    return conflict(getAbdera(), request, "Collection not found");
+                if (! (collection instanceof CollectionItem))
+                    return conflict(getAbdera(), request, "Uuid does not specify a collection");
+                contentService.
+                    removeItemFromCollection(item, (CollectionItem)collection);
+            } else {
+                contentService.removeItem(item);
+            }
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
         }

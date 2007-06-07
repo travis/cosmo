@@ -39,6 +39,12 @@ public class MockItemRequestContext extends BaseMockRequestContext
 
     public MockItemRequestContext(ServiceContext context,
                                   NoteItem item,
+                                  String method) {
+        this(context, item, method, null, null, null);
+    }
+
+    public MockItemRequestContext(ServiceContext context,
+                                  NoteItem item,
                                   String method,
                                   String contentType) {
         this(context, item, method, contentType, null, null);

@@ -21,6 +21,8 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -31,11 +33,66 @@ public class DeleteItemTest extends BaseItemProviderTestCase {
 
     public void testDeleteEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "DELETE");
+        RequestContext req = createRequestContext(item);
 
         ResponseContext res = provider.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
-        assertNull("Item not removed", helper.findItem(item.getUid()));
+        assertNull("Item not deleted", helper.findItem(item.getUid()));
+    }
+
+    public void testRemoveEntry() throws Exception {
+        // store an item in two collections
+        CollectionItem collection1 = helper.makeAndStoreDummyCollection();
+        CollectionItem collection2 = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeAndStoreDummyItem(collection1);
+        collection2.getChildren().add(item);
+        helper.getContentService().updateContent(item);
+        helper.getContentService().updateCollection(collection2);
+
+        RequestContext req = createRequestContext(item);
+        helper.addParameter(req, "uuid", collection2.getUid());
+
+        ResponseContext res = provider.deleteEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 204, res.getStatus());
+        assertNotNull("Item incorrectly removed",
+                      helper.findItem(item.getUid()));
+        assertNotNull("Item not in collection 1",
+                      collection1.getChild(item.getUid()));
+        assertNull("Item in collection 2",
+                   collection2.getChild(item.getUid()));
+    }
+
+    public void testRemoveEntryCollectionNotFound() throws Exception {
+        NoteItem item = helper.makeAndStoreDummyItem();
+
+        RequestContext req = createRequestContext(item);
+        helper.addParameter(req, "uuid", "deadbeef");
+
+        ResponseContext res = provider.deleteEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 409, res.getStatus());
+        assertNotNull("Item incorrectly removed",
+                      helper.findItem(item.getUid()));
+    }
+
+    public void testRemoveEntryNotACollection() throws Exception {
+        NoteItem item1 = helper.makeAndStoreDummyItem();
+        NoteItem item2 = helper.makeAndStoreDummyItem();
+
+        RequestContext req = createRequestContext(item1);
+        helper.addParameter(req, "uuid", item2.getUid());
+
+        ResponseContext res = provider.deleteEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 409, res.getStatus());
+        assertNotNull("Item incorrectly removed",
+                      helper.findItem(item1.getUid()));
+    }
+
+    public RequestContext createRequestContext(NoteItem item) {
+        return new MockItemRequestContext(helper.getServiceContext(), item,
+                                          "DELETE");
     }
 }

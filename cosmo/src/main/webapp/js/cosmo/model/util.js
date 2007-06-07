@@ -135,12 +135,13 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     
     //These functions are "protected" - in other words they should only be used by this class, 
     //or other classes in this package.
-    _initializeProperties: function(kwProps){
+    _initializeProperties: function(kwProps, kwArgs){
+        kwArgs = kwArgs || {};
         for (var x = 0; x < this.__propertyNames.length; x++){
             var propertyName = this.__propertyNames[x];
             if (dojo.lang.has(kwProps, propertyName)){
                 this.__setProperty(propertyName, kwProps[propertyName]);
-            } else {
+            } else if (!kwArgs.noDefaults){
                 this.__setProperty(propertyName, this.__getDefault(propertyName));
             }
         }

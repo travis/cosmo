@@ -116,7 +116,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var ticket = ticketEl.firstChild.nodeValue;
             var uidEl = cosmo.util.html.getElementsByTagName(entry, "cosmo", "collection")[0];
             var uid = uidEl.firstChild.nodeValue;
-            var subscription = new cosmo.model.subscription({
+            var subscription = new cosmo.model.Subscription({
                 displayName: displayName,
                 tickeyKey: ticket,
                 uid: uid
@@ -282,10 +282,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
            switch(recordName){
 
            case prefix.ITEM:
-               this.addItemRecord(record, note);
+               note.initializeProperties(this.itemRecordToItemProps(record), {noDefaults: true})
                break;
            case prefix.NOTE:
-               this.addNoteRecord(record, note);
+               note.initializeProperties(this.noteRecordToNoteProps(record), {noDefaults: true})
                break;
            case prefix.EVENT:
                note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
@@ -312,7 +312,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         var modifiedProperties = {};
         var modifiedStamps = {};
-        
+
         for (recordName in recordSet.records){
             with (cosmo.service.eim.constants){
     
@@ -321,10 +321,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                switch(recordName){
     
                case prefix.ITEM:
+                   dojo.lang.mixin(modifiedProperties, this.itemRecordToItemProps(record));
+                   break;
                case prefix.NOTE:
-                   for (propertyName in record.fields){
-                       modifiedProperties[propertyName] = record.fields[propertyName][1];
-                   }
+                    dojo.lang.mixin(modifiedProperties, this.noteRecordToNoteProps(record));
                    break;
                case prefix.EVENT:
                    modifiedStamps[prefix.EVENT] = this.getEventStampProperties(record);
@@ -576,7 +576,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         props.anyTime = stamp.getAnyTime();
         props.startDate = stamp.getStartDate();
         props.rrule = stamp.getRrule();
-        props.stat = stamp.getStatus();
+        props.status = stamp.getStatus();
         props.location = stamp.getLocation();
         props.duration = stamp.getDuration();
         props.exdates = stamp.getExdates();
@@ -594,7 +594,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var fields = {};
             if (props.startDate) fields.dtstart = 
                 [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
-            if (props.stat) fields.status = [type.TEXT, props.stat];
+            if (props.status) fields.status = [type.TEXT, props.status];
             if (props.location) fields.location = [type.TEXT, props.location];
             if (props.duration) fields.duration = [type.TEXT, props.duration.toIso8601()];
             if (props.rrule) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
@@ -710,16 +710,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
        if (!listString) return listString;
        else return listString.split(",");
     },
-
-    addItemRecord: function (record, object){
-        if (record.fields.title) object.setDisplayName(record.fields.title[1]);
-        if (record.fields.createdOn) object.setCreationDate(record.fields.createdOn[1]);
-
-        if (record.fields.triage) this.addTriage(record.fields.triage[1], object);
+    
+    itemRecordToItemProps: function(record){
+        var props = {};
+        if (record.fields.title) props.displayName = record.fields.title[1];
+        if (record.fields.createdOn) props.creationDate = record.fields.createdOn[1];
+        if (record.fields.triage) this.addTriageStringToItemProps(record.fields.triage[1], props);
+        return props
     },
 
-    addNoteRecord: function (record, object){
-        if (record.fields.body) object.setBody(record.fields.body[1]);
+    noteRecordToNoteProps: function(record){
+        var props = {};
+        if (record.fields.body) props.body = record.fields.body[1];
+        return props
     },
 
     fromEimDate: function (dateString){
@@ -727,17 +730,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return cosmo.datetime.fromIso8601(date);
     },
 
-    addTriage: function (triageString, object){
+    addTriageStringToItemProps: function (triageString, props){
         var triageArray = triageString.split(" ");
 
-        object.setTriageStatus(triageArray[0]);
+        props.triageStatus = triageArray[0];
 
-        object.setRank(triageArray[1]);
+        props.rank = triageArray[1];
 
         /* This looks weird, but because of JS's weird casting stuff, it's necessary.
          * Try it if you don't believe me :) - travis@osafoundation.org
          */
-        object.setAutoTriage(triageArray[2] == true);
+        props.autoTriage = triageArray[2] == true;
     },
 
     dateParamsFromEimDate: function (dateString){

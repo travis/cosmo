@@ -1,0 +1,83 @@
+Cosmo 0.7 Stress Test README
+
+The Cosmo 0.7 Stress/Performance Tester is a Ruby program that simulates
+a bunch of users and reports on server performance.
+
+Currently, the following clients are simulated:
+
+  * Morse Code Client
+    + publish,
+    + update
+    + subscribe
+    + sync
+    + delete
+  * CalDAV Client
+    + create calendar
+    + create event
+    + update event
+    + delete event
+    + time-range query on event
+  * Atom Client
+    + create event entry
+    + update event entry
+    + get full feed for collection
+    + get full EIM-JSON feed for time-range
+    
+ For each client, there is a "User" that continuously performs operations
+ based on probabilities for each operation.  The main program is a 
+ "User Runner" that allows you to configure any mix of "Users" and have them
+ run for a set number of iterations or a set time period.  Each "User" is a
+ thread and will report its statistics to a common statistics object, that
+ will print out after all threads have finished executing.
+ 
+ It is possible to run multiple "User Runners" on different machines and
+ have each process report its statistics to a common "Statistics Server", 
+ but this would only be required if you want to generate a huge load and
+ keep track of the stats in one place.
+ 
+ Instructions on How to Run:
+ 
+ * make sure you have ruby 1.8
+ * you need Log4r, which can be installed using rubygems "gem install log4r"
+ * to run:  ruby cosmo_user_runner.rb [options]
+   options are:
+
+	Usage: cosmo_user_runner.rb [options]
+    -s, --server [SERVER]            server address (default localhost)
+    -p, --port [PORT]                server port (default 8080)
+    -U, --user [USER]                username (default root)
+    -P, --password [PASSWORD]        password (default cosmo)
+    -m, --mix x,y,z                  Mix of client threads ([num mc],[num ataom],[num caldav]) (default 1,0,0)
+    -T, --time [TIME]                thread execution time
+    -i, --iterations [ITERATIONS]    number of iterations per thread (default 100)
+    -r, --rounds [ROUNDS]            number of rounds (default 1)
+    -S, --stats [STATS_SEVER]        stats server
+    -v, --verbose                    enable verbose output
+    -h, --help                       Show this message
+ 
+   For example:
+   
+   Assuming you have a default cosmo install,
+   
+     ruby cosmo_user_runner.rb -m 1,1,1 -T 300 -v
+   
+   This will create 3 "user" threads, 1 morse code, 1 atom, and 1 caldav and
+   run for 5 minutes (300 seconds), and show debug output.
+   
+     ruby cosmo_user_runner.rb -m 10,0,0 -i 1000
+   
+   This will create 10 morse code "user" threads and run for 1000 iterations
+   with no debug output.
+   
+     ruby cosmo_user_runner.rb -m 0,0,10 -T 60 -r 100
+     
+   This will create 10 caldav "user" threads and run for 60 seconds, and then
+   repeat 100 times, meaning 10*100=1000 users will get created.
+   
+How to setup a distributed stats server:
+
+  * start stats server on one machine: ruby stats_server -s [server]
+    This will start a stats server on port 9000 of [server]
+    
+  * To report stats to this server use -S [server] when starting
+    cosmo_user_runner

@@ -344,7 +344,9 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
 cosmo.model.declare("cosmo.model.Modification", null,
    [["recurrenceId", {"default": null}],
     ["modifiedProperties", {"default": cosmo.model.NEW_OBJECT}],
-    ["modifiedStamps", {"default": cosmo.model.NEW_OBJECT}]],
+    ["modifiedStamps", {"default": cosmo.model.NEW_OBJECT}],
+    ["deletedStamps", {"default": cosmo.model.NEW_OBJECT}]
+    ],
     {
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);

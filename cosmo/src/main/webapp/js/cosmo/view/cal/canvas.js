@@ -729,7 +729,11 @@ cosmo.view.cal.canvas = new function () {
         return true;
     }
     /**
-     * Removes a set or sets of recurring events for an id or ids
+     * Returns a new hash registry, filtering the recurring items with the 
+     * specified  a set or sets of recurring events for an id or ids
+     * 
+     * WARNING: this destroys the event registry (Hash) that is passed into it!
+     * 
      * @param reg An eventRegistry Hash from which to remove a group or
      * groups of recurring events
      * @param arr Array of CalEventData ids for the recurrences to
@@ -743,8 +747,9 @@ cosmo.view.cal.canvas = new function () {
      * @param ignore String, the CalEvent id of a single event to ignore from
      * the removal process -- used when you need to leave the
      * master event in a recurrence
+     * @return a new Hash to be used as your event registry
      */
-    function removeEventRecurrenceGroup(reg, arr, dt, ignore) {
+    function filterOutRecurrenceGroup(reg, arr, dt, ignore) {
         // Default behavior is to remove the lozenge
         var str = ',' + arr.join() + ',';
         var h = new Hash();
@@ -809,6 +814,7 @@ cosmo.view.cal.canvas = new function () {
      * @ return Boolean, true
      */
     function updateEventsDisplay() {
+        dojo.debug("update events display");
         // Current collection has items
         if (self.eventRegistry.length) {
             if (cosmo.view.cal.conflict.calc(self.eventRegistry) &&
@@ -894,45 +900,61 @@ cosmo.view.cal.canvas = new function () {
      * @param cmd JS Object, the command object passed in the
      * published 'success' event (contains the originally edited
      * event, cmd.data, and the update options, cmd.opts).
-     */
-    function saveSuccess(cmd) {
+     */    
+     function saveSuccess(cmd) {
         dojo.debug("saveSuccess: ");
-        var ev = cmd.data;
+        var OPTIONS = cosmo.view.cal.recurringEventOptions;
+        var ev = cmd.data
+        var note = ev.data;
         var saveType = cmd.saveType || null;
         dojo.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
-        
-        //XINT
-        if (saveType == 'recurrenceMasterRemoveRecurrence') {
-            var h = self.eventRegistry.clone();
-            h = removeEventRecurrenceGroup(h, [ev.data.id], null, ev.id);
-            removeAllEvents();
-            self.eventRegistry = h;
-            self.eventRegistry.each(appendLozenge);
-        }
 
-        // Saved event is still in view
-        var inRange = !ev.isOutOfViewRange(); 
-        if (inRange) {
-            ev.lozenge.setInputDisabled(false);
-            ev.lozenge.updateDisplayMain();
-        } else if (cmd.qualifier.offCanvas) {
-            removeEvent(ev);
-        }
+        //if the event is recurring and all future or all events are changed, we need to 
+        //re expand the event
+        if (ev.data.hasRecurrence() && saveType != OPTIONS.ONLY_THIS_EVENT){
+            dojo.debug("saveSuccess: has recurrence");
             
+            //first remove the event and recurrences from the registry.
+            var newRegistry = filterOutRecurrenceGroup(self.eventRegistry.clone(), [note.getUid()]);
+            
+            //now we have to expand out the item for the viewing range
+            var occurrences = cosmo.app.pim.serv.expandRecurringItem(note.getUid(),
+                cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd, {sync:true}).results[0];
+            
+            var newHash = cosmo.view.cal.createEventRegistry(occurrences);
+            newRegistry.append(newHash);
+            
+            removeAllEvents();
+            self.eventRegistry = newRegistry;
+            self.eventRegistry.each(appendLozenge);
+            
+        } else {
+            // Saved event is still in view
+            var inRange = !ev.isOutOfViewRange(); 
+            if (inRange) {
+                ev.lozenge.setInputDisabled(false);
+                ev.lozenge.updateDisplayMain();
+            } else if (cmd.qualifier.offCanvas) {
+                removeEvent(ev);
+            }
+        }
         
         // Don't re-render when requests are still processing
         if (!cosmo.view.cal.processingQueue.length) {
-            if (cmd.qualifier.newEvent ||
-                (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')) {
+          if (false /*&& cmd.qualifier.newEvent ||
+                (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')*/) {
                 var sel = cosmo.view.cal.lastSent;
                 sel.lozenge.setInputDisabled(false);
                 dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                     'data': sel });
             }
             updateEventsDisplay();
+        } else {
+            dojo.debug("how many left in queue: " +cosmo.view.cal.processingQueue.length);
         }
     }
+    
     /**
      * Handles a successful update of an event, for recurring
      * events -- for:

@@ -644,39 +644,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         }
         return msg;
     }
-    /**
-     * Loads the recurrence expansion for a group of
-     * recurring events. Doing it as a group allows you to
-     * grab the expansions for several recurrences at once.
-     * @param start Number, timestamp for the start of the
-     * recurrence
-     * @param end Number, timestamp for the end of the
-     * recurrence
-     * @param ev A CalEvent object, an event in the recurrence
-     * @opts A JS Object, options from the original save/remove
-     * operation that need to be passed along to the canvas
-     * re-render.
-     * FIXME: The call to self.processingQueue.shift(); should
-     * be moved into handleSaveEvent, which calls this function.
-     */
-     //XINT
-    function loadRecurrenceExpansion(start, end, ev, opts) {
-        var id = ev.data.id;
-        var s = start.getTime();
-        var e = end.getTime();
-        var f = function (hashMap) {
-            var expandEventHash = createEventRegistry(hashMap);
-            self.processingQueue.shift();
-            dojo.event.topic.publish('/calEvent', { 'action': 'eventsAddSuccess',
-               'data': { 'saveEvent': ev, 'eventRegistry': expandEventHash,
-               'opts': opts } });
-        }
 
-        cosmo.app.pim.currentCollection.conduit.expandEvents(
-            cosmo.app.pim.currentCollection.getUid(), [id], s, e,
-            cosmo.app.pim.currentCollection.transportInfo, f);
-
-    }
     /**
      * Take an array of CalEventData objects, and create a Hash of
      * CalEvent objects with attached CalEventData objects.
@@ -685,7 +653,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * @return Hash, the keys are randomized strings, and the values are
      * the CalEvent objects.
      */
-    function createEventRegistry(arrParam) {
+    this.createEventRegistry = function(arrParam) {
         var h = new Hash();
         var arr = [];
 
@@ -899,7 +867,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             return false;
         }
 
-        var eventLoadHash = createEventRegistry(eventLoadList);
+        var eventLoadHash = self.createEventRegistry(eventLoadList);
         dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
             data: eventLoadHash, opts: opts });
         return true;

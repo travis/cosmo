@@ -78,6 +78,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
         collection.setUid(uid);
         collection.setDisplayName(uid);
+        var protocolUrls = {};
+        var links = cosmo.util.html.getElementsByTagName(atomXml, "link");
+        for (var i = 0; i < links.length; i++){
+            var link = links[i];
+            var rel = link.getAttribute("rel");
+            var href = link.getAttribute("href");
+            protocolUrls[rel] = href;
+        }
+        collection.setProtocolUrls(protocolUrls);
         if (ticketKey) collection.setTicketKey(uid);
 
         return collection;

@@ -117,22 +117,10 @@ public class StandardRequestHandlerTest extends TestCase {
     public void testProcessCollectionUpdate() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createUpdateRequestContext(collection);
-        helper.setContentType(req, "application/x-www-form-urlencoded");
 
         ResponseContext res = handler.process(helper.getProvider(), req);
         assertNotNull("Null response context", res);
         assertTrue("Collection not updated",
-                   ((MockProvider)helper.getProvider()).isUpdated(collection));
-    }
-
-    public void testProcessCollectionUpdateWrongContentType() throws Exception {
-        CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createUpdateRequestContext(collection);
-        helper.setContentType(req, "multipart/form-data");
-
-        ResponseContext res = handler.process(helper.getProvider(), req);
-        assertNotNull("Null response context", res);
-        assertFalse("Collection incorrectly updated",
                    ((MockProvider)helper.getProvider()).isUpdated(collection));
     }
 

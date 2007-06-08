@@ -51,6 +51,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.util.MimeUtil;
 
 public class ItemProvider extends BaseProvider implements AtomConstants {
     private static final Log log = LogFactory.getLog(ItemProvider.class);
@@ -360,6 +361,9 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             log.debug("updating details for collection " + collection.getUid());
 
         try {
+            if (! MimeUtil.isFormEncoded(request.getContentType()))
+                return notsupported(getAbdera(), request, "Entity-body must be " + MimeUtil.MEDIA_TYPE_FORM_ENCODED);
+
             boolean dirty = false;
             for (String param : request.getParameterNames()) {
                 if (param.equals("name")) {
@@ -381,6 +385,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             rc.setEntityTag(new EntityTag(collection.getEntityTag()));
 
             return rc;
+        } catch (MimeTypeParseException e) {
+            return notsupported(getAbdera(), request, "Invalid content type");
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
         }

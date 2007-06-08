@@ -18,8 +18,6 @@ package org.osaf.cosmo.atom.servlet;
 import java.io.IOException;
 import java.text.ParseException;
 
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.abdera.protocol.EntityTag;
@@ -48,15 +46,6 @@ public class StandardRequestHandler extends DefaultRequestHandler
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardRequestHandler.class);
-    private static final MimeType MIME_TYPE_FORM;
-
-    static {
-        try {
-            MIME_TYPE_FORM = new MimeType(MEDIA_TYPE_URLENCODED);
-        } catch (MimeTypeParseException e) {
-            throw new RuntimeException("Form mime type specified incorrectly", e);
-        }
-    }
 
     /**
      * <p>
@@ -75,12 +64,9 @@ public class StandardRequestHandler extends DefaultRequestHandler
         String method = request.getMethod();
         TargetType type = request.getTarget().getType();
 
-        if (method.equals("POST")) {
-            if (type == TargetType.TYPE_COLLECTION) {
-                if (matchContentType(request, MIME_TYPE_FORM))
-                    return ((ExtendedProvider) provider).
-                        updateCollection(request);
-            }
+        if (method.equals("PUT")) {
+            if (type == TargetType.TYPE_COLLECTION)
+                return ((ExtendedProvider) provider).updateCollection(request);
         }
 
         return super.process(provider, request);
@@ -110,16 +96,6 @@ public class StandardRequestHandler extends DefaultRequestHandler
             return false;
 
         return true;
-    }
-
-    private boolean matchContentType(RequestContext request,
-                                     MimeType mediaType) {
-        try {
-            MimeType contentType = request.getContentType();
-            return contentType != null && contentType.match(mediaType);
-        } catch (MimeTypeParseException e) {
-            throw new RuntimeException("Unable to parse request content type", e);
-        }
     }
 
     private boolean ifMatch(String header,

@@ -22,7 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.util.MimeUtil;
 
 /**
  * Test class for {@link ItemProvider#updateCollection()} tests.
@@ -37,7 +39,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         String oldName = collection.getName();
         String newName = "New Name";
 
-        RequestContext req = helper.createUpdateRequestContext(collection);
+        RequestContext req = createRequestContext(collection);
         helper.addParameter(req, "name", newName);
 
         ResponseContext res = provider.updateCollection(req);
@@ -47,11 +49,25 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         assertEquals("Display name not updated", collection.getName(), newName);
     }
 
+    public void testUpdateCollectionWrongContentType() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        String oldName = collection.getName();
+        String newName = "New Name";
+
+        RequestContext req = createRequestContext(collection, false);
+        helper.setContentType(req, "multipart/form-data");
+        helper.addParameter(req, "name", newName);
+
+        ResponseContext res = provider.updateCollection(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 415, res.getStatus());
+    }
+
     public void testUpdateCollectionNoName() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         String oldName = collection.getName();
 
-        RequestContext req = helper.createUpdateRequestContext(collection);
+        RequestContext req = createRequestContext(collection);
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
@@ -65,7 +81,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         String oldName = collection.getName();
 
-        RequestContext req = helper.createUpdateRequestContext(collection);
+        RequestContext req = createRequestContext(collection);
         helper.addParameter(req, "name", null);
 
         ResponseContext res = provider.updateCollection(req);
@@ -80,7 +96,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         String oldName = collection.getName();
 
-        RequestContext req = helper.createUpdateRequestContext(collection);
+        RequestContext req = createRequestContext(collection);
         helper.addParameter(req, "name", "");
 
         ResponseContext res = provider.updateCollection(req);
@@ -89,5 +105,19 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         assertNotNull("Null etag", res.getEntityTag());
         assertTrue("Display name changed",
                    collection.getName().equals(oldName));
+    }
+
+    public RequestContext createRequestContext(CollectionItem collection) {
+        return createRequestContext(collection, true);
+    }
+
+    public RequestContext createRequestContext(CollectionItem collection,
+                                               boolean withContentType) {
+        MockCollectionRequestContext rc =
+            new MockCollectionRequestContext(helper.getServiceContext(),
+                                             collection, "PUT");
+        if (withContentType)
+            helper.setContentType(rc, MimeUtil.MEDIA_TYPE_FORM_ENCODED);
+        return rc;
     }
 }

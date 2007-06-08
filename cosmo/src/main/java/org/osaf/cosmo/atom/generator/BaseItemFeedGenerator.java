@@ -33,6 +33,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.util.MimeUtil;
 
 /**
  * A base class for feed generators that work with collectoins and items.
@@ -362,7 +363,7 @@ public abstract class BaseItemFeedGenerator
      */
     protected Link newEditLink(CollectionItem collection)
         throws GeneratorException {
-        return newLink(Link.REL_EDIT, MEDIA_TYPE_URLENCODED,
+        return newLink(Link.REL_EDIT, MimeUtil.MEDIA_TYPE_FORM_ENCODED,
                        selfIri(collection, false));
     }
 

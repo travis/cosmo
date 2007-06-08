@@ -165,7 +165,7 @@ public class AtomHelper extends MockHelper {
         throws IOException {
         MockCollectionRequestContext rc =
             new MockCollectionRequestContext(serviceContext, collection,
-                                             "POST");
+                                             "PUT");
         return rc;
     }
 

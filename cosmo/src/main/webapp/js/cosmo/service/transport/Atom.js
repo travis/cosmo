@@ -166,9 +166,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
-        
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/item/" +  collectionUid + 
+          "/atom/" + item.editLink + 
           this.queryHashToString(query);
         r.method = "POST";
         r.headers['X-Http-Method-Override'] = "DELETE";

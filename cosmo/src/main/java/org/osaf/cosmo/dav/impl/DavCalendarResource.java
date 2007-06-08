@@ -33,23 +33,35 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
+import org.apache.jackrabbit.webdav.property.DavProperty;
+import org.apache.jackrabbit.webdav.property.DavPropertyName;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
+
 import org.osaf.cosmo.calendar.util.CalendarUtils;
-import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.io.DavInputContext;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Abstract calendar resource.
  */
-public abstract class DavCalendarResource extends DavContent {
+public abstract class DavCalendarResource extends DavContent
+    implements ICalendarConstants {
     
     private static final Log log =
         LogFactory.getLog(DavCalendarResource.class);
   
+    static {
+        registerLiveProperty(DavPropertyName.GETCONTENTLENGTH);
+        registerLiveProperty(DavPropertyName.GETCONTENTTYPE);
+    }
+
     public DavCalendarResource(NoteItem item, DavResourceLocator locator,
             DavResourceFactory factory, DavSession session) {
         super(item, locator, factory, session);
@@ -89,7 +101,7 @@ public abstract class DavCalendarResource extends DavContent {
         if (contentType == null)
             throw new DavException(DavServletResponse.SC_BAD_REQUEST,
                                    "No media type specified for calendar data");
-        if (! contentType.equals(CaldavConstants.CT_ICALENDAR))
+        if (! contentType.equals(ICALENDAR_MEDIA_TYPE))
             throw new DavException(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
                                    "Content of type " + contentType + " not supported in calendar collection");
         
@@ -198,7 +210,9 @@ public abstract class DavCalendarResource extends DavContent {
         if (log.isDebugEnabled())
             log.debug("spooling file " + getResourcePath());
 
-        outputContext.setContentType(CaldavConstants.CT_ICALENDAR);
+        String contentType =
+            IOUtil.buildContentType(ICALENDAR_MEDIA_TYPE, "UTF-8");
+        outputContext.setContentType(contentType);
   
         // convert Calendar object to String, then to bytes (UTF-8)
         byte[] calendarBytes = getCalendar().toString().getBytes("UTF-8");
@@ -212,5 +226,47 @@ public abstract class DavCalendarResource extends DavContent {
         // spool calendar bytes
         ByteArrayInputStream bois = new ByteArrayInputStream(calendarBytes);
         IOUtil.spool(bois, outputContext.getOutputStream());
+    }
+
+    /** */
+    protected void loadLiveProperties() {
+        super.loadLiveProperties();
+
+        DavPropertySet properties = getProperties();
+
+        try {
+            byte[] calendarBytes = getCalendar().toString().getBytes("UTF-8");
+            String contentLength = new Integer(calendarBytes.length).toString();
+            properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH,
+                                                  contentLength));
+        } catch (Exception e) {
+            throw new RuntimeException("Can't convert calendar", e);
+        }
+
+        String contentType =
+            IOUtil.buildContentType(ICALENDAR_MEDIA_TYPE, "UTF-8");
+        properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE,
+                                              contentType));
+    }
+
+    /** */
+    protected void setLiveProperty(DavProperty property) {
+        super.setLiveProperty(property);
+
+        DavPropertyName name = property.getName();
+        String value = property.getValue().toString();
+
+        if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
+            name.equals(DavPropertyName.GETCONTENTTYPE))
+            throw new ModelValidationException("cannot set property " + name);
+    }
+
+    /** */
+    protected void removeLiveProperty(DavPropertyName name) {
+        super.removeLiveProperty(name);
+
+        if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
+            name.equals(DavPropertyName.GETCONTENTTYPE))
+            throw new ModelValidationException("cannot remove property " + name);
     }
 }

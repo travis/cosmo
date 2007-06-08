@@ -647,6 +647,7 @@ cosmo.view.cal.canvas = new function () {
                 // carets/cursors in textboxes to disappear. This is a verified
                 // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
                 if (typeof timedScrollingMainDiv != 'undefined' && timedScrollingMainDiv) {
+                    var t = timedScrollingMainDiv.scrollTop; // Preserve the scroll offset
                     if (cmd.isDisplayed) {
                         if (dojo.render.html.mozilla) {
                             timedScrollingMainDiv.style.overflow = "hidden";
@@ -659,6 +660,7 @@ cosmo.view.cal.canvas = new function () {
                            timedScrollingMainDiv.style.overflowX = "hidden";
                        }
                     }
+                    timedScrollingMainDiv.scrollTop = t;
                 }
                 break;
         }

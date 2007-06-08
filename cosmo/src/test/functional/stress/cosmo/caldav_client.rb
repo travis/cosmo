@@ -57,13 +57,10 @@ module Cosmo
         # we make an HTTP basic auth by passing the
         # username and password
         req.basic_auth @user, @pass
-        startTime = Time.now.to_f
-        resp, data = http.request(req)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "get #{path} end (#{reqTime}ms)"
-        return CalDAVResponse.new(resp, data, reqTime)
+        @@log.debug "get #{path} end (#{@reqTime}ms)"
+        return CalDAVResponse.new(resp, data, @reqTime)
       end
     end
     
@@ -77,13 +74,10 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['Content-Type'] = 'text/calendar'
-        startTime = Time.now.to_f
-        resp, data = http.request(req, data)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, data) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "put #{path} end (#{reqTime}ms)"
-        return CalDAVResponse.new(resp, data, reqTime)
+        @@log.debug "put #{path} end (#{@reqTime}ms)"
+        return CalDAVResponse.new(resp, data, @reqTime)
       end
     end
     
@@ -97,13 +91,10 @@ module Cosmo
         # we make an HTTP basic auth by passing the
         # username and password
         req.basic_auth @user, @pass
-        startTime = Time.now.to_f
-        resp, data = http.request(req)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "delete #{path} end (#{reqTime}ms)"
-        return CalDAVResponse.new(resp, data, reqTime)
+        @@log.debug "delete #{path} end (#{@reqTime}ms)"
+        return CalDAVResponse.new(resp, data, @reqTime)
       end
     end
     
@@ -117,13 +108,10 @@ module Cosmo
         req.basic_auth @user, @pass
         req['Content-Type'] = 'application/xml'
         req['Depth'] = depth
-        startTime = Time.now.to_f
-        resp, data = http.request(req, reportBody)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, reportBody) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "report #{path} end (#{reqTime}ms)"
-        return CalDAVResponse.new(resp, data, reqTime)
+        @@log.debug "report #{path} end (#{@reqTime}ms)"
+        return CalDAVResponse.new(resp, data, @reqTime)
       end
     end
     
@@ -136,13 +124,10 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['Content-Type'] = 'application/xml'
-        startTime = Time.now.to_f
-        resp, data = http.request(req, calendarBody)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, calendarBody) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "mkcalendar #{path} end (#{reqTime}ms)"
-        return CalDAVResponse.new(resp, data, reqTime)
+        @@log.debug "mkcalendar #{path} end (#{@reqTime}ms)"
+        return CalDAVResponse.new(resp, data, @reqTime)
       end
     end
     

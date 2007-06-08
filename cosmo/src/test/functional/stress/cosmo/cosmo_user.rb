@@ -280,6 +280,17 @@ module Cosmo
       @pass = pass
     end
     
+    # Time the execution of a block of code
+    # and store the result (milliseconds) in the 
+    # instance variable "reqTime).
+    def time_block
+      startTime = Time.now.to_f
+      return_val = yield
+      endTime = Time.now.to_f
+      @reqTime = ((endTime - startTime) * 1000).to_i
+      return return_val
+    end
+    
     attr_accessor :user, :pass
   end
   

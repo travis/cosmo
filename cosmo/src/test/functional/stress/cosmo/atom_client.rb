@@ -50,13 +50,10 @@ module Cosmo
         # we make an HTTP basic auth by passing the
         # username and password
         req.basic_auth @user, @pass
-        startTime = Time.now.to_f
-        resp, data = http.request(req)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "getFullFeed (#{format}) for #{collection} end (#{reqTime}ms)"
-        return AtomResponse.new(resp, data, reqTime)
+        @@log.debug "getFullFeed (#{format}) for #{collection} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
       end
     end
     
@@ -72,13 +69,10 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['Content-Type'] = 'application/atom+xml'
-        startTime = Time.now.to_f
-        resp, data = http.request(req, body)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, body) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "post for #{collection} end (#{reqTime}ms)"
-        return AtomResponse.new(resp, data, reqTime)
+        @@log.debug "post for #{collection} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
       end
     end
     
@@ -94,13 +88,10 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['Content-Type'] = 'application/atom+xml'
-        startTime = Time.now.to_f
-        resp, data = http.request(req, body)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, body) }
         @@log.debug "received code #{resp.code}"
-        @@log.debug "put for #{item} end (#{reqTime}ms)"
-        return AtomResponse.new(resp, data, reqTime)
+        @@log.debug "put for #{item} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
       end
     end
   end

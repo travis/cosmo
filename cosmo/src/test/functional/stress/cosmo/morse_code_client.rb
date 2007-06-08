@@ -59,15 +59,12 @@ module Cosmo
         # we make an HTTP basic auth by passing the
         # username and password
         req.basic_auth @user, @pass
-        startTime = Time.now.to_f
-        resp, data = http.request(req)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req) }
         @@log.debug "received code #{resp.code}"
         @sync_token = resp.response['X-MorseCode-SyncToken']
         @@log.debug "received sync token: #{@sync_token}"
-        @@log.debug "subscribe #{collection} end (#{reqTime}ms)"
-        return MorseCodeResponse.new(@sync_token, resp, data, reqTime)
+        @@log.debug "subscribe #{collection} end (#{@reqTime}ms)"
+        return MorseCodeResponse.new(@sync_token, resp, data, @reqTime)
       end
     end
     
@@ -82,15 +79,12 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['X-MorseCode-SyncToken'] = @sync_token
-        startTime = Time.now.to_f
-        resp, data = http.request(req)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req) }
         @@log.debug "received code #{resp.code}"
         @sync_token = resp.response['X-MorseCode-SyncToken']
         @@log.debug "received sync token: #{@sync_token}"
-        @@log.debug "sync #{collection} end (#{reqTime}ms)"
-        return MorseCodeResponse.new(@sync_token, resp, data, reqTime)
+        @@log.debug "sync #{collection} end (#{@reqTime}ms)"
+        return MorseCodeResponse.new(@sync_token, resp, data, @reqTime)
       end
     end
     
@@ -104,15 +98,12 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['Content-Type'] = 'application/eim+xml'
-        startTime = Time.now.to_f
-        resp, data = http.request(req, eimml)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, eimml) }
         @@log.debug "received code #{resp.code}"
         @sync_token = resp.response['X-MorseCode-SyncToken']
         @@log.debug "received sync token: #{@sync_token}"
-        @@log.debug "publish #{collection} end (#{reqTime}ms)"
-        return MorseCodeResponse.new(@sync_token, resp, data, reqTime)
+        @@log.debug "publish #{collection} end (#{@reqTime}ms)"
+        return MorseCodeResponse.new(@sync_token, resp, data, @reqTime)
       end
     end
     
@@ -127,15 +118,12 @@ module Cosmo
         req.basic_auth @user, @pass
         req['X-MorseCode-SyncToken'] = @sync_token
         req['Content-Type'] = 'application/eim+xml'
-        startTime = Time.now.to_f
-        resp, data = http.request(req, eimml)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req, eimml) }
         @@log.debug "received code #{resp.code}"
         @sync_token = resp.response['X-MorseCode-SyncToken']
         @@log.debug "received sync token: #{@sync_token}"
-        @@log.debug "update #{collection} end (#{reqTime}ms)"
-        return MorseCodeResponse.new(@sync_token, resp, data, reqTime)
+        @@log.debug "update #{collection} end (#{@reqTime}ms)"
+        return MorseCodeResponse.new(@sync_token, resp, data, @reqTime)
       end
     end
     
@@ -149,14 +137,11 @@ module Cosmo
         # username and password
         req.basic_auth @user, @pass
         req['Content-Type'] = 'application/eim+xml'
-        startTime = Time.now.to_f
-        resp, data = http.request(req)
-        endTime = Time.now.to_f
-        reqTime = ((endTime - startTime) * 1000).to_i
+        resp, data = time_block { http.request(req) }
         @@log.debug "received code #{resp.code}"
         @sync_token = resp.response['X-MorseCode-SyncToken']
-        @@log.debug "delete #{collection} end (#{reqTime}ms)"
-        return MorseCodeResponse.new(@sync_token, resp, data, reqTime)
+        @@log.debug "delete #{collection} end (#{@reqTime}ms)"
+        return MorseCodeResponse.new(@sync_token, resp, data, @reqTime)
       end
     end
   end

@@ -116,15 +116,8 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
 
         var opts = self.recurringEventOptions;
 
-        /*
-        // Lozenge stuff
-        // FIXME: Actually this stuff should be in view.cal.canvas
-        // ---------
-*/
         // Recurring event
         if (qual) {
-            //BOBBYNOTE: I am goign to "rework" each one of these "qual" cases individually. Ones 
-            // that have an XINT are NOT done yet.
             switch(qual) {
                 // Changing the master event in the recurring sequence
                 case opts.ALL_EVENTS:
@@ -142,8 +135,8 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                 // Break the previous recurrence and start a new one
                 case opts.ALL_FUTURE_EVENTS:
                     dojo.debug("ALL_FUTURE");
+                    var newItem  = delta.applyToOccurrenceAndFuture();
                     f = function () { 
-                        var newItem  = delta.applyToOccurrenceAndFuture();
                         doSaveEvent(ev, 
                         { 
                           'saveType': opts.ALL_FUTURE_EVENTS,
@@ -154,44 +147,26 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                     break;
 
                 // Modifications
-                //XINT
                 case opts.ONLY_THIS_EVENT:
                     dojo.debug("ONLY_THIS_EVENT");
-                    var rrule = ev.data.recurrenceRule;
-                    var changedProps = ev.hasChanged(); // The list of what has changed
-                    var mod = new Modification(); // New Modification obj to append to the list
-                    mod.event = new CalEventData(); // Empty CalEventData to use for saving
-                    // instanceDate of the mod serves as the recurrenceId
-                    mod.instanceDate = cosmo.datetime.Date.clone(ev.data.instanceDate);
-                    for (var p in changedProps.changes) {
-                        mod.modifiedProperties.push(p);
-                        mod.event[p] = changedProps.changes[p].newValue;
+                    var note = ev.data;
+                    var recurrenceId = note.recurrenceId;
+                    var master = note.getMaster();
+                    var newModification = false;
+                    if (!master.getModification(recurrenceId)){
+                         newModification = true;    
                     }
-                    for (var i = 0; i < rrule.modifications.length; i++) {
-                        var m = rrule.modifications[i];
-                        // Is there already an existing mod?
-                        if (m.instanceDate.toUTC() == mod.instanceDate.toUTC()) {
-                            // Copy over any previous changes
-                            // Overwrite if it's also a current edited prop
-                            var mods = m.modifiedProperties;
-                            for (var j = 0; j < mods.length; j++) {
-                                var p = mods[j];
-                                if (typeof changedProps.changes[p] == 'undefined') {
-                                    mod.modifiedProperties.push(p);
-                                    mod.event[p] = m.event[p];
-                                }
-                            }
-                            // Throw out the old mod
-                            rrule.modifications.splice(i, 1);
-                        }
-                    }
-                    rrule.modifications.push(mod);
-
-                    f = function () { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'save',
-                        'saveType': 'instanceOnlyThisEvent', opts: { instanceEvent: ev } }) };
+                    delta.applyToOccurrence();
+                    f = function () { 
+                        doSaveEvent(ev, 
+                        { 
+                          'saveType': opts.ONLY_THIS_EVENT,
+                          'delta': delta,
+                          'newModification': newModification
+                        }); 
+                    };
                     break;
-
-                // Default -- nothing to do
+                    
                 case 'new':
                     dojo.debug("doSaveChanges: new")
                     f = function () { doSaveEvent(ev, { 'new': true } ) };
@@ -277,8 +252,14 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                     dojo.debug("about to save note in ALL FUTURE EVENTS")
                     return;
                 case OPTIONS.ONLY_THIS_EVENT:
-                    //TODO
-                    break;
+                     if (!opts.newModification){
+                         dojo.debug("doSaveEvent: saving a previously created modificaiton")
+                         deferred = cosmo.app.pim.serv.saveItem(note);
+                     } else {
+                         dojo.debug("doSaveEvent: creating a new modificaiton")
+                         deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection);
+                     }
+                break;
             }
         } else {
             dojo.debug("normal, non-recurring event")

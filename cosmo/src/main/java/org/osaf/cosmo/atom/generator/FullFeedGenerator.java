@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import java.util.SortedSet;
-
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.model.Entry;
@@ -26,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -96,8 +95,13 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
 
         if (item.getModifies() != null)
             entry.addLink(newModifiesLink(item.getModifies()));
+
         for (NoteItem modification : item.getModifications())
             entry.addLink(newModificationLink(modification));
+
+        EventStamp stamp = EventStamp.getStamp(item);
+        if (stamp != null && stamp.isRecurring())
+            entry.addLink(newExpandedLink(item));
 
         return entry;
     }
@@ -107,13 +111,12 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
      * of the given item in this generator's data format.
      */
     protected void setEntryContent(Entry entry,
-                                   NoteItem item,
-                                   SortedSet<NoteItem> occurrences)
+                                   NoteItem item)
         throws GeneratorException {
         ContentBean content = null;
         try {
             content = getFactory().getContentFactory().
-                createContent(format, item, occurrences);
+                createContent(format, item);
             entry.setContent(content.getValue(), content.getMediaType());
         } catch (MimeTypeParseException e) {
             throw new GeneratorException("Attempted to set invalid media type " + content.getMediaType(), e);

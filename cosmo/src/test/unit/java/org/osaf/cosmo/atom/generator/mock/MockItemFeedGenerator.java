@@ -68,6 +68,13 @@ public class MockItemFeedGenerator implements ItemFeedGenerator {
         return factory.getAbdera().getFactory().newFeed();
     }
 
+    public Feed generateFeed(NoteItem item)
+        throws GeneratorException {
+        if (factory.isFailureMode())
+            throw new GeneratorException("Failure mode");
+        return factory.getAbdera().getFactory().newFeed();
+    }
+
     public Entry generateEntry(NoteItem item)
         throws GeneratorException {
         if (factory.isFailureMode())

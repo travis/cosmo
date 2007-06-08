@@ -81,6 +81,10 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
         if (match != null)
             return createItemTarget(context, match);
 
+        match = TEMPLATE_EXPANDED.match(uri);
+        if (match != null)
+            return createExpandedItemTarget(context, match);
+
         match = TEMPLATE_SUBSCRIBED.match(uri);
         if (match != null)
             return createSubscribedTarget(context, match);
@@ -142,6 +146,21 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
             return null;
         return new ItemTarget(context, (NoteItem) item, match.get("projection"),
                               match.get("format"));
+    }
+
+    /**
+     * Creates a target representing an expanded non-collection item.
+     */
+    protected Target createExpandedItemTarget(RequestContext context,
+                                              UriTemplate.Match match) {
+        Item item = contentService.findItemByUid(match.get("uid"));
+        if (item == null)
+            return null;
+        if (! (item instanceof NoteItem))
+            return null;
+        return new ExpandedItemTarget(context, (NoteItem) item,
+                                      match.get("projection"),
+                                      match.get("format"));
     }
 
     /**

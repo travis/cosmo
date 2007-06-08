@@ -41,7 +41,7 @@ public class ItemPath {
     private static final Log log = LogFactory.getLog(ItemPath.class);
 
     private static final Pattern PATTERN_ITEM_UID =
-        Pattern.compile("^/item/([^/]+)(/.*)?$");
+        Pattern.compile("^/(item|expanded)/([^/]+)(/.*)?$");
 
     private String urlPath;
     private String uid;
@@ -68,8 +68,8 @@ public class ItemPath {
         Matcher itemMatcher = PATTERN_ITEM_UID.matcher(urlPath);
         if (! itemMatcher.matches())
             throw new IllegalStateException("urlPath is not an item path");
-        this.uid = itemMatcher.group(1);
-        this.pathInfo = itemMatcher.group(2);
+        this.uid = itemMatcher.group(2);
+        this.pathInfo = itemMatcher.group(3);
     }
 
     /** */

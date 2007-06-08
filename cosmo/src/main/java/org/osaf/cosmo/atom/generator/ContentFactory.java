@@ -17,7 +17,6 @@ package org.osaf.cosmo.atom.generator;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
-import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,15 +68,14 @@ public class ContentFactory
      * supported
      */
     public ContentBean createContent(String format,
-                                     NoteItem item,
-                                     SortedSet<NoteItem> occurrences)
+                                     NoteItem item)
         throws UnsupportedFormatException {
         if (format == null)
             throw new IllegalArgumentException("null format");
         if (format.equals(FORMAT_EIM_JSON))
-            return createEimJsonContent(item, occurrences);
+            return createEimJsonContent(item);
         if (format.equals(FORMAT_EIMML))
-            return createEimmlContent(item, occurrences);
+            return createEimmlContent(item);
         if (format.equals(FORMAT_HTML))
             return createHtmlContent(item);
         if (format.equals(FORMAT_TEXT))
@@ -89,19 +87,11 @@ public class ContentFactory
         return (format != null && FORMATS.contains(format));
     }
 
-    private ContentBean createEimJsonContent(NoteItem item,
-                                             SortedSet<NoteItem> occurrences) {
+    private ContentBean createEimJsonContent(NoteItem item) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             JsonStreamWriter writer = new JsonStreamWriter(out);
-
-            if (! occurrences.isEmpty())
-                writer.writeContainer();
-
             writeJson(writer, item);
-            for (NoteItem occurrence : occurrences)
-                writeJson(writer, occurrence);
-
             writer.close();
 
             ContentBean content = new ContentBean();
@@ -122,17 +112,12 @@ public class ContentFactory
         writer.writeRecordSet(recordset);
     }
 
-    private ContentBean createEimmlContent(NoteItem item,
-                                           SortedSet<NoteItem> occurrences) {
+    private ContentBean createEimmlContent(NoteItem item) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             EimmlStreamWriter writer = new EimmlStreamWriter(out);
-
             writer.writeCollection(item.getUid(), null);
             writeEimml(writer, item);
-            for (NoteItem occurrence : occurrences)
-                writeEimml(writer, occurrence);
-
             writer.close();
 
             ContentBean content = new ContentBean();

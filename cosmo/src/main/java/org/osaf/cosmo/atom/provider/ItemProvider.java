@@ -46,8 +46,9 @@ import org.osaf.cosmo.atom.processor.UnsupportedMediaTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
@@ -386,6 +387,42 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     }
 
     // our methods
+
+    public ResponseContext getExpandedItemFeed(RequestContext request) {
+        ExpandedItemTarget target = (ExpandedItemTarget) request.getTarget();
+        NoteItem item = target.getItem();
+        if (log.isDebugEnabled())
+            log.debug("getting expanded feed for item " + item.getUid());
+
+        try {
+            NoteItemFilter filter = QueryBuilder.buildFilter(request);
+            if (filter == null)
+                return badrequest(getAbdera(), request, "Time range query parameters not included");
+
+            ServiceLocator locator = createServiceLocator(request);
+            ItemFeedGenerator generator =
+                createItemFeedGenerator(target, locator);
+            generator.setFilter(filter);
+            Feed feed = generator.generateFeed(item);
+
+            AbstractResponseContext rc =
+                createResponseContext(feed.getDocument());
+            rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            return rc;
+        } catch (InvalidQueryException e) {
+            return badrequest(getAbdera(), request, e.getMessage());
+        } catch (UnsupportedProjectionException e) {
+            String reason = "Projection " + target.getProjection() + " not supported";
+            return badrequest(getAbdera(), request, reason);
+        } catch (UnsupportedFormatException e) {
+            String reason = "Format " + target.getFormat() + " not supported";
+            return badrequest(getAbdera(), request, reason);
+        } catch (GeneratorException e) {
+            String reason = "Unknown feed generation error: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        }
+    }
 
     public ProcessorFactory getProcessorFactory() {
         return processorFactory;

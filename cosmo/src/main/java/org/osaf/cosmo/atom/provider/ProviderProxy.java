@@ -97,6 +97,8 @@ public class ProviderProxy extends BaseProvider {
             return subscriptionProvider.getFeed(request);
         if (request.getTarget() instanceof PreferencesTarget)
             return preferencesProvider.getFeed(request);
+        if (request.getTarget() instanceof ExpandedItemTarget)
+            return itemProvider.getExpandedItemFeed(request);
         return itemProvider.getFeed(request);
     }
 

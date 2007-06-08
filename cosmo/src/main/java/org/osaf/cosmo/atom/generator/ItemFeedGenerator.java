@@ -52,6 +52,16 @@ public interface ItemFeedGenerator {
         throws GeneratorException;
 
     /**
+     * Generates an Atom feed containing entries for an expanded
+     * recurring item. Requires a query filter to have been set.
+     *
+     * @param item the item on which the feed is based
+     * @throws GeneratorException
+     */
+    public Feed generateFeed(NoteItem item)
+        throws GeneratorException;
+
+    /**
      * Generates an Atom entry representing an item.
      *
      * @param item the item which the entry describes

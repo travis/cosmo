@@ -87,8 +87,7 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
      * Does nothing since there are no entries in this feed.
      */
     protected void setEntryContent(Entry entry,
-                                   NoteItem item,
-                                   SortedSet<NoteItem> occurrences)
+                                   NoteItem item)
         throws GeneratorException {
     }
 

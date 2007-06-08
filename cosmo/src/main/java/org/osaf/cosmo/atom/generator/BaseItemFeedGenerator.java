@@ -87,6 +87,23 @@ public abstract class BaseItemFeedGenerator
     }
 
     /**
+     * Generates an Atom feed containing entries for an expanded
+     * recurring item. Requires a query filter to have been set.
+     *
+     * @param master the item on which the feed is based
+     * @throws GeneratorException
+     */
+    public Feed generateFeed(NoteItem master)
+        throws GeneratorException {
+        Feed feed = createFeed(master);
+
+        for (NoteItem item : findOccurrences(master))
+            feed.addEntry(createEntry(item));
+
+        return feed;
+    }
+
+    /**
      * Generates an Atom entry representing the item.
      *
      * @param item the item which the entry describes
@@ -147,30 +164,23 @@ public abstract class BaseItemFeedGenerator
      * occurrences of a recurring event.
      * </p>
      * <p>
-     * If a query filter has been provided, this method finds all of
-     * the <code>NoteItem</code>s that match the query
-     * filter. Otherwise, the method returns an empty set.
-     * </p>
-     * <p>
      * The set is sorted with the most recently modified item first.
      * </p>
      *
      * @param the collection whose contents are to be listed
+     * @throws IllegalStateException if a filter has not been provided
      */
     protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
+        if (filter == null)
+            throw new IllegalStateException("filter must be set");
+
         TreeSet<NoteItem> contents =
             new TreeSet<NoteItem>(new AuditableComparator(true));
 
-        if (filter != null) {
-            filter.setMasterNoteItem(item);
-            // Don't include the master in the result set as we only
-            // want occurences and modifications returned
-            filter.setFilterProperty(
-                    EventStampFilter.PROPERTY_INCLUDE_MASTER_ITEMS, "false");
-            for (Item occurrence : getFactory().getContentService().
-                     findItems(filter))
-                contents.add((NoteItem)occurrence);
-        }
+        filter.setMasterNoteItem(item);
+        for (Item occurrence : getFactory().getContentService().
+                 findItems(filter))
+            contents.add((NoteItem)occurrence);
 
         return contents;
     }
@@ -192,6 +202,27 @@ public abstract class BaseItemFeedGenerator
         feed.addAuthor(newPerson(collection.getOwner()));
         feed.addLink(newSelfLink(collection));
         feed.addLink(newPimLink(collection));
+
+        return feed;
+    }
+
+    /**
+     * Creates a <code>Feed</code> with attributes set based on the
+     * given item.
+     *
+     * @param item the item on which the feed is based
+     * @throws GeneratorException
+     */
+    protected Feed createFeed(NoteItem item)
+        throws GeneratorException {
+        Feed feed = newFeed(item.getUid());
+
+        feed.setTitle(item.getDisplayName());
+        feed.setUpdated(item.getClientModifiedDate());
+        feed.setGenerator(newGenerator());
+        feed.addAuthor(newPerson(item.getOwner()));
+        feed.addLink(newSelfLink(item));
+        feed.addLink(newPimLink(item));
 
         return feed;
     }
@@ -226,12 +257,10 @@ public abstract class BaseItemFeedGenerator
         entry.setUpdated(item.getClientModifiedDate());
         entry.setPublished(item.getClientCreationDate());
         entry.addLink(newSelfLink(item));
-        if (isDocument) {
+        if (isDocument)
             entry.addAuthor(newPerson(item.getOwner()));
-            setEntryContent(entry, item, findOccurrences(item));
-        } else {
-            setEntryContent(entry, item);
-        }
+
+        setEntryContent(entry, item);
 
         return entry;
     }
@@ -242,32 +271,15 @@ public abstract class BaseItemFeedGenerator
     protected abstract String getProjection();
 
     /**
-     * Sets the entry content based on the given recurrence-expanded
-     * item.
+     * Sets the entry content based on the given item.
      *
      * @param entry the entry
      * @param item the item on which the entry is based
-     * @param occurrences the occurrences and modifications occurring
-     * within a queried time-range, if any
      * @throws GeneratorException
      */
     protected abstract void setEntryContent(Entry entry,
-                                            NoteItem item,
-                                            SortedSet<NoteItem> occurrences)
+                                            NoteItem item)
         throws GeneratorException;
-
-    /**
-     * Sets the entry content based on the given non-expanded item.
-     *
-     * @param entry the entry
-     * @param item the item on which the entry is based
-     * @throws GeneratorException
-     */
-    protected void setEntryContent(Entry entry,
-                                   NoteItem item)
-        throws GeneratorException {
-        setEntryContent(entry, item, new TreeSet<NoteItem>());
-    }
 
     /**
      * Creates a <code>Link</code> for the pim IRI of the given item.
@@ -328,6 +340,17 @@ public abstract class BaseItemFeedGenerator
     protected Link newSelfLink(Item item)
         throws GeneratorException {
         return newLink(Link.REL_SELF, MEDIA_TYPE_ATOM, selfIri(item));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the expanded IRI of the given item.
+     *
+     * @param item the item to link
+     * @throws GeneratorException
+     */
+    protected Link newExpandedLink(NoteItem item)
+        throws GeneratorException {
+        return newLink(REL_EXPANDED, MEDIA_TYPE_ATOM, expandedIri(item));
     }
 
     /**
@@ -415,6 +438,16 @@ public abstract class BaseItemFeedGenerator
         if (withPathInfo && getProjection() != null)
             iri.append("/").append(getProjection());
         return iri.toString();
+    }
+
+    /**
+     * Returns the expanded IRI of the given item including path info.
+     *
+     * @param item the item
+     */
+    protected String expandedIri(Item item) {
+        String selfIri = selfIri(item);
+        return selfIri.replaceFirst("item", "expanded");
     }
 
     public NoteItemFilter getFilter() {

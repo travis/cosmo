@@ -105,6 +105,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
     },
     //mixins for occurrence stamps
     {
+        __noOverride:{rrule:1},
         _masterPropertyGetters: {
             startDate: function (){
                return this.recurrenceId;

@@ -19,14 +19,19 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
+
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.icalendar.ComponentTypes;
+
 import org.w3c.dom.Element;
 
 /**
@@ -82,6 +87,10 @@ public class ComponentFilter implements CaldavConstants {
                     "CALDAV:comp-filter a calendar component name  (e.g., \"VEVENT\") is required",
                     -1);
         }
+
+        if (! (name.equals(Calendar.VCALENDAR) ||
+               ComponentTypes.isValidComponentType(name)))
+            throw new ParseException(name + " is not a supported iCalendar component", -1);
 
         ElementIterator i = DomUtil.getChildren(element);
         int childCount = 0;

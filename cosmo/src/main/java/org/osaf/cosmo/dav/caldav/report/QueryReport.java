@@ -131,7 +131,6 @@ public class QueryReport extends CaldavMultiStatusReport {
         try {
             return new CalendarFilter(filterdata, tz);
         } catch (ParseException e) {
-            log.error("Unable to parse calendar filter",e );
             throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Unable to parse calendar filter: " + e.getMessage());
         }
     }

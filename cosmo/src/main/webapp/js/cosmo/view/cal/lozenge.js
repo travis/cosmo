@@ -550,6 +550,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateFromEvent = function (ev) 
  * when an event lozenge is dragged or resized
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMode) {
+
     var evStart = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     var diff = this.auxDivList.length;
     var evEnd = cosmo.datetime.Date.add(evStart, dojo.date.dateParts.DAY, diff);
@@ -579,7 +580,6 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
        // JS Dates do intelligent wraparound
        evEnd.setMinutes(evStart.getMinutes() + origLengthMinutes);
     }
-
     // Update cosmo.datetime.Date with new UTC values
     startDate.updateFromUTC(evStart.getTime());
     endDate.updateFromUTC(evEnd.getTime());
@@ -874,7 +874,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setHeight = function (size, over
 /**
  * Position and resize the lozenge, and turn on its visibility
  */
-cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateElements = function lozengeUpdateElements() {
+cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateElements = function() {
     this.setLeft(this.left);
     this.setTop(this.top);
     this.setHeight(this.height);

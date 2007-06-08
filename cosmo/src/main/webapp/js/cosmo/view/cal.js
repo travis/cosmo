@@ -328,7 +328,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
-    function handleSaveEvent(ev, err, reqId, saveType, delta) {
+    function handleSaveEvent(ev, err, reqId, saveType, delta, newItem) {
         dojo.debug("handleSaveEvent");
         var OPTIONS = self.recurringEventOptions;
         var errMsg = '';
@@ -361,7 +361,8 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
              'action': act,
              'data': ev,
              'saveType': saveType,
-             'delta':delta
+             'delta':delta,
+             'newItem':newItem
         });
     }
 

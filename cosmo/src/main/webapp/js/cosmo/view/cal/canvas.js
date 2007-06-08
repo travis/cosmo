@@ -20,6 +20,7 @@ dojo.require('dojo.event.*');
 dojo.require("dojo.gfx.color.hsv");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
+dojo.require("dojo.DeferredList");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.datetime.Date");
@@ -905,29 +906,50 @@ cosmo.view.cal.canvas = new function () {
         dojo.debug("saveSuccess: ");
         var OPTIONS = cosmo.view.cal.recurringEventOptions;
         var ev = cmd.data
-        var note = ev.data;
+        var item = ev.data;
         var saveType = cmd.saveType || null;
         dojo.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
-
+        var deferred = null;
+        var newItem = cmd.newItem;
+        
         //if the event is recurring and all future or all events are changed, we need to 
         //re expand the event
         if (ev.data.hasRecurrence() && saveType != OPTIONS.ONLY_THIS_EVENT){
-            dojo.debug("saveSuccess: has recurrence");
             
             //first remove the event and recurrences from the registry.
-            var newRegistry = filterOutRecurrenceGroup(self.eventRegistry.clone(), [note.getUid()]);
-            
+            var idsToRemove = [item.getUid()];
+            if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
+                idsToRemove.push(newItem.getUid());
+            }
+            var newRegistry = filterOutRecurrenceGroup(self.eventRegistry.clone(), idsToRemove);
+
+
             //now we have to expand out the item for the viewing range
-            var occurrences = cosmo.app.pim.serv.expandRecurringItem(note.getUid(),
-                cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd, {sync:true}).results[0];
+            var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(item.getUid(),
+                cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)];
+            if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
+              deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItem.getUid(),
+                cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
+            }
+            deferred = new dojo.DeferredList(deferredArray);
             
-            var newHash = cosmo.view.cal.createEventRegistry(occurrences);
-            newRegistry.append(newHash);
-            
-            removeAllEvents();
-            self.eventRegistry = newRegistry;
-            self.eventRegistry.each(appendLozenge);
+            var addExpandedOccurrences = function(){
+                // [0][0][1] - this is where the results are 
+                //stored in a DeferredList
+                var occurrences = deferred.results[0][0][1];
+                if (deferred.results[0][1]){
+                    var otherOccurrences = deferred.results[0][1][1] 
+                    occurrences = occurrences.concat(otherOccurrences);
+                }
+                var newHash = cosmo.view.cal.createEventRegistry(occurrences);
+                newRegistry.append(newHash);
+                
+                removeAllEvents();
+                self.eventRegistry = newRegistry;
+                self.eventRegistry.each(appendLozenge);
+            }
+            deferred.addCallback(addExpandedOccurrences);
             
         } else {
             // Saved event is still in view
@@ -940,18 +962,27 @@ cosmo.view.cal.canvas = new function () {
             }
         }
         
-        // Don't re-render when requests are still processing
-        if (!cosmo.view.cal.processingQueue.length) {
-          if (false /*&& cmd.qualifier.newEvent ||
-                (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')*/) {
-                var sel = cosmo.view.cal.lastSent;
-                sel.lozenge.setInputDisabled(false);
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                    'data': sel });
+        var updateEventsCallback = function (){
+            // Don't re-render when requests are still processing
+            if (!cosmo.view.cal.processingQueue.length) {
+              if (false /*&& cmd.qualifier.newEvent ||
+                    (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')*/) {
+                    var sel = cosmo.view.cal.lastSent;
+                    sel.lozenge.setInputDisabled(false);
+                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                        'data': sel });
+                }
+                updateEventsDisplay();
+            } else {
+                dojo.debug("how many left in queue: " +cosmo.view.cal.processingQueue.length);
             }
-            updateEventsDisplay();
+        }
+        
+        dojo.debug("saveSuccess: has recurrence9");
+        if (deferred){
+            deferred.addCallback(updateEventsCallback);
         } else {
-            dojo.debug("how many left in queue: " +cosmo.view.cal.processingQueue.length);
+            updateEventsCallBack();
         }
     }
     

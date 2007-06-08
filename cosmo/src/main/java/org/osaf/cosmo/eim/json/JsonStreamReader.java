@@ -119,7 +119,13 @@ public class JsonStreamReader implements JsonConstants, EimmlConstants{
         }
         
         //deal with deleted fields
-        //XXX Todo
+        List<JSONValue> missingFields = getListValue(recordMap
+                .get(KEY_MISSING_FIELDS));
+        for (JSONValue field : missingFields){
+            EimRecordField eimField = new TextField(getAsString(field),null);
+            eimField.setMissing(true);
+            record.addField(eimField);
+        }
         
         //deal with fields
         Map<String, JSONValue> fieldMap = getMapValue(recordMap.get(KEY_FIELDS));

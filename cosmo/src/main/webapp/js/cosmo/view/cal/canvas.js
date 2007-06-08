@@ -424,11 +424,11 @@ cosmo.view.cal.canvas = new function () {
         allDayArea.setDragLimit();
         showHours();
         setCurrentDayStatus();
-        
+
         // Render event lozenges
         self.calcColors();
         loadSuccess();
-        
+
         hasBeenRendered = true;
     };
     /**
@@ -703,7 +703,7 @@ cosmo.view.cal.canvas = new function () {
         }
         return true;
     }
-    
+
     /**
      * Remove a cal event object, usually removes the event
      * lozenge as well
@@ -732,11 +732,11 @@ cosmo.view.cal.canvas = new function () {
         return true;
     }
     /**
-     * Returns a new hash registry, filtering the recurring items with the 
+     * Returns a new hash registry, filtering the recurring items with the
      * specified  a set or sets of recurring events for an id or ids
-     * 
+     *
      * WARNING: this destroys the event registry (Hash) that is passed into it!
-     * 
+     *
      * @param reg An eventRegistry Hash from which to remove a group or
      * groups of recurring events
      * @param arr Array of CalEventData ids for the recurrences to
@@ -903,7 +903,7 @@ cosmo.view.cal.canvas = new function () {
      * @param cmd JS Object, the command object passed in the
      * published 'success' event (contains the originally edited
      * event, cmd.data, and the update options, cmd.opts).
-     */    
+     */
      function saveSuccess(cmd) {
         dojo.debug("saveSuccess: ");
         var OPTIONS = cosmo.view.cal.recurringEventOptions;
@@ -914,11 +914,11 @@ cosmo.view.cal.canvas = new function () {
         var delta = cmd.delta;
         var deferred = null;
         var newItem = cmd.newItem;
-        
-        //if the event is recurring and all future or all events are changed, we need to 
+
+        //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
         if (ev.data.hasRecurrence() && saveType != OPTIONS.ONLY_THIS_EVENT){
-            
+
             //first remove the event and recurrences from the registry.
             var idsToRemove = [item.getUid()];
             if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
@@ -935,27 +935,27 @@ cosmo.view.cal.canvas = new function () {
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
             }
             deferred = new dojo.DeferredList(deferredArray);
-            
+
             var addExpandedOccurrences = function(){
-                // [0][0][1] - this is where the results are 
+                // [0][0][1] - this is where the results are
                 //stored in a DeferredList
                 var occurrences = deferred.results[0][0][1];
                 if (deferred.results[0][1]){
-                    var otherOccurrences = deferred.results[0][1][1] 
+                    var otherOccurrences = deferred.results[0][1][1]
                     occurrences = occurrences.concat(otherOccurrences);
                 }
                 var newHash = cosmo.view.cal.createEventRegistry(occurrences);
                 newRegistry.append(newHash);
-                
+
                 removeAllEvents();
                 self.eventRegistry = newRegistry;
                 self.eventRegistry.each(appendLozenge);
             }
             deferred.addCallback(addExpandedOccurrences);
-            
+
         } else {
             // Saved event is still in view
-            var inRange = !ev.isOutOfViewRange(); 
+            var inRange = !ev.isOutOfViewRange();
             if (inRange) {
                 ev.lozenge.setInputDisabled(false);
                 ev.lozenge.updateDisplayMain();
@@ -963,7 +963,7 @@ cosmo.view.cal.canvas = new function () {
                 removeEvent(ev);
             }
         }
-        
+
         var updateEventsCallback = function (){
             // Don't re-render when requests are still processing
             if (!cosmo.view.cal.processingQueue.length) {
@@ -979,7 +979,7 @@ cosmo.view.cal.canvas = new function () {
                 dojo.debug("how many left in queue: " +cosmo.view.cal.processingQueue.length);
             }
         }
-        
+
         dojo.debug("saveSuccess: has recurrence9");
         if (deferred){
             deferred.addCallback(updateEventsCallback);
@@ -987,7 +987,7 @@ cosmo.view.cal.canvas = new function () {
             updateEventsCallBack();
         }
     }
-    
+
     /**
      * Handles a successful update of an event, for recurring
      * events -- for:
@@ -1009,7 +1009,7 @@ cosmo.view.cal.canvas = new function () {
         var opts = data.opts;
         var h = null;
         var idArr = [];
-    
+
         // Copy the eventRegistry to remove any recurrence
         // instances associated with the edit
         h = self.eventRegistry.clone();
@@ -1379,7 +1379,7 @@ cosmo.view.cal.canvas = new function () {
             end = new cosmo.datetime.Date(start.getFullYear(),
                 start.getMonth(), start.getDate());
         }
-        
+
 
         // Create the CalEvent, connect it to its lozenge
         ev = new CalEvent(id, lozenge);
@@ -1392,7 +1392,7 @@ cosmo.view.cal.canvas = new function () {
         eventStamp.setAllDay(allDay);
         eventStamp.setEndDate(end);
         ev.data = note;
-        
+
         // Register the new event in the event list
         // ================================
         cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
@@ -1509,10 +1509,10 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         this.setPosition();
         this.setSize();
         if (!this.hasBeenRendered) {
-            //FIXME: Either Dojo widgetize or convert to DOM 
+            //FIXME: Either Dojo widgetize or convert to DOM
             // Right now we just want to wire the original
             // code to the newer recursive composition scheme
-            str = '';    
+            str = '';
             str += '<div id="calTopNavDiv">';
             str += '<table cellpadding="0" cellspacing="0">';
             str += '<tr>';
@@ -1536,8 +1536,8 @@ cosmo.view.cal.canvas.Canvas = function (p) {
             this.domNode.innerHTML = str;
             this.parent.domNode.appendChild(this.domNode);
             var _c = cosmo.ui.ContentBox;
-            var subList = [ 'calTopNavDiv', 'dayListDiv', 
-                'timedScrollingMainDiv', 'timedContentDiv', 'timedHourListDiv', 
+            var subList = [ 'calTopNavDiv', 'dayListDiv',
+                'timedScrollingMainDiv', 'timedContentDiv', 'timedHourListDiv',
                 'eventInfoDiv', 'allDayResizeMainDiv', 'allDayResizeHandleDiv',
                 'allDayContentDiv', 'allDayHourSpacerDiv' ];
             var vOffset = 0;
@@ -1546,7 +1546,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
                 var key = subList[i];
                 this[key] = new _c({ id: key, domNode: $(key) });
             }
-            
+
             this.hasBeenRendered = true;
         }
         // Center column
@@ -1587,10 +1587,10 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         var timedContent = this.timedContentDiv;
         timedContent.setSize((this.width - HOUR_LISTING_WIDTH), VIEW_DIV_HEIGHT);
         timedContent.setPosition((HOUR_LISTING_WIDTH + 1), 0);
-        var timedHourList = this.timedHourListDiv; 
+        var timedHourList = this.timedHourListDiv;
         timedHourList.setSize(HOUR_LISTING_WIDTH - 1, VIEW_DIV_HEIGHT);
         timedHourList.setPosition(0, 0);
-        
+
         // Set cal day column width
         cosmo.view.cal.canvas.dayUnitWidth = parseInt(
             (this.width - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );

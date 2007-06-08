@@ -483,14 +483,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     propsToItemRecord: function(props){
         var fields = {};
-        var missingFields = [];
         with (cosmo.service.eim.constants){
         
             if (props.displayName != undefined) fields.title = [type.TEXT, props.displayName];
-            else missingFields.push("title");
-            if (props.triageRank || props.triageRank || props.autoTriage)
-                fields.triage =  [type.TEXT, [props.triageStatus, props.triageRank, props.autoTriage? 1 : 0].join(" ")];
-            else missingFields.push("triage");
+            if (props.triageStatus || props.triageRank || props.autoTriage)
+                fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.triageRank), props.autoTriage? 1 : 0].join(" ")];
             
             return {
                 prefix: prefix.ITEM,
@@ -498,11 +495,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 key: {
                     uuid: [type.TEXT, props.uuid]
                 },
-                fields: fields,
-                missingFields: missingFields
+                fields: fields
             }
         }
     
+    },
+    
+    // Make sure triage rank ends in two decimals
+    fixTriageRank: function(rank){
+        if (rank.toString().match(/d*\.\d\d/)) return rank;
+        else return rank + ".00";
     },
 
     noteToNoteRecord: function(note){
@@ -531,7 +533,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     propsToNoteRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            var missingFields = [];
             if (props.body != undefined) fields.body = [type.CLOB, props.body];
             return {
                 prefix: prefix.NOTE,
@@ -539,8 +540,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 key: {
                     uuid: [type.TEXT, props.uuid]
                 },
-                fields: fields,
-                missingFields: missingFields
+                fields: fields
             }
         }
     },

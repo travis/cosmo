@@ -118,7 +118,7 @@ cosmo.model.declare("cosmo.model.Item", null,
     ["creationDate", {"default": cosmo.model.NEW_DATESTAMP}],
     ["modifiedDate", {"default": cosmo.model.NEW_DATESTAMP}],
     ["triageStatus", {"default": 100}],
-    ["autoTriage", {"default": false}],
+    ["autoTriage", {"default": true}],
     ["rank", {"default": 0}]
    ],
    //declare other properties

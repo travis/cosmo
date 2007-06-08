@@ -138,18 +138,17 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     createItem: function(item, parentCollection, kwArgs){
         kwArgs = kwArgs || {};
 
-        return this._transport.createItem(item, this._translator.itemToAtomEntry(item), 
+        var deferred =  this._transport.createItem(item, this._translator.itemToAtomEntry(item), 
                                           parentCollection.getUid(), kwArgs);
+        this._addTranslation(deferred, "translateGetItem", {oldObject: item});
+        return deferred;
         
     },
 
-    removeItem: function(collection, item, kwArgs){
+    deleteItem: function(item, kwArgs){
         kwArgs = kwArgs || {};
 
-        // add object translator to callback chain
-
-        // do topic notifications
-        return deferred;
+        return this._transport.deleteItem(item, kwArgs);
     },
     
     createSubscription: function(subscription, kwArgs){

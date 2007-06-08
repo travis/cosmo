@@ -174,12 +174,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return items;
     },
     
-    translateGetItem: function(atomXml){
+    translateGetItem: function(atomXml, kwArgs){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
+        
         var entry = atomXml.getElementsByTagName("entry")[0];
-        return this.entryToItem(entry);
+        return this.entryToItem(entry, null, kwArgs);
           
     },
     
@@ -227,7 +228,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return itemArray;
     },
     
-    entryToItem: function (/*XMLElement*/entry, /*cosmo.model.Item*/ masterItem){
+    entryToItem: function (/*XMLElement*/entry, /*cosmo.model.Item*/ masterItem, kwArgs){
             var uuid = this.getEntryUuid(entry);
             var uuidParts = uuid.split(":");
             var uidParts = uuidParts.slice(2);
@@ -247,7 +248,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 item = this.recordSetToModification(dojo.json.evalJson(content), masterItem); 
             }
             else {
-                item = this.recordSetToObject(dojo.json.evalJson(content));
+                item = this.recordSetToObject(dojo.json.evalJson(content), kwArgs);
             }
             var links = cosmo.util.html.getElementsByTagName(entry, "link");
             for (var j = 0; j < links.length; j++){
@@ -260,7 +261,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return item;
     },
     
-    recordSetToObject: function (/*Object*/ recordSet){
+    recordSetToObject: function (/*Object*/ recordSet, kwArgs){
+        kwArgs = kwArgs || {};
         //TODO
         /* We can probably optimize this by grabbing the
          * appropriate properties from the appropriate records
@@ -269,7 +271,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          * more local variables, so we should play with this later.
          */
 
-        var note = new cosmo.model.Note(
+        var note = kwArgs.oldObject || new cosmo.model.Note(
          {
              uid: recordSet.uuid
          }
@@ -429,17 +431,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             modby: this.noteToModbyRecord(noteOccurrence)
         }
         if (this.modificationHasItemModifications(modification))  
-            records.item =  this.modificationToItemRecord(modification);
+            records.item =  this.modifiedOccurrenceToItemRecord(noteOccurrence);
         if (this.modificationHasNoteModifications(modification))
-            records.note = this.modificationToNoteRecord(modification);
+            records.note = this.modifiedOccurrenceToNoteRecord(noteOccurrence);
         
-        if (modification.getModifiedStamps().event){
-            records.event = this.modificationToEventRecord(modification)
-        }
+        // Occurrences need always have an event record
+        if (!modification.getModifiedStamps().event) modification.getModifiedStamps().event = {uuid: this.getUid(noteOccurrence)};
+        records.event = this.modificationToEventRecord(modification)
+        
         if (modification.getModifiedStamps().task){
             records.task = this.modificationToTaskRecord(modification)
         }
-        if (modification.getModifiedStamps().MAIL){
+        if (modification.getModifiedStamps().mail){
             records.mail = this.modificationToMailRecord(modification)
         }
         var recordSet =  {
@@ -453,12 +456,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     modificationHasItemModifications: function (modification){
         var props = modification.getModifiedProperties();
-        return (props.title || props.triageRank || props.triageStatus || props.autoTriage)    
+        return (props.displayName || props.triageRank || props.triageStatus || props.autoTriage)    
     },
 
     noteToItemRecord: function(note){
         var props = {};
-        props.title = note.getDisplayName();
+        props.displayName = note.getDisplayName();
         props.triageRank = note.getRank();
         props.triageStatus = note.getTriageStatus();
         props.autoTriage = note.getAutoTriage();
@@ -466,17 +469,28 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return this.propsToItemRecord(props);
     },
     
-    modificationToItemRecord: function(modification){
-        return this.propsToItemRecord(modification.getModifiedProperties());
+    modifiedOccurrenceToItemRecord: function(modifiedOccurrence){
+        var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId)
+        var props = modification.getModifiedProperties();
+        props.uuid = this.getUid(modifiedOccurrence);
+        var record = this.propsToItemRecord(props);
+        var missingFields = [];
+        if (record.fields.title == undefined) missingFields.push("title");
+        if (record.fields.triage == undefined) missingFields.push("triage");
+        record.missingFields = missingFields;
+        return record;
     },
     
     propsToItemRecord: function(props){
         var fields = {};
+        var missingFields = [];
         with (cosmo.service.eim.constants){
         
-            if (props.title) fields.title = [type.TEXT, props.title];
+            if (props.displayName != undefined) fields.title = [type.TEXT, props.displayName];
+            else missingFields.push("title");
             if (props.triageRank || props.triageRank || props.autoTriage)
                 fields.triage =  [type.TEXT, [props.triageStatus, props.triageRank, props.autoTriage? 1 : 0].join(" ")];
+            else missingFields.push("triage");
             
             return {
                 prefix: prefix.ITEM,
@@ -484,7 +498,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 key: {
                     uuid: [type.TEXT, props.uuid]
                 },
-                fields: fields
+                fields: fields,
+                missingFields: missingFields
             }
         }
     
@@ -502,21 +517,30 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     
-    modificationToNoteRecord: function(modification){
-        return this.propsToNoteRecord(modification.getModifiedProperties());
+    modifiedOccurrenceToNoteRecord: function(modifiedOccurrence){
+        var modification = noteOccurrence.getMaster().getModification(noteOccurrence.recurrenceId)
+        var props = modification.getModifiedProperties();
+        props.uuid = this.getUid(modifiedOccurrence);
+        var record = this.propsToNoteRecord(props);
+        var missingFields = [];
+        if (record.fields.body == undefined) missingFields.push("body");
+        record.missingFields = missingFields;
+        return record;
     },
     
     propsToNoteRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (props.body) fields.body = [type.CLOB, props.body];
+            var missingFields = [];
+            if (props.body != undefined) fields.body = [type.CLOB, props.body];
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
                 key: {
                     uuid: [type.TEXT, props.uuid]
                 },
-                fields: fields
+                fields: fields,
+                missingFields: missingFields
             }
         }
     },
@@ -540,25 +564,38 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     modificationToMailRecord: function(modification){
-        return this.propsToMailRecord(modification.getModifiedStamps().mail);
+        var record = this.propsToMailRecord(modification.getModifiedStamps().mail);
+        var missingFields = [];
+        if (record.fields.messageId == undefined) missingFields.push("messageId");
+        if (record.fields.headers == undefined) missingFields.push("headers");
+        if (record.fields.fromAddress == undefined) missingFields.push("fromAddress");
+        if (record.fields.toAddress == undefined) missingFields.push("toAddress");
+        if (record.fields.ccAddress == undefined) missingFields.push("ccAddress");
+        if (record.fields.bccAddress == undefined) missingFields.push("bccAddress");
+        if (record.fields.originators == undefined) missingFields.push("originators");
+        if (record.fields.dateSent == undefined) missingFields.push("dateSent");
+        if (record.fields.inReplyTo == undefined) missingFields.push("inReplyTo");
+        if (record.fields.references == undefined) missingFields.push("references");
+        record.missingFields = missingFields;
+        return record;
     },
     
     propsToMailRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (props.messageId) fields.messageId = [type.TEXT, props.messageId];
-            if (props.headers) fields.headers = [type.CLOB, props.headers];
-            if (props.fromAddress) fields.fromAddress = [type.TEXT, props.fromAddress.join(",")];
-            if (props.toAddress) fields.toAddress = [type.TEXT, props.toAddress.join(",")];
-            if (props.ccAddress) fields.ccAddress = [type.TEXT, props.ccAddress.join(",")];
-            if (props.bccAddress) fields.bccAddress = [type.TEXT, props.bccAddress.join(",")];
-            if (props.originators) fields.originators = [type.TEXT, props.originators.join(",")];
-
-            if (props.dateSent) fields.dateSent = [type.TEXT, props.dateSent];
-            if (props.inReplyTo) fields.inReplyTo = [type.TEXT, props.inReplyTo];
-            if (props.references) fields.references = [type.CLOB, props.references];
+            var missingFields = [];
+            if (props.messageId != undefined) fields.messageId = [type.TEXT, props.messageId];
+            if (props.headers != undefined) fields.headers = [type.CLOB, props.headers];
+            if (props.fromAddress != undefined) fields.fromAddress = [type.TEXT, props.fromAddress.join(",")];
+            if (props.toAddress != undefined) fields.toAddress = [type.TEXT, props.toAddress.join(",")];
+            if (props.ccAddress != undefined) fields.ccAddress = [type.TEXT, props.ccAddress.join(",")];
+            if (props.bccAddress != undefined) fields.bccAddress = [type.TEXT, props.bccAddress.join(",")];
+            if (props.originators != undefined) fields.originators = [type.TEXT, props.originators.join(",")];
+            if (props.dateSent != undefined) fields.dateSent = [type.TEXT, props.dateSent];
+            if (props.inReplyTo != undefined) fields.inReplyTo = [type.TEXT, props.inReplyTo];
+            if (props.references != undefined) fields.references = [type.CLOB, props.references];
             
-           return {
+            return record = {
                 prefix: prefix.MAIL,
                 ns: ns.MAIL,
                 key: {
@@ -566,6 +603,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 },
                 fields: fields
             }
+            return record;
         }   
     },
     
@@ -586,21 +624,28 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     modificationToEventRecord: function(modification){
-        return this.propsToEventRecord(modification.getModifiedStamps().event);
+        var record = this.propsToEventRecord(modification.getModifiedStamps().event);
+        var missingFields = [];
+        if (record.fields.dtstart == undefined) missingFields.push("dtstart");
+        if (record.fields.status == undefined) missingFields.push("status");
+        if (record.fields.location == undefined) missingFields.push("location");
+        if (record.fields.duration == undefined) missingFields.push("duration");
+        record.missingFields = missingFields;
+        return record;
     },
     
     propsToEventRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (props.startDate) fields.dtstart = 
+            if (props.startDate != undefined) fields.dtstart = 
                 [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
-            if (props.status) fields.status = [type.TEXT, props.status];
-            if (props.location) fields.location = [type.TEXT, props.location];
-            if (props.duration) fields.duration = [type.TEXT, props.duration.toIso8601()];
-            if (props.rrule) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
-            if (props.exdates) fields.exdates = [type.TEXT, this.exdatesToEim(props.exdates)];
+            if (props.status != undefined) fields.status = [type.TEXT, props.status];
+            if (props.location != undefined) fields.location = [type.TEXT, props.location];
+            if (props.duration != undefined) fields.duration = [type.TEXT, props.duration.toIso8601()];
+            if (props.rrule != undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
+            if (props.exdates != undefined) fields.exdates = [type.TEXT, this.exdatesToEim(props.exdates)];
             
-           return {
+            return record = {
                 prefix: prefix.EVENT,
                 ns: ns.EVENT,
                 key: {

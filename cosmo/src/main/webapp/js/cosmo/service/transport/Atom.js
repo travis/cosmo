@@ -162,6 +162,20 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     deleteItem: function(item, kwArgs){
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+        
+        var query = this._generateAuthQuery(kwArgs);
+        
+        r.url = cosmo.env.getBaseUrl() +
+          "/atom/item/" +  collectionUid + 
+          this.queryHashToString(query);
+        r.method = "POST";
+        r.headers['X-Http-Method-Override'] = "DELETE";
+        
+        dojo.io.bind(r);
+        return deferred;
+        
     },
 
     removeItem: function(collection, item, kwArgs){

@@ -125,7 +125,7 @@ cosmo.model.declare("cosmo.model.Item", null,
   {
       initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
-      }      
+      }
   });
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
@@ -279,6 +279,10 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         modification._modifiedProperties[propertyName] = value;  
     },
     
+    _getThisModification: function(){
+        return this._master.getModification(this.recurrenceId);  
+    },
+    
     __getProperty: cosmo.model._occurrenceGetProperty,  
     
     __setProperty: cosmo.model._occurrenceSetProperty,
@@ -310,6 +314,22 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
                return null;
            }
     }, 
+    
+    setUrl: function(protocol, url){
+        this._getThisModification().setUrl(protocol, url);
+    }, 
+      
+    getUrl: function(protocol){
+        return this._getThisModification().getUrl(protocol);
+    },
+      
+    setUrls: function(protocolToUrlMap){
+        this._getThisModification().setUrls(protocolToUrlMap);
+    },
+      
+    getUrls: function(){
+        return this._getThisModification().getUrls();
+    },
     
     removeStamp: function (/*String*/ stampName){
         throw new Error("remove stamp not implented yet!");
@@ -501,5 +521,26 @@ cosmo.model._noteStampCommon = {
         }
 }
 
+cosmo.model._urlsMixin =  {
+      _urls: {},
+      setUrl: function(protocol, url){
+          this._urls[protocol] = url; 
+      }, 
+      
+      getUrl: function(protocol){
+          return this._urls[protocol];
+      },
+      
+      setUrls: function(protocolToUrlMap){
+          this._urls = protocolToUrlMap;
+      },
+      
+      getUrls: function(){
+          return this._urls;
+      }
+}
+
 dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._noteStampCommon);
 dojo.lang.mixin(cosmo.model.BaseStamp.prototype, cosmo.model._noteStampCommon);
+dojo.lang.mixin(cosmo.model.Item.prototype, cosmo.model._urlsMixin);
+dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._urlsMixin);

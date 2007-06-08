@@ -130,16 +130,20 @@ public abstract class BaseEventStamp extends Stamp
     @Transient
     public void setSummary(String text) {
         setDirty(true);
+        setSummary(text, getEvent());
+    }
+    
+    protected void setSummary(String text, VEvent event) {
         Summary summary = (Summary)
-            getEvent().getProperties().getProperty(Property.SUMMARY);
+        event.getProperties().getProperty(Property.SUMMARY);
         if (text == null) {
             if (summary != null)
-                getEvent().getProperties().remove(summary);
+                event.getProperties().remove(summary);
             return;
         }                
         if (summary == null) {
             summary = new Summary();
-            getEvent().getProperties().add(summary);
+            event.getProperties().add(summary);
         }
         summary.setValue(text);
     }
@@ -156,7 +160,7 @@ public abstract class BaseEventStamp extends Stamp
             return null;
         return p.getValue();
     }
-
+    
     /** 
      * Sets the iCalendar DESCRIPTION property of the event.
      *
@@ -165,17 +169,21 @@ public abstract class BaseEventStamp extends Stamp
     @Transient
     public void setDescription(String text) {
         setDirty(true);
+        
+    }
+    
+    protected void setDescription(String text, VEvent event) {
         Description description = (Description)
-            getEvent().getProperties().getProperty(Property.DESCRIPTION);
-       
+        event.getProperties().getProperty(Property.DESCRIPTION);
+   
         if (text == null) {
             if (description != null)
-                getEvent().getProperties().remove(description);
+                event.getProperties().remove(description);
             return;
         }                
         if (description == null) {
             description = new Description();
-            getEvent().getProperties().add(description);
+            event.getProperties().add(description);
         }
         description.setValue(text);
     }

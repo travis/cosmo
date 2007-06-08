@@ -142,6 +142,9 @@ public class EventStamp extends BaseEventStamp implements
             tzMap.put(tzid, vtz);
         }
         
+        // merge item properties to icalendar props
+        mergeCalendarProperties(masterEvent, (NoteItem) getItem());
+        
         // If event is not recurring, skip all the event modification
         // processing
         if(!isRecurring())
@@ -162,6 +165,9 @@ public class EventStamp extends BaseEventStamp implements
             } catch (Exception e) {
                 throw new RuntimeException("Cannot copy calendar", e);
             }
+            
+            // merge item properties to icalendar props
+            mergeCalendarProperties(exceptionEvent, exception);
             
             // check for inherited anyTime
             if(exceptionStamp.isAnyTime()==null) {
@@ -291,5 +297,12 @@ public class EventStamp extends BaseEventStamp implements
         }
         
         return null;
+    }
+    
+    private void mergeCalendarProperties(VEvent event, NoteItem note) {
+        //summary = displayName
+        //description = body
+        setSummary(note.getDisplayName(), event);
+        setDescription(note.getBody(), event);
     }
 }

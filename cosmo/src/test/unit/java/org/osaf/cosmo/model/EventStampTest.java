@@ -41,6 +41,8 @@ public class EventStampTest extends TestCase {
         TimeZoneRegistry registry =
             TimeZoneRegistryFactory.getInstance().createRegistry();
         NoteItem master = new NoteItem();
+        master.setDisplayName("displayName");
+        master.setBody("body");
         EventStamp eventStamp = new EventStamp(master);
         eventStamp.createCalendar();
         Date date = new ICalDate(";VALUE=DATE-TIME:20070212T074500").getDate();
@@ -55,6 +57,15 @@ public class EventStampTest extends TestCase {
         eventStamp.setStartDate(date);
         
         cal = eventStamp.getCalendar();
+        
+        // should be a single VEVENT
+        ComponentList comps = cal.getComponents(Component.VEVENT);
+        Assert.assertEquals(1, comps.size());
+        VEvent event = (VEvent) comps.get(0);
+        
+        // test item properties got merged into calendar
+        Assert.assertEquals("displayName", event.getSummary().getValue());
+        Assert.assertEquals("body", event.getDescription().getValue());
         
         // date has timezone, so there should be a timezone
         Assert.assertEquals(1, cal.getComponents(Component.VTIMEZONE).size());
@@ -88,6 +99,8 @@ public class EventStampTest extends TestCase {
         eventStamp.setRecurrenceDates(dates);
         
         NoteItem mod = new NoteItem();
+        mod.setDisplayName("modDisplayName");
+        mod.setBody("modBody");
         mod.setModifies(master);
         master.getModifications().add(mod);
         EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
@@ -97,13 +110,18 @@ public class EventStampTest extends TestCase {
         exceptionStamp.setStartDate(date);
         exceptionStamp.setRecurrenceId(date);
         
-        // first test inherited alarm
+        // test inherited alarm
         Calendar cal = eventStamp.getCalendar();
         ComponentList comps = cal.getComponents(Component.VEVENT);
         Assert.assertEquals(2, comps.size());
         VEvent masterEvent = (VEvent) comps.get(0);
         VEvent modEvent = (VEvent) comps.get(1);
         
+        // test merged properties
+        Assert.assertEquals("modDisplayName", modEvent.getSummary().getValue());
+        Assert.assertEquals("modBody", modEvent.getDescription().getValue());
+        
+        // test inherited alarm
         VAlarm masterAlarm = (VAlarm) masterEvent.getAlarms().get(0);
         VAlarm modAlarm = (VAlarm) modEvent.getAlarms().get(0);
         

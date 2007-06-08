@@ -24,7 +24,6 @@ import org.osaf.cosmo.eim.schema.BaseItemApplicator;
 import org.osaf.cosmo.eim.schema.EimFieldValidator;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
-import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -65,16 +64,6 @@ public class NoteApplicator extends BaseItemApplicator
                 Reader value = EimFieldValidator.validateClob(field);
                 note.setBody(value);
             }
-
-            // NoteItem.body == BaseEventStamp.getDescription()
-            // For now, we have to keep the NoteItem and
-            // BaseEventStamp in sync, otherwise an update by Chander
-            // to NoteItem will not propogate to a CalDAV client.
-            BaseEventStamp eventStamp = BaseEventStamp.getStamp(note);
-            if(eventStamp!=null) {
-                eventStamp.setDescription(note.getBody());
-            }
-            
         } else if (field.getName().equals(FIELD_ICALUID)) {
             if(field.isMissing()) {
                 handleMissingAttribute("icalUid");

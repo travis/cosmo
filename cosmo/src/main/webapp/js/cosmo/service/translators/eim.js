@@ -713,20 +713,22 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     getEventStampProperties: function (record){
 
         var properties = {};
-        if (record.fields.dtstart){
-            properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
-            var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
-            if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
-            if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
+        if (record.fields){
+            if (record.fields.dtstart){
+                properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
+                var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
+                if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
+                if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
+            }
+    
+            if (record.fields.duration) properties.duration=
+                    new cosmo.model.Duration(record.fields.duration[1]);
+            if (record.fields.location) properties.location = record.fields.location[1];
+            if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1]);
+            if (record.fields.exrule) properties.exrule = this.parseRRule(record.fields.exrule[1]);
+            if (record.fields.exdate) properties.exdates = this.parseExdate(record.fields.exdate[1]);
+            if (record.fields.status) properties.status = record.fields.status[1];
         }
-
-        if (record.fields.duration) properties.duration=
-                new cosmo.model.Duration(record.fields.duration[1]);
-        if (record.fields.location) properties.location = record.fields.location[1];
-        if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1]);
-        if (record.fields.exrule) properties.exrule = this.parseRRule(record.fields.exrule[1]);
-        if (record.fields.exdate) properties.exdates = this.parseExdate(record.fields.exdate[1]);
-        if (record.fields.status) properties.status = record.fields.status[1];
         return properties;
 
     },
@@ -738,16 +740,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     getMailStampProperties: function (record){
         var properties = {};
-        if (record.fields.messageId) properties.messageId = record.fields.messageId[1];
-        if (record.fields.headers) properties.headers = record.fields.headers[1];
-        if (record.fields.fromAddress) properties.fromAddress = this.parseList(record.fields.fromAddress[1]);
-        if (record.fields.toAddress) properties.toAddress = this.parseList(record.fields.toAddress[1]);
-        if (record.fields.ccAddress) properties.ccAddress = this.parseList(record.fields.ccAddress[1]);
-        if (record.fields.bccAddress) properties.bccAddress = this.parseList(record.fields.bccAddress[1]);
-        if (record.fields.originators) properties.originators = this.parseList(record.fields.originators[1]);
-        if (record.fields.dateSent) properties.dateSent = record.fields.dateSent[1]; //TODO: parse
-        if (record.fields.inReplyTo) properties.inReplyTo = record.fields.inReplyTo[1];
-        if (record.fields.references) properties.references = record.fields.references[1];
+        if (record.fields){
+            if (record.fields.messageId) properties.messageId = record.fields.messageId[1];
+            if (record.fields.headers) properties.headers = record.fields.headers[1];
+            if (record.fields.fromAddress) properties.fromAddress = this.parseList(record.fields.fromAddress[1]);
+            if (record.fields.toAddress) properties.toAddress = this.parseList(record.fields.toAddress[1]);
+            if (record.fields.ccAddress) properties.ccAddress = this.parseList(record.fields.ccAddress[1]);
+            if (record.fields.bccAddress) properties.bccAddress = this.parseList(record.fields.bccAddress[1]);
+            if (record.fields.originators) properties.originators = this.parseList(record.fields.originators[1]);
+            if (record.fields.dateSent) properties.dateSent = record.fields.dateSent[1]; //TODO: parse
+            if (record.fields.inReplyTo) properties.inReplyTo = record.fields.inReplyTo[1];
+            if (record.fields.references) properties.references = record.fields.references[1];
+        }
         return properties;
     },
     
@@ -758,15 +762,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     itemRecordToItemProps: function(record){
         var props = {};
-        if (record.fields.title) props.displayName = record.fields.title[1];
-        if (record.fields.createdOn) props.creationDate = record.fields.createdOn[1];
-        if (record.fields.triage) this.addTriageStringToItemProps(record.fields.triage[1], props);
+        if (record.fields){
+            if (record.fields.title) props.displayName = record.fields.title[1];
+            if (record.fields.createdOn) props.creationDate = record.fields.createdOn[1];
+            if (record.fields.triage) this.addTriageStringToItemProps(record.fields.triage[1], props);
+        }
         return props
     },
 
     noteRecordToNoteProps: function(record){
         var props = {};
-        if (record.fields.body) props.body = record.fields.body[1];
+        if (record.fields){
+            if (record.fields.body) props.body = record.fields.body[1];
+        }
         return props
     },
 

@@ -115,6 +115,15 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                  
                 // create item
                 if(item.getId()==-1) {
+                    
+                    // If item is a NoteItem modification, then make sure
+                    // the master NoteItem is loaded, otherwise we may get
+                    // LazyInitializationException later
+                    if(item instanceof NoteItem) {
+                        NoteItem note = (NoteItem) item;
+                        if(note.getModifies()!=null)
+                            getSession().load(note.getModifies(), note.getModifies().getId());    
+                    }
                     item = createContent(collection, item);
                 }
                 // delete item

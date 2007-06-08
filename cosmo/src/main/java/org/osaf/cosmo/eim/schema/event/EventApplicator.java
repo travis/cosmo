@@ -90,8 +90,16 @@ public class EventApplicator extends BaseStampApplicator
         return eventStamp;
     }
 
-    
-    
+    @Override
+    public void applyRecord(EimRecord record) throws EimSchemaException {
+        super.applyRecord(record);
+        
+        // Ensure that a startDate is present
+        BaseEventStamp event = (BaseEventStamp) getStamp();
+        if(event.getStartDate()==null)
+            throw new EimValidationException("field " + FIELD_DTSTART + " is required");
+    }
+
     /**
      * Copies record field values to stamp properties and
      * attributes.

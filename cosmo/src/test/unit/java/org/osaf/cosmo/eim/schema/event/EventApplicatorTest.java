@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
@@ -93,6 +94,20 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         Assert.assertFalse(modEvent.getAnyTime());
     }
     
+    public void testApplyFieldNoDtStart() throws Exception {
+        NoteItem noteItem = new NoteItem();
+       
+        EimRecord record = makeTestBogusRecord();
+        EventApplicator applicator = new EventApplicator(noteItem);
+
+        // dtstart is required, so applying should throw a EimValidationException
+        try {
+            applicator.applyRecord(record);
+            Assert.fail("able to apply with no dtstart");
+        } catch (EimValidationException e) {
+        }
+    }
+    
     private EimRecord makeTestRecord() {
         EimRecord record = new EimRecord(PREFIX_EVENT, NS_EVENT);
 
@@ -122,6 +137,17 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         addMissingTextField(FIELD_DURATION, record);
         addMissingTextField(FIELD_LOCATION, record);
         addMissingIntegerField(FIELD_STATUS, record);
+        return record;
+    }
+    
+    private EimRecord makeTestBogusRecord() {
+        EimRecord record = new EimRecord(PREFIX_EVENT, NS_EVENT);
+        // no dtstart
+        record.addField(new TextField(FIELD_DURATION, "PT1H"));
+        record.addField(new TextField(FIELD_LOCATION, "here"));
+        record.addField(new TextField(FIELD_RRULE, "FREQ=DAILY;UNTIL=20070306T055959Z"));
+        record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));
+
         return record;
     }
     

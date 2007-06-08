@@ -152,7 +152,9 @@
       </td>
     </tr>
     <c:forEach var="item" items="${Collection.children}">
-      <c:if test="${empty item.modifies}">
+      <c:choose><c:when test="${item.class.name=='org.osaf.cosmo.model.NoteItem' &&  !empty item.modifies}"></c:when>
+      <c:otherwise>
+      
     <tr>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
       <a href='<c:url value="/browse${Path}/${item.name}" />'>[browse]</a>
@@ -174,7 +176,7 @@
         <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.FileItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
-      </c:if>
+      </c:otherwise></c:choose>
     </c:forEach>
   </table>
 </div>

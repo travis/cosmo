@@ -346,6 +346,10 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     removeModification: function(/*cosmo.model.Modification*/ recurrenceId){
         this._throwOnlyMaster();
     },
+    
+    hasModification: function(){
+        return !!this._master.getModification(this.recurrenceId);
+    },
 
     getNoteOccurrence: function (/*cosmo.datetime.Date*/ recurrenceId){
         this._throwOnlyMaster();

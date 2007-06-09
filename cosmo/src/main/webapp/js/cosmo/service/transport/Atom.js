@@ -34,6 +34,8 @@ dojo.require("cosmo.service.transport.Rest");
 
 dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
+        
+    EDIT_LINK: "atom-edit",
 
     createCollection: function(name){
         
@@ -73,15 +75,16 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return deferred;    
     },
     
-    getItems: function (collectionUid, searchCrit, kwArgs){
+    getItems: function (collection, searchCrit, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
         dojo.lang.mixin(query, this._generateSearchQuery(searchCrit));
+        var editLink = collection.getUrls()[this.EDIT_LINK];
 
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/collection/" +  collectionUid + "/full/eim-json" +
+          "/atom/" +  editLink + "/full/eim-json" +
           this.queryHashToString(query);
 
         dojo.io.bind(r);
@@ -94,13 +97,13 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
-
-        if (!item.editLink){
+        var editLink = item.getUrls()[this.EDIT_LINK];
+        if (!editLink){
             throw new CantSaveException("No edit link on item with UID " + item.getUid());
         }
         r.contentType = "application/atom+xml";
         r.url = cosmo.env.getBaseUrl() + "/atom/" + 
-                item.editLink + this.queryHashToString(query);
+                editLink + this.queryHashToString(query);
         r.postContent = postContent;
         r.method = "POST";
         r.headers['X-Http-Method-Override'] = "PUT";
@@ -125,14 +128,14 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return deferred;
     },
     
-    createItem: function(item, postContent, collectionUid, kwArgs){
+    createItem: function(item, postContent, collection, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
-        
+        var editLink = collection.getUrls()[this.EDIT_LINK];
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/collection/" +  collectionUid + 
+          "/atom/" + editLink + 
           this.queryHashToString(query);
         
         r.contentType = "application/atom+xml";
@@ -166,8 +169,9 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var r = this.getDefaultRequest(deferred, kwArgs);
         
         var query = this._generateAuthQuery(kwArgs);
+        var editLink = item.getUrls()[this.EDIT_LINK];
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/" + item.editLink + 
+          "/atom/" + editLink + 
           this.queryHashToString(query);
         r.method = "POST";
         r.headers['X-Http-Method-Override'] = "DELETE";

@@ -98,7 +98,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         if (collection.getTicketKey){
             kwArgs.ticketKey = collection.getTicketKey();
         }
-        var deferred = this._transport.getItems(collection.getUid(), searchCriteria, kwArgs);
+        var deferred = this._transport.getItems(collection, searchCriteria, kwArgs);
         
         this._addTranslation(deferred, "translateGetItems");
 
@@ -131,16 +131,33 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         kwArgs = kwArgs || {};
 
         // do topic notifications
-        return this._transport.saveItem(item, this._translator.itemToAtomEntry(item), kwArgs);
+        var deferred = this._transport.saveItem(item, this._translator.itemToAtomEntry(item), kwArgs);
+        var translationArgs = {};                                  
+        if (item instanceof cosmo.model.NoteOccurrence) {
+            translationArgs.masterItem = item.getMaster();
+            translationArgs.oldObject = item;
+        } else if (item instanceof cosmo.model.Note) {
+            translationArgs.oldObject = item;
+        }
+        this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
+        
+        return deferred;
 
     },
     
     createItem: function(item, parentCollection, kwArgs){
         kwArgs = kwArgs || {};
 
-        var deferred =  this._transport.createItem(item, this._translator.itemToAtomEntry(item), 
-                                          parentCollection.getUid(), kwArgs);
-        this._addTranslation(deferred, "translateGetItem", {oldObject: item});
+        var deferred =  this._transport.createItem(item, this._translator.itemToAtomEntry(item),
+                                          parentCollection, kwArgs);
+        var translationArgs = {};                                  
+        if (item instanceof cosmo.model.NoteOccurrence) {
+            translationArgs.masterItem = item.getMaster();
+            translationArgs.oldObject = item;
+        } else if (item instanceof cosmo.model.Note) {
+            translationArgs.oldObject = item;
+        }
+        this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
         return deferred;
         
     },

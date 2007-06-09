@@ -45,6 +45,23 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }}
     },
     
+    // a hash from link rels to useful url names
+    urlNameHash: {
+        "edit": "atom-edit"
+    },
+    
+    getUrls: function (xml){
+            var urls = {};//item.getUrls();
+            var links = cosmo.util.html.getElementsByTagName(xml, "link");
+            for (var i = 0; i < links.length; i++){
+                var link = links[i];
+                var rel = link.getAttribute("rel");
+                var href = link.getAttribute("href");
+                urls[this.urlNameHash[rel] || rel] = href;
+            }
+            return urls;
+    },
+    
     RID_FMT: "%Y%m%dT%H%M%S",
 
     // Wrap each of the specified property's getter with a function
@@ -75,18 +92,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var uid = atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9);
         var displayName = cosmo.util.html.getElementsByTagName(atomXml, "title")[0].firstChild.nodeValue;
         var collection = oldCollection || new cosmo.model.Collection();
-        
         collection.setUid(uid);
-        collection.setDisplayName(uid);
-        var protocolUrls = {};
-        var links = cosmo.util.html.getElementsByTagName(atomXml, "link");
-        for (var i = 0; i < links.length; i++){
-            var link = links[i];
-            var rel = link.getAttribute("rel");
-            var href = link.getAttribute("href");
-            protocolUrls[rel] = href;
-        }
-        collection.setProtocolUrls(protocolUrls);
+        collection.setDisplayName(displayName);
+        collection.setUrls(this.getUrls(atomXml));
+
         if (ticketKey) collection.setTicketKey(uid);
 
         return collection;
@@ -106,7 +115,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             for (var j = 0; j < collectionElements.length; j++){
                 var collection = this.collectionXmlToCollection(collectionElements[j]);
-                this.setLazyLoader(collection, ["protocolUrls"], kwArgs.lazyLoader);
+                this.setLazyLoader(collection, ["urls"], kwArgs.lazyLoader);
                 collections.push(collection);
             }
         }
@@ -130,7 +139,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 tickeyKey: ticket,
                 uid: uid
             })
-            this.setLazyLoader(subscription, ["protocolUrls"], kwArgs.lazyLoader);
+            this.setLazyLoader(subscription, ["urls"], kwArgs.lazyLoader);
           
         }
         return subscriptions;
@@ -160,24 +169,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         var content = cosmo.util.html.getElementTextContent(contentEl);
         
-        var links = cosmo.util.html.getElementsByTagName(entry, "link");
-        var editLink;
-        for (var j = 0; j < links.length; j++){
-            var link = links[j];
-            if (link.getAttribute('rel') == 'edit'){
-                editLink = link.getAttribute('href');
-            };
-        }
         var recordSets = dojo.json.evalJson(content);
 
         var masterItem = this.recordSetToObject(recordSets[0]);
-        masterItem.editLink = editLink;
+        masterItem.setUrls(this.getUrls(entry));
 
         var items = [];
         // All record sets after the first are occurrences
         for (var i = 1; i < recordSets.length; i++){
            var item = this.recordSetToModification(recordSets[i], masterItem)
-           item.editLink = editLink;
+           //TODO: remove this hack to get edit urls into modifications
+           if (item.hasModification()){
+              item.setUrls({"atom-edit": "item/" + this.getUid(item)});
+           }
            items.push(item); 
         }
         return items;
@@ -193,12 +197,22 @@ dojo.declare("cosmo.service.translators.Eim", null, {
           
     },
     
+    translateSaveCreateItem: function(atomXml, kwArgs){
+        kwArgs = kwArgs || {};
+        if (!atomXml){
+            throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
+        }
+        
+        var entry = atomXml.getElementsByTagName("entry")[0];
+        return this.entryToItem(entry, kwArgs.masterItem, kwArgs);
+          
+    },
+    
     translateGetItems: function (atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
         var entries = atomXml.getElementsByTagName("entry");
-
         var items = {};
         var mods = {};
         for (var i = 0; i < entries.length; i++){
@@ -233,7 +247,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var uid in items){
             itemArray.push(items[uid]);
         }
-
         return itemArray;
     },
     
@@ -254,19 +267,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
             if (masterItem){
-                item = this.recordSetToModification(dojo.json.evalJson(content), masterItem); 
+                item = this.recordSetToModification(dojo.json.evalJson(content), masterItem, kwArgs); 
             }
             else {
                 item = this.recordSetToObject(dojo.json.evalJson(content), kwArgs);
             }
-            var links = cosmo.util.html.getElementsByTagName(entry, "link");
-            for (var j = 0; j < links.length; j++){
-                var link = links[j];
-                if (link.getAttribute('rel') == 'edit'){
-                    item.editLink = link.getAttribute('href');
-                };
+            if (item.isMaster() || (item.isOccurrence() && item.hasModification())){
+                item.setUrls(this.getUrls(entry));
             }
-
             return item;
     },
     
@@ -279,7 +287,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          * be a little less elegant, and will require the creation of
          * more local variables, so we should play with this later.
          */
-
         var note = kwArgs.oldObject || new cosmo.model.Note(
          {
              uid: recordSet.uuid
@@ -318,15 +325,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     /*
      * 
      */
-    recordSetToModification: function (recordSet, masterItem){
+    recordSetToModification: function (recordSet, masterItem, kwArgs){
+        kwArgs = kwArgs || {};
         var uidParts = recordSet.uuid.split(":");
-
+        
         var modifiedProperties = {};
         var modifiedStamps = {};
 
         for (recordName in recordSet.records){
             with (cosmo.service.eim.constants){
-    
                var record = recordSet.records[recordName];
     
                switch(recordName){
@@ -349,7 +356,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                }
             }
         }
-        var recurrenceId = this.recurrenceIdToDate(uidParts[1])
+        var recurrenceId = this.recurrenceIdToDate(uidParts[1]);
         
         if (!dojo.lang.isEmpty(modifiedProperties)
             || !dojo.lang.isEmpty(modifiedStamps)){
@@ -362,7 +369,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             );
             masterItem.addModification(mod);
         }
-        return masterItem.getNoteOccurrence(recurrenceId);
+        
+        return kwArgs.oldObject || masterItem.getNoteOccurrence(recurrenceId);
     },
     
     recurrenceIdToDate: function (/*String*/ rid){
@@ -444,15 +452,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (this.modificationHasNoteModifications(modification))
             records.note = this.modifiedOccurrenceToNoteRecord(noteOccurrence);
         
-        // Occurrences need always have an event record
-        if (!modification.getModifiedStamps().event) modification.getModifiedStamps().event = {uuid: this.getUid(noteOccurrence)};
-        records.event = this.modificationToEventRecord(modification)
+        records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence)
         
         if (modification.getModifiedStamps().task){
             records.task = this.modificationToTaskRecord(modification)
         }
         if (modification.getModifiedStamps().mail){
-            records.mail = this.modificationToMailRecord(modification)
+            records.mail = this.modifiedOccurrenceToMailRecord(noteOccurrence)
         }
         var recordSet =  {
             uuid: this.getUid(noteOccurrence),
@@ -572,8 +578,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     },
 
-    modificationToMailRecord: function(modification){
-        var record = this.propsToMailRecord(modification.getModifiedStamps().mail);
+    modifiedOccurrenceToMailRecord: function(modifiedOccurrence){
+        var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId);
+        var props = modification.getModifiedStamps().mail || {};
+        props.uuid = modifiedOccurrence.getUid();
+        var record = this.propsToMailRecord(props);
         var missingFields = [];
         if (record.fields.messageId == undefined) missingFields.push("messageId");
         if (record.fields.headers == undefined) missingFields.push("headers");
@@ -632,8 +641,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     },
 
-    modificationToEventRecord: function(modification){
-        var record = this.propsToEventRecord(modification.getModifiedStamps().event);
+    modifiedOccurrenceToEventRecord: function(modifiedOccurrence){
+        var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId);
+        var props = modification.getModifiedStamps().event || {};
+        props.uuid = modifiedOccurrence.getUid();
+        var record = this.propsToEventRecord(props);
         var missingFields = [];
         if (record.fields.dtstart == undefined) missingFields.push("dtstart");
         if (record.fields.status == undefined) missingFields.push("status");

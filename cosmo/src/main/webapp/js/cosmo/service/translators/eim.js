@@ -96,7 +96,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         collection.setDisplayName(displayName);
         collection.setUrls(this.getUrls(atomXml));
 
-        if (ticketKey) collection.setTicketKey(uid);
+        if (ticketKey && 
+        (collection instanceof cosmo.model.AnonymousTicketedCollection || 
+         collection instanceof cosmo.model.Subscription)) 
+           collection.setTicketKey(uid);
 
         return collection;
     },

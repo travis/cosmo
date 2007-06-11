@@ -386,7 +386,7 @@ cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item,
        }
     });
     
-cosmo.model.declare("cosmo.mode.AnonymousTicketedCollection", cosmo.model.Item,
+cosmo.model.declare("cosmo.model.AnonymousTicketedCollection", cosmo.model.Item,
      [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}],
       ["ticketKey", {"default": null}],
       ["writeable", {"default": true}]

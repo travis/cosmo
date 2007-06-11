@@ -915,8 +915,6 @@ cosmo.ui.detail.EventFormElements= function () {
                 timeElem.value = '';
             }
         };
-        XXXX = stamp;
-        dojo.debug("your mom");
         _html.setTextInput(f.eventLocation, stamp.getLocation());
         var start = stamp.getStartDate();
         _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));

@@ -197,7 +197,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();
-        if (stamp) {
+        if (stamp && st.stampType =="event") {
             this.eventSection.updateFromStamp(stamp);
         }
     }
@@ -915,6 +915,8 @@ cosmo.ui.detail.EventFormElements= function () {
                 timeElem.value = '';
             }
         };
+        XXXX = stamp;
+        dojo.debug("your mom");
         _html.setTextInput(f.eventLocation, stamp.getLocation());
         var start = stamp.getStartDate();
         _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));

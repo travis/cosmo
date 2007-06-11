@@ -111,7 +111,6 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
         NoteItem child = new NoteItem();
 
         child.setName(recordset.getUuid());
-        child.setDisplayName(recordset.getUuid());
         child.setUid(recordset.getUuid());
         child.setOwner(collection.getOwner());
 

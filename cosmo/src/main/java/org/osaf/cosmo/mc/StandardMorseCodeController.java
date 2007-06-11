@@ -466,7 +466,6 @@ public class StandardMorseCodeController implements MorseCodeController {
                                         EimRecordSet recordset) {
         NoteItem child = new NoteItem();
         child.setName(recordset.getUuid());
-        child.setDisplayName(recordset.getUuid());
         child.setUid(recordset.getUuid());
         child.setOwner(collection.getOwner());
         

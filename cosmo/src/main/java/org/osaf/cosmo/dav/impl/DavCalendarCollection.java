@@ -399,13 +399,23 @@ public class DavCalendarCollection extends DavCollection
             throw new IllegalArgumentException("member not DavEvent");
 
         ContentItem content = (ContentItem) member.getItem();
+        CollectionItem parent = (CollectionItem) getItem();
         
         // XXX: what exceptions need to be caught?
         if (log.isDebugEnabled())
             log.debug("removing event " + member.getResourcePath());
 
         try {
-            getContentService().removeContent(content);
+            if(content instanceof NoteItem) {
+                NoteItem note = (NoteItem) content;
+                // remove all modifications from parent
+                for(NoteItem mod: note.getModifications())
+                    getContentService().removeItemFromCollection(mod, parent);
+                // remove master from parent
+                getContentService().removeItemFromCollection(note, parent);
+            }
+            else
+                getContentService().removeContent(content);
         } catch (CollectionLockedException e) {
             throw new DavException(DavServletResponse.SC_LOCKED);
         }

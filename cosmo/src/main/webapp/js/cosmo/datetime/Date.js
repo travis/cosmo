@@ -473,7 +473,7 @@ cosmo.datetime.Date.prototype.getTimezoneAbbrName = function(){
     return "";
 }
 
-cosmo.datetime.Date.prototype.equals = function dateEquals(/*cosmo.datetime.Date*/ that){
+cosmo.datetime.Date.prototype.equals = function (/*cosmo.datetime.Date*/ that){
 return  that != null &&
         this.year == that.year &&
         this.month == that.month &&
@@ -487,7 +487,7 @@ return  that != null &&
 
 }
 
-cosmo.datetime.Date.prototype.hash = function dateHash(){
+cosmo.datetime.Date.prototype.hash = function (){
     var hash =   this.year + ":"
                + this.month + ":"
                + this.date + ":"
@@ -497,6 +497,23 @@ cosmo.datetime.Date.prototype.hash = function dateHash(){
                + this.milliseconds + ":"
                + this.tzId;
     return hash;
+}
+
+/**
+ * Creates a new date at the same time, but in the given timezone.
+ * @param tzId - the id of the timezone you want the new date to use, or "utc"
+ * @return - a new date that is the same time (i.e. the UTC time is the same)
+ *           as "this" date, but in a different timezone.
+ */
+cosmo.datetime.Date.prototype.createDateForTimezone = function(tzId){
+    var date = new cosmo.datetime.Date();
+    if (tzId.toLowerCase() == "utc"){
+        date.utc = true;
+    } else {
+        date.tzId = tzId;
+    }
+    date.updateFromUTC(this.getTime());
+    return date
 }
 
 // Date static methods

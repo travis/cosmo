@@ -30,12 +30,27 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
     ],
     //mixins for master item stamps		 
     {
+        _preserveEndDate: true,
+        
+        getPreserveEndDate: function(){
+            //summary: if true, end dates will be preserved when setting start dates. Otherwise, 
+            //         duration is preserved.
+            return this._preserveEndDate;
+        },
+        
+        setPreserveEndDate: function(preserveEndDate){
+            this._preserveEndDate = preserveEndDate;
+        },
+        
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
 
         getEndDate: function (){
             var duration = this.getDuration();
+            if (duration == null || this.getStartDate() == null){
+                return null;
+            }
             var endDate = this.getStartDate().clone();
             endDate.addDuration(duration);
             if (this.getAnyTime() || this.getAllDay()){
@@ -54,8 +69,13 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
         },
     
         setStartDate: function (/*cosmo.datetime.Date*/ newStartDate){
+           var endDate = this.getEndDate();
            var oldDate = this.getStartDate();
            this.__setProperty("startDate", newStartDate);
+           
+           if (this.getPreserveEndDate() && endDate != null){
+               this.setEndDate(endDate);    
+           }
            
            //if there are modifications, we need to move the recurrenceid's for all of them
            if (this.item && oldDate && !dojo.lang.isEmpty(this.item._modifications)){

@@ -47,7 +47,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     // a hash from link rels to useful url names
     urlNameHash: {
-        "edit": "atom-edit"
+        "edit": "atom-edit",
+        "self": "self", 
+        "alternate": "alternate", 
+        "morse code": "mc", 
+        "dav": "dav",
+        "webcal": "webcal"
     },
     
     getUrls: function (xml){

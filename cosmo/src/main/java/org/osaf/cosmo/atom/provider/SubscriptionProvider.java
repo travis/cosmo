@@ -19,11 +19,11 @@ import java.io.IOException;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.util.Constants;
+import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -77,6 +77,7 @@ public class SubscriptionProvider extends BaseProvider
                 createResponseContext(entry.getDocument(), 201, "Created");
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             rc.setEntityTag(new EntityTag(sub.getEntityTag()));
+            rc.setLastModified(sub.getModifiedDate());
 
             try {
                 rc.setLocation(entry.getSelfLink().getHref().toString());
@@ -151,6 +152,7 @@ public class SubscriptionProvider extends BaseProvider
                 createResponseContext(entry.getDocument());
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             rc.setEntityTag(new EntityTag(sub.getEntityTag()));
+            rc.setLastModified(sub.getModifiedDate());
 
             return rc;
         } catch (IOException e) {
@@ -212,6 +214,7 @@ public class SubscriptionProvider extends BaseProvider
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument());
             rc.setEntityTag(new EntityTag(sub.getEntityTag()));
+            rc.setLastModified(sub.getModifiedDate());
             // override Abdera which sets content type to include the
             // type attribute because IE chokes on it
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);

@@ -24,11 +24,11 @@ import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
-import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.util.Constants;
+import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -88,6 +88,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 createResponseContext(entry.getDocument(), 201, "Created");
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLastModified(item.getModifiedDate());
 
             try {
                 rc.setLocation(entry.getSelfLink().getHref().toString());
@@ -187,6 +188,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 createResponseContext(entry.getDocument());
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLastModified(item.getModifiedDate());
 
             return rc;
         } catch (ParseException e) {
@@ -239,6 +241,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             AbstractResponseContext rc = createResponseContext(204);
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLastModified(item.getModifiedDate());
 
             return rc;
         } catch (MimeTypeParseException e) {
@@ -285,6 +288,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             AbstractResponseContext rc =
                 createResponseContext(feed.getDocument());
             rc.setEntityTag(new EntityTag(collection.getEntityTag()));
+            rc.setLastModified(collection.getModifiedDate());
             return rc;
         } catch (InvalidQueryException e) {
             return badrequest(getAbdera(), request, e.getMessage());
@@ -317,6 +321,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument());
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLastModified(item.getModifiedDate());
             // override Abdera which sets content type to include the
             // type attribute because IE chokes on it
             rc.setContentType(Constants.ATOM_MEDIA_TYPE);
@@ -383,7 +388,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             AbstractResponseContext rc = createResponseContext(204);
             rc.setEntityTag(new EntityTag(collection.getEntityTag()));
-
+            rc.setLastModified(collection.getModifiedDate());
             return rc;
         } catch (MimeTypeParseException e) {
             return notsupported(getAbdera(), request, "Invalid content type");
@@ -414,6 +419,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             AbstractResponseContext rc =
                 createResponseContext(feed.getDocument());
             rc.setEntityTag(new EntityTag(item.getEntityTag()));
+            rc.setLastModified(item.getModifiedDate());
             return rc;
         } catch (InvalidQueryException e) {
             return badrequest(getAbdera(), request, e.getMessage());

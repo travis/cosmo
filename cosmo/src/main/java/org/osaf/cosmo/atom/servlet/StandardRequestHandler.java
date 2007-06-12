@@ -17,16 +17,17 @@ package org.osaf.cosmo.atom.servlet;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.Provider;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.protocol.server.servlet.DefaultRequestHandler;
 import org.apache.abdera.protocol.server.servlet.RequestHandler;
+import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -95,6 +96,14 @@ public class StandardRequestHandler extends DefaultRequestHandler
         if (! ifNoneMatch(request.getIfNoneMatch(), target, request, response))
             return false;
 
+        if (! ifModifiedSince(request.getIfModifiedSince(), target, request,
+                              response))
+            return false;
+
+        if (! ifUnmodifiedSince(request.getIfUnmodifiedSince(), target, request,
+                                response))
+            return false;
+
         return true;
     }
 
@@ -139,6 +148,32 @@ public class StandardRequestHandler extends DefaultRequestHandler
         if (target.getEntityTag() != null)
             response.addHeader("ETag", target.getEntityTag().toString());
 
+        return false;
+    }
+
+    private boolean ifModifiedSince(Date date,
+                                    BaseItemTarget target,
+                                    RequestContext request,
+                                    HttpServletResponse response)
+        throws IOException {
+        if (date == null)
+            return true;
+        if (target.getLastModified().after(date))
+            return true;
+        response.sendError(304, "Not Modified");
+        return false;
+    }
+
+    private boolean ifUnmodifiedSince(Date date,
+                                      BaseItemTarget target,
+                                      RequestContext request,
+                                      HttpServletResponse response)
+        throws IOException {
+        if (date == null)
+            return true;
+        if (target.getLastModified().before(date))
+            return true;
+        response.sendError(412, "If-Unmodified-Since disallows conditional request");
         return false;
     }
 

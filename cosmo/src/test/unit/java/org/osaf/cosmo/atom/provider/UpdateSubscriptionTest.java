@@ -43,6 +43,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         assertNotNull("Null etag", res.getEntityTag());
         assertFalse("Matching etags",
                     sub.getEntityTag().equals(newsub.getEntityTag()));
+        assertNotNull("Null last modified", res.getLastModified());
 
         String username = helper.getUser().getUsername();
         CollectionSubscription saved = helper.getUserService().

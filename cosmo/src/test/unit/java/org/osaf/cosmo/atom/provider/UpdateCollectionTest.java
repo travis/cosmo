@@ -46,6 +46,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
+        assertNotNull("Null last modified", res.getLastModified());
         assertEquals("Display name not updated", collection.getName(), newName);
     }
 

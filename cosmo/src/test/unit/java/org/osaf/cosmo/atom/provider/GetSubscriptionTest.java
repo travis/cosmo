@@ -37,6 +37,7 @@ public class GetSubscriptionTest extends BaseSubscriptionProviderTestCase {
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
+        assertNotNull("Null last modified", res.getLastModified());
     }
 
     public void testGenerationError() throws Exception {

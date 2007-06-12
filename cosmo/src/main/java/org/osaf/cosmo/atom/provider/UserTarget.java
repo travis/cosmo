@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.EntityTag;
 import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;

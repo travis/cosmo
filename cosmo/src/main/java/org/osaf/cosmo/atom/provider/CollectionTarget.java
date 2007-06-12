@@ -15,9 +15,11 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.EntityTag;
+import java.util.Date;
+
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.util.EntityTag;
 
 import org.osaf.cosmo.model.CollectionItem;
 
@@ -45,5 +47,9 @@ public class CollectionTarget extends BaseItemTarget {
     public EntityTag getEntityTag() {
         return collection != null ?
             new EntityTag(collection.getEntityTag()) : null;
+    }
+
+    public Date getLastModified() {
+        return collection != null ? collection.getModifiedDate() : null;
     }
 }

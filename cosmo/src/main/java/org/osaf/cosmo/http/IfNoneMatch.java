@@ -17,7 +17,7 @@ package org.osaf.cosmo.http;
 
 import java.text.ParseException;
 
-import org.apache.abdera.protocol.EntityTag;
+import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -35,8 +35,9 @@ public class GetPreferencesTest extends BasePreferencesProviderTestCase {
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
-        // preferences feeds have no etag
+        // preferences feeds have no etag or last modified
         assertNull("Invalid etag", res.getEntityTag());
+        assertNull("Invalid last modified", res.getLastModified());
     }
 
     public void testGenerationError() throws Exception {

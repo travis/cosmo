@@ -56,8 +56,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext
 
     public void setContent(Entry entry)
         throws IOException {
-        String xml = (String)
-            context.getAbdera().getWriterFactory().getWriter().write(entry);
+        String xml = context.getAbdera().getWriter().write(entry).toString();
         getMockRequest().setContent(xml.getBytes());
         getMockRequest().setContentType(ATOM_MEDIA_TYPE);
         getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);

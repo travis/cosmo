@@ -15,11 +15,13 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.EntityTag;
+import java.util.Date;
+
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.util.Constants;
+import org.apache.abdera.util.EntityTag;
 
 import org.osaf.cosmo.model.NoteItem;
 
@@ -46,6 +48,10 @@ public class ItemTarget extends BaseItemTarget implements Constants {
 
     public EntityTag getEntityTag() {
         return item != null ? new EntityTag(item.getEntityTag()) : null;
+    }
+
+    public Date getLastModified() {
+        return item != null ? item.getModifiedDate() : null;
     }
 
     private static TargetType type(RequestContext request) {

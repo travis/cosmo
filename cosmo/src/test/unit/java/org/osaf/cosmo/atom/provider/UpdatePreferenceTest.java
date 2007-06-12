@@ -43,6 +43,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         assertNotNull("Null etag", res.getEntityTag());
         assertFalse("Matching etags",
                     pref.getEntityTag().equals(newpref.getEntityTag()));
+        assertNotNull("Null last modified", res.getLastModified());
 
         String username = helper.getUser().getUsername();
         Preference saved = helper.getUserService().getUser(username).

@@ -40,6 +40,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
+        assertNotNull("Null last modified", res.getLastModified());
         assertNotNull("Null Location header", res.getHeader("Location"));
         assertNotNull("Null Content-Location header",
                       res.getHeader("Content-Location"));

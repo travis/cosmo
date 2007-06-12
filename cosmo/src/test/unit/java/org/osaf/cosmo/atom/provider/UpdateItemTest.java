@@ -40,6 +40,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
+        assertNotNull("Null last modified", res.getLastModified());
     }
 
     public void testUnsupportedMediaType() throws Exception {

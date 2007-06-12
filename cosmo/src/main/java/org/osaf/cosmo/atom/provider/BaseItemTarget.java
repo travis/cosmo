@@ -15,10 +15,12 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.EntityTag;
+import java.util.Date;
+
 import org.apache.abdera.protocol.server.provider.AbstractTarget;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.util.EntityTag;
 
 public abstract class BaseItemTarget extends AbstractTarget {
 
@@ -48,4 +50,6 @@ public abstract class BaseItemTarget extends AbstractTarget {
     }
 
     public abstract EntityTag getEntityTag();
+
+    public abstract Date getLastModified();
 }

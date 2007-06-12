@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Date;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.protocol.server.ServiceContext;
@@ -244,6 +245,18 @@ public class AtomHelper extends MockHelper {
         ((MockHttpServletRequest)
          ((BaseMockRequestContext)context).getRequest()).
             addHeader("If-None-Match", etag);
+    }
+
+    public void setIfModifiedSince(RequestContext context,
+                                   Date date) {
+        ((BaseMockRequestContext)context).getMockRequest().
+            addHeader("If-Modified-Since", date);
+    }
+
+    public void setIfUnmodifiedSince(RequestContext context,
+                                     Date date) {
+        ((BaseMockRequestContext)context).getMockRequest().
+            addHeader("If-Unmodified-Since", date);
     }
 
     public void setContentType(RequestContext context,

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.servlet;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
@@ -107,6 +109,58 @@ public class StandardRequestHandlerTest extends TestCase {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createFeedRequestContext(collection, "GET");
         helper.setIfNoneMatch(req, "aeiou");
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        assertTrue("Preconditions failed", rv);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
+    public void testIfModifiedSinceAfter() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        Date date = new Date(System.currentTimeMillis()-1000000);
+        helper.setIfModifiedSince(req, date);
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        assertTrue("Preconditions failed", rv);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
+    public void testIfModifiedSinceBefore() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        Date date = new Date(System.currentTimeMillis()+1000000);
+        helper.setIfModifiedSince(req, date);
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        assertFalse("Preconditions failed", rv);
+        assertEquals("Incorrect response status", 304, res.getStatus());
+    }
+
+    public void testIfUnmodifiedSinceAfter() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        Date date = new Date(System.currentTimeMillis()-1000000);
+        helper.setIfUnmodifiedSince(req, date);
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        assertFalse("Preconditions failed", rv);
+        assertEquals("Incorrect response status", 412, res.getStatus());
+    }
+
+    public void testIfUnmodifiedSinceBefore() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        RequestContext req = helper.createFeedRequestContext(collection, "GET",
+                                                             "yyz", "eff");
+        Date date = new Date(System.currentTimeMillis()+1000000);
+        helper.setIfUnmodifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(), req, res);

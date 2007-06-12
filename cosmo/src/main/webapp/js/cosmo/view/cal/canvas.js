@@ -950,6 +950,7 @@ cosmo.view.cal.canvas = new function () {
         }
 
         var updateEventsCallback = function (){
+            dojo.debug("updateEventsCallback")
             // Don't re-render when requests are still processing
             if (!cosmo.view.cal.processingQueue.length) {
               if (false /*&& cmd.qualifier.newEvent ||
@@ -965,11 +966,10 @@ cosmo.view.cal.canvas = new function () {
             }
         }
 
-        dojo.debug("saveSuccess: has recurrence9");
         if (deferred){
             deferred.addCallback(updateEventsCallback);
         } else {
-            updateEventsCallBack();
+            updateEventsCallback();
         }
     }
 

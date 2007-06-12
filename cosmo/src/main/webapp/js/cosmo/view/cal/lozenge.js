@@ -999,13 +999,10 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateFromEvent = function (ev, t
 }
 
 /**
- * Update an event from changes to the lozenge -- usually called
+ * Returns the Delta based on changes to the lozenge -- usually called
  * when an event lozenge is dragged or resized
- * The updated event is then passed back to the backend for saving
- * If the save operation fails, the event can be restored from
- * the backup copy of the CalEventData in the event's dataOrig property
  */
-cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateEvent = function (ev, dragMode) {
+cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getDelta = function (ev, dragMode) {
     var eventStamp = ev.data.getEventStamp();
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();    // Dragged-to date
@@ -1019,7 +1016,13 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateEvent = function (ev, dragM
         dojo.date.dateParts.DAY, diff);
     endDate = cosmo.datetime.Date.add(endDate,
         dojo.date.dateParts.DAY, diff);
-    return true;
+        
+    var delta = new cosmo.model.Delta(ev.data);
+    delta.addStampProperty("event","startDate", startDate);
+    delta.addStampProperty("event","endDate", endDate);
+    delta.deltafy();
+    
+    return delta;
 }
 
 /**

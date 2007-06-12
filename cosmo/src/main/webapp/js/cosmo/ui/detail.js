@@ -65,8 +65,19 @@ cosmo.ui.detail.StampFormElemState = function (p) {
     this.value = null; // String
     this.hintText = null; // String
     for (var n in params) { this[n] = params[n]; }
-}
+};
 
+cosmo.ui.detail.itemStamps = [
+    { stampType: 'Mail',
+    enablePrompt: 'Address this item',
+    hasBody: true },
+    { stampType: 'Event',
+    enablePrompt: 'Add to calendar',
+    hasBody: true },
+    { stampType: 'Task',
+    enablePrompt: 'Mark as a task',
+    hasBody: false }
+];
 cosmo.ui.detail.DetailViewForm = function (p) {
     var self = this;
     var params = p || {};
@@ -76,8 +87,19 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     this.mailSection = null;
     this.eventSection = null;
     this.taskSection = null;
+    this.stamps = cosmo.ui.detail.itemStamps;
 
     for (var n in params) { this[n] = params[n]; }
+
+    // Markup bar
+    /*
+    var d = _createElem('div');
+    var c = new cosmo.ui.detail.MarkupBar({ id: 'markupBar',
+        parent: this, domNode: d });
+    this.children.push(c);
+    this.domNode.appendChild(c.domNode);
+    this.markupBar = c;
+    */
 
     // Main section
     var d = _createElem('div');
@@ -86,18 +108,8 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.mainSection = c;
-    this.stamps = [
-        { stampType: 'Mail',
-        enablePrompt: 'Address this item',
-        hasBody: true },
-        { stampType: 'Event',
-        enablePrompt: 'Add this item to the calendar',
-        hasBody: true },
-        { stampType: 'Task',
-        enablePrompt: 'Make this item a task',
-        hasBody: false }
-    ];
-    // Create the stamp sections
+
+    // Stamp sections
     var stamps = this.stamps;
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
@@ -105,7 +117,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         var c = new cosmo.ui.detail.StampSection({ parent: this,
             domNode: d,
             stampType: st.stampType,
-            title: st.enablePrompt,
+            promptText: st.enablePrompt,
             hasBody: st.hasBody });
         this.children.push(c);
         this.domNode.appendChild(c.domNode);
@@ -213,6 +225,53 @@ cosmo.ui.detail.DetailViewForm.prototype.clear =
     }
 };
 
+cosmo.ui.detail.MarkupBar = function (p) {
+    // Private vars
+    // -------
+    var self = this;
+    var params = p || {};
+
+    this.id = '';
+    this.domNode = null; // Main node
+    // Override defaults with params passed in
+    for (var n in params) { this[n] = params[n] };
+
+    this.domNode.id = this.id;
+    var d = this.domNode;
+
+    this.renderSelf = function () {
+        this.clearAll();
+
+        // Add e-mail icon when it's added to the image grid
+        addEmailThisIcon();
+
+        // Do test for read-only collection here
+        addReadOnlyIcon();
+
+        breakFloat();
+    }
+    function addEmailThisIcon() {}
+    function addReadOnlyIcon() {
+        var t = _createElem('div');
+        t.id = 'readOnlyIcon';
+        t.className = 'floatRight';
+        t.style.width = '12px';
+        t.style.height = '12px';
+        t.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() +
+            'image_grid.png)';
+        t.style.backgroundPosition = '-280px -45px';
+        t.style.margin = '6px';
+        d.appendChild(t);
+    }
+    function breakFloat() {
+        var t = _createElem('div');
+        t.className = 'clearBoth';
+        d.appendChild(t);
+    }
+}
+
+cosmo.ui.detail.MarkupBar.prototype =
+    new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.StampSection = function (p) {
     // Private vars
@@ -225,10 +284,10 @@ cosmo.ui.detail.StampSection = function (p) {
     this.stampType = '';
     this.hasBody = true;
     this.id = '';
-    this.title = '';
+    this.promptText = '';
     this.domNode = null; // Main node
     this.headerNode = null; // Header with toolbar
-    this.titleNode = null; // Stamp title
+    this.promptNode = null; // Stamp enabling prompt
     this.bodyNode = null; // Body with form section
     this.enablerSwitch = null; // Checkbox for toggling disabled state
     this.showHideSwitch = null // Show/hide link
@@ -286,11 +345,11 @@ cosmo.ui.detail.StampSection = function (p) {
         header.appendChild(label);
         // Title
         d = _createElem('div');
-        d.className = 'expandoTitle floatLeft';
+        d.className = 'expandoPrompt floatLeft';
         d.id = id + 'Title';
-        d.innerHTML = self.title;
+        d.innerHTML = self.promptText;
         label.appendChild(d);
-        self.titleNode = d;
+        self.promptNode = d;
         if (self.hasBody) {
             // Show/hide link
             d = _createElem('div');
@@ -495,7 +554,7 @@ cosmo.ui.detail.MainSection = function () {
     var f = _createElem('form');
 
     d.id = 'mainFormSection';
-    d.style.padding = '8px';
+    d.style.padding = '4px 8px 8px 8px';
 
     // Title
     var t = cosmo.ui.detail.createLabelDiv(_(
@@ -963,7 +1022,7 @@ cosmo.ui.detail.EventFormElements= function () {
         }
         else {
             _html.setSelect(f.recurrenceInterval, '');
-            _html.setTextInput(recurEnd, 'mm/dd/yyyy', true, true);
+            _html.clearAndDisableFormElem(recurEnd, 'text');
         }
     };
 };

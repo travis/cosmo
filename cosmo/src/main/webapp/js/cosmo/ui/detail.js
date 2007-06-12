@@ -139,8 +139,11 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 //self.clear();
                 break;
             case 'eventsDisplaySuccess':
-                self.updateFromItem(item);
-                self.buttonSection.setButtons(true);
+                // FIXME: This may not be needed if there's always
+                // an item that gets the default selection
+                //self.updateFromItem(item);
+                //console.log('asdf');
+                //self.buttonSection.setButtons(true);
                 /*
                 toggleReadOnlyIcon();
                 */
@@ -203,6 +206,11 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     var f = null;
     var stamps = this.stamps;
     var stamp = null;
+
+    // Clear out previous values
+    this.clear();
+
+    this.mainSection.toggleEnabled(true);
     f = this.mainSection.formNode;
     f.noteTitle.value = data.getDisplayName();
     f.noteDescription.value = data.getBody();
@@ -414,7 +422,8 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (e) {
     }
 }
 
-cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e) {
+cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, setUp) {
+    var setUpDefaults = true;
     // Allow explicit enabled state to be passed
     if (typeof e == 'boolean') {
         // Don't bother enabling and setting up default state
@@ -422,20 +431,22 @@ cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e) {
         if (e == this.enabled) { return false; }
         this.enabled = e;
         this.enablerSwitch.checked = e;
+        setUpDefaults = (setUp == false) ? false : true;
     }
     else {
         this.enabled = !this.enabled;
         // Don't pass click event along to the expando
         // when enabled/expanded states already match
         if (this.hasBody && (this.enabled != this.expanded)) { this.toggleExpando(); }
+        setUpDefaults = true;
     }
     if (this.hasBody) {
-        this.formSection.toggleEnabled(this.enabled);
+        this.formSection.toggleEnabled(this.enabled, setUpDefaults);
     }
 }
 
 cosmo.ui.detail.StampSection.prototype.updateFromStamp = function (stamp) {
-    this.toggleEnabled(true);
+    this.toggleEnabled(true, false);
     if (this.hasBody) {
         this.formSection.updateFromStamp(stamp);
     }
@@ -480,7 +491,7 @@ cosmo.ui.detail.StampFormElements.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
-    = function (explicit) {
+    = function (explicit, setUpDefaults) {
     var toggleText = function (tags, isEnabled) {
         var key = isEnabled ? 'remove' : 'add';
         for (var i = 0; i < tags.length; i++) {
@@ -511,7 +522,13 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
             var elem = f[i];
             var state = d[i];
             var elemType = elems[i];
-            this.setElemDefaultState(elem, elemType, state);
+            cosmo.util.html.enableFormElem(elem, elemType);
+            if (setUpDefaults != false) {
+                this.setElemDefaultState(elem, elemType, state);
+            }
+            else {
+                cosmo.util.html.clearFormElem(elem, elemType);
+            }
         }
     }
     else {
@@ -525,7 +542,6 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
 
 cosmo.ui.detail.StampFormElements.prototype.setElemDefaultState =
     function (elem, elemType, state) {
-    cosmo.util.html.enableFormElem(elem, elemType);
     if (!state) {
         cosmo.util.html.clearFormElem(elem, elemType);
     }
@@ -640,6 +656,18 @@ cosmo.ui.detail.MailFormElements = function () {
     // Interface methods
     // -------
     this.updateFromStamp = function (stamp) {
+        function joinVals(a) {
+            if (a && a.length) {
+                return a.join(', ');
+            }
+            else {
+                return '';
+            }
+        }
+        var f = this.formNode;
+        f.mailFrom.value = joinVals(stamp.getFromAddress());
+        f.mailTo.value = joinVals(stamp.getToAddress());
+        f.mailCc.value = joinVals(stamp.getCcAddress());
     }
 };
 cosmo.ui.detail.MailFormElements.prototype =

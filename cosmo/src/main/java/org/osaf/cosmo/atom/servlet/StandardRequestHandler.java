@@ -34,7 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
-import org.osaf.cosmo.atom.provider.BaseItemTarget;
+import org.osaf.cosmo.atom.provider.AuditableTarget;
 import org.osaf.cosmo.atom.provider.ExtendedProvider;
 import org.osaf.cosmo.http.IfMatch;
 import org.osaf.cosmo.http.IfNoneMatch;
@@ -85,10 +85,10 @@ public class StandardRequestHandler extends DefaultRequestHandler
         if (! super.preconditions(provider, request, response))
             return false;
 
-        if (! (request.getTarget() instanceof BaseItemTarget))
+        if (! (request.getTarget() instanceof AuditableTarget))
             return true;
 
-        BaseItemTarget target = (BaseItemTarget) request.getTarget();
+        AuditableTarget target = (AuditableTarget) request.getTarget();
 
         if (! ifMatch(request.getIfMatch(), target, request, response))
             return false;
@@ -108,7 +108,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
     }
 
     private boolean ifMatch(String header,
-                            BaseItemTarget target,
+                            AuditableTarget target,
                             RequestContext request,
                             HttpServletResponse response)
         throws IOException {
@@ -128,7 +128,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
     }
 
     private boolean ifNoneMatch(String header,
-                                BaseItemTarget target,
+                                AuditableTarget target,
                                 RequestContext request,
                                 HttpServletResponse response)
         throws IOException {
@@ -152,7 +152,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
     }
 
     private boolean ifModifiedSince(Date date,
-                                    BaseItemTarget target,
+                                    AuditableTarget target,
                                     RequestContext request,
                                     HttpServletResponse response)
         throws IOException {
@@ -165,7 +165,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
     }
 
     private boolean ifUnmodifiedSince(Date date,
-                                      BaseItemTarget target,
+                                      AuditableTarget target,
                                       RequestContext request,
                                       HttpServletResponse response)
         throws IOException {

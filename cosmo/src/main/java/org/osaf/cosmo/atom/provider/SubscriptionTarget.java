@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.util.Date;
+
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.util.EntityTag;
 
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
@@ -26,7 +29,7 @@ import org.osaf.cosmo.model.User;
  * A target that identifies a particular collection subscription.
  * </p>
  */
-public class SubscriptionTarget extends UserTarget {
+public class SubscriptionTarget extends UserTarget implements AuditableTarget {
 
     private CollectionSubscription subscription;
 
@@ -36,6 +39,22 @@ public class SubscriptionTarget extends UserTarget {
         super(TargetType.TYPE_ENTRY, request, user);
         this.subscription = subscription;
     }
+
+    // AuditableTarget methods
+
+    public EntityTag getEntityTag() {
+        if (subscription == null)
+            return null;
+        return new EntityTag(subscription.getEntityTag());
+    }
+
+    public Date getLastModified() {
+        if (subscription == null)
+            return null;
+        return subscription.getModifiedDate();
+    }
+
+    // our methods
 
     public CollectionSubscription getSubscription() {
         return subscription;

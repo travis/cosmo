@@ -22,7 +22,8 @@ import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.util.EntityTag;
 
-public abstract class BaseItemTarget extends AbstractTarget {
+public abstract class BaseItemTarget extends AbstractTarget
+    implements AuditableTarget {
 
     private String projection;
     private String format;
@@ -48,8 +49,4 @@ public abstract class BaseItemTarget extends AbstractTarget {
     public String getFormat() {
         return format;
     }
-
-    public abstract EntityTag getEntityTag();
-
-    public abstract Date getLastModified();
 }

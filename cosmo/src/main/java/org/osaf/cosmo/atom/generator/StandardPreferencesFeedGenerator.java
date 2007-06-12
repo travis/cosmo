@@ -195,8 +195,8 @@ public class StandardPreferencesFeedGenerator
      */
     protected String preferenceIri(Preference pref) {
         try {
-            StringBuffer iri = new StringBuffer(preferencesIri(pref.getUser()));
-            iri.append("/").
+            StringBuffer iri = new StringBuffer(personIri(pref.getUser()));
+            iri.append("/preference/").
                 append(URLEncoder.encode(pref.getKey(), "UTF-8"));
             return iri.toString();
         } catch (UnsupportedEncodingException e) {

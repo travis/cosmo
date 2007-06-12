@@ -40,9 +40,7 @@ public class CollectionTarget extends BaseItemTarget {
         this.collection = collection;
     }
 
-    public CollectionItem getCollection() {
-        return collection;
-    }
+    // AuditableTarget methods
 
     public EntityTag getEntityTag() {
         return collection != null ?
@@ -51,5 +49,11 @@ public class CollectionTarget extends BaseItemTarget {
 
     public Date getLastModified() {
         return collection != null ? collection.getModifiedDate() : null;
+    }
+
+    // our methods
+
+    public CollectionItem getCollection() {
+        return collection;
     }
 }

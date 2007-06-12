@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.util.Date;
+
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.util.EntityTag;
 
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
@@ -26,7 +29,7 @@ import org.osaf.cosmo.model.User;
  * A target that identifies a particular user preference.
  * </p>
  */
-public class PreferenceTarget extends UserTarget {
+public class PreferenceTarget extends UserTarget implements AuditableTarget {
 
     private Preference preference;
 
@@ -36,6 +39,22 @@ public class PreferenceTarget extends UserTarget {
         super(TargetType.TYPE_ENTRY, request, user);
         this.preference = preference;
     }
+
+    // AuditableTarget methods
+
+    public EntityTag getEntityTag() {
+        if (preference == null)
+            return null;
+        return new EntityTag(preference.getEntityTag());
+    }
+
+    public Date getLastModified() {
+        if (preference == null)
+            return null;
+        return preference.getModifiedDate();
+    }
+
+    // our methods
 
     public Preference getPreference() {
         return preference;

@@ -41,9 +41,7 @@ public class ExpandedItemTarget extends BaseItemTarget {
         this.item = item;
     }
 
-    public NoteItem getItem() {
-        return item;
-    }
+    // AuditableTarget methods
 
     public EntityTag getEntityTag() {
         return item != null ? new EntityTag(item.getEntityTag()) : null;
@@ -51,5 +49,11 @@ public class ExpandedItemTarget extends BaseItemTarget {
 
     public Date getLastModified() {
         return item != null ? item.getModifiedDate() : null;
+    }
+
+    // our methods
+
+    public NoteItem getItem() {
+        return item;
     }
 }

@@ -42,9 +42,7 @@ public class ItemTarget extends BaseItemTarget implements Constants {
         this.item = item;
     }
 
-    public NoteItem getItem() {
-        return item;
-    }
+    // AuditableTarget methods
 
     public EntityTag getEntityTag() {
         return item != null ? new EntityTag(item.getEntityTag()) : null;
@@ -52,6 +50,12 @@ public class ItemTarget extends BaseItemTarget implements Constants {
 
     public Date getLastModified() {
         return item != null ? item.getModifiedDate() : null;
+    }
+
+    // our methods
+
+    public NoteItem getItem() {
+        return item;
     }
 
     private static TargetType type(RequestContext request) {

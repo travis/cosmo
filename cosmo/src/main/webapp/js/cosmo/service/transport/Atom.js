@@ -75,6 +75,12 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return deferred;    
     },
     
+    getItemsProjections: {
+        now: "dashboard-now",
+        later: "dashboard-later",
+        done: "dashboard-done"  
+    },
+    
     getItems: function (collection, searchCrit, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);
@@ -82,9 +88,11 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var query = this._generateAuthQuery(kwArgs);
         dojo.lang.mixin(query, this._generateSearchQuery(searchCrit));
         var editLink = collection.getUrls()[this.EDIT_LINK];
+        
+        var projection = this.getItemsProjections[searchCrit.triage] || "full";
 
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/" +  editLink + "/full/eim-json" +
+          "/atom/" +  editLink + "/" + projection + "/eim-json" +
           this.queryHashToString(query);
 
         dojo.io.bind(r);

@@ -27,7 +27,6 @@ public interface AtomConstants {
 
     // media type constants
 
-    /** */
     public static final String MEDIA_TYPE_ATOMSVC = "application/atomsvc+xml";
     /** */
     public static final String MEDIA_TYPE_ATOM = "application/atom+xml";
@@ -64,6 +63,9 @@ public interface AtomConstants {
     public static final String PROJECTION_BASIC = "basic";
     /** */
     public static final String PROJECTION_FULL = "full";
+    public static final String PROJECTION_DASHBOARD_NOW = "dashboard-now";
+    public static final String PROJECTION_DASHBOARD_LATER = "dashboard-later";
+    public static final String PROJECTION_DASHBOARD_DONE = "dashboard-done";
     /** */
     public static final String PROJECTION_DETAILS = "details";
 

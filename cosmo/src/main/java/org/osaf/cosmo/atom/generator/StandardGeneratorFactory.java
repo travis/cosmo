@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
@@ -65,6 +66,12 @@ public class StandardGeneratorFactory
      * <dd>{@link BasicFeedGenerator}</dd>
      * <dt>{@link AtomConstants#PROJECTION_FULL}</dt>
      * <dd>{@link FullFeedGenerator}</dd>
+     * <dt>{@link AtomConstants#PROJECTION_DASHBOARD_NOW}</dt>
+     * <dd>{@link DashboardFeedGenerator}</dd>
+     * <dt>{@link AtomConstants#PROJECTION_DASHBOARD_LATER}</dt>
+     * <dd>{@link DashboardFeedGenerator}</dd>
+     * <dt>{@link AtomConstants#PROJECTION_DASHBOARD_DONE}</dt>
+     * <dd>{@link DashboardFeedGenerator}</dd>
      * <dt>{@link AtomConstants#PROJECTION_DETAILS}</dt>
      * <dd>{@link DetailsFeedGenerator}</dd>
      * </dl>
@@ -76,6 +83,8 @@ public class StandardGeneratorFactory
      * <dl>
      * <dt>{@link AtomConstants#FORMAT_EIM_JSON}</dt>
      * <dd>EIM over JSON</dd>
+     * <dt>{@link AtomConstants#FORMAT_EIMML}</dt>
+     * <dd>EIMML</dd>
      * </dl>
      * <p>
      * The basic and details feed generators ignore the format
@@ -100,6 +109,15 @@ public class StandardGeneratorFactory
             return new FullFeedGenerator(this, locator, format);
         if (projection.equals(PROJECTION_DETAILS))
             return new DetailsFeedGenerator(this, locator);
+        if (projection.equals(PROJECTION_DASHBOARD_NOW))
+            return new DashboardFeedGenerator(this, locator, format,
+                                              TriageStatus.CODE_NOW);
+        if (projection.equals(PROJECTION_DASHBOARD_LATER))
+            return new DashboardFeedGenerator(this, locator, format,
+                                              TriageStatus.CODE_LATER);
+        if (projection.equals(PROJECTION_DASHBOARD_DONE))
+            return new DashboardFeedGenerator(this, locator, format,
+                                              TriageStatus.CODE_DONE);
         throw new UnsupportedProjectionException(projection);
     }
 

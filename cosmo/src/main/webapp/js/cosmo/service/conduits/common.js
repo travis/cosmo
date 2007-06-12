@@ -200,20 +200,6 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     },
     
-    //TODO - actually implement this once BCM give us what we need
-    getProtocolUrls:function(collectionUid, kwargs){
-        var fakeDeferred = {};
-        fakeDeferred.results = [{
-            mc: "http://mc",
-            atom: "http://atom",
-            webcal: "http://webcal",
-            dav: "http://dav",
-            pim: "http://pim"
-        }, null];
-        
-        return fakeDeferred;
-    },
-    
     _addTranslation: function (deferred, translationFunction, kwArgs){
         deferred.addCallback(
             dojo.lang.hitch(this._translator, function (obj, xhr){

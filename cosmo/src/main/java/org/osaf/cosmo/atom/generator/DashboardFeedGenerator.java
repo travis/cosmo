@@ -15,7 +15,10 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -24,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItemComparator;
-import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
@@ -74,31 +76,25 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      * include as entries in the feed.
      * </p>
      * <p>
+     * Calls {@link ContentService#findNotesByTriageStatus(CollectionItem, String, Date)} to find all relevant <code>NoteItem</code>s for the
+     * generator's triage status at the current point in time. Returns
+     * the notes sorted according to triage status rank. Limits
+     * the number of <code>DONE</code> items to {@link #MAX_DONE}.
      * Performs a dashboard query for the generator's triage status
-     * and returns the resulting <code>NoteItem</code>s sorted
-     * according to triage status rank.
      * </p>
      *
      * @param the collection whose contents are to be listed
      */
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
-        // stupid grouping and sorting of items by triage
-        // status. replace with service queries.
+        Date now = Calendar.getInstance().getTime();
+        String label = TriageStatus.label(triageStatus);
+        Set<NoteItem> notes = getFactory().getContentService().
+            findNotesByTriageStatus(collection, label, now);
 
+        // sort by triage rank
         TreeSet<NoteItem> contents =
             new TreeSet<NoteItem>(new ContentItemComparator());
-
-        for (Item child : collection.getChildren()) {
-            if (! (child instanceof NoteItem))
-                continue;
-            NoteItem note = (NoteItem) child;
-            if (triageStatus == TriageStatus.CODE_NOW)
-                addIfNow(contents, note);
-            else if (triageStatus == TriageStatus.CODE_LATER)
-                addIfLater(contents, note);
-            else
-                addIfDone(contents, note);
-        }
+        contents.addAll(notes);
 
         if (triageStatus == TriageStatus.CODE_DONE) {
             // limit to 25 entries
@@ -114,56 +110,6 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
         }
 
         return contents;
-    }
-
-    private void addIfNow(SortedSet contents,
-                          NoteItem note) {
-        EventStamp stamp = EventStamp.getStamp(note);
-        if (stamp != null && stamp.isRecurring()) {
-            // XXX: occurrences whose period overlaps the current
-            // point in time
-        } else {
-            // non-recurring with no or null triage status
-            if (note.getTriageStatus() == null ||
-                note.getTriageStatus().getCode() == null ||
-                // non-recurring or modifications with triage status NOW
-                note.getTriageStatus().getCode() == TriageStatus.CODE_NOW)
-                contents.add(note);
-        }
-    }
-
-    private void addIfLater(SortedSet contents,
-                            NoteItem note) {
-        EventStamp stamp = EventStamp.getStamp(note);
-        if (stamp != null && stamp.isRecurring()) {
-            // XXX: either the next occurring modification with triage
-            // status LATER or the next occurrence, whichever occurs
-            // sooner
-        }
-        // non-recurring with triage status LATER
-        if (note.getTriageStatus() == null)
-            return;
-        if (note.getTriageStatus().getCode() == null)
-            return;
-        if (note.getTriageStatus().getCode() == TriageStatus.CODE_LATER)
-            contents.add(note);
-    }
-
-    private void addIfDone(SortedSet contents,
-                           NoteItem note) {
-        EventStamp stamp = EventStamp.getStamp(note);
-        if (stamp != null && stamp.isRecurring()) {
-            // XXX: either the most recently occurring modification
-            // with triage status DONE or the most recent occurrence,
-            // whichever occurred more recently
-        }
-        // non-recurring with triage status DONE
-        if (note.getTriageStatus() == null)
-            return;
-        if (note.getTriageStatus().getCode() == null)
-            return;
-        if (note.getTriageStatus().getCode() == TriageStatus.CODE_DONE)
-            contents.add(note);
     }
 
     /**

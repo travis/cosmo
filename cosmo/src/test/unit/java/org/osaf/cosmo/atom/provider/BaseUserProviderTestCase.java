@@ -19,17 +19,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Base class for for {@link ProviderProxy} tests.
+ * Base class for for {@link UserProvider} tests.
  */
-public abstract class BaseProviderProxyTestCase extends BaseProviderTestCase {
+public abstract class BaseUserProviderTestCase extends BaseProviderTestCase {
     private static final Log log =
-        LogFactory.getLog(BaseProviderProxyTestCase.class);
+        LogFactory.getLog(BaseUserProviderTestCase.class);
 
     protected BaseProvider createProvider() {
-        ProviderProxy provider = new ProviderProxy();
-        provider.setItemProvider(new ItemProvider());
-        provider.setSubscriptionProvider(new SubscriptionProvider());
-        provider.setPreferencesProvider(new PreferencesProvider());
+        UserProvider provider = new UserProvider();
         return provider;
     }
 }

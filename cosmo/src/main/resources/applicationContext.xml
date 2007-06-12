@@ -514,37 +514,36 @@
     <property name="providerManager">
       <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager"
             init-method="init">
-        <property name="provider">
-          <bean class="org.osaf.cosmo.atom.provider.ProviderProxy"
+        <property name="itemProvider">
+          <bean class="org.osaf.cosmo.atom.provider.ItemProvider"
                 init-method="init" parent="baseProvider">
-            <property name="itemProvider">
-              <bean class="org.osaf.cosmo.atom.provider.ItemProvider"
-                    init-method="init" parent="baseProvider">
-                <property name="processorFactory">
-                  <bean class="org.osaf.cosmo.atom.processor.StandardProcessorFactory"/>
-                </property>
-                <property name="contentService">
-                  <ref local="contentService"/>
-                </property>
-              </bean>
+            <property name="processorFactory">
+              <bean class="org.osaf.cosmo.atom.processor.StandardProcessorFactory"/>
             </property>
-            <property name="subscriptionProvider">
-              <bean class="org.osaf.cosmo.atom.provider.SubscriptionProvider"
-                    init-method="init" parent="baseProvider">
-                <property name="userService">
-                  <ref local="userService"/>
-                </property>
-              </bean>
-            </property>
-            <property name="preferencesProvider">
-              <bean class="org.osaf.cosmo.atom.provider.PreferencesProvider"
-                    init-method="init" parent="baseProvider">
-                <property name="userService">
-                  <ref local="userService"/>
-                </property>
-              </bean>
+            <property name="contentService">
+              <ref local="contentService"/>
             </property>
           </bean>
+        </property>
+        <property name="subscriptionProvider">
+          <bean class="org.osaf.cosmo.atom.provider.SubscriptionProvider"
+                init-method="init" parent="baseProvider">
+            <property name="userService">
+              <ref local="userService"/>
+            </property>
+          </bean>
+        </property>
+        <property name="preferencesProvider">
+          <bean class="org.osaf.cosmo.atom.provider.PreferencesProvider"
+                init-method="init" parent="baseProvider">
+            <property name="userService">
+              <ref local="userService"/>
+            </property>
+          </bean>
+        </property>
+        <property name="userProvider">
+          <bean class="org.osaf.cosmo.atom.provider.UserProvider"
+                init-method="init" parent="baseProvider"/>
         </property>
       </bean>
     </property>

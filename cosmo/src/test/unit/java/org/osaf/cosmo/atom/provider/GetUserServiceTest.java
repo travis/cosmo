@@ -21,18 +21,19 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockServiceRequestContext;
 
 /**
  * Test class for {@link ProviderProxy#getService()} tests.
  */
-public class GetUserServiceTest extends BaseProviderProxyTestCase {
+public class GetUserServiceTest extends BaseUserProviderTestCase {
     private static final Log log = LogFactory.getLog(GetUserServiceTest.class);
 
     public void testGetService() throws Exception {
         helper.makeAndStoreDummyCollection();
         helper.makeAndStoreDummyCollection();
         helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createServiceRequestContext();
+        RequestContext req = createRequestContext();
 
         ResponseContext res = provider.getService(req);
         assertNotNull("Null response context", res);
@@ -41,11 +42,16 @@ public class GetUserServiceTest extends BaseProviderProxyTestCase {
 
     public void testGenerationError() throws Exception {
         helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createServiceRequestContext();
+        RequestContext req = createRequestContext();
         helper.enableGeneratorFailure();
 
         ResponseContext res = provider.getService(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
+    }
+
+    private RequestContext createRequestContext() {
+        return new MockServiceRequestContext(helper.getServiceContext(),
+                                             helper.getUser());
     }
 }

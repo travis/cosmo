@@ -54,10 +54,8 @@ public class StandardRequestHandler extends DefaultRequestHandler
      * extensions:
      * </p>
      * <ul>
-     * <li> When <code>POST</code>ing to a collection, if the content
-     * type of the request is
-     * <code>application/x-www-form-urlencoded</code>, the request is
-     * interpreted as a collection details update.
+     * <li> When <code>PUT</code>ing to a collection, the request is
+     * interpreted as an update of the collection itself.
      * </ul>
      */
     protected ResponseContext process(Provider provider,
@@ -75,8 +73,8 @@ public class StandardRequestHandler extends DefaultRequestHandler
 
     /**
      * Extends the superclass method to implement conditional request
-     * methods by honoring the <code>If-Match</code> request header
-     * and friends.
+     * methods by honoring conditional method headers for
+     * <code>AuditableTarget</code>s.
      */
     protected boolean preconditions(Provider provider, 
                                     RequestContext request, 

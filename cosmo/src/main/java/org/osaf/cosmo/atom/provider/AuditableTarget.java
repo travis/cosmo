@@ -30,7 +30,7 @@ import org.apache.abdera.util.EntityTag;
  */
 public interface AuditableTarget extends Target {
 
-    public abstract EntityTag getEntityTag();
+    public EntityTag getEntityTag();
 
-    public abstract Date getLastModified();
+    public Date getLastModified();
 }

@@ -232,7 +232,8 @@ public class RecurrenceExpander {
             Date endMod = getEndDate(modComp);
             if (startMod.before(dateRange[0]))
                 dateRange[0] = startMod;
-            if (dateRange[1] != null && endMod.after(dateRange[1]))
+            if (dateRange[1] != null && endMod != null &&
+                endMod.after(dateRange[1]))
                 dateRange[1] = endMod;
             
             // TODO: handle THISANDFUTURE/THISANDPRIOR edge cases

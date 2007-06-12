@@ -243,7 +243,7 @@ cosmo.datetime.Date.prototype.updateFromUTC = function(utc) {
     var dt = null;
 
     // Get a fake Date object in UTC frame of reference
-    dt = new Date(utc - this.getTimezoneOffsetMs());
+    dt = new Date(utc - this.getTimezoneOffsetMsForGivenDate(new Date(utc)));
 
     // Update cosmo.datetime.Date values based on UTC values
     this.year = dt.getUTCFullYear();
@@ -276,6 +276,10 @@ cosmo.datetime.Date.prototype.updateFromLocalDate = function(dt) {
  * Returns the offset from GMT in minutes
  */
 cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
+    return this.getTimezoneOffsetForGivenDate(this);
+};
+
+cosmo.datetime.Date.prototype.getTimezoneOffsetForGivenDate = function(date){
     var offsetMin = 0;
     // Is UTC, no need to do more work
     if (this.utc) {
@@ -286,7 +290,7 @@ cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
         if (this.tzId) {
             var timezone = cosmo.datetime.timezone.getTimezone(this.tzId);
             if (timezone){
-                return (timezone.getOffsetInMinutes(this)*-1);
+                return (timezone.getOffsetInMinutes(date)*-1);
             }
             else {
                 //couldn't find timezone just make it utc?
@@ -297,17 +301,25 @@ cosmo.datetime.Date.prototype.getTimezoneOffset = function() {
         // No timezone, no UTC -- must be a floating date
         // For now we cheat and use the local browser offset
         else {
-            offsetMin = this.getUserPrefTimezoneOffset();
+            offsetMin = this.getUserPrefTimezoneOffsetForGivenDate(date);
         }
     }
     return offsetMin;
-};
+    
+}
 
 /**
  * Returns the offset from GMT in milliseconds
  */
 cosmo.datetime.Date.prototype.getTimezoneOffsetMs = function() {
-    return(this.getTimezoneOffset()*60*1000);
+    return this.getTimezoneOffsetMsForGivenDate(this)
+};
+
+/**
+ * Returns the offset from GMT in milliseconds
+ */
+cosmo.datetime.Date.prototype.getTimezoneOffsetMsForGivenDate = function(date) {
+    return(this.getTimezoneOffsetForGivenDate(date)*60*1000);
 };
 
 
@@ -317,14 +329,18 @@ cosmo.datetime.Date.prototype.getTimezoneOffsetMs = function() {
   * Or independently with fallback to the normal browser local offset
   */
 cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
+    return this.getUserPrefTimezoneOffsetForGivenDate(this);
+};
+
+cosmo.datetime.Date.prototype.getUserPrefTimezoneOffsetForGivenDate = function(date){
     var offsetMin = 0;
     // For now, punt and go with the browser's offset for that date
         offsetMin = cosmo.datetime.Date.getBrowserTimezoneOffset(
-            this.getYear(), this.getMonth(), this.getDate(),
-            this.getHours(), this.getMinutes(), this.getSeconds());
+            date.getYear(), date.getMonth(), date.getDate(),
+            date.getHours(), date.getMinutes(), date.getSeconds());
     return offsetMin;
-};
-
+    
+}
 /**
  * Formats the date in it's original timezone, using the strftime function
  * found in date.js.

@@ -902,7 +902,7 @@ cosmo.view.cal.canvas = new function () {
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
         if (ev.data.hasRecurrence() && saveType != OPTIONS.ONLY_THIS_EVENT){
-
+            dojo.debug("saveSuccess: has recurrence");
             //first remove the event and recurrences from the registry.
             var idsToRemove = [item.getUid()];
             if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
@@ -912,15 +912,16 @@ cosmo.view.cal.canvas = new function () {
 
 
             //now we have to expand out the item for the viewing range
-            var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(item.getUid(),
+            var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(item.getMaster(),
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)];
             if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
-              deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItem.getUid(),
+              deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItem,
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
             }
             deferred = new dojo.DeferredList(deferredArray);
 
             var addExpandedOccurrences = function(){
+                dojo.debug("saveSuccess: addExpandedRecurrences");
                 // [0][0][1] - this is where the results are
                 //stored in a DeferredList
                 var occurrences = deferred.results[0][0][1];

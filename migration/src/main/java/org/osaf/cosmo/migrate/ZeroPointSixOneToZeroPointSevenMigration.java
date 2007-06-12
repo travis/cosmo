@@ -134,7 +134,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         
         try {
             stmt = conn.prepareStatement("select i.modifiesitemid, s.id, es.icaldata from item i, stamp s, event_stamp es where i.id=s.itemid and s.id=es.stampid");
-            updateStmt = conn.prepareStatement("update event_stamp set isfloating=?, startdate=?, enddate=? where stampid=?");
+            updateStmt = conn.prepareStatement("update event_stamp set isfloating=?, isrecurring=?, startdate=?, enddate=? where stampid=?");
             selectMasterCalStmt = conn.prepareStatement("select es.icaldata from item i, stamp s, event_stamp es where i.id=? and i.id=s.itemid and s.id=es.stampid");
             
             rs = stmt.executeQuery();
@@ -168,9 +168,10 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
                 
                 Object[] indexes = getIndexValues(calendar, masterCalendar);
                 updateStmt.setBoolean(1, (Boolean) indexes[2]);
-                updateStmt.setString(2, (String) indexes[0]);
-                updateStmt.setString(3, (String) indexes[1]);
-                updateStmt.setLong(4, eventId);
+                updateStmt.setBoolean(2, (Boolean) indexes[3]);
+                updateStmt.setString(3, (String) indexes[0]);
+                updateStmt.setString(4, (String) indexes[1]);
+                updateStmt.setLong(5, eventId);
                 
                 updateStmt.executeUpdate();
                 count++;
@@ -197,6 +198,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
      * Object[0] = startDate index
      * Object[1] = endDate index
      * Object[2] = isFloating index
+     * Object[3] = isRecurring index
      */
     private Object[] getIndexValues(Calendar calendar, Calendar masterCalendar) {
         ComponentList events = calendar.getComponents().getComponents(
@@ -220,7 +222,10 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         }
         
         
+        boolean isRecurring = false;
+        
         if (isRecurring(event)) {
+            isRecurring = true;
             RecurrenceExpander expander = new RecurrenceExpander();
             Date[] range = expander
                     .calculateRecurrenceRange(calendar);
@@ -245,7 +250,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
                 isFloating = true;
         }
         
-        Object[] timeRangeIndex = new Object[3];
+        Object[] timeRangeIndex = new Object[4];
         timeRangeIndex[0] = fromDateToStringNoTimezone(startDate);
         
         
@@ -257,6 +262,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
             timeRangeIndex[1] = "Z-TIME-INFINITY";
         
         timeRangeIndex[2] = new Boolean(isFloating);
+        timeRangeIndex[3] = new Boolean(isRecurring);
         
         return timeRangeIndex;
     }

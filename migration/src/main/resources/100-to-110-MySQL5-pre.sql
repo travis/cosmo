@@ -7,6 +7,7 @@ alter table subscription add column modifydate bigint;
 
 # event_stamp
 alter table event_stamp add column isfloating bit;
+alter table event_stamp add column isrecurring bit;
 alter table event_stamp add column startdate varchar(16);
 alter table event_stamp add column enddate varchar(16);
 alter table event_stamp add index idx_startdt (startdate);

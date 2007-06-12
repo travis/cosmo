@@ -7,6 +7,7 @@ alter table subscription add column modifydate bigint
 
 # event_stamp
 alter table event_stamp add column isfloating smallint
+alter table event_stamp add column isrecurring smallint
 alter table event_stamp add column startdate varchar(16)
 alter table event_stamp add column enddate varchar(16)
 create index idx_startdt on event_stamp (startdate)

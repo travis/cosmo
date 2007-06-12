@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -48,7 +49,7 @@ public class RecurrenceExpander {
     
     private static Date MAX_EXPAND_DATE = null;
     private static Date MAX_EXPAND_DATE_TIME = null;
-    
+   
     static {
         try {
             // Expand out to 2030 for those recurrence rules
@@ -305,6 +306,44 @@ public class RecurrenceExpander {
             instances.addOverride(mod);
         
         return instances;
+    }
+    
+    /**
+     * Calculate and return the latest ocurring instance for the 
+     * specified recurring calendar compnent and date range.
+     * @param calendar recurring calendar component
+     * @param rangeStart period start
+     * @param rangeEnd period end
+     * @return the latest ocurring instance, else null if no instance
+     *         occurs within the specified time range
+     */
+    public Instance getLatestInstance(Calendar calendar, Date rangeStart, Date rangeEnd) {
+        InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd );
+        if(instances.size()==0)
+            return null;
+        
+        TreeMap<String, Instance> sortedInstances = new TreeMap<String, Instance>();
+        sortedInstances.putAll(instances);
+        return sortedInstances.get(sortedInstances.lastKey());
+    }
+    
+    /**
+     * Calculate and return the first ocurring instance for the 
+     * specified recurring calendar compnent and date range.
+     * @param calendar recurring calendar component
+     * @param rangeStart period start
+     * @param rangeEnd period end
+     * @return the first ocurring instance, else null if no instance
+     *         occurs within the specified time range
+     */
+    public Instance getFirstInstance(Calendar calendar, Date rangeStart, Date rangeEnd) {
+        InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd );
+        if(instances.size()==0)
+            return null;
+        
+        TreeMap<String, Instance> sortedInstances = new TreeMap<String, Instance>();
+        sortedInstances.putAll(instances);
+        return sortedInstances.get(sortedInstances.firstKey());
     }
     
     private Date getStartDate(Component comp) {

@@ -41,6 +41,7 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.impl.StandardContentService;
+import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
@@ -78,11 +79,13 @@ public class MockHelper extends TestHelper {
         MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
         SingleVMLockManager lockManager = new SingleVMLockManager();
-
+        
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
         contentService.setContentDao(contentDao);
         contentService.setLockManager(lockManager);
+        contentService.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
+       
         contentService.init();
 
         userService = new StandardUserService();

@@ -79,6 +79,7 @@ public class StandardContentServiceTest extends TestCase {
         service.setCalendarDao(calendarDao);
         service.setContentDao(contentDao);
         service.setLockManager(lockManager);
+        service.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
         service.init();
     }
 

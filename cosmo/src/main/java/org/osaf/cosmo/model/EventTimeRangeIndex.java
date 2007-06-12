@@ -11,6 +11,7 @@ public class EventTimeRangeIndex {
     private String startDate = null;
     private String endDate = null;
     private Boolean isFloating = null;
+    private Boolean isRecurring = null;
     
     /**
      * The end date of the event.  If the event is recurring, the
@@ -88,5 +89,14 @@ public class EventTimeRangeIndex {
 
     public void setIsFloating(Boolean isFloating) {
         this.isFloating = isFloating;
+    }
+    
+    @Column(table="event_stamp", name = "isrecurring")
+    public Boolean getIsRecurring() {
+        return isRecurring;
+    }
+
+    public void setIsRecurring(Boolean isRecurring) {
+        this.isRecurring = isRecurring;
     }
 }

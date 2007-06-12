@@ -182,6 +182,15 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         selectBuf.append(", BaseEventStamp es");
         appendWhere(whereBuf, "es.item=i");
         
+        // handle recurring event filter
+        if(filter.getIsRecurring()!=null) {
+            if(filter.getIsRecurring().booleanValue()==true)
+                appendWhere(whereBuf, "es.timeRangeIndex.isRecurring=true");
+            else
+                appendWhere(whereBuf, "es.timeRangeIndex.isRecurring=false");
+        }
+        
+        // handle time range
         if(filter.getPeriod()!=null) {
            whereBuf.append(" and ((es.timeRangeIndex.dateStart < case when es.timeRangeIndex.isFloating=true then '" + filter.getFloatStart() + "'");
            whereBuf.append(" else '" + filter.getUTCStart() + "' end and es.timeRangeIndex.dateEnd > case when es.timeRangeIndex.isFloating=true then '" + filter.getFloatStart() + "'");
@@ -237,8 +246,13 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         
         // handle triageStatus filter
         if(filter.getTriageStatus()!=null) {
-            appendWhere(whereBuf,"i.triageStatus.code=:triageStatus");
-            params.put("triageStatus", filter.getTriageStatus());
+            // status code of "-1" means no triage status for now
+            if(filter.getTriageStatus()==-1) {
+                appendWhere(whereBuf,"i.triageStatus.code is null");
+            } else {
+                appendWhere(whereBuf,"i.triageStatus.code=:triageStatus");
+                params.put("triageStatus", filter.getTriageStatus());
+            }
         }
     }
     

@@ -91,6 +91,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         NoteItem noteMod = generateNote("testnotemod", "testuser");
         noteMod.setUid(NOTE_UID + ":mod");
         noteMod.setModifies(note);
+        noteMod.getTriageStatus().setCode(TriageStatus.CODE_NOW);
         noteMod = (NoteItem) contentDao.createContent(calendar1, noteMod);
         
         for (int i = 1; i <= 3; i++) {
@@ -166,7 +167,13 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         // find triageStatus==LATER only, which should match none
         filter.setTriageStatus(TriageStatus.CODE_LATER);
         results = contentDao.findItems(filter);
-        Assert.assertEquals(0, results.size()); 
+        Assert.assertEquals(0, results.size());
+        
+        //find notes without triage
+        filter = new NoteItemFilter();
+        filter.setTriageStatus(-1);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(8, results.size());
     }
     
     public void testFilterByParent() throws Exception {
@@ -199,6 +206,12 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         Set<Item> results = contentDao.findItems(filter);
         Assert.assertEquals(8, results.size());
         
+        // find only recurring events
+        eventFilter.setIsRecurring(true);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(2, results.size());
+        
+        eventFilter.setIsRecurring(null);
         filter.setParent(calendar1);
         results = contentDao.findItems(filter);
         Assert.assertEquals(5, results.size());

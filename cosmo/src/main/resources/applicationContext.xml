@@ -344,6 +344,13 @@
     </property>
   </bean>
 
+  <bean id="triageStatusQueryProcessor"
+      class="org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor">
+    <property name="contentDao">
+      <ref local="contentDao" />
+    </property>
+  </bean>
+
   <bean id="userService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
       <value>org.osaf.cosmo.service.UserService</value>
@@ -398,6 +405,9 @@
     </property>
     <property name="lockManager">
       <ref bean="contentLockManager"/>
+    </property>
+    <property name="triageStatusQueryProcessor">
+      <ref bean="triageStatusQueryProcessor"/>
     </property>
   </bean>
 

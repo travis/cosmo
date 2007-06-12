@@ -25,6 +25,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -322,6 +323,16 @@ public interface ContentService extends Service {
                                              DateTime rangeStart, DateTime rangeEnd,
                                              boolean expandRecurringEvents);
     
+    
+    /**
+     * Find note items by triage status.
+     * @param collection collection
+     * @param statusLabel triage status to find
+     * @param pointInTime point in time to triage
+     * @return set of notes that match the specified triage status label
+     */
+    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection,
+            String statusLabel, Date pointInTime);
     
     /**
      * Creates a ticket on an item.

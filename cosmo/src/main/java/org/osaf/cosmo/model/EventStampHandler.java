@@ -73,7 +73,11 @@ public class EventStampHandler implements StampHandler {
                 endDate = Dates.getInstance(duration.getTime(startDate), startDate);
         }
         
+        
+        boolean isRecurring = false;
+        
         if (eventStamp.isRecurring()) {
+            isRecurring = true;
             RecurrenceExpander expander = new RecurrenceExpander();
             Date[] range = expander
                     .calculateRecurrenceRange(((EventStamp) eventStamp)
@@ -111,6 +115,7 @@ public class EventStampHandler implements StampHandler {
             timeRangeIndex.setDateEnd(EventStamp.TIME_INFINITY);
         
         timeRangeIndex.setIsFloating(isFloating);
+        timeRangeIndex.setIsRecurring(isRecurring);
         
         eventStamp.setTimeRangeIndex(timeRangeIndex);
     }

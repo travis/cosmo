@@ -16,6 +16,7 @@
 package org.osaf.cosmo.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.lock.LockManager;
+import org.osaf.cosmo.service.triage.TriageStatusQueryProcessor;
 
 /**
  * Standard implementation of <code>ContentService</code>.
@@ -53,6 +55,7 @@ public class StandardContentService implements ContentService {
     private CalendarDao calendarDao;
     private ContentDao contentDao;
     private LockManager lockManager;
+    private TriageStatusQueryProcessor triageStatusQueryProcessor;
     
     private long lockTimeout = 0;
 
@@ -740,6 +743,18 @@ public class StandardContentService implements ContentService {
         return calendarDao.findEvents(collection, rangeStart, rangeEnd, expandRecurringEvents);
     }
     
+    
+    /**
+     * Find note items by triage status.
+     * @param collection collection
+     * @param statusLabel triage status to find
+     * @param pointInTime point in time to triage
+     * @return set of notes that match the specified triage status label
+     */
+    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection, String statusLabel, Date pointInTime) {
+        return triageStatusQueryProcessor.processTriageStatusQuery(collection, statusLabel, pointInTime);
+    }
+
     /**
      * Find items by filter.
      *
@@ -865,6 +880,8 @@ public class StandardContentService implements ContentService {
             throw new IllegalStateException("contentDao must not be null");
         if (lockManager == null)
             throw new IllegalStateException("lockManager must not be null");
+        if(triageStatusQueryProcessor == null)
+            throw new IllegalStateException("triageStatusQueryProcessor must not be null");
     }
 
     /**
@@ -895,6 +912,12 @@ public class StandardContentService implements ContentService {
     /** */
     public void setContentDao(ContentDao dao) {
         contentDao = dao;
+    }
+    
+    
+    public void setTriageStatusQueryProcessor(
+            TriageStatusQueryProcessor triageStatusQueryProcessor) {
+        this.triageStatusQueryProcessor = triageStatusQueryProcessor;
     }
 
     /** */

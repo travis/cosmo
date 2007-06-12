@@ -50,6 +50,7 @@ import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.impl.StandardContentService;
+import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
 import org.osaf.cosmo.util.PathUtil;
@@ -94,6 +95,7 @@ public class DavTestHelper extends TestHelper {
         contentService.setCalendarDao(calendarDao);
         contentService.setContentDao(contentDao);
         contentService.setLockManager(lockManager);
+        contentService.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
         contentService.init();
 
         userService = new StandardUserService();

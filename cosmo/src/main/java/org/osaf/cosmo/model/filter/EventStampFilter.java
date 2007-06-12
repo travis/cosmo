@@ -42,6 +42,7 @@ public class EventStampFilter extends StampFilter {
         "cosmo.filter.eventStamp.timeRange.includeMasterItems";
     
     private Period period = null;
+    private Boolean isRecurring = null;
     private DateTime dstart, dend, fstart, fend;
     private TimeZone timezone = null;
     private boolean expandRecurringEvents = false;
@@ -125,6 +126,21 @@ public class EventStampFilter extends StampFilter {
     public void setTimezone(TimeZone timezone) {
         this.timezone = timezone;
         updateFloatingTimes();
+    }
+    
+    
+
+    public Boolean getIsRecurring() {
+        return isRecurring;
+    }
+
+    /**
+     * Match only recurring events.
+     * @param isRecurring if set, return recurring events only, or only
+     *                    non recurring events
+     */
+    public void setIsRecurring(Boolean isRecurring) {
+        this.isRecurring = isRecurring;
     }
 
     @Override

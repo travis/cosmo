@@ -227,12 +227,7 @@ cosmo.ui.menu.MainMenu = function (p) {
             cosmo.ui.menu.init();
             this.hasBeenRendered = true;
         }
-        // Remove any nodes -- for re-render
-        var ch = this.domNode.firstChild;
-        while (ch) {
-            this.domNode.removeChild(ch);
-            ch = this.domNode.firstChild;
-        }
+        this.clearAll();
         // Render menu according to loaded items
         var items = cosmo.ui.menu.items;
         var last = (items.length - 1);

@@ -1158,8 +1158,10 @@ td.dataDisplayLabel {
 .expandoIcon {
     padding-right: 8px;
 }
-.expandoTitle {
+.expandoPrompt {
     padding-right: 8px;
+    font-weight: bold;
+    color: #333;
 }
 .expandoBody {
     width: 100%;
@@ -1167,3 +1169,6 @@ td.dataDisplayLabel {
     overflow: hidden;
 }
 
+#markupBar {
+    height: 24px;
+}

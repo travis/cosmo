@@ -30,8 +30,10 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
+dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
+dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.view.cal");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
@@ -341,23 +343,6 @@ cosmo.view.cal.canvas = new function () {
             }
             headerDiv.appendChild(document.createTextNode(str));
         }
-        /**
-         * Set up the week-to-week navigation button panel
-         */
-        function setUpNavButtons() {
-            var back = function back() {
-                dojo.event.topic.publish('/calEvent', {
-                    action: 'loadCollection', opts: { goTo: 'back' }, data: {}
-                });
-            }
-            var next = function next() {
-                dojo.event.topic.publish('/calEvent', {
-                    action: 'loadCollection', opts: { goTo: 'next' }, data: {}
-                });
-            }
-            var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
-            document.getElementById('viewNavButtons').appendChild(navButtons.domNode);
-        };
         function setCurrentDayStatus() {
             // 'Today' is in the displayed view range
             var currDate = cosmo.app.pim.currDate;
@@ -409,7 +394,6 @@ cosmo.view.cal.canvas = new function () {
             dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
-            setUpNavButtons();
             // Get a reference to the main scrolling area for timed events;
             timedScrollingMainDiv = $('timedScrollingMainDiv');
             // Set the scrollbar to 'working hours' -- do this
@@ -1494,11 +1478,10 @@ cosmo.view.cal.canvas = new function () {
 }
 
 cosmo.view.cal.canvas.Canvas = function (p) {
+    var self = this;
     var params = p || {}
-    var d = null;
-    d = _createElem('div');
-    d.id = 'calendarCanvas';
-    this.domNode = d;
+    this.domNode = _createElem('div');
+    this.domNode.id = 'calendarCanvas';
     this.viewStart = null;
     this.viewEnd = null;
     this.currDate = null;
@@ -1509,93 +1492,196 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         this.setPosition();
         this.setSize();
         if (!this.hasBeenRendered) {
-            //FIXME: Either Dojo widgetize or convert to DOM
-            // Right now we just want to wire the original
-            // code to the newer recursive composition scheme
-            str = '';
-            str += '<div id="calTopNavDiv">';
-            str += '<table cellpadding="0" cellspacing="0">';
-            str += '<tr>';
-            str += '<td>&nbsp;&nbsp;&nbsp;</td>';
-            str += '<td id="viewNavButtons"></td>';
-            str += '<td>&nbsp;&nbsp;&nbsp;</td>';
-            str += '<td id="monthHeaderDiv" class="labelTextXL"></td>';
-            str += '</tr>';
-            str += '</table>';
-            str += '</div>';
-            str += '<div id="dayListDiv"></div>';
-            str += '<div id="allDayResizeMainDiv" onSelectStart="return false;">';
-            str += '<div id="allDayHourSpacerDiv"></div>';
-            str += '<div id="allDayContentDiv"></div>';
-            str += '</div>';
-            str += '<div id="allDayResizeHandleDiv"></div>';
-            str += '<div id="timedScrollingMainDiv" onSelectStart="return false;">';
-            str += '<div id="timedHourListDiv"></div>';
-            str += '<div id="timedContentDiv"></div>';
-            str += '</div>';
-            this.domNode.innerHTML = str;
-            this.parent.domNode.appendChild(this.domNode);
-            var _c = cosmo.ui.ContentBox;
-            var subList = [ 'calTopNavDiv', 'dayListDiv',
-                'timedScrollingMainDiv', 'timedContentDiv', 'timedHourListDiv',
-                'eventInfoDiv', 'allDayResizeMainDiv', 'allDayResizeHandleDiv',
-                'allDayContentDiv', 'allDayHourSpacerDiv' ];
-            var vOffset = 0;
-            var calcHeight = 0;
-            for (var i = 0; i < subList.length; i++) {
-                var key = subList[i];
-                this[key] = new _c({ id: key, domNode: $(key) });
-            }
-
+            // Set up DOM structures, create ContentBox objs
+            // for major components
+            setUPDOM();
             this.hasBeenRendered = true;
         }
+        // Position all the components based on current
+        // viewport size and constants defined in cosmo.ui.conf
+        doPositioning();
+
+        // Set cal day column width
+        cosmo.view.cal.canvas.dayUnitWidth = parseInt(
+            (this.width - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );
+
+        // Bolt onto older rendering code in cosmo.view.cal.canvas
+        // FIXME: This is a temporary shim until we can convert pull
+        // rendering-specific functions into cosmo.view.cal.canvas.Canvas,
+        // leaving only the utility functions in cosmo.view.cal.canvas
+        // ==============
+        cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
+        // ==============
+    };
+
+    // Private methods
+    function setUPDOM() {
+        var d = self.domNode;
+        var _html = cosmo.util.html;
+
+        // Top nav area
+        var t = _createElem('div');
+        t.id = 'calTopNavDiv';
+        var table = _createElem('table');
+        var body = _createElem('tbody');
+        var tr = _createElem('tr');
+        table.cellPadding = '0';
+        table.cellSpacing = '0';
+        table.appendChild(body);
+        body.appendChild(tr);
+        var td = _createElem('td');
+        td.id = 'viewToggle';
+        this.viewToggle = td;
+
+        var _radio = cosmo.ui.widget.GraphicRadioButtonSet.Button;
+        var w = 24;
+        var btns = [
+            new _radio({ width: w,
+                defaultImgPos: [-360, 0],
+                mouseoverImgPos: [-405, 0],
+                downStateImgPos: [-450, 0],
+                handleClick: function () {
+                    cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.domNode.style.display
+                    = 'none'; }
+                }),
+            new _radio({ width: w,
+                defaultImgPos: [-495, 0],
+                mouseoverImgPos: [-540, 0],
+                downStateImgPos: [-585, 0],
+                handleClick: function () { alert('bar'); }
+                })
+        ];
+        var vT =  dojo.widget.createWidget("cosmo:GraphicRadioButtonSet", {
+            selectedButtonIndex: 1, height: 35, buttons: btns }, td, 'last');
+        tr.appendChild(td);
+        var td = _createElem('td');
+        td.style.width = '16px';
+        td.appendChild(_html.nbsp());
+        tr.appendChild(td);
+        var td = _createElem('td');
+        td.id = 'viewNavButtons';
+        self.viewNavButtons = td;
+        // Add week-to-week navigation
+        var back = function back() {
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection', opts: { goTo: 'back' }, data: {}
+            });
+        }
+        var next = function next() {
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection', opts: { goTo: 'next' }, data: {}
+            });
+        }
+        var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
+        self.viewNavButtons.appendChild(navButtons.domNode);
+
+        tr.appendChild(td);
+        var td = _createElem('td');
+        td.appendChild(_html.nbsp());
+        td.appendChild(_html.nbsp());
+        td.appendChild(_html.nbsp());
+        tr.appendChild(td);
+        var td = _createElem('td');
+        td.id = 'monthHeaderDiv';
+        td.className = 'labelTextXL';
+        tr.appendChild(td);
+        t.appendChild(table);
+        d.appendChild(t);
+
+        // List of day names for the week
+        var t = _createElem('div');
+        t.id = 'dayListDiv';
+        d.appendChild(t);
+        // Outside container for untimed event resizable area
+        var t = _createElem('div');
+        t.id = 'allDayResizeMainDiv';
+        // Prevent text selection on drag
+        t.onselectstart = function () { return false; };
+        d.appendChild(t);
+        // Left-hand spacer on untimed canvas that lines up
+        // with timeline below in the timed canvas
+        var sub = _createElem('div');
+        sub.id = 'allDayHourSpacerDiv';
+        t.appendChild(sub);
+        // Untimed events canvas -- content area where events sit
+        var sub = _createElem('div');
+        sub.id = 'allDayContentDiv';
+        t.appendChild(sub);
+        // Resize handle for untimed event area
+        var t = _createElem('div');
+        t.id = 'allDayResizeHandleDiv';
+        d.appendChild(t);
+        // Outside container for timed event scrolling area
+        var t = _createElem('div');
+        t.id = 'timedScrollingMainDiv';
+        // Prevent text selection on drag
+        t.onselectstart = function () { return false; };
+        d.appendChild(t);
+        // Left-hand timeline that lists hours of the day
+        var sub = _createElem('div');
+        sub.id = 'timedHourListDiv';
+        t.appendChild(sub);
+        // Timed events canvas -- content area where events sit
+        var sub = _createElem('div');
+        sub.id = 'timedContentDiv';
+        t.appendChild(sub);
+
+        self.parent.domNode.appendChild(self.domNode);
+        var _c = cosmo.ui.ContentBox;
+        var subList = [ 'calTopNavDiv', 'dayListDiv',
+            'timedScrollingMainDiv', 'timedContentDiv', 'timedHourListDiv',
+            'eventInfoDiv', 'allDayResizeMainDiv', 'allDayResizeHandleDiv',
+            'allDayContentDiv', 'allDayHourSpacerDiv' ];
+        var vOffset = 0;
+        var calcHeight = 0;
+        for (var i = 0; i < subList.length; i++) {
+            var key = subList[i];
+            self[key] = new _c({ id: key, domNode: $(key) });
+        }
+    }
+    function doPositioning() {
         // Center column
         // Top nav
         vOffset = 0;
         // 1px for border per retarded CSS spec
-        var topNav = this.calTopNavDiv;
-        topNav.setSize(this.width - 2, CAL_TOP_NAV_HEIGHT-1);
+        var topNav = self.calTopNavDiv;
+        topNav.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
         topNav.setPosition(0, vOffset);
         // Day listing
         vOffset += CAL_TOP_NAV_HEIGHT;
-        var dayList = this.dayListDiv;
-        dayList.setSize(this.width - 2, DAY_LIST_DIV_HEIGHT);
+        var dayList = self.dayListDiv;
+        dayList.setSize(self.width - 2, DAY_LIST_DIV_HEIGHT);
         dayList.setPosition(0, vOffset);
         // No-time event area
         vOffset += DAY_LIST_DIV_HEIGHT;
-        var allDayMain = this.allDayResizeMainDiv;
-        allDayMain.setSize((this.width - 2), ALL_DAY_RESIZE_AREA_HEIGHT);
+        var allDayMain = self.allDayResizeMainDiv;
+        allDayMain.setSize((self.width - 2), ALL_DAY_RESIZE_AREA_HEIGHT);
         allDayMain.setPosition(0, vOffset);
         // Resize handle
         vOffset += ALL_DAY_RESIZE_AREA_HEIGHT;
-        var allDayResize = this.allDayResizeHandleDiv;
-        allDayResize.setSize(this.width - 1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
+        var allDayResize = self.allDayResizeHandleDiv;
+        allDayResize.setSize(self.width - 1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
         allDayResize.setPosition(0, vOffset);
-        var allDayContent = this.allDayContentDiv;
-        allDayContent.setSize((this.width - SCROLLBAR_SPACER_WIDTH - HOUR_LISTING_WIDTH), '100%');
+        var allDayContent = self.allDayContentDiv;
+        allDayContent.setSize((self.width - SCROLLBAR_SPACER_WIDTH - HOUR_LISTING_WIDTH), '100%');
         allDayContent.setPosition((HOUR_LISTING_WIDTH + 1), 0);
-        var allDaySpacer = this.allDayHourSpacerDiv
+        var allDaySpacer = self.allDayHourSpacerDiv
         allDaySpacer.setSize((HOUR_LISTING_WIDTH - 1), '100%');
         allDaySpacer.setPosition(0, 0);
 
         // Scrollable view area
         vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
-        calcHeight = this.height - vOffset;
-        var timedMain = this.timedScrollingMainDiv;
-        timedMain.setSize(this.width - 2, calcHeight); // Variable height area
+        calcHeight = self.height - vOffset;
+        var timedMain = self.timedScrollingMainDiv;
+        timedMain.setSize(self.width - 2, calcHeight); // Variable height area
         timedMain.setPosition(0, vOffset);
-        var timedContent = this.timedContentDiv;
-        timedContent.setSize((this.width - HOUR_LISTING_WIDTH), VIEW_DIV_HEIGHT);
+        var timedContent = self.timedContentDiv;
+        timedContent.setSize((self.width - HOUR_LISTING_WIDTH), VIEW_DIV_HEIGHT);
         timedContent.setPosition((HOUR_LISTING_WIDTH + 1), 0);
-        var timedHourList = this.timedHourListDiv;
+        var timedHourList = self.timedHourListDiv;
         timedHourList.setSize(HOUR_LISTING_WIDTH - 1, VIEW_DIV_HEIGHT);
         timedHourList.setPosition(0, 0);
-
-        // Set cal day column width
-        cosmo.view.cal.canvas.dayUnitWidth = parseInt(
-            (this.width - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );
-        cosmo.view.cal.canvas.render(this.viewStart, this.viewEnd, this.currDate);
-    };
+    }
 }
 cosmo.view.cal.canvas.Canvas.prototype =
     new cosmo.ui.ContentBox();

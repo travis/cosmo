@@ -81,6 +81,18 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         done: "dashboard-done"  
     },
     
+    getNowItems: function(collection, kwArgs){
+        return this.getItems(collection, {triage: "now"}, kwArgs);
+    },
+    
+    getLaterItems: function(collection, kwArgs){
+        return this.getItems(collection, {triage: "later"}, kwArgs);
+    },
+    
+    getDoneItems: function(collection, kwArgs){
+        return this.getItems(collection, {triage: "done"}, kwArgs);
+    },
+    
     getItems: function (collection, searchCrit, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);

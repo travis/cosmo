@@ -99,7 +99,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var query = this._generateAuthQuery(kwArgs);
         var editLink = item.getUrls()[this.EDIT_LINK];
         if (!editLink){
-            throw new CantSaveException("No edit link on item with UID " + item.getUid());
+            throw new Error("No edit link on item with UID " + item.getUid());
         }
         r.contentType = "application/atom+xml";
         r.url = cosmo.env.getBaseUrl() + "/atom/" + 

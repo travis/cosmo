@@ -128,6 +128,21 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return deferred;
     },
     
+    expandRecurringItem: function(item, searchCrit, kwArgs){
+        var deferred = new dojo.Deferred();
+        var r = this.getDefaultRequest(deferred, kwArgs);
+
+        var query = this._generateAuthQuery(kwArgs);
+        dojo.lang.mixin(query, this._generateSearchQuery(searchCrit));
+        r.url = cosmo.env.getBaseUrl() + "/atom/" + 
+                item.getUrls()['expanded'] + this.queryHashToString(query);
+        
+        r.method = "GET";
+        
+        dojo.io.bind(r);
+        return deferred;
+    },
+    
     createItem: function(item, postContent, collection, kwArgs){
         var deferred = new dojo.Deferred();
         var r = this.getDefaultRequest(deferred, kwArgs);

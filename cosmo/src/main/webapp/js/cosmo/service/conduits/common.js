@@ -116,13 +116,12 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return deferred;
     },
     
-    expandRecurringItem: function(uid, start, end, kwArgs){
+    expandRecurringItem: function(item, start, end, kwArgs){
         kwArgs = kwArgs || {};
+        var deferred = this._transport.expandRecurringItem(item, 
+            {start: start, end: end}, kwArgs);
 
-        var deferred = this._transport.getItem(uid, 
-            dojo.lang.mixin(kwArgs,{start: start, end: end}));
-
-        this._addTranslation(deferred, "translateExpandRecurringItem");
+        this._addTranslation(deferred, "translateGetItems");
         
         return deferred;
     },

@@ -31,12 +31,9 @@ cosmotest.service.conduits.test_conduits = {
             var collections = conduit.getCollections({sync: true}).results[0];
             jum.assertTrue("collections", !!collections);
             jum.assertTrue("collections length", collections.length > 0);
-            
             var c0 = collections[0];
-            
             // test lazy loading
-            jum.assertTrue("lazy loading broken", !!c0.getProtocolUrls())
-            
+            jum.assertTrue("lazy loading broken", !!c0.getUrls())
             // test getCollection
             var collectionDetails = conduit.getCollection(c0.getUid(), {sync: true});
             jum.assertTrue("collectionDetails", !!collectionDetails)
@@ -56,8 +53,10 @@ cosmotest.service.conduits.test_conduits = {
                 body: newItemBody
             }
            );
-
+            
             conduit.createItem(newItem, c0, {sync: true});
+
+            jum.assertTrue("no edit link on item", !!newItem.getUrls()['atom-edit']);
 
             var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0];
             
@@ -70,12 +69,12 @@ cosmotest.service.conduits.test_conduits = {
             // Test saveItem
             var item0DisplayName = "New Display Name";
             item0.setDisplayName(item0DisplayName);
-            
+
             conduit.saveItem(item0, {sync: true});
             item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0];
      
             jum.assertEquals("item display name", item0DisplayName, item0.getDisplayName());
-
+ 
             // Test getItems
             conduit.createItem(new cosmo.model.Note(
             {
@@ -87,15 +86,13 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertTrue("items", !!items);
             jum.assertEquals("items length", 2, items.length);
             
-            
             // Test deleteItem 
-            /*
-            conduit.deleteItem(item0.getUid, {sync: true});
+
+            conduit.deleteItem(item0, {sync: true});
             
-            items = conduit.getItems(c0, {sync: true}).results[0];
+            items = conduit.getItems(c0, {}, {sync: true}).results[0];
             jum.assertTrue("deleteItem: items", !!items);
-            jum.assertEquals("deleteItem: items length", 1, items.length);*/
-            
+            jum.assertEquals("deleteItem: items length", 1, items.length);
             
         }
         finally{
@@ -132,7 +129,7 @@ cosmotest.service.conduits.test_conduits = {
             });
 
             conduit.createItem(newItem, c0, {sync: true});
-            
+
             var item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0];
             jum.assertTrue("start date", startDate.equals(item0.getEventStamp().getStartDate()));
             jum.assertTrue("duration", duration.equals(item0.getEventStamp().getDuration()));
@@ -173,8 +170,8 @@ cosmotest.service.conduits.test_conduits = {
             ).results[0];
             jum.assertTrue("no rrule", !!item0Occurrences[0].getMaster().getEventStamp().getRrule())            
             jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);
-            
-            item0Occurrences = conduit.expandRecurringItem(item0.getUid(), 
+            //TODO
+            item0Occurrences = conduit.expandRecurringItem(item0, 
                new cosmo.datetime.Date(2007, 5, 10),
                new cosmo.datetime.Date(2007, 5, 17), 
                {sync: true}
@@ -183,13 +180,30 @@ cosmotest.service.conduits.test_conduits = {
 
             var item4 = item0Occurrences[3];
             var item4Rid = item4.recurrenceId;
+            var newDisplayName = "Ze New Name"
             var item4Modification = new cosmo.model.Modification({
                 recurrenceId: item4.recurrenceId,
-                modifiedProperties: {displayName: "Ze Modification"}
+                modifiedProperties: {displayName: newDisplayName}
             });
             item4.getMaster().addModification(item4Modification);
-            jum.assertEquals("modification display name wrong", "Ze Modification", item4.getDisplayName());
+            jum.assertEquals("modification display name wrong", newDisplayName, item4.getDisplayName());
+            
             conduit.createItem(item4, c0, {sync:true});
+            // Make sure changes stuck
+            item0Occurrences = conduit.getItems(c0, 
+               {start: new cosmo.datetime.Date(2007, 5, 10),
+                end: new cosmo.datetime.Date(2007, 5, 17)}, 
+               {sync: true}
+            ).results[0];
+
+            item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
+
+            jum.assertEquals("modification display name didn't save", newDisplayName, item4.getDisplayName());
+
+
+            var anotherNewDisplayName = "Another new name";
+            item4.setDisplayName(anotherNewDisplayName);
+            conduit.saveItem(item4, {sync: true});
             
             // Make sure changes stuck
             item0Occurrences = conduit.getItems(c0, 
@@ -199,8 +213,9 @@ cosmotest.service.conduits.test_conduits = {
             ).results[0];
             
             item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
-//            jum.assertEquals("modfication display name didn't save", "Ze Modificaiton", item4.getDisplayName());
-            
+            jum.assertEquals("modification display name didn't save", anotherNewDisplayName, item4.getDisplayName());
+
+                        
 
             
         } finally {

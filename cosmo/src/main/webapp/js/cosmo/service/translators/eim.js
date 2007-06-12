@@ -359,7 +359,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                }
             }
         }
-        var recurrenceId = this.recurrenceIdToDate(uidParts[1]);
+        var recurrenceId = this.recurrenceIdToDate(uidParts[1], masterItem.getEventStamp().getStartDate());
         
         if (!dojo.lang.isEmpty(modifiedProperties)
             || !dojo.lang.isEmpty(modifiedStamps)){
@@ -376,8 +376,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return kwArgs.oldObject || masterItem.getNoteOccurrence(recurrenceId);
     },
     
-    recurrenceIdToDate: function (/*String*/ rid){
-         return cosmo.datetime.fromIso8601(rid);
+    recurrenceIdToDate: function (/*String*/ rid, masterItemStartDate){
+         var rid = cosmo.datetime.fromIso8601(rid);
+         rid.tzId = masterItemStartDate.tzId;
+
+         return rid;
     },
 
     subscriptionToAtomEntry: function (subscription){
@@ -458,7 +461,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence)
         
         if (modification.getModifiedStamps().task){
-            records.task = this.modificationToTaskRecord(modification)
+            records.task = this.modifiedOccurrenceToTaskRecord(modification)
         }
         if (modification.getModifiedStamps().mail){
             records.mail = this.modifiedOccurrenceToMailRecord(noteOccurrence)
@@ -538,7 +541,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     
     modifiedOccurrenceToNoteRecord: function(modifiedOccurrence){
-        var modification = noteOccurrence.getMaster().getModification(noteOccurrence.recurrenceId)
+        var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId)
         var props = modification.getModifiedProperties();
         props.uuid = this.getUid(modifiedOccurrence);
         var record = this.propsToNoteRecord(props);
@@ -803,8 +806,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     fromEimDate: function (dateString){
-        var date = dateString.split(":")[1];
-        return cosmo.datetime.fromIso8601(date);
+        var dateParts = dateString.split(":");
+        var dateParamList = dateParts[0].split(";");
+        var dateParams = {};
+        for (var i = 0; i < dateParamList.length; i++){
+            var keyValue = dateParamList[i].split("=");
+            dateParams[String.toLowerCase(keyValue[0])] = keyValue[1];
+        }
+        var date = cosmo.datetime.fromIso8601(dateParts[1]);
+
+        date.tzId = dateParams['tzid'] || null;
+        return date;
     },
 
     addTriageStringToItemProps: function (triageString, props){

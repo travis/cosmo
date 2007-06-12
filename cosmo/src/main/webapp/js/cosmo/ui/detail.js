@@ -209,8 +209,8 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();
-        if (stamp && st.stampType =="event") {
-            this.eventSection.updateFromStamp(stamp);
+        if (stamp) {
+            this[st.stampType.toLowerCase() + 'Section'].updateFromStamp(stamp);
         }
     }
 };

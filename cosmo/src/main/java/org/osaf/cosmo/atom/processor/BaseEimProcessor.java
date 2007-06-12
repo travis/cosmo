@@ -126,8 +126,9 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
                 if (sibling.getUid().equals(masterUid)) {
                     if (! (sibling instanceof NoteItem))
                         throw new ValidationException("Modification master item " + sibling.getUid() + " is not a note item");
+                    master = (NoteItem) sibling;
+                    break;
                 }
-                master = (NoteItem) sibling;
             }
 
             if (master != null)

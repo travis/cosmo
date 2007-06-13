@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import net.fortuna.ical4j.model.TimeZone;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -30,6 +32,7 @@ import org.osaf.cosmo.model.ContentItemComparator;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -86,8 +89,16 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      * @param the collection whose contents are to be listed
      */
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
-        Date now = Calendar.getInstance().getTime();
         String label = TriageStatus.label(triageStatus);
+        Date now = Calendar.getInstance().getTime();
+        TimeZone tz = null;
+        if (getFilter() != null) {
+            EventStampFilter esf = (EventStampFilter)
+                getFilter().getStampFilter(EventStampFilter.class);
+            tz = esf.getTimezone();
+        }
+
+        // XXX: pass timezone
         Set<NoteItem> notes = getFactory().getContentService().
             findNotesByTriageStatus(collection, label, now);
 

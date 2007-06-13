@@ -15,7 +15,10 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import net.fortuna.ical4j.model.TimeZone;
+
 import java.io.IOException;
+import java.util.Date;
 
 import javax.activation.MimeTypeParseException;
 
@@ -48,6 +51,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
@@ -273,6 +277,9 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     }
 
     public ResponseContext getFeed(RequestContext request) {
+        if (request.getTarget() instanceof ExpandedItemTarget)
+            return getExpandedItemFeed(request);
+
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
@@ -282,7 +289,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             ServiceLocator locator = createServiceLocator(request);
             ItemFeedGenerator generator =
                 createItemFeedGenerator(target, locator);
-            generator.setFilter(QueryBuilder.buildFilter(request));
+            generator.setFilter(createQueryFilter(request));
+
             Feed feed = generator.generateFeed(collection);
 
             AbstractResponseContext rc =
@@ -315,7 +323,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             ServiceLocator locator = createServiceLocator(request);
             ItemFeedGenerator generator =
                 createItemFeedGenerator(target, locator);
-            generator.setFilter(QueryBuilder.buildFilter(request));
             Entry entry = generator.generateEntry(item);
 
             AbstractResponseContext rc =
@@ -332,8 +339,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         } catch (UnsupportedFormatException e) {
             String reason = "Format " + target.getFormat() + " not supported";
             return badrequest(getAbdera(), request, reason);
-        } catch (InvalidQueryException e) {
-            return badrequest(getAbdera(), request, e.getMessage());
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -406,14 +411,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             log.debug("getting expanded feed for item " + item.getUid());
 
         try {
-            NoteItemFilter filter = QueryBuilder.buildFilter(request);
-            if (filter == null)
-                return badrequest(getAbdera(), request, "Time range query parameters not included");
-
             ServiceLocator locator = createServiceLocator(request);
             ItemFeedGenerator generator =
                 createItemFeedGenerator(target, locator);
-            generator.setFilter(filter);
+            generator.setFilter(createQueryFilter(request));
+
             Feed feed = generator.generateFeed(item);
 
             AbstractResponseContext rc =
@@ -493,5 +495,40 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     protected ContentProcessor createContentProcessor(String mediaType)
         throws UnsupportedMediaTypeException {
         return processorFactory.createProcessor(mediaType);
+    }
+
+    private NoteItemFilter createQueryFilter(RequestContext request)
+        throws InvalidQueryException {
+        EventStampFilter eventFilter = new EventStampFilter();
+
+        try {
+            Date start = getDateParameter(request, "start");
+            Date end = getDateParameter(request, "end");
+
+            if ((start == null && end != null) ||
+                (start != null && end == null))
+                throw new InvalidQueryException("Both start and end parameters must be provided for a time-range query");
+
+            if (start != null && end != null) {
+                eventFilter.setTimeRange(start, end);
+                eventFilter.setExpandRecurringEvents(true);
+            }
+        } catch (java.text.ParseException e) {
+            throw new InvalidQueryException("Error parsing time-range parameter", e);
+        }
+
+        try {
+            TimeZone tz = getTimeZoneParameter(request, "tz");
+            if (tz != null)
+                eventFilter.setTimezone(tz);
+        } catch (IllegalArgumentException e) {
+            log.warn("Unrecognized time zone " + request.getParameter("tz") +
+                     " ... falling back to system default time zone");
+        }
+
+        NoteItemFilter itemFilter = new NoteItemFilter();
+        itemFilter.getStampFilters().add(eventFilter);
+        
+        return itemFilter;
     }
 }

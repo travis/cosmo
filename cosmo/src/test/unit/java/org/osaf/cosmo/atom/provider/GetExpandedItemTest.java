@@ -42,15 +42,6 @@ public class GetExpandedItemTest extends BaseItemProviderTestCase {
         assertNotNull("Null last modified", res.getLastModified());
     }
 
-    public void testNoFilter() throws Exception {
-        NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = createRequestContext(item, "yyz", "eff", false);
-
-        ResponseContext res = ((ItemProvider)provider).getExpandedItemFeed(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 400, res.getStatus());
-    }
-
     public void testUnsupportedProjection() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = createRequestContext(item, "yyz", "eff");

@@ -46,9 +46,9 @@ public class MockItemFeedGenerator implements ItemFeedGenerator {
 
     /** */
     public MockItemFeedGenerator(MockGeneratorFactory factory,
-                             String projection,
-                             String format,
-                             ServiceLocator locator) {
+                                 String projection,
+                                 String format,
+                                 ServiceLocator locator) {
         this.factory = factory;
         this.projection = projection;
         this.format = format;

@@ -15,6 +15,13 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+
+import java.text.ParseException;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.Abdera;
@@ -28,16 +35,20 @@ import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
+import org.osaf.cosmo.util.DateUtil;
 
 public abstract class BaseProvider extends AbstractProvider
     implements ExtendedProvider {
     private static final Log log = LogFactory.getLog(BaseProvider.class);
+    private static final TimeZoneRegistry TIMEZONE_REGISTRY =
+        TimeZoneRegistryFactory.getInstance().createRegistry();
 
     private Abdera abdera;
     private GeneratorFactory generatorFactory;
@@ -51,6 +62,52 @@ public abstract class BaseProvider extends AbstractProvider
     }
 
     // our methods
+
+    /**
+     * Returns the value for a request parameter. If the parameter's
+     * value is empty, returns null.
+     */
+    protected String getNonEmptyParameter(RequestContext request,
+                                          String name) {
+        String value = request.getParameter(name);
+        return ! StringUtils.isBlank(value) ? value : null;
+    }
+
+    /**
+     * Returns the value for a request parameter as a
+     * <code>Date</code>. The value must be specified as an RFC 3339
+     * datetime.
+     *
+     * @throws ParseException if the value cannot be parsed
+     */
+    protected Date getDateParameter(RequestContext request,
+                                    String name)
+        throws ParseException {
+        String value = getNonEmptyParameter(request, name);
+        if (value == null)
+            return null;
+        return DateUtil.parseRfc3339Calendar(value).getTime();
+    }
+
+    /**
+     * Returns the value for a request parameter as a
+     * <code>TimeZone</code>. The value must be specified as the
+     * identifier string for a time zone registered in the server's
+     * <code>TimeZoneRegistry</code>.
+     *
+     * @throws IllegalArgumentException if the specified time zone is
+     * not registered
+     */
+    protected TimeZone getTimeZoneParameter(RequestContext request,
+                                            String name) {
+        String value = getNonEmptyParameter(request, name);
+        if (value == null)
+            return null;
+        TimeZone tz = TIMEZONE_REGISTRY.getTimeZone(value);
+        if (tz == null)
+            throw new IllegalArgumentException("Unregistered timezone " + value);
+        return tz;
+    }
 
     public Abdera getAbdera() {
         return abdera;

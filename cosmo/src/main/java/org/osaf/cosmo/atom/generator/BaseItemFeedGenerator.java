@@ -89,7 +89,7 @@ public abstract class BaseItemFeedGenerator
 
     /**
      * Generates an Atom feed containing entries for an expanded
-     * recurring item. Requires a query filter to have been set.
+     * recurring item.
      *
      * @param master the item on which the feed is based
      * @throws GeneratorException
@@ -162,26 +162,31 @@ public abstract class BaseItemFeedGenerator
     /**
      * <p>
      * Returns a sorted set of items representing modifications and
-     * occurrences of a recurring event.
+     * occurrences of a master item.
+     * </p>
+     * <p>
+     * If a query filter has been provided, this method finds all of
+     * the <code>NoteItem</code>s in the collection that match the
+     * query filter. Otherwise, it includes only the provided master
+     * <code>NoteItem</code>.
      * </p>
      * <p>
      * The set is sorted with the most recently modified item first.
      * </p>
      *
      * @param the collection whose contents are to be listed
-     * @throws IllegalStateException if a filter has not been provided
      */
     protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
-        if (filter == null)
-            throw new IllegalStateException("filter must be set");
-
         TreeSet<NoteItem> contents =
             new TreeSet<NoteItem>(new AuditableComparator(true));
 
-        filter.setMasterNoteItem(item);
-        for (Item occurrence : getFactory().getContentService().
-                 findItems(filter))
-            contents.add((NoteItem)occurrence);
+        if (filter != null) {
+            filter.setMasterNoteItem(item);
+            for (Item occurrence : getFactory().getContentService().
+                     findItems(filter))
+                contents.add((NoteItem)occurrence);
+        } else
+            contents.add(item);
 
         return contents;
     }

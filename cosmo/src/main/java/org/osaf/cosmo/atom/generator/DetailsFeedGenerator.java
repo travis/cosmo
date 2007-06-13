@@ -67,6 +67,7 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
         feed.addLink(newMorseCodeLink(collection));
         feed.addLink(newDavLink(collection));
         feed.addLink(newWebcalLink(collection));
+        feed.addLink(newPimLink(collection));
 
         for (Ticket ticket : visibleTickets(collection))
             addTicket(feed, ticket);

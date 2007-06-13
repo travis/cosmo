@@ -18,10 +18,12 @@ package org.osaf.cosmo.atom.generator;
 import javax.activation.MimeTypeParseException;
 
 import org.apache.abdera.model.Entry;
+import org.apache.abdera.model.Feed;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -40,6 +42,26 @@ public class BasicFeedGenerator extends BaseItemFeedGenerator {
     public BasicFeedGenerator(StandardGeneratorFactory factory,
                               ServiceLocator locator) {
         super(factory, locator);
+    }
+
+    /**
+     * <p>
+     * Augments the feed created by the superclass as follows:
+     * </p>
+     * <ul>
+     * <li> Adds a PIM link</cli>
+     * </ul>
+     *
+     * @param collection the collection on which the feed is based
+     * @throws GeneratorException
+     */
+    protected Feed createFeed(CollectionItem collection)
+        throws GeneratorException {
+        Feed feed = super.createFeed(collection);
+
+        feed.addLink(newPimLink(collection));
+
+        return feed;
     }
 
     /**

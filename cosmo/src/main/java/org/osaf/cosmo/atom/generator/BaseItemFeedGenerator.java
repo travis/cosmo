@@ -207,7 +207,6 @@ public abstract class BaseItemFeedGenerator
         feed.setGenerator(newGenerator());
         feed.addAuthor(newPerson(collection.getOwner()));
         feed.addLink(newSelfLink(collection));
-        feed.addLink(newPimLink(collection));
 
         return feed;
     }
@@ -228,7 +227,6 @@ public abstract class BaseItemFeedGenerator
         feed.setGenerator(newGenerator());
         feed.addAuthor(newPerson(item.getOwner()));
         feed.addLink(newSelfLink(item));
-        feed.addLink(newPimLink(item));
 
         return feed;
     }

@@ -31,6 +31,7 @@ dojo.require('cosmo.convenience');
 
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.view.cal.canvas');
+dojo.require('cosmo.view.list.canvas');
 
 // -- Widget includes, may not always find proper namespaced refs
 // -- ie, cosmo:CollectionSelector
@@ -249,20 +250,30 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     var rightSidebar = this.baseLayout.mainApp.rightSidebar;
     var d = _createElem('div');
     d.id = 'calTopNavDiv';
-    var navBar = new cosmo.ui.navbar.Bar({ domNode: d, id: d.id, width: centerColumn.width });
+    var navBar = new cosmo.ui.navbar.Bar({ domNode: d, id: d.id,
+        width: centerColumn.width });
     centerColumn.addChild(navBar);
     centerColumn.navBar = navBar;
     navBar.render();
 
-    // Cal canvas -- namespace singleton and Canvas ContentBox obj
+    // Cal view canvas -- namespace singleton and Canvas ContentBox obj
     // are bolted together in an unpleasant way here
-    var canvas = new cosmo.view.cal.canvas.Canvas({
+    var cal = new cosmo.view.cal.canvas.Canvas({
         viewStart: cosmo.view.cal.viewStart,
         viewEnd: cosmo.view.cal.viewEnd,
         currDate: cosmo.app.pim.currDate
     });
-    centerColumn.addChild(canvas);
-    centerColumn.calCanvas = canvas;
+    centerColumn.addChild(cal);
+    centerColumn.calCanvas = cal;
+
+    // List view canvas
+    var d = _createElem('div');
+    d.id = 'listViewContainer';
+    var list = new cosmo.view.list.canvas.Canvas({ domNode: d, id: d.id,
+        width: centerColumn.width - 2, // 2px for borders
+        height: centerColumn.height - CAL_TOP_NAV_HEIGHT });
+    centerColumn.addChild(list);
+    centerColumn.listCanvas = list;
 
     // Cal selector / single cal name -- the container is a
     // ContentBox, and the contents is a Dojo widget

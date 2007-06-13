@@ -16,7 +16,7 @@
 
 dojo.provide("cosmo.util.hash");
 
-cosmo.util.hash.Hash = function() {
+cosmo.util.hash.Hash = function () {
 
     var self = this;
 
@@ -32,10 +32,10 @@ cosmo.util.hash.Hash = function() {
         }
     }
 
-    this.getItem = function(key) {
+    this.getItem = function (key) {
         return this.items[key];
     };
-    this.setItem = function(key, val) {
+    this.setItem = function (key, val) {
         if (typeof val != 'undefined') {
             if (typeof this.items[key] == 'undefined') {
                 this.order[this.length] = key;
@@ -45,10 +45,10 @@ cosmo.util.hash.Hash = function() {
             return this.items[key];
         }
     };
-    this.addItem = function(key, val) {
+    this.addItem = function (key, val) {
         this.setItem(key, val);
     };
-    this.removeItem = function(key) {
+    this.removeItem = function (key) {
         if (typeof this.items[key] != 'undefined') {
             var pos = null;
             delete this.items[key]; // Remove the value
@@ -62,10 +62,10 @@ cosmo.util.hash.Hash = function() {
             this.length--; // Decrement the length
         }
     };
-    this.hasKey = function(key) {
+    this.hasKey = function (key) {
         return typeof this.items[key] != 'undefined';
     };
-    this.hasValue = function(val) {
+    this.hasValue = function (val) {
         for (var i = 0; i < this.order.length; i++) {
             if (this.items[this.order[i]] == val) {
                 return true;
@@ -73,10 +73,10 @@ cosmo.util.hash.Hash = function() {
         }
         return false;
     };
-    this.allKeys = function(str) {
+    this.allKeys = function (str) {
         return this.order.join(str);
     };
-    this.replaceKey = function(oldKey, newKey) {
+    this.replaceKey = function (oldKey, newKey) {
         // If item for newKey exists, nuke it
         if (this.hasKey(newKey)) {
             this.removeItem(newKey);
@@ -89,17 +89,17 @@ cosmo.util.hash.Hash = function() {
             }
         }
     };
-    this.getAtPos = function(pos) {
+    this.getAtPos = function (pos) {
         var lookup = this.items[this.order[pos]];
         return typeof lookup != 'undefined' ? lookup : false;
     };
-    this.insertAtPos = function(pos, key, val) {
+    this.insertAtPos = function (pos, key, val) {
         this.order.splice(pos, 0, key);
         this.items[key] = val;
         this.length++;
         return true;
     };
-    this.removeAtPos = function(pos) {
+    this.removeAtPos = function (pos) {
         var ret = this.items[this.order[pos]];
         if (typeof ret != 'undefined') {
             delete this.items[this.order[pos]]
@@ -115,17 +115,17 @@ cosmo.util.hash.Hash = function() {
         var pos = this.getPos(refKey);
         this.insertAtPos(pos, key, val);
     };
-    this.getFirst = function() {
+    this.getFirst = function () {
         return this.items[this.order[0]];
     };
-    this.getLast = function() {
+    this.getLast = function () {
         var ret = this.items[this.order[this.length-1]];
         return ret;
     };
-    this.getCurrent = function() {
+    this.getCurrent = function () {
         return this.items[this.order[this.cursorPos]];
     };
-    this.getNext = function() {
+    this.getNext = function () {
         if (this.cursorPos == this.length-1) {
             return false;
         }
@@ -134,7 +134,7 @@ cosmo.util.hash.Hash = function() {
             return this.items[this.order[this.cursorPos]];
         }
     };
-    this.getPrevious = function() {
+    this.getPrevious = function () {
         if (this.cursorPos == 0) {
             return false;
         }
@@ -143,14 +143,14 @@ cosmo.util.hash.Hash = function() {
             return this.items[this.order[this.cursorPos]];
         }
     };
-    this.getPos = function(key) {
+    this.getPos = function (key) {
         for (var i = 0; i < this.order.length; i++) {
             if (key == this.order[i]) {
                 return i;
             }
         }
     };
-    this.pop = function() {
+    this.pop = function () {
         var pos = this.length-1;
         var ret = this.items[this.order[pos]];
         if (typeof ret != 'undefined') {
@@ -161,16 +161,16 @@ cosmo.util.hash.Hash = function() {
             return false;
         }
     };
-    this.set = function(cursorPos) {
+    this.set = function (cursorPos) {
         this.cursorPos = cursorPos;
     };
-    this.reset = function() {
+    this.reset = function () {
         this.cursorPos = 0;
     };
-    this.end = function() {
+    this.end = function () {
         this.cursorPos = (this.length-1);
     };
-    this.each = function(func) {
+    this.each = function (func) {
         for (var i = 0; i < this.order.length; i++) {
             var key = this.order[i];
             var val = this.items[key];
@@ -178,7 +178,7 @@ cosmo.util.hash.Hash = function() {
         }
         return true;
     };
-    this.clone = function() {
+    this.clone = function () {
         var h = new Hash();
         for (var i = 0; i < self.order.length; i++) {
             var key = self.order[i];
@@ -187,7 +187,7 @@ cosmo.util.hash.Hash = function() {
         }
         return h;
     };
-    this.append = function(hNew) {
+    this.append = function (hNew) {
         for (var i = 0; i < hNew.order.length; i++) {
             var key = hNew.order[i];
             var val = hNew.items[key];
@@ -195,7 +195,7 @@ cosmo.util.hash.Hash = function() {
         }
 
     };
-    this.sort = function(specialSort, desc) {
+    this.sort = function (specialSort, desc) {
         var sortFunc = getSort(specialSort, desc);
         var valSort = [];
         var keySort = [];
@@ -217,7 +217,7 @@ cosmo.util.hash.Hash = function() {
             this.setItem(keySort[i], valSort[i]);
         }
     };
-    this.sortByKey = function(specialSort, desc) {
+    this.sortByKey = function (specialSort, desc) {
         var sortFunc = getSort(specialSort, desc);
         this.order.sort(sortFunc);
     };

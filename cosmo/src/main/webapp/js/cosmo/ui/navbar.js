@@ -18,12 +18,14 @@ dojo.provide('cosmo.ui.navbar');
 
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.list.common");
 
 cosmo.ui.navbar.Bar = function (p) {
     var self = this;
@@ -36,7 +38,7 @@ cosmo.ui.navbar.Bar = function (p) {
 
     // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
-    
+
     // Interface methods
     this.renderSelf = function () {
         var d = this.domNode;
@@ -53,7 +55,7 @@ cosmo.ui.navbar.Bar = function (p) {
         this.viewToggle = td;
 
         this.clearAll();
-        
+
         var _radio = cosmo.ui.widget.GraphicRadioButtonSet.Button;
         var w = 24;
         var btns = [
@@ -62,8 +64,10 @@ cosmo.ui.navbar.Bar = function (p) {
                 mouseoverImgPos: [-405, 0],
                 downStateImgPos: [-450, 0],
                 handleClick: function () {
-                    cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.domNode.style.display
-                    = 'none';
+                    var center = cosmo.app.pim.baseLayout.mainApp.centerColumn;
+                    center.calCanvas.domNode.style.display = 'none';
+                    cosmo.view.list.loadItems({ collection: cosmo.app.pim.currentCollection });
+                    center.listCanvas.domNode.style.display = 'block';
                     $('viewNavButtons').style.display = 'none';
                     $('monthHeaderDiv').style.display = 'none';
                     }
@@ -73,8 +77,9 @@ cosmo.ui.navbar.Bar = function (p) {
                 mouseoverImgPos: [-540, 0],
                 downStateImgPos: [-585, 0],
                 handleClick: function () {
-                    cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.domNode.style.display
-                    = 'block';
+                    var center = cosmo.app.pim.baseLayout.mainApp.centerColumn;
+                    center.calCanvas.domNode.style.display = 'block';
+                    center.listCanvas.domNode.style.display = 'none';
                     $('viewNavButtons').style.display = 'block';
                     $('monthHeaderDiv').style.display = 'block';
                     }
@@ -116,7 +121,7 @@ cosmo.ui.navbar.Bar = function (p) {
         td.className = 'labelTextXL';
         tr.appendChild(td);
         d.appendChild(table);
-        
+
         if (self.parent) { self.width = self.parent.width; }
         self.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
         self.setPosition(0, 0);
@@ -158,7 +163,7 @@ cosmo.ui.navbar.Bar = function (p) {
             case 'eventsLoadSuccess':
                 this._showMonthHeader();
                 break;
-        } 
+        }
     };
 }
 

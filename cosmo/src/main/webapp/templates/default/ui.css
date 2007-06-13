@@ -31,7 +31,7 @@ img {
 hr {
     height: 1px;
     border: 0px;
-    background: #cccccc;
+    background: #ccc;
 }
 
 /* Set default font size here
@@ -64,11 +64,11 @@ div {
 /* Default link color --
  * generally color for text of active buttons should match */
 a {
-    color: #333399;
+    color: #339;
     cursor: pointer;
 }
 a span, a{
-    color: #333399;
+    color: #339;
     text-decoration: none;
 }
 
@@ -92,7 +92,7 @@ a:hover {
 
 body.adminPage {
     font-size: 12px;
-    background: #ffffff;
+    background: #fff;
     color: #222222;
     padding-left: 1%;
     padding-right: 1%;
@@ -134,7 +134,7 @@ body.adminPage {
 }
 #loginDialogFormContainer {
     padding: 12px;
-    border: 1px solid #999999;
+    border: 1px solid #999;
 }
 
 #loginDialogInputsBox{
@@ -198,13 +198,13 @@ body.adminPage {
     font-weight: bold;
     text-align: center;
     background: #eeeeee;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     white-space: nowrap;
 }
 
 .smTableData {
     font-size: 11px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
 }
 
 /* Buttons
@@ -214,7 +214,7 @@ body.adminPage {
     margin: auto;
     text-align: center;
     font-size: 11px;
-    color: #333399;
+    color: #339;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
@@ -243,7 +243,7 @@ body.adminPage {
     margin: auto;
     text-align: center;
     font-size: 9px;
-    color: #333399;
+    color: #339;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
@@ -284,15 +284,15 @@ body.adminPage {
  * --------------------- */
 /* Main areas of the UI surface */
 .baseWidget {
-    background: #ffffff;
-    border: 1px solid #999999;
+    background: #fff;
+    border: 1px solid #999;
 }
 /* Embossed divider line */
 .embossedLine {
     height: 1px;
     font-size: 0px;
-    background: #999999;
-    border-bottom: 1px solid #ffffff;
+    background: #999;
+    border-bottom: 1px solid #fff;
     margin-left: auto;
     margin-right: auto;
 }
@@ -337,7 +337,7 @@ body.adminPage {
     font-weight: normal;
     color: #000000;
     border: 1px
-    solid #aaaaaa;
+    solid #aaa;
     padding: 2px;
 }
 /* Disabled text inputs */
@@ -345,8 +345,8 @@ body.adminPage {
     font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
     font-size: 11px;
     font-weight: normal;
-    color: #999999;
-    border: 1px solid #aaaaaa;
+    color: #999;
+    border: 1px solid #aaa;
     padding: 2px;
 }
 /* Select box */
@@ -355,7 +355,7 @@ body.adminPage {
     font-size: 11px;
     font-weight: normal;
     color: #000000;
-    border: 1px solid #aaaaaa;
+    border: 1px solid #aaa;
 }
 /* Form-input-specific errors */
 .inputError {
@@ -364,7 +364,7 @@ body.adminPage {
 }
 /* A simple bordered box */
 .borderBox {
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     padding: 8px;
 }
 
@@ -413,8 +413,8 @@ td.dataDisplayLabel {
 /* Contain day/date at column top -- e.g., 'Sun 11' */
 .dayListDayDiv {
     position: absolute;
-    border-right: 1px solid #cccccc;
-    border-bottom: 1px solid #cccccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
     text-align: center;
     -moz-user-select: none;
 }
@@ -436,7 +436,7 @@ td.dataDisplayLabel {
 /* Top half-hour of a one-hour block on the timed canvas */
 .hourDivTop {
     width: 100%;
-    border-bottom: 1px dotted #cccccc;
+    border-bottom: 1px dotted #ccc;
     vertical-align: top;
 }
 /* Bottom half-hour of a one-hour block on the timed canvas */
@@ -447,7 +447,7 @@ td.dataDisplayLabel {
 }
 /* Left-hand timeline containing times of day -- e.g., '11 AM' */
 .hourDivSubLeft {
-    color: #999999;
+    color: #999;
     font-size: 9px;
     padding-top: 2px;
     padding-right: 3px;
@@ -457,7 +457,7 @@ td.dataDisplayLabel {
 }
 /* AM/PM in lighter color after time of day */
 .hourDivSubLeft span {
-    color: #cccccc;
+    color: #ccc;
 }
 /* Adds colored background to current day column */
 .currentDayDay {
@@ -533,7 +533,7 @@ td.dataDisplayLabel {
 /* Menubar main */
 #menuBar {
     position: absolute;
-    background: #ffffff;
+    background: #fff;
     border-bottom: 1px solid #dddddd;
     visibility: visible;
 }
@@ -553,7 +553,7 @@ td.dataDisplayLabel {
 /* The pipe character between links */
 #menuNavItems span.menuBarDivider {
     font-weight: normal;
-    color: #999999;
+    color: #999;
 }
 /* Cosmo logo up on menubar */
 #smallLogoDiv {
@@ -577,7 +577,7 @@ td.dataDisplayLabel {
 /* Left sidebar main */
 #leftSidebarDiv {
     position: absolute;
-    background: #ffffff;
+    background: #fff;
 }
 /* Collection select box */
 #calSelectNav {
@@ -587,7 +587,7 @@ td.dataDisplayLabel {
 }
 /* Text for single collections */
 #collectionLabelPrompt {
-    color: #aaaaaa;
+    color: #aaa;
     padding-bottom: 2px;
 }
 /* Jump-to date box */
@@ -600,7 +600,7 @@ td.dataDisplayLabel {
 /* Right sidebar main */
 #rightSidebarDiv {
     position: absolute;
-    background: #ffffff;
+    background: #fff;
 }
 /* Center column for main content
  * --------------------- */
@@ -625,46 +625,65 @@ td.dataDisplayLabel {
     margin: auto;
     top: 50%;
     margin-top: -20px;
-    color: #333399;
-    border: 1px solid #333399;
+    color: #339;
+    border: 1px solid #339;
     line-height: 38px;
     text-align: center;
 }
 /* Nav button set for week-to-week nav */
 #calTopNavDiv {
-    border-left: 1px solid #999999;
-    border-right: 1px solid #999999;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
     position: absolute;
     border-bottom: 1px solid #dfdfdf;
-    background: #ffffff;
+    background: #fff;
     line-height: 34px;
     vertical-align: middle;
 }
+/* List view */
+#listViewContainer {
+    position: absolute;
+    display: none;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+}
+.headerCell {
+    color: #999;
+    font-weight: bold;
+    padding: 3px;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+.dataCell {
+    padding: 3px;
+    border-bottom: 1px solid #ddd;
+}
+/* Calendar canvas */
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
 #dayListDiv {
-    border-left: 1px solid #999999;
-    border-right: 1px solid #999999;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
     position: absolute;
 }
 /* Shoves the day list over the width of the timeline sidebar */
 #dayListSpacer {
-    background: #ffffff;
+    background: #fff;
 }
 /* Main container for resizable all-day event area */
 #allDayResizeMainDiv {
-    border-left: 1px solid #999999;
-    border-right: 1px solid #999999;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
     position: absolute;
-    background: #ffffff;
+    background: #fff;
     z-index: 100;
 }
 /* Handle to grab and drag to resize all-day event area */
 #allDayResizeHandleDiv {
-    border-top: 1px solid #999999;
-    border-bottom: 1px solid #999999;
-    border-right: 1px solid #999999;
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-right: 1px solid #999;
     position: absolute;
-    background: #ffffff;
+    background: #fff;
     line-height: 12px;
     font-size: 1px; cursor: s-resize;
     z-index: 100;
@@ -675,7 +694,7 @@ td.dataDisplayLabel {
  * the timeline sidebar */
 #allDayHourSpacerDiv {
     position: absolute;
-    background: #ffffff;
+    background: #fff;
     border-right: 1px solid #dfdfdf;
 }
 /* Contains the cols for the all-day events */
@@ -686,8 +705,8 @@ td.dataDisplayLabel {
 }
 /* Scrolling area containing the timeline and timed events */
 #timedScrollingMainDiv {
-    border-left: 1px solid #999999;
-    border-right: 1px solid #999999;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
     position: absolute;
     overflow: auto; overflow-y: auto; overflow-x: hidden;
     -moz-user-select: none;
@@ -696,7 +715,7 @@ td.dataDisplayLabel {
 #timedHourListDiv {
     position: absolute;
     border-right: 1px solid #dfdfdf;
-    background: #ffffff;
+    background: #fff;
     -moz-user-select: none;
 }
 /* Canvas for timed events */
@@ -719,9 +738,9 @@ td.dataDisplayLabel {
 /* Main box for fake popup */
 #modalDialog {
     position: absolute;
-    /* background: #ffffff;
-    background: #ffffff;
-    border: 1px solid #999999; */
+    /* background: #fff;
+    background: #fff;
+    border: 1px solid #999; */
     z-index: 2000;
     display: none;
 }
@@ -850,10 +869,10 @@ td.dataDisplayLabel {
     margin-top: 24px;
 }
 .tabSelected {
-    color: #333399; 
-    border-left: 1px solid #aaaaaa; 
-    border-top: 1px solid #aaaaaa;
-    border-right: 1px solid #aaaaaa; 
+    color: #339; 
+    border-left: 1px solid #aaa; 
+    border-top: 1px solid #aaa;
+    border-right: 1px solid #aaa; 
     height: 19px;
     line-height: 20px;
     vertical-align: middle;
@@ -863,11 +882,11 @@ td.dataDisplayLabel {
     cursor: pointer;
 }
 .tabUnselected {
-    color: #333399; 
-    border-left: 1px solid #aaaaaa;
-    border-top: 1px solid #aaaaaa;
-    border-right: 1px solid #aaaaaa;
-    border-bottom: 1px solid #999999;
+    color: #339; 
+    border-left: 1px solid #aaa;
+    border-top: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #999;
     background: #eeeeee;
     height: 18px;
     line-height: 20px;
@@ -881,7 +900,7 @@ td.dataDisplayLabel {
     height: 19px;
     line-height: 20px;
     width: 1%;
-    border-bottom: 1px solid #999999;
+    border-bottom: 1px solid #999;
 }
 
 /* Minical styles
@@ -903,19 +922,19 @@ td.dataDisplayLabel {
     text-align: left;
     margin: auto;
     width: 140px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
 }
 #miniCalNavPanel td {
     font-size: 0.9em;
     font-weight: bold;
-    border-bottom: 1px solid #cccccc;
+    border-bottom: 1px solid #ccc;
     line-height: 1.4em;
     padding-left: 4px;
     padding-right: 4px;
 }
 #miniCalNavPanelCenter {
-    border-right: 1px solid #cccccc;
-    border-left: 1px solid #cccccc;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
 }
 .miniMonthTile td {
     border-bottom: 1px solid rgb(226,226,226);
@@ -1032,13 +1051,13 @@ td.dataDisplayLabel {
     font-weight: bold;
     text-align: center;
     background: #eeeeee;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     white-space: nowrap;
 }
 
 .smTableData {
     font-size: 11px;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
 }
 
 
@@ -1072,11 +1091,11 @@ td.dataDisplayLabel {
 
 .confirm { color: #33aa33 }
 
-.disabled { color: #aaaaaa; }
+.disabled { color: #aaa; }
 
 .textInput {
     color: #000000;
-    border: 1px solid #aaaaaa;
+    border: 1px solid #aaa;
     padding: 2px;
 }
 
@@ -1086,7 +1105,7 @@ td.dataDisplayLabel {
 }
 
 .widgetBorder {
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
 }
 
 .widgetContent {

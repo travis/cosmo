@@ -832,8 +832,6 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var id = '';
         var ev = null;
         
-        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadStart', 
-            opts: opts });
         // Load the array of events
         // ======================
         try {

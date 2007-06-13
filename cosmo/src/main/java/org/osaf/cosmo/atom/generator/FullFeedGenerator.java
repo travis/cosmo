@@ -27,6 +27,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -86,8 +87,6 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
         throws GeneratorException {
         Entry entry = super.createEntry(item, isDocument);
 
-        entry.addLink(newEditLink(item));
-
         if (isDocument) {
             for (CollectionItem parent : item.getParents())
                 entry.addLink(newParentLink(parent));
@@ -102,6 +101,11 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
         EventStamp stamp = EventStamp.getStamp(item);
         if (stamp != null && stamp.isRecurring())
             entry.addLink(newExpandedLink(item));
+
+        if (item instanceof NoteOccurrence)
+            entry.addLink(newMasterLink((NoteOccurrence)item));
+        else
+            entry.addLink(newEditLink(item));
 
         return entry;
     }

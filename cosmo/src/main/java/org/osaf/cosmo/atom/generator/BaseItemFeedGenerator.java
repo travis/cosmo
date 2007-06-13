@@ -30,6 +30,7 @@ import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -260,11 +261,10 @@ public abstract class BaseItemFeedGenerator
         entry.setTitle(item.getDisplayName());
         entry.setUpdated(item.getClientModifiedDate());
         entry.setPublished(item.getClientCreationDate());
-        entry.addLink(newSelfLink(item));
         if (isDocument)
             entry.addAuthor(newPerson(item.getOwner()));
-
         setEntryContent(entry, item);
+        entry.addLink(newSelfLink(item));
 
         return entry;
     }
@@ -358,10 +358,23 @@ public abstract class BaseItemFeedGenerator
     }
 
     /**
+     * Creates a <code>Link</code> for the master IRI of the given
+     * occurrence.
+     *
+     * @param occurrence the occurrence to link
+     * @throws GeneratorException
+     */
+    protected Link newMasterLink(NoteOccurrence occurrence)
+        throws GeneratorException {
+        return newLink(REL_MASTER, MEDIA_TYPE_ATOM,
+                       selfIri(occurrence.getMasterNote()));
+    }
+
+    /**
      * Creates a <code>Link</code> for the edit IRI of the given
      * collection.
      *
-     * @param item the item to link
+     * @param collection the collection to link
      * @throws GeneratorException
      */
     protected Link newEditLink(CollectionItem collection)

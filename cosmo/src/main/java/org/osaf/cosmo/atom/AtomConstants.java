@@ -56,6 +56,7 @@ public interface AtomConstants {
     /** */
     public static final String REL_MODIFICATION = "modification";
     public static final String REL_EXPANDED = "expanded";
+    public static final String REL_MASTER = "master";
 
     // projection constants
 

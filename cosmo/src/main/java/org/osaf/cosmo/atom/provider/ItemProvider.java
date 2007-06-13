@@ -514,7 +514,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 eventFilter.setExpandRecurringEvents(true);
             }
         } catch (java.text.ParseException e) {
-            throw new InvalidQueryException("Error parsing time-range parameter", e);
+            throw new InvalidQueryException("Error parsing time-range parameter: " + e.getMessage(), e);
         }
 
         try {

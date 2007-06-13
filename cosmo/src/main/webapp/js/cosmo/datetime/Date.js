@@ -147,6 +147,9 @@ cosmo.datetime.Date.prototype.getUTCMonth = function () {
 cosmo.datetime.Date.prototype.getUTCSeconds = function () {
     return this.getUTCDateProxy().getUTCSeconds();
 };
+cosmo.datetime.Date.prototype.isFloating = function () {
+    return !(this.utc || this.tzId);
+};
 cosmo.datetime.Date.prototype.setFullYear = function(n) {
     this.setAttribute('year', n);
 };

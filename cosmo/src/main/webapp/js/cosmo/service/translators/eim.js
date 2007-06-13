@@ -382,10 +382,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     recurrenceIdToDate: function (/*String*/ rid, masterItemStartDate){
-         var rid = cosmo.datetime.fromIso8601(rid);
-         rid.tzId = masterItemStartDate.tzId;
-
-         return rid;
+         return cosmo.datetime.fromIso8601(rid, masterItemStartDate.tzId);
     },
 
     subscriptionToAtomEntry: function (subscription){
@@ -412,9 +409,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     getUid: function (/*cosmo.model.Note*/ note){
         if (note instanceof cosmo.model.NoteOccurrence){
-            return note.getUid() + ":" + note.recurrenceId.strftime(this.RID_FMT);
+            return note.getUid() + ":" + this.getRid(note.recurrenceId);
         } else {
             return note.getUid();
+        }
+    },
+    
+    getRid: function(/*cosmo.datetime.Date*/date){
+        if (date.isFloating()) {
+            return date.strftime(this.RID_FMT);
+        } else {
+            return  date.createDateForTimezone("utc").strftime(this.RID_FMT + "Z");
         }
     },
 
@@ -769,7 +774,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         return {};
     },
-
+ 
     getMailStampProperties: function (record){
         var properties = {};
         if (record.fields){
@@ -818,9 +823,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var keyValue = dateParamList[i].split("=");
             dateParams[String.toLowerCase(keyValue[0])] = keyValue[1];
         }
-        var date = cosmo.datetime.fromIso8601(dateParts[1]);
+        var tzId = dateParams['tzid'] || null;
+        var jsDate = dojo.date.fromIso8601(dateParts[1]);
+        var date = new cosmo.datetime.Date();
+        date.tzId = tzId;
 
-        date.tzId = dateParams['tzid'] || null;
+        date.setYear(jsDate.getFullYear());
+        date.setMonth(jsDate.getMonth());
+        date.setDate(jsDate.getDate());
+        date.setHours(jsDate.getHours());
+        date.setMinutes(jsDate.getMinutes());
+        date.setSeconds(jsDate.getSeconds());
+        date.setMilliseconds(0);
         return date;
     },
 

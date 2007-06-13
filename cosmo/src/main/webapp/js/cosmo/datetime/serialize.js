@@ -24,19 +24,17 @@ cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
     dojo.unimplemented();
 };
 
-cosmo.datetime.fromIso8601 = function(/*String*/formattedString){
-    // summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
-    return new cosmo.datetime.Date(dojo.date.setIso8601(new Date(0, 0), formattedString));
-};
+cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
+    var date = new cosmo.datetime.Date();
+    if (timezone){
+        date.tzId = timezone;
+    }
+    else if (formattedString[formattedString.length - 1].toLowerCase() == "z"){
+        date.utc = true;
+    }
 
-cosmo.datetime.fromIso8601Date = function(/*String*/formattedString){
-    // summary: returns a Date object based on an ISO 8601 formatted string (date only)
-    return new cosmo.datetime.Date(dojo.date.setIso8601Date(new Date(0, 0), formattedString));
-};
-
-cosmo.datetime.fromIso8601Time = function(/*String*/formattedString){
-    // summary: returns a Date object based on an ISO 8601 formatted string (time only)
-    return new cosmo.datetime.Date(dojo.date.setIso8601Time(new Date(0, 0), formattedString));
+    date.updateFromUTC(dojo.date.fromIso8601(formattedString).getTime());
+    return date;
 };
 
 cosmo.datetime.fromRfc3339 = function(/*String*/rfcDate){

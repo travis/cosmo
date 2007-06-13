@@ -94,6 +94,51 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertTrue("deleteItem: items", !!items);
             jum.assertEquals("deleteItem: items length", 1, items.length);
             
+            
+            // Test dashboard projections
+            var nowItem = new cosmo.model.Note(
+            {
+                displayName: "Now Item",
+                triageStatus: 100,
+                rank: 0,
+                autoTriage: 0,
+                body: "Now Item"
+            }
+            );
+            
+            conduit.createItem(nowItem, c0, {sync: true});
+
+            // Test dashboard projections
+            var laterItem = new cosmo.model.Note(
+            {
+                displayName: "Later Item",
+                triageStatus: 200,
+                rank: 0,
+                autoTriage: 0,
+                body: "Later Item"
+            }
+            );
+            
+            conduit.createItem(laterItem, c0, {sync: true});
+
+            // Test dashboard projections
+            var doneItem = new cosmo.model.Note(
+            {
+                displayName: "Done Item",
+                triageStatus: 300,
+                rank: 0,
+                autoTriage: 0,
+                body: "Done Item"
+            }
+            );
+            
+            conduit.createItem(doneItem, c0, {sync: true});
+            
+            items = conduit.getItems(c0, {triage: "now"}, {sync: true}).results[0];
+            items = conduit.getItems(c0, {triage: "later"}, {sync: true}).results[0];
+            items = conduit.getItems(c0, {triage: "done"}, {sync: true}).results[0];
+            
+            
         }
         finally{
             cosmotest.service.conduits.test_conduits.cleanup(user);            

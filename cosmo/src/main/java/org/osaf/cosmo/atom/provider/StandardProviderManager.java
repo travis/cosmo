@@ -35,6 +35,8 @@ public class StandardProviderManager implements ProviderManager {
 
     public Provider getProvider(RequestContext request) {
         Target target = request.getTarget();
+        if (target == null)
+            return null;
         if (target instanceof BaseItemTarget)
             return itemProvider;
         if (target instanceof SubscribedTarget ||

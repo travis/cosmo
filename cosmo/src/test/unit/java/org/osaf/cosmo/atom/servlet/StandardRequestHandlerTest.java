@@ -51,7 +51,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfMatch(req, "*");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -63,7 +63,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfMatch(req, collection);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -75,7 +75,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfMatch(req, "aeiou");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions passed", rv);
         assertEquals("Incorrect response status", 412, res.getStatus());
         assertNotNull("Null ETag header", res.getHeader("ETag"));
@@ -87,7 +87,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfNoneMatch(req, "*");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions passed", rv);
         assertEquals("Incorrect response status", 304, res.getStatus());
         assertNotNull("Null ETag header", res.getHeader("ETag"));
@@ -99,7 +99,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfNoneMatch(req, collection);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions passed", rv);
         assertEquals("Incorrect response status", 304, res.getStatus());
         assertNotNull("Null ETag header", res.getHeader("ETag"));
@@ -111,7 +111,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfNoneMatch(req, "aeiou");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -124,7 +124,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfModifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -137,7 +137,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfModifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions failed", rv);
         assertEquals("Incorrect response status", 304, res.getStatus());
     }
@@ -150,7 +150,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfUnmodifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions failed", rv);
         assertEquals("Incorrect response status", 412, res.getStatus());
     }
@@ -163,7 +163,7 @@ public class StandardRequestHandlerTest extends TestCase {
         helper.setIfUnmodifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
-        boolean rv = handler.preconditions(helper.getProvider(), req, res);
+        boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -172,10 +172,10 @@ public class StandardRequestHandlerTest extends TestCase {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = helper.createUpdateRequestContext(collection);
 
-        ResponseContext res = handler.process(helper.getProvider(), req);
+        ResponseContext res = handler.process(helper.getProvider(req), req);
         assertNotNull("Null response context", res);
         assertTrue("Collection not updated",
-                   ((MockProvider)helper.getProvider()).isUpdated(collection));
+                   helper.getProvider(req).isUpdated(collection));
     }
 
     protected void setUp() throws Exception {

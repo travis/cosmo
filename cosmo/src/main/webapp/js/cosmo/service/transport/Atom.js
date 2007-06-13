@@ -231,10 +231,10 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var ret = {};
         if (!searchCrit) return ret;
         if (searchCrit.start) {
-            ret["start-min"] = dojo.date.toRfc3339(searchCrit.start);
+            ret["start"] = dojo.date.toRfc3339(searchCrit.start);
         }
         if (searchCrit.end) {
-            ret["start-max"] = dojo.date.toRfc3339(searchCrit.end);
+            ret["end"] = dojo.date.toRfc3339(searchCrit.end);
         }
         return ret;
     }

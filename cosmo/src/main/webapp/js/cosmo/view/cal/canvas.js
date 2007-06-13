@@ -432,6 +432,8 @@ cosmo.view.cal.canvas = new function () {
         top -= cosmo.app.pim.viewOffset;
         // Subtract change in resized all-day event area
         top -= (allDayArea.dragSize - allDayArea.origSize);
+        // Subtract height of navbar -- this lives outside the cal view
+        top -=  CAL_TOP_NAV_HEIGHT;
         return top;
     };
     /**
@@ -1604,7 +1606,9 @@ cosmo.view.cal.canvas.Canvas = function (p) {
 
         // Scrollable view area
         vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
-        calcHeight = self.height - vOffset - CAL_TOP_NAV_HEIGHT;
+        calcHeight = self.height - vOffset;
+        // Subtract the navbar height -- this lives outside the cal view
+        calcHeight -= CAL_TOP_NAV_HEIGHT; 
         var timedMain = self.timedScrollingMainDiv;
         timedMain.setSize(self.width - 2, calcHeight); // Variable height area
         timedMain.setPosition(0, vOffset);

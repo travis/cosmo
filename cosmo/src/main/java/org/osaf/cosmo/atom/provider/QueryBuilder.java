@@ -45,7 +45,7 @@ public class QueryBuilder {
      * <p>
      * The returned filter specifies all events that
      * begin with the time range specified by the
-     * <code>start-min</code> and <code>start-max</code> request
+     * <code>start</code> and <code>end</code> request
      * parameters. These parameter values are both required and must
      * be in RFC 3339 format.
      *
@@ -55,17 +55,17 @@ public class QueryBuilder {
      */
     public static NoteItemFilter buildFilter(RequestContext request)
         throws InvalidQueryException {
-        String isostart = request.getParameter("start-min");
+        String isostart = request.getParameter("start");
         if (StringUtils.isBlank(isostart))
             isostart = null;
-        String isoend = request.getParameter("start-max");
+        String isoend = request.getParameter("end");
         if (StringUtils.isBlank(isoend))
             isoend = null;
 
         if (isostart == null && isoend == null)
             return null;
         if (isostart == null || isoend == null)
-            throw new InvalidQueryException("Both start-min and start-max parameters must be provided");
+            throw new InvalidQueryException("Both start and end parameters must be provided");
 
         Date start = parseDateParameter(isostart);
         Date end = parseDateParameter(isoend);

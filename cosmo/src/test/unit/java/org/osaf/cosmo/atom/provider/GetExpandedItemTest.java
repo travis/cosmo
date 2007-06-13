@@ -102,8 +102,8 @@ public class GetExpandedItemTest extends BaseItemProviderTestCase {
             new MockExpandedRequestContext(helper.getServiceContext(), item,
                                            projection, format);
         if (withQueryParams) {
-            helper.addParameter(rc, "start-min", "2007-01-01T00:00:00Z");
-            helper.addParameter(rc, "start-max", "2007-01-31T23:59:59Z");
+            helper.addParameter(rc, "start", "2007-01-01T00:00:00Z");
+            helper.addParameter(rc, "end", "2007-01-31T23:59:59Z");
         }
         return rc;
     }

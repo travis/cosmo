@@ -33,7 +33,6 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.view.cal");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
@@ -317,6 +316,7 @@ cosmo.view.cal.canvas = new function () {
          * Displays the month name at the top
          */
         function showMonthHeader() {
+            return true;
             var vS = viewStart;
             var vE = viewEnd;
             var mS = vS.getMonth();
@@ -1490,7 +1490,8 @@ cosmo.view.cal.canvas.Canvas = function (p) {
     this.renderSelf = function () {
         this.width = this.parent.width;
         this.height = this.parent.height;
-        this.setPosition();
+        this.domNode.style.position = 'absolute';
+        this.setPosition(0, CAL_TOP_NAV_HEIGHT);
         this.setSize();
         if (!this.hasBeenRendered) {
             // Set up DOM structures, create ContentBox objs
@@ -1519,75 +1520,6 @@ cosmo.view.cal.canvas.Canvas = function (p) {
     function setUPDOM() {
         var d = self.domNode;
         var _html = cosmo.util.html;
-
-        // Top nav area
-        var t = _createElem('div');
-        t.id = 'calTopNavDiv';
-        var table = _createElem('table');
-        var body = _createElem('tbody');
-        var tr = _createElem('tr');
-        table.cellPadding = '0';
-        table.cellSpacing = '0';
-        table.appendChild(body);
-        body.appendChild(tr);
-        var td = _createElem('td');
-        td.id = 'viewToggle';
-        this.viewToggle = td;
-
-        var _radio = cosmo.ui.widget.GraphicRadioButtonSet.Button;
-        var w = 24;
-        var btns = [
-            new _radio({ width: w,
-                defaultImgPos: [-360, 0],
-                mouseoverImgPos: [-405, 0],
-                downStateImgPos: [-450, 0],
-                handleClick: function () {
-                    cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.domNode.style.display
-                    = 'none'; }
-                }),
-            new _radio({ width: w,
-                defaultImgPos: [-495, 0],
-                mouseoverImgPos: [-540, 0],
-                downStateImgPos: [-585, 0],
-                handleClick: function () { alert('bar'); }
-                })
-        ];
-        var vT =  dojo.widget.createWidget("cosmo:GraphicRadioButtonSet", {
-            selectedButtonIndex: 1, height: 35, buttons: btns }, td, 'last');
-        tr.appendChild(td);
-        var td = _createElem('td');
-        td.style.width = '16px';
-        td.appendChild(_html.nbsp());
-        tr.appendChild(td);
-        var td = _createElem('td');
-        td.id = 'viewNavButtons';
-        self.viewNavButtons = td;
-        // Add week-to-week navigation
-        var back = function back() {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { goTo: 'back' }, data: {}
-            });
-        }
-        var next = function next() {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { goTo: 'next' }, data: {}
-            });
-        }
-        var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
-        self.viewNavButtons.appendChild(navButtons.domNode);
-
-        tr.appendChild(td);
-        var td = _createElem('td');
-        td.appendChild(_html.nbsp());
-        td.appendChild(_html.nbsp());
-        td.appendChild(_html.nbsp());
-        tr.appendChild(td);
-        var td = _createElem('td');
-        td.id = 'monthHeaderDiv';
-        td.className = 'labelTextXL';
-        tr.appendChild(td);
-        t.appendChild(table);
-        d.appendChild(t);
 
         // List of day names for the week
         var t = _createElem('div');
@@ -1645,11 +1577,11 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         // Top nav
         vOffset = 0;
         // 1px for border per retarded CSS spec
-        var topNav = self.calTopNavDiv;
-        topNav.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
-        topNav.setPosition(0, vOffset);
+        //var topNav = self.calTopNavDiv;
+        //topNav.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
+        //topNav.setPosition(0, vOffset);
         // Day listing
-        vOffset += CAL_TOP_NAV_HEIGHT;
+        //vOffset += CAL_TOP_NAV_HEIGHT;
         var dayList = self.dayListDiv;
         dayList.setSize(self.width - 2, DAY_LIST_DIV_HEIGHT);
         dayList.setPosition(0, vOffset);
@@ -1672,7 +1604,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
 
         // Scrollable view area
         vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
-        calcHeight = self.height - vOffset;
+        calcHeight = self.height - vOffset - CAL_TOP_NAV_HEIGHT;
         var timedMain = self.timedScrollingMainDiv;
         timedMain.setSize(self.width - 2, calcHeight); // Variable height area
         timedMain.setPosition(0, vOffset);

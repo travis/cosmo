@@ -38,6 +38,7 @@ dojo.require("cosmo.ui.widget.CollectionSelector");
 // --
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.menu");
+dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.detail");
 
 
@@ -51,7 +52,7 @@ cosmo.app.pim.layout = new function () {
         // so they don't bleed through the mask
         // cosmo.app.hideMask will show them again after the mask
         // goes away
-        cosmo.app.showHideSelectBoxes(false); 
+        cosmo.app.showHideSelectBoxes(false);
         return this.baseLayout;
     };
 };
@@ -242,6 +243,17 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
+
+    var centerColumn = this.baseLayout.mainApp.centerColumn;
+    var leftSidebar = this.baseLayout.mainApp.leftSidebar;
+    var rightSidebar = this.baseLayout.mainApp.rightSidebar;
+    var d = _createElem('div');
+    d.id = 'calTopNavDiv';
+    var navBar = new cosmo.ui.navbar.Bar({ domNode: d, id: d.id, width: centerColumn.width });
+    centerColumn.addChild(navBar);
+    centerColumn.navBar = navBar;
+    navBar.render();
+
     // Cal canvas -- namespace singleton and Canvas ContentBox obj
     // are bolted together in an unpleasant way here
     var canvas = new cosmo.view.cal.canvas.Canvas({
@@ -249,16 +261,16 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         viewEnd: cosmo.view.cal.viewEnd,
         currDate: cosmo.app.pim.currDate
     });
-    this.baseLayout.mainApp.centerColumn.addChild(canvas);
-    this.baseLayout.mainApp.centerColumn.calCanvas = canvas;
+    centerColumn.addChild(canvas);
+    centerColumn.calCanvas = canvas;
 
     // Cal selector / single cal name -- the container is a
     // ContentBox, and the contents is a Dojo widget
     var d = _createElem('div');
     d.id = 'calSelectNav';
     var cB = new cosmo.ui.ContentBox({ domNode: d, id: d.id });
-    this.baseLayout.mainApp.leftSidebar.addChild(cB);
-    this.baseLayout.mainApp.leftSidebar.collectionSelector = cB;
+    leftSidebar.addChild(cB);
+    leftSidebar.collectionSelector = cB;
     dojo.widget.createWidget('cosmo:CollectionSelector', {
         'collections': cosmo.app.pim.currentCollections,
         'currentCollection': cosmo.app.pim.currentCollection,
@@ -267,13 +279,16 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     // Minical -- subclassed ContentBox
     var d = _createElem('div');
     d.id = 'miniCal';
-    cB = new cosmo.ui.minical.MiniCal({ domNode: d, currDate: cosmo.app.pim.currDate });
-    this.baseLayout.mainApp.leftSidebar.addChild(cB);
-    this.baseLayout.mainApp.leftSidebar.minical = cB;
+    cB = new cosmo.ui.minical.MiniCal({ domNode: d, currDate:
+        cosmo.app.pim.currDate });
+    leftSidebar.addChild(cB);
+    leftSidebar.minical = cB;
 
+    // Main menu of links at the top of the UI
     var d = _createElem('div');
     d.id = 'menuNavItems';
-    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top: (TOP_MENU_HEIGHT - 20) });
+    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top:
+        (TOP_MENU_HEIGHT - 20) });
     this.baseLayout.menuBar.addChild(cB);
     this.baseLayout.menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data
@@ -307,13 +322,13 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         // Add to the menu area in the first position
         d.insertBefore(s, d.firstChild);
     }
-    
+
     // Detail-view form
     var d = _createElem('div');
     d.id = 'detailViewForm';
     var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: d, id: d.id, top: 0 });
-    this.baseLayout.mainApp.rightSidebar.addChild(cB);
-    this.baseLayout.mainApp.rightSidebar.detailViewForm = cB;
-    this.baseLayout.mainApp.rightSidebar.render();
+    rightSidebar.addChild(cB);
+    rightSidebar.detailViewForm = cB;
+    rightSidebar.render();
 
 };

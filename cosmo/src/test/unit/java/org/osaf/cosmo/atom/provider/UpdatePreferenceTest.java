@@ -80,9 +80,19 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
 
-    public void testInvalidEntry() throws Exception {
+    public void testEntryNoValue() throws Exception {
         Preference pref = helper.makeDummyPreference();
-        Preference newpref = new Preference("invalid", null);
+        Preference newpref = new Preference("new key", null);
+        RequestContext req = createRequestContext(pref, newpref);
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+    }
+
+    public void testInvalidEntryNoKey() throws Exception {
+        Preference pref = helper.makeDummyPreference();
+        Preference newpref = new Preference(null, "new value");
         RequestContext req = createRequestContext(pref, newpref);
 
         ResponseContext res = provider.updateEntry(req);
@@ -103,7 +113,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         MockPreferenceRequestContext rc =
             new MockPreferenceRequestContext(helper.getServiceContext(),
                                              helper.getUser(), pref, "POST");
-        rc.setContent(serialize(newpref));
+        rc.setXhtmlContentAsEntry(serialize(newpref));
         return rc;
     }
 }

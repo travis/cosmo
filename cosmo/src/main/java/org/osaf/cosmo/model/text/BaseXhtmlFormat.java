@@ -59,8 +59,12 @@ public class BaseXhtmlFormat {
 
     protected boolean hasClass(XMLStreamReader reader,
                                String clazz) {
-        String value = reader.getAttributeValue(null, "class");
+        String value = getClass(reader);
         return value != null && value.equals(clazz);
+    }
+
+    protected String getClass(XMLStreamReader reader) {
+        return reader.getAttributeValue(null, "class");
     }
 
     protected void handleParseException(String message,

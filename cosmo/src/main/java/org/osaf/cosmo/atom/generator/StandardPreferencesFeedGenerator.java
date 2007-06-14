@@ -33,6 +33,7 @@ import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.text.XhtmlPreferenceFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -167,12 +168,13 @@ public class StandardPreferencesFeedGenerator
         entry.setTitle(pref.getKey());
         entry.setUpdated(now);
         entry.setPublished(now);
-        entry.addLink(newSelfLink(iri));
-        entry.addLink(newEditLink(iri));
         if (isDocument)
             entry.addAuthor(newPerson(pref.getUser()));
+        entry.addLink(newSelfLink(iri));
+        entry.addLink(newEditLink(iri));
 
-        entry.setContent(pref.getValue());
+        XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
+        entry.setContentAsXhtml(formatter.format(pref));
 
         return entry;
     }

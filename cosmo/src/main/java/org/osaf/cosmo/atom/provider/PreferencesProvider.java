@@ -16,7 +16,9 @@
 package org.osaf.cosmo.atom.provider;
 
 import java.io.IOException;
+import java.text.ParseException;
 
+import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
@@ -34,6 +36,7 @@ import org.osaf.cosmo.atom.generator.PreferencesFeedGenerator;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.Preference;
+import org.osaf.cosmo.model.text.XhtmlPreferenceFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.UserService;
 
@@ -89,7 +92,10 @@ public class PreferencesProvider extends BaseProvider
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
         } catch (ValidationException e) {
-            return badrequest(getAbdera(), request, "Invalid preference entry: " + e.getMessage());
+            String msg = "Invalid entry: " + e.getMessage();
+            if (e.getCause() != null)
+                log.error(msg, e.getCause());
+            return badrequest(getAbdera(), request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -155,7 +161,10 @@ public class PreferencesProvider extends BaseProvider
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
         } catch (ValidationException e) {
-            return badrequest(getAbdera(), request, "Invalid entry: " + e.getMessage());
+            String msg = "Invalid entry: " + e.getMessage();
+            if (e.getCause() != null)
+                log.error(msg, e.getCause());
+            return badrequest(getAbdera(), request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -266,13 +275,20 @@ public class PreferencesProvider extends BaseProvider
 
     private Preference readPreference(Entry entry)
         throws ValidationException {
-        Preference pref = new Preference();
+        if (entry.getContentType() == null ||
+            ! entry.getContentType().equals(Content.Type.XHTML))
+            throw new ValidationException("Content must be XHTML");
 
-        if (entry.getContent() == null)
-            throw new ValidationException("No entry content found");
-
-        pref.setKey(entry.getTitle());
-        pref.setValue(entry.getContent());
-        return pref;
+        try {
+            XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
+            Preference pref = formatter.parse(entry.getContent());
+            if (pref.getKey() == null)
+                throw new ValidationException("Preference requires a key");
+            if (pref.getValue() == null)
+                pref.setValue("");
+            return pref;
+        } catch (ParseException e) {
+            throw new ValidationException("Error parsing XHTML content", e);
+        }
     }
 }

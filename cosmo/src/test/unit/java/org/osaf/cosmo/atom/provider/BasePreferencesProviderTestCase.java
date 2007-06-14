@@ -15,13 +15,12 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.model.Entry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.Preference;
+import org.osaf.cosmo.model.text.XhtmlPreferenceFormat;
 
 /**
  * Base class for for {@link PreferencesProvider} tests.
@@ -37,11 +36,8 @@ public abstract class BasePreferencesProviderTestCase
         return provider;
     }
 
-    protected Entry serialize(Preference pref) {
-        Entry entry = helper.getAbdera().getFactory().newEntry();
-        entry.setTitle(pref.getKey());
-        if (pref.getValue() != null)
-            entry.setContent(pref.getValue());
-        return entry;
+    protected String serialize(Preference pref) {
+        XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
+        return formatter.format(pref);
     }
 }

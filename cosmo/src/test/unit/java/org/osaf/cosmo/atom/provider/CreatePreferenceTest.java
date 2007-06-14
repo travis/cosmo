@@ -72,8 +72,17 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
 
-    public void testInvalidEntry() throws Exception {
-        Preference pref = new Preference("invalid", null);
+    public void testEntryNoValue() throws Exception {
+        Preference pref = new Preference("new key", null);
+        RequestContext req = createRequestContext(pref);
+
+        ResponseContext res = provider.createEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 201, res.getStatus());
+    }
+
+    public void testInvalidEntryNoKey() throws Exception {
+        Preference pref = new Preference(null, "new value");
         RequestContext req = createRequestContext(pref);
 
         ResponseContext res = provider.createEntry(req);
@@ -86,7 +95,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         MockPreferencesRequestContext rc =
             new MockPreferencesRequestContext(helper.getServiceContext(),
                                               helper.getUser(), "POST");
-        rc.setContent(serialize(pref));
+        rc.setXhtmlContentAsEntry(serialize(pref));
         return rc;
     }
 }

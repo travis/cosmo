@@ -225,6 +225,45 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             return new cosmo.model.NoteOccurrence(this, recurrenceId);
         },
         
+       autoTriage: function(){
+           if (!this.getAutoTriage() || !this.getEventStamp()){
+               return false;
+           }    
+           
+           var eventStamp = this.getEventStamp();
+           var currentTriageStatus = item.getTriageStatus();
+           var newTriageStatus = -1;
+           
+           var startDate = this.getStartDate();
+           var endDate = this.getEndDate();
+           var startTime = this.getStartDate().getTime();
+           var endTime = (endDate != null) ? endDate.getTime() : startDate.getTime();
+           
+           if (eventStamp.getAllDay() || eventStamp.getAnyTime()){
+               endTime = startTime + (24 * 60 * 60 * 1000);
+           } 
+           
+           var now = (new Date()).getTime();
+           
+           if (now <= endTime){
+               if (now >= startTime){
+                   newTriageStatus = cosmo.model.TRIAGE_NOW;
+               } else {
+                   newTriageStatus = cosmo.model.TRIAGE_DONE;
+               }
+           } else {
+               newTriageStatus = cosmo.model.TRIAGE_LATER;
+           }
+           
+           if (newTriageStatus != currentTriageStatus){
+               this.setTriageStatus(newTriageStatus);
+               return true;
+           }
+           
+           return false;
+           
+        },
+        
         clone: function (){
           //summary: creates a deep copy of all the properties of this Item. 
           //description: Copies all the properties of the Note, making copies

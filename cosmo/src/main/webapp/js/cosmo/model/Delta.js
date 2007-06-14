@@ -249,6 +249,34 @@ dojo.declare("cosmo.model.Delta", null, {
         //HACK - this might break with custom recurrence rules
     },
     
+    
+    _needsAutoTriage: function(){
+        //summary: determines whether auto triage might be needed. 
+        //descripiton: If any properties which might cause a triage change have been changed,
+        //              return strue. Called by autoTriage().
+        var note = this._note;
+        
+        if (!note.getAutoTriage() || !note.getEventStamp()){
+            return false;
+        }
+        
+        //if any of these properties change. we need to try autotriaging.
+        return dojo.lang.some([
+            ["event", "startDate"],
+            ["event", "endDate"],
+            ["event", "duration"],
+            ["event", "anyDay"], 
+            ["event", "allDay"], 
+            ["event", "atTime"]
+        ], 
+        
+        function(eventProp){
+            return this.isStampPropertyChanged(eventProp[0], eventProp[1]);
+        });
+        
+    },
+    
+
     _apply: function(type, note){
         note = note || this._note;
         for (var stampName in this._deletedStamps){

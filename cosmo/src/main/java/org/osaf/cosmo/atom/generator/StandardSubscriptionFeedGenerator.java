@@ -34,6 +34,7 @@ import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.text.XhtmlSubscriptionFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
@@ -176,17 +177,33 @@ public class StandardSubscriptionFeedGenerator
         entry.setTitle(sub.getDisplayName());
         entry.setUpdated(sub.getModifiedDate());
         entry.setPublished(sub.getCreationDate());
-        entry.addLink(newSelfLink(iri));
-        entry.addLink(newEditLink(iri));
         if (isDocument)
             entry.addAuthor(newPerson(sub.getOwner()));
-
-        // Cosmo extensions
-
-        entry.addExtension(newCollection(sub.getCollectionUid(), collection));
-        entry.addExtension(newTicket(sub.getTicketKey(), ticket));
+        entry.addLink(newSelfLink(iri));
+        entry.addLink(newEditLink(iri));
+        setEntryContent(entry, sub, collection, ticket);
 
         return entry;
+    }
+
+    /**
+     * Sets the entry content based on the given subscription,
+     * collection and ticket.
+     *
+     * @param entry the entry
+     * @param sub the subscription on which the entry is based
+     * @param collection the collection associated with the
+     * subscription
+     * @param ticket the ticket associated with the subscription
+     * @throws GeneratorException
+     */
+    protected void setEntryContent(Entry entry,
+                                   CollectionSubscription sub,
+                                   CollectionItem collection,
+                                   Ticket ticket)
+        throws GeneratorException {
+        XhtmlSubscriptionFormat formatter = new XhtmlSubscriptionFormat();
+        entry.setContentAsXhtml(formatter.format(sub, collection, ticket));
     }
 
     /**

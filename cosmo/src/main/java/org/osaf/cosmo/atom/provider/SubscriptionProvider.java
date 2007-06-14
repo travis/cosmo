@@ -16,7 +16,10 @@
 package org.osaf.cosmo.atom.provider;
 
 import java.io.IOException;
+import java.text.ParseException;
 
+import org.apache.abdera.model.Content;
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
@@ -35,6 +38,7 @@ import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.text.XhtmlSubscriptionFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.UserService;
 
@@ -92,7 +96,10 @@ public class SubscriptionProvider extends BaseProvider
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
         } catch (ValidationException e) {
-            return badrequest(getAbdera(), request, "Invalid entry: " + e.getMessage());
+            String msg = "Invalid entry: " + e.getMessage();
+            if (e.getCause() != null)
+                msg += ": " + e.getCause().getMessage();
+            return badrequest(getAbdera(), request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -160,7 +167,10 @@ public class SubscriptionProvider extends BaseProvider
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
         } catch (ValidationException e) {
-            return badrequest(getAbdera(), request, "Invalid entry: " + e.getMessage());
+            String msg = "Invalid entry: " + e.getMessage();
+            if (e.getCause() != null)
+                log.error(msg, e.getCause());
+            return badrequest(getAbdera(), request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -272,20 +282,22 @@ public class SubscriptionProvider extends BaseProvider
 
     private CollectionSubscription readSubscription(Entry entry)
         throws ValidationException {
-        CollectionSubscription sub = new CollectionSubscription();
+        if (entry.getContentType() == null ||
+            ! entry.getContentType().equals(Content.Type.XHTML))
+            throw new ValidationException("Content must be XHTML");
 
-        sub.setDisplayName(entry.getTitle());
-
-        String ticketKey = entry.getSimpleExtension(QN_TICKET);
-        if (StringUtils.isBlank(ticketKey))
-            throw new ValidationException("No ticket key found");
-        sub.setTicketKey(ticketKey);
-
-        String collectionUid = entry.getSimpleExtension(QN_COLLECTION);
-        if (StringUtils.isBlank(collectionUid))
-            throw new ValidationException("No collection uid found");
-        sub.setCollectionUid(collectionUid);
-
-        return sub;
+        try {
+            XhtmlSubscriptionFormat formatter = new XhtmlSubscriptionFormat();
+            CollectionSubscription sub = formatter.parse(entry.getContent());
+            if (sub.getDisplayName() == null)
+                throw new ValidationException("Subscription requires a display name");
+            if (sub.getCollectionUid() == null)
+                throw new ValidationException("Subscription requires a collection uuid");
+            if (sub.getTicketKey() == null)
+                throw new ValidationException("Subscription requires a ticket key");
+            return sub;
+        } catch (ParseException e) {
+            throw new ValidationException("Error parsing XHTML content", e);
+        }
     }
 }

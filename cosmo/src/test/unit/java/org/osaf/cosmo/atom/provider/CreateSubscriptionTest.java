@@ -103,7 +103,7 @@ public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         MockSubscribedRequestContext rc =
             new MockSubscribedRequestContext(helper.getServiceContext(),
                                              helper.getUser(), "POST");
-        rc.setContent(serialize(sub));
+        rc.setXhtmlContentAsEntry(serialize(sub));
         return rc;
     }
 }

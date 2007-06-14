@@ -69,6 +69,13 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         setContent(entry);
     }
 
+    public void setXhtmlContentAsEntry(String content)
+        throws IOException {
+        Entry entry = context.getAbdera().getFactory().newEntry();
+        entry.setContentAsXhtml(content);
+        setContent(entry);
+    }
+
     public void setContentAsText(String content)
         throws IOException {
         getMockRequest().setContent(content.getBytes());

@@ -122,7 +122,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         MockSubscriptionRequestContext rc =
             new MockSubscriptionRequestContext(helper.getServiceContext(),
                                                helper.getUser(), sub, "PUT");
-        rc.setContent(serialize(newsub));
+        rc.setXhtmlContentAsEntry(serialize(newsub));
         return rc;
     }
 }

@@ -506,6 +506,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
     private NoteItemFilter createQueryFilter(RequestContext request)
         throws InvalidQueryException {
+        boolean requiresFilter = false;
         EventStampFilter eventFilter = new EventStampFilter();
 
         try {
@@ -517,6 +518,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 throw new InvalidQueryException("Both start and end parameters must be provided for a time-range query");
 
             if (start != null && end != null) {
+                requiresFilter = true;
                 eventFilter.setTimeRange(start, end);
                 eventFilter.setExpandRecurringEvents(true);
             }
@@ -526,16 +528,21 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
         try {
             TimeZone tz = getTimeZoneParameter(request, "tz");
-            if (tz != null)
+            if (tz != null) {
+                requiresFilter = true;
                 eventFilter.setTimezone(tz);
+            }
         } catch (IllegalArgumentException e) {
             log.warn("Unrecognized time zone " + request.getParameter("tz") +
                      " ... falling back to system default time zone");
         }
 
+        if (! requiresFilter)
+            return null;
+
         NoteItemFilter itemFilter = new NoteItemFilter();
         itemFilter.getStampFilters().add(eventFilter);
-        
+
         return itemFilter;
     }
 }

@@ -45,10 +45,10 @@ public class XhtmlSubscriptionFormat extends BaseXhtmlFormat
         CollectionSubscription sub = new CollectionSubscription();
 
         try {
+            if (source == null)
+                throw new ParseException("Source has no XML data", -1);
             StringReader sr = new StringReader(source);
             XMLStreamReader reader = createXmlReader(sr);
-            if (! reader.hasNext())
-                handleParseException("Source has no XML data", reader);
 
             boolean inLocalSub = false;
             boolean inCollection = false;

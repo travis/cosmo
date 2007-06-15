@@ -291,7 +291,17 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
               clone._modifications = cosmo.model.clone(this._modifications);
           }
           return clone;
-      }
+        },
+
+        getItemUid: function () {
+            if (this.isMaster()){
+                return this.getUid()
+            } 
+            else {
+                return this.getUid() + 
+                    this.recurrenceId.strftime(this.OCCURRENCE_FMT_STRING).replace(' ', '_');
+            }
+        }
               
     });
     

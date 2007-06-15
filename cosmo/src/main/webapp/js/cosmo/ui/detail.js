@@ -142,7 +142,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 // FIXME: This may not be needed if there's always
                 // an item that gets the default selection
                 //self.updateFromItem(item);
-                //console.log('asdf');
                 //self.buttonSection.setButtons(true);
                 /*
                 toggleReadOnlyIcon();
@@ -153,7 +152,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 break;
             case 'setSelected':
                 self.updateFromItem(item);
-                self.buttonSection.setButtons(true);
                 break;
             case 'saveSuccess':
                 /*
@@ -221,6 +219,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
             this[st.stampType.toLowerCase() + 'Section'].updateFromStamp(stamp);
         }
     }
+    this.buttonSection.setButtons(true);
 };
 
 cosmo.ui.detail.DetailViewForm.prototype.clear =

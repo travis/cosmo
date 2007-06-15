@@ -21,6 +21,7 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
+dojo.require("cosmo.view.common");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
@@ -50,11 +51,11 @@ cosmo.view.list.loadItems = function (o) {
     var itemLoadHash = new cosmo.util.hash.Hash();
     var statuses = cosmo.view.list.triageStatusCodeStrings;
     var getStatus = opts.triageStatus;
-    var loadItemsByTriage = function (stat) { 
-        // Load the array of items 
+    var loadItemsByTriage = function (stat) {
+        // Load the array of items
         // ======================
         try {
-            var deferred = cosmo.app.pim.serv.getItems(collection, 
+            var deferred = cosmo.app.pim.serv.getItems(collection,
                 { triage: stat }, { sync: true });
             var results = deferred.results;
             // Catch any error stuffed in the deferred
@@ -76,7 +77,7 @@ cosmo.view.list.loadItems = function (o) {
         return true;
     };
     var showErr = function (e) {
-        cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
+        cosmo.app.showErr(_('Main.Error.LoadEventsFailed'),
             e);
         return false;
     };
@@ -95,7 +96,7 @@ cosmo.view.list.loadItems = function (o) {
     cosmo.view.list.itemRegistry = itemLoadHash;
     // This could be done with topics to avoid the explicit
     // dependency, but would be slower
-    cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas.render(); 
+    cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas.render();
     return true;
 };
 

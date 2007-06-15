@@ -21,6 +21,7 @@ dojo.require("dojo.gfx.color.hsv");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("dojo.DeferredList");
+dojo.require("cosmo.view.common");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.datetime.Date");
@@ -61,6 +62,9 @@ cosmo.view.cal.canvas = new function () {
     this.eventRegistry = new Hash();
     // Currently selected event
     this.selectedEvent = null;
+    // Index in Hash of selected event
+    this.selectedEventIndex = null;
+    // Available lozenge colors
     this.colors = {};
     // The scrolling div for timed events
     this.timedCanvas = null;
@@ -559,7 +563,7 @@ cosmo.view.cal.canvas = new function () {
         switch (act) {
             case 'eventsLoadSuccess':
                 self.eventRegistry = data;
-                self.selectedEvent = null;
+                //self.selectedEvent = null;
                 var _c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
                 // Update viewStart, viewEnd from passed opts
                 for (var n in opts) { _c[n] = opts[n]; }
@@ -668,8 +672,10 @@ cosmo.view.cal.canvas = new function () {
         if (self.selectedEvent) {
             self.selectedEvent.lozenge.setDeselected();
         }
-        self.selectedEvent = ev; // Pointer to the currently selected event
-        ev.lozenge.setSelected(); // Show the associated lozenge as selected
+        self.selectedEvent = ev; 
+        self.selectedEventIndex = self.eventRegistry.getPos(ev.id);
+        // Show the associated lozenge as selected
+        ev.lozenge.setSelected(); 
     };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
@@ -1330,7 +1336,7 @@ cosmo.view.cal.canvas = new function () {
         var min = 0;
         var start = null;
         var end = null;
-        var id = cosmo.view.cal.generateTempId(); //this is NOTthe uid of the object!
+        var id = cosmo.view.generateTempUid(); //this is NOTthe uid of the object!
 
         var note = new cosmo.model.Note();
         var eventStamp = note.getEventStamp(true);

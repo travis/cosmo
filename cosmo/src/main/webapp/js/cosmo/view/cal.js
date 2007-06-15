@@ -17,6 +17,7 @@
 dojo.provide('cosmo.view.cal');
 
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.view.common");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
@@ -663,7 +664,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         for (var i = 0; i < arr.length; i++) {
             var note = arr[i];
             var eventStamp = note.getEventStamp();
-            var id = self.generateTempId();
+            var id = note.getItemUid();
             var ev = new CalEvent(id, null);
             ev.data = note;
             h.setItem(id, ev);
@@ -862,20 +863,6 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
             data: eventLoadHash, opts: opts });
         return true;
-    };
-    /**
-     * Generate a scratch ID to use for events in the UI
-     * @return A random string to use as an ID for a CalEvent obj
-     */
-    this.generateTempId = function () {
-        var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-        var len = 12;
-        var randomString = '';
-        for (var i = 0; i < len; i++) {
-            var rnum = Math.floor(Math.random() * chars.length);
-            randomString += chars.substring(rnum,rnum+1);
-        }
-        return 'ev' + randomString;
     };
     /**
      * Get the start and end for the span of time to view in the cal

@@ -66,7 +66,6 @@ cosmo.model.util.BasePropertyApplicator.prototype = {
     }
 }
 
-//TODO Make a clone() function
 dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BasePropertyApplicator, {
     addProperty: function(ctr, propertyName, kwArgs){
         kwArgs = kwArgs || {};

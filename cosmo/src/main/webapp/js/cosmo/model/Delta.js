@@ -192,10 +192,16 @@ dojo.declare("cosmo.model.Delta", null, {
     
     applyToMaster: function(){
         this._apply("master");
+        if (this._needsAutoTriage()){
+            this._note.autoTriage();
+        }
     },
 
     applyToOccurrence: function(){
         this._apply("occurrence");
+        if (this._needsAutoTriage()){
+            this._note.autoTriage();
+        }
     },
 
     applyToOccurrenceAndFuture: function(){
@@ -261,6 +267,7 @@ dojo.declare("cosmo.model.Delta", null, {
         }
         
         //if any of these properties change. we need to try autotriaging.
+        var delta = this;
         return dojo.lang.some([
             ["event", "startDate"],
             ["event", "endDate"],
@@ -271,7 +278,7 @@ dojo.declare("cosmo.model.Delta", null, {
         ], 
         
         function(eventProp){
-            return this.isStampPropertyChanged(eventProp[0], eventProp[1]);
+            return delta.isStampPropertyChanged(eventProp[0], eventProp[1]);
         });
         
     },

@@ -69,10 +69,10 @@ cosmo.util.auth = new function() {
     }
 
     this.getAuthorizedRequest = function(kwArgs){
+        kwArgs = kwArgs || {};
     	var req = {};
     	req.headers = {};
-    	var dontAddCredentials = kwArgs && !kwArgs.addCredentials;
-    	if (this.getCred() && !dontAddCredentials){
+    	if (this.getCred() && !kwArgs.noAuth){
     	   	req.headers.Authorization =  "Basic " + this.getCred();
     	}
     	return req;

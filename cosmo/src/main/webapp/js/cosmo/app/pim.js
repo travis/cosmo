@@ -36,6 +36,7 @@ dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require('cosmo.view.cal');
 dojo.require('cosmo.account.create');
+dojo.require('cosmo.util.uri');
 dojo.require('cosmo.service.conduits.common');
 dojo.require('cosmo.app.pim.layout');
 
@@ -82,12 +83,10 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.currentCollection = null;
     //The list of calendars available to the current user
     this.currentCollections = [];
-    // Anonymous ticket view, no client-side timeout
+    // If this is true, we are in normal authenticated user mode
     this.authAccess = true;
     // Ticket passed, if any
     this.ticketKey = null;
-    // Create the 'Welcome to Cosmo' event?
-    this.createWelcomeItem = false;
 
     // ==========================
     // Init
@@ -97,10 +96,10 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
      */
     this.init = function (p) {
         var params = p || {};
-        var collectionUid = params.collectionUid;
+        var collectionUrl = params.collectionUrl;
 
-        this.ticketKey = params.ticketKey;
         this.authAccess = params.authAccess;
+        this.ticketKey = params.ticketKey;
         this.currDate = new Date();
 
         // Do some setup
@@ -112,7 +111,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Tell the calendar view what week we're on
         cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
-        this.loadCollections(this.ticketKey, collectionUid);
+        this.loadCollections(collectionUrl);
 
         // Base layout
         // ===============================
@@ -224,13 +223,17 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     // ==========================
     // Collections
     // ==========================
-    this.loadCollections = function (ticketKey, collectionUid) {
+    this.loadCollections = function (collectionUrl) {
         // Load/create calendar to view
         // --------------
         // If we received a ticket, just grab the specified collection
-        if (ticketKey) {
+        
+        // Uid of the first calendar to select.
+        var selectUid;
+        if (collectionUrl) {
             try {
-               var collection = this.serv.getCollection(collectionUid, {ticketKey:ticketKey, sync:true}).results[0];
+               var collection = this.serv.getCollection(collectionUrl, {sync:true}).results[0];
+               selectUid = collection.getUid();
             }
             catch(e) {
                 cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
@@ -253,6 +256,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                  throw new Error("No collections!")
             }
             var subscriptions = this.serv.getSubscriptions({sync:true}).results[0];
+
             //XINT make sure this still works!
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];
@@ -270,7 +274,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             var bName = b.getDisplayName().toLowerCase();
             var r = 0;
             if (aName == bName) {
-                r = (a.collection.getUid() > b.collection.getUid()) ? 1 : -1;
+                r = (a.getUid() > b.getUid()) ? 1 : -1;
             }
             else {
                 r = (aName > bName) ? 1 : -1;
@@ -279,10 +283,10 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         };
         this.currentCollections.sort(f);
 
-        // If we received a collectionUid, select that collection
-        if (collectionUid){
+        // If we received a collectionUrl, select that collection
+        if (selectUid){
             for (var i = 0; i < this.currentCollections.length; i++){
-                if (this.currentCollections[i].getUid() == collectionUid){
+                if (this.currentCollections[i].getUid() == selectUid){
                     this.currentCollection = this.currentCollections[i];
                     break;
                 }
@@ -317,19 +321,20 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     };
 
     //XINT
+    //TODO
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
-        var filteredSubscriptions = dojo.lang.filter(subscriptions,
+/*        var filteredSubscriptions = dojo.lang.filter(subscriptions,
             function(sub){
                if (!sub.calendar){
-                   self.serv.deleteSubscription(sub.uid, sub.ticket.ticketKey);
+                   self.serv.deleteSubscription(sub.uid, sub.getTicketKey());
                    deletedSubscriptions.push(sub);
                    return false;
                } else {
                    return true;
                }
-        });
-        return [filteredSubscriptions, deletedSubscriptions];
+        });*/
+        return [subscriptions, deletedSubscriptions];
     };
 
     // ==========================

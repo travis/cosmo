@@ -44,14 +44,15 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         this._addTranslation(deferred, "translateGetCollections", 
         {
-            lazyLoader: this.generateLazyLoader(
+            lazyLoader:  this.generateLazyLoader(
                 dojo.lang.hitch(this, 
                                 function (collection){
-                                    return this.getCollection(collection.getUid(), 
+                                    return this.getCollection(collection.href, 
                                                               {sync: true}).results[0];
                                 }
                 )
                 )
+
         } );
 
         return deferred;
@@ -74,18 +75,28 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         var deferred = this._transport.getSubscriptions(kwArgs);
 
-        this._addTranslation(deferred, "translateGetSubscriptions");
+        this._addTranslation(deferred, "translateGetSubscriptions", 
+        {
+            lazyLoader:  this.generateLazyLoader(
+                dojo.lang.hitch(this, 
+                                function (collection){
+                                    return this.getCollection(collection.href, 
+                                                              {sync: true, noAuth: true}).results[0];
+                                }
+                )
+                )
+        });
 
         return deferred;
     },
 
     /*
-     * returns: dojo.Deferred with callbac that returns XML Document object.
+     * returns: dojo.Deferred with callback that returns XML Document object.
      */
-    getCollection: function(collectionUid, kwArgs){
+    getCollection: function(url, kwArgs){
         kwArgs = kwArgs || {};
 
-        var deferred = this._transport.getCollection(collectionUid, kwArgs);
+        var deferred = this._transport.getCollection(url, kwArgs);
 
         this._addTranslation(deferred, "translateGetCollection");
         
@@ -157,6 +168,17 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             translationArgs.oldObject = item;
         }
         this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
+        return deferred;
+        
+    },
+
+    createSubscription: function(subscription, kwArgs){
+        kwArgs = kwArgs || {};
+
+        var deferred =  this._transport.createSubscription(subscription, 
+            this._translator.subscriptionToAtomEntry(subscription), kwArgs);
+        var translationArgs = {};                                  
+
         return deferred;
         
     },

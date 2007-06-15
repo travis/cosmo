@@ -417,30 +417,18 @@ cosmo.model.declare("cosmo.model.Modification", null,
     });
 
 cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item, 
-    [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}]
+    [
     ],
     {
        isWriteable: function(){
           return true;
        }
     });
-    
-cosmo.model.declare("cosmo.model.AnonymousTicketedCollection", cosmo.model.Item,
-     [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}],
-      ["ticketKey", {"default": null}],
-      ["writeable", {"default": true}]
-     ],
-     {
-         isWriteable: function(){
-             return this.getWriteable();
-         }
-     }
-);
 
 cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
-    [["protocolUrls", {"default": cosmo.model.NEW_OBJECT}],
-     ["ticketKey", {"default": null}],
-     ["writeable", {"default": true}]
+    [["ticketKey", {"default": null}],
+     ["writeable", {"default": true}],
+     ["collection", {"default": null}]
      ],
     {
          isWriteable: function(){

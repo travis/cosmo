@@ -37,20 +37,27 @@ dojo.declare("cosmo.service.transport.Rest", null,
          */
         getDefaultRequest: function (/*dojo.Deferred*/deferred,
                                      /*Object*/ kwArgs){
+            kwArgs = kwArgs || {};
+            if (kwArgs.url){
+                if (!!kwArgs.url.match(/.*ticket=.*/)){
+                    kwArgs.noAuth = true;
+                }
+            }
             
             // Add error for transport layer problems
             deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
-                                              dojo.debug(e)
+                                              dojo.debug(e);
                                               return e;});
-            var request = cosmo.util.auth.getAuthorizedRequest({addCredentials: !kwArgs.ticketKey});
+            var request = cosmo.util.auth.getAuthorizedRequest(kwArgs);
 
             request.load = this.resultCallback(deferred);
             request.error = this.errorCallback(deferred);
             request.transport = "XMLHTTPTransport";
-            request.contentType =  'text/xml';
+            request.contentType = 'text/xml';
             request.sync = kwArgs.sync;
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
+            request.url = kwArgs.url;
             // Fight the dark powers of IE's evil caching mechanism
             //if (document.all) {
                 request.preventCache = true;
@@ -80,7 +87,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 }
     		}
     	},
-
+    	
     	resultCallback: function(/* dojo.Deferred */ deferredRequestHandler){
     		// summary
     		// create callback that calls the Deferred's callback method
@@ -105,6 +112,37 @@ dojo.declare("cosmo.service.transport.Rest", null,
     			}
     		);
     		return tf;
+    	},
+    	
+    	putText: function (text, url, kwArgs){
+    	    var deferred = new dojo.Deferred();
+            var r = this.getDefaultRequest(deferred, kwArgs);
+
+            r.contentType = "application/atom+xml";
+            r.url = url;
+
+            r.postContent = text;
+            r.method = "POST";
+            r.headers['X-Http-Method-Override'] = "PUT";
+    
+            dojo.io.bind(r);
+            return deferred;
+    	    
+    	},
+    	
+    	postText: function (text, url, kwArgs){
+    	    var deferred = new dojo.Deferred();
+            var r = this.getDefaultRequest(deferred, kwArgs);
+
+            r.contentType = "application/atom+xml";
+            r.url = url;
+
+            r.postContent = text;
+            r.method = "POST";
+    
+            dojo.io.bind(r);
+            return deferred;
+    	    
     	},
     	
     	queryHashToString: function(/*Object*/ queryHash){

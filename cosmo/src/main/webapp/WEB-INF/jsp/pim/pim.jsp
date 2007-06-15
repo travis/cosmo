@@ -67,15 +67,21 @@ dojo.require('cosmo.account.settings');
 cosmo.app.initObj = cosmo.app.pim;
 cosmo.app.initParams = {};
 
-<c:if test="${collection != null}">
-cosmo.app.initParams.collectionUid = '${collection.uid}';
-</c:if>
-<c:if test="${not empty ticketKey}">
-cosmo.app.initParams.ticketKey = '${ticketKey}';
-</c:if>
-<c:if test="${not ticketedView}">
-cosmo.app.initParams.authAccess = true;
-</c:if>
+var collectionUrlIndex = location.pathname.indexOf("collection");
+if (collectionUrlIndex >= 0){
+	cosmo.app.initParams.collectionUrl = 
+		location.pathname.substring(collectionUrlIndex) + location.search
+}
+if (location.search){
+	var params = cosmo.util.uri.parseQueryString(location.search);
+	if (params['ticket']) 
+		cosmo.app.initParams.ticketKey = params['ticket'];
+}
+
+// If this is true, we are not in anonymous ticketed mode, 
+// and the user better have logged in
+cosmo.app.initParams.authAccess = !cosmo.app.initParams.ticketKey;
+
 <authz:authorize ifAnyGranted="ROLE_USER">
 cosmo.app.initParams.roleUser = true;
 </authz:authorize>
@@ -96,6 +102,8 @@ cosmo.ui.event.listeners.hookUpListeners();
       <div id="appLoadingMessage">
         Loading the app ...
       </div>
+    </div>
+    <div id="debug">
     </div>
 </body>
 

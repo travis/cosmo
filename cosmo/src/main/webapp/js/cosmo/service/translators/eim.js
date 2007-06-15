@@ -79,14 +79,25 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var getterName = "get" + dojo.string.capitalize(propertyName);
             var oldGetter = object[getterName];
             oldGetters[getterName] = oldGetter;
-            object[getterName] = 
-                function(){
-                    loaderFunction(object, propertyNames);
-                    for (var oldGetterName in oldGetters){
-                        object[oldGetterName] = oldGetters[oldGetterName];
-                    }
-                    return object[getterName]();
-                }  
+            
+            // This is needed to create a new scope so we can enclose "getter name"
+            var createReplacerFunction = function(){
+                // Create a new variable to hold the current getter name
+                // that won't get replaced during the next iteration
+                // of the for loop.
+                var myName = getterName;
+               
+                object[myName] = 
+                    function(){   
+                        // does the get and loads properties from new object into old object
+                        loaderFunction(object, propertyNames);
+                        for (var oldGetterName in oldGetters){
+                            object[oldGetterName] = oldGetters[oldGetterName];
+                        }
+                        return object[myName]();
+                };
+            }
+            createReplacerFunction();
         }
     },
     
@@ -100,16 +111,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         collection.setUid(uid);
         collection.setDisplayName(displayName);
         collection.setUrls(this.getUrls(atomXml));
-
-        if (ticketKey && 
-        (collection instanceof cosmo.model.AnonymousTicketedCollection || 
-         collection instanceof cosmo.model.Subscription)) 
-           collection.setTicketKey(uid);
-
         return collection;
     },
           
     translateGetCollections: function (atomXml, kwArgs){
+        kwArgs = kwArgs || {};
         var workspaces = atomXml.getElementsByTagName("workspace");
         var collections = [];
         for (var i = 0; i < workspaces.length; i++){
@@ -123,7 +129,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             for (var j = 0; j < collectionElements.length; j++){
                 var collection = this.collectionXmlToCollection(collectionElements[j]);
-                this.setLazyLoader(collection, ["urls"], kwArgs.lazyLoader);
+                collection.href = collectionElements[j].getAttribute("href");
+                this.setLazyLoader(collection, ["urls", "uid"], kwArgs.lazyLoader);
                 collections.push(collection);
             }
         }
@@ -131,24 +138,35 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     translateGetSubscriptions: function (atomXml, kwArgs){
+        // TODO: redo this with query api
+        kwArgs = kwArgs || {};
         var entries = atomXml.getElementsByTagName("entry");
         var subscriptions = [];
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
-            
-            var displayNameEl = cosmo.util.html.getElementsByTagName(entry, "title")[0];
+            var content = entry.getElementsByTagName("content")[0];
+            var displayNameEl = dojo.html.getElementsByClassName("name", content)[0];
             var displayName = displayNameEl.firstChild.nodeValue;
-            var ticketEl = cosmo.util.html.getElementsByTagName(entry, "cosmo", "ticket")[0];
-            var ticket = ticketEl.firstChild.nodeValue;
-            var uidEl = cosmo.util.html.getElementsByTagName(entry, "cosmo", "collection")[0];
-            var uid = uidEl.firstChild.nodeValue;
+            var ticketEl = dojo.html.getElementsByClassName("ticket", content)[0];
+            var ticketKeyEl = dojo.html.getElementsByClassName("key", ticketEl)[0];
+            var ticket = ticketKeyEl.firstChild.nodeValue;
+            var collectionEl = dojo.html.getElementsByClassName("collection", content)[0];
+            var collectionUidEl = dojo.html.getElementsByClassName("uuid", collectionEl)[0];
+            var uid = collectionUidEl.firstChild.nodeValue;
+            var collection = new cosmo.model.Collection({
+                uid: uid
+            });
+            collection.href = "collection/" + uid + "?ticket=" + ticket;
+            
             var subscription = new cosmo.model.Subscription({
                 displayName: displayName,
                 tickeyKey: ticket,
-                uid: uid
+                uid: uid,
+                collection: collection
             })
-            this.setLazyLoader(subscription, ["urls"], kwArgs.lazyLoader);
-          
+
+            this.setLazyLoader(collection, ["urls"], kwArgs.lazyLoader);
+            subscriptions.push(subscription);
         }
         return subscriptions;
     },
@@ -156,8 +174,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     collectionXmlToCollection: function (collectionXml){
         return collection = new cosmo.model.Collection(
             {
-                //TODO: replace this with the correct uid grabbing code
-                uid: collectionXml.getAttribute("href").split("/")[1],
                 displayName: cosmo.util.html.getElementsByTagName(collectionXml, "atom", "title")
                     [0].firstChild.nodeValue
             }

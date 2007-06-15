@@ -35,7 +35,7 @@ cosmotest.service.conduits.test_conduits = {
             // test lazy loading
             jum.assertTrue("lazy loading broken", !!c0.getUrls())
             // test getCollection
-            var collectionDetails = conduit.getCollection(c0.getUid(), {sync: true});
+            var collectionDetails = conduit.getCollection("collection/" + c0.getUid(), {sync: true});
             jum.assertTrue("collectionDetails", !!collectionDetails)
 
             // Test createItem
@@ -52,9 +52,14 @@ cosmotest.service.conduits.test_conduits = {
                 autoTriage: newItemAutoTriage,
                 body: newItemBody
             }
-           );
+            );
             
             conduit.createItem(newItem, c0, {sync: true});
+            
+            var items = conduit.getItems(c0, {}, {sync: true}).results[0];
+
+            jum.assertTrue("items", !!items);
+            jum.assertEquals("items length", 1, items.length);
 
             jum.assertTrue("no edit link on item", !!newItem.getUrls()['atom-edit']);
 
@@ -83,6 +88,7 @@ cosmotest.service.conduits.test_conduits = {
             ), c0, {sync: true});
 
             var items = conduit.getItems(c0, {}, {sync: true}).results[0];
+
             jum.assertTrue("items", !!items);
             jum.assertEquals("items length", 2, items.length);
             

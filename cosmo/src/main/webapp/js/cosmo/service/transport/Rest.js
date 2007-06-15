@@ -32,38 +32,49 @@ dojo.declare("cosmo.service.transport.Rest", null,
 
         },
         
+        methodIsSupported: {
+            'get': true,
+            'post': true
+        },
+        
         /**
          * summary: Return request populated with attributes common to all CMP calls.
          */
         getDefaultRequest: function (/*dojo.Deferred*/deferred,
+                                     /*Object*/ r,
                                      /*Object*/ kwArgs){
             kwArgs = kwArgs || {};
-            if (kwArgs.url){
-                if (!!kwArgs.url.match(/.*ticket=.*/)){
+            if (r.url){
+                if (!!r.url.match(/.*ticket=.*/)){
                     kwArgs.noAuth = true;
                 }
             }
-            
-            // Add error for transport layer problems
+            // Add error fo transport layer problems
             deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
                                               dojo.debug(e);
                                               return e;});
-            var request = cosmo.util.auth.getAuthorizedRequest(kwArgs);
+            var request = cosmo.util.auth.getAuthorizedRequest(r, kwArgs);
 
-            request.load = this.resultCallback(deferred);
-            request.error = this.errorCallback(deferred);
-            request.transport = "XMLHTTPTransport";
-            request.contentType = 'text/xml';
-            request.sync = kwArgs.sync;
+            request.load = request.load || this.resultCallback(deferred);
+            request.error = request.error || this.errorCallback(deferred);
+            request.transport = request.transport || "XMLHTTPTransport";
+            request.contentType = request.contentType || 'text/xml';
+            request.sync = kwArgs.sync || r.sync || false;
+            request.headers = request.headers || {};
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
-            request.url = kwArgs.url;
             // Fight the dark powers of IE's evil caching mechanism
             //if (document.all) {
-                request.preventCache = true;
+                request.preventCache = request.preventCache || true;
             //}
+            if (request.method){
+                if (!this.methodIsSupported[request.method.toLowerCase()]){
+                    request.headers['X-Http-Method-Override'] = request.method;
+                    request.method = 'POST';
+                }
+            }
 
-            return request;
+            return request
         },
 
         errorCallback: function(/* dojo.Deferred */ deferredRequestHandler){
@@ -154,6 +165,15 @@ dojo.declare("cosmo.service.transport.Rest", null,
     	        return "?" + queryList.join("&");
     	    }
     	    else return "";
-    	}
+    	},
+    	
+    	bind: function (r, kwArgs) {
+            kwArgs = kwArgs || {};
+            var deferred = new dojo.Deferred();
+            var request = this.getDefaultRequest(deferred, r, kwArgs);
+            dojo.lang.mixin(request, r);
+            dojo.io.bind(request);
+            return deferred;
+        }
     }
 );

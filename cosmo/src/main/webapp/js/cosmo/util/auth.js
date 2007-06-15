@@ -68,14 +68,15 @@ cosmo.util.auth = new function() {
 		return dojo.io.cookie.get(COSMO_AUTH_COOKIE);
     }
 
-    this.getAuthorizedRequest = function(kwArgs){
+    this.getAuthorizedRequest = function(request, kwArgs){
         kwArgs = kwArgs || {};
-    	var req = {};
-    	req.headers = {};
+    	request = request || {};
+        request.headers = request.headers || {};
+        
     	if (this.getCred() && !kwArgs.noAuth){
-    	   	req.headers.Authorization =  "Basic " + this.getCred();
+    	   	request.headers.Authorization =  request.headers.Authorization || "Basic " + this.getCred();
     	}
-    	return req;
+    	return request;
     }
 
 }

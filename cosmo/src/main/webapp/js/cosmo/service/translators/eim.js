@@ -427,6 +427,31 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '</content>',
          '</entry>'].join("");
     },
+    
+    keyValToPreference: function(key, val){
+        return this.createEntry({
+            contentType: "xhtml",
+            content: ['<div class="preference">',
+                '<span class="key">', key, '</span>', '<span class="value">', val, '</span>',
+                '</div>'].join("")
+        });
+    },
+    
+    createEntry: function(fields){
+        var entryList = ['<entry xmlns="http://www.w3.org/2005/Atom">'];
+        if (fields.title) entryList = 
+            entryList.concat(['<title>', fields.title, '</title>']);
+        if (fields.id) entryList = 
+            entryList.concat(['<id>',  fields.id, '</id>']);
+        if (fields.updated) entryList = 
+            entryList.concat(['<updated>', fields.updated, '</updated>']);
+        if (fields.authorName) entryList = 
+            entryList.concat(['<author><name>', fields.authorName, '</name></author>']);
+        if (fields.content) entryList = 
+            entryList.concat(['<content type="', fields.contentType, '">', fields.content, '</content>']);
+        entryList.push('</entry>');
+        return entryList.join("");
+    },
 
     itemToAtomEntry: function (object){
          return ['<entry xmlns="http://www.w3.org/2005/Atom">',

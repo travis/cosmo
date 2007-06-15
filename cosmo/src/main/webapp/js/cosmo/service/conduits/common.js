@@ -97,9 +97,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         kwArgs = kwArgs || {};
 
         var deferred = this._transport.getCollection(url, kwArgs);
-
         this._addTranslation(deferred, "translateGetCollection");
-        
         //TODO: do topic notifications
         return deferred;
     },
@@ -172,17 +170,6 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         
     },
 
-    createSubscription: function(subscription, kwArgs){
-        kwArgs = kwArgs || {};
-
-        var deferred =  this._transport.createSubscription(subscription, 
-            this._translator.subscriptionToAtomEntry(subscription), kwArgs);
-        var translationArgs = {};                                  
-
-        return deferred;
-        
-    },
-
     deleteItem: function(item, kwArgs){
         kwArgs = kwArgs || {};
 
@@ -199,27 +186,23 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
     
     getPreference: function (key){
-
+       return this._transport.getPreference();
     },
 
     setPreference: function (key, val){
-
+       return this._transport.setPreference(key, val, this._translator.keyValToPreference(key, val));
     },
 
     removePreference: function (key){
-
+       return this._transport.removePreference();
     },
     
     getPreferences: function (){
-       return {};
+       return this._transport.getPreferences();
     },
 
     setPreferences: function (prefs){
-
-    },
-
-    setMultiplePreferences: function (prefs){
-
+       return this._transport.getPreferences();
     },
     
     _addTranslation: function (deferred, translationFunction, kwArgs){

@@ -50,82 +50,71 @@ public class XhtmlSubscriptionFormat extends BaseXhtmlFormat
             if (! reader.hasNext())
                 handleParseException("Source has no XML data", reader);
 
-            reader.nextTag();
-            if (! (reader.isStartElement() && isDiv(reader) &&
-                   hasClass(reader, "local-subscription")))
-                handleParseException("Expected local-subscription root div", reader);
-            if (log.isDebugEnabled())
-                log.debug("read local-subscription div");
-
+            boolean inLocalSub = false;
+            boolean inCollection = false;
+            boolean inTicket = false;
             while (reader.hasNext()) {
-                reader.nextTag();
-                if (reader.isEndElement())
-                    break;
+                reader.next();
+                if (! reader.isStartElement())
+                    continue;
 
-                if (isSpan(reader)) {
-                    if (! hasClass(reader, "name"))
-                        handleParseException("Child span of local-subscription div must have class name", reader);
+                if (hasClass(reader, "local-subscription")) {
                     if (log.isDebugEnabled())
-                        log.debug("read name span");
+                        log.debug("found local-subscription element");
+                    inLocalSub = true;
+                    continue;
+                }
 
-                    String displayName = reader.getElementText();
-                    if (StringUtils.isBlank(displayName))
-                        handleParseException("Name span must have non-empty value", reader);
-                    sub.setDisplayName(displayName);
+                if (inLocalSub && hasClass(reader, "name")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found name element");
+
+                    String name = reader.getElementText();
+                    if (StringUtils.isBlank(name))
+                        handleParseException("Name element must not be empty", reader);
+                    sub.setDisplayName(name);
 
                     continue;
                 }
 
-                else if (isDiv(reader)) {
-                    if (hasClass(reader, "collection")) {
-                        if (log.isDebugEnabled())
-                            log.debug("read collection div");
+                if (inLocalSub && hasClass(reader, "collection")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found collection element");
+                    inCollection = true;
+                    inTicket = false;
+                    continue;
+                }
 
-                        reader.nextTag();
-                        if (! reader.isStartElement() && isSpan(reader))
-                            handleParseException("Expected span element within collection div", reader);
+                if (inCollection && hasClass(reader, "uuid")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found uuid element");
 
-                        if (hasClass(reader, "uuid")) {
-                            if (log.isDebugEnabled())
-                                log.debug("read collection uuid span");
+                    String uuid = reader.getElementText();
+                    if (StringUtils.isBlank(uuid))
+                        handleParseException("Uuid element must not be empty", reader);
+                    sub.setCollectionUid(uuid);
 
-                            String uuid = reader.getElementText();
-                            if (StringUtils.isBlank(uuid))
-                                handleParseException("Uuid span must have non-empty value", reader);
-                            sub.setCollectionUid(uuid);
-                        } else {
-                            handleParseException("Expected uuid span within collection div", reader);
-                        }
+                    continue;
+                }
 
-                        // advance past </div>
-                        reader.nextTag();
-                        continue;
-                    }
+                if (inLocalSub && hasClass(reader, "ticket")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found ticket element");
+                    inCollection = false;
+                    inTicket = true;
+                    continue;
+                }
 
-                    else if (hasClass(reader, "ticket")) {
-                        if (log.isDebugEnabled())
-                            log.debug("read ticket div");
+                if (inTicket && hasClass(reader, "key")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found key element");
 
-                        reader.nextTag();
-                        if (! reader.isStartElement() && isSpan(reader))
-                            handleParseException("Expected span element within ticket div", reader);
+                    String key = reader.getElementText();
+                    if (StringUtils.isBlank(key))
+                        handleParseException("Key element must not be empty", reader);
+                    sub.setTicketKey(key);
 
-                        if (hasClass(reader, "key")) {
-                            if (log.isDebugEnabled())
-                                log.debug("read ticket key span");
-
-                            String key = reader.getElementText();
-                            if (StringUtils.isBlank(key))
-                                handleParseException("Key span must have non-empty value", reader);
-                            sub.setTicketKey(key);
-                        } else {
-                            handleParseException("Expected key span within ticket div", reader);
-                        }
-
-                        // advance past </div>
-                        reader.nextTag();
-                        continue;
-                    }
+                    continue;
                 }
             }
 
@@ -160,6 +149,7 @@ public class XhtmlSubscriptionFormat extends BaseXhtmlFormat
             writer.writeAttribute("class", "local-subscription");
 
             if (sub.getDisplayName() != null) {
+                writer.writeCharacters("Subscription: ");
                 writer.writeStartElement("span");
                 writer.writeAttribute("class", "name");
                 writer.writeCharacters(sub.getDisplayName());
@@ -169,11 +159,13 @@ public class XhtmlSubscriptionFormat extends BaseXhtmlFormat
             if (sub.getCollectionUid() != null) {
                 writer.writeStartElement("div");
                 writer.writeAttribute("class", "collection");
+                writer.writeCharacters("Collection: ");
                 writer.writeStartElement("span");
                 writer.writeAttribute("class", "uuid");
                 writer.writeCharacters(sub.getCollectionUid());
                 writer.writeEndElement();
                 if (isCollectionProvided) {
+                    writer.writeCharacters(" Exists? ");
                     writer.writeStartElement("span");
                     writer.writeAttribute("class", "exists");
                     writer.writeCharacters(Boolean.valueOf(collection != null).
@@ -186,11 +178,13 @@ public class XhtmlSubscriptionFormat extends BaseXhtmlFormat
             if (sub.getTicketKey() != null) {
                 writer.writeStartElement("div");
                 writer.writeAttribute("class", "ticket");
+                writer.writeCharacters("Ticket: ");
                 writer.writeStartElement("span");
                 writer.writeAttribute("class", "key");
                 writer.writeCharacters(sub.getTicketKey());
                 writer.writeEndElement();
                 if (isTicketProvided) {
+                    writer.writeCharacters(" Exists? ");
                     writer.writeStartElement("span");
                     writer.writeAttribute("class", "exists");
                     writer.writeCharacters(Boolean.valueOf(ticket != null).

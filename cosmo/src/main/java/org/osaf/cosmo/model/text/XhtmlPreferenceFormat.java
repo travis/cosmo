@@ -48,39 +48,41 @@ public class XhtmlPreferenceFormat extends BaseXhtmlFormat
             if (! reader.hasNext())
                 handleParseException("Source has no XML data", reader);
 
-            reader.nextTag();
-            if (! (reader.isStartElement() && isDiv(reader) &&
-                   hasClass(reader, "preference")))
-                handleParseException("Expected preference root div", reader);
-            if (log.isDebugEnabled())
-                log.debug("read preference div");
-
+            boolean inPreference = false;
             while (reader.hasNext()) {
-                reader.nextTag();
-                if (reader.isEndElement())
-                    break;
+                reader.next();
+                if (! reader.isStartElement())
+                    continue;
 
-                if (! isSpan(reader))
-                    handleParseException("Expected span element within preference div", reader);
-
-                if (hasClass(reader, "key")) {
+                if (hasClass(reader, "preference")) {
                     if (log.isDebugEnabled())
-                        log.debug("read key span");
+                        log.debug("found preference element");
+                    inPreference = true;
+                    continue;
+                }
+
+                if (inPreference && hasClass(reader, "key")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found key element");
 
                     String key = reader.getElementText();
                     if (StringUtils.isBlank(key))
-                        handleParseException("Key span must have non-empty value", reader);
+                        handleParseException("Key element must not be empty", reader);
                     pref.setKey(key);
-                } else if (hasClass(reader, "value")) {
+
+                    continue;
+                }
+
+                if (inPreference && hasClass(reader, "value")) {
                     if (log.isDebugEnabled())
-                        log.debug("read value span");
+                        log.debug("found value element");
 
                     String value = reader.getElementText();
                     if (StringUtils.isBlank(value))
                         value = "";
                     pref.setValue(value);
-                } else {
-                    handleParseException("Found span with unrecognized class '" + getClass(reader) + "' within preference div", reader);
+
+                    continue;
                 }
             }
 
@@ -100,12 +102,16 @@ public class XhtmlPreferenceFormat extends BaseXhtmlFormat
             writer.writeStartElement("div");
             writer.writeAttribute("class", "preference");
 
+            writer.writeCharacters("Preference: ");
+
             if (pref.getKey() != null) {
                 writer.writeStartElement("span");
                 writer.writeAttribute("class", "key");
                 writer.writeCharacters(pref.getKey());
                 writer.writeEndElement();
             }
+
+            writer.writeCharacters(" = ");
 
             if (pref.getValue() != null) {
                 writer.writeStartElement("span");

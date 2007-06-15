@@ -77,7 +77,6 @@ public class BaseXhtmlFormat {
                                       XMLStreamException e)
         throws ParseException {
         message += ": " + e.getMessage();
-        log.error(message, e);
         handleException(message , e.getLocation());
     }
 

@@ -94,7 +94,7 @@ public class PreferencesProvider extends BaseProvider
         } catch (ValidationException e) {
             String msg = "Invalid entry: " + e.getMessage();
             if (e.getCause() != null)
-                log.error(msg, e.getCause());
+                msg += e.getCause().getMessage();
             return badrequest(getAbdera(), request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
@@ -163,7 +163,7 @@ public class PreferencesProvider extends BaseProvider
         } catch (ValidationException e) {
             String msg = "Invalid entry: " + e.getMessage();
             if (e.getCause() != null)
-                log.error(msg, e.getCause());
+                msg += e.getCause().getMessage();
             return badrequest(getAbdera(), request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();

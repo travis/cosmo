@@ -463,22 +463,22 @@ cosmo.model.declare("cosmo.model.Modification", null,
     });
 
 cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item, 
-    [
+    [["writeable", {"default": false}]
     ],
     {
        isWriteable: function(){
-          return true;
+          return this.getWriteable();
        }
     });
 
 cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
     [["ticketKey", {"default": null}],
-     ["writeable", {"default": true}],
+     ["writeable", {"default": false}],
      ["collection", {"default": null}]
      ],
     {
          isWriteable: function(){
-             return this.getWriteable();
+             return this.getCollection().getWriteable();
          }
     }
 );

@@ -102,15 +102,24 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     translateGetCollection: function (atomXml, oldCollection){
-        var ticketKey;
-        var ticketElement = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket")[0];
-        if (ticketElement) ticketKey = ticketElement.firstChild.nodeValue;
+
         var uid = atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9);
         var displayName = cosmo.util.html.getElementsByTagName(atomXml, "title")[0].firstChild.nodeValue;
         var collection = oldCollection || new cosmo.model.Collection();
         collection.setUid(uid);
         collection.setDisplayName(displayName);
         collection.setUrls(this.getUrls(atomXml));
+        
+        var selfUrl = collection.getUrls()['self'];
+        if (!selfUrl.match(/.*ticket=.*/)) collection.setWriteable(true);
+        else {
+            var ticketElements = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket");
+            for (var i = 0; i < ticketElements.length; i++){
+                var permission = ticketElements[i].getAttribute("cosmo:type");
+                if (permission == "read-write") collection.setWriteable(true);
+            }
+        }
+        
         return collection;
     },
           
@@ -130,7 +139,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             for (var j = 0; j < collectionElements.length; j++){
                 var collection = this.collectionXmlToCollection(collectionElements[j]);
                 collection.href = collectionElements[j].getAttribute("href");
-                this.setLazyLoader(collection, ["urls", "uid"], kwArgs.lazyLoader);
+                this.setLazyLoader(collection, ["urls", "uid", "writeable"], kwArgs.lazyLoader);
                 collections.push(collection);
             }
         }
@@ -165,7 +174,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 collection: collection
             })
 
-            this.setLazyLoader(collection, ["urls"], kwArgs.lazyLoader);
+            this.setLazyLoader(collection, ["urls", "writeable"], kwArgs.lazyLoader);
             subscriptions.push(subscription);
         }
         return subscriptions;
@@ -402,24 +411,31 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     subscriptionToAtomEntry: function (subscription){
-         return '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:cosmo="http://osafoundation.org/cosmo/Atom">' +
-         '<title>' + subscription.getDisplayName() + '</title>' +
-         '<updated>' + dojo.date.toRfc3339(new Date()) + '</updated>' +
-         '<author><name>' + cosmo.util.auth.getUsername() + '</name></author>' +
-         '<cosmo:ticket>' + subscription.getTicketKey() + '</cosmo:ticket>' +
-         '<cosmo:collection>' + subscription.getUid() + '</cosmo:collection>' +
-         '</entry>'
+         return ['<entry xmlns="http://www.w3.org/2005/Atom" xmlns:cosmo="http://osafoundation.org/cosmo/Atom">',
+         '<content type="xhtml">',
+          '<div xmlns="http://www.w3.org/1999/xhtml">',
+            '<div class="local-subscription">',
+              '<span class="name">', subscription.getDisplayName(), '</span>', 
+              '<div class="collection">',
+                '<span class="uuid">', subscription.getUid(), '</span>',
+              '</div>',
+              '<div class="ticket">',
+                '<span class="key">', subscription.getTicketKey(), '</span>',
+              '</div>',
+            '</div>',
+          '</div>',
+         '</content>',
+         '</entry>'].join("");
     },
 
     itemToAtomEntry: function (object){
-         var jsonObject = this.objectToRecordSet(object);
-         return '<entry xmlns="http://www.w3.org/2005/Atom">' +
-         '<title>' + object.getDisplayName() + '</title>' +
-         '<id>urn:uuid:' + this.getUid(object) + '</id>' +
-         '<updated>' + dojo.date.toRfc3339(new Date()) + '</updated>' +
-         '<author><name>' + cosmo.util.auth.getUsername() + '</name></author>' +
-         '<content type="application/eim+json">' + dojo.json.serialize(jsonObject) + '</content>' +
-         '</entry>'
+         return ['<entry xmlns="http://www.w3.org/2005/Atom">',
+         '<title>', object.getDisplayName(), '</title>',
+         '<id>urn:uuid:', this.getUid(object), '</id>',
+         '<updated>', dojo.date.toRfc3339(new Date()), '</updated>',
+         '<author><name>', cosmo.util.auth.getUsername(), '</name></author>',
+         '<content type="application/eim+json">', dojo.json.serialize(this.objectToRecordSet(object)), '</content>',
+         '</entry>'].join("");
     },
     
     

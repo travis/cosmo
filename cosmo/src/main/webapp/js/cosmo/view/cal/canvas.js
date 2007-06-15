@@ -48,8 +48,6 @@ cosmo.view.cal.canvas = new function () {
     var allDayArea = null;
     // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
     var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
-    // The scrolling div for timed events
-    var timedScrollingMainDiv = null;
 
     // Public props
     // ****************
@@ -64,6 +62,10 @@ cosmo.view.cal.canvas = new function () {
     // Currently selected event
     this.selectedEvent = null;
     this.colors = {};
+    // The scrolling div for timed events
+    this.timedCanvas = null;
+    // The scroll offset -- needed to preserve scroll position
+    this.timedCanvasScrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
 
     // Public methods
     // ****************
@@ -395,16 +397,12 @@ cosmo.view.cal.canvas = new function () {
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
             // Get a reference to the main scrolling area for timed events;
-            timedScrollingMainDiv = $('timedScrollingMainDiv');
-            // Set the scrollbar to 'working hours' -- do this
-            // last because Safari will reset if you update content
-            // in the DOM element
-            timedScrollingMainDiv.scrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
+            this.timedCanvas = $('timedCanvas');
         }
         allDayArea = new cosmo.ui.resize_area.ResizeArea(
             'allDayResizeMainDiv', 'allDayResizeHandleDiv');
         allDayArea.init('down');
-        allDayArea.addAdjacent('timedScrollingMainDiv');
+        allDayArea.addAdjacent('timedCanvas');
         allDayArea.setDragLimit();
         showHours();
         setCurrentDayStatus();
@@ -414,6 +412,12 @@ cosmo.view.cal.canvas = new function () {
         loadSuccess();
 
         hasBeenRendered = true;
+    };
+    this.saveTimedCanvasScrollOffset = function () {
+        this.timedCanvasScrollTop = this.timedCanvas.scrollTop;
+    };
+    this.resetTimedCanvasScrollOffset = function () {
+        this.timedCanvas.scrollTop = this.timedCanvasScrollTop;
     };
     /**
      * Get the scroll offset for the timed canvas
@@ -425,7 +429,7 @@ cosmo.view.cal.canvas = new function () {
     this.getTimedCanvasScrollTop = function () {
         // Has to be looked up every time, as value may change
         // either when user scrolls or resizes all-day event area
-        var top = timedScrollingMainDiv.scrollTop;
+        var top = this.timedCanvas.scrollTop;
         // FIXME -- viewOffset is the vertical offset of the UI
         // with the top menubar added in. This should be a property
         // of render context that the canvas can look up
@@ -473,7 +477,7 @@ cosmo.view.cal.canvas = new function () {
     };
     /**
      * Figures out the date based on Y-pos of left edge of event lozenge
-     * with respect to canvas (scrollable div 'timedScrollingMainDiv').
+     * with respect to canvas (scrollable div 'timedCanvas').
      * @param point Left edge of dragged event lozenge after snap-to.
      * @return A Date object
      */
@@ -484,7 +488,7 @@ cosmo.view.cal.canvas = new function () {
     };
     /**
      * Figures out the hour based on X-pos of top and bottom edges of event lozenge
-     * with respect to canvas (scrollable div 'timedScrollingMainDiv').
+     * with respect to canvas (scrollable div 'timedCanvas').
      * @param point top or bottom edge of dragged event lozenge after snap-to.
      * @return A time string in in military time format
      */
@@ -632,21 +636,21 @@ cosmo.view.cal.canvas = new function () {
                 // plaforms, overflow of 'auto' in underlying divs causes
                 // carets/cursors in textboxes to disappear. This is a verified
                 // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
-                if (typeof timedScrollingMainDiv != 'undefined' && timedScrollingMainDiv) {
-                    var t = timedScrollingMainDiv.scrollTop; // Preserve the scroll offset
+                if (typeof this.timedCanvas != 'undefined' && this.timedCanvas) {
+                    this.timedCanvasScrollTop = this.timedCanvas.scrollTop; // Preserve the scroll offset
                     if (cmd.isDisplayed) {
                         if (dojo.render.html.mozilla) {
-                            timedScrollingMainDiv.style.overflow = "hidden";
+                            this.timedCanvas.style.overflow = "hidden";
                         }
                     }
                     else {
                        if (dojo.render.html.mozilla) {
-                           timedScrollingMainDiv.style.overflow = "auto";
-                           timedScrollingMainDiv.style.overflowY = "auto";
-                           timedScrollingMainDiv.style.overflowX = "hidden";
+                           this.timedCanvas.style.overflow = "auto";
+                           this.timedCanvas.style.overflowY = "auto";
+                           this.timedCanvas.style.overflowX = "hidden";
                        }
                     }
-                    timedScrollingMainDiv.scrollTop = t;
+                    this.timedCanvas.scrollTop = this.timedCanvasScrollTop;
                 }
                 break;
         }
@@ -1548,7 +1552,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         d.appendChild(t);
         // Outside container for timed event scrolling area
         var t = _createElem('div');
-        t.id = 'timedScrollingMainDiv';
+        t.id = 'timedCanvas';
         // Prevent text selection on drag
         t.onselectstart = function () { return false; };
         d.appendChild(t);
@@ -1564,7 +1568,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         self.parent.domNode.appendChild(self.domNode);
         var _c = cosmo.ui.ContentBox;
         var subList = [ 'calTopNavDiv', 'dayListDiv',
-            'timedScrollingMainDiv', 'timedContentDiv', 'timedHourListDiv',
+            'timedCanvas', 'timedContentDiv', 'timedHourListDiv',
             'eventInfoDiv', 'allDayResizeMainDiv', 'allDayResizeHandleDiv',
             'allDayContentDiv', 'allDayHourSpacerDiv' ];
         var vOffset = 0;
@@ -1609,7 +1613,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         calcHeight = self.height - vOffset;
         // Subtract the navbar height -- this lives outside the cal view
         calcHeight -= CAL_TOP_NAV_HEIGHT; 
-        var timedMain = self.timedScrollingMainDiv;
+        var timedMain = self.timedCanvas;
         timedMain.setSize(self.width - 2, calcHeight); // Variable height area
         timedMain.setPosition(0, vOffset);
         var timedContent = self.timedContentDiv;

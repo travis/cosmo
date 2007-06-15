@@ -647,16 +647,20 @@ td.dataDisplayLabel {
     border-left: 1px solid #999;
     border-right: 1px solid #999;
 }
-.headerCell {
+.listViewHeaderCell {
     color: #999;
     font-weight: bold;
     padding: 3px;
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
 }
-.dataCell {
+.listViewDataCell {
+    cursor: pointer;
     padding: 3px;
     border-bottom: 1px solid #ddd;
+}
+.listViewSelectedCell {
+    background-color: #deeeff;
 }
 /* Calendar canvas */
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
@@ -704,7 +708,7 @@ td.dataDisplayLabel {
     -moz-user-select: none
 }
 /* Scrolling area containing the timeline and timed events */
-#timedScrollingMainDiv {
+#timedCanvas {
     border-left: 1px solid #999;
     border-right: 1px solid #999;
     position: absolute;

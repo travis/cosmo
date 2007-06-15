@@ -47,14 +47,21 @@ yPos = 0;
  * @object The Cal singleton
  */
 cosmo.app.pim = dojo.lang.mixin(new function () {
+    
     var self = this;
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
-
+    // Available views 
+    this.views = {
+        LIST: 'list',
+        CAL: 'cal'
+    };
     // The Cosmo service -- used to talk to the backend
     this.serv = null;
     // The base layout for the PIM -- cosmo.ui.ContentBox obj
     this.baseLayout = null;
+    // The currently selected view -- list or cal
+    this.currentView = this.views.CAL;
 
     // For calculating UI element positions
     this.top = 0;
@@ -116,8 +123,10 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
 
         // Load data -- successful load triggers render of UI widgets
         // ===============================
-        cosmo.view.cal.loadEvents({ collection: this.currentCollection,
-            viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
+        //cosmo.view.cal.loadEvents({ collection: this.currentCollection,
+        //    viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
+
+        this.baseLayout.mainApp.centerColumn.navBar.displayView(this.currentView);
 
         // Show errors for deleted subscriptions -- deletedSubscriptions
         // is a private var populated in the loadCollections method

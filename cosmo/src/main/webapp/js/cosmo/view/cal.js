@@ -24,6 +24,9 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.cal.dialog');
+dojo.require("cosmo.service.exception");
+
+dojo.require("cosmo.util.debug");
 
 cosmo.view.cal = dojo.lang.mixin(new function(){
 
@@ -831,19 +834,27 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var evData = null;
         var id = '';
         var ev = null;
-        
+        var showErr = function (e) {
+            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
+                getErrDetailMessage(e));
+        };
         // Load the array of events
         // ======================
         try {
-            dojo.debug("start:" + start);
-            dojo.debug("end:" + end);
             var deferred = cosmo.app.pim.serv.getItems(collection, 
                 { start: start, end: end }, { sync: true });
-            eventLoadList = deferred.results[0];
+            var results = deferred.results;
+            // Catch any error stuffed in the deferred
+            if (results[1] instanceof Error) {
+                showErr(results[1]);
+                return false;
+            }
+            else {
+                eventLoadList = results[0];
+            }
         }
         catch(e) {
-            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
-                getErrDetailMessage(e));
+            showErr(e);
             return false;
         }
 

@@ -294,6 +294,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         cosmo.app.pim.currDate });
     leftSidebar.addChild(cB);
     leftSidebar.minical = cB;
+    cB.render();
 
     // Main menu of links at the top of the UI
     var d = _createElem('div');

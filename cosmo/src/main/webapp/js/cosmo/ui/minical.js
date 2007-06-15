@@ -36,6 +36,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.view.cal");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.service.exception");
 
@@ -43,8 +44,10 @@ cosmo.ui.minical.MiniCal = function (p) {
 
     var params = p || {};
     var self = this;
-    var viewStart = null;
-    var viewEnd = null;
+    // Initialize these to the start/ends of the
+    // viewable span in the calendar canvas
+    var viewStart = cosmo.view.cal.viewStart;
+    var viewEnd = cosmo.view.cal.viewEnd;
 
     /** helper method to pull day data. This is a cleaner implementation
      * when we start rendering busybars.

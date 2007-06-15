@@ -23,6 +23,7 @@ dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.service.exception");
 
 // The list of items
 cosmo.view.list.itemRegistry = null;
@@ -55,17 +56,30 @@ cosmo.view.list.loadItems = function (o) {
         try {
             var deferred = cosmo.app.pim.serv.getItems(collection, 
                 { triage: stat }, { sync: true });
-            itemLoadList = deferred.results[0];
+            var results = deferred.results;
+            // Catch any error stuffed in the deferred
+            if (results[1] instanceof Error) {
+                showErr(results[1]);
+                return false;
+            }
+            else {
+                itemLoadList = results[0];
+            }
         }
         catch (e) {
-            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
-                getErrDetailMessage(e));
+            showErr(e);
             return false;
         }
         // Create a hash from the array
         var h = cosmo.view.list.createItemRegistry(itemLoadList, stat);
         itemLoadHash.append(h);
-    }
+        return true;
+    };
+    var showErr = function (e) {
+        cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
+            e);
+        return false;
+    };
     // Loading a specific status
     if (getStatus) {
         loadItemsByTriage(getStatus);
@@ -75,7 +89,7 @@ cosmo.view.list.loadItems = function (o) {
         // We don't care about the order of loading -- have to sort
         // client-side anyway
         for (var n in statuses) {
-            loadItemsByTriage(statuses[n]);
+            if (!loadItemsByTriage(statuses[n])) { return false; }
         }
     }
     cosmo.view.list.itemRegistry = itemLoadHash;

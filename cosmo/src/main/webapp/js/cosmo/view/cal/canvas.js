@@ -1388,6 +1388,9 @@ cosmo.view.cal.canvas = new function () {
         eventStamp.setStartDate(start);
         eventStamp.setAllDay(allDay);
         eventStamp.setEndDate(end);
+        //normally the delta does the autotriaging, but since this is a new event
+        //there is no delta, so we do it manually.
+        note.autoTriage();
         ev.data = note;
 
         // Register the new event in the event list

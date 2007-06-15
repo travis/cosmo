@@ -213,6 +213,9 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     
     createItem: function(item, postContent, collection, kwArgs){
         kwArgs = kwArgs || {};
+        if (collection instanceof cosmo.model.Subscription){
+            collection = collection.getCollection();
+        }
         
         var deferred = new dojo.Deferred();
         var query = this._generateAuthQuery(kwArgs);

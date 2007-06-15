@@ -837,7 +837,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var dateParams = {};
         for (var i = 0; i < dateParamList.length; i++){
             var keyValue = dateParamList[i].split("=");
-            dateParams[String.toLowerCase(keyValue[0])] = keyValue[1];
+            dateParams[keyValue[0].toLowerCase()] = keyValue[1];
         }
         var tzId = dateParams['tzid'] || null;
         var jsDate = dojo.date.fromIso8601(dateParts[1]);

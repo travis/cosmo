@@ -21,7 +21,6 @@ dojo.require("dojo.gfx.color.hsv");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("dojo.DeferredList");
-dojo.require("cosmo.view.common");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.datetime.Date");
@@ -1336,9 +1335,8 @@ cosmo.view.cal.canvas = new function () {
         var min = 0;
         var start = null;
         var end = null;
-        var id = cosmo.view.generateTempUid(); //this is NOTthe uid of the object!
-
         var note = new cosmo.model.Note();
+        var id = note.getUid();
         var eventStamp = note.getEventStamp(true);
 
         dojo.debug("insertCalEventNew 2");

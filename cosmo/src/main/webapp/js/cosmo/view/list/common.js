@@ -21,7 +21,6 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
-dojo.require("cosmo.view.common");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
@@ -132,11 +131,4 @@ cosmo.view.list.createItemRegistry = function (arrParam, statusParam) {
     }
     return h;
 };
-
-cosmo.view.list.sort = function (hash) {
-    this.itemRegistry = hash;
-    return true;
-};
-
-
 

@@ -648,11 +648,13 @@ td.dataDisplayLabel {
     border-right: 1px solid #999;
 }
 .listViewHeaderCell {
-    color: #999;
+    color: #666;
     font-weight: bold;
     padding: 3px;
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
+    background-image: url(images/day_col_header_background.gif);
+    cursor: pointer;
 }
 .listViewDataCell {
     cursor: pointer;

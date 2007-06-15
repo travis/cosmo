@@ -431,9 +431,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     keyValToPreference: function(key, val){
         return this.createEntry({
             contentType: "xhtml",
-            content: ['<div class="preference">',
-                '<span class="key">', key, '</span>', '<span class="value">', val, '</span>',
+            content: [
+                '<div xmlns="http://www.w3.org/1999/xhtml">',
+                    '<div class="preference">',
+                        '<span class="key">', key, '</span>', '<span class="value">', val, '</span>',
+                    '</div>',
                 '</div>'].join("")
+                
         });
     },
     
@@ -462,7 +466,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '<content type="application/eim+json">', dojo.json.serialize(this.objectToRecordSet(object)), '</content>',
          '</entry>'].join("");
     },
-    
     
     getUid: function (/*cosmo.model.Note*/ note){
         if (note instanceof cosmo.model.NoteOccurrence){
@@ -522,8 +525,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         if (this.modificationHasItemModifications(modification))  
             records.item =  this.modifiedOccurrenceToItemRecord(noteOccurrence);
+        else records.item = this.generateEmptyItem(noteOccurrence);
+
         if (this.modificationHasNoteModifications(modification))
             records.note = this.modifiedOccurrenceToNoteRecord(noteOccurrence);
+        else records.note = this.generateEmptyItem(noteOccurrence);
         
         records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence)
         
@@ -550,7 +556,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     noteToItemRecord: function(note){
         var props = {};
         props.displayName = note.getDisplayName();
-        props.triageRank = note.getRank();
+        props.rank = note.getRank();
         props.triageStatus = note.getTriageStatus();
         props.autoTriage = note.getAutoTriage();
         props.uuid = this.getUid(note);
@@ -569,13 +575,24 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return record;
     },
     
+    generateEmptyItem: function(note){
+        var record = this.propsToItemRecord({uuid: note.getUid()});
+        record.missingFields = [
+            "title",
+            "triage",
+            "hasBeenSent",
+            "needsReply"
+        ]
+        return record;
+    },
+    
     propsToItemRecord: function(props){
         var fields = {};
         with (cosmo.service.eim.constants){
         
             if (props.displayName != undefined) fields.title = [type.TEXT, props.displayName];
             if (props.triageStatus || props.triageRank || props.autoTriage)
-                fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.triageRank), props.autoTriage? 1 : 0].join(" ")];
+                fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.rank), props.autoTriage? 1 : 0].join(" ")];
             
             return {
                 prefix: prefix.ITEM,
@@ -591,6 +608,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     // Make sure triage rank ends in two decimals
     fixTriageRank: function(rank){
+        rank = rank || "0";
         if (rank.toString().match(/d*\.\d\d/)) return rank;
         else return rank + ".00";
     },
@@ -618,7 +636,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return record;
     },
     
-    propsToNoteRecord: function(props){
+    generateEmptyNote: function (note){
+        var record = this.propsToItemRecord({uuid: note.getUid()});
+        record.missingFields = [
+            "body",
+        ];
+        return record;
+    },
+    
+    propsToNoteRecord: function (props){
         with (cosmo.service.eim.constants){
             var fields = {};
             if (props.body != undefined) fields.body = [type.CLOB, props.body];

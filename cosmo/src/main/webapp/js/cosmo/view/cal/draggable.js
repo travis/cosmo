@@ -80,7 +80,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         var lozenge = ev.lozenge;
         var div = lozenge.div;
         this.vertOffset = cosmo.app.pim.baseLayout.mainApp.top +
-            cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.timedScrollingMainDiv.top;
+            cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.timedCanvas.top;
         this.dragMode = dragMode;
         // Snapshot measurements
         this.origDivLeft = div.offsetLeft;

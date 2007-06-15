@@ -225,35 +225,46 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
             return new cosmo.model.NoteOccurrence(this, recurrenceId);
         },
         
-       autoTriage: function(){
-           if (!this.getAutoTriage() || !this.getEventStamp()){
+        _getImplicitTriageStatus: function(){
+            //summary: returns what the triage status would be based on auto-triage rules
+            var eventStamp = this.getEventStamp();
+
+            if (!eventStamp){
+                return cosmo.model.TRIAGE_NOW;
+            } 
+            
+            var startDate = eventStamp.getStartDate();
+            var endDate = eventStamp.getEndDate();
+            var startTime = eventStamp.getStartDate().getTime();
+            var endTime = (endDate != null) ? endDate.getTime() : startDate.getTime();
+
+            if (eventStamp.getAllDay() || eventStamp.getAnyTime()){
+               endTime = startTime + (24 * 60 * 60 * 1000);
+            } 
+           
+            var now = (new Date()).getTime();
+           
+            if (now <= endTime){
+                if (now >= startTime){
+                    return cosmo.model.TRIAGE_NOW;
+                } else {
+                    return cosmo.model.TRIAGE_LATER;
+                }
+            } else {
+                return cosmo.model.TRIAGE_DONE;
+            }
+            
+        },
+        
+        autoTriage: function(){
+           if (!this.getAutoTriage() || !this.getEventStamp() ||(this.isMaster() && this.hasRecurrence())){
                return false;
            }    
            
            var eventStamp = this.getEventStamp();
-           var currentTriageStatus = item.getTriageStatus();
-           var newTriageStatus = -1;
+           var currentTriageStatus = this.getTriageStatus();
+           var newTriageStatus = this._getImplicitTriageStatus();
            
-           var startDate = this.getStartDate();
-           var endDate = this.getEndDate();
-           var startTime = this.getStartDate().getTime();
-           var endTime = (endDate != null) ? endDate.getTime() : startDate.getTime();
-           
-           if (eventStamp.getAllDay() || eventStamp.getAnyTime()){
-               endTime = startTime + (24 * 60 * 60 * 1000);
-           } 
-           
-           var now = (new Date()).getTime();
-           
-           if (now <= endTime){
-               if (now >= startTime){
-                   newTriageStatus = cosmo.model.TRIAGE_NOW;
-               } else {
-                   newTriageStatus = cosmo.model.TRIAGE_DONE;
-               }
-           } else {
-               newTriageStatus = cosmo.model.TRIAGE_LATER;
-           }
            
            if (newTriageStatus != currentTriageStatus){
                this.setTriageStatus(newTriageStatus);
@@ -304,6 +315,15 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         return this._master;
     },
     
+    autoTriage: function(){
+        var modification = this._getThisModification();
+        if (modification){
+            return this._inherited("autoTriage");
+        } else {
+            return false;
+        }
+    },
+    
     _getMasterProperty: function (propertyName){
         return this._master.__getProperty(propertyName);
     },
@@ -325,8 +345,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     __getProperty: cosmo.model._occurrenceGetProperty,  
     
     __setProperty: cosmo.model._occurrenceSetProperty,
-    
-    
+        
     initializeProperties: function (){
         return;
     },
@@ -400,8 +419,35 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     
     clone: function(){
         throw new Error("you cannot clone an occurrence!");
-    }
+    },
     
+    _getNonInheritableProperty: function(propertyName, defaultFunction){
+        //summary: gets properties that cannot be inherited from the master item.
+        //         The value of the property must therefore either come from the modification 
+        //         item or as the evaluation of the passed default function
+        var modification = this._getThisModification();
+        if (!modification){
+            return defaultFunction();
+        }
+        
+        var modifiedProperty = this._getModifiedProperty(propertyName);
+        if (typeof(modifiedProperty) != "undefined"){
+            return modifiedProperty;            
+        }
+        
+        return defaultFunction();
+        
+    },
+    
+    getTriageStatus: function(){
+        //triage status is not inherited from the master. In fact, the triage status of master events should 
+        //never really be used. 
+        return this._getNonInheritableProperty("triageStatus", dojo.lang.hitch(this, this._getImplicitTriageStatus))
+    },
+    
+    getAutoTriage: function(){
+        return this._getNonInheritableProperty("autoTriage", dojo.lang.hitch(this, function(){return true}))
+    }
 });
 
 cosmo.model.declare("cosmo.model.Modification", null,

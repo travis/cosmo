@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -31,7 +32,10 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
 
     public void testUpdateMedia() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createMediaRequestContext(item, "PUT");
+        NoteItem copy = (NoteItem) item.copy();
+        copy.setUid(item.getUid());
+        copy.setName("item copy");
+        RequestContext req = createRequestContext(item, copy);
 
         ResponseContext res = provider.updateMedia(req);
         assertNotNull("Null response context", res);
@@ -42,7 +46,10 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
 
     public void testUnsupportedMediaType() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createMediaRequestContext(item, "PUT");
+        NoteItem copy = (NoteItem) item.copy();
+        copy.setUid(item.getUid());
+        copy.setName("item copy");
+        RequestContext req = createRequestContext(item, copy);
         helper.forgetMediaTypes();
 
         ResponseContext res = provider.updateMedia(req);
@@ -52,7 +59,10 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
 
     public void testInvalidContent() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createMediaRequestContext(item, "PUT");
+        NoteItem copy = (NoteItem) item.copy();
+        copy.setUid(item.getUid());
+        copy.setName("item copy");
+        RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorValidationError();
 
         ResponseContext res = provider.updateMedia(req);
@@ -62,7 +72,10 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
 
     public void testProcessingError() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createMediaRequestContext(item, "PUT");
+        NoteItem copy = (NoteItem) item.copy();
+        copy.setUid(item.getUid());
+        copy.setName("item copy");
+        RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorFailure();
 
         ResponseContext res = provider.updateMedia(req);
@@ -74,5 +87,15 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         super.setUp();
 
         helper.rememberMediaType("text/plain");
+    }
+
+    private RequestContext createRequestContext(NoteItem original,
+                                                NoteItem update)
+        throws Exception {
+        MockItemRequestContext rc =
+            new MockItemRequestContext(helper.getServiceContext(), original,
+                                       "PUT");
+        rc.setContentAsText(update.getUid());
+        return rc;
     }
 }

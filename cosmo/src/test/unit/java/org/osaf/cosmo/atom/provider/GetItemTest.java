@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -31,8 +32,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
 
     public void testGetEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "GET",
-                                                              "yyz", "eff");
+        RequestContext req = createRequestContext(item);
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
@@ -43,8 +43,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
 
     public void testUnsupportedProjection() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "GET",
-                                                              "yyz", "eff");
+        RequestContext req = createRequestContext(item);
         helper.forgetProjections();
 
         ResponseContext res = provider.getEntry(req);
@@ -54,8 +53,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
 
     public void testUnsupportedFormat() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "GET",
-                                                              "yyz", "eff");
+        RequestContext req = createRequestContext(item);
         helper.forgetFormats();
 
         ResponseContext res = provider.getEntry(req);
@@ -65,8 +63,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
 
     public void testGenerationError() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        RequestContext req = helper.createEntryRequestContext(item, "GET",
-                                                              "yyz", "eff");
+        RequestContext req = createRequestContext(item);
         helper.enableGeneratorFailure();
 
         ResponseContext res = provider.getEntry(req);
@@ -79,5 +76,10 @@ public class GetItemTest extends BaseItemProviderTestCase {
 
         helper.rememberProjection("yyz");
         helper.rememberFormat("eff");
+    }
+
+    private RequestContext createRequestContext(NoteItem item) {
+        return new MockItemRequestContext(helper.getServiceContext(), item,
+                                          "GET", "yyz", "eff");
     }
 }

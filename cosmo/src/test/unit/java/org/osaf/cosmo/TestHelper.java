@@ -301,6 +301,7 @@ public class TestHelper {
 
         FileItem content = new FileItem();
 
+        content.setUid(name);
         content.setName(name);
         content.setOwner(user);
         content.setContent("test!".getBytes());
@@ -320,6 +321,7 @@ public class TestHelper {
 
         NoteItem note = new NoteItem();
 
+        note.setUid(name);
         note.setName(name);
         note.setOwner(user);
         note.setIcalUid(serial);

@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomHelper;
+import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockProvider;
 import org.osaf.cosmo.model.CollectionItem;
 
@@ -46,8 +47,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfMatchAll() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         helper.setIfMatch(req, "*");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
@@ -58,8 +58,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfMatchOk() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         helper.setIfMatch(req, collection);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
@@ -70,8 +69,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfMatchNotOk() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         helper.setIfMatch(req, "aeiou");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
@@ -83,7 +81,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfNoneMatchAll() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET");
+        RequestContext req = createRequestContext(collection);
         helper.setIfNoneMatch(req, "*");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
@@ -95,7 +93,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfNoneMatchNotOk() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET");
+        RequestContext req = createRequestContext(collection);
         helper.setIfNoneMatch(req, collection);
         MockHttpServletResponse res = new MockHttpServletResponse();
 
@@ -107,7 +105,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfNoneMatchOk() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET");
+        RequestContext req = createRequestContext(collection);
         helper.setIfNoneMatch(req, "aeiou");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
@@ -118,8 +116,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfModifiedSinceAfter() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()-1000000);
         helper.setIfModifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
@@ -131,8 +128,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfModifiedSinceBefore() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()+1000000);
         helper.setIfModifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
@@ -144,8 +140,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfUnmodifiedSinceAfter() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()-1000000);
         helper.setIfUnmodifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
@@ -157,8 +152,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testIfUnmodifiedSinceBefore() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()+1000000);
         helper.setIfUnmodifiedSince(req, date);
         MockHttpServletResponse res = new MockHttpServletResponse();
@@ -170,7 +164,7 @@ public class StandardRequestHandlerTest extends TestCase {
 
     public void testProcessCollectionUpdate() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createUpdateRequestContext(collection);
+        RequestContext req = createPutRequestContext(collection);
 
         ResponseContext res = handler.process(helper.getProvider(req), req);
         assertNotNull("Null response context", res);
@@ -187,5 +181,16 @@ public class StandardRequestHandlerTest extends TestCase {
 
     protected void tearDown() throws Exception {
         helper.tearDown();
+    }
+
+    public RequestContext createRequestContext(CollectionItem collection) {
+        return new MockCollectionRequestContext(helper.getServiceContext(),
+                                                collection, "GET", "yyz",
+                                                "eff");
+    }
+
+    public RequestContext createPutRequestContext(CollectionItem collection) {
+        return new MockCollectionRequestContext(helper.getServiceContext(),
+                                                collection, "PUT");
     }
 }

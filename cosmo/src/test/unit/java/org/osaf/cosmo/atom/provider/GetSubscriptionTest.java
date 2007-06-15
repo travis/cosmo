@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockSubscriptionRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
 
 /**
@@ -31,7 +32,7 @@ public class GetSubscriptionTest extends BaseSubscriptionProviderTestCase {
 
     public void testGetSubscriptionEntry() throws Exception {
         CollectionSubscription sub = helper.makeAndStoreDummySubscription();
-        RequestContext req = helper.createSubscriptionRequestContext(sub);
+        RequestContext req = createRequestContext(sub);
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
@@ -42,11 +43,16 @@ public class GetSubscriptionTest extends BaseSubscriptionProviderTestCase {
 
     public void testGenerationError() throws Exception {
         CollectionSubscription sub = helper.makeAndStoreDummySubscription();
-        RequestContext req = helper.createSubscriptionRequestContext(sub);
+        RequestContext req = createRequestContext(sub);
         helper.enableGeneratorFailure();
 
         ResponseContext res = provider.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
+    }
+
+    private RequestContext createRequestContext(CollectionSubscription sub) {
+        return new MockSubscriptionRequestContext(helper.getServiceContext(),
+                                                  helper.getUser(), sub);
     }
 }

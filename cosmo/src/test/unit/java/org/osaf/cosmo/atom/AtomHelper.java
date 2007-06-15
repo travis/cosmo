@@ -36,13 +36,8 @@ import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.mock.MockProcessorFactory;
 import org.osaf.cosmo.atom.provider.StandardTargetResolver;
 import org.osaf.cosmo.atom.provider.mock.BaseMockRequestContext;
-import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
-import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockProvider;
 import org.osaf.cosmo.atom.provider.mock.MockProviderManager;
-import org.osaf.cosmo.atom.provider.mock.MockServiceRequestContext;
-import org.osaf.cosmo.atom.provider.mock.MockSubscribedRequestContext;
-import org.osaf.cosmo.atom.provider.mock.MockSubscriptionRequestContext;
 import org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
@@ -101,122 +96,6 @@ public class AtomHelper extends MockHelper {
     public MockProvider getProvider(RequestContext request) {
         return (MockProvider)
             serviceContext.getProviderManager().getProvider(request);
-    }
-
-    public RequestContext createServiceRequestContext()
-        throws IOException {
-        return new MockServiceRequestContext(serviceContext, getUser());
-    }
-
-    public RequestContext createFeedRequestContext(CollectionItem collection,
-                                                   String method)
-        throws IOException {
-        MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(serviceContext, collection,
-                                             method);
-        if (method.equals("POST")) {
-            NoteItem item = makeDummyItem(collection.getOwner());
-            rc.setContentAsEntry(item.getName());
-        }
-        return rc;
-    }
-
-    public RequestContext createFeedRequestContext(CollectionItem collection,
-                                                   String method,
-                                                   String projection,
-                                                   String format)
-        throws IOException {
-        MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(serviceContext, collection,
-                                             method, projection, format);
-        if (method.equals("POST")) {
-            NoteItem item = makeDummyItem(collection.getOwner());
-            rc.setContentAsEntry(item.getName());            
-        }
-        return rc;
-    }
-
-    public RequestContext createFeedRequestContext(String uid,
-                                                   String method) {
-        return new MockCollectionRequestContext(serviceContext, uid, method);
-    }
-
-    public RequestContext createSubscribedRequestContext()
-        throws IOException {
-        MockSubscribedRequestContext rc =
-            new MockSubscribedRequestContext(serviceContext, getUser());
-        return rc;
-    }
-
-    public RequestContext
-        createSubscriptionRequestContext(CollectionSubscription sub)
-        throws IOException {
-        return createSubscriptionRequestContext(sub, "GET");
-    }
-
-    public RequestContext
-        createSubscriptionRequestContext(CollectionSubscription sub,
-                                         String method)
-        throws IOException {
-        MockSubscriptionRequestContext rc =
-            new MockSubscriptionRequestContext(serviceContext, getUser(), sub,
-                                               method);
-        return rc;
-    }
-
-    public RequestContext createUpdateRequestContext(CollectionItem collection)
-        throws IOException {
-        MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(serviceContext, collection,
-                                             "PUT");
-        return rc;
-    }
-
-    public RequestContext createEntryRequestContext(NoteItem item,
-                                                    String method)
-        throws IOException {
-        MockItemRequestContext rc =
-            new MockItemRequestContext(serviceContext, item, method, null);
-        if (method.equals("PUT"))
-            rc.setContentAsEntry(item);
-        return rc;
-    }
-
-    public RequestContext createEntryRequestContext(NoteItem item,
-                                                    String method,
-                                                    String projection,
-                                                    String format)
-        throws IOException {
-        MockItemRequestContext rc =
-            new MockItemRequestContext(serviceContext, item, method, null,
-                                       projection, format);
-        if (method.equals("PUT"))
-            rc.setContentAsEntry(item);
-        return rc;
-    }
-
-    public RequestContext createEntryRequestContext(String uid,
-                                                    String method)
-        throws IOException {
-        return new MockItemRequestContext(serviceContext, uid, method, null);
-    }
-
-    public RequestContext createMediaRequestContext(NoteItem item,
-                                                    String method)
-        throws IOException {
-        MockItemRequestContext rc =
-            new MockItemRequestContext(serviceContext, item, method,
-                                       "text/plain");
-        if (method.equals("PUT"))
-            rc.setContentAsText(item);
-        return rc;
-    }
-
-    public RequestContext createMediaRequestContext(String uid,
-                                                    String method)
-        throws IOException {
-        return new MockItemRequestContext(serviceContext, uid, method,
-                                          "text/plain");
     }
 
     public void setIfMatch(RequestContext context,

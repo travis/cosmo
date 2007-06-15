@@ -21,15 +21,20 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockContentItem;
+
 import org.springframework.dao.ConcurrencyFailureException;
 
 /**
@@ -40,6 +45,7 @@ import org.springframework.dao.ConcurrencyFailureException;
  * @see CollectionItem
  */
 public class MockContentDao extends MockItemDao implements ContentDao {
+    private static final Log log = LogFactory.getLog(MockItemDao.class);
 
     public static boolean THROW_CONCURRENT_EXCEPTION = false;
     
@@ -163,6 +169,9 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
+
+        if (getStorage().getItemByUid(content.getUid()) != null)
+            throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
         content.getParents().add(parent);
           
@@ -190,6 +199,9 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
         
+        if (getStorage().getItemByUid(content.getUid()) != null)
+            throw new UidInUseException("Uid " + content.getUid() + " already in use");
+        
         // Set mock id
         setMockId(content);
         getStorage().storeItem((Item)content);
@@ -210,6 +222,10 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
+
+        Item stored = getStorage().getItemByUid(content.getUid());
+        if (stored != null && stored != content)
+            throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
         if(content instanceof MockContentItem)
             ((MockContentItem) content).setMockVersion(content.getVersion()+1);
@@ -291,6 +307,9 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
         if(THROW_CONCURRENT_EXCEPTION)
             throw new ConcurrencyFailureException("fail!");
+        
+        if (getStorage().getItemByUid(content.getUid()) != null)
+            throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
         content.getParents().addAll(parents);
           

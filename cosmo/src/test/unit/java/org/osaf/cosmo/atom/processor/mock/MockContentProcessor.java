@@ -91,5 +91,15 @@ public class MockContentProcessor extends BaseContentProcessor {
             throw new ValidationException("Validation error mode");
         if (factory.isFailureMode())
             throw new ProcessorException("Failure mode");
+
+        try {
+            String uid = IOUtils.toString(content);
+
+            log.error("updating item " + item.getUid() + " with new uid " + uid);
+
+            item.setUid(uid);
+        } catch (Exception e) {
+            throw new ProcessorException("Cannot create child item", e);
+        }
     }
 }

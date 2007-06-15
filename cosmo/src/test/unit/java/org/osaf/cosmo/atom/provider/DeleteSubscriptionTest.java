@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockSubscriptionRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
 
 /**
@@ -31,15 +32,20 @@ public class DeleteSubscriptionTest
     private static final Log log =
         LogFactory.getLog(DeleteSubscriptionTest.class);
 
-    public void testDeleteSubscriptionntry() throws Exception {
+    public void testDeleteSubscriptionEntry() throws Exception {
         CollectionSubscription sub = helper.makeAndStoreDummySubscription();
-        RequestContext req =
-            helper.createSubscriptionRequestContext(sub, "DELETE");
+        RequestContext req = createRequestContext(sub);
 
         ResponseContext res = provider.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Subscription not removed",
                    helper.findSubscription(sub.getDisplayName()));
+    }
+
+    private RequestContext createRequestContext(CollectionSubscription sub) {
+        return new MockSubscriptionRequestContext(helper.getServiceContext(),
+                                                  helper.getUser(), sub,
+                                                  "DELETE");
     }
 }

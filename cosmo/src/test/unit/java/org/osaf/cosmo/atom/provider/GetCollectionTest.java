@@ -21,6 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
 
 /**
@@ -31,8 +32,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
 
     public void testGetFeed() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
 
         ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
@@ -43,8 +43,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
 
     public void testUnsupportedProjection() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         helper.forgetProjections();
 
         ResponseContext res = provider.getFeed(req);
@@ -54,8 +53,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
 
     public void testUnsupportedFormat() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         helper.forgetFormats();
 
         ResponseContext res = provider.getFeed(req);
@@ -65,8 +63,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
 
     public void testGenerationError() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(collection, "GET",
-                                                             "yyz", "eff");
+        RequestContext req = createRequestContext(collection);
         helper.enableGeneratorFailure();
 
         ResponseContext res = provider.getFeed(req);
@@ -79,5 +76,11 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
 
         helper.rememberProjection("yyz");
         helper.rememberFormat("eff");
+    }
+
+    public RequestContext createRequestContext(CollectionItem collection) {
+        return new MockCollectionRequestContext(helper.getServiceContext(),
+                                                collection, "GET", "yyz",
+                                                "eff");
     }
 }

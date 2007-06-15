@@ -51,6 +51,7 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -117,6 +118,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (UidInUseException e) {
+            return conflict(getAbdera(), request, "Uid already in use");
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
@@ -210,6 +213,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (UidInUseException e) {
+            return conflict(getAbdera(), request, "Uid already in use");
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
@@ -263,6 +268,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (UidInUseException e) {
+            return conflict(getAbdera(), request, "Uid already in use");
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);

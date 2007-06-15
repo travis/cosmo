@@ -161,7 +161,10 @@ public class MockDaoStorage {
 
     /** */
     public void updateItem(Item item) {
-        if (itemsByUid.get(item.getUid()) != item)
+        Item stored = itemsByUid.get(item.getUid());
+        if (stored == null)
+            throw new IllegalArgumentException("item to be updated is not already stored");
+        if (! stored.equals(item))
             throw new IllegalArgumentException("item to be updated does not match stored item");
         if (item.getName() == null)
             throw new IllegalArgumentException("name cannot be null");

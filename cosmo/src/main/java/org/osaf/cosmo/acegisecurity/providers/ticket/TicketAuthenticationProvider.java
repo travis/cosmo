@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.server.CollectionPath;
+import org.osaf.cosmo.server.ItemPath;
 
 import org.springframework.dao.DataAccessException;
 
@@ -121,6 +122,13 @@ public class TicketAuthenticationProvider
                 throw new TicketedItemNotFoundException("Item with uid " + cp.getUid() + " not found");
 
             return item;
+        }
+
+        ItemPath ip = ItemPath.parse(path, true);
+        if (ip != null) {
+            item = contentService.findItemByUid(ip.getUid());
+            if (item != null)
+                return item;
         }
 
         item = contentService.findItemByPath(path);

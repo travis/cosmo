@@ -16,6 +16,7 @@
 package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.model.Content;
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 
@@ -23,7 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Test class for {@link ItemProvider#createEntry()} tests.
@@ -33,8 +36,9 @@ public class CreateItemTest extends BaseItemProviderTestCase
     private static final Log log = LogFactory.getLog(CreateItemTest.class);
 
     public void testCreateEntry() throws Exception {
-        CollectionItem item = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(item, "POST");
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeDummyItem(collection.getOwner());
+        RequestContext req = createRequestContext(collection, item);
 
         ResponseContext res = provider.createEntry(req);
         assertNotNull("Null response context", res);
@@ -47,8 +51,9 @@ public class CreateItemTest extends BaseItemProviderTestCase
     }
 
     public void testUnsupportedMediaType() throws Exception {
-        CollectionItem item = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(item, "POST");
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeDummyItem(collection.getOwner());
+        RequestContext req = createRequestContext(collection, item);
         helper.forgetMediaTypes();
 
         ResponseContext res = provider.createEntry(req);
@@ -57,8 +62,9 @@ public class CreateItemTest extends BaseItemProviderTestCase
     }
 
     public void testInvalidContent() throws Exception {
-        CollectionItem item = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(item, "POST");
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeDummyItem(collection.getOwner());
+        RequestContext req = createRequestContext(collection, item);
         helper.enableProcessorValidationError();
 
         ResponseContext res = provider.createEntry(req);
@@ -66,9 +72,22 @@ public class CreateItemTest extends BaseItemProviderTestCase
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
 
+    public void testUidInUse() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item1 = helper.makeAndStoreDummyItem(collection);
+        NoteItem item2 = helper.makeDummyItem(collection.getOwner());
+        item2.setUid(item1.getUid());
+        RequestContext req = createRequestContext(collection, item2);
+
+        ResponseContext res = provider.createEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 409, res.getStatus());
+    }
+
     public void testProcessingError() throws Exception {
-        CollectionItem item = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(item, "POST");
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeDummyItem(collection.getOwner());
+        RequestContext req = createRequestContext(collection, item);
         helper.enableProcessorFailure();
 
         ResponseContext res = provider.createEntry(req);
@@ -79,9 +98,10 @@ public class CreateItemTest extends BaseItemProviderTestCase
     public void DONTtestLockedError() throws Exception {
         // XXX re-enable when i figure out how to lock the collection
         // from another thread
-        CollectionItem item = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(item, "POST");
-        helper.lockCollection(item);
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeDummyItem(collection.getOwner());
+        RequestContext req = createRequestContext(collection, item);
+        helper.lockCollection(collection);
 
         ResponseContext res = provider.createEntry(req);
         assertNotNull("Null response context", res);
@@ -89,8 +109,9 @@ public class CreateItemTest extends BaseItemProviderTestCase
     }
 
     public void testGenerationError() throws Exception {
-        CollectionItem item = helper.makeAndStoreDummyCollection();
-        RequestContext req = helper.createFeedRequestContext(item, "POST");
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+        NoteItem item = helper.makeDummyItem(collection.getOwner());
+        RequestContext req = createRequestContext(collection, item);
         helper.enableGeneratorFailure();
 
         ResponseContext res = provider.createEntry(req);
@@ -103,5 +124,15 @@ public class CreateItemTest extends BaseItemProviderTestCase
 
         helper.rememberProjection(PROJECTION_FULL);
         helper.rememberMediaType(Content.Type.TEXT.toString());
+    }
+
+    private RequestContext createRequestContext(CollectionItem collection,
+                                                NoteItem item)
+        throws Exception {
+        MockCollectionRequestContext rc =
+            new MockCollectionRequestContext(helper.getServiceContext(),
+                                             collection, "POST");
+        rc.setContentAsEntry(item.getUid());
+        return rc;
     }
 }

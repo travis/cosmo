@@ -40,44 +40,30 @@ public class MockItemRequestContext extends BaseMockRequestContext
     public MockItemRequestContext(ServiceContext context,
                                   NoteItem item,
                                   String method) {
-        this(context, item, method, null, null, null);
+        this(context, item, method, null, null);
     }
 
     public MockItemRequestContext(ServiceContext context,
                                   NoteItem item,
                                   String method,
-                                  String contentType) {
-        this(context, item, method, contentType, null, null);
-    }
-
-    public MockItemRequestContext(ServiceContext context,
-                                  NoteItem item,
-                                  String method,
-                                  String contentType,
                                   String projection,
                                   String format) {
         super(context, method, toRequestUri(item, projection, format));
-        if (contentType == null)
-            contentType = ATOM_MEDIA_TYPE;
-        getMockRequest().setContentType(contentType);
-        getMockRequest().addHeader("Content-Type", contentType);
         this.target = new ItemTarget(this, item, projection, format);
     }
 
     public MockItemRequestContext(ServiceContext context,
                                   String uid,
-                                  String method,
-                                  String contentType) {
-        this(context, newItem(uid), method, contentType);
+                                  String method) {
+        this(context, newItem(uid), method);
     }
 
     public MockItemRequestContext(ServiceContext context,
                                   String uid,
                                   String method,
-                                  String contentType,
                                   String projection,
                                   String format) {
-        this(context, newItem(uid), method, contentType, projection, format);
+        this(context, newItem(uid), method, projection, format);
     }
 
     private static String toRequestUri(NoteItem item,
@@ -90,15 +76,5 @@ public class MockItemRequestContext extends BaseMockRequestContext
         NoteItem item = new NoteItem();
         item.setUid(uid);
         return item;
-    }
-
-    public void setContentAsEntry(NoteItem item)
-        throws IOException {
-        setContentAsEntry("this is item " + item.getUid());
-    }
-
-    public void setContentAsText(NoteItem item)
-        throws IOException {
-        setContentAsText("this is item " + item.getUid());
     }
 }

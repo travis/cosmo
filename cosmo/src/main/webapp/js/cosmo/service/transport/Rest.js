@@ -34,7 +34,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
         
         methodIsSupported: {
             'get': true,
-            'post': true
+            'post': true,
+            'head': true
         },
         
         /**
@@ -50,13 +51,17 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 }
             }
             // Add error fo transport layer problems
-            deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
+            
+            var request = cosmo.util.auth.getAuthorizedRequest(r, kwArgs);
+            
+            if (deferred){
+                deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
                                               dojo.debug(e);
                                               return e;});
-            var request = cosmo.util.auth.getAuthorizedRequest(r, kwArgs);
-
-            request.load = request.load || this.resultCallback(deferred);
-            request.error = request.error || this.errorCallback(deferred);
+            
+                request.load = request.load || this.resultCallback(deferred);
+                request.error = request.error || this.errorCallback(deferred);
+            }
             request.transport = request.transport || "XMLHTTPTransport";
             request.contentType = request.contentType || 'text/xml';
             request.sync = kwArgs.sync || r.sync || false;

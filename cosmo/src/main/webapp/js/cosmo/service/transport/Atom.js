@@ -230,42 +230,45 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             },
             kwArgs);
     },
-
-    headPreference: function (key, kwArgs){
-        return this.bind(
-            {
-                url: cosmo.env.getBaseUrl() +
-                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preferences/" + key,
-                method: "HEAD"
-            },
-            kwArgs);
-    },
     
     _prefExists: function (key){
-        var exists;
-        dojo.io.bind(this.getDefaultRequest({
-          url: url + "/"+ key,
+        var exists = false;
+        dojo.io.bind(this.getDefaultRequest(null, {
+          url: cosmo.env.getBaseUrl() +
+               "/atom/user/" + cosmo.util.auth.getUsername() + "/preference" + "/"+ key,
           method: "HEAD",
           sync: true,
           handle: function (result, error, xhr){
-              //debugger
+             if (xhr.status == 200) exists = true;
           }
         }
         ));
+        
+        return exists;
         
     },
     
     // This is not the right way to do this. We shouldn't be guessing urls,
     // but since the design does not currently support processing the entry in this
     // layer (and thus does not have access to the urls returned by 
-    // getPreference) I believe this is the best option for the moment. 
-    
-    // Once this layer is redesigned, we should redo this.
+    // getting the preference collection) I believe this is the best option for the moment. 
+    //
+    // Once this layer is redesigned, we should redo this. If we get a chance, this might be something
+    // to improve before preview.
     setPreference: function (key, val, postContent, kwArgs){
-        
-        var method = "POST";
-        var url = cosmo.env.getBaseUrl() +
+        var method;
+        var url;
+
+        if (this._prefExists(key)) {
+            method = "PUT"
+            url = cosmo.env.getBaseUrl() +
+                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preference/" + key;
+        } else {
+            method = "POST";
+            url = cosmo.env.getBaseUrl() +
                      "/atom/user/" + cosmo.util.auth.getUsername() + "/preferences";
+            
+        }
         return this.bind(
             {
                 url: url,

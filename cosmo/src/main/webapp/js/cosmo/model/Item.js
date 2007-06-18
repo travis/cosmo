@@ -261,13 +261,35 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
                return false;
            }    
            
-           var eventStamp = this.getEventStamp();
            var currentTriageStatus = this.getTriageStatus();
            var newTriageStatus = this._getImplicitTriageStatus();
            
            
            if (newTriageStatus != currentTriageStatus){
                this.setTriageStatus(newTriageStatus);
+               return true;
+           }
+           
+           return false;
+           
+        },
+        
+        tickle: function(){
+           if (!this.getAutoTriage() || !this.getEventStamp() ||(this.isMaster() && this.hasRecurrence())){
+               return false;
+           }
+           
+           var currentTriageStatus = this.getTriageStatus();
+           
+           //you can only traige from LATER to NOW
+           if (currentTriageStatus != cosmo.model.TRIAGE_LATER){
+               return false;
+           }
+           
+           var newTriageStatus = this._getImplicitTriageStatus();
+           if (newTriageStatus != cosmo.model.TRIAGE_LATER){
+               this.setTriageStatus(cosmo.model.TRIAGE_NOW);
+               this.setAutoTriage(false);
                return true;
            }
            
@@ -329,6 +351,15 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         var modification = this._getThisModification();
         if (modification){
             return this._inherited("autoTriage");
+        } else {
+            return false;
+        }
+    },
+    
+    tickle: function(){
+        var modification = this._getThisModification();
+        if (modification){
+            return this._inherited("tickle");
         } else {
             return false;
         }

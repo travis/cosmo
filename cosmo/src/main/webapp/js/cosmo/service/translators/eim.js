@@ -529,7 +529,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         if (this.modificationHasNoteModifications(modification))
             records.note = this.modifiedOccurrenceToNoteRecord(noteOccurrence);
-        else records.note = this.generateEmptyItem(noteOccurrence);
+        else records.note = this.generateEmptyNote(noteOccurrence);
         
         records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence)
         
@@ -762,8 +762,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (props.status != undefined) fields.status = [type.TEXT, props.status];
             if (props.location != undefined) fields.location = [type.TEXT, props.location];
             if (props.duration != undefined) fields.duration = [type.TEXT, props.duration.toIso8601()];
-            if (props.rrule != undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
-            if (props.exdates != undefined) fields.exdates = [type.TEXT, this.exdatesToEim(props.exdates)];
+            if (props.rrule != undefined) fields.rrule = [type.CLOB, this.rruleToICal(props.rrule)];
+            if (props.exdates != undefined) fields.exdates = [type.CLOB, this.exdatesToEim(props.exdates)];
             
             return record = {
                 prefix: prefix.EVENT,

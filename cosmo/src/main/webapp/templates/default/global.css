@@ -176,29 +176,29 @@ hr {
 /* Buttons
  * --------------------- */
 .btnElemBase {
-
+    width: 76px;
     margin: auto;
     text-align: center;
     font-size: 11px;
-    color: #333399;
+    color: #339;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
-    height: 24px;
+    height: 19px;
     padding: 0 0 2px 0;
     cursor: pointer;
-    background-image: url(images/button_bgs.gif);
+    background-image: url(images/button_bgs.png);
     background-repeat: repeat-x;
     background-position: 0px 0px;
 }
 .btnElemMouseover {
     color: #3333aa;
-    background-position: 0px -24px;
+    background-position: 0px -19px;
 }
 .btnElemMousedown {
     color: #3333aa;
     border-color: #555 #bbb #bbb #555;
-    background-position: 0px -24px;
+    background-position: 0px -19px;
 }
 .btnElemDisabled {
     color: #999;
@@ -210,25 +210,25 @@ hr {
     margin: auto;
     text-align: center;
     font-size: 9px;
-    color: #333399;
+    color: #339;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
-    height: 18px;
+    height: 16px;
     padding: 0 0 1px 0;
     cursor: pointer;
-    background-image: url(images/button_bgs_sm.gif);
+    background-image: url(images/button_bgs.png);
     background-repeat: repeat-x;
-    background-position: 0px 0px;
+    background-position: 0px -2px;
 }
 .btnElemMouseoverSm {
     color: #3333aa;
-    background-position: 0px -18px;
+    background-position: 0px -21px;
 }
 .btnElemMousedownSm {
     color: #3333aa;
     border-color: #555 #bbb #bbb #555;
-    background-position: 0px -18px;
+    background-position: 0px -22px;
 }
 .btnElemDisabledSm {
     color: #999;
@@ -247,3 +247,4 @@ hr {
     border: 0px;
     background-color: #555;
 }
+

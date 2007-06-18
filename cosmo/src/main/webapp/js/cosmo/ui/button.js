@@ -106,21 +106,20 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
 
         nbData.id = id + 'Center' + side;
         nbData.style.width = '13px';
-        nbData.style.height = '16px';
-        nbData.style.lineHeight = '16px';
+        nbData.style.height = '15px';
+        nbData.style.lineHeight = '0px';
         nbData.style.textAlign = lowerCaseSide;
         nbData.className = 'btnElemBaseSm';
-        nbData.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() + 'button_bgs_sm.gif)';
+        nbData.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() + 'button_bgs.png)';
         nbImg.src = BUTTON_DIR_PATH + 'nav_arrow_' +
             lowerCaseSide + '.gif';
+        nbImg.style.padding = '2px 5px 0 5px';
         if (side == 'Left') {
             nbData.style.borderWidth = '1px 0 1px 1px';
         }
         else {
             nbData.style.borderWidth = '1px 1px 1px 0';
         }
-        nbImg.style.verticalAlign = 'middle';
-        nbImg.style.padding = '0 6px 0 6px';
         nbData.appendChild(nbImg);
 
         dojo.event.connect(nbData, 'onmouseover', self, '_morphButton');

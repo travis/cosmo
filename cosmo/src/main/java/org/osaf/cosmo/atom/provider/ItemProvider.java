@@ -284,9 +284,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     }
 
     public ResponseContext getFeed(RequestContext request) {
-        if (request.getTarget() instanceof ExpandedItemTarget)
-            return getExpandedItemFeed(request);
-
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
@@ -411,40 +408,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
     // our methods
 
-    public ResponseContext getExpandedItemFeed(RequestContext request) {
-        ExpandedItemTarget target = (ExpandedItemTarget) request.getTarget();
-        NoteItem item = target.getItem();
-        if (log.isDebugEnabled())
-            log.debug("getting expanded feed for item " + item.getUid());
-
-        try {
-            ServiceLocator locator = createServiceLocator(request);
-            ItemFeedGenerator generator =
-                createItemFeedGenerator(target, locator);
-            generator.setFilter(createQueryFilter(request));
-
-            Feed feed = generator.generateFeed(item);
-
-            AbstractResponseContext rc =
-                createResponseContext(feed.getDocument());
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLastModified(item.getModifiedDate());
-            return rc;
-        } catch (InvalidQueryException e) {
-            return badrequest(getAbdera(), request, e.getMessage());
-        } catch (UnsupportedProjectionException e) {
-            String reason = "Projection " + target.getProjection() + " not supported";
-            return badrequest(getAbdera(), request, reason);
-        } catch (UnsupportedFormatException e) {
-            String reason = "Format " + target.getFormat() + " not supported";
-            return badrequest(getAbdera(), request, reason);
-        } catch (GeneratorException e) {
-            String reason = "Unknown feed generation error: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
-        }
-    }
-
     public ProcessorFactory getProcessorFactory() {
         return processorFactory;
     }
@@ -504,7 +467,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         return processorFactory.createProcessor(mediaType);
     }
 
-    private NoteItemFilter createQueryFilter(RequestContext request)
+    protected NoteItemFilter createQueryFilter(RequestContext request)
         throws InvalidQueryException {
         boolean requiresFilter = false;
         EventStampFilter eventFilter = new EventStampFilter();

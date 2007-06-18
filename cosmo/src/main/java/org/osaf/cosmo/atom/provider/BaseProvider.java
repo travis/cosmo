@@ -162,6 +162,17 @@ public abstract class BaseProvider extends AbstractProvider
                           423, null);
     }
 
+    protected ResponseContext methodnotallowed(Abdera abdera, 
+                                               RequestContext request,
+                                               String[] methods) {
+        BaseResponseContext resp = (BaseResponseContext)
+            returnBase(createErrorDocument(abdera, 405, "Method Not Allowed",
+                                           null),
+                       405, null);
+        resp.setAllow(methods);
+        return resp;
+    }
+  
     protected AbstractResponseContext
         createResponseContext(int status) {
         return createResponseContext(status, null);

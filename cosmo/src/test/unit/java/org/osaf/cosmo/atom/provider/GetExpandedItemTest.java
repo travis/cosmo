@@ -26,16 +26,16 @@ import org.osaf.cosmo.atom.provider.mock.MockExpandedRequestContext;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
- * Test class for {@link ItemProvider#getExpandedItemFeed()} tests.
+ * Test class for {@link ExpandedItemProvider#getFeed()} tests.
  */
-public class GetExpandedItemTest extends BaseItemProviderTestCase {
+public class GetExpandedItemTest extends BaseExpandedItemProviderTestCase {
     private static final Log log = LogFactory.getLog(GetExpandedItemTest.class);
 
     public void testGetFeed() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = createRequestContext(item, "yyz", "eff");
 
-        ResponseContext res = ((ItemProvider)provider).getExpandedItemFeed(req);
+        ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -47,7 +47,7 @@ public class GetExpandedItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, "yyz", "eff");
         helper.forgetProjections();
 
-        ResponseContext res = ((ItemProvider)provider).getExpandedItemFeed(req);
+        ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -57,7 +57,7 @@ public class GetExpandedItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, "yyz", "eff");
         helper.forgetFormats();
 
-        ResponseContext res = ((ItemProvider)provider).getExpandedItemFeed(req);
+        ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -67,7 +67,7 @@ public class GetExpandedItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, "yyz", "eff");
         helper.enableGeneratorFailure();
 
-        ResponseContext res = ((ItemProvider)provider).getExpandedItemFeed(req);
+        ResponseContext res = provider.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }

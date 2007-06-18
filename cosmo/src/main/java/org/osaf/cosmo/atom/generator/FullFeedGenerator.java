@@ -139,10 +139,11 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
      *
      * @param item the item
      */
-    protected String selfIri(Item item) {
-        StringBuffer iri = new StringBuffer(super.selfIri(item));
-        if (format != null)
-            iri.append("/").append(format);
+    protected String selfIri(Item item,
+                             boolean withPathInfo) {
+        StringBuffer iri = new StringBuffer(super.selfIri(item, withPathInfo));
+        if (withPathInfo && format != null)
+            addPathInfo(iri, format);
         return iri.toString();
     }
 }

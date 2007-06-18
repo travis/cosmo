@@ -453,7 +453,7 @@ public abstract class BaseItemFeedGenerator
         StringBuffer iri =
             new StringBuffer(getLocator().getAtomUrl(item, false));
         if (withPathInfo && getProjection() != null)
-            iri.append("/").append(getProjection());
+            addPathInfo(iri, getProjection());
         return iri.toString();
     }
 
@@ -465,6 +465,17 @@ public abstract class BaseItemFeedGenerator
     protected String expandedIri(Item item) {
         String selfIri = selfIri(item);
         return selfIri.replaceFirst("item", "expanded");
+    }
+
+    protected void addPathInfo(StringBuffer iri,
+                               String pathInfo) {
+        // if there's a query string, insert the projection just
+        // before it
+        int qm = iri.indexOf("?");
+        if (qm > 0)
+            iri.insert(qm, '/').insert(qm+1, pathInfo);
+        else
+            iri.append('/').append(pathInfo);
     }
 
     public NoteItemFilter getFilter() {

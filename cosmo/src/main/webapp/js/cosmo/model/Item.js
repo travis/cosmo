@@ -22,9 +22,18 @@ dojo.require("cosmo.util.uuid");
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
 cosmo.model.NEW_ARRAY = function(){return []};
+
+//Triage Statuses
 cosmo.model.TRIAGE_NOW = 100;
 cosmo.model.TRIAGE_LATER = 200;
 cosmo.model.TRIAGE_DONE = 300;
+
+//for use in ModBy records
+cosmo.model.ACTION_EDITED = 100;
+cosmo.model.ACTION_QUEUED = 200;
+cosmo.model.ACTION_SENT = 300;
+cosmo.model.ACTION_UPDATED = 400;
+cosmo.model.ACTION_CREATED = 500;
 
 cosmo.model._stampRegistry = {};
 
@@ -129,7 +138,8 @@ cosmo.model.declare("cosmo.model.Item", null,
   });
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
-    [ ["body", {"default": null}] ],
+    [ ["body", {"default": null}],
+      ["modifiedBy", {"default": function(){return new cosmo.model.ModifiedBy()}}]],
     {
         //TODO could be useful to use the same format as is in the UUID in EIM
          OCCURRENCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
@@ -615,6 +625,19 @@ cosmo.model.declareStamp("cosmo.model.MailStamp", "mail",
             this.initializeProperties(kwArgs);
         }
     });
+
+cosmo.model.declare("cosmo.model.ModifiedBy", null, 
+    //declare the dynamically generated properties
+   [["userId", {"default": null} ],
+    ["action", {"default": cosmo.model.ACTION_CREATED} ],
+    ["timeStamp", {"default": cosmo.model.NEW_DATESTAMP}]
+   ],
+   //declare other properties
+  {
+      initializer: function(kwArgs){
+            this.initializeProperties(kwArgs);
+      }
+  });  
 
 //stuff that note and stamp has in common.
 cosmo.model._noteStampCommon = {

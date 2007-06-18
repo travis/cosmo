@@ -143,6 +143,8 @@ public class BaseGeneratorTestCase extends TestCase
     }
     
     private String read(Reader reader) {
+        if (reader == null)
+            return null;
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(reader, writer);

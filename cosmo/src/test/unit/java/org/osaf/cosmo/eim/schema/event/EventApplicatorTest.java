@@ -15,10 +15,14 @@
  */
 package org.osaf.cosmo.eim.schema.event;
 
+import java.io.StringReader;
+
 import junit.framework.Assert;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
@@ -114,7 +118,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         record.addField(new TextField(FIELD_DTSTART, ";VALUE=DATE-TIME:20070212T074500"));
         record.addField(new TextField(FIELD_DURATION, "PT1H"));
         record.addField(new TextField(FIELD_LOCATION, "here"));
-        record.addField(new TextField(FIELD_RRULE, "FREQ=DAILY;UNTIL=20070306T055959Z"));
+        record.addField(new ClobField(FIELD_RRULE, new StringReader("FREQ=DAILY;UNTIL=20070306T055959Z")));
         record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));
 
         return record;
@@ -145,7 +149,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         // no dtstart
         record.addField(new TextField(FIELD_DURATION, "PT1H"));
         record.addField(new TextField(FIELD_LOCATION, "here"));
-        record.addField(new TextField(FIELD_RRULE, "FREQ=DAILY;UNTIL=20070306T055959Z"));
+        record.addField(new ClobField(FIELD_RRULE, new StringReader("FREQ=DAILY;UNTIL=20070306T055959Z")));
         record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));
 
         return record;

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.eim.schema;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,7 @@ import net.fortuna.ical4j.model.parameter.Related;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Trigger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,6 +75,25 @@ public class EimValueConverter implements EimSchemaConstants {
     }
 
     /**
+     * Parses a serialized clob value and returns the contained
+     * recurrence rules.
+     * <p>
+     * Recurrence rules in the clob value must be colon-separated.
+     *
+     * @return <code>List<Recur></code>
+     * @throws EimValidationException
+     * @throws EimSchemaException
+     */
+    public static List<Recur> toICalRecurs(Reader clob)
+        throws EimValidationException, EimSchemaException {
+        try {
+            return toICalRecurs(IOUtils.toString(clob));
+        } catch (IOException e) {
+            throw new EimSchemaException("Unable to convert clob to string", e);
+        }
+    }
+
+    /**
      * Serializes a list of recurrence rules.
      * <p>
      * Recurrence rules in the returned value are colon-separated.
@@ -101,6 +123,25 @@ public class EimValueConverter implements EimSchemaConstants {
             throw new EimValidationException("Invalid date value " + text, e);
         } catch (UnknownTimeZoneException e) {
             throw new EimValidationException("Unknown timezone " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Parses a serialized clob value and returns the contained
+     * date or date-time.
+     *
+     * @return <code>ICalDate</code>
+     * @throws EimValidationException
+     * @throws EimSchemaException
+     */
+    public static ICalDate toICalDate(Reader clob)
+        throws EimValidationException, EimSchemaException {
+        if (clob == null)
+            return null;
+        try {
+            return toICalDate(IOUtils.toString(clob));
+        } catch (IOException e) {
+            throw new EimSchemaException("Unable to convert clob to string", e);
         }
     }
 

@@ -180,6 +180,27 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return subscriptions;
     },
     
+    translateGetPreferences: function(atomXml, kwArgs){
+        kwArgs = kwArgs || {};
+        var entries = atomXml.getElementsByTagName("entry");
+        var preferences = {};
+        for (var i = 0; i < entries.length; i++){
+            var entry = entries[i];
+            var content = entry.getElementsByTagName("content")[0];
+            var preference = this.preferenceXmlToPreference(content.firstChild);
+            preferences[preference[0]] = preference[1];
+        }
+        return preferences;
+    },
+    
+    preferenceXmlToPreference: function(xml){
+        var keyEl = dojo.html.getElementsByClassName("key", xml)[0];
+        var key = keyEl.firstChild.nodeValue;
+        var valueEl = dojo.html.getElementsByClassName("value", xml)[0];
+        var value = valueEl.firstChild.nodeValue;
+        return [key,value];
+    },
+    
     collectionXmlToCollection: function (collectionXml){
         return collection = new cosmo.model.Collection(
             {
@@ -338,6 +359,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
            case prefix.NOTE:
                note.initializeProperties(this.noteRecordToNoteProps(record), {noDefaults: true})
                break;
+           case prefix.MODBY:
+               note.setModifiedBy(new cosmo.model.ModifiedBy(this.modbyRecordToModbyProps(record)));
+               break;
            case prefix.EVENT:
                note.getStamp(prefix.EVENT, true, this.getEventStampProperties(record));
                break;
@@ -376,6 +400,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                    break;
                case prefix.NOTE:
                     dojo.lang.mixin(modifiedProperties, this.noteRecordToNoteProps(record));
+                   break;
+               case prefix.MODBY:
+                    modifiedProperties.modifiedBy = new cosmo.model.ModifiedBy(this.modbyRecordToModbyProps(record));
                    break;
                case prefix.EVENT:
                    modifiedStamps[prefix.EVENT] = this.getEventStampProperties(record);
@@ -822,7 +849,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 ns: ns.MODBY,
                 key:{
                     uuid: [type.TEXT, this.getUid(note)],
-                    userid: [type.TEXT, ""],
+                    userid: [type.TEXT, note.getModifiedBy().getUserId() || 
+                                        cosmo.util.auth.getUsername()],
                     action: [type.INTEGER, 100], //TODO: figure this out
                     timestamp: [type.DECIMAL, new Date().getTime()]
                 }
@@ -887,7 +915,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (record.fields.createdOn) props.creationDate = record.fields.createdOn[1];
             if (record.fields.triage) this.addTriageStringToItemProps(record.fields.triage[1], props);
         }
-        return props
+        return props;
     },
 
     noteRecordToNoteProps: function(record){
@@ -895,7 +923,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (record.fields){
             if (record.fields.body) props.body = record.fields.body[1];
         }
-        return props
+        return props;
+    },
+
+    modbyRecordToModbyProps: function(record){
+        var props = {};
+        if (record.fields){
+            if (record.fields.userid) props.userId = record.fields.userid[1];
+            if (record.fields.timestamp) props.timeStamp = record.fields.timestamp[1];
+            if (record.fields.action) props.action = record.fields.action[1];
+        }
+        return props;
     },
 
     fromEimDate: function (dateString){

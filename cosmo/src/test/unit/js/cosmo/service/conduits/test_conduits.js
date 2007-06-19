@@ -265,10 +265,7 @@ cosmotest.service.conduits.test_conduits = {
             
             item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
             jum.assertEquals("modification display name didn't save", anotherNewDisplayName, item4.getDisplayName());
-
-                        
-
-            
+   
         } finally {
            cosmotest.service.conduits.test_conduits.cleanup(user);            
         }
@@ -333,6 +330,34 @@ cosmotest.service.conduits.test_conduits = {
         }
     },
     
+    test_Preferences: function(){
+        try {
+            var user = cosmotest.service.conduits.test_conduits.createTestAccount();
+            
+            var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
+            
+            var preferences = conduit.getPreferences({sync: true}).results[0];
+            jum.assertTrue("preferences object not starting empty", dojo.lang.isEmpty(preferences));
+            
+            conduit.setPreference("foo", "bar", {sync: true});
+            
+            preferences = conduit.getPreferences({sync: true}).results[0];
+            jum.assertEquals("preference foo wrong in getPreferences", "bar", preferences.foo);
+            
+            var foo = conduit.getPreference("foo", {sync: true}).results[0];
+            
+            jum.assertEquals("preference foo wrong in getPreference", "bar", foo);
+            
+            conduit.deletePreference("foo", {sync: true});
+            
+            var preferences = conduit.getPreferences({sync: true}).results[0];
+            jum.assertTrue("removePreference failed", dojo.lang.isEmpty(preferences));
+            
+    
+        } finally {
+           cosmotest.service.conduits.test_conduits.cleanup(user);            
+        }
+    },
     createTestAccount: function(){
        cosmo.util.auth.clearAuth();
        var user = {

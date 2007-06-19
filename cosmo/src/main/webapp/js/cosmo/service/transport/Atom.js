@@ -221,16 +221,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
 
-    getPreference: function (key, kwArgs){
-        return this.bind(
-            {
-                url: cosmo.env.getBaseUrl() +
-                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preferences/" + key,
-                method: "GET"
-            },
-            kwArgs);
-    },
-    
     _prefExists: function (key){
         var exists = false;
         dojo.io.bind(this.getDefaultRequest(null, {
@@ -278,10 +268,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             kwArgs);
     },
 
-    removePreference: function (key){
-        return this._transport.removePreference();
-    },
-
     getPreferences: function (kwArgs){
         return this.bind(
             {url: cosmo.env.getBaseUrl() +
@@ -290,10 +276,26 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             kwArgs);
     },
     
-    setPreferences: function (prefs){
-       return this._transport.getPreferences();
+    getPreference: function (key, kwArgs){
+        return this.bind(
+            {
+                url: cosmo.env.getBaseUrl() +
+                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preference/" + key,
+                method: "GET"
+            },
+            kwArgs);
     },
-
+    
+    deletePreference: function(key, kwArgs){
+        return this.bind(
+            {
+                url: cosmo.env.getBaseUrl() +
+                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preference/" + key,
+                method: "DELETE"
+            },
+            kwArgs);
+    },
+    
     _generateSearchQuery: function(/*Object*/searchCrit){
         var ret = {};
         if (!searchCrit) return ret;

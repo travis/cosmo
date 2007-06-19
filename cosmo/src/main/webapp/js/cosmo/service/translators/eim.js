@@ -187,10 +187,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
             var content = entry.getElementsByTagName("content")[0];
-            var preference = this.preferenceXmlToPreference(content.firstChild);
+            var preference = this.preferenceXmlToPreference(dojo.html.getElementsByClassName("preference", content)[0]);
             preferences[preference[0]] = preference[1];
         }
         return preferences;
+    },
+
+    translateGetPreference: function(atomXml, kwArgs){
+        kwArgs = kwArgs || {};
+
+        var content = atomXml.getElementsByTagName("content")[0];
+        var preference = this.preferenceXmlToPreference(dojo.html.getElementsByClassName("preference", content)[0]);
+        return preference[1];
+
     },
     
     preferenceXmlToPreference: function(xml){

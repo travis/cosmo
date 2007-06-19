@@ -185,26 +185,26 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             
     },
     
-    getPreference: function (key){
-       return this._transport.getPreference();
+    getPreference: function (key, kwArgs){
+       var deferred = this._transport.getPreference(key, kwArgs);
+       this._addTranslation(deferred, "translateGetPreference");
+       return deferred;
     },
 
-    setPreference: function (key, val){
-       return this._transport.setPreference(key, val, this._translator.keyValToPreference(key, val));
+    setPreference: function (key, val, kwArgs){
+       return this._transport.setPreference(key, val, this._translator.keyValToPreference(key, val), kwArgs);
     },
 
-    removePreference: function (key){
-       return this._transport.removePreference();
+    getPreferences: function (kwArgs){
+       var deferred = this._transport.getPreferences(kwArgs);
+       this._addTranslation(deferred, "translateGetPreferences");
+       return deferred;
     },
     
-    getPreferences: function (){
-       return this._transport.getPreferences();
+    deletePreference: function(key, kwArgs){
+       return this._transport.deletePreference(key, kwArgs);
     },
 
-    setPreferences: function (prefs){
-       return this._transport.getPreferences();
-    },
-    
     _addTranslation: function (deferred, translationFunction, kwArgs){
         deferred.addCallback(
             dojo.lang.hitch(this._translator, function (obj, xhr){

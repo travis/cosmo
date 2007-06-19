@@ -33,7 +33,7 @@ cosmo.service.eim.constants = {
         EVENT: "http://osafoundation.org/eim/event/0",
         TASK: "http://osafoundation.org/eim/task/0",
         MAIL: "http://osafoundation.org/eim/mail/0",
-        MODBY: "http://osafoundation.org/eim/modby/0",
+        MODBY: "http://osafoundation.org/eim/modifiedBy/0",
         OCCURRENCE: "http://osafoundation.org/eim/occurrence/0"
     },
         

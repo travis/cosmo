@@ -969,6 +969,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     addTriageStringToItemProps: function (triageString, props){
+        if (dojo.string.trim(triageString) == "" || triageString == null){
+            props.autoTriage = true;
+            props.triageStatus = null;
+            return;
+        }
         var triageArray = triageString.split(" ");
 
         props.triageStatus = triageArray[0];

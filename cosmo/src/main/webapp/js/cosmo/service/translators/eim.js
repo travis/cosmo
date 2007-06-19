@@ -546,7 +546,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             uuid: this.getUid(note),
             records: records
         };
-        var deletedStamps = note.getDeletedStamps();
+        var deletedStamps = note.getStampsToDelete();
         if (deletedStamps.length > 0){
             recordSet.deletedRecords = deletedStamps;
         }

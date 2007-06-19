@@ -145,7 +145,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
          OCCURRENCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
         
         _stamps: null,
-        _deletedStamps: [],
+        _stampsToDelete: {},
         
         initializer: function(){
             this._stamps = {};
@@ -212,13 +212,9 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
 
         removeStamp: function (/*String*/ stampName){
             delete this._stamps[stampName];
-            this._deletedStamps.push(stampName);
+            this.addStampToDelete(stampName);
         },
-        
-        getDeletedStamps: function(){
-            return this._deletedStamps;  
-        },
-        
+       
         getEventStamp: function (/*Boolean?*/ createIfDoesntExist, /*Object?*/initialProps){
             return this.getStamp("event", createIfDoesntExist, initialProps);
         },
@@ -324,7 +320,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
           }
           return clone;
         },
-
+        
         getItemUid: function () {
             if (this.isMaster()){
                 return this.getUid()
@@ -406,21 +402,25 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
 
     getStamp: function (/*String*/ stampName, /*Boolean*/createIfDoesntExist){
+           var modification = this.getMaster().getModification(this.recurrenceId);
            var ctr = cosmo.model._stampRegistry[stampName]["occurrenceConstructor"];
-           //does the parent have the stamp?
-           if (this.getMaster().getStamp(stampName)){
-               return new ctr(this);
-           } else {
-              var modification = this.getMaster().getModification(this.recurrenceId);
-              if (modification && modification.getModifiedStamps[stampName]){
-                  return new ctr(this);
-              }                               
-           } 
+           var deleted = modification && modification.getDeletedStamps()[stampName];
            
-           if (createIfDoesntExist){
-               return new ctr(this);
-           } else {
-               return null;
+           //does the parent have the stamp?
+           if (!deleted){
+               if (this.getMaster().getStamp(stampName)){
+                   return new ctr(this);
+               } else {
+                  if (modification && modification.getModifiedStamps[stampName]){
+                      return new ctr(this);
+                  }                               
+               } 
+               } else {
+               if (createIfDoesntExist){
+                   return new ctr(this);
+               } else {
+                   return null;
+               }
            }
     }, 
     
@@ -441,7 +441,8 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
     
     removeStamp: function (/*String*/ stampName){
-        throw new Error("remove stamp not implented yet!");
+        
+        this.addStampToDelete(stampName);
     },
 
     getModification: function(/*cosmo.datetime.Date*/ recurrenceId){
@@ -498,6 +499,46 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     
     getAutoTriage: function(){
         return this._getNonInheritableProperty("autoTriage", dojo.lang.hitch(this, function(){return true}))
+    },
+    
+    getStampsToDelete: function(){
+        var mod = _getThisModification();
+        if (mod){
+            return mod.getStampsToDelete();
+        }
+    },
+    
+    addStampToDelete: function(stampName){
+        var mod = _getThisModification();
+        if (!mod){
+            mod = new cosmo.model.Modification({
+                recurrenceId: this.recurrenceId
+            });
+            master.addModification(modification);
+        }
+        mod.addStampToDelete(stampName);
+    },
+    
+    removeStampToDelete: function(stampName){
+        var mod = _getThisModification();
+        if (mod){
+            mod.removeStampToDelete(stampName);
+        }
+    },
+    
+    isStampToBeDeleted: function(stampName){
+        var mod = _getThisModification();
+        if (mod){
+            return mod.isStampToBeDeleted(stampName);
+        }
+        return false;
+    },
+    
+    clearStampsToDelete: function(){
+        var mod = _getThisModification();
+        if (mod){
+            mod.clearStampsToDelete();
+        }
     }
 });
 
@@ -681,7 +722,40 @@ cosmo.model._urlsMixin =  {
       }
 }
 
+cosmo.model._deletedStampsMixin = {
+    _stampsToDelete: {},
+    getStampsToDelete: function(){
+        var array = [];
+        for (var stampName in this._stampsToDelete){
+            if (this._stampsToDelete[stampName]){
+                array.push(stampName);
+            }
+        }
+        
+        return array;    
+    },
+    
+    addStampToDelete: function(stampName){
+       this._stampsToDelete[stampName] = true;  
+    },
+    
+    removeStampToDelete: function(stampName){
+        delete this._stampsToDelete[stampName];
+    },
+    
+    isStampToBeDeleted: function(stampName){
+        return !!this._stampsToDelete(stampName);  
+    },
+    
+    clearStampsToDelete: function(){
+        this._stampsToDelete = {};
+    }
+    
+}
+
 dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._noteStampCommon);
 dojo.lang.mixin(cosmo.model.BaseStamp.prototype, cosmo.model._noteStampCommon);
 dojo.lang.mixin(cosmo.model.Item.prototype, cosmo.model._urlsMixin);
+dojo.lang.mixin(cosmo.model.Item.prototype, cosmo.model._deletedStampsMixin);
 dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._urlsMixin);
+dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._deletedStampsMixin);

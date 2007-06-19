@@ -415,7 +415,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
                       return new ctr(this);
                   }                               
                } 
-               } else {
+           } else {
                if (createIfDoesntExist){
                    return new ctr(this);
                } else {
@@ -756,6 +756,6 @@ cosmo.model._deletedStampsMixin = {
 dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._noteStampCommon);
 dojo.lang.mixin(cosmo.model.BaseStamp.prototype, cosmo.model._noteStampCommon);
 dojo.lang.mixin(cosmo.model.Item.prototype, cosmo.model._urlsMixin);
-dojo.lang.mixin(cosmo.model.Item.prototype, cosmo.model._deletedStampsMixin);
+dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._deletedStampsMixin);
 dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._urlsMixin);
 dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._deletedStampsMixin);

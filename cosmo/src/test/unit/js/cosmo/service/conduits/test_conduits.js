@@ -345,13 +345,17 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertEquals("preference foo wrong in getPreferences", "bar", preferences.foo);
             
             var foo = conduit.getPreference("foo", {sync: true}).results[0];
-            
             jum.assertEquals("preference foo wrong in getPreference", "bar", foo);
+            
+            conduit.setPreference("foo", "baz", {sync: true});
+            
+            foo = conduit.getPreference("foo", {sync: true}).results[0];
+            jum.assertEquals("preference foo wrong in getPreference", "baz", foo);
             
             conduit.deletePreference("foo", {sync: true});
             
             var preferences = conduit.getPreferences({sync: true}).results[0];
-            jum.assertTrue("removePreference failed", dojo.lang.isEmpty(preferences));
+            jum.assertTrue("deletePreference failed", dojo.lang.isEmpty(preferences));
             
     
         } finally {

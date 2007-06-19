@@ -292,12 +292,12 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
            var currentTriageStatus = this.getTriageStatus();
            
            //you can only traige from LATER to NOW
-           if (currentTriageStatus != cosmo.model.TRIAGE_LATER){
+           if (currentTriageStatus && currentTriageStatus != cosmo.model.TRIAGE_LATER){
                return false;
            }
            
            var newTriageStatus = this._getImplicitTriageStatus();
-           if (newTriageStatus != cosmo.model.TRIAGE_LATER){
+           if (newTriageStatus != cosmo.model.TRIAGE_LATER || (!currentTriageStatus)){
                this.setTriageStatus(cosmo.model.TRIAGE_NOW);
                this.setAutoTriage(false);
                return true;

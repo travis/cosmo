@@ -38,6 +38,7 @@ dojo.require('cosmo.view.cal');
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.uri');
 dojo.require('cosmo.service.conduits.common');
+dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
 
 // Global variables for X and Y position for mouse
@@ -105,7 +106,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Do some setup
         // ===============================
         // Create and init the Cosmo service
-        this.serv = cosmo.service.conduits.getAtomPlusEimConduit();
+        this.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.getAtomPlusEimConduit());
         // Localized date strings
         this.loadLocaleDateInfo();
         // Tell the calendar view what week we're on

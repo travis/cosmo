@@ -77,16 +77,16 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
         checkTextField(locationField, FIELD_LOCATION, "here");
 
         EimRecordField rruleField = fields.get(3);
-        checkClobField(rruleField, FIELD_RRULE, null);
+        checkTextField(rruleField, FIELD_RRULE, null);
         
         EimRecordField exruleField = fields.get(4);
-        checkClobField(exruleField, FIELD_EXRULE, null);
+        checkTextField(exruleField, FIELD_EXRULE, null);
         
         EimRecordField rdateField = fields.get(5);
-        checkClobField(rdateField, FIELD_RDATE, null);
+        checkTextField(rdateField, FIELD_RDATE, null);
         
         EimRecordField exdateField = fields.get(6);
-        checkClobField(exdateField, FIELD_EXDATE, null);
+        checkTextField(exdateField, FIELD_EXDATE, null);
         
         EimRecordField statusField = fields.get(7);
         checkTextField(statusField, FIELD_STATUS, "CONFIRMED");
@@ -136,16 +136,16 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
         Assert.assertTrue(locationField.isMissing());
 
         EimRecordField rruleField = fields.get(3);
-        checkClobField(rruleField, FIELD_RRULE, null);
+        checkTextField(rruleField, FIELD_RRULE, null);
         
         EimRecordField exruleField = fields.get(4);
-        checkClobField(exruleField, FIELD_EXRULE, null);
+        checkTextField(exruleField, FIELD_EXRULE, null);
         
         EimRecordField rdateField = fields.get(5);
-        checkClobField(rdateField, FIELD_RDATE, null);
+        checkTextField(rdateField, FIELD_RDATE, null);
         
         EimRecordField exdateField = fields.get(6);
-        checkClobField(exdateField, FIELD_EXDATE, null);
+        checkTextField(exdateField, FIELD_EXDATE, null);
         
         EimRecordField statusField = fields.get(7);
         Assert.assertEquals(FIELD_STATUS, statusField.getName());

@@ -15,15 +15,12 @@
  */
 package org.osaf.cosmo.eim.schema.event;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
@@ -110,18 +107,18 @@ public class EventGenerator extends BaseStampGenerator
         } else {
             record.addField(new TextField(FIELD_LOCATION, stamp.getLocation()));
         }
-
+        
         value = EimValueConverter.fromICalRecurs(stamp.getRecurrenceRules());
-        record.addField(new ClobField(FIELD_RRULE, toReader(value)));
+        record.addField(new TextField(FIELD_RRULE, value));
 
         value = EimValueConverter.fromICalRecurs(stamp.getExceptionRules());
-        record.addField(new ClobField(FIELD_EXRULE, toReader(value)));
+        record.addField(new TextField(FIELD_EXRULE, value));
 
         value = EimValueConverter.fromICalDates(stamp.getRecurrenceDates());
-        record.addField(new ClobField(FIELD_RDATE, toReader(value)));
+        record.addField(new TextField(FIELD_RDATE, value));
 
         value = EimValueConverter.fromICalDates(stamp.getExceptionDates());
-        record.addField(new ClobField(FIELD_EXDATE, toReader(value)));
+        record.addField(new TextField(FIELD_EXDATE, value));
 
         if(isMissingAttribute("status")) {
             record.addField(generateMissingField(new TextField(FIELD_STATUS, null)));
@@ -131,11 +128,8 @@ public class EventGenerator extends BaseStampGenerator
         
         record.addFields(generateUnknownFields());
     }
-
-    private Reader toReader(String value) {
-        return value != null ? new StringReader(value) : null;
-    }
-
+    
+    
     /**
      * Determine if startDate is missing.  The startDate is missing
      * if the startDate is equal to the reucurreceId and the anyTime

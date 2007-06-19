@@ -43,22 +43,22 @@ eventLocation =
 
 eventRRule =
    element event:rrule {
-      eimClobFieldContent
+      eimTextFieldContent
    }
 
 eventExRule =
    element event:exrule {
-      eimClobFieldContent
+      eimTextFieldContent
    }
 
 eventRDate =
    element event:rdate {
-      eimClobFieldContent
+      eimTextFieldContent
    }
 
 eventExDate =
    element event:exdate {
-      eimClobFieldContent
+      eimTextFieldContent
    }
 
 eventStatus =

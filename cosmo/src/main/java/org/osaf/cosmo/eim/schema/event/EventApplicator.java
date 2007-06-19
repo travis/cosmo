@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.eim.schema.event;
 
-import java.io.Reader;
 import java.text.ParseException;
 
 import net.fortuna.ical4j.model.DateTime;
@@ -152,17 +151,19 @@ public class EventApplicator extends BaseStampApplicator
                 event.setLocation(value);
             }
         } else if (field.getName().equals(FIELD_RRULE)) {
-            Reader value = EimFieldValidator.validateClob(field);
+            String value = EimFieldValidator.validateText(field, MAXLEN_RRULE);
             event.setRecurrenceRules(EimValueConverter.toICalRecurs(value));
         } else if (field.getName().equals(FIELD_EXRULE)) {
-            Reader value = EimFieldValidator.validateClob(field);
+            String value =
+                EimFieldValidator.validateText(field, MAXLEN_EXRULE);
             event.setExceptionRules(EimValueConverter.toICalRecurs(value));
         } else if (field.getName().equals(FIELD_RDATE)) {
-            Reader value = EimFieldValidator.validateClob(field);
+            String value = EimFieldValidator.validateText(field, MAXLEN_RDATE);
             ICalDate icd = EimValueConverter.toICalDate(value);
             event.setRecurrenceDates(icd != null ? icd.getDateList() : null);
         } else if (field.getName().equals(FIELD_EXDATE)) {
-            Reader value = EimFieldValidator.validateClob(field);
+            String value =
+                EimFieldValidator.validateText(field, MAXLEN_EXDATE);
             ICalDate icd = EimValueConverter.toICalDate(value);
             event.setExceptionDates(icd != null ? icd.getDateList() : null);
         } else if (field.getName().equals(FIELD_STATUS)) {

@@ -36,11 +36,19 @@ public interface EventConstants {
     /** */
     public static final String FIELD_RRULE = "rrule";
     /** */
+    public static final int MAXLEN_RRULE = 1024 * 32;
+    /** */
     public static final String FIELD_EXRULE = "exrule";
+    /** */
+    public static final int MAXLEN_EXRULE = 1024 * 32;
     /** */
     public static final String FIELD_RDATE = "rdate";
     /** */
+    public static final int MAXLEN_RDATE = 1024 * 32;
+    /** */
     public static final String FIELD_EXDATE = "exdate";
+    /** */
+    public static final int MAXLEN_EXDATE = 1024 *32;
     /** */
     public static final String FIELD_STATUS = "status";
     /** */

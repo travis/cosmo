@@ -435,6 +435,21 @@ public abstract class BaseEventStamp extends Stamp
         setDirty(true);
     }
 
+    /** 
+     * Sets a single iCalendar RRULE property of the event,
+     * removing any RRULEs that were previously set.
+     *
+     * @param recur a <code>Recur</code>
+     */
+    @Transient
+    public void setRecurrenceRule(Recur recur) {
+        if (recur == null)
+            return;
+        ArrayList<Recur> recurs = new ArrayList<Recur>(1);
+        recurs.add(recur);
+        setRecurrenceRules(recurs);
+    }
+
     /**
      * Returns a list of copies of the iCalendar EXRULE property values
      * of the event (can be empty).

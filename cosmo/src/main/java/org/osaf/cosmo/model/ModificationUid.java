@@ -53,7 +53,7 @@ public class ModificationUid {
         this.parentUid = parent.getUid();
         this.recurrenceId = recurrenceId;
     }
-    
+
     /**
      * Construct modification uid from String.
      * @param modUid modification uid

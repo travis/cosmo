@@ -15,6 +15,10 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Recur;
+
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.provider.RequestContext;
@@ -25,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
+import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -103,6 +109,35 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
+    public void testUpdateEntryChangeRecurrenceStart() throws Exception {
+        NoteItem master = makeAndStoreRecurringEvent("20070601T120000");
+        NoteItem mod = makeAndStoreModification(master, "20070603T120000");
+        String oldModUid = mod.getUid();
+
+        String newStart = "20070601T140000";
+        String newModUid = master.getUid() + ":" + newStart;
+        NoteItem copy = updateRecurringEventStartDate(master, newStart);
+        RequestContext req = createRequestContext(master, copy);
+
+        ResponseContext res = provider.updateEntry(req);
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 200, res.getStatus());
+        assertNotNull("Null etag", res.getEntityTag());
+        assertNotNull("Null last modified", res.getLastModified());
+        assertNull("Original modification still stored",
+                   helper.findItem(oldModUid));
+        assertNotNull("Replacement modification not stored",
+                      helper.findItem(newModUid));
+        assertNull("Original modification still known to master",
+                   findModification(master, oldModUid));
+
+        NoteItem replacement = findModification(master, newModUid);
+        assertNotNull("Replacement modification not known to master",
+                      replacement);
+        assertEquals("Master not known to replacement modification", master,
+                     replacement.getModifies());
+    }
+
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -116,7 +151,59 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         MockItemRequestContext rc =
             new MockItemRequestContext(helper.getServiceContext(), original,
                                        "PUT");
-        rc.setContentAsEntry(update.getUid());
+        rc.setPropertiesAsEntry(serialize(update));
         return rc;
+    }
+
+    private NoteItem makeAndStoreRecurringEvent(String start)
+        throws Exception {
+        NoteItem item = helper.makeAndStoreDummyItem();
+        EventStamp stamp = new EventStamp();
+        item.addStamp(stamp);
+        stamp.createCalendar();
+
+        stamp.setStartDate(new DateTime(start));
+        stamp.setDuration(new Dur("PT1H"));
+        stamp.setRecurrenceRule(new Recur("FREQ=DAILY;COUNT=5"));
+
+        return item;
+    }
+
+    private NoteItem makeAndStoreModification(NoteItem master,
+                                              String recurrenceId)
+        throws Exception {
+        NoteItem item = helper.makeAndStoreDummyItem();
+        master.getModifications().add(item);
+        item.setModifies(master);
+
+        EventExceptionStamp stamp = new EventExceptionStamp();
+        item.addStamp(stamp);
+        stamp.createCalendar();
+
+        stamp.setRecurrenceId(new DateTime(recurrenceId));
+        stamp.setSummary("this is an exception");
+
+        return item;
+    }
+
+    private NoteItem updateRecurringEventStartDate(NoteItem master,
+                                                   String start)
+        throws Exception {
+        NoteItem copy = (NoteItem) master.copy();
+        copy.setUid(master.getUid());
+
+        EventStamp stamp = EventStamp.getStamp(copy);
+        stamp.setStartDate(new DateTime(start));
+
+        return copy;
+    }
+
+    private NoteItem findModification(NoteItem master,
+                                      String uid) {
+        for (NoteItem mod : master.getModifications()) {
+            if (mod.getUid().equals(uid))
+                return mod;
+        }
+        return null;
     }
 }

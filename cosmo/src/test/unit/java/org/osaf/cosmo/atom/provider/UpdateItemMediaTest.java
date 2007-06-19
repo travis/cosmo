@@ -95,7 +95,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         MockItemRequestContext rc =
             new MockItemRequestContext(helper.getServiceContext(), original,
                                        "PUT");
-        rc.setContentAsText(update.getUid());
+        rc.setPropertiesAsText(serialize(update));
         return rc;
     }
 }

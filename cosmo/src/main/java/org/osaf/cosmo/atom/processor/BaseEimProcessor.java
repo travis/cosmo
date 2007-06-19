@@ -82,7 +82,7 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
                                NoteItem item)
         throws ValidationException, ProcessorException {
         EimRecordSet recordset = readRecordSet(content);
- 
+
         try {
             ItemTranslator translator = new ItemTranslator(item);
             translator.applyRecords(recordset);

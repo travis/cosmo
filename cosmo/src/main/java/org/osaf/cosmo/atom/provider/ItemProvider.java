@@ -19,6 +19,8 @@ import net.fortuna.ical4j.model.TimeZone;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.activation.MimeTypeParseException;
 
@@ -49,7 +51,9 @@ import org.osaf.cosmo.atom.processor.UnsupportedMediaTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.filter.EventStampFilter;
@@ -182,8 +186,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             // XXX: does abdera automatically resolve external content?
             Entry entry = (Entry) request.getDocument().getRoot();
             ContentProcessor processor = createContentProcessor(entry);
-            processor.processContent(entry.getContent(), item);
-            item = (NoteItem) contentService.updateItem(item);
+            item = processEntryUpdate(processor, entry, item);
 
             target = new ItemTarget(request, item, PROJECTION_FULL, null);
             ServiceLocator locator = createServiceLocator(request);
@@ -507,5 +510,61 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         itemFilter.getStampFilters().add(eventFilter);
 
         return itemFilter;
+    }
+
+    private NoteItem processEntryUpdate(ContentProcessor processor,
+                                        Entry entry,
+                                        NoteItem item)
+        throws ValidationException, ProcessorException {
+        EventStamp es = EventStamp.getStamp(item);
+        net.fortuna.ical4j.model.Date oldstart =
+            es != null && es.isRecurring() ? es.getStartDate() : null;
+
+        processor.processContent(entry.getContent(), item);
+        item = (NoteItem) contentService.updateItem(item);
+
+        if (oldstart != null) {
+            net.fortuna.ical4j.model.Date newstart = es.getStartDate();
+            if (newstart != null && ! newstart.equals(oldstart)) {
+                if (log.isDebugEnabled())
+                    log.debug("master event start date changed - replacing modifications");
+
+                HashSet<NoteItem> copies = new HashSet<NoteItem>();
+                HashSet<NoteItem> removals = new HashSet<NoteItem>();
+
+                // copy each modification and update the copy's uid
+                // with the new start date
+                Iterator<NoteItem> mi = item.getModifications().iterator();
+                while (mi.hasNext()) {
+                    NoteItem mod = mi.next();
+                    removals.add(mod);
+
+                    NoteItem copy = (NoteItem) mod.copy();
+                    copy.setUid(new ModificationUid(item, newstart).toString());
+                    copies.add(copy);
+                }
+
+                // remove the old mods from each of their collections,
+                // leaving tombstones behind
+                for (NoteItem mod : removals) {
+                    for (CollectionItem parent : mod.getParents())
+                        contentService.removeItemFromCollection(mod, parent);
+                }
+
+                // add the replacement mods to each of the master's
+                // collections
+                for (NoteItem mod : copies) {
+                    mod.setModifies(item);
+                    item.getModifications().add(mod);
+
+                    Iterator<CollectionItem> pi = item.getParents().iterator();
+                    contentService.createContent(pi.next(), mod);
+                    while (pi.hasNext())
+                        contentService.addItemToCollection(mod, pi.next());
+                }
+            }
+        }
+
+        return item;
     }
 }

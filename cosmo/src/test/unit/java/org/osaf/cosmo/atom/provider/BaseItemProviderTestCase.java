@@ -15,8 +15,13 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Base class for for {@link ItemProvider} tests.
@@ -30,5 +35,17 @@ public abstract class BaseItemProviderTestCase extends BaseProviderTestCase {
         provider.setProcessorFactory(helper.getProcessorFactory());
         provider.setContentService(helper.getContentService());
         return provider;
+    }
+
+    protected Properties serialize(NoteItem item) {
+        Properties props = new Properties();
+
+        props.setProperty("uid", item.getUid());
+
+        EventStamp es = EventStamp.getStamp(item);
+        if (es != null)
+            props.setProperty("startDate", es.getStartDate().toString());
+
+        return props;
     }
 }

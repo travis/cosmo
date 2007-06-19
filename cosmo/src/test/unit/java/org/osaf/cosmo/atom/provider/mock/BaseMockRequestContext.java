@@ -15,7 +15,9 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
@@ -60,6 +62,22 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         getMockRequest().setContent(xml.getBytes());
         getMockRequest().setContentType(ATOM_MEDIA_TYPE);
         getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);
+    }
+
+    public void setPropertiesAsEntry(Properties props)
+        throws IOException {
+        Entry entry = context.getAbdera().getFactory().newEntry();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        props.store(out, null);
+        entry.setContent(out.toString());
+        setContent(entry);
+    }
+
+    public void setPropertiesAsText(Properties props)
+        throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        props.store(out, null);
+        setContentAsText(out.toString());
     }
 
     public void setContentAsEntry(String content)

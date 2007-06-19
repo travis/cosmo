@@ -132,7 +132,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         MockCollectionRequestContext rc =
             new MockCollectionRequestContext(helper.getServiceContext(),
                                              collection, "POST");
-        rc.setContentAsEntry(item.getUid());
+        rc.setPropertiesAsEntry(serialize(item));
         return rc;
     }
 }

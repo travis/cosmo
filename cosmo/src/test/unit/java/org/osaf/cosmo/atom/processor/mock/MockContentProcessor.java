@@ -15,7 +15,11 @@
  */
 package org.osaf.cosmo.atom.processor.mock;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.Reader;
+import java.text.ParseException;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -25,6 +29,7 @@ import org.osaf.cosmo.atom.processor.BaseContentProcessor;
 import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -59,18 +64,13 @@ public class MockContentProcessor extends BaseContentProcessor {
         if (factory.isFailureMode())
             throw new ProcessorException("Failure mode");
 
-        try {
-            String uid = IOUtils.toString(content);
+        NoteItem item = new NoteItem();
+        item.setOwner(collection.getOwner());
+        setItemProperties(content, item);
+        if (item.getName() == null)
+            item.setName(item.getUid());
 
-            NoteItem child = new NoteItem();
-            child.setUid(uid);
-            child.setName(uid);
-            child.setOwner(collection.getOwner());
-
-            return child;
-        } catch (Exception e) {
-            throw new ProcessorException("Cannot create child item", e);
-        }
+        return item;
     }
 
     /**
@@ -92,14 +92,42 @@ public class MockContentProcessor extends BaseContentProcessor {
         if (factory.isFailureMode())
             throw new ProcessorException("Failure mode");
 
+        setItemProperties(content, item);
+    }
+
+    private void setItemProperties(Reader content,
+                                   NoteItem item)
+        throws ValidationException, ProcessorException {
+        Properties props = new Properties();
+
         try {
-            String uid = IOUtils.toString(content);
+            ByteArrayInputStream in =
+                new ByteArrayInputStream(IOUtils.toByteArray(content));
+            props.load(in);
+            in.close();
+        } catch (IOException e) {
+            throw new ProcessorException("Could not read properties", e);
+        }
 
-            log.error("updating item " + item.getUid() + " with new uid " + uid);
+        String uid = props.getProperty("uid");
+        if (uid == null)
+            throw new ProcessorException("Uid not found in content");
+        item.setUid(uid);
 
-            item.setUid(uid);
-        } catch (Exception e) {
-            throw new ProcessorException("Cannot create child item", e);
+        EventStamp es = EventStamp.getStamp(item);
+        if (es != null) {
+            String startDate = props.getProperty("startDate");
+            if (startDate != null)
+                es.setStartDate(parseDateTime(startDate));
+        }
+    }
+
+    private net.fortuna.ical4j.model.DateTime parseDateTime(String str)
+        throws ValidationException {
+        try {
+            return new net.fortuna.ical4j.model.DateTime(str);
+        } catch (ParseException e) {
+            throw new ValidationException("Could not parse date " + str, e);
         }
     }
 }

@@ -49,11 +49,11 @@ yPos = 0;
  * @object The Cal singleton
  */
 cosmo.app.pim = dojo.lang.mixin(new function () {
-    
+
     var self = this;
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
-    // Available views 
+    // Available views
     this.views = {
         LIST: 'list',
         CAL: 'cal'
@@ -63,7 +63,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     // The base layout for the PIM -- cosmo.ui.ContentBox obj
     this.baseLayout = null;
     // The currently selected view -- list or cal
-    this.currentView = this.views.LIST;
+    this.currentView = this.views.CAL;
 
     // For calculating UI element positions
     this.top = 0;
@@ -228,7 +228,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Load/create calendar to view
         // --------------
         // If we received a ticket, just grab the specified collection
-        
+
         // Uid of the first calendar to select.
         var selectUid;
         if (collectionUrl) {

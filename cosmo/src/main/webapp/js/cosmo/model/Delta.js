@@ -192,7 +192,7 @@ dojo.declare("cosmo.model.Delta", null, {
     
     applyToMaster: function(){
         this._apply("master");
-        if (this._needsAutoTriage()){
+        if (!this._note.hasRecurrence() &&this._needsAutoTriage()){
             this._note.autoTriage();
         }
     },

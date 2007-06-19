@@ -35,6 +35,9 @@ cosmo.ui.navbar.Bar = function (p) {
     this.id = '';
     this.width = 0;
     this.monthHeader = null;
+    this.listViewPager = null;
+    this.listViewPageNum = null;
+
     for (var n in params) { this[n] = params[n]; }
 
     // Subscribe to the '/calEvent' channel
@@ -50,6 +53,9 @@ cosmo.ui.navbar.Bar = function (p) {
         if (_pim.currentView == _pim.views.CAL) {
             this._addCalViewNav();
             this._showMonthHeader();
+        }
+        else if (_pim.currentView == _pim.views.LIST) {
+            this._showListPager();
         }
         // Break the float of the different NavBar items
         var t = _createElem('div');
@@ -166,7 +172,7 @@ cosmo.ui.navbar.Bar = function (p) {
         t.appendChild(table);
         d.appendChild(t);
     };
-    this._showMonthHeader = function() {
+    this._showMonthHeader = function () {
         var vS = cosmo.view.cal.viewStart;
         var vE =  cosmo.view.cal.viewEnd;
         var mS = vS.getMonth();
@@ -193,7 +199,37 @@ cosmo.ui.navbar.Bar = function (p) {
         }
         headerDiv.appendChild(document.createTextNode(str));
     };
-
+    this._showListPager = function () {
+        var f = function (e) {
+            if (e && e.target && e.target.id) {
+                var str = e.target.id.replace('listViewGo', '');
+                var listCanvas = cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas;
+                listCanvas['go' + str + 'Page']();
+            }
+        }
+        var listCanvas = {};
+        var d = this.domNode;
+        var t = _createElem('div');
+        t.className = 'floatRight';
+        t.style.paddingRight = '12px';
+        var a = _createElem('a');
+        a.id = 'listViewGoPrev';
+        a.innerHTML = '[prev]';
+        dojo.event.connect(a, 'onclick', f);
+        t.appendChild(a);
+        var s = _createElem('span');
+        s.id = 'listViewPageNum';
+        s.innerHTML = '&nbsp;';
+        this.listViewPageNum = s;
+        t.appendChild(s);
+        var a = _createElem('a');
+        a.id = 'listViewGoNext';
+        a.innerHTML = '[next]';
+        dojo.event.connect(a, 'onclick', f);
+        t.appendChild(a);
+        d.appendChild(t);
+        this.listViewPager = t;
+    };
 }
 
 cosmo.ui.navbar.Bar.prototype = new cosmo.ui.ContentBox();

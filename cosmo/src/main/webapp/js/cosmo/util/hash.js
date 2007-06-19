@@ -170,8 +170,13 @@ cosmo.util.hash.Hash = function () {
     this.end = function () {
         this.cursorPos = (this.length-1);
     };
-    this.each = function (func) {
-        for (var i = 0; i < this.order.length; i++) {
+    this.each = function (func, o) {
+        var opts = o || {};
+        var len = this.order.length;
+        var start = opts.start ? opts.start : 0;
+        var ceiling = opts.items ? (start + opts.items) : len;
+        ceiling = (ceiling > len) ? len : ceiling;
+        for (var i = start; i < ceiling; i++) {
             var key = this.order[i];
             var val = this.items[key];
             func(key, val);

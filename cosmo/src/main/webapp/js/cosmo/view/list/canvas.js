@@ -34,6 +34,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.currSelectedItem = null;
     this.currSortCol = 'Title';
     this.currSortDir = 'Desc';
+    this.itemsPerPage = 5;
+    this.itemCount = 0;
+    this.pageCount = 0;
+    this.currPageNum = 1;
 
     for (var n in params) { this[n] = params[n]; }
 
@@ -45,7 +49,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this.setSize();
 
         cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
-        this._displayTable(reg);
+        this.displayTable();
         if (this.currSelectedItem) {
             cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.updateFromItem(
                 this.currSelectedItem);
@@ -109,35 +113,32 @@ cosmo.view.list.canvas.Canvas = function (p) {
             }
         }
     };
-
-    // Private methods
-    this._updateSize = function () {
-        if (this.parent) {
-            this.width = this.parent.width - 2; // 2px for borders
-            this.height = this.parent.height - CAL_TOP_NAV_HEIGHT;
-        }
-    };
     // innerHTML will be much faster for table display with
     // lots of rows
-    this._displayTable = function (hash) {
+    this.displayTable = function () {
+        var _list = cosmo.view.list;
+        var hash = _list.itemRegistry;
         var map = cosmo.view.list.triageStatusCodeNumberMappings;
         var t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">';
         var r = '';
         r += '<tr>';
         r += '<td id="listViewTaskHeader" class="listViewHeaderCell" style="width: 24px;">&nbsp;</td>';
         r += '<td id="listViewTitleHeader" class="listViewHeaderCell">Title</td>';
+        r += '<td id="listViewWhoHeader" class="listViewHeaderCell">Updated By</td>';
         r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">Starts On</td>';
         r += '<td id="listViewTriageHeader" class="listViewHeaderCell" style="border-right: 0px;">Triage</td>';
         r += '</tr>';
         t += r;
         var getRow = function (key, val) {
             var item = val.data;
+            //console.log(item);
             var uid = item.getItemUid();
             var selCss = 'listView_item' + uid == self.currSelectedId ? ' listViewSelectedCell' : '';
             var eventStamp = item.getEventStamp();
             var start = eventStamp ? eventStamp.getStartDate() : '';
             var triage = item.getTriageStatus();
             var task = item.getTaskStamp() ? '[x]' : '';
+            var updatedBy = '';
             if (start) {
                 start = start.strftime('%b %d, %Y %I:%M%p');
             }
@@ -146,18 +147,50 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<tr id="listView_item'  + item.getUid() +'">';
             r += '<td class="listViewDataCell' + selCss + '" style="text-align: center;">' + task + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + item.getDisplayName() + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + updatedBy + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + start + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + triage + '</td>';
             r += '</tr>';
             t += r;
         }
-        hash.each(getRow);
+
+        var size = this.itemsPerPage;
+        var st = (this.currPageNum * size) - size;
+        hash.each(getRow, { start: st, items: size });
+
         t += '</table>';
         this.domNode.innerHTML = t;
+
         // Attach event listeners -- event will be delagated by row
         dojo.event.connect($('listViewTable'), 'onmouseover', this, 'handleMouseOver');
         dojo.event.connect($('listViewTable'), 'onmouseout', this, 'handleMouseOut');
         dojo.event.connect($('listViewTable'), 'onclick', this, 'handleClick');
+    };
+    this.initListProps = function () {
+        var items = cosmo.view.list.itemRegistry.length;
+        var pages = parseInt(items/this.itemsPerPage);
+        if (items % this.itemsPerPage > 0) {
+            pages++;
+        }
+        this.itemCount =  items;
+        this.pageCount = pages;
+    };
+    this.goNextPage = function () {
+        self.currPageNum++;
+        self.render();
+    };
+    this.goPrevPage = function () {
+        self.currPageNum--;
+        self.render();
+    };
+
+
+    // Private methods
+    this._updateSize = function () {
+        if (this.parent) {
+            this.width = this.parent.width - 2; // 2px for borders
+            this.height = this.parent.height - CAL_TOP_NAV_HEIGHT;
+        }
     };
     this._setSort = function (id) {
         var s = id.replace('listView', '').replace('Header', '');
@@ -168,10 +201,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
         else {
             this.currSortDir = cosmo.view.list.sort.defaultDirections[s.toUpperCase()];
         }
+
+        this.currPageNum = 1;
         this.currSortCol = s;
         cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
-        this._displayTable(reg);
+        this.displayTable();
     };
+
 };
 
 cosmo.view.list.canvas.Canvas.prototype =

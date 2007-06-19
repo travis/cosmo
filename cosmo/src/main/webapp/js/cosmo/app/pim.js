@@ -62,7 +62,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     // The base layout for the PIM -- cosmo.ui.ContentBox obj
     this.baseLayout = null;
     // The currently selected view -- list or cal
-    this.currentView = this.views.CAL;
+    this.currentView = this.views.LIST;
 
     // For calculating UI element positions
     this.top = 0;

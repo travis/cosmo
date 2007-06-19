@@ -33,91 +33,116 @@ cosmo.view.list.sort.doSort = function (hash, col, dir) {
 };
 cosmo.view.list.sort.defaultDirections = {
     TASK: 'Asc',
+    WHO: 'Desc',
     TITLE: 'Desc',
     STARTDATE: 'Desc',
     TRIAGE: 'Desc'
 };
 cosmo.view.list.sort.sorts = {
     sortTaskDesc: function (a, b) {
-        var getTask = function (o) {
-            return o.data.getTaskStamp() ? 1 : 0;
-        }
-        if (getTask(a) > getTask(b)) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
+        return cosmo.view.list.sort.sorts.sortTask(a, b);
     },
     sortTaskAsc: function (a, b) {
+        return cosmo.view.list.sort.sorts.sortTask(b, a);
+    },
+    sortTask: function (a, b) {
         var getTask = function (o) {
             return o.data.getTaskStamp() ? 1 : 0;
         }
-        if (getTask(a) < getTask(b)) {
+        var valA = getTask(a);
+        var valB = getTask(b);
+        if (valA > valB) {
             return 1;
         }
-        else {
+        else if (valA < valB) {
             return -1;
+        }
+        // Secondary sort on Title
+        else {
+            return cosmo.view.list.sort.sorts.sortTitleDesc(a, b);
         }
     },
     sortTitleDesc: function (a, b) {
-        if (a.data.getDisplayName() > b.data.getDisplayName()) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
+        return cosmo.view.list.sort.sorts.sortTitle(a, b);
     },
     sortTitleAsc: function (a, b) {
-        if (a.data.getDisplayName() < b.data.getDisplayName()) {
+        return cosmo.view.list.sort.sorts.sortTitle(b, a);
+    },
+    sortTitle: function (a, b) {
+        var valA = a.data.getDisplayName();
+        var valB = b.data.getDisplayName();
+        if (valA > valB) {
             return 1;
         }
-        else {
+        else if (valA < valB) {
             return -1;
         }
+        // Secondary sort -- doesn't have to be the UID, but
+        // if you're going to change it to something else,
+        // do the code inline here -- don't use a function
+        // that falls back to sorting on Title; you'll end up
+        // in an endless loop if the item has identical values
+        // for both columns
+        else {
+            if (a.data.getItemUid() > b.data.getItemUid()) {
+                return 1;
+            }
+            else {
+                return -1;
+            }
+        }
+    },
+    sortWhoDesc: function (a, b) {
+    },
+    sortWhoAsc: function (a, b) {
+    },
+    sortWho: function (a, b) {
+
     },
     sortStartDateDesc: function (a, b) {
-        var getDt = function (o) {
-            var st = o.data.getEventStamp();
-            var dt = st ? st.getStartDate().getTime() : 0;
-            return dt;
-        }
-        if (getDt(a) > getDt(b)) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
+        return cosmo.view.list.sort.sorts.sortStartDate(a, b);
     },
     sortStartDateAsc: function (a, b) {
+        return cosmo.view.list.sort.sorts.sortStartDate(b, a);
+    },
+    sortStartDate: function (a, b) {
         var getDt = function (o) {
             var st = o.data.getEventStamp();
             var dt = st ? st.getStartDate().getTime() : 0;
             return dt;
         }
-        if (getDt(a) < getDt(b)) {
+        var valA = getDt(a);
+        var valB = getDt(b);
+        if (valA > valB) {
             return 1;
         }
-        else {
+        else if (valA < valB) {
             return -1;
+        }
+        // Secondary sort on Title
+        else {
+            return cosmo.view.list.sort.sorts.sortTitleDesc(a, b);
         }
     },
     sortTriageDesc: function (a, b) {
-        if (a.data.getTriageStatus() > b.data.getTriageStatus()) {
-            return 1;
-        }
-        else {
-            return -1;
-        }
+        return cosmo.view.list.sort.sorts.sortTriage(a, b);
     },
     sortTriageAsc: function (a, b) {
-        if (a.data.getTriageStatus() < b.data.getTriageStatus()) {
+        return cosmo.view.list.sort.sorts.sortTriage(b, a);
+    },
+    sortTriage: function (a, b) {
+        var valA = a.data.getTriageStatus();
+        var valB = b.data.getTriageStatus();
+        if (valA > valB) {
             return 1;
         }
-        else {
+        else if (valA < valB) {
             return -1;
         }
-    }
+        // Secondary sort on Title
+        else {
+            return cosmo.view.list.sort.sorts.sortTitleDesc(a, b);
+        }
+    },
 }
-
 

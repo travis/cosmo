@@ -25,6 +25,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
 
+
 // The list of items
 cosmo.view.list.itemRegistry = null;
 
@@ -95,7 +96,9 @@ cosmo.view.list.loadItems = function (o) {
     cosmo.view.list.itemRegistry = itemLoadHash;
     // This could be done with topics to avoid the explicit
     // dependency, but would be slower
-    cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas.render();
+    listCanvas = cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas;
+    listCanvas.initListProps();
+    listCanvas.render();
     return true;
 };
 
@@ -131,4 +134,5 @@ cosmo.view.list.createItemRegistry = function (arrParam, statusParam) {
     }
     return h;
 };
+
 

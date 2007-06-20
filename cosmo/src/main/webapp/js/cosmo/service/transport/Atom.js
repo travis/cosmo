@@ -68,7 +68,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         
         var r = {};
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/user/" + cosmo.util.auth.getUsername();
+            "/atom/user/" + cosmo.util.auth.getUsername();
         
         return this.bind(r, kwArgs);
     },
@@ -100,18 +100,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         now: "dashboard-now",
         later: "dashboard-later",
         done: "dashboard-done"  
-    },
-    
-    getNowItems: function(collection, kwArgs){
-        return this.getItems(collection, {triage: "now"}, kwArgs);
-    },
-    
-    getLaterItems: function(collection, kwArgs){
-        return this.getItems(collection, {triage: "later"}, kwArgs);
-    },
-    
-    getDoneItems: function(collection, kwArgs){
-        return this.getItems(collection, {triage: "done"}, kwArgs);
     },
     
     getItems: function (collection, searchCrit, kwArgs){
@@ -202,6 +190,31 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "POST";
+        
+        return this.bind(r, kwArgs);
+    },
+
+    saveSubscription: function(subscription, postContent, kwArgs){
+        kwArgs = kwArgs || {};
+
+        var r = {};
+        r.url = cosmo.env.getBaseUrl() + "/atom/user/" + 
+            cosmo.util.auth.getUsername() + "/subscribed/" + subscription.getDisplayName();
+        r.contentType = "application/atom+xml";
+        r.postContent = postContent;
+        r.method = "PUT";
+        
+        return this.bind(r, kwArgs);
+    },
+    
+    saveCollection: function(collection, postContent, kwArgs){
+        kwArgs = kwArgs || {};
+
+        var r = {};
+        r.url = cosmo.env.getBaseUrl() + "/atom/" + collection.getUrls()[this.EDIT_LINK];
+        r.contentType = "application/x-www-form-urlencoded";
+        r.postContent = postContent;
+        r.method = "PUT";
         
         return this.bind(r, kwArgs);
     },

@@ -101,12 +101,61 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         //TODO: do topic notifications
         return deferred;
     },
+    
+    saveCollection: function(collection, kwArgs){
+       if (collection instanceof cosmo.model.Subscription){
+           return this._transport.saveSubscription(collection, this._translator.subscriptionToAtomEntry(collection), kwArgs);
+       } else {
+           return this._transport.saveCollection(collection, this._translator.collectionToSaveRepresentation(collection), kwArgs);
+       }
+    },
+    
+    getDashboardItems: function(collection, kwArgs){
+        var entries = [];
+        var addEntriesCallback = function (partialEntries){
+            for (var i = 0; i < partialEntries.length; i++){
+                entries.push(partialEntries[i]);
+            }
+        }
+        var deferred = new dojo.Deferred();
+        
+        var dNow = this._transport.getItems(collection, {triage: "now"}, kwArgs)
+        this._addTranslation(dNow, "translateGetDashboardItems");
+        dNow.addCallback(addEntriesCallback);
+        deferred.addCallback(dojo.lang.hitch(this, function () {
+            return dNow;
+        }));
+        
+        var dLater = this._transport.getItems(collection, {triage: "later"}, kwArgs)
+        this._addTranslation(dLater, "translateGetDashboardItems");
+        dLater.addCallback(addEntriesCallback);
+        deferred.addCallback(dojo.lang.hitch(this, function () {
+            return dLater;
+        }));
+        
+        var dDone = this._transport.getItems(collection, {triage: "done"}, kwArgs)
+        this._addTranslation(dDone, "translateGetDashboardItems");
+        dDone.addCallback(addEntriesCallback);
+        deferred.addCallback(dojo.lang.hitch(this, function () {
+            return dDone;
+        }));
+        
+        deferred.addCallback(dojo.lang.hitch(this, function(){
+            return this._translator.entriesToItems(entries);
+        }));
+
+        deferred.addErrback(function (e, xhr){
+            dojo.debug("Translation error:")
+            dojo.debug(e);
+            return e;
+        });
+        
+        deferred.callback();
+        return deferred;
+    },
 
     getItems: function (collection, searchCriteria, kwArgs){
         kwArgs = kwArgs || {};
-        if (collection.getTicketKey){
-            kwArgs.ticketKey = collection.getTicketKey();
-        }
         var deferred = this._transport.getItems(collection, searchCriteria, kwArgs);
         
         this._addTranslation(deferred, "translateGetItems");

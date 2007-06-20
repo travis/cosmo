@@ -276,6 +276,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
         var entries = atomXml.getElementsByTagName("entry");
+        return this.entriesToItems(entries);
+    },
+    
+    translateGetDashboardItems: function (atomXml){
+        if (!atomXml){
+            throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
+        }
+        return atomXml.getElementsByTagName("entry");
+    },
+    
+    entriesToItems: function(entries){
         var items = {};
         var mods = {};
         for (var i = 0; i < entries.length; i++){
@@ -312,7 +323,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         return itemArray;
     },
-    
+
     entryToItem: function (/*XMLElement*/entry, /*cosmo.model.Item*/ masterItem, kwArgs){
             var uuid = this.getEntryUuid(entry);
             var uuidParts = uuid.split(":");
@@ -462,6 +473,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
           '</div>',
          '</content>',
          '</entry>'].join("");
+    },
+    
+    collectionToSaveRepresentation: function(collection){
+        return "name=" + escape(collection.getDisplayName());
     },
     
     keyValToPreference: function(key, val){

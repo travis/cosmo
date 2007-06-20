@@ -139,11 +139,8 @@ cosmotest.service.conduits.test_conduits = {
             );
             
             conduit.createItem(doneItem, c0, {sync: true});
-            
-            items = conduit.getItems(c0, {triage: "now"}, {sync: true}).results[0];
-            items = conduit.getItems(c0, {triage: "later"}, {sync: true}).results[0];
-            items = conduit.getItems(c0, {triage: "done"}, {sync: true}).results[0];
-            
+                      
+            items = conduit.getDashboardItems(c0, {sync: true})//.results[0];
             
         }
         finally{
@@ -362,6 +359,27 @@ cosmotest.service.conduits.test_conduits = {
            cosmotest.service.conduits.test_conduits.cleanup(user);            
         }
     },
+    
+    test_Collections: function(){
+        try {
+            var user = cosmotest.service.conduits.test_conduits.createTestAccount();
+            
+            var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
+            
+            var c0 = conduit.getCollections({sync: true}).results[0][0];
+            c0.getUid(); // do lazy loading, TODO: we should be wrapping setters too
+            c0.setDisplayName("foobar");
+            
+            conduit.saveCollection(c0, {sync: true});
+            
+            c0 = conduit.getCollections({sync: true}).results[0][0];
+            jum.assertEquals("collection name didn't save", "foobar", c0.getDisplayName())
+    
+        } finally {
+           cosmotest.service.conduits.test_conduits.cleanup(user);            
+        }
+    },
+    
     createTestAccount: function(){
        cosmo.util.auth.clearAuth();
        var user = {

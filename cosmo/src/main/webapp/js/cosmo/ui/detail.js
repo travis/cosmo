@@ -60,9 +60,21 @@ cosmo.ui.detail = new function () {
         return d;
     };
     
+    
+/*    this.getStampForm = function(stampName){
+        //summary: returns the form object for the given stamp name
+        stampName = stampName.toLowerCase();
+        return cosmo.app.pim.baseLayout.mainApp.rightSidebar
+                   .detailViewForm.[stampName +"Section"].formSection.formNode;
+    }*/
+    
+    this.getMainForm = function(){
+        return cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.mainSection.formNode;
+    }
+    
     this.createDelta = function(){
         
-    };shh
+    };
 };
 
 cosmo.ui.detail.StampFormElemState = function (p) {

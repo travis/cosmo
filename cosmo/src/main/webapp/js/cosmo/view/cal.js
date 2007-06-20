@@ -77,7 +77,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                 size++;
             }
         }
-        
+
         //only one type of change
         if (size == 1){
             delta.applyChangeType(change);
@@ -86,7 +86,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
           cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm', {changeTypes:changeTypes, delta:delta, saveItem:ev}));
         }
     }
-    
+
     /**
      * Called for after passthrough from saveEventChangesConfirm. Routes to
      * the right save operation (i.e., for recurring events, 'All Future,'
@@ -104,7 +104,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         // setTimeout to allow the 'processing ...' state to
         // display
         var f = null;
-        
+
         // A second function object used as a callback from
         // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
@@ -127,8 +127,8 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                     dojo.debug("ALL_EVENTS");
                     delta.applyToMaster();
                     f = function(){
-                        doSaveEvent(ev, 
-                         { 
+                        doSaveEvent(ev,
+                         {
                             'saveType': opts.ALL_EVENTS,
                             'delta': delta
                          });
@@ -139,13 +139,13 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                 case opts.ALL_FUTURE_EVENTS:
                     dojo.debug("ALL_FUTURE");
                     var newItem  = delta.applyToOccurrenceAndFuture();
-                    f = function () { 
-                        doSaveEvent(ev, 
-                        { 
+                    f = function () {
+                        doSaveEvent(ev,
+                        {
                           'saveType': opts.ALL_FUTURE_EVENTS,
                           'delta': delta,
-                          'newItem': newItem 
-                        }); 
+                          'newItem': newItem
+                        });
                     };
                     break;
 
@@ -157,19 +157,19 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                     var master = note.getMaster();
                     var newModification = false;
                     if (!master.getModification(recurrenceId)){
-                         newModification = true;    
+                         newModification = true;
                     }
                     delta.applyToOccurrence();
-                    f = function () { 
-                        doSaveEvent(ev, 
-                        { 
+                    f = function () {
+                        doSaveEvent(ev,
+                        {
                           'saveType': opts.ONLY_THIS_EVENT,
                           'delta': delta,
                           'newModification': newModification
-                        }); 
+                        });
                     };
                     break;
-                    
+
                 case 'new':
                     dojo.debug("doSaveChanges: new")
                     f = function () { doSaveEvent(ev, { 'new': true } ) };
@@ -225,33 +225,33 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
                         createItem(newItem, cosmo.app.pim.currentCollection);
                     var requestId = newItemDeferred.id;
                     self.processingQueue.push(requestId);
-                    
+
                     newItemDeferred.addCallback(function(){
                         dojo.debug("in newItemDeferred call back")
                         if (newItemDeferred.results[1] != null){
-                            //if there was an error, pass it to handleSaveEvent, with the original 
+                            //if there was an error, pass it to handleSaveEvent, with the original
                             //item
                             handleSaveEvent(ev, newItemDeferred.results[1], requestId,opts.saveType, delta);
                         } else {
                             //get rid of the id from the processing queue
                             self.processingQueue.shift()
 
-                            //success at saving new item (the one broken off from the original recurrence chain! 
+                            //success at saving new item (the one broken off from the original recurrence chain!
                             // Now let's save the original.
                             var originalDeferred = cosmo.app.pim.serv.saveItem(note.getMaster());
                             originalDeferred.addCallback(function(){
                                 handleSaveEvent(ev,
-                                    originalDeferred.results[1], 
-                                    originalDeferred.id, 
-                                    opts.saveType, 
+                                    originalDeferred.results[1],
+                                    originalDeferred.id,
+                                    opts.saveType,
                                     delta,
-                                    newItem); 
+                                    newItem);
                             });
                             self.processingQueue.push(originalDeferred.id);
                             self.lastSent = ev;
                         }
                     });
-                    
+
                     dojo.debug("about to save note in ALL FUTURE EVENTS")
                     return;
                 case OPTIONS.ONLY_THIS_EVENT:
@@ -272,12 +272,12 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var f = function () {
             var saveType = isNew ? "new" : opts.saveType;
             dojo.debug("callback: saveType="+ saveType)
-            handleSaveEvent(ev, deferred.results[1], deferred.id, saveType, delta); 
+            handleSaveEvent(ev, deferred.results[1], deferred.id, saveType, delta);
         };
-        
+
         deferred.addCallback(f);
         requestId = deferred.id;
-        
+
         // Add to processing queue -- canvas will not re-render until
         // queue is empty
         self.processingQueue.push(requestId);
@@ -613,9 +613,9 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         // RecurrenceRule to all the other instances on the canvas
         if (syncRecurrence(rruleEv)) {
             // Broadcast success
-            dojo.event.topic.publish('/calEvent', 
+            dojo.event.topic.publish('/calEvent',
                 { 'action': act,
-                'data': rruleEv, 'opts': opts, 'qualifier': qual 
+                'data': rruleEv, 'opts': opts, 'qualifier': qual
                 });
         }
     }
@@ -686,9 +686,9 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * how to handle the published event.
      */
     this.handlePub_calEvent = function (cmd) {
-        
+
         // Ignore input when not the current view
-        var _pim = cosmo.app.pim; 
+        var _pim = cosmo.app.pim;
         if (_pim.currentView != _pim.views.CAL) {
             return false;
         }
@@ -730,9 +730,9 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * how to handle the published event.
      */
     this.handlePub_app = function (cmd) {
-        
+
         // Ignore input when not the current view
-        var _pim = cosmo.app.pim; 
+        var _pim = cosmo.app.pim;
         if (_pim.currentView != _pim.views.CAL) {
             return false;
         }
@@ -782,13 +782,13 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             }
         }
     };
-    
+
     this.triggerLoadEvents = function (o) {
         dojo.debug("trigger!");
         var opts = {};
         var collection = opts.collection;
         var goTo = o.goTo;
-        
+
         // Changing collection
         // --------
         if (collection) {
@@ -849,13 +849,13 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var id = '';
         var ev = null;
         var showErr = function (e) {
-            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), 
+            cosmo.app.showErr(_('Main.Error.LoadEventsFailed'),
                 getErrDetailMessage(e));
         };
         // Load the array of events
         // ======================
         try {
-            var deferred = cosmo.app.pim.serv.getItems(collection, 
+            var deferred = cosmo.app.pim.serv.getItems(collection,
                 { start: start, end: end }, { sync: true });
             var results = deferred.results;
             // Catch any error stuffed in the deferred

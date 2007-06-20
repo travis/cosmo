@@ -17,7 +17,7 @@
 dojo.provide('cosmo.view.dialog');
 
 dojo.require("cosmo.util.i18n");
-
+dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
 var _ = cosmo.util.i18n.getText;
 
@@ -25,30 +25,33 @@ cosmo.view.dialog = new function() {
 
     var self = this;
     var props = {}; // Props for each modal dialog
-    var recurOpts = cosmo.view.cal.recurringEventOptions;
     var allEventsMsg = 'All Events';
     var AllFutureMsg = 'All Future Events';
     var OnlyThisMsg = 'Only This Event';
     var btnWideWidth = 84;
     var btnWiderWidth = 120;
 
-
     // All available buttons for the dialog
     var buttons = {
         'removeAllEvents': function(){
            return new Button('allButtonDialog', btnWideWidth,
-                function() { doPublish('remove', cosmo.view.cal.recurringEventOptions.ALL_EVENTS); }, allEventsMsg, true);
+                function() { doPublish('remove', 
+                cosmo.view.service.recurringEventOptions.ALL_EVENTS); }, 
+                allEventsMsg, true);
         },
 
         'removeFutureEvents': function(){
             return new Button('allFutureButtonDialog', btnWiderWidth,
-                function() { doPublish('remove', cosmo.view.cal.recurringEventOptions.ALL_FUTURE_EVENTS); }, AllFutureMsg, true);
+                function() { doPublish('remove', 
+                cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS); }, 
+                AllFutureMsg, true);
         },
 
         'removeOnlyThisEvent': function(){
             return new Button('onlyThisButtonDialog', btnWiderWidth,
                 function() { 
-                    doPublish('remove', cosmo.view.cal.recurringEventOptions.ONLY_THIS_EVENT); 
+                    doPublish('remove', 
+                    cosmo.view.service.recurringEventOptions.ONLY_THIS_EVENT); 
                 }, 
                 OnlyThisMsg, true);
         },
@@ -56,7 +59,8 @@ cosmo.view.dialog = new function() {
         'saveAllEvents': function(saveItem, delta){
             return new Button('allButtonDialog', btnWideWidth,
                 function() {  
-                    doPublishSave(cosmo.view.cal.recurringEventOptions.ALL_EVENTS,
+                    doPublishSave(
+                        cosmo.view.service.recurringEventOptions.ALL_EVENTS,
                         saveItem, delta)
                 }, 
                 allEventsMsg, 
@@ -65,8 +69,9 @@ cosmo.view.dialog = new function() {
 
         'saveFutureEvents': function(saveItem, delta){
             return new Button('allFutureButtonDialog', btnWiderWidth,
-                function() { 
-                    doPublishSave(cosmo.view.cal.recurringEventOptions.ALL_FUTURE_EVENTS,
+                function () { 
+                    doPublishSave(
+                        cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS,
                         saveItem, delta); 
                 },
                 AllFutureMsg, true);
@@ -74,8 +79,9 @@ cosmo.view.dialog = new function() {
 
         'saveOnlyThisEvent': function(saveItem, delta){
             return new Button('onlyThisButtonDialog', btnWiderWidth,
-                function() { 
-                    doPublishSave(cosmo.view.cal.recurringEventOptions.ONLY_THIS_EVENT,
+                function () { 
+                    doPublishSave(
+                        cosmo.view.service.recurringEventOptions.ONLY_THIS_EVENT,
                         saveItem, 
                         delta); 
                 }, 
@@ -150,7 +156,7 @@ cosmo.view.dialog = new function() {
     // Public methods
     // ********************
     this.getProps = function(key, opts) {
-        var OPTIONS = cosmo.view.cal.recurringEventOptions;
+        var OPTIONS = cosmo.view.service.recurringEventOptions;
         var p = props[key]();
         var opts = opts || {};
         if (key == 'saveRecurConfirm') {

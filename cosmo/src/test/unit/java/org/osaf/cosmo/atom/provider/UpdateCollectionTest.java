@@ -37,88 +37,68 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
     public void testUpdateCollection() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         String oldName = collection.getName();
-        String newName = "New Name";
+        CollectionItem copy = (CollectionItem) collection.copy();
+        copy.setDisplayName("New Name");
 
-        RequestContext req = createRequestContext(collection);
-        helper.addParameter(req, "name", newName);
+        RequestContext req = createRequestContext(collection, copy);
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
         assertNotNull("Null last modified", res.getLastModified());
-        assertEquals("Display name not updated", collection.getName(), newName);
+        assertEquals("Display name not updated", collection.getDisplayName(),
+                     "New Name");
     }
 
     public void testUpdateCollectionWrongContentType() throws Exception {
-        CollectionItem collection = helper.makeAndStoreDummyCollection();
-        String oldName = collection.getName();
-        String newName = "New Name";
-
-        RequestContext req = createRequestContext(collection, false);
+        CollectionItem collection = helper.makeAndStoreDummyCollection(); 
+        RequestContext req = createRequestContext(collection, null);
         helper.setContentType(req, "multipart/form-data");
-        helper.addParameter(req, "name", newName);
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 415, res.getStatus());
     }
 
-    public void testUpdateCollectionNoName() throws Exception {
-        CollectionItem collection = helper.makeAndStoreDummyCollection();
-        String oldName = collection.getName();
-
-        RequestContext req = createRequestContext(collection);
-
-        ResponseContext res = provider.updateCollection(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-        assertNotNull("Null etag", res.getEntityTag());
-        assertTrue("Display name changed",
-                   collection.getName().equals(oldName));
-    }
-
     public void testUpdateCollectionNullName() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        String oldName = collection.getName();
+        CollectionItem copy = (CollectionItem) collection.copy();
+        copy.setDisplayName(null);
 
-        RequestContext req = createRequestContext(collection);
-        helper.addParameter(req, "name", null);
+        RequestContext req = createRequestContext(collection, copy);
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
-        assertTrue("Display name changed",
-                   collection.getName().equals(oldName));
+        assertEquals("Display name not updated", collection.getDisplayName(),
+                     "");
     }
 
     public void testUpdateCollectionEmptyName() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
-        String oldName = collection.getName();
+        CollectionItem copy = (CollectionItem) collection.copy();
+        copy.setDisplayName("");
 
-        RequestContext req = createRequestContext(collection);
-        helper.addParameter(req, "name", "");
+        RequestContext req = createRequestContext(collection, copy);
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
-        assertTrue("Display name changed",
-                   collection.getName().equals(oldName));
-    }
-
-    public RequestContext createRequestContext(CollectionItem collection) {
-        return createRequestContext(collection, true);
+        assertEquals("Display name not updated", collection.getDisplayName(),
+                     "");
     }
 
     public RequestContext createRequestContext(CollectionItem collection,
-                                               boolean withContentType) {
+                                               CollectionItem update)
+        throws Exception {
         MockCollectionRequestContext rc =
             new MockCollectionRequestContext(helper.getServiceContext(),
                                              collection, "PUT");
-        if (withContentType)
-            helper.setContentType(rc, MimeUtil.MEDIA_TYPE_FORM_ENCODED);
+        if (update != null)
+            rc.setContentAsXhtml(serialize(update));
         return rc;
     }
 }

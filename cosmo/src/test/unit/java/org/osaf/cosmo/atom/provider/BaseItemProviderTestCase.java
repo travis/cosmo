@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
 
 /**
  * Base class for for {@link ItemProvider} tests.
@@ -38,14 +40,27 @@ public abstract class BaseItemProviderTestCase extends BaseProviderTestCase {
     }
 
     protected Properties serialize(NoteItem item) {
+        if (item == null)
+            return null;
+
         Properties props = new Properties();
 
-        props.setProperty("uid", item.getUid());
+        props.setProperty("uid", item.getUid() != null ? item.getUid() : "");
+        props.setProperty("name", item.getDisplayName() != null ?
+                          item.getDisplayName() : "");
 
         EventStamp es = EventStamp.getStamp(item);
         if (es != null)
             props.setProperty("startDate", es.getStartDate().toString());
 
         return props;
+    }
+
+    protected String serialize(CollectionItem collection) {
+        if (collection == null)
+            return null;
+
+        XhtmlCollectionFormat format = new XhtmlCollectionFormat();
+        return format.format(collection);
     }
 }

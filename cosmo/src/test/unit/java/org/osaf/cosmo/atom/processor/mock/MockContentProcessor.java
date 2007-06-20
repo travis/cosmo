@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -110,9 +111,16 @@ public class MockContentProcessor extends BaseContentProcessor {
         }
 
         String uid = props.getProperty("uid");
-        if (uid == null)
+        if (StringUtils.isBlank(uid))
             throw new ProcessorException("Uid not found in content");
         item.setUid(uid);
+
+        String name = props.getProperty("name");
+        if (name != null) {
+            if (StringUtils.isBlank(name))
+                name = null;
+            item.setDisplayName(name);
+        }
 
         EventStamp es = EventStamp.getStamp(item);
         if (es != null) {

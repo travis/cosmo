@@ -105,6 +105,12 @@ public class StandardRequestHandler extends DefaultRequestHandler
         return true;
     }
 
+    protected String[] getAllowedMethods(TargetType type) {
+        if (type != null && type == TargetType.TYPE_COLLECTION)
+            return new String[] { "GET", "POST", "PUT", "HEAD", "OPTIONS" };
+        return super.getAllowedMethods(type);
+    }
+
     private boolean ifMatch(String header,
                             AuditableTarget target,
                             RequestContext request,

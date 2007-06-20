@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.provider;
 
 import net.fortuna.ical4j.model.TimeZone;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,12 +59,14 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.MimeUtil;
@@ -379,29 +383,26 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     public ResponseContext updateCollection(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
+
+        if (collection instanceof HomeCollectionItem)
+            return unauthorized(getAbdera(), request, "Home collection is not modifiable");
+
         if (log.isDebugEnabled())
             log.debug("updating details for collection " + collection.getUid());
 
         try {
-            if (! MimeUtil.isFormEncoded(request.getContentType()))
-                return notsupported(getAbdera(), request, "Entity-body must be " + MimeUtil.MEDIA_TYPE_FORM_ENCODED);
+            if (! MimeUtil.isXhtml(request.getContentType()))
+                return notsupported(getAbdera(), request, "Entity-body must be " + MimeUtil.MEDIA_TYPE_XHTML);
 
-            boolean dirty = false;
-            for (String param : request.getParameterNames()) {
-                if (param.equals("name")) {
-                    String name = request.getParameter("name");
-                    if (! StringUtils.isBlank(name)) {
-                        collection.setName(name);
-                        collection.setDisplayName(name);
-                        dirty = true;
-                    }
-                } else {
-                    log.warn("skipping unknown collection details parameter " +
-                             param);
-                }
-            }
-            if (dirty)
+            CollectionItem content = readCollection(request);
+
+            if (! content.getDisplayName().
+                equals(collection.getDisplayName())) {
+                if (log.isDebugEnabled())
+                    log.debug("updating collection " + collection.getUid());
+                collection.setDisplayName(content.getDisplayName());
                 collection = contentService.updateCollection(collection);
+            }
 
             AbstractResponseContext rc = createResponseContext(204);
             rc.setEntityTag(new EntityTag(collection.getEntityTag()));
@@ -409,6 +410,15 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return rc;
         } catch (MimeTypeParseException e) {
             return notsupported(getAbdera(), request, "Invalid content type");
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (ValidationException e) {
+            String msg = "Invalid request content: " + e.getMessage();
+            if (e.getCause() != null)
+                msg += ": " + e.getCause().getMessage();
+            return badrequest(getAbdera(), request, msg);
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
         }
@@ -590,5 +600,21 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         }
 
         return item;
+    }
+
+    private CollectionItem readCollection(RequestContext request)
+        throws IOException, ValidationException {
+        try {
+            XhtmlCollectionFormat formatter = new XhtmlCollectionFormat();
+            InputStream in = request.getInputStream();
+            if (in == null)
+                throw new ValidationException("An entity-body must be provided");
+            CollectionItem collection = formatter.parse(IOUtils.toString(in));
+            if (collection.getDisplayName() == null)
+                collection.setDisplayName("");
+            return collection;
+        } catch (java.text.ParseException e) {
+            throw new ValidationException("Error parsing XHTML content", e);
+        }
     }
 }

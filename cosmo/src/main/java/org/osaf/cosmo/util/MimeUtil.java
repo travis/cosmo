@@ -23,10 +23,13 @@ public class MimeUtil {
     public static final String MEDIA_TYPE_FORM_ENCODED =
         "application/x-www-form-urlencoded";
     public static final MimeType MIME_TYPE_FORM_ENCODED;
+    public static final String MEDIA_TYPE_XHTML = "application/xhtml+xml";
+    public static final MimeType MIME_TYPE_XHTML;
 
     static {
         try {
             MIME_TYPE_FORM_ENCODED = new MimeType(MEDIA_TYPE_FORM_ENCODED);
+            MIME_TYPE_XHTML = new MimeType(MEDIA_TYPE_XHTML);
         } catch (MimeTypeParseException e) {
             throw new RuntimeException(e);
         }
@@ -39,5 +42,9 @@ public class MimeUtil {
 
     public static boolean isFormEncoded(MimeType mimeType) {
         return match(mimeType, MIME_TYPE_FORM_ENCODED);
+    }
+
+    public static boolean isXhtml(MimeType mimeType) {
+        return match(mimeType, MIME_TYPE_XHTML);
     }
 }

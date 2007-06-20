@@ -100,4 +100,12 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         getMockRequest().setContentType("text/plain");
         getMockRequest().addHeader("Content-Type", "text/plain");
     }
+
+    public void setContentAsXhtml(String content)
+        throws IOException {
+        if (content != null)
+            getMockRequest().setContent(content.getBytes());
+        getMockRequest().setContentType("application/xhtml+xml");
+        getMockRequest().addHeader("Content-Type", "application/xhtml+xml");
+    }
 }

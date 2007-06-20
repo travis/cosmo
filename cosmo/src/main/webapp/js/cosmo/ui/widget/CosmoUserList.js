@@ -44,6 +44,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
         pageNumber : 1,
         pageSize : 25,
+        query: "",
 
         cmpFirstLink : null,
         cmpPreviousLink : null,
@@ -148,6 +149,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                     case('st'):
                         this.setSortType(pair[1]);
                         break;
+                    case('q'):
+                        this.query = pair[1];
                     }
             }
             this.updateUserList()
@@ -210,6 +213,45 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             return s;
         },
 
+        createSearchBox:function(){
+
+            var s = document.createElement("span");
+
+            s.setAttribute("id", "searchBox");
+
+            var i = document.createElement("input");
+            i.setAttribute("type", "text");
+            i.setAttribute("size", "15");
+            i.setAttribute("maxlength", "100");
+            i.setAttribute("value", this.query);
+            i.setAttribute("align", "left");
+
+            dojo.event.connect(i,"onchange", dojo.lang.hitch(this,
+                    function (){
+                        this.query = i.value;
+                        this.updateUserList();
+                    }));
+
+            s.appendChild(i);
+
+            var b = document.createElement("input");
+            b.setAttribute("type", "button");
+            b.setAttribute("size", "4");
+            b.setAttribute("maxlength", "4");
+            b.setAttribute("value", _("UserList.Control.Search"));
+            b.setAttribute("align", "middle");
+
+            b.onclick = dojo.lang.hitch(this, function(){
+                this.query = i.value;
+                this.updateUserList();
+                return false
+            });
+
+            s.appendChild(b);
+
+            return s;
+        },
+        
         createPageNumberChooser:function(){
 
             var s = document.createElement("span");
@@ -264,7 +306,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
 			this.userCountIndicator = count;
 
-			s.appendChild(document.createTextNode("Total Users: "));
+			s.appendChild(document.createTextNode(_("UserList.TotalUsers")));
 			s.appendChild(count);
 
 			this.updateTotalUserCount();
@@ -318,6 +360,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         updatePageSize:function(size){
             this.pageSize = size;
             this.updateUserList();
+        },
+        
+        updateQuery: function(query){
+            this.query = query;
+            this.updateUserList();  
         },
 
         updateControlsView: function(){
@@ -447,7 +494,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                  this.pageNumber,
                  this.pageSize,
                  this.sortOrder,
-                 this.sortType);
+                 this.sortType,
+                 this.query);
         },
 
         // These two functions will disable client side sorting.
@@ -489,14 +537,37 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             var table = this.domNode;
 
-            var controls = document.createElement("div");
+            var controls = document.createElement("table");
             controls.setAttribute("id", "userListControls");
-
-            controls.appendChild(this.createPageSizeChooser());
-            controls.appendChild(this.createPageNumberChooser());
-            controls.appendChild(this.createUserCountIndicator());
-
             table.parentNode.insertBefore(controls, table);
+            controls.style.width = '100%';
+            var tableBody = document.createElement("tbody");
+            controls.appendChild(tableBody);
+            tableBody.style.width = '100%';
+            var controlsRow = document.createElement("tr");
+            tableBody.appendChild(controlsRow);
+
+            var td;
+
+            td = document.createElement("td");
+            td.setAttribute("id", "searchBoxContainer");
+            td.appendChild(this.createSearchBox());
+            controlsRow.appendChild(td);
+
+            td = document.createElement("td");
+            td.setAttribute("id", "pageNumberChooserContainer");
+            td.appendChild(this.createPageNumberChooser());
+            controlsRow.appendChild(td);
+
+            td = document.createElement("td");
+            td.setAttribute("id", "userCountContainer");
+            td.appendChild(this.createUserCountIndicator());
+            controlsRow.appendChild(td);
+
+            td = document.createElement("td");
+            td.setAttribute("id", "pageSizeChooserContainer");
+            td.appendChild(this.createPageSizeChooser());
+            controlsRow.appendChild(td);
 
             dojo.event.topic.registerPublisher("/userListSelectionChanged", this, "renderSelections");
 

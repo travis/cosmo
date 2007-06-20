@@ -70,18 +70,35 @@ a.userListPagingLink {
 }
 
 span#pageNumberChooser {
-    position: absolute;
-    left: 2em;
+
 }
 
 span#pageSizeChooser {
-    position: absolute;
-    right: 2em;
+
 }
 
 span#userCountIndicatorSpan {
-	position: absolute;
-   left: 45%;
+
+}
+
+span#searchBox {
+
+}
+
+td#searchBoxContainer {
+	text-align: left;
+}
+
+td#pageNumberChooserContainer {
+	text-align: center;
+}
+
+td#userCountContainer {
+	text-align: center;
+}
+
+td#pageSizeChooserContainer {
+	text-align: right;
 }
 
 div#userListControls {

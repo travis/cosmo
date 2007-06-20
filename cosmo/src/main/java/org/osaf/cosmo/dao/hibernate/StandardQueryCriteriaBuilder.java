@@ -77,7 +77,8 @@ public class StandardQueryCriteriaBuilder<SortType extends Enum> implements Quer
                         MatchMode.ANYWHERE);
             } else {
                 orCriterion = Restrictions.or(orCriterion, 
-                        Restrictions.ilike(pair[0], pair[1]));
+                        Restrictions.ilike(pair[0], pair[1], 
+                                MatchMode.ANYWHERE));
             }
         }
         if (orCriterion != null)

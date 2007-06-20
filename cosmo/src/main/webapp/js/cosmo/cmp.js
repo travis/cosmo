@@ -88,10 +88,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
                             /*int*/ pageSize,
                             /*String*/ sortOrder,
                             /*String*/ sortType,
+                            /*String*/ query,
                             /*boolean?*/ sync) {
             handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
 
-            this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, sync);
+            this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, query, sync);
         },
 
         /**
@@ -108,6 +109,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                                /*int*/ pageSize,
                                /*String*/ sortOrder,
                                /*String*/ sortType,
+                               /*String*/ query,
                                /*boolean?*/ sync) {
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users";
@@ -118,6 +120,9 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     "&ps=" + (pageSize ? pageSize : DEFAULT_PAGE_SIZE).toString() +
                     "&so=" + (sortOrder ? sortOrder : DEFAULT_SORT_ORDER) +
                     "&st=" + (sortType ? sortType : DEFAULT_SORT_TYPE);
+            }
+            if (query) {
+                requestDict.url += "&q=" + query;
             }
             requestDict.method = "GET";
 

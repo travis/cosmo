@@ -556,6 +556,13 @@ cosmo.view.cal.canvas = new function () {
      * how to handle the published event.
      */
     this.handlePub_calEvent = function (cmd) {
+        
+        // Ignore input when not the current view
+        var _pim = cosmo.app.pim; 
+        if (_pim.currentView != _pim.views.CAL) {
+            return false;
+        }
+        
         var act = cmd.action;
         var opts = cmd.opts;
         var data = cmd.data;
@@ -630,6 +637,13 @@ cosmo.view.cal.canvas = new function () {
     };
 
     this.handlePub_app = function (cmd) {
+        
+        // Ignore input when not the current view
+        var _pim = cosmo.app.pim; 
+        if (_pim.currentView != _pim.views.CAL) {
+            return false;
+        }
+        
         var t = cmd.type;
         switch (t) {
             case 'modalDialogToggle':

@@ -23,7 +23,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
-dojo.require('cosmo.view.cal.dialog');
+dojo.require('cosmo.view.dialog');
 dojo.require("cosmo.service.exception");
 
 dojo.require("cosmo.util.debug");
@@ -83,7 +83,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             delta.applyChangeType(change);
             dojo.event.topic.publish('/calEvent', {action:'save', data:ev, delta:delta});
         } else {
-          cosmo.app.showDialog(cosmo.view.cal.dialog.getProps('saveRecurConfirm', {changeTypes:changeTypes, delta:delta, saveItem:ev}));
+          cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm', {changeTypes:changeTypes, delta:delta, saveItem:ev}));
         }
     }
     
@@ -305,6 +305,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * to events.
      * @param ev A CalEvent object, the original event clicked on,
      * or created by double-clicking on the cal canvas.
+     * FIXME: Comments below are hopelessly out of date
      * @param newEvId String, the id for the event returned when creating a
      * new event
      * @param err A JS object, the error returned from the server when
@@ -328,6 +329,8 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
             }
             // Failed create
             else {
+                // FIXME: Should we be removing the event from
+                // the eventRegistry here?
                 errMsg = _('Main.Error.EventNewSaveFailed');
             }
             cosmo.app.showErr(errMsg, getErrDetailMessage(err));
@@ -374,7 +377,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         else {
             str = 'removeConfirm';
         }
-        cosmo.app.showDialog(cosmo.view.cal.dialog.getProps(str, opts));
+        cosmo.app.showDialog(cosmo.view.dialog.getProps(str, opts));
     }
     /**
      * Called for after passthrough from removeEventConfirm. Routes to

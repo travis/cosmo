@@ -26,6 +26,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
+dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.view.cal");
 dojo.require("cosmo.view.list.common");
 
@@ -50,7 +51,7 @@ cosmo.ui.navbar.Bar = function (p) {
     // ===========
     // Handle published messages -- in this case just a poke
     // to let the NavBar know to re-render
-    this.handlePub_calEvent = function (cmd) { 
+    this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
         var opts = cmd.opts;
         switch (act) {
@@ -71,6 +72,7 @@ cosmo.ui.navbar.Bar = function (p) {
             this._showMonthHeader();
         }
         else if (_pim.currentView == _pim.views.LIST) {
+            this._showQuickItemEntry();
             this._showListPager();
         }
         // Break the float of the different NavBar items
@@ -122,14 +124,14 @@ cosmo.ui.navbar.Bar = function (p) {
                 defaultImgPos: [-360, 0],
                 mouseoverImgPos: [-405, 0],
                 downStateImgPos: [-450, 0],
-                handleClick: function () { 
+                handleClick: function () {
                     self.displayView(cosmo.app.pim.views.LIST); }
                 }),
             new _radio({ width: w,
                 defaultImgPos: [-495, 0],
                 mouseoverImgPos: [-540, 0],
                 downStateImgPos: [-585, 0],
-                handleClick: function () { 
+                handleClick: function () {
                     self.displayView(cosmo.app.pim.views.CAL); }
                 })
         ];
@@ -215,16 +217,42 @@ cosmo.ui.navbar.Bar = function (p) {
         }
         headerDiv.appendChild(document.createTextNode(str));
     };
-    this._showListPager = function () {
-        
-        var form = null;
-        // Next/prev page navigation
-        var nextPrev = function (e) {
-            if (e && e.target && e.target.id) {
-                var str = e.target.id.replace('listViewGo', '');
-                self.listCanvas['go' + str + 'Page']();
-            }
+    this._showQuickItemEntry = function () {
+        var f = null;
+        var d = this.domNode;
+        var t = _createElem('div');
+        t.className = 'floatLeft';
+        t.style.paddingLeft = '12px';
+        f = _createElem('form');
+        f.onsubmit = function () { return false; };
+        t.appendChild(f);
+        var o = { type: 'text',
+            id: 'listViewQuickItemEntry',
+            name: 'listViewQuickItemEntry',
+            size: 24,
+            className: 'inputText',
+            value: ''
         };
+        var text = cosmo.util.html.createInput(o);
+        f.appendChild(text);
+        f.appendChild(cosmo.util.html.nbsp());
+        var func = function () {
+            var title = f.listViewQuickItemEntry.value;
+            cosmo.view.list.createNoteItem(title);
+        };
+        button = dojo.widget.createWidget("cosmo:Button", {
+            text: 'Create',
+            handleOnClick: func,
+            small: true,
+            width: 42,
+            enabled: true },
+            f, 'last');
+        d.appendChild(t);
+
+    }
+    this._showListPager = function () {
+
+        var form = null;
         // Go-to page num
         var goToPage = function (e) {
             if (e.target && e.target.id && e.keyCode && e.keyCode == 13) {
@@ -240,7 +268,7 @@ cosmo.ui.navbar.Bar = function (p) {
         var t = _createElem('div');
         t.className = 'floatRight';
         t.style.paddingRight = '12px';
-        
+
         var table = _createElem('table');
         var body = _createElem('tbody');
         var tr = _createElem('tr');
@@ -250,13 +278,21 @@ cosmo.ui.navbar.Bar = function (p) {
         body.appendChild(tr);
         // Month/year header
         var td = _createElem('td');
-        var a = _createElem('a');
-        a.id = 'listViewGoPrev';
-        a.innerHTML = '[prev]';
-        dojo.event.connect(a, 'onclick', nextPrev);
-        td.appendChild(a);
+        if (self.listCanvas.currPageNum == 1) {
+            var fPrev = null;
+        }
+        else {
+            var fPrev = self.listCanvas.goPrevPage;
+        }
+        button = dojo.widget.createWidget("cosmo:Button", {
+            text: 'Prev',
+            handleOnClick: fPrev,
+            small: true,
+            width: 32,
+            enabled: (typeof fPrev == 'function') },
+            td, 'last');
         tr.appendChild(td);
-        
+
         var td = _createElem('td');
         td.id = 'listViewPageNum';
         td.style.padding = '0px 8px';
@@ -264,7 +300,7 @@ cosmo.ui.navbar.Bar = function (p) {
         // Suppress submission
         form.onsubmit = function () { return false; };
         td.appendChild(form);
-        var o = { type: 'text', 
+        var o = { type: 'text',
             id: 'listViewGoToPage',
             name: 'listViewGoToPage',
             size: 1,
@@ -277,15 +313,23 @@ cosmo.ui.navbar.Bar = function (p) {
         td.appendChild(_createText(' of ' + this.listCanvas.pageCount));
         this.listViewPageNum = td;
         tr.appendChild(td);
-        
+
         var td = _createElem('td');
-        var a = _createElem('a');
-        a.id = 'listViewGoNext';
-        a.innerHTML = '[next]';
-        dojo.event.connect(a, 'onclick', nextPrev);
-        td.appendChild(a);
+        if (self.listCanvas.currPageNum == self.listCanvas.pageCount) {
+            var fNext = null;
+        }
+        else {
+            var fNext = self.listCanvas.goNextPage;
+        }
+        button = dojo.widget.createWidget("cosmo:Button", {
+            text: 'Next',
+            handleOnClick: fNext,
+            small: true,
+            width: 32,
+            enabled: (typeof fNext == 'function') },
+            td, 'last');
         tr.appendChild(td);
-      
+
         t.appendChild(table);
         d.appendChild(t);
         this.listViewPager = t;

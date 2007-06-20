@@ -21,10 +21,18 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
+dojo.require('cosmo.view.dialog');
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
 
+dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
+
+cosmo.view.list.ListItem = function () {
+    this.sort = null;
+    this.display = null;
+    this.data = null;
+}
 
 // The list of items
 cosmo.view.list.itemRegistry = null;
@@ -44,56 +52,61 @@ cosmo.view.list.triageStatusCodeStrings = {
     NOW: 'now',
     LATER: 'later' };
 
+cosmo.view.list.handlePub_calEvent = function (cmd) {
+
+    // Ignore input when not the current view
+    var _pim = cosmo.app.pim;
+    if (_pim.currentView != _pim.views.LIST) {
+        return false;
+    }
+
+    var act = cmd.action;
+    var qual = cmd.qualifier || null;
+    var data = cmd.data || {};
+    var opts = cmd.opts;
+    var delta = cmd.delta;
+    switch (act) {
+        case 'save':
+            var saveItem = cmd.data;
+            alert('Not implemented yet.');
+            break;
+    }
+
+};
+
 cosmo.view.list.loadItems = function (o) {
     var opts = o;
     var collection = opts.collection;
     var itemLoadList = null;
-    var itemLoadHash = new cosmo.util.hash.Hash();
-    var statuses = cosmo.view.list.triageStatusCodeStrings;
-    var getStatus = opts.triageStatus;
-    var loadItemsByTriage = function (stat) {
-        // Load the array of items
-        // ======================
-        try {
-            var deferred = cosmo.app.pim.serv.getItems(collection,
-                { triage: stat }, { sync: true });
-            var results = deferred.results;
-            // Catch any error stuffed in the deferred
-            if (results[1] instanceof Error) {
-                showErr(results[1]);
-                return false;
-            }
-            else {
-                itemLoadList = results[0];
-            }
-        }
-        catch (e) {
-            showErr(e);
-            return false;
-        }
-        // Create a hash from the array
-        var h = cosmo.view.list.createItemRegistry(itemLoadList, stat);
-        itemLoadHash.append(h);
-        return true;
-    };
     var showErr = function (e) {
         cosmo.app.showErr(_('Main.Error.LoadEventsFailed'),
             e);
         return false;
     };
-    // Loading a specific status
-    if (getStatus) {
-        loadItemsByTriage(getStatus);
-    }
-    // Loading all the statuses
-    else {
-        // We don't care about the order of loading -- have to sort
-        // client-side anyway
-        for (var n in statuses) {
-            if (!loadItemsByTriage(statuses[n])) { return false; }
+
+    // Load the array of items
+    // ======================
+    try {
+        var deferred = cosmo.app.pim.serv.getDashboardItems(collection,
+            { sync: true });
+        var results = deferred.results;
+        // Catch any error stuffed in the deferred
+        if (results[1] instanceof Error) {
+            showErr(results[1]);
+            return false;
+        }
+        else {
+            itemLoadList = results[0];
         }
     }
-    cosmo.view.list.itemRegistry = itemLoadHash;
+    catch (e) {
+        showErr(e);
+        return false;
+    }
+    // Create a hash from the array
+    cosmo.view.list.itemRegistry =
+        cosmo.view.list.createItemRegistry(itemLoadList);
+
     // This could be done with topics to avoid the explicit dependency
     listCanvas = cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas;
     listCanvas.initListProps();
@@ -101,7 +114,7 @@ cosmo.view.list.loadItems = function (o) {
     return true;
 };
 
-cosmo.view.list.createItemRegistry = function (arrParam, statusParam) {
+cosmo.view.list.createItemRegistry = function (arrParam) {
     var h = new cosmo.util.hash.Hash();
     var arr = [];
 
@@ -125,9 +138,8 @@ cosmo.view.list.createItemRegistry = function (arrParam, statusParam) {
 
     for (var i = 0; i < arr.length; i++) {
         var note = arr[i];
-        var eventStamp = note.getEventStamp();
         var id = note.getUid();
-        var item = {};
+        var item = new cosmo.view.list.ListItem();
         item.data = note;
         // Precalculate values used for sort/display
         // to avoid doing the same calculations twice
@@ -148,19 +160,19 @@ cosmo.view.list.setSortAndDisplay = function (item) {
         sort[key] = s; // Precalc'd values used in the sort
         display[key] = d; // Precalc'd values used in the table display
     }
-    // Uid 
+    // Uid
     var uid = data.getItemUid();
     setVals('uid', uid, uid);
     // Task-ness
     var sr = data.getTaskStamp() ? 1 : 0;
     var fm = sr ? '[x]' : '';
     setVals('task', sr, fm);
-    // Title 
+    // Title
     var t = data.getDisplayName();
     setVals('title', t, t);
     // Who
     var m = data.getModifiedBy().userId;
-    m = m ? m : cosmo.app.currentUsername; 
+    m = m ? m : cosmo.app.currentUsername;
     setVals('who', m, m);
     // Start
     var st = data.getEventStamp();
@@ -179,3 +191,32 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     item.sort = sort;
     item.display = display;
 };
+
+cosmo.view.list.createNoteItem = function (s) {
+    var title = s;
+    var errMsg = '';
+    var item = new cosmo.view.list.ListItem();
+    if (!title) {
+        errMsg = 'New item must have a title.';
+    }
+    if (errMsg) {
+        cosmo.app.showErr(_('Main.Error.EventNewSaveFailed'), errMsg);
+        return false;
+    }
+    else {
+        var note = new cosmo.model.Note();
+        var id = note.getUid();
+        note.setDisplayName(title);
+        note.setBody('');
+        //normally the delta does the autotriaging, but since this is a new event
+        //there is no delta, so we do it manually.
+        note.autoTriage();
+        item.data = note;
+        cosmo.view.list.itemRegistry.setItem(id, item);
+        dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': item, 'qualifier': 'new' })
+        return cosmo.view.list.itemRegistry.getItem(id);
+    }
+};
+
+
+

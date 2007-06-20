@@ -14,14 +14,14 @@
  * limitations under the License.
 */
 
-dojo.provide('cosmo.view.cal.dialog');
+dojo.provide('cosmo.view.dialog');
 
 dojo.require("cosmo.util.i18n");
 
 dojo.require("cosmo.convenience");
 var _ = cosmo.util.i18n.getText;
 
-cosmo.view.cal.dialog = new function() {
+cosmo.view.dialog = new function() {
 
     var self = this;
     var props = {}; // Props for each modal dialog
@@ -184,4 +184,3 @@ cosmo.view.cal.dialog = new function() {
         return p;
     };
 };
-cosmo.view.cal.dialog.constructor = null;

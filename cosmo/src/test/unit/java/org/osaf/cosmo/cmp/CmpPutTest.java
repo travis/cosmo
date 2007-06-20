@@ -41,6 +41,8 @@ public class CmpPutTest extends BaseCmpServletTestCase {
      */
     public void testSignup() throws Exception {
         User u1 = testHelper.makeDummyUser();
+        u1.setAdmin(Boolean.TRUE);
+        u1.setLocked(Boolean.TRUE);
 
         MockHttpServletRequest request = createMockRequest("PUT", "/signup");
         sendXmlRequest(request, new UserContent(u1));
@@ -53,21 +55,10 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         assertNotNull("null Content-Location",
                       response.getHeader("Content-Location"));
         assertNotNull("null ETag", response.getHeader("ETag"));
-        
-        // Make sure user can't sign up w/ admin privs
-        
-        User u2 = testHelper.makeDummyUser();
-        u2.setAdmin(true);
 
-        request = createMockRequest("PUT", "/signup");
-        sendXmlRequest(request, new UserContent(u2));
-
-        response = new MockHttpServletResponse();
-        servlet.service(request, response);
-
-        this.assertEquals("user was allowed to sign up as admin", 
-                MockHttpServletResponse.SC_FORBIDDEN ,response.getStatus());
-        
+        User u2 = userService.getUser(u1.getUsername());
+        assertFalse("User signed up as admin", u2.getAdmin());
+        assertFalse("User signed up as locked", u2.isLocked());
     }
 
     /**

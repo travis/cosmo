@@ -796,23 +796,14 @@ public class CmpServlet extends HttpServlet {
         try {
             Document xmldoc = readXmlRequest(req);
             UserResource resource = new UserResource(getUrlBase(req), xmldoc);
-            User user = userService.createUser(resource.getUser(),
-                    createActivationContext(req));
+            User user = resource.getUser();
+            user.setAdmin(Boolean.FALSE);
+            user.setLocked(Boolean.FALSE);
+            user = userService.createUser(user, createActivationContext(req));
+            resource = new UserResource(user, getUrlBase(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
             resp.setHeader("ETag", resource.getEntityTag());
-            resource =
-                new UserResource(user, getUrlBase(req), xmldoc);
-            if (user.getAdmin() == true){
-                // Non admin tried to change admin status
-                user.setAdmin(false);
-                log.warn("bad request for signup: " +
-                                "user may not signup as admin");
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN,
-                "User may not signup as admin.");
-                return;
-            }
-
             sendXmlResponse(resp, resource);
         } catch (SAXException e) {
             log.warn("error parsing request body: " + e.getMessage());
@@ -842,6 +833,7 @@ public class CmpServlet extends HttpServlet {
             User user = getLoggedInUser();
             String oldUsername = user.getUsername();
             Boolean oldAdmin = user.getAdmin();
+            Boolean oldLocked = user.isLocked();
             UserResource resource =
                 new UserResource(user, getUrlBase(req), xmldoc);
             if (user.isUsernameChanged()) {
@@ -863,6 +855,11 @@ public class CmpServlet extends HttpServlet {
                 "Non admin may not change own admin status.");
                 return;
 
+            }
+            if (user.isLocked() != oldLocked) {
+                user.setLocked(oldLocked);
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN,
+                               "User may not changed own locked status.");
             }
             userService.updateUser(user);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);

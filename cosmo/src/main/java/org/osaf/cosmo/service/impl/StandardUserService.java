@@ -156,9 +156,8 @@ public class StandardUserService implements UserService {
         user.setDateModified(user.getDateCreated());
 
         userDao.createUser(user);
-
         User newUser = userDao.getUser(user.getUsername());
-        
+
         HomeCollectionItem home = contentDao.createRootItem(newUser);
         
         CollectionItem collection = new CollectionItem();

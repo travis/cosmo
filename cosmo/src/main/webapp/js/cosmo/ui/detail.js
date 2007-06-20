@@ -33,15 +33,18 @@ dojo.require('cosmo.datetime.timezone');
 dojo.require("cosmo.ui.widget.Button");
 
 cosmo.ui.detail = new function () {
-    this.getFormElementsForStamp = function (stampType) {
+    this.createFormElementsForStamp = function (stampType) {
         return new cosmo.ui.detail[stampType + 'FormElements']();
     };
+    
     this.saveItem = function () {
         alert('save');
     };
+    
     this.removeItem = function () {
         alert('remove');
     };
+    
     // Utility functions
     this.createLabelDiv = function (str) {
         var d = _createElem('div');
@@ -49,12 +52,17 @@ cosmo.ui.detail = new function () {
         d.appendChild(_createText((str)));
         return d;
     };
+    
     this.createFormElemDiv = function (elem) {
         var d = _createElem('div');
         d.className = 'formElem';
         d.appendChild(elem);
         return d;
     };
+    
+    this.createDelta = function(){
+        
+    };shh
 };
 
 cosmo.ui.detail.StampFormElemState = function (p) {
@@ -381,7 +389,7 @@ cosmo.ui.detail.StampSection = function (p) {
             body = _createElem('div');
             body.id = id + 'Body';
             body.className = 'expandoBody';
-            self.formSection = cosmo.ui.detail.getFormElementsForStamp(self.stampType);
+            self.formSection = cosmo.ui.detail.createFormElementsForStamp(self.stampType);
             if (!self.formSection.domNode) {
                throw('Form section for ' + self.stampType + ' has no DOM node.');
             }

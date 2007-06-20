@@ -17,6 +17,7 @@
 dojo.provide('cosmo.app');
 
 dojo.require("dojo.event.*");
+dojo.require("dojo.io.*");
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");

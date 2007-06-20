@@ -29,7 +29,7 @@ dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
 // --
 
-dojo.require('cosmo.view.cal');
+dojo.require('cosmo.view.cal.common');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.list.canvas');
 

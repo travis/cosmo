@@ -24,7 +24,7 @@ dojo.provide("cosmo.legacy.cal_event");
 
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.model");
-dojo.require('cosmo.view.cal');
+dojo.require('cosmo.view.cal.common');
 dojo.require('cosmo.view.cal.lozenge');
 
 /**

@@ -27,7 +27,7 @@ dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.ui.widget.Button");
-dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.list.common");
 
 cosmo.ui.navbar.Bar = function (p) {

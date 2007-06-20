@@ -34,7 +34,7 @@ dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
-dojo.require('cosmo.view.cal');
+dojo.require('cosmo.view.cal.common');
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.uri');
 dojo.require('cosmo.service.conduits.common');

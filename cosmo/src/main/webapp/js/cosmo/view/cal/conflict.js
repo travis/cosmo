@@ -15,7 +15,7 @@
 */
 dojo.provide('cosmo.view.cal.conflict');
 
-dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.cal.common");
 
 cosmo.view.cal.conflict = new function() {
 

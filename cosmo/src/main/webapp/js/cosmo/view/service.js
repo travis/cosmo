@@ -21,6 +21,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
+dojo.require("cosmo.legacy.cal_event");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.dialog');
@@ -466,7 +467,7 @@ cosmo.view.service = new function () {
                             }
                             else {
                                 // doRemoveEvent expects a CalEvent with attached CalEventData
-                                var removeEv = new CalEvent();
+                                var removeEv = new cosmo.legacy.cal_event.CalEvent();
                                 removeEv.data = evData;
                                 doRemoveEvent(removeEv, { 'removeType': 'recurrenceMaster',
                                     'instanceEvent': ev });

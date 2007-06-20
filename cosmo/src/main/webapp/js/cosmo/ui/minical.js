@@ -36,7 +36,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.service.exception");
 

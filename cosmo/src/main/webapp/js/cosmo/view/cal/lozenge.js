@@ -30,7 +30,7 @@ dojo.provide('cosmo.view.cal.lozenge');
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.cal.canvas");
 
 cosmo.view.cal.lozenge = {};

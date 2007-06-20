@@ -30,10 +30,11 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
+dojo.require("cosmo.legacy.cal_event");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("cosmo.view.cal");
+dojo.require("cosmo.view.cal.common");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
 dojo.require("cosmo.app.pim");
@@ -1391,7 +1392,7 @@ cosmo.view.cal.canvas = new function () {
 
 
         // Create the CalEvent, connect it to its lozenge
-        ev = new CalEvent(id, lozenge);
+        ev = new cosmo.legacy.cal_event.CalEvent(id, lozenge);
 
         // Set CalEventData start and end calculated from click position
         // --------

@@ -70,6 +70,8 @@ public class UserResource implements CmpResource, OutputsXml {
     /**
      */
     public static final String EL_UNACTIVATED = "unactivated";
+    public static final String EL_LOCKED = "locked";
+
     private User user;
     private String urlBase;
     private String userUrl;
@@ -184,6 +186,10 @@ public class UserResource implements CmpResource, OutputsXml {
             e.appendChild(unactivated);
         }
 
+        Element locked = DomUtil.createElement(doc, EL_LOCKED, NS_CMP);
+        DomUtil.setText(locked, user.isLocked().toString());
+        e.appendChild(locked);
+
         if (! user.getUsername().equals(User.USERNAME_OVERLORD)) {
             Element hurl = DomUtil.createElement(doc, EL_HOMEDIRURL, NS_CMP);
             DomUtil.setText(hurl, homedirUrl);
@@ -281,6 +287,11 @@ public class UserResource implements CmpResource, OutputsXml {
                                                "must be true");
                 }
                 user.setAdmin(Boolean.parseBoolean(DomUtil.getTextTrim(e)));
+            }
+            else if (DomUtil.matches(e, EL_LOCKED, NS_CMP)){
+                if (user.isOverlord())
+                    throw new CmpException("root user cannot be locked");
+                user.setLocked(Boolean.parseBoolean(DomUtil.getTextTrim(e)));
             }
             else {
                 throw new CmpException("unknown user attribute element " +

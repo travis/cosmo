@@ -84,17 +84,16 @@ public class CosmoUserDetails implements UserDetails {
     }
 
     /**
-     * Indicates whether the user is locked or unlocked. A locked
-     * user can not be authenticated.
-     *
-     * Note: since user locking has not been implemented in
-     * Cosmo, this method always returns <code>true</code>.
+     * Indicates whether the user account is locked or unlocked. A
+     * locked user can not be authenticated.
      *
      * @return <code>true</code> if the user is not locked,
      * <code>false</code> otherwise
      */
     public boolean isAccountNonLocked() {
-        return true;
+        if (user.isOverlord())
+            return true;
+        return ! user.isLocked().booleanValue();
     }
 
     /**
@@ -123,11 +122,8 @@ public class CosmoUserDetails implements UserDetails {
     }
 
     /**
-     * Indicates whether the users is enabled or disabled. A disabled
-     * user cannot be authenticated.
-     *
-     * Note: since user disablement has not been implemented in
-     * Cosmo, this method always returns <code>true</code>.
+     * Indicates whether the user account has been activated. A
+     * disabled user cannot be authenticated.
      *
      * @return <code>true</code> if the user is enabled,
      * <code>false</code> otherwise

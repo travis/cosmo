@@ -97,7 +97,13 @@ public class UserContent implements XmlSerializable {
             e.appendChild(admin);
         }
 
-        
+        if (user.isLocked() != null) {
+            Element locked =
+                DomUtil.createElement(doc, UserResource.EL_LOCKED,
+                                      UserResource.NS_CMP);
+            DomUtil.setText(locked, user.isLocked().toString());
+            e.appendChild(locked);
+        }
 
         return e;
     }

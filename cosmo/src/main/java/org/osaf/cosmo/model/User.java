@@ -123,6 +123,10 @@ public class User extends BaseModelObject {
      * A String indicating the results should be sorted by Activated status
      */
     public static final String ACTIVATED_SORT_STRING = "Activated";
+    /**
+     * A String indicating the results should be sorted by Locked status
+     */
+    public static final String LOCKED_SORT_STRING = "Locked";
     
     
 
@@ -138,6 +142,7 @@ public class User extends BaseModelObject {
     public static final String CREATED_URL_STRING = "created";
     public static final String LAST_MODIFIED_URL_STRING = "modified";
     public static final String ACTIVATED_URL_STRING = "activated";
+    public static final String LOCKED_URL_STRING = "locked";
 
     private String uid;
     private String username;
@@ -150,6 +155,7 @@ public class User extends BaseModelObject {
     private String activationId;
     private Boolean admin;
     private Boolean oldAdmin;
+    private Boolean locked;
     private Date dateCreated;
     private Date dateModified;
     private Set<Preference> preferences = new HashSet<Preference>(0);
@@ -160,6 +166,7 @@ public class User extends BaseModelObject {
      */
     public User() {
         admin = Boolean.FALSE;
+        locked = Boolean.FALSE;
     }
 
     /**
@@ -377,6 +384,15 @@ public class User extends BaseModelObject {
        this.activationId = null;
     }
 
+    @Column(name = "locked")
+    public Boolean isLocked() {
+        return locked;
+    }
+    
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
     /**
      * Username determines equality 
      */
@@ -409,6 +425,7 @@ public class User extends BaseModelObject {
             append("email", email).
             append("admin", admin).
             append("activationId", activationId).
+            append("locked", locked).
             append("dateCreated", dateCreated).
             append("dateModified", dateModified).
             toString();
@@ -639,7 +656,8 @@ public class User extends BaseModelObject {
         EMAIL (EMAIL_URL_STRING, EMAIL_SORT_STRING),
         CREATED (CREATED_URL_STRING, CREATED_SORT_STRING),
         LAST_MODIFIED (LAST_MODIFIED_URL_STRING, LAST_MODIFIED_SORT_STRING),
-        ACTIVATED (ACTIVATED_URL_STRING, ACTIVATED_SORT_STRING);
+        ACTIVATED (ACTIVATED_URL_STRING, ACTIVATED_SORT_STRING),
+        LOCKED (LOCKED_URL_STRING, LOCKED_SORT_STRING);
 
         private final String urlString;
         private final String titleString;
@@ -672,6 +690,8 @@ public class User extends BaseModelObject {
                 return LAST_MODIFIED;
             } else if (string.equals(ACTIVATED_URL_STRING)){
                 return ACTIVATED;
+            } else if (string.equals(LOCKED_URL_STRING)){
+                return LOCKED;
             } else {
                 return null;
             }

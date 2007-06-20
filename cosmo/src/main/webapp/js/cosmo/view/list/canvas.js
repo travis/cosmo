@@ -17,6 +17,7 @@
 dojo.provide('cosmo.view.list.canvas');
 
 dojo.require('dojo.event.*');
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.view.list.sort");
@@ -32,7 +33,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.id = '';
     this.currSelectedId = '';
     this.currSelectedItem = null;
-    this.currSortCol = 'Title';
+    this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';
     this.itemsPerPage = 5;
     this.itemCount = 0;
@@ -83,7 +84,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var targ = e.target;
             // Header cell clicked
             if (targ.id && targ.id.indexOf('Header') > -1) {
-                this._setSort(targ.id);
+                this._doSort(targ.id);
             }
             // Normal row cell clicked
             else {
@@ -130,26 +131,18 @@ cosmo.view.list.canvas.Canvas = function (p) {
         r += '</tr>';
         t += r;
         var getRow = function (key, val) {
-            var item = val.data;
-            //console.log(item);
-            var uid = item.getItemUid();
-            var selCss = 'listView_item' + uid == self.currSelectedId ? ' listViewSelectedCell' : '';
-            var eventStamp = item.getEventStamp();
-            var start = eventStamp ? eventStamp.getStartDate() : '';
-            var triage = item.getTriageStatus();
-            var task = item.getTaskStamp() ? '[x]' : '';
+            var item = val;
+            var display = item.display;
+            var selCss = 'listView_data' + display.uid == self.currSelectedId ? ' listViewSelectedCell' : '';
             var updatedBy = '';
-            if (start) {
-                start = start.strftime('%b %d, %Y %I:%M%p');
-            }
-            triage = map[triage];
             r = '';
-            r += '<tr id="listView_item'  + item.getUid() +'">';
-            r += '<td class="listViewDataCell' + selCss + '" style="text-align: center;">' + task + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + item.getDisplayName() + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + updatedBy + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + start + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + triage + '</td>';
+            r += '<tr id="listView_data' + display.uid + '">';
+            r += '<td class="listViewDataCell' + selCss + 
+                '" style="text-align: center;">' + display.task + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + display.title + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + display.who + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + display.startDate + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + display.triage + '</td>';
             r += '</tr>';
             t += r;
         }
@@ -165,6 +158,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
         dojo.event.connect($('listViewTable'), 'onmouseover', this, 'handleMouseOver');
         dojo.event.connect($('listViewTable'), 'onmouseout', this, 'handleMouseOut');
         dojo.event.connect($('listViewTable'), 'onclick', this, 'handleClick');
+        
+        dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
+            opts: null });
     };
     this.initListProps = function () {
         var items = cosmo.view.list.itemRegistry.length;
@@ -192,7 +188,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             this.height = this.parent.height - CAL_TOP_NAV_HEIGHT;
         }
     };
-    this._setSort = function (id) {
+    this._doSort = function (id) {
         var s = id.replace('listView', '').replace('Header', '');
         var reg = cosmo.view.list.itemRegistry;
         if (this.currSortCol == s) {

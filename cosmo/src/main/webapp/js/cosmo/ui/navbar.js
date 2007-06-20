@@ -21,6 +21,7 @@ dojo.require("dojo.date.format");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
+dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.button");
@@ -34,6 +35,8 @@ cosmo.ui.navbar.Bar = function (p) {
     this.domNode = null;
     this.id = '';
     this.width = 0;
+    this.listCanvas = null;
+    this.calCanvas = null;
     this.monthHeader = null;
     this.listViewPager = null;
     this.listViewPageNum = null;
@@ -44,6 +47,19 @@ cosmo.ui.navbar.Bar = function (p) {
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     // Interface methods
+    // ===========
+    // Handle published messages -- in this case just a poke
+    // to let the NavBar know to re-render
+    this.handlePub_calEvent = function (cmd) { 
+        var act = cmd.action;
+        var opts = cmd.opts;
+        switch (act) {
+            case 'loadCollection':
+            case 'navigateLoadedCollection':
+                self.renderSelf();
+                break;
+        }
+    };
     this.renderSelf = function () {
         var _pim = cosmo.app.pim;
         this.clearAll();
@@ -70,27 +86,27 @@ cosmo.ui.navbar.Bar = function (p) {
         var _pim = cosmo.app.pim;
         _pim.currentView = v;
         if (v == _pim.views.LIST) {
-            var center = _pim.baseLayout.mainApp.centerColumn;
             cosmo.view.list.loadItems({ collection: _pim.currentCollection });
             // If the cal canvas is currently showing, save the scroll
             // offset of the timed canvas
-            if (center.calCanvas.domNode.style.display == 'block') {
+            if (self.calCanvas.domNode.style.display == 'block') {
                 cosmo.view.cal.canvas.saveTimedCanvasScrollOffset();
             }
-            center.calCanvas.domNode.style.display = 'none';
-            center.listCanvas.domNode.style.display = 'block';
+            self.calCanvas.domNode.style.display = 'none';
+            self.listCanvas.domNode.style.display = 'block';
         }
         else if (v == _pim.views.CAL) {
-            var center = _pim.baseLayout.mainApp.centerColumn;
             cosmo.view.cal.loadEvents({ collection: _pim.currentCollection,
                 viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
-            center.listCanvas.domNode.style.display = 'none';
-            center.calCanvas.domNode.style.display = 'block';
+            self.listCanvas.domNode.style.display = 'none';
+            self.calCanvas.domNode.style.display = 'block';
             cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
         }
         else {
             throw(v + ' is not a valid view.');
         }
+        // Changing views also needs to re-render the nav bar
+        // to show the view-specific widgets in it
         self.renderSelf();
     };
 
@@ -200,33 +216,77 @@ cosmo.ui.navbar.Bar = function (p) {
         headerDiv.appendChild(document.createTextNode(str));
     };
     this._showListPager = function () {
-        var f = function (e) {
+        
+        var form = null;
+        // Next/prev page navigation
+        var nextPrev = function (e) {
             if (e && e.target && e.target.id) {
                 var str = e.target.id.replace('listViewGo', '');
-                var listCanvas = cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas;
-                listCanvas['go' + str + 'Page']();
+                self.listCanvas['go' + str + 'Page']();
             }
-        }
-        var listCanvas = {};
+        };
+        // Go-to page num
+        var goToPage = function (e) {
+            if (e.target && e.target.id && e.keyCode && e.keyCode == 13) {
+                var list = self.listCanvas;
+                var n = form[e.target.id].value;
+                n = n > list.pageCount ? list.pageCount : n;
+                n = n < 1 ? 1 : n;
+                list.currPageNum = n;
+                list.render();
+            }
+        };
         var d = this.domNode;
         var t = _createElem('div');
         t.className = 'floatRight';
         t.style.paddingRight = '12px';
+        
+        var table = _createElem('table');
+        var body = _createElem('tbody');
+        var tr = _createElem('tr');
+        table.cellPadding = '0';
+        table.cellSpacing = '0';
+        table.appendChild(body);
+        body.appendChild(tr);
+        // Month/year header
+        var td = _createElem('td');
         var a = _createElem('a');
         a.id = 'listViewGoPrev';
         a.innerHTML = '[prev]';
-        dojo.event.connect(a, 'onclick', f);
-        t.appendChild(a);
-        var s = _createElem('span');
-        s.id = 'listViewPageNum';
-        s.innerHTML = '&nbsp;';
-        this.listViewPageNum = s;
-        t.appendChild(s);
+        dojo.event.connect(a, 'onclick', nextPrev);
+        td.appendChild(a);
+        tr.appendChild(td);
+        
+        var td = _createElem('td');
+        td.id = 'listViewPageNum';
+        td.style.padding = '0px 8px';
+        form = _createElem('form');
+        // Suppress submission
+        form.onsubmit = function () { return false; };
+        td.appendChild(form);
+        var o = { type: 'text', 
+            id: 'listViewGoToPage',
+            name: 'listViewGoToPage',
+            size: 1,
+            className: 'inputText',
+            value: this.listCanvas.currPageNum
+        };
+        var text = cosmo.util.html.createInput(o);
+        dojo.event.connect(text, 'onkeyup', goToPage);
+        form.appendChild(text);
+        td.appendChild(_createText(' of ' + this.listCanvas.pageCount));
+        this.listViewPageNum = td;
+        tr.appendChild(td);
+        
+        var td = _createElem('td');
         var a = _createElem('a');
         a.id = 'listViewGoNext';
         a.innerHTML = '[next]';
-        dojo.event.connect(a, 'onclick', f);
-        t.appendChild(a);
+        dojo.event.connect(a, 'onclick', nextPrev);
+        td.appendChild(a);
+        tr.appendChild(td);
+      
+        t.appendChild(table);
         d.appendChild(t);
         this.listViewPager = t;
     };

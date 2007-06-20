@@ -579,7 +579,7 @@ cosmo.ui.detail.MainSection = function () {
         id: 'noteTitle',
         name: 'noteTitle',
         size: 28,
-        maxlenght: 100,
+        maxlength: 100,
         value: '',
         className: 'inputText' });
     var t =  cosmo.ui.detail.createFormElemDiv(elem);

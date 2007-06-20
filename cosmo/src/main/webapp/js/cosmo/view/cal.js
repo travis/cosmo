@@ -683,6 +683,13 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * how to handle the published event.
      */
     this.handlePub_calEvent = function (cmd) {
+        
+        // Ignore input when not the current view
+        var _pim = cosmo.app.pim; 
+        if (_pim.currentView != _pim.views.CAL) {
+            return false;
+        }
+
         var act = cmd.action;
         var qual = cmd.qualifier || null;
         var data = cmd.data || {};
@@ -690,10 +697,7 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
         var delta = cmd.delta;
         switch (act) {
             case 'loadCollection':
-                var f = function () { self.triggerLoadEvents(opts); };
-                //self.uiMask.show();
-                // Give processing message a brief instant to show
-                setTimeout(f, 100);
+                self.triggerLoadEvents(opts);
                 break;
             case 'saveConfirm':
                 var confirmEv = cmd.data;
@@ -723,6 +727,13 @@ cosmo.view.cal = dojo.lang.mixin(new function(){
      * how to handle the published event.
      */
     this.handlePub_app = function (cmd) {
+        
+        // Ignore input when not the current view
+        var _pim = cosmo.app.pim; 
+        if (_pim.currentView != _pim.views.CAL) {
+            return false;
+        }
+
         var e = cmd.appEvent;
         var t = cmd.type;
         // Handle keyboard input

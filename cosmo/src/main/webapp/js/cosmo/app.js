@@ -39,6 +39,8 @@ cosmo.app = new function () {
     this.dragItem = null;
     // List of any queued-up error messages
     this.errorList = [];
+    // Quick access to the currently logged-in user
+    this.currentUsername =  dojo.io.cookie.getCookie('username');
     //select boxes to show/hide when displaying modal dialog box
     this._selectBoxIds = {};
 

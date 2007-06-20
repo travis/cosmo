@@ -98,7 +98,7 @@ cosmo.ui.menu.requiredRoles = {
 cosmo.ui.menu.urls = {
     HELP: 'http://wiki.osafoundation.org/Projects/CosmoHelpRel0dot6',
     ACCOUNT_BROWSER: cosmo.env.getBaseUrl() + '/browse/' + 
-        dojo.io.cookie.getCookie('username'),
+        cosmo.app.currentUsername,
     ADMIN_CONSOLE: cosmo.env.getBaseUrl() + '/admin/users'
 };
 
@@ -109,7 +109,7 @@ cosmo.ui.menu.urls = {
 // based on display mode, user permissions, and user prefs
 cosmo.ui.menu.allItems = [
     { id: 'welcomeMenuItem',
-        displayText: 'Welcome, ' + dojo.io.cookie.getCookie('username'),
+        displayText: 'Welcome, ' + cosmo.app.currentUsername,
         displayMode: cosmo.ui.menu.displayModes.AUTH,
         requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
         },

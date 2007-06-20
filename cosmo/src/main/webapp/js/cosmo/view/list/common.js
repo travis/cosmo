@@ -94,8 +94,7 @@ cosmo.view.list.loadItems = function (o) {
         }
     }
     cosmo.view.list.itemRegistry = itemLoadHash;
-    // This could be done with topics to avoid the explicit
-    // dependency, but would be slower
+    // This could be done with topics to avoid the explicit dependency
     listCanvas = cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas;
     listCanvas.initListProps();
     listCanvas.render();
@@ -128,11 +127,55 @@ cosmo.view.list.createItemRegistry = function (arrParam, statusParam) {
         var note = arr[i];
         var eventStamp = note.getEventStamp();
         var id = note.getUid();
-        var ev = {};
-        ev.data = note;
-        h.setItem(id, ev);
+        var item = {};
+        item.data = note;
+        // Precalculate values used for sort/display
+        // to avoid doing the same calculations twice
+        this.setSortAndDisplay(item);
+        h.setItem(id, item);
     }
     return h;
 };
 
+// Getting an appropriate value to display and to sort on
+// require a lot of the same calculations -- don't do them
+// twice
+cosmo.view.list.setSortAndDisplay = function (item) {
+    var sort = {};
+    var display = {};
+    var data = item.data;
+    var setVals = function (key, s, d) {
+        sort[key] = s; // Precalc'd values used in the sort
+        display[key] = d; // Precalc'd values used in the table display
+    }
+    // Uid 
+    var uid = data.getItemUid();
+    setVals('uid', uid, uid);
+    // Task-ness
+    var sr = data.getTaskStamp() ? 1 : 0;
+    var fm = sr ? '[x]' : '';
+    setVals('task', sr, fm);
+    // Title 
+    var t = data.getDisplayName();
+    setVals('title', t, t);
+    // Who
+    var m = data.getModifiedBy().userId;
+    m = m ? m : cosmo.app.currentUsername; 
+    setVals('who', m, m);
+    // Start
+    var st = data.getEventStamp();
+    var dt = st ? st.getStartDate() : null;
+    var sr = dt ? dt.getTime() : 0;
+    var fm = dt ? dt.strftime('%b %d, %Y %I:%M%p') : '';
+    setVals('startDate', sr, fm);
+    // Triage
+    var tr = data.getTriageStatus();
+    var fm = this.triageStatusCodeNumberMappings[tr];
+    setVals('triage', tr, fm);
 
+    // Use two separate keyword/val objs since
+    // access to the values are done in totally
+    // separate places
+    item.sort = sort;
+    item.display = display;
+};

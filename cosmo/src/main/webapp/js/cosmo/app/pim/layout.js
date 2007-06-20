@@ -248,14 +248,16 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     var centerColumn = this.baseLayout.mainApp.centerColumn;
     var leftSidebar = this.baseLayout.mainApp.leftSidebar;
     var rightSidebar = this.baseLayout.mainApp.rightSidebar;
-    var d = _createElem('div');
-    d.id = 'calTopNavDiv';
-    var navBar = new cosmo.ui.navbar.Bar({ domNode: d, id: d.id,
-        width: centerColumn.width });
-    centerColumn.addChild(navBar);
-    centerColumn.navBar = navBar;
-    navBar.render();
 
+    // List view canvas
+    var d = _createElem('div');
+    d.id = 'listViewContainer';
+    var list = new cosmo.view.list.canvas.Canvas({ domNode: d, id: d.id,
+        width: centerColumn.width - 2, // 2px for borders
+        height: centerColumn.height - CAL_TOP_NAV_HEIGHT });
+    centerColumn.addChild(list);
+    centerColumn.listCanvas = list;
+    
     // Cal view canvas -- namespace singleton and Canvas ContentBox obj
     // are bolted together in an unpleasant way here
     var cal = new cosmo.view.cal.canvas.Canvas({
@@ -266,14 +268,17 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     centerColumn.addChild(cal);
     centerColumn.calCanvas = cal;
 
-    // List view canvas
+    // Navbar for the two views -- list and cal
+    // Pass in refs to the two view widgets
     var d = _createElem('div');
-    d.id = 'listViewContainer';
-    var list = new cosmo.view.list.canvas.Canvas({ domNode: d, id: d.id,
-        width: centerColumn.width - 2, // 2px for borders
-        height: centerColumn.height - CAL_TOP_NAV_HEIGHT });
-    centerColumn.addChild(list);
-    centerColumn.listCanvas = list;
+    d.id = 'calTopNavDiv';
+    var navBar = new cosmo.ui.navbar.Bar({ domNode: d, id: d.id,
+        width: centerColumn.width,
+        listCanvas: list,
+        calCanvas: cal });
+    centerColumn.addChild(navBar);
+    centerColumn.navBar = navBar;
+    navBar.render();
 
     // Cal selector / single cal name -- the container is a
     // ContentBox, and the contents is a Dojo widget

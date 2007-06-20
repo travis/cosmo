@@ -18,11 +18,15 @@ package org.osaf.cosmo.atom.provider;
 import net.fortuna.ical4j.model.TimeZone;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.activation.MimeTypeParseException;
+
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.util.Dates;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Content;
@@ -52,6 +56,7 @@ import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
@@ -476,8 +481,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         EventStampFilter eventFilter = new EventStampFilter();
 
         try {
-            Date start = getDateParameter(request, "start");
-            Date end = getDateParameter(request, "end");
+            java.util.Date start = getDateParameter(request, "start");
+            java.util.Date end = getDateParameter(request, "end");
 
             if ((start == null && end != null) ||
                 (start != null && end == null))
@@ -517,17 +522,20 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                                         NoteItem item)
         throws ValidationException, ProcessorException {
         EventStamp es = EventStamp.getStamp(item);
-        net.fortuna.ical4j.model.Date oldstart =
-            es != null && es.isRecurring() ? es.getStartDate() : null;
+        Date oldstart = es != null && es.isRecurring() ?
+            es.getStartDate() : null;
 
         processor.processContent(entry.getContent(), item);
         item = (NoteItem) contentService.updateItem(item);
 
         if (oldstart != null) {
-            net.fortuna.ical4j.model.Date newstart = es.getStartDate();
+            Date newstart = es.getStartDate();
             if (newstart != null && ! newstart.equals(oldstart)) {
+                long delta = newstart.getTime() - oldstart.getTime();
                 if (log.isDebugEnabled())
-                    log.debug("master event start date changed - replacing modifications");
+                    log.debug("master event start date changed; " +
+                              "adjusting modifications by " + delta +
+                              " milliseconds");
 
                 HashSet<NoteItem> copies = new HashSet<NoteItem>();
                 HashSet<NoteItem> removals = new HashSet<NoteItem>();
@@ -540,27 +548,43 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     removals.add(mod);
 
                     NoteItem copy = (NoteItem) mod.copy();
-                    copy.setUid(new ModificationUid(item, newstart).toString());
+
+                    EventExceptionStamp ees =
+                        EventExceptionStamp.getStamp(copy);
+                    DateTime oldRid = (DateTime) ees.getRecurrenceId();
+                    java.util.Date newRidTime =
+                        new java.util.Date(oldRid.getTime() + delta);
+                    DateTime newRid = (DateTime)
+                        Dates.getInstance(newRidTime, Value.DATE_TIME);
+                    if (oldRid.isUtc())
+                        newRid.setUtc(true);
+                    else
+                        newRid.setTimeZone(oldRid.getTimeZone());
+                        
+                    copy.setUid(new ModificationUid(item, newRid).toString());
+                    ees.setRecurrenceId(newRid);
+
                     copies.add(copy);
                 }
 
                 // remove the old mods from each of their collections,
                 // leaving tombstones behind
-                for (NoteItem mod : removals) {
-                    for (CollectionItem parent : mod.getParents())
-                        contentService.removeItemFromCollection(mod, parent);
+                for (NoteItem removal : removals) {
+                    for (CollectionItem parent : removal.getParents())
+                        contentService.removeItemFromCollection(removal,
+                                                                parent);
                 }
 
                 // add the replacement mods to each of the master's
                 // collections
-                for (NoteItem mod : copies) {
-                    mod.setModifies(item);
-                    item.getModifications().add(mod);
+                for (NoteItem newmod : copies) {
+                    newmod.setModifies(item);
+                    item.getModifications().add(newmod);
 
                     Iterator<CollectionItem> pi = item.getParents().iterator();
-                    contentService.createContent(pi.next(), mod);
+                    contentService.createContent(pi.next(), newmod);
                     while (pi.hasNext())
-                        contentService.addItemToCollection(mod, pi.next());
+                        contentService.addItemToCollection(newmod, pi.next());
                 }
             }
         }

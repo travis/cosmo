@@ -114,9 +114,9 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         NoteItem mod = makeAndStoreModification(master, "20070603T120000");
         String oldModUid = mod.getUid();
 
-        String newStart = "20070601T140000";
-        String newModUid = master.getUid() + ":" + newStart;
-        NoteItem copy = updateRecurringEventStartDate(master, newStart);
+        String newModUid = master.getUid() + ":20070603T140000";
+        NoteItem copy =
+            updateRecurringEventStartDate(master, "20070601T140000");
         RequestContext req = createRequestContext(master, copy);
 
         ResponseContext res = provider.updateEntry(req);

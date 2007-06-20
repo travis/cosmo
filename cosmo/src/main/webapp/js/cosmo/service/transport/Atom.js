@@ -198,8 +198,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
 
         var r = {};
-        r.url = cosmo.env.getBaseUrl() + "/atom/user/" + 
-            cosmo.util.auth.getUsername() + "/subscribed/" + subscription.getDisplayName();
+        r.url = cosmo.env.getBaseUrl() + "/atom/" + subscription.getUrls()[this.EDIT_LINK];
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "PUT";
@@ -212,7 +211,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
         var r = {};
         r.url = cosmo.env.getBaseUrl() + "/atom/" + collection.getUrls()[this.EDIT_LINK];
-        r.contentType = "application/x-www-form-urlencoded";
+        r.contentType = "application/xhtml+xml";
         r.postContent = postContent;
         r.method = "PUT";
         

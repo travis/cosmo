@@ -169,11 +169,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             var subscription = new cosmo.model.Subscription({
                 displayName: displayName,
-                tickeyKey: ticket,
+                ticketKey: ticket,
                 uid: uid,
                 collection: collection
             })
 
+            subscription.setUrls(this.getUrls(entry));
             this.setLazyLoader(collection, ["urls", "writeable"], kwArgs.lazyLoader);
             subscriptions.push(subscription);
         }
@@ -476,7 +477,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     collectionToSaveRepresentation: function(collection){
-        return "name=" + escape(collection.getDisplayName());
+         return ['<entry xmlns="http://www.w3.org/2005/Atom" xmlns:cosmo="http://osafoundation.org/cosmo/Atom">',
+         '<content type="xhtml">',
+          '<div xmlns="http://www.w3.org/1999/xhtml">',
+            '<div class="collection">',
+              '<span class="name">', escape(collection.getDisplayName()), '</span>', 
+            '</div>',
+          '</div>',
+         '</content>',
+         '</entry>'].join("");
     },
     
     keyValToPreference: function(key, val){

@@ -119,13 +119,6 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
         this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
 
-        //cosmo.app.showHideSelectBoxes(false);
-
-        // Load data -- successful load triggers render of UI widgets
-        // ===============================
-        //cosmo.view.cal.loadEvents({ collection: this.currentCollection,
-        //    viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
-
         this.baseLayout.mainApp.centerColumn.navBar.displayView(this.currentView);
 
         // Show errors for deleted subscriptions -- deletedSubscriptions

@@ -88,21 +88,25 @@ cosmo.ui.navbar.Bar = function (p) {
         var _pim = cosmo.app.pim;
         _pim.currentView = v;
         if (v == _pim.views.LIST) {
-            cosmo.view.list.loadItems();
-            // If the cal canvas is currently showing, save the scroll
-            // offset of the timed canvas
-            if (self.calCanvas.domNode.style.display == 'block') {
-                cosmo.view.cal.canvas.saveTimedCanvasScrollOffset();
+            // Only switch views if the data for the view loads successfully
+            if (cosmo.view.list.loadItems()) {
+                // If the cal canvas is currently showing, save the scroll
+                // offset of the timed canvas
+                if (self.calCanvas.domNode.style.display == 'block') {
+                    cosmo.view.cal.canvas.saveTimedCanvasScrollOffset();
+                }
+                self.calCanvas.domNode.style.display = 'none';
+                self.listCanvas.domNode.style.display = 'block';
             }
-            self.calCanvas.domNode.style.display = 'none';
-            self.listCanvas.domNode.style.display = 'block';
         }
         else if (v == _pim.views.CAL) {
-            cosmo.view.cal.loadEvents({ viewStart: cosmo.view.cal.viewStart, 
-                viewEnd: cosmo.view.cal.viewEnd });
-            self.listCanvas.domNode.style.display = 'none';
-            self.calCanvas.domNode.style.display = 'block';
-            cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
+            // Only switch views if the data for the view loads successfully
+            if (cosmo.view.cal.loadEvents({ viewStart: cosmo.view.cal.viewStart, 
+                viewEnd: cosmo.view.cal.viewEnd })) {
+                self.listCanvas.domNode.style.display = 'none';
+                self.calCanvas.domNode.style.display = 'block';
+                cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
+            }
         }
         else {
             throw(v + ' is not a valid view.');

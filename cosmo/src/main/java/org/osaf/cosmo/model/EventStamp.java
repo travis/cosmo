@@ -115,7 +115,12 @@ public class EventStamp extends BaseEventStamp implements
         } catch (Exception e) {
             throw new RuntimeException("Cannot copy calendar", e);
         }
-        
+
+        // the master calendar might not have any events; for
+        // instance, a client might be trying to save a VTODO
+        if (masterCal.getComponents(Component.VEVENT).isEmpty())
+            return masterCal;
+
         VEvent masterEvent = (VEvent) masterCal.getComponents(Component.VEVENT).get(0);
         VAlarm masterAlarm = getDisplayAlarm(masterEvent);
         

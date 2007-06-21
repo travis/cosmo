@@ -30,6 +30,7 @@ import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavException;
@@ -340,16 +341,17 @@ public class DavCalendarCollection extends DavCollection
             throw new IllegalArgumentException("member not DavEvent");
         ContentItem content = (ContentItem) member.getItem();
         EventStamp event = EventStamp.getStamp(content);
+        Calendar calendar = event.getCalendar();
 
         // CALDAV:valid-calendar-object-resource
-        if (hasMultipleComponentTypes(event.getCalendar()))
+        if (hasMultipleComponentTypes(calendar))
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object contains more than one type of component");
-        if (event.getCalendar().getProperties().getProperty(Property.METHOD) != null)
+        if (calendar.getProperties().getProperty(Property.METHOD) != null)
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object contains METHOD property");
 
         // CALDAV:supported-calendar-component
-        if (! cc.supportsCalendar(event.getCalendar()))
-            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object does not contain at least one supported component");
+        if (! cc.supportsCalendar(calendar))
+            throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED, "Calendar object may only contain " + StringUtils.join(cc.getSupportedComponents(), ", "));
 
         // XXX CALDAV:calendar-collection-location-ok
 

@@ -29,7 +29,7 @@ cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
     if (timezone){
         date.tzId = timezone;
     }
-    else if (formattedString[formattedString.length - 1].toLowerCase() == "z"){
+    else if (formattedString.substring(formattedString.length - 1).toLowerCase() == "z"){
         date.utc = true;
     }
 

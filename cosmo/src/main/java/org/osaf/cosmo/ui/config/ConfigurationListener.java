@@ -39,8 +39,7 @@ public class ConfigurationListener implements ServletContextListener {
     /**
      * Gets the configurer from the
      * {@link org.springframework.web.context.WebApplicationContext}
-     * and directs it to configure the servlet context. Also sets
-     * system properties required by certain libraries.
+     * and directs it to configure the servlet context.
      */
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext sc = sce.getServletContext();
@@ -52,12 +51,6 @@ public class ConfigurationListener implements ServletContextListener {
             wac.getBean(BEAN_SERVLET_CONTEXT_CONFIGURER,
                         ServletContextConfigurer.class);
         scc.configure(sc);
-
-        // set system properties for ical4j
-        System.setProperty("net.fortuna.ical4j.timezone.registry",
-                           "org.osaf.cosmo.calendar.CosmoTimeZoneRegistryFactory");
-        System.setProperty("ical4j.unfolding.relaxed", "true");
-        System.setProperty("ical4j.parsing.relaxed", "true");
     }
 
     /**

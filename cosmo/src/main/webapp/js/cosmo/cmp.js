@@ -122,7 +122,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     "&st=" + (sortType ? sortType : DEFAULT_SORT_TYPE);
             }
             if (query) {
-                requestDict.url += "&q=" + query;
+                requestDict.url += "&q=" + escape(query);
             }
             requestDict.method = "GET";
 

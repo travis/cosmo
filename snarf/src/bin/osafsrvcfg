@@ -44,14 +44,6 @@
 #OSAFSRV_JMX_LOCAL=true
 
 #
-# This feature allows iCalendar objects with both LF and CRLF line
-# endings (RFC 2445 mandates CRLF, but some implementations only use
-# LF). To disable this feature and require strict line endings, set
-# the variable to false or 0.
-#
-#OSAFSRV_ICAL4J_UNFOLDING_RELAXED=true
-
-#
 # This feature allows you to redirect Derby's logging output to
 # another location on the filesystem. Derby unfortunately uses a
 # proprietary logging mechanism rather than commons-logging or log4j,

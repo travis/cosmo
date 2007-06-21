@@ -72,19 +72,12 @@ if [ -f "$OSAFSRV_BINDIR"/"$CFGSCRIPT" ]; then
 fi
 
 # enable/disable features
-OSAFSRV_OPTS="-server -Dnet.fortuna.ical4j.timezone.registry=org.osaf.cosmo.calendar.CosmoTimeZoneRegistryFactory"
+OSAFSRV_OPTS="-server"
 check_feature $OSAFSRV_JMX_LOCAL
 if [ $? -lt 2 ]; then
     OSAFSRV_OPTS="$OSAFSRV_OPTS -Dcom.sun.management.jmxremote"
 else
     echo "Disabling JMX"
-fi
-check_feature $OSAFSRV_ICAL4J_UNFOLDING_RELAXED
-if [ $? -lt 2 ]; then
-    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dical4j.unfolding.relaxed=true"
-else
-    OSAFSRV_OPTS="$OSAFSRV_OPTS -Dical4j.unfolding.relaxed=false"
-    echo "Disabling ical4j relaxed unfolding"
 fi
 if [ -n "$OSAFSRV_DERBY_ERROR_LOG" ]; then
     OSAFSRV_OPTS="$OSAFSRV_OPTS -Dderby.stream.error.file=$OSAFSRV_DERBY_ERROR_LOG";

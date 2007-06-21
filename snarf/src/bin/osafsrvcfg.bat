@@ -43,14 +43,6 @@ rem
 remset OSAFSRV_JMX_LOCAL=true
 
 rem
-rem This feature allows iCalendar objects with both LF and CRLF line
-rem endings (RFC 2445 mandates CRLF, but some implementations only use
-rem LF). To disable this feature and require strict line endings, set
-rem the variable to false or 0.
-rem
-remset OSAFSRV_ICAL4J_UNFOLDING_RELAXED=true
-
-rem
 rem This feature allows you to redirect Derby's logging output to
 rem another location on the filesystem. Derby unfortunately uses a
 rem proprietary logging mechanism rather than commons-logging or log4j,

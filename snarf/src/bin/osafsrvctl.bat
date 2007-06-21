@@ -51,22 +51,13 @@ call "%CURRENT_DIR%\%CFGSCRIPT"
 :checkFeatures
 
 rem enable/disable features
-set OSAFSRV_OPTS=-server -Dnet.fortuna.ical4j.timezone.registry=org.osaf.cosmo.calendar.CosmoTimeZoneRegistryFactory
+set OSAFSRV_OPTS=-server
 
 if "%OSAFSRV_JMX_LOCAL%" == "" goto setJMX
 echo "Disabling JMX"
-goto checkUnfolding
+goto checkDerby
 :setJMX
 set OSAFSRV_OPTS=%OSAFSRV_OPTS% -Dcom.sun.management.jmxremote
-
-:checkUnfolding
-if "%OSAFSRV_ICAL4J_UNFOLDING_RELAXED%" == "" goto setUnfolding
-set OSAFSRV_OPTS=%OSAFSRV_OPTS% -Dical4j.unfolding.relaxed=false
-echo "Disabling ical4j relaxed unfolding"
-goto checkDerby
-:setUnfolding
-set OSAFSRV_OPTS=%OSAFSRV_OPTS% -Dical4j.unfolding.relaxed=true
-goto checkDerby
 
 :checkDerby
 if "%OSAFSRV_DERBY_ERROR_LOG%" == "" goto logDerby

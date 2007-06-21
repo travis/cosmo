@@ -49,6 +49,7 @@ import org.osaf.cosmo.service.UserService;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
  * The standard implementation for
@@ -194,7 +195,10 @@ public class StandardMorseCodeController implements MorseCodeController {
             collection =
                 contentService.createCollection(parent, collection, children);
         } catch (CannotAcquireLockException e) {
-            log.debug("DEADLOCK(PUBLISH):");
+            log.debug("DEADLOCK(PUBLISH):" + uid);
+            throw new ServerBusyException("Database is busy", e);
+        } catch (OptimisticLockingFailureException e) {
+            log.warn("Publish of " +  uid + " failed due to concurrent requests");
             throw new ServerBusyException("Database is busy", e);
         }
 

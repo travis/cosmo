@@ -108,9 +108,6 @@
     <property name="authenticationEntryPoint">
       <ref local="davBasicAuthenticationEntryPoint"/>
     </property>
-    <property name="ignoreFailure">
-      <value>true</value>
-    </property>
   </bean>
 
   <!-- filter that converts authn/authz exceptions to DAV responses -->

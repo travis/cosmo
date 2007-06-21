@@ -95,9 +95,6 @@
     <property name="authenticationEntryPoint">
       <ref local="webcalBasicAuthenticationEntryPoint"/>
     </property>
-    <property name="ignoreFailure">
-      <value>true</value>
-    </property>
   </bean>
 
   <!-- filter that converts authn/authz exceptions to webcal responses -->

@@ -74,28 +74,44 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     // getter.
     setLazyLoader: function (object, propertyNames, loaderFunction){
         var oldGetters = {};
+        var oldSetters = {};
         for (var i = 0; i < propertyNames.length; i++) {
             var propertyName = propertyNames[i];
             var getterName = "get" + dojo.string.capitalize(propertyName);
-            var oldGetter = object[getterName];
-            oldGetters[getterName] = oldGetter;
+            var setterName = "set" + dojo.string.capitalize(propertyName);
+            oldGetters[getterName] = object[getterName];
+            oldSetters[setterName] = object[setterName];
             
             // This is needed to create a new scope so we can enclose "getter name"
             var createReplacerFunction = function(){
+                
+                var resetMethods = function(){
+                    for (var oldGetterName in oldGetters){
+                        object[oldGetterName] = oldGetters[oldGetterName];
+                    }
+                    for (var oldSetterName in oldSetters){
+                        object[oldSetterName] = oldSetters[oldSetterName];
+                    }
+                }
                 // Create a new variable to hold the current getter name
                 // that won't get replaced during the next iteration
                 // of the for loop.
-                var myName = getterName;
-               
-                object[myName] = 
+                var myGetName = getterName;
+                var mySetName = setterName;
+                object[myGetName] = 
                     function(){   
                         // does the get and loads properties from new object into old object
+                        resetMethods();
                         loaderFunction(object, propertyNames);
-                        for (var oldGetterName in oldGetters){
-                            object[oldGetterName] = oldGetters[oldGetterName];
-                        }
-                        return object[myName]();
-                };
+                        return object[myGetName]();
+                    };
+                object[mySetName] = 
+                    function(val){   
+                        // does the get and loads properties from new object into old object
+                        resetMethods();
+                        loaderFunction(object, propertyNames);
+                        return object[mySetName](val);
+                    };
             }
             createReplacerFunction();
         }
@@ -441,6 +457,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
         if (!dojo.lang.isEmpty(modifiedProperties)
             || !dojo.lang.isEmpty(modifiedStamps)){
+            
+            // Get deleted records and make them into a hash
+            var deletedStampsList = recordSet.deletedRecords;
+            var deletedStamps = {};
+            if (deletedStampsList){
+                for (var i = 0; i < deletedStampsList.length; i++){
+                    deletedStamps[deletedStampsList[i]] = true;
+                }
+            }
+            
             var mod = new cosmo.model.Modification(
                 {
                     "recurrenceId": recurrenceId,
@@ -555,6 +581,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
     
+    addStampsToDelete: function (recordSet, note){
+        var stampsToDelete = note.getStampsToDelete();
+        if (stampsToDelete.length > 0){
+            recordSet.deletedRecords = stampsToDelete;
+            note.clearStampsToDelete();
+        }
+    },
+    
     noteToRecordSet: function(note){
         var records = {
             item: this.noteToItemRecord(note),
@@ -570,10 +604,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             uuid: this.getUid(note),
             records: records
         };
-        var deletedStamps = note.getStampsToDelete();
-        if (deletedStamps.length > 0){
-            recordSet.deletedRecords = deletedStamps;
-        }
+        
+        this.addStampsToDelete(recordSet, note);
         
         return recordSet;
     },
@@ -599,10 +631,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (modification.getModifiedStamps().mail){
             records.mail = this.modifiedOccurrenceToMailRecord(noteOccurrence)
         }
+
         var recordSet =  {
             uuid: this.getUid(noteOccurrence),
             records: records
         };
+        
+        this.addStampsToDelete(recordSet, noteOccurrence);
         
         return recordSet;
         

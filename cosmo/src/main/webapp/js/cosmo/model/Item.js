@@ -501,14 +501,14 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
     
     getStampsToDelete: function(){
-        var mod = _getThisModification();
+        var mod = this._getThisModification();
         if (mod){
             return mod.getStampsToDelete();
         }
     },
     
     addStampToDelete: function(stampName){
-        var mod = _getThisModification();
+        var mod = this._getThisModification();
         if (!mod){
             mod = new cosmo.model.Modification({
                 recurrenceId: this.recurrenceId
@@ -519,14 +519,14 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
     
     removeStampToDelete: function(stampName){
-        var mod = _getThisModification();
+        var mod = this._getThisModification();
         if (mod){
             mod.removeStampToDelete(stampName);
         }
     },
     
     isStampToBeDeleted: function(stampName){
-        var mod = _getThisModification();
+        var mod = this._getThisModification();
         if (mod){
             return mod.isStampToBeDeleted(stampName);
         }
@@ -534,7 +534,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
     
     clearStampsToDelete: function(){
-        var mod = _getThisModification();
+        var mod = this._getThisModification();
         if (mod){
             mod.clearStampsToDelete();
         }

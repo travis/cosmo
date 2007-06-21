@@ -33,8 +33,15 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertTrue("collections length", collections.length > 0);
             var c0 = collections[0];
             // test lazy loading
-            jum.assertTrue("lazy loading broken", !!c0.getUrls())
-            // test getCollection
+            jum.assertTrue("lazy loading on get broken", !!c0.getUrls())
+            
+            collections = conduit.getCollections({sync: true}).results[0];
+            c0 = collections[0];
+            
+            c0.setDisplayName("bork bork bork");
+            jum.assertEquals("lazy loading before set broken", "bork bork bork", c0.getDisplayName());
+            
+           // test getCollection
             var collectionDetails = conduit.getCollection("collection/" + c0.getUid(), {sync: true});
             jum.assertTrue("collectionDetails", !!collectionDetails)
 

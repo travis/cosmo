@@ -170,6 +170,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         this.itemCount =  items;
         this.pageCount = pages;
+        this.currPageNum = 1;
     };
     this.goNextPage = function () {
         self.currPageNum++;

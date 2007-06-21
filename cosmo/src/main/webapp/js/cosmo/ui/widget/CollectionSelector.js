@@ -52,9 +52,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var c = this.collections[t.selectedIndex];
             this.currentCollection = c;
             cosmo.app.pim.currentCollection = c;
-            dojo.event.topic.publish('/calEvent', {
+            // Publish this through a setTimeout call so that the
+            // select box doesn't just sit open while waiting for
+            // the collection data to load and the UI to render
+            var f = function () { dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection', opts: { collection: c }, data: {}
-            });
+            }); };
+            setTimeout(f, 0);
         },
 
         strings: {

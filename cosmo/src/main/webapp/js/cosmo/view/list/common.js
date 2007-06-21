@@ -66,6 +66,9 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
     var opts = cmd.opts;
     var delta = cmd.delta;
     switch (act) {
+        case 'loadCollection':
+            cosmo.view.list.loadItems();
+            break;
         case 'save':
             var saveItem = cmd.data;
             alert('Not implemented yet.');
@@ -75,8 +78,9 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
 };
 
 cosmo.view.list.loadItems = function (o) {
-    var opts = o;
-    var collection = opts.collection;
+    var opts = o || {};
+    // Default to the app's currentCollection if one isn't passed
+    var collection = opts.collection || cosmo.app.pim.currentCollection;
     var itemLoadList = null;
     var showErr = function (e) {
         cosmo.app.showErr(_('Main.Error.LoadEventsFailed'),

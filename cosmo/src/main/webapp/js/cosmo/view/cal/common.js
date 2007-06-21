@@ -125,43 +125,33 @@ cosmo.view.cal.handlePub_app = function (cmd) {
 cosmo.view.cal.triggerLoadEvents = function (o) {
     dojo.debug("trigger!");
     var _cal = cosmo.view.cal; // Scope-ness
-    var _pim = cosmo.app.pim;
     var opts = {};
-    var collection = opts.collection;
-    var goTo = o.goTo;
+    var goToNav = o.goTo;
 
-    // Changing collection
-    // --------
-    if (collection) {
-        // Update pointer to currently selected collection
-        _cal.currentCollection = collection;
-        _pim.currentCollection = collection;
-    }
     // Changing dates
     // --------
-    if (goTo) {
+    if (goToNav) {
         dojo.debug("goto");
         // param is 'back' or 'next'
-        if (typeof goTo == 'string') {
-            var key = goTo.toLowerCase();
+        if (typeof goToNav == 'string') {
+            var key = goToNav.toLowerCase();
             var incr = key.indexOf('back') > -1 ? -1 : 1;
             queryDate = cosmo.datetime.Date.add(_cal.viewStart,
                 dojo.date.dateParts.WEEK, incr);
         }
         // param is actual Date
         else {
-            queryDate = goTo;
+            queryDate = goToNav;
         }
         // Update _cal.viewStart and _cal.viewEnd with new dates
         _cal.setQuerySpan(queryDate);
     }
 
-    // Data obj to pass to topic publishing
+    // Opts obj to pass to topic publishing
     opts = {
-        collection: _pim.currentCollection,
         viewStart: _cal.viewStart,
         viewEnd: _cal.viewEnd,
-        currDate: _pim.currDate
+        currDate: cosmo.app.pim.currDate
     }
     // Pass along the original opts
     for (var n in o) { opts[n] = o[n]; }
@@ -179,7 +169,8 @@ cosmo.view.cal.triggerLoadEvents = function (o) {
  */
 cosmo.view.cal.loadEvents = function (o) {
     var opts = o;
-    var collection = opts.collection;
+    // Default to the app's currentCollection if one isn't passed
+    var collection = opts.collection || cosmo.app.pim.currentCollection;
     var start = opts.viewStart;
     var end = opts.viewEnd;
     var eventLoadList = null;

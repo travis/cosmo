@@ -88,7 +88,7 @@ cosmo.ui.navbar.Bar = function (p) {
         var _pim = cosmo.app.pim;
         _pim.currentView = v;
         if (v == _pim.views.LIST) {
-            cosmo.view.list.loadItems({ collection: _pim.currentCollection });
+            cosmo.view.list.loadItems();
             // If the cal canvas is currently showing, save the scroll
             // offset of the timed canvas
             if (self.calCanvas.domNode.style.display == 'block') {
@@ -98,8 +98,8 @@ cosmo.ui.navbar.Bar = function (p) {
             self.listCanvas.domNode.style.display = 'block';
         }
         else if (v == _pim.views.CAL) {
-            cosmo.view.cal.loadEvents({ collection: _pim.currentCollection,
-                viewStart: cosmo.view.cal.viewStart, viewEnd: cosmo.view.cal.viewEnd });
+            cosmo.view.cal.loadEvents({ viewStart: cosmo.view.cal.viewStart, 
+                viewEnd: cosmo.view.cal.viewEnd });
             self.listCanvas.domNode.style.display = 'none';
             self.calCanvas.domNode.style.display = 'block';
             cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();

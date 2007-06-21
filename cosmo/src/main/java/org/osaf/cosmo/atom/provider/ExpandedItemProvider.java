@@ -35,33 +35,35 @@ import org.osaf.cosmo.server.ServiceLocator;
 public class ExpandedItemProvider extends ItemProvider {
     private static final Log log =
         LogFactory.getLog(ExpandedItemProvider.class);
-    private static final String[] ALLOWED_METHODS =
-        new String[] { "GET", "HEAD" };
+    private static final String[] ALLOWED_COLL_METHODS =
+        new String[] { "GET", "HEAD", "OPTIONS" };
+    private static final String[] ALLOWED_ENTRY_METHODS =
+        new String[] { "OPTIONS" };
 
     // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext deleteMedia(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        throw new UnsupportedOperationException();
     }
 
     public ResponseContext updateEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext updateMedia(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext getService(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        throw new UnsupportedOperationException();
     }
 
     public ResponseContext getFeed(RequestContext request) {
@@ -99,28 +101,28 @@ public class ExpandedItemProvider extends ItemProvider {
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext getMedia(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext getCategories(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedProvider methods
 
     public ResponseContext updateCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_METHODS);
+        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
     }
 }

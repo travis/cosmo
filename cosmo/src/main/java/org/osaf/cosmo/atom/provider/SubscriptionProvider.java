@@ -46,6 +46,10 @@ public class SubscriptionProvider extends BaseProvider
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(SubscriptionProvider.class);
+    private static final String[] ALLOWED_COLL_METHODS =
+        new String[] { "GET", "HEAD", "POST", "OPTIONS" };
+    private static final String[] ALLOWED_ENTRY_METHODS =
+        new String[] { "GET", "HEAD", "PUT", "OPTIONS" };
 
     private UserService userService;
 
@@ -245,17 +249,17 @@ public class SubscriptionProvider extends BaseProvider
     }
   
     public ResponseContext entryPost(RequestContext request) {
-        throw new UnsupportedOperationException();
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext mediaPost(RequestContext request) {
-        throw new UnsupportedOperationException();
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedProvider methods
 
     public ResponseContext updateCollection(RequestContext request) {
-        throw new UnsupportedOperationException();
+        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
     }
 
     // our methods

@@ -78,6 +78,10 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     private ContentService contentService;
 
     // Provider methods
+    private static final String[] ALLOWED_COLL_METHODS =
+        new String[] { "GET", "HEAD", "POST", "PUT", "OPTIONS" };
+    private static final String[] ALLOWED_ENTRY_METHODS =
+        new String[] { "GET", "HEAD", "PUT", "OPTIONS" };
 
     public ResponseContext createEntry(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
@@ -371,11 +375,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     }
   
     public ResponseContext entryPost(RequestContext request) {
-        throw new UnsupportedOperationException();
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext mediaPost(RequestContext request) {
-        throw new UnsupportedOperationException();
+        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedProvider methods

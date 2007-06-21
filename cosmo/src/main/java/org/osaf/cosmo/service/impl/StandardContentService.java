@@ -22,19 +22,24 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.calendar.RecurrenceExpander;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -74,8 +79,9 @@ public class StandardContentService implements ContentService {
     }
 
     /**
-     * Find an item with the specified uid. The return type will be one of
-     * ContentItem, CollectionItem, CalendarCollectionItem, CalendarItem.
+     * Find an item with the specified uid.  If the uid is found, return
+     * the item found.  If the uid represents a recurring NoteItem occurrence
+     * (parentUid:recurrenceId), return a NoteOccurrence.
      *
      * @param uid
      *            uid of item to find
@@ -85,7 +91,32 @@ public class StandardContentService implements ContentService {
         if (log.isDebugEnabled()) {
             log.debug("finding item with uid " + uid);
         }
-        return contentDao.findItemByUid(uid);
+        Item item = contentDao.findItemByUid(uid);
+        return item;
+        
+//      TODO: Can't do this yet because there is code that expects null when
+//      a modification doesn't exist.  Need to fix that before enablling
+//      this
+  
+        
+        // return item if found
+//        if(item!=null)
+//            return item;      
+        
+//        // Handle case where uid represents an occurence of a
+//        // recurring item.
+//        if(uid.indexOf(ModificationUid.RECURRENCEID_DELIMITER)!=-1) {
+//            ModificationUid modUid = new ModificationUid(uid);
+//            // Find the parent, and then verify that the recurrenceId is a valid
+//            // occurrence date for the recurring item.
+//            NoteItem parent = (NoteItem) contentDao.findItemByUid(modUid.getParentUid());
+//            if(parent==null)
+//                return null;
+//            else
+//                return getNoteOccurrence(parent, modUid.getRecurrenceId());
+//        }
+//        
+//        return null;
     }
 
     /**
@@ -749,10 +780,12 @@ public class StandardContentService implements ContentService {
      * @param collection collection
      * @param statusLabel triage status to find
      * @param pointInTime point in time to triage
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return set of notes that match the specified triage status label
      */
-    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection, String statusLabel, Date pointInTime) {
-        return triageStatusQueryProcessor.processTriageStatusQuery(collection, statusLabel, pointInTime);
+    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection, String statusLabel, Date pointInTime, TimeZone timezone) {
+        return triageStatusQueryProcessor.processTriageStatusQuery(collection, statusLabel, pointInTime, timezone);
     }
 
     /**
@@ -1019,5 +1052,18 @@ public class StandardContentService implements ContentService {
             lockManager.unlockCollection(lock);
     }
     
-    
+    private NoteOccurrence getNoteOccurrence(NoteItem parent, net.fortuna.ical4j.model.Date recurrenceId) {
+        EventStamp eventStamp = EventStamp.getStamp(parent);
+        
+        // parent must be a recurring event
+        if(eventStamp==null || !eventStamp.isRecurring())
+            return null;
+        
+        // verify that occurrence date is valid
+        RecurrenceExpander expander = new RecurrenceExpander();
+        if(expander.isOccurrence(eventStamp.getCalendar(), recurrenceId))
+            return new NoteOccurrence(recurrenceId, parent);
+        
+        return null;
+    }
 }

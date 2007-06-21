@@ -98,9 +98,8 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             tz = esf.getTimezone();
         }
 
-        // XXX: pass timezone
         Set<NoteItem> notes = getFactory().getContentService().
-            findNotesByTriageStatus(collection, label, now);
+            findNotesByTriageStatus(collection, label, now, tz);
 
         // sort by triage rank
         TreeSet<NoteItem> contents =
@@ -110,13 +109,9 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
         if (triageStatus == TriageStatus.CODE_DONE) {
             // limit to 25 entries
             if (contents.size() > MAX_DONE) {
-                Iterator it = contents.iterator();
-                int i = 0;
-                while (it.hasNext()) {
-                    i++;
-                    if (i > MAX_DONE)
-                        it.remove();
-                }
+                int size = contents.size();
+                for(int i=0;i<(size-25);i++)
+                    contents.remove(contents.first());
             }
         }
 

@@ -26,6 +26,8 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
@@ -34,6 +36,8 @@ import net.fortuna.ical4j.model.component.VTimeZone;
  */
 public class InstanceListTest extends TestCase {
     protected String baseDir = "src/test/unit/resources/testdata/";
+    private static final TimeZoneRegistry TIMEZONE_REGISTRY =
+                TimeZoneRegistryFactory.getInstance().createRegistry();
     
     public void testNonUTCInstanceList() throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
@@ -231,6 +235,77 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070511T081500Z", key);
         Assert.assertEquals("20070511T081500Z", instance.getStart().toString());
         Assert.assertEquals("20070511T091500Z", instance.getEnd().toString());
+    }
+    
+    public void testFloatingWithSwitchingTimezoneInstanceList() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "floating_recurr_event.ics");
+        Calendar calendar = cb.build(fis);
+        
+        TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles");
+        InstanceList instances = new InstanceList();
+        instances.setTimezone(tz);
+        
+        DateTime start = new DateTime("20060102T220000Z");
+        DateTime end = new DateTime("20060108T190000Z");
+        
+        ComponentList comps = calendar.getComponents();
+        Iterator<VEvent> it = comps.getComponents("VEVENT").iterator();
+        boolean addedMaster = false;
+        while(it.hasNext()) {
+            VEvent event = it.next();
+            if(event.getRecurrenceId()==null) {
+                addedMaster = true;
+                instances.addComponent(event, start, end);
+            }
+            else {
+                Assert.assertTrue(addedMaster);
+                instances.addOverride(event);
+            }
+        }
+        
+        TreeSet sortedKeys = new TreeSet(instances.keySet());
+        Assert.assertEquals(5, sortedKeys.size() );
+        
+        Iterator<String> keys = sortedKeys.iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20060102T220000Z", key);
+        Assert.assertEquals("20060102T220000Z", instance.getStart().toString());
+        Assert.assertEquals("20060102T230000Z", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20060103T220000Z", key);
+        Assert.assertEquals("20060103T220000Z", instance.getStart().toString());
+        Assert.assertEquals("20060103T230000Z", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20060104T220000Z", key);
+        Assert.assertEquals("20060105T000000Z", instance.getStart().toString());
+        Assert.assertEquals("20060105T010000Z", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20060105T220000Z", key);
+        Assert.assertEquals("20060106T000000Z", instance.getStart().toString());
+        Assert.assertEquals("20060106T010000Z", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20060106T220000Z", key);
+        Assert.assertEquals("20060106T220000Z", instance.getStart().toString());
+        Assert.assertEquals("20060106T230000Z", instance.getEnd().toString());
     }
     
 }

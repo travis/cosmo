@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
@@ -329,10 +330,12 @@ public interface ContentService extends Service {
      * @param collection collection
      * @param statusLabel triage status to find
      * @param pointInTime point in time to triage
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return set of notes that match the specified triage status label
      */
     public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection,
-            String statusLabel, Date pointInTime);
+            String statusLabel, Date pointInTime, TimeZone timezone);
     
     /**
      * Creates a ticket on an item.

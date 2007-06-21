@@ -176,6 +176,23 @@ public class RecurrenceExpanderTest extends TestCase {
         Assert.assertEquals("20101212T120000", range[1].toString());
     }
     
+    public void testRecurrenceExpanderSingleOccurrence() throws Exception {
+        RecurrenceExpander expander = new RecurrenceExpander();
+        EventStamp es = new EventStamp(new NoteItem());
+        es.createCalendar();
+        es.setStartDate(new DateTime("20070101T100000"));
+        es.setEndDate(new DateTime("20070101T120000"));
+        
+        String recur1 = "FREQ=DAILY;UNTIL=20100101T120000Z";
+       
+        List recurs = EimValueConverter.toICalRecurs(recur1);
+        es.setRecurrenceRules(recurs);
+        
+        InstanceList instances = expander.getOcurrences(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080101T100001"), null);
+        
+        Assert.assertEquals(1, instances.size());
+    }
+    
     public void testRecurrenceExpanderFirstOccurrence() throws Exception {
         RecurrenceExpander expander = new RecurrenceExpander();
         EventStamp es = new EventStamp(new NoteItem());
@@ -188,7 +205,7 @@ public class RecurrenceExpanderTest extends TestCase {
         List recurs = EimValueConverter.toICalRecurs(recur1);
         es.setRecurrenceRules(recurs);
         
-        Instance instance = expander.getFirstInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T100000"));
+        Instance instance = expander.getFirstInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T100000"), null);
         
         Assert.assertEquals("20080101T100000", instance.getRid().toString());
     }
@@ -205,9 +222,54 @@ public class RecurrenceExpanderTest extends TestCase {
         List recurs = EimValueConverter.toICalRecurs(recur1);
         es.setRecurrenceRules(recurs);
         
-        Instance instance = expander.getLatestInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T110000"));
+        Instance instance = expander.getLatestInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T110000"), null);
         
         Assert.assertEquals("20080105T100000", instance.getRid().toString());
+    }
+    
+    public void testIsOccurrence() throws Exception {
+        RecurrenceExpander expander = new RecurrenceExpander();
+        EventStamp es = new EventStamp(new NoteItem());
+        es.createCalendar();
+        
+        // test floating DATETIME
+        es.setStartDate(new DateTime("20070101T100000"));
+        es.setEndDate(new DateTime("20070101T120000"));
+        
+        String recur1 = "FREQ=DAILY;UNTIL=20100101T120000Z";
+       
+        List recurs = EimValueConverter.toICalRecurs(recur1);
+        es.setRecurrenceRules(recurs);
+        
+        Assert.assertTrue(expander.isOccurrence(es.getCalendar(), new DateTime("20070102T100000")));
+        Assert.assertFalse(expander.isOccurrence(es.getCalendar(), new DateTime("20070102T110000")));
+        Assert.assertFalse(expander.isOccurrence(es.getCalendar(), new DateTime("20070102T100001")));
+    
+        // test DATE
+        es.setStartDate(new Date("20070101"));
+        es.setEndDate(new Date("20070102"));
+        recur1 = "FREQ=WEEKLY;UNTIL=20100101";
+        
+        recurs = EimValueConverter.toICalRecurs(recur1);
+        es.setRecurrenceRules(recurs);
+        
+        Assert.assertTrue(expander.isOccurrence(es.getCalendar(), new Date("20070101")));
+        Assert.assertFalse(expander.isOccurrence(es.getCalendar(), new Date("20070102")));
+        Assert.assertTrue(expander.isOccurrence(es.getCalendar(), new Date("20070108")));
+        
+        // test DATETIME with timezone
+        TimeZone ctz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
+        es.setStartDate(new DateTime("20070101T100000", ctz));
+        es.setEndDate(new DateTime("20070101T120000", ctz));
+        
+        recur1 = "FREQ=DAILY;UNTIL=20100101T120000Z";
+       
+        recurs = EimValueConverter.toICalRecurs(recur1);
+        es.setRecurrenceRules(recurs);
+        
+        Assert.assertTrue(expander.isOccurrence(es.getCalendar(), new DateTime("20070102T100000", ctz)));
+        Assert.assertFalse(expander.isOccurrence(es.getCalendar(), new DateTime("20070102T110000", ctz)));
+        Assert.assertFalse(expander.isOccurrence(es.getCalendar(), new DateTime("20070102T100001", ctz)));
     }
     
 }

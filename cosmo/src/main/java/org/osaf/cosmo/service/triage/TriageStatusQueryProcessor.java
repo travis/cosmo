@@ -18,6 +18,8 @@ package org.osaf.cosmo.service.triage;
 import java.util.Date;
 import java.util.Set;
 
+import net.fortuna.ical4j.model.TimeZone;
+
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -31,7 +33,20 @@ import org.osaf.cosmo.model.NoteItem;
  * on the status queried.
  */
 public interface TriageStatusQueryProcessor {
+    
+    /**
+     * Return NoteItems from a collection that fall into a 
+     * given triage status category.
+     * @param collection collection to search
+     * @param triageStatusLabel triage status label to match
+     * @param pointInTime time that is considered "NOW"
+     * @param timezone Optional timezone to use in interpreting
+     *                 floating times. If null, the system default
+     *                 will be used.
+     * @return the set of NoteItems that match the given parameters
+     */
     public Set<NoteItem> processTriageStatusQuery(CollectionItem collection,
             String triageStatusLabel,
-            Date pointInTime);
+            Date pointInTime,
+            TimeZone timezone);
 }

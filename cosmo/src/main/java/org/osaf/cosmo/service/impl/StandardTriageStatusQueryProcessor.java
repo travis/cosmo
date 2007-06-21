@@ -22,6 +22,7 @@ import java.util.Set;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,14 +59,17 @@ public class StandardTriageStatusQueryProcessor implements
     private Dur doneDur = new Dur("-P30D");
     private int maxDone = 25;
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.service.triage.TriageStatusQueryProcessor#processTriageStatusQuery(org.osaf.cosmo.model.CollectionItem, java.lang.String, java.util.Date, net.fortuna.ical4j.model.TimeZone)
+     */
     public Set<NoteItem> processTriageStatusQuery(CollectionItem collection,
-            String triageStatusLabel, Date pointInTime) {
+            String triageStatusLabel, Date pointInTime, TimeZone timezone) {
         if(TriageStatus.LABEL_DONE.equalsIgnoreCase(triageStatusLabel))
-            return getDone(collection, pointInTime);
+            return getDone(collection, pointInTime, timezone);
         else if(TriageStatus.LABEL_NOW.equalsIgnoreCase(triageStatusLabel))
-            return getNow(collection, pointInTime);
+            return getNow(collection, pointInTime, timezone);
         else if(TriageStatus.LABEL_LATER.equalsIgnoreCase(triageStatusLabel))
-            return getLater(collection, pointInTime);
+            return getLater(collection, pointInTime, timezone);
         else
             throw new IllegalArgumentException("invalid status: " + triageStatusLabel);
     }
@@ -77,7 +81,7 @@ public class StandardTriageStatusQueryProcessor implements
      *   - Modifications with triage status NOW<br/>
      *   - Occurrences whose period overlaps the current point in time 
      */
-    private Set<NoteItem> getNow(CollectionItem collection, Date pointInTime) {
+    private Set<NoteItem> getNow(CollectionItem collection, Date pointInTime, TimeZone timezone) {
         
         // filter for NOW triage notes
         NoteItemFilter nowFilter = getTriageStatusFilter(collection, TriageStatus.CODE_NOW);
@@ -113,7 +117,7 @@ public class StandardTriageStatusQueryProcessor implements
             EventStamp eventStamp = EventStamp.getStamp(note);
            
             // Get all occurrences that overlap current instance in time
-            InstanceList occurrences = expander.getOcurrences(eventStamp.getCalendar(), currentDate, currentDate);
+            InstanceList occurrences = expander.getOcurrences(eventStamp.getCalendar(), currentDate, currentDate, timezone);
             
             for(Instance instance: (Collection<Instance>) occurrences.values()) {
                 // Not interested in modifications
@@ -136,7 +140,7 @@ public class StandardTriageStatusQueryProcessor implements
      *   - For each recurring item, either the next occurring modification 
      *     with triage status LATER or the next occurrence, whichever occurs sooner 
      */
-    private Set<NoteItem> getLater(CollectionItem collection, Date pointInTime) {
+    private Set<NoteItem> getLater(CollectionItem collection, Date pointInTime, TimeZone timezone) {
        
        // filter for LATER triage status 
        NoteItemFilter laterFilter = getTriageStatusFilter(collection, TriageStatus.CODE_LATER);
@@ -161,7 +165,7 @@ public class StandardTriageStatusQueryProcessor implements
            
            // calculate the next occurrence or modification of the recurring event
            Instance instance = 
-               expander.getFirstInstance(eventStamp.getCalendar(), new DateTime(currentDate), new DateTime(futureDate));
+               expander.getFirstInstance(eventStamp.getCalendar(), new DateTime(currentDate), new DateTime(futureDate), timezone);
        
            if(instance!=null) {
                // add master
@@ -189,7 +193,7 @@ public class StandardTriageStatusQueryProcessor implements
      *     modification with triage status DONE or the most recent occurrence,
      *     whichever occurred most recently 
      */
-    private Set<NoteItem> getDone(CollectionItem collection, Date pointInTime) {
+    private Set<NoteItem> getDone(CollectionItem collection, Date pointInTime, TimeZone timezone) {
         
         // filter for DONE triage status
         NoteItemFilter doneFilter = getTriageStatusFilter(collection, TriageStatus.CODE_DONE);
@@ -214,7 +218,7 @@ public class StandardTriageStatusQueryProcessor implements
            
             // calculate the previous occurrence or modification
             Instance instance = 
-                expander.getLatestInstance(eventStamp.getCalendar(), new DateTime(pastDate), new DateTime(currentDate));
+                expander.getLatestInstance(eventStamp.getCalendar(), new DateTime(pastDate), new DateTime(currentDate), timezone);
         
             if(instance!=null) {
                 // add master

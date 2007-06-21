@@ -33,6 +33,7 @@ import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -40,6 +41,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.util.Dates;
 
 /**
  * Utility class that contains apis that that involve
@@ -48,7 +50,6 @@ import net.fortuna.ical4j.model.property.RRule;
 public class RecurrenceExpander {
     
     private static Date MAX_EXPAND_DATE = null;
-    private static Date MAX_EXPAND_DATE_TIME = null;
    
     static {
         try {
@@ -56,7 +57,6 @@ public class RecurrenceExpander {
             // that have an end.  Recurring events with no end
             // will be indexed as infinite.
             MAX_EXPAND_DATE = new Date("20300101");
-            MAX_EXPAND_DATE_TIME = new DateTime("20300101T010000");
         } catch (ParseException e) {}
     }
     
@@ -213,7 +213,7 @@ public class RecurrenceExpander {
             // adjustedRangeStart, rangeEnd, (Value)
             // start.getParameters().getParameter(Parameter.VALUE));
             DateList startDates = rrule.getRecur().getDates(start, start,
-                    getMaxExpandDate(start),
+                    MAX_EXPAND_DATE,
                     (start instanceof DateTime) ? Value.DATE_TIME : Value.DATE);
             
             // Dates are sorted, so get the last occurence, and calculate the end
@@ -249,16 +249,18 @@ public class RecurrenceExpander {
         
         return dateRange;
     }
-
+    
     /**
      * Expand recurring event for given time-range.
      * @param calendar calendar containing recurring event and modifications
      * @param rangeStart expand start
      * @param rangeEnd expand end
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return InstanceList containing all occurences of recurring event during
      *         time range
      */
-    public InstanceList getOcurrences(Calendar calendar, Date rangeStart, Date rangeEnd) {
+    public InstanceList getOcurrences(Calendar calendar, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         ComponentList vevents = calendar.getComponents().getComponents(
                 Component.VEVENT);
         
@@ -275,7 +277,7 @@ public class RecurrenceExpander {
             
         }
         
-        return getOcurrences(masterComp, exceptions, rangeStart, rangeEnd);
+        return getOcurrences(masterComp, exceptions, rangeStart, rangeEnd, timezone);
     }
     
     /**
@@ -283,11 +285,13 @@ public class RecurrenceExpander {
      * @param component recurring component to expand
      * @param rangeStart expand start date
      * @param rangeEnd expand end date
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return InstanceList containing all occurences of recurring event during
      *         time range
      */
-    public InstanceList getOcurrences(Component component, Date rangeStart, Date rangeEnd) {
-        return getOcurrences(component, new ArrayList<Component>(0), rangeStart, rangeEnd);
+    public InstanceList getOcurrences(Component component, Date rangeStart, Date rangeEnd, TimeZone timezone) {
+        return getOcurrences(component, new ArrayList<Component>(0), rangeStart, rangeEnd, timezone);
     }
     
     /**
@@ -296,11 +300,14 @@ public class RecurrenceExpander {
      * @param modifications modifications to recurring component
      * @param rangeStart expand start date
      * @param rangeEnd expand end date
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return InstanceList containing all occurences of recurring event during
      *         time range 
      */
-    public InstanceList getOcurrences(Component component, List<Component> modifications, Date rangeStart, Date rangeEnd) {
+    public InstanceList getOcurrences(Component component, List<Component> modifications, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         InstanceList instances = new InstanceList();
+        instances.setTimezone(timezone);
         instances.addMaster(component, rangeStart, rangeEnd);
         for(Component mod: modifications)
             instances.addOverride(mod);
@@ -314,11 +321,13 @@ public class RecurrenceExpander {
      * @param calendar recurring calendar component
      * @param rangeStart period start
      * @param rangeEnd period end
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return the latest ocurring instance, else null if no instance
      *         occurs within the specified time range
      */
-    public Instance getLatestInstance(Calendar calendar, Date rangeStart, Date rangeEnd) {
-        InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd );
+    public Instance getLatestInstance(Calendar calendar, Date rangeStart, Date rangeEnd, TimeZone timezone) {
+        InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd, timezone );
         if(instances.size()==0)
             return null;
         
@@ -327,23 +336,59 @@ public class RecurrenceExpander {
         return sortedInstances.get(sortedInstances.lastKey());
     }
     
+    
     /**
      * Calculate and return the first ocurring instance for the 
      * specified recurring calendar compnent and date range.
      * @param calendar recurring calendar component
      * @param rangeStart period start
      * @param rangeEnd period end
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
      * @return the first ocurring instance, else null if no instance
      *         occurs within the specified time range
      */
-    public Instance getFirstInstance(Calendar calendar, Date rangeStart, Date rangeEnd) {
-        InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd );
+    public Instance getFirstInstance(Calendar calendar, Date rangeStart, Date rangeEnd, TimeZone timezone) {
+        InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd, timezone );
         if(instances.size()==0)
             return null;
         
         TreeMap<String, Instance> sortedInstances = new TreeMap<String, Instance>();
         sortedInstances.putAll(instances);
         return sortedInstances.get(sortedInstances.firstKey());
+    }
+    
+    /**
+     * Determine if date is a valid occurence in recurring calendar component
+     * @param calendar recurring calendar component
+     * @param occurrence occurrence date
+     * @return true if the occurrence date is a valid occurrence, otherwise false
+     */
+    public boolean isOccurrence(Calendar calendar, Date occurrence) {
+        java.util.Calendar cal = Dates.getCalendarInstance(occurrence);
+        cal.setTime(occurrence);
+       
+        // Add a second or day (one unit forward) so we can set a range for
+        // finding instances.  This is required because ical4j's Recur apis
+        // only calculate recurring dates up until but not including the 
+        // end date of the range.
+        if(occurrence instanceof DateTime)
+            cal.add(java.util.Calendar.SECOND, 1);
+        else
+            cal.add(java.util.Calendar.DAY_OF_WEEK, 1);
+        
+        Date rangeEnd = 
+            org.osaf.cosmo.calendar.util.Dates.getInstance(cal.getTime(), occurrence);
+        
+        InstanceList instances = getOcurrences(calendar, occurrence, rangeEnd, null);
+        
+        for(Iterator<Instance> it = instances.values().iterator(); it.hasNext();) {
+            Instance instance = it.next();
+            if(instance.getRid().getTime()==occurrence.getTime())
+                return true;
+        }
+        
+        return false;
     }
     
     private Date getStartDate(Component comp) {
@@ -365,12 +410,5 @@ public class RecurrenceExpander {
             }
         }
         return (dtEnd != null) ? dtEnd.getDate() : null;
-    }
-    
-    private Date getMaxExpandDate(Date date) {
-        if(date instanceof DateTime)
-            return MAX_EXPAND_DATE_TIME;
-        else
-            return MAX_EXPAND_DATE;
     }
 }

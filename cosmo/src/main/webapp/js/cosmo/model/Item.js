@@ -441,7 +441,6 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
     
     removeStamp: function (/*String*/ stampName){
-        
         this.addStampToDelete(stampName);
     },
 

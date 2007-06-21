@@ -113,7 +113,22 @@ dojo.declare("cosmo.model.Delta", null, {
                 continue;
             }
             this._filterOutEqualProperties(stamp, stampChanges);
-        }        
+        }
+        
+        for (var stampName in this._addedStamps){
+            //if the note actually already has this stamp, no need for it to be in added stamps
+            if (this._note.getStamp(stampName)){
+                delete this._addedStamps[stampName];
+            }    
+        }
+        
+        for (var stampName in this._deletedStamps){
+            //if the note doesn't have this stamp, no need for it to be in deleted stamps
+            if (!this._note.getStamp(stampName)){
+                delete this._deletedStamps[stampName];
+            }    
+        }    
+        
     },
     
     getApplicableChangeTypes: function(){

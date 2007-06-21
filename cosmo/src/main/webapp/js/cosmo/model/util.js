@@ -228,6 +228,10 @@ cosmo.model.util.equals = function (a,b){
         return false;
     }
     
+    if (a == null){
+        type = typeof(b);
+    }
+    
     if (type != typeof(b)){
         throw new Error("Both operands must be of the same type!\n You passed '" 
            + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));

@@ -31,14 +31,18 @@ dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.datetime.timezone');
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.DetailFormConverter");
 
 cosmo.ui.detail = new function () {
+    this.item = null;
+    
     this.createFormElementsForStamp = function (stampType) {
         return new cosmo.ui.detail[stampType + 'FormElements']();
     };
     
     this.saveItem = function () {
-        alert('save');
+        var converter = new cosmo.ui.DetailFormConverter(this.item.data);
+        xxx = converter.createDelta();
     };
     
     this.removeItem = function () {
@@ -60,21 +64,6 @@ cosmo.ui.detail = new function () {
         return d;
     };
     
-    
-/*    this.getStampForm = function(stampName){
-        //summary: returns the form object for the given stamp name
-        stampName = stampName.toLowerCase();
-        return cosmo.app.pim.baseLayout.mainApp.rightSidebar
-                   .detailViewForm.[stampName +"Section"].formSection.formNode;
-    }*/
-    
-    this.getMainForm = function(){
-        return cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.mainSection.formNode;
-    }
-    
-    this.createDelta = function(){
-        
-    };
 };
 
 cosmo.ui.detail.StampFormElemState = function (p) {
@@ -214,11 +203,10 @@ cosmo.ui.detail.DetailViewForm.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
-    function (i) {
+    function (item) {
 
-    var _html = cosmo.util.html;
+    var _html = cosmo.util.html;    
 
-    var item = i || cosmo.view.cal.canvas.getSelectedEvent();
     var data = item.data;
     var section = null;
     var f = null;
@@ -228,6 +216,9 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     // Clear out previous values
     this.clear();
 
+    //save the item
+    cosmo.ui.detail.item = item;
+    
     this.mainSection.toggleEnabled(true);
     f = this.mainSection.formNode;
     f.noteTitle.value = data.getDisplayName();
@@ -1096,7 +1087,7 @@ cosmo.ui.detail.ButtonSection = function () {
             if (btn) {
                 btn.destroy();
             }
-            var func = enabled ? cosmo.ui.detail[key + 'Item'] : null;
+            var func = enabled ? dojo.lang.hitch(cosmo.ui.detail,cosmo.ui.detail[key + 'Item']) : null;
             this[key + 'Button'] = dojo.widget.createWidget("cosmo:Button", {
                 text: _("App.Button." + btns[i]),
                 handleOnClick: func,

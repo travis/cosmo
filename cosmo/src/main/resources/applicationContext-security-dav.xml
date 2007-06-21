@@ -76,49 +76,8 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=davHttpRequestContextIntegrationFilter,davBasicProcessingFilter,davTicketProcessingFilter,davExceptionTranslationFilter,davFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,davFilterInvocationInterceptor
       </value>
-    </property>
-  </bean>
-
-  <!-- filter that integrates SecurityContext into HTTP request -->
-
-  <bean id="davHttpRequestContextIntegrationFilter"
-        class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
-
-  <!-- filter that performs ticket authentication -->
-
-  <bean id="davTicketProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
-
-  <!-- filter that performs Basic authentication -->
-
-  <bean id="davBasicAuthenticationEntryPoint"
-        class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-    <property name="realmName">
-      <value>Cosmo Sharing Server</value>
-    </property>
-  </bean>
-
-  <bean id="davBasicProcessingFilter"
-        class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
-    <property name="authenticationManager">
-      <ref bean="authenticationManager"/>
-    </property>
-    <property name="authenticationEntryPoint">
-      <ref local="davBasicAuthenticationEntryPoint"/>
-    </property>
-  </bean>
-
-  <!-- filter that converts authn/authz exceptions to DAV responses -->
-
-  <bean id="davExceptionTranslationFilter"
-        class="org.acegisecurity.ui.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint">
-      <ref local="davBasicAuthenticationEntryPoint"/>
-    </property>
-    <property name="createSessionAllowed">
-      <value>false</value>
     </property>
   </bean>
 

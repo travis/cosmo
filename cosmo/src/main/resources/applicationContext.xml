@@ -734,8 +734,8 @@
      </property>
      <property name="objectDefinitionSource">
        <value>
-     CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-     PATTERN_TYPE_APACHE_ANT
+         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+         PATTERN_TYPE_APACHE_ANT
          /account/new=ROLE_ANONYMOUS
          /account/signup=ROLE_ANONYMOUS
          /account=ROLE_ROOT,ROLE_USER
@@ -842,6 +842,35 @@
     <property name="authenticationEntryPoint">
       <ref local="defaultFormBasedAuthenticationEntryPoint"/>
     </property>
+  </bean>
+
+  <!-- security beans for protocol access -->
+
+  <bean id="protocolHttpRequestContextIntegrationFilter"
+        class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
+
+  <bean id="protocolAuthenticationEntryPoint"
+        class="org.osaf.cosmo.acegisecurity.ui.CosmoAuthenticationEntryPoint"/>
+
+  <bean id="protocolTicketProcessingFilter"
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
+
+  <bean id="protocolBasicProcessingFilter"
+        class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="protocolAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+  <bean id="protocolExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
+    <property name="authenticationEntryPoint">
+      <ref bean="protocolAuthenticationEntryPoint"/>
+    </property>
+    <property name="createSessionAllowed" value="false"/>
   </bean>
 
   <!-- Logging resources -->

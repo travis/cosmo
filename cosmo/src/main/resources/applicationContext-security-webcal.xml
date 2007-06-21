@@ -63,49 +63,8 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=webcalHttpRequestContextIntegrationFilter,webcalBasicProcessingFilter,webcalTicketProcessingFilter,webcalExceptionTranslationFilter,webcalFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,webcalFilterInvocationInterceptor
       </value>
-    </property>
-  </bean>
-
-  <!-- filter that integrates SecurityContext into HTTP request -->
-
-  <bean id="webcalHttpRequestContextIntegrationFilter"
-        class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
-
-  <!-- filter that performs ticket authentication -->
-
-  <bean id="webcalTicketProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
-
-  <!-- filter that performs Basic authentication -->
-
-  <bean id="webcalBasicAuthenticationEntryPoint"
-        class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-    <property name="realmName">
-      <value>Cosmo Sharing Server</value>
-    </property>
-  </bean>
-
-  <bean id="webcalBasicProcessingFilter"
-        class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
-    <property name="authenticationManager">
-      <ref bean="authenticationManager"/>
-    </property>
-    <property name="authenticationEntryPoint">
-      <ref local="webcalBasicAuthenticationEntryPoint"/>
-    </property>
-  </bean>
-
-  <!-- filter that converts authn/authz exceptions to webcal responses -->
-
-  <bean id="webcalExceptionTranslationFilter"
-        class="org.acegisecurity.ui.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint">
-      <ref local="webcalBasicAuthenticationEntryPoint"/>
-    </property>
-    <property name="createSessionAllowed">
-      <value>false</value>
     </property>
   </bean>
 

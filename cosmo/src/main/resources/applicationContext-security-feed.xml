@@ -63,49 +63,8 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=feedHttpRequestContextIntegrationFilter,feedBasicProcessingFilter,feedTicketProcessingFilter,feedExceptionTranslationFilter,feedFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor
       </value>
-    </property>
-  </bean>
-
-  <!-- filter that integrates SecurityContext into HTTP request -->
-
-  <bean id="feedHttpRequestContextIntegrationFilter"
-        class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
-
-  <!-- filter that performs ticket authentication -->
-
-  <bean id="feedTicketProcessingFilter"
-        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
-
-  <!-- filter that performs Basic authentication -->
-
-  <bean id="feedBasicAuthenticationEntryPoint"
-        class="org.acegisecurity.ui.basicauth.BasicProcessingFilterEntryPoint">
-    <property name="realmName">
-      <value>Cosmo Sharing Server</value>
-    </property>
-  </bean>
-
-  <bean id="feedBasicProcessingFilter"
-        class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">
-    <property name="authenticationManager">
-      <ref bean="authenticationManager"/>
-    </property>
-    <property name="authenticationEntryPoint">
-      <ref local="feedBasicAuthenticationEntryPoint"/>
-    </property>
-  </bean>
-
-  <!-- filter that converts authn/authz exceptions to feed responses -->
-
-  <bean id="feedExceptionTranslationFilter"
-        class="org.acegisecurity.ui.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint">
-      <ref local="feedBasicAuthenticationEntryPoint"/>
-    </property>
-    <property name="createSessionAllowed">
-      <value>false</value>
     </property>
   </bean>
 

@@ -16,9 +16,12 @@
 package org.osaf.cosmo.service.impl;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
@@ -35,6 +38,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteItemTriageStatusComparator;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.filter.EventStampFilter;
@@ -52,6 +56,9 @@ public class StandardTriageStatusQueryProcessor implements
 
     private ContentDao contentDao = null;
     private static final Log log = LogFactory.getLog(StandardTriageStatusQueryProcessor.class);
+    private static final Comparator<NoteItem> TRIAGE_COMPARATOR_ASC = new NoteItemTriageStatusComparator(false);
+    private static final Comparator<NoteItem> TRIAGE_COMPARATOR_DESC = new NoteItemTriageStatusComparator(true);
+    
     
     // Duration to search forward/backward for recurring events
     // is set to 30 days by default
@@ -94,7 +101,7 @@ public class StandardTriageStatusQueryProcessor implements
         NoteItemFilter eventFilter = getRecurringEventFilter(collection);
         
         // store all results here
-        Set<NoteItem> results = new HashSet<NoteItem>();
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(TRIAGE_COMPARATOR_ASC);
         
         // Add all non-recurring items that are have an explicit NOW triage,
         // modifications with NOW triage, or no triage (null triage)
@@ -130,7 +137,6 @@ public class StandardTriageStatusQueryProcessor implements
             }
         }
         
-        // TODO: sorting
         return results; 
     }
     
@@ -148,7 +154,7 @@ public class StandardTriageStatusQueryProcessor implements
        // recurring event filter
        NoteItemFilter eventFilter = getRecurringEventFilter(collection);
        
-       Set<NoteItem> results = new HashSet<NoteItem>();
+       TreeSet<NoteItem> results = new TreeSet<NoteItem>(TRIAGE_COMPARATOR_ASC);
        
        // Add all items that are have an explicit LATER triage
        for(Item item : contentDao.findItems(laterFilter))
@@ -182,7 +188,6 @@ public class StandardTriageStatusQueryProcessor implements
            }
        }
        
-       // TODO: sorting
        return results;
     }
     
@@ -201,7 +206,8 @@ public class StandardTriageStatusQueryProcessor implements
         // filter for recurring events
         NoteItemFilter eventFilter = getRecurringEventFilter(collection);
         
-        Set<NoteItem> results = new HashSet<NoteItem>();
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(TRIAGE_COMPARATOR_DESC);
+        Set<NoteItem> masters = new HashSet<NoteItem>();
         
         // Add all items that are have an explicit DONE triage
         for(Item item : contentDao.findItems(doneFilter))
@@ -221,8 +227,8 @@ public class StandardTriageStatusQueryProcessor implements
                 expander.getLatestInstance(eventStamp.getCalendar(), new DateTime(pastDate), new DateTime(currentDate), timezone);
         
             if(instance!=null) {
-                // add master
-                results.add(note);
+                // keep track of master
+                masters.add(note);
                 if(instance.isOverridden()==false) {
                     // add occurrence
                     results.add(new NoteOccurrence(instance.getRid(), note));
@@ -236,7 +242,15 @@ public class StandardTriageStatusQueryProcessor implements
             }
         }
         
-        // TODO: limit to maxDone items and sorting
+        // limit to maxDone items
+        int resultsSize = results.size();
+        for(int i=0;i<(resultsSize - maxDone);i++)
+            results.remove(results.last());
+        
+        // add masters
+        for(NoteItem master : masters)
+            results.add(master);
+        
         return results;
     }
 

@@ -15,25 +15,22 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import net.fortuna.ical4j.model.TimeZone;
-
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
+import net.fortuna.ical4j.model.TimeZone;
+
+import org.apache.abdera.model.Feed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItemComparator;
-import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.server.ServiceLocator;
+import org.osaf.cosmo.service.ContentService;
 
 /**
  * <p>
@@ -98,24 +95,8 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             tz = esf.getTimezone();
         }
 
-        Set<NoteItem> notes = getFactory().getContentService().
+        return (SortedSet<NoteItem>) getFactory().getContentService().
             findNotesByTriageStatus(collection, label, now, tz);
-
-        // sort by triage rank
-        TreeSet<NoteItem> contents =
-            new TreeSet<NoteItem>(new ContentItemComparator());
-        contents.addAll(notes);
-
-        if (triageStatus == TriageStatus.CODE_DONE) {
-            // limit to 25 entries
-            if (contents.size() > MAX_DONE) {
-                int size = contents.size();
-                for(int i=0;i<(size-25);i++)
-                    contents.remove(contents.first());
-            }
-        }
-
-        return contents;
     }
 
     /**

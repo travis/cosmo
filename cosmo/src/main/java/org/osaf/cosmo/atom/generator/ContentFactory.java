@@ -108,7 +108,7 @@ public class ContentFactory
                            NoteItem item)
         throws JsonStreamException {
         ItemTranslator translator = new ItemTranslator(item);
-        EimRecordSet recordset = translator.generateRecords(0);
+        EimRecordSet recordset = translator.generateRecords();
         writer.writeRecordSet(recordset);
     }
 
@@ -134,7 +134,7 @@ public class ContentFactory
                             NoteItem item)
         throws EimmlStreamException {
         ItemTranslator translator = new ItemTranslator(item);
-        EimRecordSet recordset = translator.generateRecords(0);
+        EimRecordSet recordset = translator.generateRecords();
         writer.writeRecordSet(recordset);
     }
 

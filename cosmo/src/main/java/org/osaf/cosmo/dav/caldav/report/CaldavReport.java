@@ -225,7 +225,6 @@ public abstract class CaldavReport
     protected void doQuery(DavResource resource,
                            boolean recurse)
         throws DavException {
-        
         if (((ExtendedDavResource)resource).isCalendarCollection()) {
             try {
                 DavCalendarCollection collection = (DavCalendarCollection) resource;

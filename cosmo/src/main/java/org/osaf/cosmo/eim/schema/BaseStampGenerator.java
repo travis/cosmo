@@ -57,7 +57,7 @@ public abstract class BaseStampGenerator extends BaseGenerator {
      */
     public List<EimRecord> generateRecords(long timestamp) {
         ArrayList<EimRecord> records = new ArrayList<EimRecord>();
-        
+
         // if stamp doesn't exist, check tombstones
         if(stamp==null) {
             checkForTombstones(records, timestamp);
@@ -142,11 +142,11 @@ public abstract class BaseStampGenerator extends BaseGenerator {
                     // need to know about past deletions
                     if(timestamp==-1)
                         return;
-                    
+
                     // Ignore if Tombstone occured before last timestamp
                     if(ts.getTimestamp().getTime()< timestamp)
                         return;
-                    
+
                     // the stamp has been deleted since the given time
                     EimRecord record = new EimRecord(getPrefix(), getNamespace());
                     addKeyFields(record);

@@ -36,7 +36,6 @@ import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.AccountActivator;
 import org.osaf.cosmo.service.account.ActivationContext;
-import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
 
@@ -51,11 +50,6 @@ public class StandardUserService implements UserService {
      */
     public static final String DEFAULT_DIGEST_ALGORITHM = "MD5";
     
-    /**
-     * The name for the default collection created by the server on new accounts.
-     */
-    public static final String DEFAULT_COLLECTION_NAME = "Default Collection";
-
     private MessageDigest digest;
     private String digestAlgorithm;
     private StringIdentifierGenerator passwordGenerator;
@@ -161,9 +155,10 @@ public class StandardUserService implements UserService {
         HomeCollectionItem home = contentDao.createRootItem(newUser);
         
         CollectionItem collection = new CollectionItem();
-        collection.setName(DEFAULT_COLLECTION_NAME);
+        String fullName = newUser.getFirstName() + " " + newUser.getLastName();
+        collection.setName(fullName);
         collection.setOwner(user);
-        collection.setDisplayName(DEFAULT_COLLECTION_NAME);
+        collection.setDisplayName(fullName);
         CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
         collection.addStamp(ccs);
         

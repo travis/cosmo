@@ -21,7 +21,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
-dojo.require("cosmo.legacy.cal_event");
+dojo.require("cosmo.view.cal.CalItem");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.service');
@@ -242,7 +242,7 @@ cosmo.view.cal.createEventRegistry = function(arrParam) {
         var note = arr[i];
         var eventStamp = note.getEventStamp();
         var id = note.getItemUid();
-        var ev = new cosmo.legacy.cal_event.CalEvent(id, null);
+        var ev = new cosmo.view.cal.CalItem(id, null);
         ev.data = note;
         h.setItem(id, ev);
     }

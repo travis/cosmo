@@ -1,6 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
- *
+ * Copyright 2006 Open Source Applications Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +20,7 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
+dojo.require('cosmo.view.BaseItem');
 dojo.require('cosmo.view.dialog');
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
@@ -33,6 +33,7 @@ cosmo.view.list.ListItem = function () {
     this.display = null;
     this.data = null;
 }
+cosmo.view.list.ListItem.prototype = new cosmo.view.BaseItem();
 
 // The list of items
 cosmo.view.list.itemRegistry = null;
@@ -69,9 +70,8 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
         case 'loadCollection':
             cosmo.view.list.loadItems();
             break;
-        case 'save':
-            var saveItem = cmd.data;
-            alert('Not implemented yet.');
+        default:
+            // Do nothing
             break;
     }
 
@@ -216,7 +216,13 @@ cosmo.view.list.createNoteItem = function (s) {
         //there is no delta, so we do it manually.
         note.autoTriage();
         item.data = note;
+        // Precalc the values used in the table display and the sort
+        this.setSortAndDisplay(item);
+        // Stick the item in the registry
         cosmo.view.list.itemRegistry.setItem(id, item);
+        // Make service call to save the item -- success from
+        // the service will publish 'saveSuccess' action to tell
+        // the UI to update appropriately
         dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': item, 'qualifier': 'new' })
         return cosmo.view.list.itemRegistry.getItem(id);
     }

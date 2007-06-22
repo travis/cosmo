@@ -20,18 +20,19 @@
  * @license Apache License 2.0
  */
 
-dojo.provide("cosmo.legacy.cal_event");
+dojo.provide("cosmo.view.cal.CalItem");
 
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.model");
+dojo.require("cosmo.view.BaseItem");
 dojo.require('cosmo.view.cal.common');
 dojo.require('cosmo.view.cal.lozenge');
 
 /**
- * @object CalEvent -- an event on the Calendar, links to the event's
+ * @object CalItem -- an event on the Calendar, links to the event's
  * Lozenge and CalEventDate objects
  */
-cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
+cosmo.view.cal.CalItem = function(id, lozenge) {
     // Randomly generated ID for each CalEvent
     // Lozenge div elements get their id suffixes from this
     this.id = id;
@@ -102,39 +103,6 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
         }
     };
     /**
-     * Makes a clone backup of the CalEventData for the event to
-     * store in the dataOrig property. This is used to back out of
-     * a cancelled/failed save operation or failed remove operation.
-     */
-    this.makeSnapshot = function () {
-        // Make backup snapshot before saving
-        // ================
-        if (this.data.isMaster()){
-            this.dataOrig = this.data.clone();
-            this.occurrence = false;
-        } else {
-            this.dataOrig = this.data.getMaster();
-            this.occurrence = true;
-            this.recurrenceId = this.data.recurrenceId
-        }
-        return true;
-    };
-    /**
-     * Makes a clone backup of the CalEventData for the event to
-     * store in the dataOrig property. This is used to back out of
-     * a cancelled/failed save operation or failed remove operation.
-     */
-    this.restoreFromSnapshot = function () {
-        // Restore from backup snapshot
-        // ================
-        if (!this.occurrence){
-            this.data = this.dataOrig.clone();
-        } else {
-            this.data = this.dataOrig.getNoteOccurrence(this.recurrenceId);
-        }
-        return true;
-    };
-    /**
      * Whether the start and end properties of an event put it
      * on one side or the other of the current view span
      */
@@ -159,6 +127,8 @@ cosmo.legacy.cal_event.CalEvent = function(id, lozenge) {
     this.endsAfterViewRange = function () {
         return (this.data.getEventStamp().getEndDate().toUTC() > cosmo.view.cal.viewEnd.getTime());
     };
-    //toString = genericToString;
-}
-CalEvent = cosmo.legacy.cal_event.CalEvent;
+};
+
+cosmo.view.cal.CalItem.prototype = new cosmo.view.BaseItem();
+
+

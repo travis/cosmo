@@ -21,7 +21,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
-dojo.require("cosmo.legacy.cal_event");
+dojo.require("cosmo.view.BaseItem");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.dialog');
@@ -42,11 +42,11 @@ cosmo.view.service = new function () {
     // ********************
     // What view we're using -- currently only week view exists
     this.viewtype = 'week';
-    // Start date for events to display
+    // Start date for items to display
     this.viewStart = null;
-    // End date for events to display
+    // End date for items to display
     this.viewEnd = null;
-    // Options for saving/removing recurring events
+    // Options for saving/removing recurring items
     this.recurringEventOptions = {
         ALL_EVENTS: 'master',
         ALL_FUTURE_EVENTS: 'occurrenceAndFuture',
@@ -54,17 +54,17 @@ cosmo.view.service = new function () {
     };
     // How many updates/removals are in-flight
     this.processingQueue = [];
-    // Last clicked cal event -- used for selection persistence.
+    // Last clicked cal item -- used for selection persistence.
     this.lastSent = null;
-    
+
     // Subscribe to the '/calEvent' channel
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     /**
-     * Handle events published on the '/calEvent' channel, including
-     * self-published events
+     * Handle items published on the '/calEvent' channel, including
+     * self-published items
      * @param cmd A JS Object, the command containing orders for
-     * how to handle the published event.
+     * how to handle the published item.
      */
     this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
@@ -74,20 +74,20 @@ cosmo.view.service = new function () {
         var delta = cmd.delta;
         switch (act) {
             case 'saveConfirm':
-                var confirmEv = cmd.data;
-                saveEventChangesConfirm(confirmEv, delta);
+                var confirmItem = cmd.data;
+                saveItemChangesConfirm(confirmItem, delta);
                 break;
             case 'save':
-                var saveEv = cmd.data;
-                saveEventChanges(saveEv, qual, delta);
+                var saveItem = cmd.data;
+                saveItemChanges(saveItem, qual, delta);
                 break;
             case 'removeConfirm':
-                var confirmEv = cmd.data;
-                removeEventConfirm(confirmEv);
+                var confirmItem = cmd.data;
+                removeItemConfirm(confirmItem);
                 break;
             case 'remove':
                 var removeEv = cmd.data;
-                removeEvent(removeEv, qual);
+                removeItem(removeEv, qual);
                 break;
             default:
                 // Do nothing
@@ -99,13 +99,13 @@ cosmo.view.service = new function () {
     // Saving changes
     // =========================
     /**
-     * Main function call for saving new events or changes to existing
-     * events -- invokes confirmation dialog for changes to event properties
-     * for recurring events (changes to the recurrence rule spawn no dialog).
-     * For normal events, this simply passes through to saveEventChanges
-     * @param ev A CalEvent object, the event to be saved.
+     * Main function call for saving new items or changes to existing
+     * items -- invokes confirmation dialog for changes to item properties
+     * for recurring items (changes to the recurrence rule spawn no dialog).
+     * For normal items, this simply passes through to saveItemChanges
+     * @param item A CalEvent object, the item to be saved.
      */
-    function saveEventChangesConfirm(ev, delta) {
+    function saveItemChangesConfirm(item, delta) {
         var changeTypes = delta.getApplicableChangeTypes();
         var size = 0;
         var change = null;
@@ -119,24 +119,26 @@ cosmo.view.service = new function () {
         //only one type of change
         if (size == 1){
             delta.applyChangeType(change);
-            dojo.event.topic.publish('/calEvent', {action:'save', data:ev, delta:delta});
-        } else {
-          cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm', {changeTypes:changeTypes, delta:delta, saveItem:ev}));
+            dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
+        }
+        else {
+          cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm',
+            { changeTypes: changeTypes, delta: delta, saveItem: item }));
         }
     }
 
     /**
-     * Called for after passthrough from saveEventChangesConfirm. Routes to
-     * the right save operation (i.e., for recurring events, 'All Future,'
+     * Called for after passthrough from saveItemChangesConfirm. Routes to
+     * the right save operation (i.e., for recurring items, 'All Future,'
      * 'Only This Event,' etc.)
-     * @param ev A CalEvent object, the object to be saved.
+     * @param item A CalEvent object, the object to be saved.
      * @param qual String, flag for different variations of saving
-     * recurring events. May be one of the three recurringEventOptions, or
-     * the two special cases of adding recurrence to a single event or
-     * removing recurrence completely from a master event for a recurrence.
+     * recurring items. May be one of the three recurringEventOptions, or
+     * the two special cases of adding recurrence to a single item or
+     * removing recurrence completely from a master item for a recurrence.
      */
-    function saveEventChanges(ev, qual, delta) {
-        dojo.debug("save event changes...");
+    function saveItemChanges(item, qual, delta) {
+        dojo.debug("save item changes...");
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
         // setTimeout to allow the 'processing ...' state to
@@ -146,7 +148,7 @@ cosmo.view.service = new function () {
         // A second function object used as a callback from
         // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
-        // master event rather than the instance -- basically
+        // master item rather than the instance -- basically
         // just a way of chaining two async calls together
         var h = null;
 
@@ -157,15 +159,15 @@ cosmo.view.service = new function () {
 
         var opts = self.recurringEventOptions;
 
-        // Recurring event
+        // Recurring item
         if (qual) {
             switch(qual) {
-                // Changing the master event in the recurring sequence
+                // Changing the master item in the recurring sequence
                 case opts.ALL_EVENTS:
                     dojo.debug("ALL_EVENTS");
                     delta.applyToMaster();
                     f = function(){
-                        doSaveEvent(ev,
+                        doSaveItem(item,
                          {
                             'saveType': opts.ALL_EVENTS,
                             'delta': delta
@@ -178,7 +180,7 @@ cosmo.view.service = new function () {
                     dojo.debug("ALL_FUTURE");
                     var newItem  = delta.applyToOccurrenceAndFuture();
                     f = function () {
-                        doSaveEvent(ev,
+                        doSaveItem(item,
                         {
                           'saveType': opts.ALL_FUTURE_EVENTS,
                           'delta': delta,
@@ -190,7 +192,7 @@ cosmo.view.service = new function () {
                 // Modifications
                 case opts.ONLY_THIS_EVENT:
                     dojo.debug("ONLY_THIS_EVENT");
-                    var note = ev.data;
+                    var note = item.data;
                     var recurrenceId = note.recurrenceId;
                     var master = note.getMaster();
                     var newModification = false;
@@ -199,7 +201,7 @@ cosmo.view.service = new function () {
                     }
                     delta.applyToOccurrence();
                     f = function () {
-                        doSaveEvent(ev,
+                        doSaveItem(item,
                         {
                           'saveType': opts.ONLY_THIS_EVENT,
                           'delta': delta,
@@ -210,16 +212,16 @@ cosmo.view.service = new function () {
 
                 case 'new':
                     dojo.debug("doSaveChanges: new")
-                    f = function () { doSaveEvent(ev, { 'new': true } ) };
+                    f = function () { doSaveItem(item, { 'new': true } ) };
                     break;
                 default:
                     break;
             }
         }
-        // Normal one-shot event
+        // Normal one-shot item
         else {
-            dojo.debug("saveEventChanges: normal sone shot event");
-            f = function () { doSaveEvent(ev, { } ) };
+            dojo.debug("saveItemChanges: normal sone shot item");
+            f = function () { doSaveItem(item, { } ) };
         }
 
         // Give a sec for the processing state to show
@@ -227,22 +229,22 @@ cosmo.view.service = new function () {
         setTimeout(f, 500);
     }
     /**
-     * Call the service to do a normal event save.
+     * Call the service to do a normal item save.
      * Creates an anonymous function to pass as the callback for the
-     * async service call that saves the changes to the event.
-     * Response to the async request is handled by handleSaveEvent.
-     * @param ev A CalEvent object, the event to be saved.
+     * async service call that saves the changes to the item.
+     * Response to the async request is handled by handleSaveItem.
+     * @param item A CalEvent object, the item to be saved.
      * @param opts An Object, options for the save operation.
      */
-     //BOBBYNOTE: Can we collapse this into "saveEventChanges" ?
-    function doSaveEvent(ev, opts) {
-        dojo.debug("doSaveEvent");
+     //BOBBYNOTE: Can we collapse this into "saveItemChanges" ?
+    function doSaveItem(item, opts) {
+        dojo.debug("doSaveItem");
         var OPTIONS = self.recurringEventOptions;
 
         var deferred = null;
         var requestId = null;
         var isNew = opts['new'] || false;
-        var note = ev.data;
+        var note = item.data;
         var delta = opts.delta;
         var newItem = opts.newItem;
         dojo.debug("Do save: savetype: " + opts.saveType)
@@ -267,10 +269,11 @@ cosmo.view.service = new function () {
                     newItemDeferred.addCallback(function(){
                         dojo.debug("in newItemDeferred call back")
                         if (newItemDeferred.results[1] != null){
-                            //if there was an error, pass it to handleSaveEvent, with the original
+                            //if there was an error, pass it to handleSaveItem, with the original
                             //item
-                            handleSaveEvent(ev, newItemDeferred.results[1], requestId,opts.saveType, delta);
-                        } else {
+                            handleSaveItem(item, newItemDeferred.results[1], requestId,opts.saveType, delta);
+                        }
+                        else {
                             //get rid of the id from the processing queue
                             self.processingQueue.shift()
 
@@ -278,7 +281,7 @@ cosmo.view.service = new function () {
                             // Now let's save the original.
                             var originalDeferred = cosmo.app.pim.serv.saveItem(note.getMaster());
                             originalDeferred.addCallback(function(){
-                                handleSaveEvent(ev,
+                                handleSaveItem(item,
                                     originalDeferred.results[1],
                                     originalDeferred.id,
                                     opts.saveType,
@@ -286,7 +289,7 @@ cosmo.view.service = new function () {
                                     newItem);
                             });
                             self.processingQueue.push(originalDeferred.id);
-                            self.lastSent = ev;
+                            self.lastSent = item;
                         }
                     });
 
@@ -294,23 +297,25 @@ cosmo.view.service = new function () {
                     return;
                 case OPTIONS.ONLY_THIS_EVENT:
                      if (!opts.newModification){
-                         dojo.debug("doSaveEvent: saving a previously created modificaiton")
+                         dojo.debug("doSaveItem: saving a previously created modificaiton")
                          deferred = cosmo.app.pim.serv.saveItem(note);
-                     } else {
-                         dojo.debug("doSaveEvent: creating a new modificaiton")
+                     }
+                     else {
+                         dojo.debug("doSaveItem: creating a new modificaiton")
                          deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection);
                      }
                 break;
             }
-        } else {
-            dojo.debug("normal, non-recurring event")
+        }
+        else {
+            dojo.debug("normal, non-recurring item")
             deferred = cosmo.app.pim.serv.saveItem(note);
         }
 
         var f = function () {
             var saveType = isNew ? "new" : opts.saveType;
             dojo.debug("callback: saveType="+ saveType)
-            handleSaveEvent(ev, deferred.results[1], deferred.id, saveType, delta);
+            handleSaveItem(item, deferred.results[1], deferred.id, saveType, delta);
         };
 
         deferred.addCallback(f);
@@ -322,7 +327,7 @@ cosmo.view.service = new function () {
 
         // Selection persistence
         // --------------------
-        // In these cases, the events concerned will be re-rendered
+        // In these cases, the items concerned will be re-rendered
         // after re-expanding the recurrence on the server -- no
         // way to preserve the original selection pointer. This means
         // that figuring out where selection goes will require some
@@ -331,34 +336,34 @@ cosmo.view.service = new function () {
             opts.saveType == 'singleEventAddRecurrence') {
             self.lastSent = null;
         }
-        // Just remember the original event that held the selection
+        // Just remember the original item that held the selection
         // we'll keep it there after re-render
         else {
-            self.lastSent = ev;
+            self.lastSent = item;
         }
     }
 
     /**
      * Handles the response from the async call when saving changes
-     * to events.
-     * @param ev A CalEvent object, the original event clicked on,
+     * to items.
+     * @param item A CalEvent object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
      * FIXME: Comments below are hopelessly out of date
-     * @param newEvId String, the id for the event returned when creating a
-     * new event
+     * @param newItemId String, the id for the item returned when creating a
+     * new item
      * @param err A JS object, the error returned from the server when
      * a save operation fails.
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
-    function handleSaveEvent(ev, err, reqId, saveType, delta, newItem) {
-        dojo.debug("handleSaveEvent");
+    function handleSaveItem(item, err, reqId, saveType, delta, newItem) {
+        dojo.debug("handleSaveItem");
         var OPTIONS = self.recurringEventOptions;
         var errMsg = '';
         var act = '';
 
         if (err) {
-            dojo.debug("handleSaveEvent: err");
+            dojo.debug("handleSaveItem: err");
             // Failure -- display exception info
             act = 'saveFailed';
             // Failed update
@@ -367,24 +372,25 @@ cosmo.view.service = new function () {
             }
             // Failed create
             else {
-                // FIXME: Should we be removing the event from
-                // the eventRegistry here?
+                // FIXME: Should we be removing the item from
+                // the itemRegistry/itemRegistry here?
                 errMsg = _('Main.Error.EventNewSaveFailed');
             }
             cosmo.app.showErr(errMsg, getErrDetailMessage(err));
-        } else {
+        }
+        else {
             // Success
             act = 'saveSuccess';
-            dojo.debug("handleSaveEvent: saveSuccess");
+            dojo.debug("handleSaveItem: saveSuccess");
         }
 
-        dojo.debug("handleSaveEvent: publish topic for all other cases");
+        dojo.debug("handleSaveItem: publish topic for all other cases");
         // Success/failure for all other cases
         self.processingQueue.shift();
         // Broadcast message for success/failure
         dojo.event.topic.publish('/calEvent', {
              'action': act,
-             'data': ev,
+             'data': item,
              'saveType': saveType,
              'delta':delta,
              'newItem':newItem
@@ -394,21 +400,21 @@ cosmo.view.service = new function () {
     // Remove
     // =========================
     /**
-     * Main function call for removing events -- invokes different
-     * confirmation dialog for recurring events.
-     * @param ev A CalEvent object, the event to be removed.
+     * Main function call for removing items -- invokes different
+     * confirmation dialog for recurring items.
+     * @param item A CalEvent object, the item to be removed.
      */
      //XINT
-    function removeEventConfirm(ev) {
+    function removeItemConfirm(item) {
         var str = '';
         var opts = {};
         opts.masterEvent = false;
         // Recurrence is a ball-buster
         // Display the correct confirmation dialog based on
-        // whether or not the event recurs
-        if (ev.data.recurrenceRule) {
+        // whether or not the item recurs
+        if (item.data.recurrenceRule) {
             str = 'removeRecurConfirm';
-            if (ev.data.masterEvent) {
+            if (item.data.masterEvent) {
                 opts.masterEvent = true;
             }
         }
@@ -418,15 +424,15 @@ cosmo.view.service = new function () {
         cosmo.app.showDialog(cosmo.view.dialog.getProps(str, opts));
     }
     /**
-     * Called for after passthrough from removeEventConfirm. Routes to
-     * the right remove operation (i.e., for recurring events, 'All Future,'
+     * Called for after passthrough from removeItemConfirm. Routes to
+     * the right remove operation (i.e., for recurring items, 'All Future,'
      * 'Only This Event,' etc.)
-     * @param ev A CalEvent object, the object to be saved.
+     * @param item A CalEvent object, the object to be saved.
      * @param qual String, flag for different variations of removing
-     * recurring events. Will be one of the three recurringEventOptions.
+     * recurring items. Will be one of the three recurringEventOptions.
      */
      //XINT
-    function removeEvent(ev, qual) {
+    function removeItem(item, qual) {
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
         // setTimeout to allow the 'processing ...' state to
@@ -435,7 +441,7 @@ cosmo.view.service = new function () {
         // A second function object used as a callback from
         // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
-        // master event rather than the instance -- basically
+        // master item rather than the instance -- basically
         // just a way of chaining two async calls together
         var h = null;
         var opts = self.recurringEventOptions;
@@ -444,43 +450,44 @@ cosmo.view.service = new function () {
         if (cosmo.app.modalDialog.isDisplayed) {
             cosmo.app.hideDialog();
         }
-        // Recurring event
+        // Recurring item
         if (qual) {
             switch(qual) {
-                // This is easy -- remove the master event
+                // This is easy -- remove the master item
                 case opts.ALL_EVENTS:
-                    // User is removing the master event directly --
+                    // User is removing the master item directly --
                     // no need to go look it up
-                    if (ev.data.masterEvent) {
-                        f = function () { doRemoveEvent(ev, { 'removeType': 'recurrenceMaster' }) };
+                    if (item.data.masterEvent) {
+                        f = function () { doRemoveItem(item, { 'removeType': 'recurrenceMaster' }) };
                     }
-                    // User is removing all the events in the recurrence from an
-                    // instance -- have to look up the master event. This means
+                    // User is removing all the items in the recurrence from an
+                    // instance -- have to look up the master item. This means
                     // two chained async calls
                     else {
-                        h = function (evData, err) {
+                        h = function (itemData, err) {
                             if (err) {
-                                cosmo.app.showErr('Could not retrieve master event for this recurrence.', getErrDetailMessage(err));
+                                cosmo.app.showErr('Could not retrieve master item for this recurrence.', getErrDetailMessage(err));
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
-                                    'data': ev });
+                                    'data': item });
                             }
                             else {
-                                // doRemoveEvent expects a CalEvent with attached CalEventData
-                                var removeEv = new cosmo.legacy.cal_event.CalEvent();
-                                removeEv.data = evData;
-                                doRemoveEvent(removeEv, { 'removeType': 'recurrenceMaster',
-                                    'instanceEvent': ev });
+                                // Just use BaseItem as the only thing the remove
+                                // op is interested in is the data prop
+                                var removeEv = new cosmo.view.BaseItem();
+                                removeEv.data = itemData;
+                                doRemoveItem(removeEv, { 'removeType': 'recurrenceMaster',
+                                    'instanceEvent': item });
                             }
                         };
                         f = function () {
                             var reqId = cosmo.app.pim.currentCollection.conduit.getEvent(
-                                cosmo.app.pim.currentCollection.collection.uid, ev.data.id,
+                                cosmo.app.pim.currentCollection.collection.uid, item.data.id,
                                 cosmo.app.pim.currentCollection.transportInfo, h);
                         };
                     }
                     break;
-                // 'Removing' all future events really just means setting the
+                // 'Removing' all future items really just means setting the
                 // end date on the recurrence
                 case opts.ALL_FUTURE_EVENTS:
                         // Have to go get the recurrence rule -- this means two chained async calls
@@ -489,16 +496,16 @@ cosmo.view.service = new function () {
                                 cosmo.app.showErr('Could not retrieve recurrence rule for this recurrence.', getErrDetailMessage(err));
                                 // Broadcast failure
                                 dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
-                                    'data': ev });
+                                    'data': item });
                             }
                             else {
                                 // JS object with only one item in it -- get the RecurrenceRule
                                 for (var a in hashMap) {
                                     var saveRule = hashMap[a];
                                 }
-                                var freq = ev.data.recurrenceRule.frequency;
-                                var start = ev.data.start;
-                                // Use the date of the selected event to figure the
+                                var freq = item.data.recurrenceRule.frequency;
+                                var start = item.data.start;
+                                // Use the date of the selected item to figure the
                                 // new end date for the recurrence
                                 var recurEnd = new cosmo.datetime.Date(start.getFullYear(),
                                     start.getMonth(), start.getDate());
@@ -509,26 +516,26 @@ cosmo.view.service = new function () {
                                 // for a weekly, etc.
                                 recurEnd = cosmo.datetime.Date.add(recurEnd, unit, incr);
                                 saveRule.endDate = recurEnd;
-                                doSaveRecurrenceRule(ev, saveRule, { 'saveAction': 'remove',
+                                doSaveRecurrenceRule(item, saveRule, { 'saveAction': 'remove',
                                     'removeType': 'instanceAllFuture', 'recurEnd': recurEnd });
                             }
                         };
                         // Look up the RecurrenceRule and pass the result on to function h
                         f = function () {
                             var reqId = cosmo.app.pim.currentCollection.conduit.getRecurrenceRules(
-                                cosmo.app.pim.currentCollection.collection.uid, [ev.data.id],
+                                cosmo.app.pim.currentCollection.collection.uid, [item.data.id],
                                 cosmo.app.pim.currentCollection.transportInfo, h);
                             };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
                 case opts.ONLY_THIS_EVENT:
-                    var rrule = ev.data.recurrenceRule;
+                    var rrule = item.data.recurrenceRule;
                     var dates = rrule.exceptionDates;
-                    var d = cosmo.datetime.Date.clone(ev.data.instanceDate);
+                    var d = cosmo.datetime.Date.clone(item.data.instanceDate);
                     dates.push(d);
                     rrule.removeModification(d);
 
-                    f = function () { doSaveRecurrenceRule(ev, rrule, { 'saveAction': 'remove',
+                    f = function () { doSaveRecurrenceRule(item, rrule, { 'saveAction': 'remove',
                         'saveType': 'instanceOnlyThisEvent' }) };
                     break;
                 default:
@@ -536,44 +543,44 @@ cosmo.view.service = new function () {
                     break;
             }
         }
-        // Normal one-shot event
+        // Normal one-shot item
         else {
-            f = function () { doRemoveEvent(ev, { 'removeType': 'singleEvent' }) }
+            f = function () { doRemoveItem(item, { 'removeType': 'singleEvent' }) }
         }
         // Give a sec for the processing state to show
         setTimeout(f, 500);
     }
     /**
-     * Call the service to do event removal -- creates an anonymous
+     * Call the service to do item removal -- creates an anonymous
      * function to pass as the callback for the async service call.
-     * Response to the async request is handled by handleRemoveEvent.
-     * @param ev A CalEvent object, the event to be saved.
+     * Response to the async request is handled by handleRemoveItem.
+     * @param item A CalEvent object, the item to be saved.
      * @param opts A JS Object, options for the remove operation.
      */
      //XINT
-    function doRemoveEvent(ev, opts) {
-        // Pass the original event and opts object to the handler function
+    function doRemoveItem(item, opts) {
+        // Pass the original item and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function (newEvId, err, reqId) {
-            handleRemoveResult(ev, newEvId, err, reqId, opts); };
+        var f = function (newItemId, err, reqId) {
+            handleRemoveResult(item, newItemId, err, reqId, opts); };
 
         var requestId = cosmo.app.pim.currentCollection.conduit.removeEvent(
-            cosmo.app.pim.currentCollection.collection.uid, ev.data.id,
+            cosmo.app.pim.currentCollection.collection.uid, item.data.id,
             cosmo.app.pim.currentCollection.transportInfo, f);
     }
     /**
-     * Handles the response from the async call when removing an event.
-     * @param ev A CalEvent object, the original event clicked on,
+     * Handles the response from the async call when removing an item.
+     * @param ev A CalEvent object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
-     * @param newEvId String, FIXME -- Why is this included in Remove?
+     * @param newItemId String, FIXME -- Why is this included in Remove?
      * @param err A JS object, the error returned from the server when
      * a remove operation fails.
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
     //XINT
-    function handleRemoveResult(ev, newEvId, err, reqId, opts) {
-        var removeEv = ev;
+    function handleRemoveResult(item, newItemId, err, reqId, opts) {
+        var removeEv = item;
         // Simple error message to go along with details from Error obj
         var errMsg = _('Main.Error.EventRemoveFailed');
         if (err) {
@@ -592,25 +599,25 @@ cosmo.view.service = new function () {
      * Call the service to save a recurrence rule -- creates an anonymous
      * function to pass as the callback for the async service call.
      * Response to the async request is handled by handleSaveRecurrenceRule.
-     * @param ev A CalEvent object, the event originally clicked on.
+     * @param item A CalEvent object, the item originally clicked on.
      * @param rrule A RecurrenceRule, the updated rule for saving.
      * @param opts A JS Object, options for the remove operation.
      */
     //XINT
-    function doSaveRecurrenceRule(ev, rrule, opts) {
-        // Pass the original event and opts object to the handler function
+    function doSaveRecurrenceRule(item, rrule, opts) {
+        // Pass the original item and opts object to the handler function
         // along with the original params passed back in from the async response
         var f = function (ret, err, reqId) {
-            handleSaveRecurrenceRule(ev, err, reqId, opts); };
+            handleSaveRecurrenceRule(item, err, reqId, opts); };
         var requestId = cosmo.app.pim.currentCollection.conduit.saveRecurrenceRule(
             cosmo.app.pim.currentCollection.collection.uid,
-            ev.data.id, rrule,
+            item.data.id, rrule,
             cosmo.app.pim.currentCollection.transportInfo, f);
     }
     /**
      * Handles the response from the async call when saving changes
      * to a RecurrenceRule.
-     * @param ev A CalEvent object, the original event clicked on,
+     * @param item A CalEvent object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
      * @param err A JS object, the error returned from the server when
      * a remove operation fails.
@@ -618,9 +625,9 @@ cosmo.view.service = new function () {
      * @param opts A JS Object, options for the save operation.
      */
     //XINT
-    function handleSaveRecurrenceRule(ev, err, reqId, opts) {
+    function handleSaveRecurrenceRule(item, err, reqId, opts) {
 
-        var rruleEv = ev;
+        var rruleEv = item;
         // Saving the RecurrenceRule can be part of a 'remove'
         // or 'save' -- set the message for an error appropriately
         var errMsgKey = opts.saveAction == 'remove' ?
@@ -637,8 +644,8 @@ cosmo.view.service = new function () {
             act = opts.saveAction + 'Success';
         }
 
-        // If the event has been edited such that it is now out of
-        // the viewable range, remove the event from display
+        // If the item has been edited such that it is now out of
+        // the viewable range, remove the item from display
         if (rruleEv.isOutOfViewRange()) {
             qual.onCanvas = false;
         }

@@ -24,10 +24,6 @@ dojo.require("cosmo.util.i18n");
 dojo.require('cosmo.convenience');
 // --
 
-// -- FIXME: Weirdness that should be fixed
-dojo.require("cosmo.legacy.cal_event");
-// --
-
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");

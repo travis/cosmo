@@ -25,6 +25,8 @@ cosmo.view.list.sort.doSort = function (hash, col, dir) {
     var defaultSort = function (a, b) {
         var valA = a.sort[defaultSortKey];
         var valB =  b.sort[defaultSortKey];
+        valA = (typeof valA == 'string') ? valA.toLowerCase() : valA;
+        valB = (typeof valB == 'string') ? valB.toLowerCase() : valB;
         if (valA == valB) {
             // If sort is already on title, secondary sort is uid
             // (it could be anything; I just picked that out of the air)

@@ -57,6 +57,7 @@ cosmo.ui.navbar.Bar = function (p) {
         switch (act) {
             case 'loadCollection':
             case 'navigateLoadedCollection':
+            case 'saveSuccess':
                 self.renderSelf();
                 break;
         }

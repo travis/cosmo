@@ -26,6 +26,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 
+
 cosmo.view.list.canvas.Canvas = function (p) {
     var self = this;
     var params = p || {};
@@ -35,14 +36,39 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.currSelectedItem = null;
     this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';
-    this.itemsPerPage = 5;
+    this.itemsPerPage = 10;
     this.itemCount = 0;
     this.pageCount = 0;
     this.currPageNum = 1;
 
     for (var n in params) { this[n] = params[n]; }
+      
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     // Interface methods
+    this.handlePub_calEvent = function (cmd) {
+
+        // Ignore input when not the current view
+        var _pim = cosmo.app.pim;
+        if (_pim.currentView != _pim.views.LIST) {
+            return false;
+        }
+
+        var act = cmd.action;
+        var qual = cmd.qualifier || null;
+        var data = cmd.data || {};
+        var opts = cmd.opts;
+        var delta = cmd.delta;
+        switch (act) {
+            case 'saveSuccess':
+                self._doSortAndDisplay();
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+
+    };
     this.renderSelf = function () {
         var reg = cosmo.view.list.itemRegistry;
         this._updateSize();
@@ -84,7 +110,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var targ = e.target;
             // Header cell clicked
             if (targ.id && targ.id.indexOf('Header') > -1) {
-                this._doSort(targ.id);
+                this._doSortAndDisplay(targ.id);
             }
             // Normal row cell clicked
             else {
@@ -133,10 +159,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var getRow = function (key, val) {
             var item = val;
             var display = item.display;
-            var selCss = 'listView_data' + display.uid == self.currSelectedId ? ' listViewSelectedCell' : '';
+            var selCss = 'listView_item' + display.uid == self.currSelectedId ? ' listViewSelectedCell' : '';
             var updatedBy = '';
             r = '';
-            r += '<tr id="listView_data' + display.uid + '">';
+            r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + 
                 '" style="text-align: center;">' + display.task + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.title + '</td>';
@@ -146,7 +172,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '</tr>';
             t += r;
         }
-
         var size = this.itemsPerPage;
         var st = (this.currPageNum * size) - size;
         hash.each(getRow, { start: st, items: size });
@@ -189,20 +214,28 @@ cosmo.view.list.canvas.Canvas = function (p) {
             this.height = this.parent.height - CAL_TOP_NAV_HEIGHT;
         }
     };
-    this._doSort = function (id) {
-        var s = id.replace('listView', '').replace('Header', '');
+    this._doSortAndDisplay = function (id) {
+        var s = '';
         var reg = cosmo.view.list.itemRegistry;
-        if (this.currSortCol == s) {
-            this.currSortDir = this.currSortDir == 'Desc' ? 'Asc' : 'Desc';
+        // If id was passed in, it means a change to the sort
+        // if no id, then just re-run the current sort and re-display
+        if (typeof id != 'undefined') {
+            s = id.replace('listView', '').replace('Header', '');
+            if (this.currSortCol == s) {
+                this.currSortDir = this.currSortDir == 'Desc' ? 'Asc' : 'Desc';
+            }
+            else {
+                this.currSortDir = cosmo.view.list.sort.defaultDirections[s.toUpperCase()];
+            }
+            this.currPageNum = 1;
+            this.currSortCol = s;
+        }
+        if (cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir)) {
+            this.displayTable();
         }
         else {
-            this.currSortDir = cosmo.view.list.sort.defaultDirections[s.toUpperCase()];
+            throw('Could not sort item registry.');
         }
-
-        this.currPageNum = 1;
-        this.currSortCol = s;
-        cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
-        this.displayTable();
     };
 
 };

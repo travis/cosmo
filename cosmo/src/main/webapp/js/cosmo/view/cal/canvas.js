@@ -30,7 +30,6 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
-dojo.require("cosmo.legacy.cal_event");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
@@ -975,10 +974,10 @@ cosmo.view.cal.canvas = new function () {
             }
         }
 
-        var updateEventsCallback = function (){
+        var updateEventsCallback = function () {
             dojo.debug("updateEventsCallback")
             // Don't re-render when requests are still processing
-            if (!cosmo.view.cal.processingQueue.length) {
+            if (!cosmo.view.service.processingQueue.length) {
               if (false /*&& cmd.qualifier.newEvent ||
                     (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')*/) {
                     var sel = cosmo.view.cal.lastSent;
@@ -994,7 +993,8 @@ cosmo.view.cal.canvas = new function () {
 
         if (deferred){
             deferred.addCallback(updateEventsCallback);
-        } else {
+        }
+        else {
             updateEventsCallback();
         }
     }
@@ -1392,7 +1392,7 @@ cosmo.view.cal.canvas = new function () {
 
 
         // Create the CalEvent, connect it to its lozenge
-        ev = new cosmo.legacy.cal_event.CalEvent(id, lozenge);
+        ev = new cosmo.view.cal.CalItem(id, lozenge);
 
         // Set CalEventData start and end calculated from click position
         // --------

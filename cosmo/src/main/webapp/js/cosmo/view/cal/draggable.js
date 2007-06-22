@@ -35,6 +35,7 @@ dojo.provide("cosmo.view.cal.draggable");
 dojo.require("dojo.event.topic");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
+dojo.require("cosmo.view.cal.canvas");
 /**
  * @object An event lozenge being dragged or resized
  */

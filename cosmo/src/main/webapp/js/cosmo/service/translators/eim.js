@@ -204,7 +204,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
             var content = entry.getElementsByTagName("content")[0];
-            var preference = this.preferenceXmlToPreference(dojo.html.getElementsByClassName("preference", content)[0]);
+            var wrapperDiv = content.getElementsByTagName("div")[0];
+            var preference = this.preferenceXmlToPreference(this.getPreferenceDiv(wrapperDiv));
             preferences[preference[0]] = preference[1];
         }
         return preferences;
@@ -214,15 +215,36 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         kwArgs = kwArgs || {};
 
         var content = atomXml.getElementsByTagName("content")[0];
-        var preference = this.preferenceXmlToPreference(dojo.html.getElementsByClassName("preference", content)[0]);
+        var wrapperDiv = content.getElementsByTagName("div")[0];
+        var preference = this.preferenceXmlToPreference(this.getPreferenceDiv(wrapperDiv));
         return preference[1];
 
     },
     
+    // this is really weird, but ie7 appears to be having trouble with getAttribute
+    // TODO: examine problem further
+    getPreferenceDiv: function(xml){
+        return this.getChildrenByClassName(xml, "preference", "div")[0];
+    },
+    
+    getChildrenByClassName: function (xml, className, tagName){
+        var nodes = xml.childNodes;
+        var returnNodes = [];
+        for (var i = 0; i < nodes.length; i++){
+            var node = nodes[i];
+            if ((node.nodeType != 1) || (tagName && tagName != node.tagName)) continue;
+            var classNode = node.getAttributeNode("class")
+            if (classNode && (classNode.nodeValue == className)){
+                returnNodes.push(node);
+            }
+        }
+        return returnNodes;
+    },
+    
     preferenceXmlToPreference: function(xml){
-        var keyEl = dojo.html.getElementsByClassName("key", xml)[0];
+        var keyEl = this.getChildrenByClassName(xml, "key")[0];
         var key = keyEl.firstChild.nodeValue;
-        var valueEl = dojo.html.getElementsByClassName("value", xml)[0];
+        var valueEl = this.getChildrenByClassName(xml, "value")[0];
         var value = valueEl.firstChild.nodeValue;
         return [key,value];
     },
@@ -734,7 +756,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     generateEmptyNote: function (note){
         var record = this.propsToItemRecord({uuid: note.getUid()});
         record.missingFields = [
-            "body",
+            "body"
         ];
         return record;
     },

@@ -88,9 +88,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
     		return function(type, e, xhr){
                 // Workaround to not choke on 204s
     		    if ((dojo.render.safari &&
-                    !xhr.status) || (dojo.render.ie &&
-                         evt.status == 1223)){
-
+                    !xhr.status) || (dojo.render.html.ie &&
+                         xhr.status == 1223)){
     		        xhr = {};
                     xhr.status = 204;
                     xhr.statusText = "No Content";
@@ -99,7 +98,17 @@ dojo.declare("cosmo.service.transport.Rest", null,
                     deferredRequestHandler.callback("", xhr);
 
                 } else {
-        			deferredRequestHandler.errback(new Error(e.message), xhr);
+                    // Turns out that when we get a 204 in IE it raises an error
+                    // that causes Dojo to call this function with a fake
+                    // 404 response (they return {status: 404}. Unfortunately, 
+                    // the xhr still does return with a 1223, and the 
+                    // Deferred's load methods get called twice, raising a fatal error.
+                    // This works around this, but is very tightly coupled to the Dojo
+                    // implementation. 
+                    // TODO: find a better way to do this
+                    if (!(dojo.render.html.ie && xhr.status == 404 && !xhr.send)){
+            			deferredRequestHandler.errback(new Error(e.message), xhr);
+                    }
                 }
     		}
     	},

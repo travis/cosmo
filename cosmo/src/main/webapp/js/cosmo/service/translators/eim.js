@@ -822,11 +822,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var missingFields = [];
             if (props.messageId != undefined) fields.messageId = [type.TEXT, props.messageId];
             if (props.headers != undefined) fields.headers = [type.CLOB, props.headers];
-            if (props.fromAddress != undefined) fields.fromAddress = [type.TEXT, props.fromAddress.join(",")];
-            if (props.toAddress != undefined) fields.toAddress = [type.TEXT, props.toAddress.join(",")];
-            if (props.ccAddress != undefined) fields.ccAddress = [type.TEXT, props.ccAddress.join(",")];
-            if (props.bccAddress != undefined) fields.bccAddress = [type.TEXT, props.bccAddress.join(",")];
-            if (props.originators != undefined) fields.originators = [type.TEXT, props.originators.join(",")];
+            if (props.fromAddress != undefined) fields.fromAddress = [type.TEXT, props.fromAddress];
+            if (props.toAddress != undefined) fields.toAddress = [type.TEXT, props.toAddress];
+            if (props.ccAddress != undefined) fields.ccAddress = [type.TEXT, props.ccAddress];
+            if (props.bccAddress != undefined) fields.bccAddress = [type.TEXT, props.bccAddress];
+            if (props.originators != undefined) fields.originators = [type.TEXT, props.originators];
             if (props.dateSent != undefined) fields.dateSent = [type.TEXT, props.dateSent];
             if (props.inReplyTo != undefined) fields.inReplyTo = [type.TEXT, props.inReplyTo];
             if (props.references != undefined) fields.references = [type.CLOB, props.references];
@@ -983,11 +983,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (record.fields){
             if (record.fields.messageId) properties.messageId = record.fields.messageId[1];
             if (record.fields.headers) properties.headers = record.fields.headers[1];
-            if (record.fields.fromAddress) properties.fromAddress = this.parseList(record.fields.fromAddress[1]);
-            if (record.fields.toAddress) properties.toAddress = this.parseList(record.fields.toAddress[1]);
-            if (record.fields.ccAddress) properties.ccAddress = this.parseList(record.fields.ccAddress[1]);
-            if (record.fields.bccAddress) properties.bccAddress = this.parseList(record.fields.bccAddress[1]);
-            if (record.fields.originators) properties.originators = this.parseList(record.fields.originators[1]);
+            if (record.fields.fromAddress) properties.fromAddress = record.fields.fromAddress[1];
+            if (record.fields.toAddress) properties.toAddress = record.fields.toAddress[1];
+            if (record.fields.ccAddress) properties.ccAddress = record.fields.ccAddress[1];
+            if (record.fields.bccAddress) properties.bccAddress = record.fields.bccAddress[1];
+            if (record.fields.originators) properties.originators = record.fields.originators[1]
             if (record.fields.dateSent) properties.dateSent = record.fields.dateSent[1]; //TODO: parse
             if (record.fields.inReplyTo) properties.inReplyTo = record.fields.inReplyTo[1];
             if (record.fields.references) properties.references = record.fields.references[1];

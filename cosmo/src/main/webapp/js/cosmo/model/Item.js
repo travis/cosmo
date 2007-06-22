@@ -145,11 +145,12 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
          OCCURRENCE_FMT_STRING: "%Y-%m-%d %H:%M:%S",
         
         _stamps: null,
-        _stampsToDelete: {},
+        _stampsToDelete: null,
         
         initializer: function(){
             this._stamps = {};
             this._modifications = {};
+            this._stampsToDelete = {};
         },
         
         getStamp: function(/*String*/ stampName, /*Boolean?*/ createIfDoesntExist, /*Object*/ initialProps) {
@@ -565,7 +566,8 @@ cosmo.model.declare("cosmo.model.Collection", cosmo.model.Item,
 cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
     [["ticketKey", {"default": null}],
      ["writeable", {"default": false}],
-     ["collection", {"default": null}]
+     ["collection", {"default": null}],
+     ["collectionDeleted", {"default": false}]
      ],
     {
          isWriteable: function(){
@@ -651,11 +653,11 @@ cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
 cosmo.model.declareStamp("cosmo.model.MailStamp", "mail",
     [[ "messageId", String, {}],
      [ "headers", String, {}],
-     [ "fromAddress", [Array, String], {}],
-     [ "toAddress", [Array, String], {}],
-     [ "ccAddress", [Array, String], {}],
-     [ "bccAddress", [Array, String], {}],
-     [ "originators", [Array, String], {}],
+     [ "fromAddress", String, {}],
+     [ "toAddress", String, {}],
+     [ "ccAddress", String, {}],
+     [ "bccAddress", String, {}],
+     [ "originators", String, {}],
      [ "dateSent", String, {}],
      [ "inReplyTo", String, {}],
      [ "references", String, {}]

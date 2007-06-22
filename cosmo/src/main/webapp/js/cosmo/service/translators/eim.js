@@ -977,8 +977,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (record.fields.duration) properties.duration=
                     new cosmo.model.Duration(record.fields.duration[1]);
             if (record.fields.location) properties.location = record.fields.location[1];
-            if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1]);
-            if (record.fields.exrule) properties.exrule = this.parseRRule(record.fields.exrule[1]);
+            if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1], properties.startDate);
+            if (record.fields.exrule) properties.exrule = this.parseRRule(record.fields.exrule[1]), properties.startDate;
             if (record.fields.exdate) properties.exdates = this.parseExdate(record.fields.exdate[1]);
             if (record.fields.status) properties.status = record.fields.status[1];
         }
@@ -1108,7 +1108,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
              var endDate = rrule.getEndDate();
              if (endDate){
                 recurrenceRuleList.push(";UNTIL=");
-                recurrenceRuleList.push(dojo.date.strftime(rrule.getEndDate().getUTCDateProxy(), "%Y%m%dT%H%M%SZ"));
+                var dateString = this._createRecurrenceEndDateString(rrule.getEndDate())
+                recurrenceRuleList.push(dateString);
              }
             
             return recurrenceRuleList.join("");
@@ -1117,8 +1118,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return rrulePropsToICal(rrule.getUnsupportedRule());
         }
     },
+    
+    _createRecurrenceEndDateString: function (date){
+        date = date.clone();
+        date.setHours(23);
+        date.setMinutes(59);
+        date.setSeconds(59);
+        date = date.createDateForTimezone("utc");
+        return dojo.date.strftime(date, "%Y%m%dT%H%M%SZ")
+    },
 
-    rrlePropsToICal: function (rProps){
+    rrlePropsToICal: function (rProps, startDate){
         var iCalProps = [];
         for (var key in rProps){
             iCalProps.push(key);
@@ -1127,9 +1137,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 iCalProps.push(rProps[key].join());
             }
             else if (rProps[key] instanceof cosmo.datetime.Date){
-                iCalProps.push(
-                    dojo.date.strftime(rProps[key].getUTCDateProxy(), "%Y%m%dT%H%M%SZ")
-                );
+                var dateString = this._createRecurrenceEndDateString(rProps[key]);
+                iCalProps.push(dateString);
             }
             else {
                 iCalProps.push(rProps[key]);
@@ -1139,11 +1148,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
     },
 
-    parseRRule: function (rule){
+    parseRRule: function (rule, startDate){
         if (!rule) {
             return null;
         }
-        return this.rPropsToRRule(this.parseRRuleToHash(rule));
+        return this.rPropsToRRule(this.parseRRuleToHash(rule), startDate);
     },
     
     parseExdate: function (exdate){
@@ -1250,7 +1259,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
 
-    rPropsToRRule: function (rprops){
+    rPropsToRRule: function (rprops, startDate){
         if (this.isRRuleUnsupported(rprops)) {
             // TODO set something more readable?
             return new cosmo.model.RecurrenceRule({
@@ -1282,7 +1291,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
             // Set until date
             if (rprops.until) {
-                recurrenceRule.endDate = cosmo.datetime.fromIso8601(rprops.until);
+                var endDate = cosmo.datetime.fromIso8601(rprops.until);
+                var tzId = startDate.tzId || (startDate.utc ? "utc" : null);
+                endDate = endDate.createDateForTimezone(tzId);
+                recurrenceRule.endDate = endDate;
             }
             
             recurrenceRule = new cosmo.model.RecurrenceRule(recurrenceRule);
@@ -1303,10 +1315,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         uuid = unescape(uuid.firstChild.nodeValue.substring(9));
         return uuid;
     }
-
-    
-
-
 });
 
 cosmo.service.translators.eim = new cosmo.service.translators.Eim();

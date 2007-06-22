@@ -22,6 +22,7 @@ create table user_preferences (id bigint not null auto_increment, createdate big
 
 # migrate data
 update item set itemtype='file' where itemtype='content';
+update subscription set createdate=UNIX_TIMESTAMP()*1000, modifydate=UNIX_TIMESTAMP()*1000;
 update users set locked=0;
 insert into user_preferences (userid, preferencename, preferencevalue, createdate, modifydate) select userid, preferencename, preferencevalue, UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000 from x_user_preferences;
 drop table x_user_preferences;

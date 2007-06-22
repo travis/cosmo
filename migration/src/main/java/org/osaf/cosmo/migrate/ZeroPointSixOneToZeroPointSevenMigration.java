@@ -86,33 +86,10 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
     public void migrateData(Connection conn, String dialect) throws Exception {
         
         log.debug("starting migrateData()");
-        migrateSubscriptions(conn);
         migrateTimeRangeIndexes(conn);
        
     }
     
-    /**
-     * Add createdate,modifydate to each subscription.
-     */
-    private void migrateSubscriptions(Connection conn) throws Exception {
-        
-        PreparedStatement updateStmt = null;
-        long count = 0;
-        log.debug("starting migrateSubscriptions()");
-        
-        try {
-            updateStmt = conn.prepareStatement("update subscription set createdate=?, modifydate=?");
-            long currentTime = System.currentTimeMillis();
-            updateStmt.setLong(1, currentTime);
-            updateStmt.setLong(2, currentTime);
-            count = updateStmt.executeUpdate();
-        } finally {
-            if(updateStmt!=null)
-                updateStmt.close();
-        }
-        
-        log.debug("processed " + count + " subscriptions");
-    }
     
     /**
      * Calculate time-range index for each event stamp row.
@@ -133,12 +110,16 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         log.debug("starting migrateTimeRangeIndexes()");
         
         try {
+            // get all stamp/item data to migrate
             stmt = conn.prepareStatement("select i.modifiesitemid, s.id, es.icaldata from item i, stamp s, event_stamp es where i.id=s.itemid and s.id=es.stampid");
+            // migration statment
             updateStmt = conn.prepareStatement("update event_stamp set isfloating=?, isrecurring=?, startdate=?, enddate=? where stampid=?");
+            // get the master calendar data for a master event note
             selectMasterCalStmt = conn.prepareStatement("select es.icaldata from item i, stamp s, event_stamp es where i.id=? and i.id=s.itemid and s.id=es.stampid");
             
             rs = stmt.executeQuery();
             
+            // migrate each event_stamp row
             while(rs.next()) {
                 long modifiesItemId = rs.getLong(1);
                 long eventId = rs.getLong(2);
@@ -150,6 +131,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
                 try {
                     calendar = calBuilder.build(new StringReader(icalData));
                 } catch (ParserException e) {
+                    log.error("unable to parse: " + icalData);
                     throw e;
                 }
                 
@@ -158,14 +140,17 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
                     selectMasterCalStmt.setLong(1, modifiesItemId);
                     ResultSet masterCalRs = selectMasterCalStmt.executeQuery();
                     masterCalRs.next();
+                    String  masterIcalData = masterCalRs.getString(1);
                     try {
-                        masterCalendar  = calBuilder.build(new StringReader(masterCalRs.getString(1)));
+                        masterCalendar  = calBuilder.build(new StringReader(masterIcalData));
                     } catch (ParserException e) {
+                        log.error("unable to parse: " + masterIcalData);
                         throw e;
                     }
                     masterCalRs.close();
                 }
                 
+                // calculate and store time-range indexes
                 Object[] indexes = getIndexValues(calendar, masterCalendar);
                 updateStmt.setBoolean(1, (Boolean) indexes[2]);
                 updateStmt.setBoolean(2, (Boolean) indexes[3]);
@@ -179,12 +164,9 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
             
             
         } finally {
-            if(stmt!=null)
-                stmt.close();
-            if(updateStmt!=null)
-                updateStmt.close();
-            if(selectMasterCalStmt!=null)
-                selectMasterCalStmt.close();
+            close(stmt);
+            close(updateStmt);
+            close(selectMasterCalStmt);
         }
         
         log.debug("processed " + count + " event stamps");
@@ -313,6 +295,13 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         event.getProperties().getProperty(Property.DURATION);
         if (duration != null)
             return duration.getDuration();
+        
+        // if there is no DURATION, check for DTSTART/DTEND and calculate
+        DtStart start = event.getStartDate();
+        DtEnd end = event.getEndDate();
+        
+        if(start!=null && end!=null)
+            return new Duration(start.getDate(), end.getDate()).getDuration();
         else
             return null;
     }

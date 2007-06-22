@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -158,5 +160,19 @@ public abstract class AbstractMigration implements Migration {
     
     private String getPostMigrationUpdateFileName(String dialect) {
         return getBaseFileName(dialect) + "-post.sql";
+    }
+    
+    protected void close(ResultSet rs) {
+        try {
+            rs.close();
+        } catch (Exception e) {
+        }
+    }
+    
+    protected void close(Statement stmt) {
+        try {
+            stmt.close();
+        } catch (Exception e) {
+        }
     }
 }

@@ -447,11 +447,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
         var modifiedProperties = {};
         var modifiedStamps = {};
+        var deletedStamps = {};
+        for (stampName in masterItem._stamps){
+            deletedStamps[stampName] = true;
+        }
 
         for (recordName in recordSet.records){
+            deletedStamps[recordName] = false;
             with (cosmo.service.eim.constants){
                var record = recordSet.records[recordName];
-    
+                
                switch(recordName){
     
                case prefix.ITEM:
@@ -480,20 +485,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (!dojo.lang.isEmpty(modifiedProperties)
             || !dojo.lang.isEmpty(modifiedStamps)){
             
-            // Get deleted records and make them into a hash
-            var deletedStampsList = recordSet.deletedRecords;
-            var deletedStamps = {};
-            if (deletedStampsList){
-                for (var i = 0; i < deletedStampsList.length; i++){
-                    deletedStamps[deletedStampsList[i]] = true;
-                }
-            }
-            
             var mod = new cosmo.model.Modification(
                 {
                     "recurrenceId": recurrenceId,
                     "modifiedProperties": modifiedProperties,
-                    "modifiedStamps": modifiedStamps
+                    "modifiedStamps": modifiedStamps,
+                    "deletedStamps": deletedStamps
                 }
             );
             masterItem.addModification(mod);

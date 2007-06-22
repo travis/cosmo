@@ -122,20 +122,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             throw convertHibernateAccessException(e);
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.ItemDao#findAnyItemByUid(java.lang.String)
-     */
-    public Item findAnyItemByUid(String uid) {
-        try {
-            Query hibQuery = getSession().getNamedQuery("item.any.by.uid")
-                    .setParameter("uid", uid);
-            hibQuery.setCacheable(true);
-            return (Item) hibQuery.uniqueResult();
-        } catch (HibernateException e) {
-            throw convertHibernateAccessException(e);
-        }
-    }
 
     /*
      * (non-Javadoc)
@@ -695,7 +681,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected void checkForDuplicateUid(Item item) {
         // verify uid not in use
         if (item.getUid() != null) {
-            Item duplicate  = findAnyItemByUid(item.getUid());
+            Item duplicate  = findItemByUid(item.getUid());
             
             // if uid is in use and item is active, throw exception
             if(duplicate!=null && duplicate.getIsActive()) {

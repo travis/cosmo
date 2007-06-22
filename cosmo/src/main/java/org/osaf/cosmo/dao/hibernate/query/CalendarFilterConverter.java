@@ -116,10 +116,14 @@ public class CalendarFilterConverter {
         
         TextMatchFilter textMatch = propFilter.getTextMatchFilter();
         if(textMatch==null)
-            return;
+            throw new IllegalArgumentException("unsupported filter: must contain text match filter");
         
         if(textMatch.isNegateCondition())
             throw new IllegalArgumentException("unsupported negate condition for prop-filter");
+        
+        if(textMatch.isCaseless())
+            throw new IllegalArgumentException("unsupported isCaseless condition for prop-filter");
+        
         itemFilter.setIcalUid(textMatch.getValue());
     }
     
@@ -132,10 +136,14 @@ public class CalendarFilterConverter {
         
         TextMatchFilter textMatch = propFilter.getTextMatchFilter();
         if(textMatch==null)
-            return;
+            throw new IllegalArgumentException("unsupported filter: must contain text match filter");
         
         if(textMatch.isNegateCondition())
             throw new IllegalArgumentException("unsupported negate condition for prop-filter");
+        
+        if(textMatch.isCaseless())
+            throw new IllegalArgumentException("unsupported isCaseless condition for prop-filter");
+        
         itemFilter.setBody(textMatch.getValue());
     }
     
@@ -148,10 +156,14 @@ public class CalendarFilterConverter {
         
         TextMatchFilter textMatch = propFilter.getTextMatchFilter();
         if(textMatch==null)
-            return;
+            throw new IllegalArgumentException("unsupported filter: must contain text match filter");
         
         if(textMatch.isNegateCondition())
             throw new IllegalArgumentException("unsupported negate condition for prop-filter");
+        
+        if(textMatch.isCaseless())
+            throw new IllegalArgumentException("unsupported isCaseless condition for prop-filter");
+        
         itemFilter.setDisplayName(textMatch.getValue());
     }
         

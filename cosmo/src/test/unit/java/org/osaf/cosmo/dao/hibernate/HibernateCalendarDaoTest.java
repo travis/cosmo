@@ -27,6 +27,7 @@ import net.fortuna.ical4j.model.Period;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
+import org.osaf.cosmo.calendar.query.IsNotDefinedFilter;
 import org.osaf.cosmo.calendar.query.PropertyFilter;
 import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
@@ -237,6 +238,8 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         eventFilter.getPropFilters().add(propFilter);
 
         clearSession();
+        
+        calendar = contentDao.findCollectionByUid(calendar.getUid());
 
         // Should match ics.1
         Set<ContentItem> queryEvents = calendarDao.findEvents(calendar,
@@ -259,26 +262,26 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals(3, queryEvents.size());
 
         // should match everything except #1...so that means 4
-//        eventFilter.getPropFilters().remove(propFilter2);
-//        propFilter.getTextMatchFilter().setNegateCondition(true);
-//        queryEvents = calendarDao.findEvents(calendar, filter);
-//        Assert.assertEquals(4, queryEvents.size());
+        eventFilter.getPropFilters().remove(propFilter2);
+        propFilter.getTextMatchFilter().setNegateCondition(true);
+        queryEvents = calendarDao.findEvents(calendar, filter);
+        Assert.assertEquals(4, queryEvents.size());
 
         // should match ics.1 again
-//        propFilter.getTextMatchFilter().setNegateCondition(false);
-//        propFilter.getTextMatchFilter().setCaseless(true);
-//        propFilter.getTextMatchFilter().setValue("vISiBlE");
-//        queryEvents = calendarDao.findEvents(calendar, filter);
-//        Assert.assertEquals(1, queryEvents.size());
-//        nextItem = (ContentItem) queryEvents.iterator().next();
-//        Assert.assertEquals("test1.ics", nextItem.getName());
+        propFilter.getTextMatchFilter().setNegateCondition(false);
+        propFilter.getTextMatchFilter().setCaseless(true);
+        propFilter.getTextMatchFilter().setValue("vISiBlE");
+        queryEvents = calendarDao.findEvents(calendar, filter);
+        Assert.assertEquals(1, queryEvents.size());
+        nextItem = (ContentItem) queryEvents.iterator().next();
+        Assert.assertEquals("test1.ics", nextItem.getName());
 
         // should match all 5 (none have rrules)
-//        propFilter.setTextMatchFilter(null);
-//        propFilter.setName("RRULE");
-//        propFilter.setIsNotDefinedFilter(new IsNotDefinedFilter());
-//        queryEvents = calendarDao.findEvents(calendar, filter);
-//        Assert.assertEquals(5, queryEvents.size());
+        propFilter.setTextMatchFilter(null);
+        propFilter.setName("RRULE");
+        propFilter.setIsNotDefinedFilter(new IsNotDefinedFilter());
+        queryEvents = calendarDao.findEvents(calendar, filter);
+        Assert.assertEquals(5, queryEvents.size());
 
         // time range test
         eventFilter.setPropFilters(new ArrayList());

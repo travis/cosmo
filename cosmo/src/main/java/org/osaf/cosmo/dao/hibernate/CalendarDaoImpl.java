@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.DateTime;
@@ -25,14 +26,20 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.CalendarFilterEvaluater;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.hibernate.query.CalendarFilterConverter;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -51,10 +58,28 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                                              CalendarFilter filter) {
 
         try {
-            // translate CalendarFilter to ItemFilter and execute filter
-            ItemFilter itemFilter = new CalendarFilterConverter().translateToItemFilter(collection, filter);
-            Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
-            return (Set<ContentItem>) results;
+            
+            try {
+                // translate CalendarFilter to ItemFilter and execute filter
+                ItemFilter itemFilter = new CalendarFilterConverter().translateToItemFilter(collection, filter);
+                Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
+                return (Set<ContentItem>) results;
+            } catch (IllegalArgumentException e) {
+            }
+            
+            // Use brute-force method if CalendarFilter can't be translated
+            // to an ItemFilter (slower but at least gets the job done).
+            HashSet<ContentItem> results = new HashSet<ContentItem>();
+            CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+            CalendarCollectionStamp calendar = CalendarCollectionStamp.getStamp(collection);
+            
+            // Evaluate filter against all events
+            for(EventStamp event: calendar.getEventStamps()) {
+               if(evaluater.evaluate(event.getCalendar(),filter)==true)
+                   results.add((ContentItem) event.getItem()); 
+            }
+            
+            return results;
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }

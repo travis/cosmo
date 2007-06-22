@@ -74,7 +74,7 @@ dojo.declare("cosmo.util.uuid.RandomGenerator", dojo.uuid.RandomGenerator,
             this.fixLength(timeMid.toString(16), 4),
             this.fixLength(timeHighAndVersion.toString(16), 4),
             this.fixLength(clockSeq.toString(16), 4), 
-            this.fixLength(node.toString(16), 12),
+            this.fixLength(node.toString(16), 12)
             ].join("-");
             
                

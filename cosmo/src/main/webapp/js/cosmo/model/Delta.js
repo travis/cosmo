@@ -336,7 +336,7 @@ dojo.declare("cosmo.model.Delta", null, {
     },
     
     _applyPropertiesToEventStamp: function(original, changes, type){
-        //start date must be applied first so that duration can be calculate
+        //start date must be applied first so that duration can be calculated
         //properly
         if (changes["startDate"]){
            var changeValue = changes["startDate"];
@@ -352,7 +352,7 @@ dojo.declare("cosmo.model.Delta", null, {
             if (!original.isChanged(propName, changeValue)){
                 delete changes[propName];
             } 
-        }
+       }
     },
     
     _getStamp: function (stampName){

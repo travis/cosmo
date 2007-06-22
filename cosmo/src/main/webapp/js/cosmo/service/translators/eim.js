@@ -919,6 +919,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     dateToEimDtstart: function (start, allDay, anyTime){
         return [(anyTime? ";X-OSAF-ANYTIME=TRUE" : ""),
+                (start.tzId? ";TZID=" + start.tzId : ""),
                 ";VALUE=",
                 ((allDay || anyTime)? "DATE" : "DATE-TIME"),
                 ":",

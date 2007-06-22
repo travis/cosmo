@@ -286,8 +286,11 @@ public class EventStamp extends BaseEventStamp implements
             VTimeZone vtz = (VTimeZone) it.next();
             String tzid = vtz.getTimeZoneId().getValue();
             TimeZone tz = TIMEZONE_REGISTRY.getTimeZone(tzid);
-            if(tz!=null && tz.getID().equals(tzid))
-                toRemove.add(vtz);
+            //  Remove timezone iff it matches the one in the registry
+            if(tz!=null) {
+                if(vtz.equals(tz.getVTimeZone()))
+                    toRemove.add(vtz);
+            }
         }
         
         // remove known timezones from master calendar

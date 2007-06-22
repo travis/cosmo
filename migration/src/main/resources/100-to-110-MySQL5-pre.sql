@@ -5,6 +5,9 @@
 alter table subscription add column createdate bigint;
 alter table subscription add column modifydate bigint;
 
+# users
+alter table users add column locked bit;
+
 # event_stamp
 alter table event_stamp add column isfloating bit;
 alter table event_stamp add column isrecurring bit;
@@ -19,6 +22,7 @@ create table user_preferences (id bigint not null auto_increment, createdate big
 
 # migrate data
 update item set itemtype='file' where itemtype='content';
+update users set locked=0;
 insert into user_preferences (userid, preferencename, preferencevalue, createdate, modifydate) select userid, preferencename, preferencevalue, UNIX_TIMESTAMP()*1000, UNIX_TIMESTAMP()*1000 from x_user_preferences;
 drop table x_user_preferences;
 alter table user_preferences add index FK199BD08467D36616 (userid), add constraint FK199BD08467D36616 foreign key (userid) references users (id);

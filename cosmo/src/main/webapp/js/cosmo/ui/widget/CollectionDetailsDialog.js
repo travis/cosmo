@@ -93,7 +93,8 @@ dojo.widget.HtmlWidget, function(){
         
         // Lifecycle functions
         postMixInProperties: function(){
-           this.protocolUrls = this.collection.getUrls();
+           this.protocolUrls = ((this.collection instanceof cosmo.model.Subscription)? 
+                                this.collection.getCollection().getUrls() : this.collection.getUrls());
            this.displayName = this.collection.getDisplayName();
         },
         

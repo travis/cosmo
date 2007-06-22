@@ -64,6 +64,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 var href = link.getAttribute("href");
                 urls[this.urlNameHash[rel] || rel] = href;
             }
+            
+            // Handle regular atom feed url differently.
+            // This seems like kind of an ugly way to do this, but it works for now.
+            if (urls['atom-edit']){
+                var url = 
+                   location.protocol + "//" + location.host + 
+                   cosmo.env.getBaseUrl() + "/atom/" + urls['atom-edit'] 
+                var urlParts = url.split("?");
+                urlParts[0] = urlParts[0] + "/basic";
+                url = urlParts.join("?");
+                urls.atom = url;
+            }
+            
             return urls;
     },
     

@@ -667,6 +667,7 @@ cosmo.ui.detail.MailFormElements = function () {
         tbody.appendChild(mailRow('Fr', 'From'));
         tbody.appendChild(mailRow('To', 'To'));
         tbody.appendChild(mailRow('Cc', 'Cc'));
+        tbody.appendChild(mailRow('Bcc', 'Bcc'));
 
         f.appendChild(table);
         d.appendChild(f);
@@ -683,9 +684,10 @@ cosmo.ui.detail.MailFormElements = function () {
             }
         }
         var f = this.formNode;
-        f.mailFrom.value = joinVals(stamp.getFromAddress());
-        f.mailTo.value = joinVals(stamp.getToAddress());
-        f.mailCc.value = joinVals(stamp.getCcAddress());
+        f.mailFrom.value = stamp.getFromAddress();
+        f.mailTo.value = stamp.getToAddress();
+        f.mailCc.value = stamp.getCcAddress();
+        f.mailBcc.value = stamp.getBccAddress();
     }
 };
 cosmo.ui.detail.MailFormElements.prototype =

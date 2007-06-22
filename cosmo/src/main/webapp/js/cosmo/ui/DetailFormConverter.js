@@ -178,6 +178,21 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         },
         
         mail: {
+            fromAddress: {
+                  type: "string",
+                  field: "mailFrom"},
+
+            toAddress: {
+                  type: "string",
+                  field: "mailTo"},
+
+            ccAddress: {
+                  type: "string",
+                  field: "mailCc"},
+
+            bccAddress: {
+                  type: "string",
+                  field: "mailBcc"}
         },
         
         task: {

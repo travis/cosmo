@@ -92,31 +92,25 @@ public class StandardContentService implements ContentService {
             log.debug("finding item with uid " + uid);
         }
         Item item = contentDao.findItemByUid(uid);
-        return item;
-        
-//      TODO: Can't do this yet because there is code that expects null when
-//      a modification doesn't exist.  Need to fix that before enablling
-//      this
-  
         
         // return item if found
-//        if(item!=null)
-//            return item;      
+        if(item!=null)
+            return item;      
         
-//        // Handle case where uid represents an occurence of a
-//        // recurring item.
-//        if(uid.indexOf(ModificationUid.RECURRENCEID_DELIMITER)!=-1) {
-//            ModificationUid modUid = new ModificationUid(uid);
-//            // Find the parent, and then verify that the recurrenceId is a valid
-//            // occurrence date for the recurring item.
-//            NoteItem parent = (NoteItem) contentDao.findItemByUid(modUid.getParentUid());
-//            if(parent==null)
-//                return null;
-//            else
-//                return getNoteOccurrence(parent, modUid.getRecurrenceId());
-//        }
-//        
-//        return null;
+        // Handle case where uid represents an occurence of a
+        // recurring item.
+        if(uid.indexOf(ModificationUid.RECURRENCEID_DELIMITER)!=-1) {
+            ModificationUid modUid = new ModificationUid(uid);
+            // Find the parent, and then verify that the recurrenceId is a valid
+            // occurrence date for the recurring item.
+            NoteItem parent = (NoteItem) contentDao.findItemByUid(modUid.getParentUid());
+            if(parent==null)
+                return null;
+            else
+                return getNoteOccurrence(parent, modUid.getRecurrenceId());
+        }
+        
+        return null;
     }
 
     /**

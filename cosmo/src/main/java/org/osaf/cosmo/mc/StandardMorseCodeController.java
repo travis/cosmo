@@ -38,6 +38,7 @@ import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.UidInUseException;
@@ -444,13 +445,18 @@ public class StandardMorseCodeController implements MorseCodeController {
                         contentService.findItemByUid(recordset.getUuid());
                     if (item != null && ! (item instanceof ContentItem))
                         throw new ValidationException("Child item " + recordset.getUuid() + " is not a content item");
-                    
                    
-                    ContentItem child = (item != null) ?
-                        (ContentItem) item :
-                        createChildItem(collection, recordset);
-                        
-                    collection.getChildren().add(child);
+                    ContentItem child = (ContentItem) item;
+                    
+                    // Handle case where item is a NoteOccurence, in which case
+                    // a new modification NoteItem needs to be created
+                    if(child instanceof NoteOccurrence)
+                        child = createChildItem((NoteOccurrence) child, collection, recordset);
+                    
+                    // Handle case where item doesn't exist, so create a new one
+                    if(child==null)
+                        child = createChildItem(collection, recordset);
+                    
                     children.add(child);
                     new ItemTranslator(child).applyRecords(recordset);
                 } catch (EimValidationException e) {
@@ -468,21 +474,35 @@ public class StandardMorseCodeController implements MorseCodeController {
     // creates a new item and adds it as a child of the collection
     private ContentItem createChildItem(CollectionItem collection,
                                         EimRecordSet recordset) {
+        ContentItem child = createBaseChildItem(collection, recordset);
+        if(child.getUid().contains(ModificationUid.RECURRENCEID_DELIMITER))
+            handleModificationItem((NoteItem) child, collection);
+        return child;
+    }
+    
+    //  creates a new item based off a NoteOccurrence
+    private ContentItem createChildItem(NoteOccurrence occurrence, 
+                                        CollectionItem collection,
+                                        EimRecordSet recordset) {
+        NoteItem child = (NoteItem) createBaseChildItem(collection, recordset);
+        child.setModifies(occurrence.getMasterNote());
+        return child;
+    }
+    
+    private ContentItem createBaseChildItem(CollectionItem collection,
+                                        EimRecordSet recordset) {
         NoteItem child = new NoteItem();
         child.setName(recordset.getUuid());
         child.setUid(recordset.getUuid());
         child.setOwner(collection.getOwner());
         
-        // If the item is a modification, we need to find the master item.
-        // If the master item hasn't been created, then we need to return null,
-        // and try again at the end of the recordset.
-        if(child.getUid().indexOf(ModificationUid.RECURRENCEID_DELIMITER)>0)
-            handleModificationItem(child, collection);
-                
-                  
         // Add reference to parent collection so that applicator can
         // access parent (and children) if necessary
         child.getParents().add(collection);
+        
+        // add new item to parent's children
+        collection.getChildren().add(child);
+        
         return child;
     }
     
@@ -509,7 +529,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         log.debug("could not find parent item for " + noteMod.getUid());
         throw new ValidationException("no parent found for " + noteMod.getUid());
     }
-    
+     
     private List<ContentItem> getAllItems(CollectionItem collection) {
         ArrayList<ContentItem> itemList = new ArrayList<ContentItem>();
         Set<ContentItem> allItems = contentService.loadChildren(collection,

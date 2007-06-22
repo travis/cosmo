@@ -235,7 +235,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var t = cosmo.datetime.util.parseTimeString(timeFieldValue);
             var h = cosmo.datetime.util.hrStd2Mil(t.hours, (meridianFieldValue == "pm"));
             var m = t.minutes;
-            jsDate.setHours(h, m);
         }
 
         if (errMsg){
@@ -253,8 +252,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             date.updateFromUTC(jsDate.getTime());            
         }
         date.utc = false;
-        date.updateFromUTC(jsDate.getTime());
-        
         return [date, null];
     }, 
     
@@ -262,6 +259,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         var propertyDisplayName = _("Main.DetailForm." + propertyName);
         var frequencyFieldValue = this._getFormValue(form, info.frequencyField);
         var endDateFieldValue = this._getFormValue(form, info.endDateField);
+        endDateFieldValue = endDateFieldValue == "mm/dd/yyyy" ? null : endDateFieldValue;
+        
         var errMsg = "";
         
         if (!frequencyFieldValue){
@@ -278,7 +277,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             } 
 
             var jsDate= new Date(endDateFieldValue);
-            endDate = new cosmo.datetime.Date(jsDate.getFullYear(), jsDate.getMonth(), jsDategetDate());
+            endDate = new cosmo.datetime.Date(jsDate.getFullYear(), jsDate.getMonth(), jsDate.getDate());
         }
         
         return [new cosmo.model.RecurrenceRule({

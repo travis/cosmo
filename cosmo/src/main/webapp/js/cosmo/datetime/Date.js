@@ -510,10 +510,12 @@ cosmo.datetime.Date.prototype.hash = function (){
  */
 cosmo.datetime.Date.prototype.createDateForTimezone = function(tzId){
     var date = new cosmo.datetime.Date();
-    if (tzId.toLowerCase() == "utc"){
-        date.utc = true;
-    } else {
-        date.tzId = tzId;
+    if (tzId){
+        if (tzId.toLowerCase() == "utc"){
+            date.utc = true;
+        } else {
+            date.tzId = tzId;
+        }
     }
     date.updateFromUTC(this.getTime());
     return date

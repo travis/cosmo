@@ -30,7 +30,7 @@ cosmotest.service.translators.test_eim = {
         var autoTriage = "1";
         var rank = "-12345.67";
         var createdOn = "1178053319";
-        var dtstartDateString = "00021231T000000";
+        var dtstartDateString = "20001231T000000";
         var dtstart = ";VALUE=DATE-TIME:" + dtstartDateString;
         var a = cosmotest.service.translators.test_eim.generateAtom(
             cosmotest.service.translators.test_eim.getEimRecordset({

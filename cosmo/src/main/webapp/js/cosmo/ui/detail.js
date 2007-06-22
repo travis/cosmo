@@ -42,7 +42,15 @@ cosmo.ui.detail = new function () {
     
     this.saveItem = function () {
         var converter = new cosmo.ui.DetailFormConverter(this.item.data);
-        xxx = converter.createDelta();
+        var deltaAndError = converter.createDelta();
+        var error = deltaAndError[1];
+        var delta = deltaAndError[0];
+        if (error){
+            alert(error);
+            return;
+        } else {
+            dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':this.item});
+        }
     };
     
     this.removeItem = function () {
@@ -723,18 +731,18 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         var elem = _html.createInput({ type: 'radio',
-            id: name + 'Meridian0',
+            id: name + 'MeridianAM',
             name: name + 'Meridian',
-            value: 1 });
+            value: "am" });
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
             _('App.AM')));
         t.appendChild(_html.nbsp());
         var elem = _html.createInput({ type: 'radio',
-            id: name + 'Meridian1',
+            id: name + 'MeridianPM',
             name: name + 'Meridian',
-            value: 2 });
+            value: "pm" });
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
@@ -839,10 +847,10 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(_createText('All day'));
         f.appendChild(t);
         // Event start
-        var t = createDateTimeInputs('Starts', 'start');
+        var t = createDateTimeInputs('startDate', 'start');
         f.appendChild(t);
         // Event end
-        var t = createDateTimeInputs('Ends', 'end');
+        var t = createDateTimeInputs('endDate', 'end');
         f.appendChild(t);
         // Timezone
         var t = cosmo.ui.detail.createLabelDiv(_(
@@ -881,7 +889,7 @@ cosmo.ui.detail.EventFormElements= function () {
         f.appendChild(t);
         // Recurrence
         var t = cosmo.ui.detail.createLabelDiv(_(
-            'Main.DetailForm.Occurs'));
+            'Main.DetailForm.rrule'));
         t.className += ' formElem';
         t.style.whiteSpace = 'nowrap';
         var elem = _html.createSelect({ id: 'recurrenceInterval',

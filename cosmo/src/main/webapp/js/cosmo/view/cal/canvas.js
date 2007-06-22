@@ -56,10 +56,8 @@ cosmo.view.cal.canvas = new function () {
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
-    // Currently selected event
-    this.selectedEvent = null;
-    // Index in Hash of selected event
-    this.selectedEventIndex = null;
+    // UID of the selected event
+    this.selectedEventId = '';
     // Available lozenge colors
     this.colors = {};
     // The scrolling div for timed events
@@ -448,7 +446,7 @@ cosmo.view.cal.canvas = new function () {
      * @return CalItem object, the currently selected event
      */
     this.getSelectedEvent = function () {
-        return self.selectedEvent;
+        return cosmo.view.cal.itemRegistry.getItem(this.selectedEventId);
     };
     this.calcColors = function () {
         var getRGB = function (h, s, v) {
@@ -566,7 +564,6 @@ cosmo.view.cal.canvas = new function () {
         switch (act) {
             case 'eventsLoadSuccess':
                 cosmo.view.cal.itemRegistry = data;
-                //self.selectedEvent = null;
                 var _c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
                 // Update viewStart, viewEnd from passed opts
                 for (var n in opts) { _c[n] = opts[n]; }
@@ -678,14 +675,18 @@ cosmo.view.cal.canvas = new function () {
      * @param ev CalItem object, the event to select
      */
     function setSelectedEvent(ev) {
-        // Deselect previously selected event if any
-        if (self.selectedEvent) {
-            self.selectedEvent.lozenge.setDeselected();
+        if (!ev) {
+            throw('No CalItem passed to setSelectedEvent.');
         }
-        self.selectedEvent = ev;
-        self.selectedEventIndex = cosmo.view.cal.itemRegistry.getPos(ev.id);
+        // Deselect previously selected event if any
+        var sel = self.getSelectedEvent();
+        if (sel) {
+            sel.lozenge.setDeselected();
+        }
+        self.selectedEventId = ev.id;
+        sel = self.getSelectedEvent();
         // Show the associated lozenge as selected
-        ev.lozenge.setSelected();
+        sel.lozenge.setSelected();
     };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
@@ -705,7 +706,7 @@ cosmo.view.cal.canvas = new function () {
         ev.lozenge.remove();
         // Remove selection if need be
         if (selEv && (selEv.id == ev.id)) {
-            self.selectedEvent = null;
+            self.selectedEventId = '';
         }
         return true;
     }
@@ -830,12 +831,12 @@ cosmo.view.cal.canvas = new function () {
                 positionLozenges()) {
                 // If no currently selected event, put selection on
                 // the final one loaded
-                if (!self.selectedEvent) {
-                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                        'data': cosmo.view.cal.itemRegistry.getLast() });
-                }
+                //if (!self.getSelectedEvent()) {
+                //    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                //        'data': cosmo.view.cal.itemRegistry.getLast() });
+                //}
                 dojo.event.topic.publish('/calEvent', { 'action':
-                    'eventsDisplaySuccess', 'data': self.selectedEvent });
+                    'eventsDisplaySuccess', 'data': self.getSelectedEvent() });
             }
         }
         // No items displayed in the current collection
@@ -883,7 +884,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function wipe() {
         removeAllEvents();
-        self.selectedEvent = null;
+        //self.selectedEventId = '';
     }
     /**
      * Render the canvas after successfully loading events
@@ -1058,7 +1059,7 @@ cosmo.view.cal.canvas = new function () {
                 // Before wiping, remember the position of the currently selected
                 // event. If the canvas renders immediately after this update,
                 // we need to keep the selection where it was.
-                var currSel = cosmo.view.cal.itemRegistry.getPos(self.selectedEvent.id);
+                var currSel = cosmo.view.cal.itemRegistry.getPos(self.getSelectedEvent().id);
                 h = removeEventRecurrenceGroup(h, idArr);
             }
             // 'All Future Events' -- remove instances appearing after the
@@ -1203,7 +1204,10 @@ cosmo.view.cal.canvas = new function () {
 
                 // Publish selection
                 var c = cosmo.view.cal.canvas;
-                if (c.selectedEvent && item.id != c.selectedEvent.id) {
+                var sel = c.getSelectedEvent();
+                // If no currently selected item, or the item clicked
+                // is not the currently selected item, update the selection
+                if ((!sel) || (item.id != sel.id)) {
                     dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': item });
                 }
 

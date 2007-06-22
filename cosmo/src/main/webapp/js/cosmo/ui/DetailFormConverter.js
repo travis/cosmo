@@ -22,6 +22,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
    
    initializer: function(item){
        this._item = item;
+       xxxitem = item;
    },
    
    createDelta: function(){
@@ -235,7 +236,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var t = cosmo.datetime.util.parseTimeString(timeFieldValue);
             var h = cosmo.datetime.util.hrStd2Mil(t.hours, (meridianFieldValue == "pm"));
             var m = t.minutes;
-        }
+            jsDate.setHours(h, m);
+          }
 
         if (errMsg){
             return [null, errMsg];

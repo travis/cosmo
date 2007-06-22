@@ -47,6 +47,7 @@
     <property name="exceptionMappings">
        <value>
           org.osaf.cosmo.security.PermissionDeniedException=error_forbidden
+          org.osaf.cosmo.dao.NoSuchResourceException=error_notfound
           java.lang.Exception=error_exception
        </value>
     </property>

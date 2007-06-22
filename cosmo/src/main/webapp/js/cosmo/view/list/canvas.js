@@ -70,6 +70,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     this.renderSelf = function () {
+        
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        
         var reg = cosmo.view.list.itemRegistry;
         this._updateSize();
         this.setPosition(0, CAL_TOP_NAV_HEIGHT);
@@ -237,7 +240,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
             throw('Could not sort item registry.');
         }
     };
-
 };
 
 cosmo.view.list.canvas.Canvas.prototype =

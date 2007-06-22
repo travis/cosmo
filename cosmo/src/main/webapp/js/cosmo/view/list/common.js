@@ -55,6 +55,8 @@ cosmo.view.list.triageStatusCodeStrings = {
 
 cosmo.view.list.handlePub_calEvent = function (cmd) {
 
+    if (!cosmo.view.list.isCurrentView()) { return false; }
+
     // Ignore input when not the current view
     var _pim = cosmo.app.pim;
     if (_pim.currentView != _pim.views.LIST) {
@@ -226,6 +228,10 @@ cosmo.view.list.createNoteItem = function (s) {
         dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': item, 'qualifier': 'new' })
         return cosmo.view.list.itemRegistry.getItem(id);
     }
+};
+
+cosmo.view.list.isCurrentView = function () {
+    return (cosmo.app.pim.currentView == cosmo.app.pim.views.LIST);
 };
 
 

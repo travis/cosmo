@@ -45,6 +45,8 @@ cosmo.view.cal.itemRegistry = null;
  */
 cosmo.view.cal.handlePub_calEvent = function (cmd) {
 
+    if (!cosmo.view.cal.isCurrentView()) { return false; }
+
     // Ignore input when not the current view
     var _pim = cosmo.app.pim;
     if (_pim.currentView != _pim.views.CAL) {
@@ -73,11 +75,7 @@ cosmo.view.cal.handlePub_calEvent = function (cmd) {
  */
 cosmo.view.cal.handlePub_app = function (cmd) {
 
-    // Ignore input when not the current view
-    var _pim = cosmo.app.pim;
-    if (_pim.currentView != _pim.views.CAL) {
-        return false;
-    }
+    if (!cosmo.view.cal.isCurrentView()) { return false; }
 
     var e = cmd.appEvent;
     var t = cmd.type;
@@ -279,6 +277,10 @@ cosmo.view.cal.getNewViewStart = function (key) {
     queryDate = cosmo.datetime.Date.add(this.viewStart,
         dojo.date.dateParts.WEEK, incr);
     return queryDate;
+};
+
+cosmo.view.cal.isCurrentView = function () {
+    return (cosmo.app.pim.currentView == cosmo.app.pim.views.CAL);
 };
 
 

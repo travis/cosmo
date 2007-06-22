@@ -1527,6 +1527,9 @@ cosmo.view.cal.canvas.Canvas = function (p) {
     this.currDate = null;
     for (var n in params) { this[n] = params[n]; }
     this.renderSelf = function () {
+        
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        
         this.width = this.parent.width;
         this.height = this.parent.height;
         this.domNode.style.position = 'absolute';

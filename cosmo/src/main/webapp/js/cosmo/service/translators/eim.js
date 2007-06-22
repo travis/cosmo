@@ -1137,7 +1137,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (!exdate) return null;
         return dojo.lang.map(
                 exdate.split(":")[1].split(","),
-                cosmo.datetime.fromIso8601
+                function (exdate, index) {return cosmo.datetime.fromIso8601(exdate)}
          );
     },
 

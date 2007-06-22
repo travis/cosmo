@@ -107,6 +107,9 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             case "text":
                 return element.value;
                 break;
+            case "textarea":
+                return element.value;
+                break;
             case "radio":
                 return cosmo.util.html.getRadioButtonSetValue(element);
                 break;
@@ -115,7 +118,9 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 break;
             case "checkbox":
                 return element.checked ? "1" : "0";
+                break;
             default: 
+                alert(type);
                 return "";
                 break;
         }

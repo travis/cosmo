@@ -230,7 +230,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     this.mainSection.toggleEnabled(true);
     f = this.mainSection.formNode;
     f.noteTitle.value = data.getDisplayName();
-    f.noteDescription.value = data.getBody() + "\n" +data.getTriageStatus() +"\n"+ data.getAutoTriage();
+    f.noteDescription.value = data.getBody();
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();

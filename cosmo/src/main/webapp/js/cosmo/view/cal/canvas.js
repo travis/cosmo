@@ -56,8 +56,9 @@ cosmo.view.cal.canvas = new function () {
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
-    // UID of the selected event
-    this.selectedEventId = '';
+    // UIDs for selected events keyed by the uid of
+    // the currently displayed collection
+    this.selectedEventIdRegistry = {};
     // Available lozenge colors
     this.colors = {};
     // The scrolling div for timed events
@@ -439,14 +440,23 @@ cosmo.view.cal.canvas = new function () {
         return top;
     };
     /**
-     * Get the currently selected event -- might be okay to allow
-     * direct access to the property itself, but with a getter
-     * you could trigger certain events if neeeded whenever something
-     * grabs the selected event
+     * Get the currently selected event
      * @return CalItem object, the currently selected event
      */
     this.getSelectedEvent = function () {
-        return cosmo.view.cal.itemRegistry.getItem(this.selectedEventId);
+        var key = cosmo.app.pim.currentCollection.getUid();
+        var id = self.selectedEventIdRegistry[key];
+        return cosmo.view.cal.itemRegistry.getItem(id);
+    };
+    this.setSelectedEvent = function (ev) {
+        var key = cosmo.app.pim.currentCollection.getUid();
+        self.selectedEventIdRegistry[key] = ev.id;
+        return true;
+    };
+    this.clearSelectedEvent = function (ev) {
+        var key = cosmo.app.pim.currentCollection.getUid();
+        self.selectedEventIdRegistry[key] = '';
+        return true;
     };
     this.calcColors = function () {
         var getRGB = function (h, s, v) {
@@ -574,7 +584,7 @@ cosmo.view.cal.canvas = new function () {
                 break;
             case 'setSelected':
                 var ev = cmd.data;
-                setSelectedEvent(ev);
+                setSelectedCalItem(ev);
                 break;
             case 'save':
                 setLozengeProcessing(cmd);
@@ -674,19 +684,18 @@ cosmo.view.cal.canvas = new function () {
      * canvas
      * @param ev CalItem object, the event to select
      */
-    function setSelectedEvent(ev) {
+    function setSelectedCalItem(ev) {
         if (!ev) {
-            throw('No CalItem passed to setSelectedEvent.');
+            throw('No CalItem passed to setSelectedCalItem.');
         }
         // Deselect previously selected event if any
         var sel = self.getSelectedEvent();
         if (sel) {
             sel.lozenge.setDeselected();
         }
-        self.selectedEventId = ev.id;
-        sel = self.getSelectedEvent();
+        self.setSelectedEvent(ev);
         // Show the associated lozenge as selected
-        sel.lozenge.setSelected();
+        ev.lozenge.setSelected();
     };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
@@ -706,7 +715,7 @@ cosmo.view.cal.canvas = new function () {
         ev.lozenge.remove();
         // Remove selection if need be
         if (selEv && (selEv.id == ev.id)) {
-            self.selectedEventId = '';
+            self.clearSelectedEvent();
         }
         return true;
     }
@@ -884,7 +893,6 @@ cosmo.view.cal.canvas = new function () {
      */
     function wipe() {
         removeAllEvents();
-        //self.selectedEventId = '';
     }
     /**
      * Render the canvas after successfully loading events
@@ -1353,7 +1361,7 @@ cosmo.view.cal.canvas = new function () {
         var start = null;
         var end = null;
         var note = new cosmo.model.Note();
-        var id = note.getUid();
+        var id = note.getUid(); // Won't be recurring, don't need to use getItemUid
         var eventStamp = note.getEventStamp(true);
 
         dojo.debug("createNewCalItem 2");

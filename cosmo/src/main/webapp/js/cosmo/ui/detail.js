@@ -155,20 +155,14 @@ cosmo.ui.detail.DetailViewForm = function (p) {
             case 'eventsLoadPrepare':
                 //self.clear();
                 break;
-            case 'eventsDisplaySuccess':
-                // FIXME: This may not be needed if there's always
-                // an item that gets the default selection
-                //self.updateFromItem(item);
-                //self.buttonSection.setButtons(true);
-                /*
-                toggleReadOnlyIcon();
-                */
-                break;
             case 'saveFromForm':
                 //saveCalEvent(ev);
                 break;
+            case 'eventsDisplaySuccess':
             case 'setSelected':
-                self.updateFromItem(item);
+                if (item) {
+                    self.updateFromItem(item);
+                }
                 break;
             case 'saveSuccess':
                 /*

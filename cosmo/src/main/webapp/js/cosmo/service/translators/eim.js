@@ -170,14 +170,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var i = 0; i < entries.length; i++){
             var entry = entries[i];
             var content = entry.getElementsByTagName("content")[0];
-            var displayNameEl = dojo.html.getElementsByClassName("name", content)[0];
+            var divWrapper = content.getElementsByTagName("div")[0];
+            var subscriptionDiv = this.getChildrenByClassName(divWrapper, "local-subscription", "div")[0];
+            var displayNameEl = this.getChildrenByClassName(subscriptionDiv, "name", "span")[0];
             var displayName = displayNameEl.firstChild.nodeValue;
-            var ticketEl = dojo.html.getElementsByClassName("ticket", content)[0];
-            var ticketKeyEl = dojo.html.getElementsByClassName("key", ticketEl)[0];
+            var ticketEl = this.getChildrenByClassName(subscriptionDiv, "ticket", "div")[0];
+            var ticketKeyEl = this.getChildrenByClassName(ticketEl, "key", "span")[0];
             var ticket = ticketKeyEl.firstChild.nodeValue;
-            var collectionEl = dojo.html.getElementsByClassName("collection", content)[0];
-            var collectionUidEl = dojo.html.getElementsByClassName("uuid", collectionEl)[0];
+            var collectionEl = this.getChildrenByClassName(subscriptionDiv, "collection", "div")[0];
+            var collectionUidEl = this.getChildrenByClassName(collectionEl, "uuid", "span")[0];
+            var collectionExistsEl = this.getChildrenByClassName(collectionEl, "exists", "span")[0];
             var uid = collectionUidEl.firstChild.nodeValue;
+            var collectionDeleted = (collectionExistsEl.firstChild.nodeValue == "false");
             var collection = new cosmo.model.Collection({
                 uid: uid
             });
@@ -187,7 +191,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 displayName: displayName,
                 ticketKey: ticket,
                 uid: uid,
-                collection: collection
+                collection: collection,
+                collectionDeleted: collectionDeleted
             })
 
             subscription.setUrls(this.getUrls(entry));

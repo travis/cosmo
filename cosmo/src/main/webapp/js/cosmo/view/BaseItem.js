@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview Calendar events -- links the Lozenge to the CalEventData
+ * @fileoverview Calendar events -- links the Lozenge to the CalItemData
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */
@@ -29,7 +29,7 @@ cosmo.view.BaseItem = function(id) {
 }
 
 /**
- * Makes a clone backup of the CalEventData for the event to
+ * Makes a clone backup of the stamped Note data for the item to
  * store in the dataOrig property. This is used to back out of
  * a cancelled/failed save operation or failed remove operation.
  */
@@ -47,7 +47,7 @@ cosmo.view.BaseItem.prototype.makeSnapshot = function () {
     return true;
 };
 /**
- * Makes a clone backup of the CalEventData for the event to
+ * Makes a clone backup of the stamped Note data for the item to
  * store in the dataOrig property. This is used to back out of
  * a cancelled/failed save operation or failed remove operation.
  */

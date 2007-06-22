@@ -36,7 +36,7 @@ cosmo.view.cal.conflict = new function() {
         /**
          * Clear the conflict props on an event
          * @param key String, the Hash key for the event's entry in the Hash
-         * @param val CalEvent obj, the calendar event to clear
+         * @param val CalItem obj, the calendar event to clear
          * conflict properties on
          */
         function clearProps(key, val) {
@@ -111,7 +111,7 @@ cosmo.view.cal.conflict = new function() {
          * Calculate the indent level an event based on the
          * indent level of its preceeding conflicting events
          * @param key String, the Hash key for the event's entry in the Hash
-         * @param val CalEvent obj, the calendar event to calc the conflict
+         * @param val CalItem obj, the calendar event to calc the conflict
          * depth for.
          */
         function calcConflictDepth(key, val) {
@@ -152,7 +152,7 @@ cosmo.view.cal.conflict = new function() {
          * The max indent level of all items that conflict with this
          * one -- used to adjust width of a block
          * @param key String, the Hash key for the event's entry in the Hash
-         * @param val CalEvent obj, the calendar event to calc the maximum
+         * @param val CalItem obj, the calendar event to calc the maximum
          * conflict depth for.
          * @return Number, the maximum depth of overlap for this event
          * considering both *before* and *after* conflicts
@@ -214,7 +214,7 @@ cosmo.view.cal.conflict = new function() {
          * Set the positions in the sparse matrix for all-day
          * event tiling
          * @param key String, the id for the event in the Hash
-         * @param val CalEvent obj, the event that is being
+         * @param val CalItem obj, the event that is being
          * positioned in the resizable all-day event area
          */
         function setMatrixPos(key, val) {

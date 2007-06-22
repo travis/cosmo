@@ -209,12 +209,12 @@ cosmo.view.cal.loadEvents = function (o) {
     return true;
 };
 /**
- * Take an array of CalEventData objects, and create a Hash of
- * CalEvent objects with attached CalEventData objects.
+ * Create a Hash of CalItem objects with data property of stamped
+ * Note objects.
  * @param arrParam Either an Array, or JS Object with multiple Arrays,
- * containing CalEventData objects
- * @return Hash, the keys are randomized strings, and the values are
- * the CalEvent objects.
+ * containing stamped Note objects
+ * @return Hash, the keys are the UID of the Notes, and the values are
+ * the CalItem objects.
  */
 cosmo.view.cal.createEventRegistry = function(arrParam) {
     var h = new cosmo.util.hash.Hash();

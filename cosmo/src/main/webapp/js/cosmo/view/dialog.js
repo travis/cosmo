@@ -162,7 +162,7 @@ cosmo.view.dialog = new function() {
         if (key == 'saveRecurConfirm') {
             var changeTypes = opts.changeTypes;
             var delta = opts.delta;
-            var saveItem = opts.saveItem  //a "CalEvent"
+            var saveItem = opts.saveItem  // CalItem/ListItem
             p.btnsRight = [];
             if (!changeTypes[OPTIONS.ALL_EVENTS]){
                 p.btnsRight.push(buttons.allEventsDisabled());

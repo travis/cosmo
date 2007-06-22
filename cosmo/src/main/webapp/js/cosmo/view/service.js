@@ -103,7 +103,7 @@ cosmo.view.service = new function () {
      * items -- invokes confirmation dialog for changes to item properties
      * for recurring items (changes to the recurrence rule spawn no dialog).
      * For normal items, this simply passes through to saveItemChanges
-     * @param item A CalEvent object, the item to be saved.
+     * @param item A ListItem/CalItem object, the item to be saved.
      */
     function saveItemChangesConfirm(item, delta) {
         var changeTypes = delta.getApplicableChangeTypes();
@@ -131,7 +131,7 @@ cosmo.view.service = new function () {
      * Called for after passthrough from saveItemChangesConfirm. Routes to
      * the right save operation (i.e., for recurring items, 'All Future,'
      * 'Only This Event,' etc.)
-     * @param item A CalEvent object, the object to be saved.
+     * @param item A ListItem/CalItem object, the object to be saved.
      * @param qual String, flag for different variations of saving
      * recurring items. May be one of the three recurringEventOptions, or
      * the two special cases of adding recurrence to a single item or
@@ -233,7 +233,7 @@ cosmo.view.service = new function () {
      * Creates an anonymous function to pass as the callback for the
      * async service call that saves the changes to the item.
      * Response to the async request is handled by handleSaveItem.
-     * @param item A CalEvent object, the item to be saved.
+     * @param item A ListItem/CalItem object, the item to be saved.
      * @param opts An Object, options for the save operation.
      */
      //BOBBYNOTE: Can we collapse this into "saveItemChanges" ?
@@ -346,7 +346,7 @@ cosmo.view.service = new function () {
     /**
      * Handles the response from the async call when saving changes
      * to items.
-     * @param item A CalEvent object, the original item clicked on,
+     * @param item A ListItem/CalItem object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
      * FIXME: Comments below are hopelessly out of date
      * @param newItemId String, the id for the item returned when creating a
@@ -402,7 +402,7 @@ cosmo.view.service = new function () {
     /**
      * Main function call for removing items -- invokes different
      * confirmation dialog for recurring items.
-     * @param item A CalEvent object, the item to be removed.
+     * @param item A ListItem/CalItem object, the item to be removed.
      */
      //XINT
     function removeItemConfirm(item) {
@@ -427,7 +427,7 @@ cosmo.view.service = new function () {
      * Called for after passthrough from removeItemConfirm. Routes to
      * the right remove operation (i.e., for recurring items, 'All Future,'
      * 'Only This Event,' etc.)
-     * @param item A CalEvent object, the object to be saved.
+     * @param item A ListItem/CalItem object, the object to be saved.
      * @param qual String, flag for different variations of removing
      * recurring items. Will be one of the three recurringEventOptions.
      */
@@ -554,7 +554,7 @@ cosmo.view.service = new function () {
      * Call the service to do item removal -- creates an anonymous
      * function to pass as the callback for the async service call.
      * Response to the async request is handled by handleRemoveItem.
-     * @param item A CalEvent object, the item to be saved.
+     * @param item A ListItem/CalItem object, the item to be saved.
      * @param opts A JS Object, options for the remove operation.
      */
      //XINT
@@ -570,7 +570,7 @@ cosmo.view.service = new function () {
     }
     /**
      * Handles the response from the async call when removing an item.
-     * @param ev A CalEvent object, the original item clicked on,
+     * @param item A ListItem/CalItem object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
      * @param newItemId String, FIXME -- Why is this included in Remove?
      * @param err A JS object, the error returned from the server when
@@ -599,7 +599,7 @@ cosmo.view.service = new function () {
      * Call the service to save a recurrence rule -- creates an anonymous
      * function to pass as the callback for the async service call.
      * Response to the async request is handled by handleSaveRecurrenceRule.
-     * @param item A CalEvent object, the item originally clicked on.
+     * @param item A ListItem/CalItem object, the item originally clicked on.
      * @param rrule A RecurrenceRule, the updated rule for saving.
      * @param opts A JS Object, options for the remove operation.
      */
@@ -617,7 +617,7 @@ cosmo.view.service = new function () {
     /**
      * Handles the response from the async call when saving changes
      * to a RecurrenceRule.
-     * @param item A CalEvent object, the original item clicked on,
+     * @param item A ListItem/CalItem object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
      * @param err A JS object, the error returned from the server when
      * a remove operation fails.

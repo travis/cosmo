@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview Calendar events -- links the Lozenge to the CalEventData
+ * @fileoverview Calendar events -- links the Lozenge to the CalItemData
  * @author Matthew Eernisse mailto:mde@osafoundation.org
  * @license Apache License 2.0
  */
@@ -30,15 +30,15 @@ dojo.require('cosmo.view.cal.lozenge');
 
 /**
  * @object CalItem -- an event on the Calendar, links to the event's
- * Lozenge and CalEventDate objects
+ * Lozenge and CalItemDate objects
  */
 cosmo.view.cal.CalItem = function(id, lozenge) {
-    // Randomly generated ID for each CalEvent
+    // Randomly generated ID for each CalItem
     // Lozenge div elements get their id suffixes from this
     this.id = id;
     // Points to this event's Lozenge obj
     this.lozenge = lozenge;
-    // Points to this event's CalEventData obj
+    // Points to this event's stamped Note obj
     this.data = null;
     // A backup copy (clone) of the .data property made
     // before trying to edit

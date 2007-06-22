@@ -57,8 +57,8 @@ cosmo.view.cal.canvas = new function () {
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
     // The list currently displayed events
-    // on the calendar -- key is the CalEvent obj's id prop,
-    // value is the CalEvent
+    // on the calendar -- key is the CalItem obj's id prop,
+    // value is the CalItem
     this.eventRegistry = new Hash();
     // Currently selected event
     this.selectedEvent = null;
@@ -449,7 +449,7 @@ cosmo.view.cal.canvas = new function () {
      * direct access to the property itself, but with a getter
      * you could trigger certain events if neeeded whenever something
      * grabs the selected event
-     * @return CalEvent object, the currently selected event
+     * @return CalItem object, the currently selected event
      */
     this.getSelectedEvent = function () {
         return self.selectedEvent;
@@ -557,13 +557,13 @@ cosmo.view.cal.canvas = new function () {
      * how to handle the published event.
      */
     this.handlePub_calEvent = function (cmd) {
-        
+
         // Ignore input when not the current view
-        var _pim = cosmo.app.pim; 
+        var _pim = cosmo.app.pim;
         if (_pim.currentView != _pim.views.CAL) {
             return false;
         }
-        
+
         var act = cmd.action;
         var opts = cmd.opts;
         var data = cmd.data;
@@ -638,13 +638,13 @@ cosmo.view.cal.canvas = new function () {
     };
 
     this.handlePub_app = function (cmd) {
-        
+
         // Ignore input when not the current view
-        var _pim = cosmo.app.pim; 
+        var _pim = cosmo.app.pim;
         if (_pim.currentView != _pim.views.CAL) {
             return false;
         }
-        
+
         var t = cmd.type;
         switch (t) {
             case 'modalDialogToggle':
@@ -679,17 +679,17 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Set the passed calendar event as the selected one on
      * canvas
-     * @param ev CalEvent object, the event to select
+     * @param ev CalItem object, the event to select
      */
     function setSelectedEvent(ev) {
         // Deselect previously selected event if any
         if (self.selectedEvent) {
             self.selectedEvent.lozenge.setDeselected();
         }
-        self.selectedEvent = ev; 
+        self.selectedEvent = ev;
         self.selectedEventIndex = self.eventRegistry.getPos(ev.id);
         // Show the associated lozenge as selected
-        ev.lozenge.setSelected(); 
+        ev.lozenge.setSelected();
     };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
@@ -701,7 +701,7 @@ cosmo.view.cal.canvas = new function () {
      *     creation fails
      * Likely called in a loop with the Hash's 'each' method
      * @param id String, id of the event to be removed
-     * @param ev CalEvent obj, the event to be removed
+     * @param ev CalItem obj, the event to be removed
      */
     function removeEventFromDisplay(id, ev) {
         var selEv = self.getSelectedEvent();
@@ -717,9 +717,9 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Remove a cal event object, usually removes the event
      * lozenge as well
-     * @param ev CalEvent object, the event to select
+     * @param ev CalItem object, the event to select
      * @param rem Boolean, if explicit false is passed,
-     * don't remove the lozenge along with the CalEvent obj
+     * don't remove the lozenge along with the CalItem obj
      */
     function removeEvent(ev, rem) {
         // Default behavior is to remove the lozenge
@@ -734,7 +734,7 @@ cosmo.view.cal.canvas = new function () {
      * Clear the entire eventRegistry, usually clear the
      * lozenges from the canvas as well
      * @param rem Boolean, if explicit false is passed,
-     * don't remove the lozenges along with the CalEvent objs
+     * don't remove the lozenges along with the CalItem objs
      */
     function removeAllEvents() {
         self.eventRegistry.each(removeEventFromDisplay);
@@ -749,7 +749,7 @@ cosmo.view.cal.canvas = new function () {
      *
      * @param reg An eventRegistry Hash from which to remove a group or
      * groups of recurring events
-     * @param arr Array of CalEventData ids for the recurrences to
+     * @param arr Array of Item ids for the recurrences to
      * remove
      * @param dt A cosmo.datetime.Date,represents the end date of a
      * recurrence -- if the dt param is present, it will remove
@@ -757,7 +757,7 @@ cosmo.view.cal.canvas = new function () {
      * It will also reset the recurrence endDate for all dates
      * to the dt (the new recurrence end date) for all the events
      * that it leaves
-     * @param ignore String, the CalEvent id of a single event to ignore from
+     * @param ignore String, the CalItem id of a single event to ignore from
      * the removal process -- used when you need to leave the
      * master event in a recurrence
      * @return a new Hash to be used as your event registry
@@ -808,7 +808,7 @@ cosmo.view.cal.canvas = new function () {
      * Append an calendar event lozenge to the canvas -- likely
      * called in a loop with the Hash's 'each' method
      * @param key String, the Hash key for the eventRegistry
-     * @param val CalEvent obj, value in the eventRegistry
+     * @param val CalItem obj, value in the eventRegistry
      * for the event getting added to the canvas
      */
     function appendLozenge(key, val) {
@@ -856,11 +856,11 @@ cosmo.view.cal.canvas = new function () {
     };
     /**
      * Position the lozenge on the canvase based on the
-     * CalEventData props -- happens after they're put on the canvas
+     * Item props -- happens after they're put on the canvas
      * with appendLozenge. Called in a loop with Hash's 'each' method
      * @param key String, the Hash key for the event in the
      * eventRegistry
-     * @param val CalEvent object, the value in the Hash
+     * @param val CalItem object, the value in the Hash
      */
     function positionLozenge(key, val) {
         ev = val;
@@ -871,9 +871,9 @@ cosmo.view.cal.canvas = new function () {
      * Restores a cal event to it's previous state after:
      * (1) a user cancels an edit
      * (2) an update operation fails on the server
-     * Restores the CalEventData from the backup snapshot, and
+     * Restores the CalItem from the backup snapshot, and
      * returns the lozenge to its previous position
-     * @param ev CalEvent object, the event to restore
+     * @param ev CalItem object, the event to restore
      */
     function restoreEvent(ev) {
         if (ev.restoreFromSnapshot()) {
@@ -1146,7 +1146,7 @@ cosmo.view.cal.canvas = new function () {
     }
     /**
      * Handles a successful removal of an event
-     * @param ev CalEvent object, the removed event
+     * @param ev CalItem object, the removed event
      * @param opts JS Object, options for the removal that
      * tell you what kind of remove is happening
      */
@@ -1250,7 +1250,7 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Double-clicks -- if event source is in the scrolling area
      * for normal events, or in the resizeable all-day event area
-     * calls insertCalEventNew to create a new event
+     * calls createNewCalItem to create a new event
      * FIXME: This could be segregated into two functions
      * attached to each of the two canvas areas
      */
@@ -1269,7 +1269,7 @@ cosmo.view.cal.canvas = new function () {
                 case (id.indexOf('hourDiv') > -1):
                 // On all-day column -- create new all-day event
                 case (id.indexOf('allDayListDiv') > -1):
-                    insertCalEventNew(id);
+                    createNewCalItem(id);
                     break;
                 // On event title -- edit-in-place
                 case (id.indexOf('eventDiv') > -1):
@@ -1335,8 +1335,8 @@ cosmo.view.cal.canvas = new function () {
      * the user double-clicks on the cal canvas
      * @param id A string, the id of the div on the cal canvas double-clicked
      */
-    function insertCalEventNew(evParam) {
-        dojo.debug("insertCalEventNew 1");
+    function createNewCalItem(evParam) {
+        dojo.debug("createNewCalItem 1");
         var ev = null; // New event
         var evSource = '';
         var evType = '';
@@ -1356,14 +1356,15 @@ cosmo.view.cal.canvas = new function () {
         var id = note.getUid();
         var eventStamp = note.getEventStamp(true);
 
-        dojo.debug("insertCalEventNew 2");
-        // Create the CalEvent obj, attach the CalEventData obj, create the Lozenge
+        dojo.debug("createNewCalItem 2");
+        // Create the CalItem obj, attach the Note obj
+        // as .data with EventStamp, create the Lozenge
         // ================================
         evType = (evParam.indexOf('allDayListDiv') > -1) ? 'allDayMain' : 'normal';
         evSource = 'click';
         // Create the lozenge
         if (evType =='normal') {
-            dojo.debug("insertCalEventNew 3");
+            dojo.debug("createNewCalItem 3");
             lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(id);
             allDay = false;
             startstr = getIndexFromHourDiv(evParam);
@@ -1393,10 +1394,10 @@ cosmo.view.cal.canvas = new function () {
         }
 
 
-        // Create the CalEvent, connect it to its lozenge
+        // Create the CalItem, connect it to its lozenge
         ev = new cosmo.view.cal.CalItem(id, lozenge);
 
-        // Set CalEventData start and end calculated from click position
+        // Set EventStamp start and end calculated from click position
         // --------
         note.setDisplayName(_('Main.NewEvent'));
         note.setBody('');
@@ -1636,7 +1637,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
         calcHeight = self.height - vOffset;
         // Subtract the navbar height -- this lives outside the cal view
-        calcHeight -= CAL_TOP_NAV_HEIGHT; 
+        calcHeight -= CAL_TOP_NAV_HEIGHT;
         var timedMain = self.timedCanvas;
         timedMain.setSize(self.width - 2, calcHeight); // Variable height area
         timedMain.setPosition(0, vOffset);

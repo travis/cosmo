@@ -88,6 +88,15 @@ cosmo.util.html.setSelect = function (sel, val) {
     }
 };
 
+cosmo.util.html.getSelectValue = function (selectElement){
+    for (var x = 0; x < selectElement.length; x++){
+        var option = selectElement[x]; 
+        if (option.selected){ 
+            return option.value;
+        } 
+    }
+}
+
 cosmo.util.html.createInput = function (type, id, name,
     size, maxlength, value, className, parentNode) {
 
@@ -212,9 +221,9 @@ cosmo.util.html.createRollOverMouseDownImage = function(normalImageUrl){
 
 // Fix bug where safari does not put form inputs into form.elements.
 cosmo.util.html.addInputsToForm = function(inputs, form){
-	for (i=0; i < inputs.length; i++){
-		form[inputs[i].id] = inputs[i];
-	}
+    for (i=0; i < inputs.length; i++){
+        form[inputs[i].id] = inputs[i];
+    }
 };
 
 cosmo.util.html.handleTextInputFocus = function (e) {

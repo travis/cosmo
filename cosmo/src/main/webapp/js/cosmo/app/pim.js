@@ -122,7 +122,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         if (deletedSubscriptions && deletedSubscriptions.length > 0){
             for (var x = 0; x < deletedSubscriptions.length; x++){
                 cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",
-                    deletedSubscriptions[x].displayName));
+                    deletedSubscriptions[x].getDisplayName()));
             }
         }
     };
@@ -314,17 +314,17 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     //TODO
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
-/*        var filteredSubscriptions = dojo.lang.filter(subscriptions,
+        var filteredSubscriptions = dojo.lang.filter(subscriptions,
             function(sub){
-               if (!sub.calendar){
-                   self.serv.deleteSubscription(sub.uid, sub.getTicketKey());
+               if (sub.getCollectionDeleted()){
+                   self.serv.deleteItem(sub);
                    deletedSubscriptions.push(sub);
                    return false;
                } else {
                    return true;
                }
-        });*/
-        return [subscriptions, deletedSubscriptions];
+        });
+        return [filteredSubscriptions, deletedSubscriptions];
     };
 
     // ==========================

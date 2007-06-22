@@ -33,6 +33,7 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
+dojo.require("cosmo.view.service");
 dojo.require("cosmo.view.cal.common");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
@@ -915,7 +916,7 @@ cosmo.view.cal.canvas = new function () {
      */
      function saveSuccess(cmd) {
         dojo.debug("saveSuccess: ");
-        var OPTIONS = cosmo.view.cal.recurringEventOptions;
+        var OPTIONS = cosmo.view.service.recurringEventOptions;
         var ev = cmd.data
         var item = ev.data;
         var saveType = cmd.saveType || null;
@@ -969,7 +970,8 @@ cosmo.view.cal.canvas = new function () {
             if (inRange) {
                 ev.lozenge.setInputDisabled(false);
                 ev.lozenge.updateDisplayMain();
-            } else if (cmd.qualifier.offCanvas) {
+            }
+            else if (cmd.qualifier.offCanvas) {
                 removeEvent(ev);
             }
         }
@@ -987,7 +989,7 @@ cosmo.view.cal.canvas = new function () {
                 }
                 updateEventsDisplay();
             } else {
-                dojo.debug("how many left in queue: " +cosmo.view.cal.processingQueue.length);
+                dojo.debug("how many left in queue: " +cosmo.view.service.processingQueue.length);
             }
         }
 
@@ -1089,7 +1091,7 @@ cosmo.view.cal.canvas = new function () {
 
         // Repaint and restore selection if there are no
         // more requests processing
-        if (!cosmo.view.cal.processingQueue.length) {
+        if (!cosmo.view.service.processingQueue.length) {
             updateEventsDisplay();
             if (!cosmo.view.cal.lastSent) {
                 // ==========================================================

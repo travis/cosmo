@@ -269,6 +269,19 @@ cosmotest.service.conduits.test_conduits = {
             
             item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
             jum.assertEquals("modification display name didn't save", anotherNewDisplayName, item4.getDisplayName());
+
+
+            conduit.deleteItem(item4, {sync: true});
+            
+            // Make sure changes stuck
+            item0Occurrences = conduit.getItems(c0, 
+               {start: new cosmo.datetime.Date(2007, 5, 10),
+                end: new cosmo.datetime.Date(2007, 5, 17)}, 
+               {sync: true}
+            ).results[0];
+            
+            item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
+            jum.assertEquals("modification display name didn't save", item4.getMaster().getDisplayName(), item4.getDisplayName());
    
         } finally {
            cosmotest.service.conduits.test_conduits.cleanup(user);            

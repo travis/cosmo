@@ -300,10 +300,10 @@ cosmo.view.cal.conflict = new function() {
     /**
      * Calculate the conflicts, positions, and indention levels for
      * all the overlapping events on the canvas.
-     * @param eR Hash, the eventRegistry of loaded calendar events.
+     * @param eR Hash, the itemRegistry of loaded calendar events.
      */
-    this.calc = function(eR) {
-        evReg = eR;
+    this.calc = function(iR) {
+        evReg = iR;
         return sortAndClearEvents() &&
             checkConflicts() &&
             stackUntimed();

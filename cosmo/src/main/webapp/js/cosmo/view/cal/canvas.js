@@ -56,10 +56,6 @@ cosmo.view.cal.canvas = new function () {
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
-    // The list currently displayed events
-    // on the calendar -- key is the CalItem obj's id prop,
-    // value is the CalItem
-    this.eventRegistry = new Hash();
     // Currently selected event
     this.selectedEvent = null;
     // Index in Hash of selected event
@@ -537,7 +533,7 @@ cosmo.view.cal.canvas = new function () {
      */
     this.cleanup = function () {
         // Let's be tidy
-        self.eventRegistry = null;
+        cosmo.view.cal.itemRegistry = null;
         if (allDayArea){
             allDayArea.cleanup();
         }
@@ -569,7 +565,7 @@ cosmo.view.cal.canvas = new function () {
         var data = cmd.data;
         switch (act) {
             case 'eventsLoadSuccess':
-                self.eventRegistry = data;
+                cosmo.view.cal.itemRegistry = data;
                 //self.selectedEvent = null;
                 var _c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
                 // Update viewStart, viewEnd from passed opts
@@ -687,7 +683,7 @@ cosmo.view.cal.canvas = new function () {
             self.selectedEvent.lozenge.setDeselected();
         }
         self.selectedEvent = ev;
-        self.selectedEventIndex = self.eventRegistry.getPos(ev.id);
+        self.selectedEventIndex = cosmo.view.cal.itemRegistry.getPos(ev.id);
         // Show the associated lozenge as selected
         ev.lozenge.setSelected();
     };
@@ -727,18 +723,18 @@ cosmo.view.cal.canvas = new function () {
         if (removeLozenge) {
             removeEventFromDisplay(ev.id, ev);
         }
-        self.eventRegistry.removeItem(ev.id);
+        cosmo.view.cal.itemRegistry.removeItem(ev.id);
         ev = null;
     }
     /**
-     * Clear the entire eventRegistry, usually clear the
+     * Clear the entire itemRegistry, usually clear the
      * lozenges from the canvas as well
      * @param rem Boolean, if explicit false is passed,
      * don't remove the lozenges along with the CalItem objs
      */
     function removeAllEvents() {
-        self.eventRegistry.each(removeEventFromDisplay);
-        self.eventRegistry = new Hash();
+        cosmo.view.cal.itemRegistry.each(removeEventFromDisplay);
+        cosmo.view.cal.itemRegistry = new Hash();
         return true;
     }
     /**
@@ -747,7 +743,7 @@ cosmo.view.cal.canvas = new function () {
      *
      * WARNING: this destroys the event registry (Hash) that is passed into it!
      *
-     * @param reg An eventRegistry Hash from which to remove a group or
+     * @param reg An itemRegistry Hash from which to remove a group or
      * groups of recurring events
      * @param arr Array of Item ids for the recurrences to
      * remove
@@ -807,8 +803,8 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Append an calendar event lozenge to the canvas -- likely
      * called in a loop with the Hash's 'each' method
-     * @param key String, the Hash key for the eventRegistry
-     * @param val CalItem obj, value in the eventRegistry
+     * @param key String, the Hash key for the itemRegistry
+     * @param val CalItem obj, value in the itemRegistry
      * for the event getting added to the canvas
      */
     function appendLozenge(key, val) {
@@ -829,14 +825,14 @@ cosmo.view.cal.canvas = new function () {
     function updateEventsDisplay() {
         dojo.debug("update events display");
         // Current collection has items
-        if (self.eventRegistry.length) {
-            if (cosmo.view.cal.conflict.calc(self.eventRegistry) &&
+        if (cosmo.view.cal.itemRegistry.length) {
+            if (cosmo.view.cal.conflict.calc(cosmo.view.cal.itemRegistry) &&
                 positionLozenges()) {
                 // If no currently selected event, put selection on
                 // the final one loaded
                 if (!self.selectedEvent) {
                     dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                        'data': self.eventRegistry.getLast() });
+                        'data': cosmo.view.cal.itemRegistry.getLast() });
                 }
                 dojo.event.topic.publish('/calEvent', { 'action':
                     'eventsDisplaySuccess', 'data': self.selectedEvent });
@@ -852,14 +848,14 @@ cosmo.view.cal.canvas = new function () {
      * Call positionLozenges in a loop with Hash's 'each' method
      */
     function positionLozenges() {
-        return self.eventRegistry.each(positionLozenge);
+        return cosmo.view.cal.itemRegistry.each(positionLozenge);
     };
     /**
      * Position the lozenge on the canvase based on the
      * Item props -- happens after they're put on the canvas
      * with appendLozenge. Called in a loop with Hash's 'each' method
      * @param key String, the Hash key for the event in the
-     * eventRegistry
+     * itemRegistry
      * @param val CalItem object, the value in the Hash
      */
     function positionLozenge(key, val) {
@@ -893,14 +889,14 @@ cosmo.view.cal.canvas = new function () {
      * Render the canvas after successfully loading events
      * from the server -- called for initial load, and for
      * week-to-week navigation
-     * @param ev Hash, the eventRegistry of loaded events
+     * @param ev Hash, the itemRegistry of loaded events
      */
     function loadSuccess(ev) {
         if (ev) {
             removeAllEvents();
-            self.eventRegistry = ev;
+            cosmo.view.cal.itemRegistry = ev;
         }
-        self.eventRegistry.each(appendLozenge);
+        cosmo.view.cal.itemRegistry.each(appendLozenge);
         // Update the view
         updateEventsDisplay();
     }
@@ -934,7 +930,7 @@ cosmo.view.cal.canvas = new function () {
             if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
                 idsToRemove.push(newItem.getUid());
             }
-            var newRegistry = filterOutRecurrenceGroup(self.eventRegistry.clone(), idsToRemove);
+            var newRegistry = filterOutRecurrenceGroup(cosmo.view.cal.itemRegistry.clone(), idsToRemove);
 
 
             //now we have to expand out the item for the viewing range
@@ -959,8 +955,8 @@ cosmo.view.cal.canvas = new function () {
                 newRegistry.append(newHash);
 
                 removeAllEvents();
-                self.eventRegistry = newRegistry;
-                self.eventRegistry.each(appendLozenge);
+                cosmo.view.cal.itemRegistry = newRegistry;
+                cosmo.view.cal.itemRegistry.each(appendLozenge);
             }
             deferred.addCallback(addExpandedOccurrences);
 
@@ -1010,7 +1006,7 @@ cosmo.view.cal.canvas = new function () {
      * have recurrence
      * @param data JS Object, the data passed from the published
      * 'success' event (data.idArr, the array of event ids to use
-     * for removing the recurrence instances; data.eventRegistry,
+     * for removing the recurrence instances; data.itemRegistry,
      * the Hash of expanded events; data.saveEvent, the originally
      * clicked-on event; data.opts, the JS Object of options that
      * tells you what kind of save operation is happening)
@@ -1025,7 +1021,7 @@ cosmo.view.cal.canvas = new function () {
 
         // Copy the eventRegistry to remove any recurrence
         // instances associated with the edit
-        h = self.eventRegistry.clone();
+        h = cosmo.view.cal.itemRegistry.clone();
 
         // Splitting the recurrence, new event is set to frequency
         // of 'once' -- just remove previous recurrence instances
@@ -1036,8 +1032,8 @@ cosmo.view.cal.canvas = new function () {
             idArr.push(opts.masterEventDataId);
             h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd, ev.id);
             removeAllEvents();
-            self.eventRegistry = h;
-            self.eventRegistry.each(appendLozenge);
+            cosmo.view.cal.itemRegistry = h;
+            cosmo.view.cal.itemRegistry.each(appendLozenge);
         }
         // Normal split where original and new are both recurring, or
         // Change to master that just updates all of a single recurrence
@@ -1062,7 +1058,7 @@ cosmo.view.cal.canvas = new function () {
                 // Before wiping, remember the position of the currently selected
                 // event. If the canvas renders immediately after this update,
                 // we need to keep the selection where it was.
-                var currSel = self.eventRegistry.getPos(self.selectedEvent.id);
+                var currSel = cosmo.view.cal.itemRegistry.getPos(self.selectedEvent.id);
                 h = removeEventRecurrenceGroup(h, idArr);
             }
             // 'All Future Events' -- remove instances appearing after the
@@ -1084,9 +1080,9 @@ cosmo.view.cal.canvas = new function () {
             // Clear the canvas
             removeAllEvents();
             // Swap out the eventRegistry with the new one
-            self.eventRegistry = h;
+            cosmo.view.cal.itemRegistry = h;
             // Stick all the event lozenges on the canvas
-            self.eventRegistry.each(appendLozenge);
+            cosmo.view.cal.itemRegistry.each(appendLozenge);
         }
 
         // Repaint and restore selection if there are no
@@ -1116,7 +1112,7 @@ cosmo.view.cal.canvas = new function () {
                     if (opts.instanceEvent && ev.data.recurrenceRule.endDate &&
                         (rrule.getEndDate().toUTC() <
                             opts.instanceEvent.data.getEventStamp().getStartDate().toUTC())) {
-                        ev =  self.eventRegistry.getLast();
+                        ev =  cosmo.view.cal.itemRegistry.getLast();
                     }
                     else {
                         // Daily recurrence events
@@ -1125,7 +1121,7 @@ cosmo.view.cal.canvas = new function () {
                             // selecting 'All Events'
                             if (opts.saveType == 'recurrenceMaster' &&
                                 opts.instanceEvent && opts.instanceEvent.data.isInstance()) {
-                                ev = self.eventRegistry.getAtPos(currSel);
+                                ev = cosmo.view.cal.itemRegistry.getAtPos(currSel);
                             }
                             else {
                                 // Do nothing -- if original selection was on the master
@@ -1153,15 +1149,15 @@ cosmo.view.cal.canvas = new function () {
     function removeSuccess(ev, opts) {
         if (opts && (opts.removeType == 'recurrenceMaster' ||
             opts.removeType == 'instanceAllFuture')) {
-            var h = self.eventRegistry.clone();
+            var h = cosmo.view.cal.itemRegistry.clone();
             var dt = null;
             if (opts.removeType == 'instanceAllFuture') {
                 dt = opts.recurEnd;
             }
             h = removeEventRecurrenceGroup(h, [ev.data.id], dt);
             removeAllEvents();
-            self.eventRegistry = h;
-            self.eventRegistry.each(appendLozenge);
+            cosmo.view.cal.itemRegistry = h;
+            cosmo.view.cal.itemRegistry.each(appendLozenge);
         }
         else {
             removeEvent(ev);
@@ -1198,7 +1194,7 @@ cosmo.view.cal.canvas = new function () {
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
                 s = getIndexEvent(id);
-                item = cosmo.view.cal.canvas.eventRegistry.getItem(s);
+                item = cosmo.view.cal.itemRegistry.getItem(s);
 
                 // If this object is currently in 'processing' state, ignore any input
                 if (item.lozenge.getInputDisabled()) {
@@ -1325,7 +1321,7 @@ cosmo.view.cal.canvas = new function () {
                     }
                 }
             }
-            var evReg = cosmo.view.cal.canvas.eventRegistry;
+            var evReg = cosmo.view.cal.itemRegistry;
             evReg.each(f);
         }
     }
@@ -1411,7 +1407,7 @@ cosmo.view.cal.canvas = new function () {
 
         // Register the new event in the event list
         // ================================
-        cosmo.view.cal.canvas.eventRegistry.setItem(id, ev);
+        cosmo.view.cal.itemRegistry.setItem(id, ev);
 
         // Update the lozenge
         // ================================
@@ -1419,7 +1415,7 @@ cosmo.view.cal.canvas = new function () {
             // Save new event
             dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev, 'qualifier': 'new' })
         }
-        return cosmo.view.cal.canvas.eventRegistry.getItem(id);
+        return cosmo.view.cal.itemRegistry.getItem(id);
     };
     /**
      * Takes the ID of any of the component DOM elements that collectively make up

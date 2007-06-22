@@ -72,6 +72,13 @@ cosmo.view.cal.lozenge.Lozenge.prototype.minimumMinutes = 30;
  * Enable/disable user input for this event -- should be disabled
  * when a remote operation is processing
  */
+cosmo.view.cal.lozenge.Lozenge.prototype.getItem = function (id) {
+    return cosmo.view.cal.itemRegistry.getItem(id);
+}
+/**
+ * Enable/disable user input for this event -- should be disabled
+ * when a remote operation is processing
+ */
 cosmo.view.cal.lozenge.Lozenge.prototype.setInputDisabled = function (isDisabled) {
     if (isDisabled) {
         this.inputDisabled = true;
@@ -102,7 +109,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateDisplayMain = function () {
  * and description
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
-    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var ev = this.getItem(this.id);
     var note = ev.data;
     var eventStamp = note.getEventStamp()
     var startDate = eventStamp.getStartDate();
@@ -151,14 +158,14 @@ cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc
         '__' + this.id).style.cursor = cursorChange;
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
-    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var ev = this.getItem(this.id);
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         cosmo.view.cal.viewStart, ev.data.getEventStamp().getStartDate());
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
-    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var ev = this.getItem(this.id);
     var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         ev.data.getEventStamp().getStartDate(), ev.data.getEventStamp().getEndDate()))+3;
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
@@ -225,7 +232,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setState = function (isProc) {
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateId) {
 
-    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(this.id);
+    var ev = this.getItem(this.id);
     var useLightColor = this.useLightColor(ev);
     var imgPath = '';
     var textColor = '';
@@ -602,7 +609,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
 
-    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(id);
+    var ev = this.getItem(id);
     var startDay = 0;
     var endDay = 0;
     var auxDivCount = 0;
@@ -1058,7 +1065,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.calcWidth = function (startDay, e
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.insert = function (id) {
-    var ev = cosmo.view.cal.canvas.eventRegistry.getItem(id);
+    var ev = this.getItem(id);
     var lozengeDiv = document.createElement('div');
     var lozengeDivSub = document.createElement('div');
     var d = null;

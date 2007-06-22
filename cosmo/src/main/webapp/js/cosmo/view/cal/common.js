@@ -34,6 +34,9 @@ dojo.event.topic.subscribe('/calEvent', cosmo.view.cal, 'handlePub_calEvent');
 // Subscribe to the '/app' channel
 dojo.event.topic.subscribe('/app', cosmo.view.cal, 'handlePub_app');
 
+// The list of items -- cosmo.util.hash.Hash obj
+cosmo.view.cal.itemRegistry = null;
+
 /**
  * Handle events published on the '/calEvent' channel, including
  * self-published events

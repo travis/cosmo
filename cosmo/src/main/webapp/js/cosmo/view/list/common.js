@@ -35,7 +35,7 @@ cosmo.view.list.ListItem = function () {
 }
 cosmo.view.list.ListItem.prototype = new cosmo.view.BaseItem();
 
-// The list of items
+// The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;
 
 cosmo.view.list.triageStatusCodeNumbers = {

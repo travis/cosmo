@@ -53,6 +53,7 @@ cosmo.ui.detail = new function () {
             if (!delta.hasChanges()){
                 return;
             }
+            this.item.makeSnapshot();
             dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':this.item});
         }
     };

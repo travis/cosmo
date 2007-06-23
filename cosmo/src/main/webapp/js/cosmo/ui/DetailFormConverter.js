@@ -22,7 +22,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
    
    initializer: function(item){
        this._item = item;
-       xxxitem = item;
    },
    
    createDelta: function(){
@@ -174,7 +173,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             rrule: {
                 type: "recurrenceRule",
                 frequencyField: "recurrenceInterval",
-                endDateField: "recurrenceEnd"
+                endDateField: "recurrenceEnd",
+                tzIdField: "tzId"                
             }
         },
         
@@ -280,6 +280,10 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
 
             var jsDate= new Date(endDateFieldValue);
             endDate = new cosmo.datetime.Date(jsDate.getFullYear(), jsDate.getMonth(), jsDate.getDate());
+            var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
+            if (tzIdFieldValue){
+                endDate.tzId = tzIdFieldValue;
+            }
         }
         
         return [new cosmo.model.RecurrenceRule({

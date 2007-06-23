@@ -45,6 +45,10 @@ cosmo.ui.detail = new function () {
         var deltaAndError = converter.createDelta();
         var error = deltaAndError[1];
         var delta = deltaAndError[0];
+        if(!delta.hasChanges()){
+            return;
+        }
+        
         if (error){
             alert(error);
             return;

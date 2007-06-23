@@ -402,15 +402,21 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
                 row.modified = dojo.date.fromRfc3339(user.dateModified);
 
                 if (user.unactivated) {
-                	row.activated = "No";
+                	row.activated = _("UserList.No");
                 } else {
-                	row.activated = "Yes";
+                	row.activated = _("UserList.Yes");
                 }
 
                 if (user.administrator) {
-                    row.admin = "Yes";
+                    row.admin = _("UserList.Yes");
                 } else {
-                    row.admin = "No";
+                    row.admin = _("UserList.No");
+                }
+
+                if (user.locked) {
+                    row.locked = _("UserList.Yes");
+                } else {
+                    row.locked = _("UserList.No");
                 }
 
                 row.userObject = user;
@@ -483,7 +489,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
         },
 
-        updateUserList:function(){
+        updateUserList: function(){
 
             var self = this;
 

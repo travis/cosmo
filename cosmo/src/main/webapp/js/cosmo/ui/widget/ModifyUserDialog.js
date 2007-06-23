@@ -25,6 +25,7 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.convenience");
 dojo.require("dojo.validate.web");
 dojo.require("dojo.event");
 
@@ -43,14 +44,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         header : "",
         disableCancel : false,
 
-        usernameLabel : "Username:",
-        firstNameLabel : "First name:",
-        lastNameLabel : "Last name:",
-        emailLabel : "Email:",
-        passwordBlurb : "",
-        passwordLabel : "Password:",
-        confirmLabel : "Confirm",
-        adminLabel : "Admin?",
+        usernameLabel : _("ModifyUser.Username"),
+        firstNameLabel : _("ModifyUser.FirstName"),
+        lastNameLabel : _("ModifyUser.LastName"),
+        emailLabel : _("ModifyUser.Email"),
+        passwordBlurb : _("ModifyUser.PasswordBlurb"),
+        passwordLabel : _("ModifyUser.Password"),
+        confirmLabel : _("ModifyUser.Confirm"),
+        adminLabel : _("ModifyUser.Admin"),
+        lockedLabel: _("ModifyUser.Locked"),
         
         usernameError : null,
         firstNameError : null,
@@ -62,8 +64,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         classes: "",
         title: "",
 
-        cancelButtonText : "Cancel",
-        submitButtonText : "Submit",
+        cancelButtonText : _("ModifyUser.Button.Cancel"),
+        submitButtonText : _("ModifyUser.Button.Submit"),
 
         removeInputs : "",
 
@@ -86,7 +88,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                               lastName: true,
                               email: true,
                               password: true,
-                              admin: true
+                              admin: true,
+                              locked: true
                           },
 
         editingUser : null,
@@ -211,12 +214,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                         form.email.value = user.email;
 
                         form.admin.checked = user.administrator;
+                        form.locked.checked = user.locked;
 
                         overlord = (user.username == cosmo.env.OVERLORD_USERNAME)
                         form.username.disabled = overlord;
                         form.firstName.disabled = overlord;
                         form.lastName.disabled = overlord;
                         form.admin.disabled = overlord;
+                        form.locked.disabled = overlord;
 
 
                     } else if (evt.status == 404){
@@ -372,6 +377,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             	userHash.administrator = form.admin.checked;
           	}
 
+            if (user.locked != form.locked.checked
+            	&& this.enabledInputs.locked){
+            	userHash.locked = form.locked.checked;
+          	}
+
             if (this.role == cosmo.ROLE_ADMINISTRATOR){
                 cosmo.cmp.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)
             } else if (this.role == cosmo.ROLE_AUTHENTICATED){
@@ -387,7 +397,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                         email : form.email.value};
 
             userHash.administrator = form.admin.checked;
-
+            userHash.locked = form.locked.checked;
             return userHash;
         },
 
@@ -429,7 +439,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
                     // A 200 means the user exists
                     } else if (evt.status == 200){
 
-                        self.usernameError.innerHTML = "Username in use";
+                        self.usernameError.innerHTML = _("ModifyUser.Error.UsernameInUse");
                     }
                  }
                  })

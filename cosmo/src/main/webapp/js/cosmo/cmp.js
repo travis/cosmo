@@ -174,6 +174,10 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     request_content += '<' + EL_ADMINISTRATOR + ' >true</' +
                     	EL_ADMINISTRATOR + '>';
                 }
+                
+                if (userHash.locked) {
+                    request_content += '<locked>true</locked>';
+                }
 
                 request_content += '</user>'
 
@@ -509,13 +513,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
             obj.dateCreated = user.getElementsByTagName("created")[0].firstChild.nodeValue;
             obj.dateModified = user.getElementsByTagName("modified")[0].firstChild.nodeValue;
             obj.url = user.getElementsByTagName("url")[0].firstChild.nodeValue;
+            obj.locked = (dojo.string.trim(
+                user.getElementsByTagName("locked")[0].firstChild.nodeValue) == "true");
 
-            obj.administrator =
-            	(
-            	dojo.string.trim(
-            		user.getElementsByTagName("administrator")[0].firstChild.nodeValue) ==
-            	"true"
-            	);
+            obj.administrator =	(dojo.string.trim(
+                user.getElementsByTagName("administrator")[0].firstChild.nodeValue) == "true");
             if (user.getElementsByTagName("unactivated").length > 0){
                 obj.unactivated = true;
             }

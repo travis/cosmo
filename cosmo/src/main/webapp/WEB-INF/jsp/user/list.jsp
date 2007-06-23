@@ -61,6 +61,7 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
             <th field="email" dataType="String" align="center">Email</th>
             <th field="admin" dataType="String" align="center">Administrator</th>
             <th field="activated" dataType="String" align="center">Activated</th>
+            <th field="locked" dataType="String" align="center">Locked</th>
             <th field="created" dataType="Date" align="center">Created</th>
             <th field="modified" dataType="Date" align="center">Last Modified</th>
     </tr>
@@ -269,35 +270,15 @@ dojo.addOnLoad(function (){
 <div 	dojoType="cosmo:ModifyUserDialog" widgetId="createUserDialog"
 
         createNew="true"
-
-        usernameLabel='<fmt:message key="User.Form.Username"/>'
-        firstNameLabel='<fmt:message key="User.Form.FirstName"/>'
-        lastNameLabel='<fmt:message key="User.Form.LastName"/>'
-        emailLabel='<fmt:message key="User.Form.Email"/>'
-        passwordLabel='<fmt:message key="User.Form.Password"/>'
-        confirmLabel='<fmt:message key="User.Form.Confirm"/>'
-        adminLabel='<fmt:message key="User.Form.MakeAdministrator"/>'
         postActionHandler="createHandlerDict"
         role="cosmo.ROLE_ADMINISTRATOR"
-        cancelButtonText='<fmt:message key="User.Form.Button.Cancel"/>'
-        submitButtonText='<fmt:message key="User.Form.Button.Create"/>'
 		classes='floating'
 		title='<fmt:message key="User.List.NewUser"/>'
         > </div>
 
 <div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
-        usernameLabel='<fmt:message key="User.Form.Username"/>'
-        firstNameLabel='<fmt:message key="User.Form.FirstName"/>'
-        lastNameLabel='<fmt:message key="User.Form.LastName"/>'
-        emailLabel='<fmt:message key="User.Form.Email"/>'
-        passwordBlurb='<fmt:message key="User.Form.PasswordBlurb"/>'
-        passwordLabel='<fmt:message key="User.Form.Password"/>'
-        confirmLabel='<fmt:message key="User.Form.Confirm"/>'
-        adminLabel='<fmt:message key="User.Form.MakeAdministrator"/>'
         postActionHandler="modifyHandlerDict"
         role="cosmo.ROLE_ADMINISTRATOR"
-        cancelButtonText='<fmt:message key="User.Form.Button.Cancel"/>'
-        submitButtonText='<fmt:message key="User.Form.Button.Update"/>'
 		classes='floating'
 		title='<fmt:message key="User.List.ModifyUser"/>'
         > </div>

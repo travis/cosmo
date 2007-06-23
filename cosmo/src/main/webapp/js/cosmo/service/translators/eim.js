@@ -1295,6 +1295,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 var endDate = cosmo.datetime.fromIso8601(rprops.until);
                 var tzId = startDate.tzId || (startDate.utc ? "utc" : null);
                 endDate = endDate.createDateForTimezone(tzId);
+                endDate.setHours(0);
+                endDate.setMinutes(0);
+                endDate.setSeconds(0);
                 recurrenceRule.endDate = endDate;
             }
             

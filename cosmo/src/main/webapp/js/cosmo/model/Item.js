@@ -692,7 +692,7 @@ cosmo.model._noteStampCommon = {
               var masterObject = this;
               if (this instanceof cosmo.model.BaseStamp){
                   if (this.isOccurrenceStamp()){
-                      masterObject = this.getMaster().getStamp(this.stampName, true);
+                      masterObject = this.getMaster().getStamp(this.stampMetaData.stampName, true);
                   }
               } else {
                  if (this.isOccurrence()){

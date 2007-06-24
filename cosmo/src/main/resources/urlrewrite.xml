@@ -79,7 +79,7 @@
     <to>/admin/status/view</to>
   </rule>
   <rule>
-    <from>^/admin/users/?$</from>
-    <to>/admin/user/list</to>
+    <from>^/admin/users(.*)$</from>
+    <to>/admin/user/list$1</to>
   </rule>
 </urlrewrite>

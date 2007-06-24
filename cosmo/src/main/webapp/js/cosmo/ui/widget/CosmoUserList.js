@@ -58,7 +58,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         DESCENDING : "descending",
         DEFAULT_SORT_TYPE : "username",
         DEFAULT_SORT_ORDER : "ascending",
-
+        
+        PARAM_PAGE_SIZE: 'ps',
+        PARAM_PAGE_NUMBER: 'pn',
+        PARAM_SORT_ORDER: 'so',
+        PARAM_SORT_TYPE: 'st',
+        PARAM_QUERY: 'q',
+        
         createOrderIndicator : function(){
             var node = document.createElement("img")
             node.setAttribute("id", "orderIndicator")
@@ -112,7 +118,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             var users = this.getSelectedData();
             var usernames = []
 
-            for (i=0; i<users.length; i++){
+            for (var i=0; i<users.length; i++){
 
                 usernames.push(users[i].username)
             }
@@ -126,34 +132,47 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
         },
 
         loadCMPPage:function(cmpUrl){
-
-            var documentAddress = new dojo.uri.Uri(cmpUrl);
-
-            var query = documentAddress.query.substring(1);
-
-            var vars = query.split("&");
-
-            for (i=0; i < vars.length; i++){
-                pair = vars[i].split("=")
-
-                switch(pair[0]){
-                    case('ps'):
-                        this.pageSize = pair[1];
-                        break;
-                    case('pn'):
-                        this.pageNumber = pair[1];
-                        break;
-                    case('so'):
-                        this.setSortOrder(pair[1]);
-                        break;
-                    case('st'):
-                        this.setSortType(pair[1]);
-                        break;
-                    case('q'):
-                        this.query = pair[1];
-                    }
+            if (cmpUrl){
+                var documentAddress = new dojo.uri.Uri(cmpUrl);
+    
+                var query = documentAddress.query;
+    
+                var vars = query.split("&");
+    
+                for (var i=0; i < vars.length; i++){
+                    var pair = vars[i].split("=")
+                    switch(pair[0]){
+                        case(this.PARAM_PAGE_SIZE):
+                            this.pageSize = pair[1];
+                            break;
+                        case(this.PARAM_PAGE_NUMBER):
+                            this.pageNumber = pair[1];
+                            break;
+                        case(this.PARAM_SORT_ORDER):
+                            this.setSortOrder(pair[1]);
+                            break;
+                        case(this.PARAM_SORT_TYPE):
+                            this.setSortType(pair[1]);
+                            break;
+                        case(this.PARAM_QUERY):
+                            this.query = pair[1];
+                            break;
+                        }
+                }
             }
             this.updateUserList()
+        },
+        
+        createCurrentUrlQuery: function (){
+            var queryList = []
+            
+            if (this.pageSize) queryList.push(this.PARAM_PAGE_SIZE + "="  + this.pageSize);
+            if (this.pageNumber) queryList.push(this.PARAM_PAGE_NUMBER + "=" + this.pageNumber);
+            if (this.sortOrder) queryList.push(this.PARAM_SORT_ORDER + "=" + this.sortOrder);
+            if (this.sortType) queryList.push(this.PARAM_SORT_TYPE + "=" + this.sortType);
+            if (this.query) queryList.push(this.PARAM_QUERY + "=" + this.query)
+            
+            return "?" + queryList.join("&");
         },
 
         createPagingLink:function(label, id, jsText){
@@ -296,6 +315,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             return s;
         },
+        
+        createStateLink:function(){
+
+            var s = document.createElement("a");
+
+            s.setAttribute("id", "stateLink");
+            s.setAttribute("href", "");
+            s.innerHTML = _("UserList.StateLink");
+            
+            this.stateLink = s;
+            
+            return s;
+        },
 
 
         createUserCountIndicator: function(){
@@ -373,6 +405,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             document.getElementById("pageNumberChooser").
                 getElementsByTagName("input")[0].value = this.pageNumber;
+            
+            document.getElementById("searchBox").
+                getElementsByTagName("input")[0].value = this.query;
 
            	this.updateTotalUserCount();
 
@@ -437,7 +472,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             this.cmpNextLink = null;
             this.cmpLastLink = null;
 
-            for (i=0; i< pagingLinks.length; i++){
+            for (var i=0; i< pagingLinks.length; i++){
 
                 link = pagingLinks[i]
                 // Apparently, Safari has issues with the $amp; entity. Instead
@@ -484,6 +519,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             document.getElementById("pageNumberChooser").style.visibility =
                 (multiPage) ? 'visible' : 'hidden';
+                
+            this.stateLink.href = this.createCurrentUrlQuery();
 
             this.store.setData(jsonObject);
 
@@ -561,8 +598,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             controlsRow.appendChild(td);
 
             td = document.createElement("td");
-            td.setAttribute("id", "pageNumberChooserContainer");
-            td.appendChild(this.createPageNumberChooser());
+            td.setAttribute("id", "stateLinkContainer");
+            td.appendChild(this.createStateLink());
             controlsRow.appendChild(td);
 
             td = document.createElement("td");
@@ -571,13 +608,18 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             controlsRow.appendChild(td);
 
             td = document.createElement("td");
+            td.setAttribute("id", "pageNumberChooserContainer");
+            td.appendChild(this.createPageNumberChooser());
+            controlsRow.appendChild(td);
+
+            td = document.createElement("td");
             td.setAttribute("id", "pageSizeChooserContainer");
             td.appendChild(this.createPageSizeChooser());
             controlsRow.appendChild(td);
 
             dojo.event.topic.registerPublisher("/userListSelectionChanged", this, "renderSelections");
-
-            this.updateUserList()
+            
+            this.loadCMPPage(location.search);
 
         }
         dojo.event.connect("after", this, "postCreate", this, "userListPostCreate");

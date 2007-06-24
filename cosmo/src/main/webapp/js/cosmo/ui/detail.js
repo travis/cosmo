@@ -591,7 +591,7 @@ cosmo.ui.detail.MainSection = function () {
 
     // Title
     var t = cosmo.ui.detail.createLabelDiv(_(
-        'Main.DetailForm.Title'));
+        'Main.DetailForm.displayName'));
     f.appendChild(t);
     var elem = _html.createInput({ type: 'text',
         id: 'noteTitle',

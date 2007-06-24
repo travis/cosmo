@@ -36,6 +36,11 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var hasFields = cosmo.ui.detail.itemStamps[x].hasBody;
             errorMessage += this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }
+
+        if (!errorMessage){
+            errorMessage += this._performInterPropertyValidations(delta);
+        }
+        
         xxx = delta;
         delta.deltafy();
         return [delta, errorMessage];  
@@ -77,6 +82,12 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var valueAndError = this[propertyInfo.type + "Converter"](form, propertyInfo, propertyName);
             var value = valueAndError[0];
             var error = valueAndError[1];
+            if (!error && propertyInfo.validation){
+                //we were able to convert the string from the form into a value, but
+                //there are other validations to perform?
+                var validationInfo = propertyInfo.validation;
+                error = this._validateValue(value, validationInfo, propertyName);
+            }
             if (!error){
                 if (stampName == "note"){
                     delta.addProperty(propertyName, value);
@@ -136,7 +147,9 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                   field: "noteDescription"},
 
             displayName: { type : "string",
-                           field : "noteTitle"}
+                           field: "noteTitle",
+                      validation: [["required"]]
+            }
         },
         
         event: {
@@ -257,6 +270,14 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         return [date, null];
     }, 
     
+    requiredValidator: function(value, propertyName){
+        var propertyDisplayName = _("Main.DetailForm." + propertyName);
+        if (!value){
+            return '"'+propertyDisplayName+'" is a required field.\n'
+        }
+        return "";
+    },
+    
     recurrenceRuleConverter: function(form, info, propertyName){
         var propertyDisplayName = _("Main.DetailForm." + propertyName);
         var frequencyFieldValue = this._getFormValue(form, info.frequencyField);
@@ -291,6 +312,27 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             endDate: endDate
         }),null];
 
+    },
+    
+    _validateValue: function(value, validationInfo, propertyName){
+        return this[validationInfo[0]+"Validator"](value, propertyName, validationInfo[1]);    
+    },
+    
+    _performInterPropertyValidations: function (delta){
+        var eventStampProperties = delta.getStampProperties("event");
+        var errMsg = "";
+        
+        if(eventStampProperties){
+            if(eventStampProperties.endDate 
+                && (eventStampProperties.startDate.getTime() 
+                > eventStampProperties.endDate.getTime())){
+                errMsg += '"Starts" and "Ends" time fields: ';
+                errMsg += 'Event cannot end before it starts.';
+                errMsg += '\n';                
+            }    
+        }
+        
+        return errMsg;
     }
     
 });

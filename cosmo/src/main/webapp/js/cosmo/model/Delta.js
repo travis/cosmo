@@ -89,6 +89,19 @@ dojo.declare("cosmo.model.Delta", null, {
         return false;
     },
     
+    getStampProperties: function(stampName){
+       var stamp = this._getStamp(stampName);
+       if (!stamp){
+           return null;
+       }
+       
+       if (!this._isEmpty(stamp)){
+           return stamp;
+       }
+       
+       return null;
+    },
+    
     _isEmpty: function(object){
         for (var x in object){
             return false;
@@ -207,7 +220,7 @@ dojo.declare("cosmo.model.Delta", null, {
     
     applyToMaster: function(){
         this._apply("master");
-        if (!this._note.hasRecurrence() &&this._needsAutoTriage()){
+        if (!this._note.hasRecurrence() && this._needsAutoTriage()){
             this._note.autoTriage();
         }
     },
@@ -300,36 +313,47 @@ dojo.declare("cosmo.model.Delta", null, {
     
 
     _apply: function(type, note){
+        dojo.debug("delta._apply(), type: " + type);
         note = note || this._note;
         for (var stampName in this._deletedStamps){
             note.removeStamp(stampName);
         }
         
+        dojo.debug("delta._apply(): adding stamps.");
         for (var stampName in this._addedStamps){
             note.getStamp(stampName, true);
         }
         
+        dojo.debug("delta._apply(): applying note properties.");
         this._applyProperties(note, this._propertyProps, type);
         
+        dojo.debug("delta._apply(): applying stamp changes");
         for (var stampName in this._stampProps){
+            dojo.debug("delta._apply(): applying stamp changes for stamp: " +stampName);
             var stampChanges = this._stampProps[stampName];
             if (stampChanges == null){
                 continue;
             }
             
             //create the stamp if it doesn't exist yet
+            dojo.debug("delta._apply():getting Stamp!");
             var stamp = note.getStamp(stampName,true);
             
             if (stampName == "event"){
+                dojo.debug("delta._apply(): eventStamp application!");
                 this._applyPropertiesToEventStamp(stamp, stampChanges, type);
             } else {
                 this._applyProperties(stamp, stampChanges, type);
             }
         }
+        dojo.debug("delta._apply(): exit!");
+        
     },
     
    _applyProperties: function(original,changes, type){
+        dojo.debug("_applyProperties() ");
         for (var propName in changes){
+           dojo.debug("_applyProperties(): propName:  " + propName);
            var changeValue = changes[propName];
            original.applyChange(propName, changeValue, type);
         }
@@ -338,6 +362,7 @@ dojo.declare("cosmo.model.Delta", null, {
     _applyPropertiesToEventStamp: function(original, changes, type){
         //start date must be applied first so that duration can be calculated
         //properly
+        dojo.debug("_applyPropertiesToEventStamp() ");
         if (changes["startDate"]){
            var changeValue = changes["startDate"];
            original.applyChange("startDate", changeValue, type);

@@ -363,7 +363,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var uuid in mods){
             var masterUuid = uuid.split(":")[0];
             var masterItem = items[uuid.split(":")[0]];
-            if (!masterItem) throw new cosmo.service.translators.ParseError(
+            
+            // Per Jeffrey's suggestion, fail silently here, logging 
+            // an error message to the debug console.
+            if (!masterItem) dojo.debug(
               "Could not find master event for modification " +
               "with uuid " + uuid);
 
@@ -1299,7 +1302,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (rprops.until) {
                 var endDate = cosmo.datetime.fromIso8601(rprops.until);
                 var tzId = startDate.tzId || (startDate.utc ? "utc" : null);
+                dojo.debug("e" + endDate)
                 endDate = endDate.createDateForTimezone(tzId);
+                dojo.debug("e" + endDate)
                 endDate.setHours(0);
                 endDate.setMinutes(0);
                 endDate.setSeconds(0);

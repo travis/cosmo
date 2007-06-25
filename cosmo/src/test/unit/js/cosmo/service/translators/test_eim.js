@@ -58,40 +58,42 @@ cosmotest.service.translators.test_eim = {
 
     test_parseRRuleFreq: function (){
         var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;"
-        var rrule = cosmo.service.translators.eim.parseRRule(rule);
+        var startDate = cosmo.datetime.fromIso8601("20000101T090000Z");
+
+        var rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
        
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY, 
                          rrule.getFrequency());
 
-        var until = cosmo.datetime.fromIso8601("20000131T090000Z");
+        var until = cosmo.datetime.fromIso8601("20000131T000000Z");
         jum.assertTrue("wrong date", until.equals(rrule.getEndDate()));
                          
         jum.assertTrue("wrong supported value", rrule.isSupported());
 
         rule = "FREQ=WEEKLY;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
 
-        jum.assertEquals("wrong frequency", 
+        jum.assertEquals("wrong frequency",
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_WEEKLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=WEEKLY;INTERVAL=2;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_BIWEEKLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=MONTHLY;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_MONTHLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=YEARLY;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_YEARLY, 
@@ -106,7 +108,7 @@ cosmotest.service.translators.test_eim = {
         jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
         jum.assertEquals("bymonth wrong in unsupported rule", 1, 
                          rrule.getUnsupportedRule().bymonth);
-                         
+
         rule = "FREQ=WEEKLY;COUNT=10"
         rrule = cosmo.service.translators.eim.parseRRule(rule);
         

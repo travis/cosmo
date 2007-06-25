@@ -21,7 +21,7 @@ dojo.require("cosmo.model.EventStamp");
 
 dojo.lang.mixin(cosmotest.model.test_model,{
 test_declareStamp : function(){
-    cosmo.model.declareStamp("TestStamp", "test",
+    cosmo.model.declareStamp("TestStamp", "test", "namespace",
         [["testString", String, {"default" : "def"}],
          ["testArrayOfNumbers", [Array, Number], {"default" : function(){return [1,2,3]}}]],
          {
@@ -158,6 +158,10 @@ test_hasRecurrence: function(){
     assertTrue(note.hasRecurrence());
     var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
     assertTrue(occurrence.hasRecurrence());
+},
+
+test_stampMetaData: function(){
+    assertEquals("event", cosmo.model.getStampMetaData("event").stampName);
 }
 
 });

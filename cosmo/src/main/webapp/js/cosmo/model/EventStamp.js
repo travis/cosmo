@@ -18,7 +18,7 @@ dojo.provide("cosmo.model.EventStamp");
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Item");
 
-cosmo.model.declareStamp("cosmo.model.EventStamp", "event",
+cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundation.org/eim/event/0",
     [ ["startDate", cosmo.datetime.Date, {}],
       ["duration", cosmo.model.Duration, {}],
       ["anyTime", Boolean, {"default":false}],

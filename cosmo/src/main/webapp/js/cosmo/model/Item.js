@@ -38,16 +38,19 @@ cosmo.model.ACTION_CREATED = 500;
 cosmo.model._stampRegistry = {};
 
 cosmo.model.uuidGenerator = new cosmo.util.uuid.RandomGenerator();
-   
+
+cosmo.model.getStampMetaData = function(stampName){
+    return this._stampRegistry[stampName].constructor.prototype.stampMetaData;
+}
 cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations, kwArgs){
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, kwArgs || {});
     return newCtr;
 }
 
-cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, attributesArray, otherDeclarations, occurrenceDeclarations){
+cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, attributesArray, otherDeclarations, occurrenceDeclarations){
     var newCtr = dojo.declare(ctrName, cosmo.model.BaseStamp, otherDeclarations);
-    var meta = new cosmo.model.StampMetaData(stampName, attributesArray);
+    var meta = new cosmo.model.StampMetaData(stampName, namespace, attributesArray);
     newCtr.prototype.stampMetaData = meta;
     var propertiesArray = [];
     for (var x = 0; x < attributesArray.length; x++){
@@ -578,12 +581,14 @@ cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
 
 dojo.declare("cosmo.model.StampMetaData", null,{
     __immutable:true,
-    stampName: null, 
+    stampName: null,
+    nameSpace: null,
     attributes: null,
     
-    initializer: function(stampName, stampAttributesArray){
+    initializer: function(stampName, nameSpace,stampAttributesArray){
         this.attributes = [];
         this.stampName = stampName || null;
+        this.nameSpace = nameSpace;
         if (!stampAttributesArray){
             return;
         } else {
@@ -642,7 +647,7 @@ dojo.declare("cosmo.model.BaseStamp", null, {
     
 });
 
-cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
+cosmo.model.declareStamp("cosmo.model.TaskStamp", "task", "http://osafoundation.org/eim/task/0",
     [ ],
     {
         initializer: function(kwArgs){
@@ -650,7 +655,7 @@ cosmo.model.declareStamp("cosmo.model.TaskStamp", "task",
         }
     });
 
-cosmo.model.declareStamp("cosmo.model.MailStamp", "mail",
+cosmo.model.declareStamp("cosmo.model.MailStamp", "mail", "http://osafoundation.org/eim/mail/0",
     [[ "messageId", String, {}],
      [ "headers", String, {}],
      [ "fromAddress", String, {}],

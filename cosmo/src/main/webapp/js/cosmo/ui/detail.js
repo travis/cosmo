@@ -35,17 +35,17 @@ dojo.require("cosmo.ui.DetailFormConverter");
 
 cosmo.ui.detail = new function () {
     this.item = null;
-    
+
     this.createFormElementsForStamp = function (stampType) {
         return new cosmo.ui.detail[stampType + 'FormElements']();
     };
-    
+
     this.saveItem = function () {
         var converter = new cosmo.ui.DetailFormConverter(this.item.data);
         var deltaAndError = converter.createDelta();
         var error = deltaAndError[1];
         var delta = deltaAndError[0];
-        
+
         if (error){
             alert(error);
             return;
@@ -57,11 +57,11 @@ cosmo.ui.detail = new function () {
             dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':this.item});
         }
     };
-    
+
     this.removeItem = function () {
         alert('remove');
     };
-    
+
     // Utility functions
     this.createLabelDiv = function (str) {
         var d = _createElem('div');
@@ -69,14 +69,14 @@ cosmo.ui.detail = new function () {
         d.appendChild(_createText((str)));
         return d;
     };
-    
+
     this.createFormElemDiv = function (elem) {
         var d = _createElem('div');
         d.className = 'formElem';
         d.appendChild(elem);
         return d;
     };
-    
+
 };
 
 cosmo.ui.detail.StampFormElemState = function (p) {
@@ -212,7 +212,7 @@ cosmo.ui.detail.DetailViewForm.prototype =
 cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     function (item) {
 
-    var _html = cosmo.util.html;    
+    var _html = cosmo.util.html;
 
     var data = item.data;
     var section = null;
@@ -225,7 +225,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
 
     //save the item
     cosmo.ui.detail.item = item;
-    
+
     this.mainSection.toggleEnabled(true);
     f = this.mainSection.formNode;
     f.noteTitle.value = data.getDisplayName();

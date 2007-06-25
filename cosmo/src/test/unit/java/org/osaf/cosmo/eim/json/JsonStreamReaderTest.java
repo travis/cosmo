@@ -16,12 +16,16 @@
 package org.osaf.cosmo.eim.json;
 
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlStreamReader;
 
 /**
@@ -42,6 +46,21 @@ public class JsonStreamReaderTest extends TestCase
         Reader in =
             testHelper.getReader("json/simple-record-set.json");
         JsonStreamReader reader = new JsonStreamReader(in);
-        reader.nextRecordSet();
+        EimRecordSet recordSet = reader.nextRecordSet();
+        List<EimRecord> deletedRecords = getDeletedRecords(recordSet);
+        assertEquals(1, deletedRecords.size());
+        EimRecord deletedRecord = deletedRecords.get(0);
+        assertEquals("deletedRecord", deletedRecord.getPrefix());
+        assertEquals("http://deletedRecord.com", deletedRecord.getNamespace());
+    }
+    
+    private List<EimRecord> getDeletedRecords(EimRecordSet recordSet){
+        List<EimRecord> deletedRecords = new ArrayList<EimRecord>();
+        for (EimRecord record : recordSet.getRecords()){
+            if (record.isDeleted()){
+                deletedRecords.add(record);
+            }
+        }
+        return deletedRecords;
     }
 }

@@ -95,7 +95,17 @@ public class JsonStreamReader implements JsonConstants, EimmlConstants{
             }
             
             //deal with deletedRecords
-            //XXX
+            List<JSONValue> deletedRecordsArray = getListValue(recordSetMap.get(KEY_DELETED_RECORDS));
+            if(deletedRecordsArray != null){
+                for (JSONValue prefixAndNameSpaceArray : deletedRecordsArray){
+                    List<JSONValue> prefixAndNameSpaceList = getListValue(prefixAndNameSpaceArray);
+                    String prefix = getStringValue(prefixAndNameSpaceList.get(0));
+                    String nameSpace = getStringValue(prefixAndNameSpaceList.get(1));
+                    EimRecord record = new EimRecord(prefix, nameSpace);
+                    record.setDeleted(true);
+                    recordSet.addRecord(record);
+                }
+            }
             
         } catch (Exception e){
             if (e instanceof JsonStreamException)

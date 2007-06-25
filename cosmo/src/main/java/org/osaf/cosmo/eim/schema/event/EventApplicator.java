@@ -17,6 +17,7 @@ package org.osaf.cosmo.eim.schema.event;
 
 import java.text.ParseException;
 
+import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
 
@@ -73,8 +74,32 @@ public class EventApplicator extends BaseStampApplicator
         else {
             eventStamp = new EventExceptionStamp(getItem());
             eventStamp.createCalendar();
-           
+            
             ModificationUid modUid = new ModificationUid(note.getUid());
+            Date recurrenceId = modUid.getRecurrenceId();
+            
+            // If recurrenceId is a DateTime with a timezone (will be UTC)
+            // store the recurrenceId in same timezone as master event's 
+            // date properties.
+            if(recurrenceId instanceof DateTime) {
+                // Get master's start date
+                Date masterStart = ((EventExceptionStamp) eventStamp)
+                        .getMasterStamp().getStartDate();
+                
+                // Master's start date must be a DateTime also
+                if(! (masterStart instanceof DateTime) )
+                    throw new EimValidationException("event modification date types must match master");
+                
+                DateTime modDt = (DateTime) recurrenceId;
+                DateTime masterDt = (DateTime) masterStart;
+                
+                // If the modification's RECURRENCE-ID is in UTC and the master's 
+                // isn't, then update the modification's timezone to be the same
+                // as the master.  Although its technically legal to specify date
+                // properties in different timezones, some clients don't like this.
+                if(modDt.isUtc() && !masterDt.isUtc())
+                    modDt.setTimeZone(masterDt.getTimeZone());
+            }
             eventStamp.setRecurrenceId(modUid.getRecurrenceId()); 
         }
         

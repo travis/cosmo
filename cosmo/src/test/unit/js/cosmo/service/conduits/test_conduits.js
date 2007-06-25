@@ -147,8 +147,9 @@ cosmotest.service.conduits.test_conduits = {
             
             conduit.createItem(doneItem, c0, {sync: true});
                       
-            items = conduit.getDashboardItems(c0, {sync: true})//.results[0];
+            items = conduit.getDashboardItems(c0, {sync: true});
             
+            // TODO add asserts
         }
         finally{
             cosmotest.service.conduits.test_conduits.cleanup(user);            

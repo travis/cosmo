@@ -118,7 +118,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
     		// create callback that calls the Deferred's callback method
     		var tf = dojo.lang.hitch(this,
     			function(type, obj, xhr){
-    				if (obj["error"]!=null) {
+    				if (obj && obj["error"] != null) {
     					var err = new Error(obj.error);
     					err.id = obj.id;
     					deferredRequestHandler.errback(err, xhr);

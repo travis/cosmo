@@ -582,13 +582,13 @@ cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
 dojo.declare("cosmo.model.StampMetaData", null,{
     __immutable:true,
     stampName: null,
-    nameSpace: null,
+    namespace: null,
     attributes: null,
     
-    initializer: function(stampName, nameSpace,stampAttributesArray){
+    initializer: function(stampName, namespace,stampAttributesArray){
         this.attributes = [];
         this.stampName = stampName || null;
-        this.nameSpace = nameSpace;
+        this.namespace = namespace;
         if (!stampAttributesArray){
             return;
         } else {

@@ -282,7 +282,17 @@ cosmotest.service.conduits.test_conduits = {
             ).results[0];
             
             item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
-            jum.assertEquals("modification display name didn't save", item4.getMaster().getDisplayName(), item4.getDisplayName());
+            jum.assertEquals("modification deletion didn't work", item4.getMaster().getDisplayName(), item4.getDisplayName());
+            
+            // Test stamp deletion
+            var masterUid = item4.getMaster().getUid()
+            item4.getMaster().removeStamp('event');
+            jum.assertTrue("Data model stamp removal didn't work", !item4.getMaster().getStamp('event'))
+            conduit.saveItem(item4.getMaster(), {sync: true});
+            
+            var masterItem = conduit.getItem(masterUid, {sync: true}).results[0];
+
+            jum.assertTrue("Removing stamp didn't work", !masterItem.getStamp('event'));
    
         } finally {
            cosmotest.service.conduits.test_conduits.cleanup(user);            

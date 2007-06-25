@@ -621,7 +621,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     addStampsToDelete: function (recordSet, note){
         var stampsToDelete = note.getStampsToDelete();
         if (stampsToDelete.length > 0){
-            recordSet.deletedRecords = stampsToDelete;
+            var recordsToDelete = [];
+            for (var i = 0; i < stampsToDelete.length; i++){
+                var stampPrefix = stampsToDelete[i];
+                recordsToDelete.push([stampPrefix, cosmo.model.getStampMetaData(stampPrefix).namespace]);
+                recordSet.deletedRecords = recordsToDelete;
+            }
             note.clearStampsToDelete();
         }
     },

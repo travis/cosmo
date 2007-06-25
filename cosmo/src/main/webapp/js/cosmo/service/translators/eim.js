@@ -1302,9 +1302,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (rprops.until) {
                 var endDate = cosmo.datetime.fromIso8601(rprops.until);
                 var tzId = startDate.tzId || (startDate.utc ? "utc" : null);
-                dojo.debug("e" + endDate)
                 endDate = endDate.createDateForTimezone(tzId);
-                dojo.debug("e" + endDate)
                 endDate.setHours(0);
                 endDate.setMinutes(0);
                 endDate.setSeconds(0);

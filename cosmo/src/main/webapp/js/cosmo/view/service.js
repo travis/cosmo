@@ -469,14 +469,9 @@ cosmo.view.service = new function () {
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
                 case opts.ONLY_THIS_EVENT:
-                    var rrule = item.data.recurrenceRule;
-                    var dates = rrule.exceptionDates;
-                    var d = cosmo.datetime.Date.clone(item.data.instanceDate);
-                    dates.push(d);
-                    rrule.removeModification(d);
-
-                    f = function () { doSaveRecurrenceRule(item, rrule, { 'saveAction': 'remove',
-                        'saveType': 'instanceOnlyThisEvent' }) };
+                    f = function () {
+                        doRemoveItem(item, { 'removeType': opts.ONLY_THIS_EVENT});
+                    };
                     break;
                 default:
                     // Do nothing
@@ -505,7 +500,7 @@ cosmo.view.service = new function () {
         var reqId = null;
 
 
-        if (opts.saveType == "singleEvent"){
+        if (opts.removeType == "singleEvent"){
             deferred = cosmo.app.pim.serv.deleteItem(item.data);
             reqId = deferred.id;
         } else if (opts.removeType == OPTIONS.ALL_EVENTS){
@@ -533,9 +528,27 @@ cosmo.view.service = new function () {
                 isSupported: oldRecurrenceRule.isSupported(),
                 unsupportedRule: oldRecurrenceRule.getUnsupportedRule()
             });
-           masterEventStamp.setRrule(newRecurrenceRule);
-           deferred = cosmo.app.pim.serv.saveItem(master);
-           reqId = deferred.id;
+            masterEventStamp.setRrule(newRecurrenceRule);
+            deferred = cosmo.app.pim.serv.saveItem(master);
+            reqId = deferred.id;
+        } else if (opts.removeType == OPTIONS.ONLY_THIS_EVENT){
+            var data = item.data;
+            var master = data.getMaster();
+            var masterEventStamp = master.getEventStamp();
+            var recurrenceId = data.recurrenceId;
+            var exDate = null; 
+            if (masterEventStamp.getStartDate().isFloating()){
+                exDate = recurrenceId.clone()
+            } else {
+                var tzId = masterEvent.getStartDate().tzId || "utc";
+                recurrenceId.createDateForTimezone(tzId);
+            }
+            if (masterEventStamp.getExdates() == null){
+                masterEventStamp.setExdates([]);
+            }
+            masterEventStamp.getExdates().push(exDate)
+            deferred = cosmo.app.pim.serv.saveItem(master);
+            reqId = deferred.id;
         }
         
         // Pass the original item and opts object to the handler function

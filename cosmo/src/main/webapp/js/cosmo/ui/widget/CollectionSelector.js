@@ -98,13 +98,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             function renderButton() {
                 var strings = self.strings;
                 var imgPath = '';
-                var f = null;
+                var clickFunction = null;
                 // If using a ticket, add the 'Add' button
                 if (passedKey) {
                     imgPath = 'subscribe';
                     imgTitle = strings.imgTitleAdd;
                     // Set up the authAction obj for the AuthBox -- this tells it
                     // what to do if the user auths successfully
+                    
+                    var subscribeFunction = function (){
+                            var subscription = new cosmo.model.Subscription({
+                                displayName: curr.getDisplayName(),
+                                uid: curr.getUid(),
+                                ticketKey: passedKey
+                            })
+                            return cosmo.app.pim.serv.createSubscription(subscription);
+                    }
                     var authAction = {
                         execInline: false,
                         authInitPrompt: 'Please enter the login information for your Cosmo account.',
@@ -112,13 +121,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         // Action to take after successful auth -- try to add the
                         // collection subscription
                         attemptFunc: function () {
-
-                            var subscription = new cosmo.model.Subscription({
-                                displayName: curr.getDisplayName(),
-                                uid: curr.getUid(),
-                                ticketKey: passedKey
-                            })
-                            var deferred = cosmo.app.pim.serv.createSubscription(subscription);
+                            var deferred = subscribeFunction();
                             deferred.addCallback(dojo.lang.hitch(this, function(x,y,z){
                                 dojo.debug(x)
                                 dojo.debug(y)
@@ -140,17 +143,28 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         },
                         attemptPrompt: strings.attemptPrompt,
                         successPrompt: strings.successPrompt };
-                    f = function () {
-                        var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
-                        cosmo.app.showDialog(authBoxProps);
-                        cosmo.app.modalDialog.content.usernameInput.focus();
+
+                    clickFunction = function () {
+                        if (!cosmo.util.auth.currentlyAuthenticated()){
+                            var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
+                            cosmo.app.showDialog(authBoxProps);
+                            cosmo.app.modalDialog.content.usernameInput.focus();
+                        } else {
+                            var deferred = subscribeFunction();
+                            deferred.addCallback(function(){
+                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+                            });
+                            deferred.addErrback(function(err){
+                                cosmo.app.showErr(self.strings.collectionAddError, err);
+                            });
+                        }
                     };
                 }
                 // Otherwise the user is logged in -- use the 'Info' button
                 else {
                     imgPath = 'details';
                     imgTitle = self.strings.imgTitleInfo;
-                    f = function () {
+                    clickFunction = function () {
                         var _pim = cosmo.app.pim;
                         cosmo.app.showDialog(
                             cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
@@ -163,7 +177,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 collIcon.style.cursor = 'pointer';
                 collIcon.alt = imgTitle;
                 collIcon.title = imgTitle;
-                dojo.event.connect(collIcon, 'onclick', f);
+                dojo.event.connect(collIcon, 'onclick', clickFunction);
                 // Img is an actual DOM element, so you set the vertical-align
                 // prop on the image, not on the enclosing div
                 collIcon.style.verticalAlign = 'middle';

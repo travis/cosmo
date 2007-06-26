@@ -219,8 +219,8 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Uid of the first calendar to select.
         var selectUid = params.collectionUid;
         
-        //If we are not authenticated, use the collectionUrl in params to load a collection
-        if (!params.authAccess) {
+        //If we received a ticket key, use the collectionUrl in params to load a collection
+        if (params.ticketKey) {
             try {
                var collection = this.serv.getCollection(params.collectionUrl, {sync:true}).results[0];
                selectUid = collection.getUid();
@@ -247,7 +247,6 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             }
             var subscriptions = this.serv.getSubscriptions({sync:true}).results[0];
 
-            //XINT make sure this still works!
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];
             deletedSubscriptions = result[1];

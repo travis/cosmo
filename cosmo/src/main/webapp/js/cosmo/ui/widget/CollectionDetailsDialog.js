@@ -257,7 +257,7 @@ dojo.widget.HtmlWidget, function(){
     btnsRight.push(closeButton);
     dummyNode.removeChild(closeButton.domNode);
 
-    if (this.saveable){
+    if (contentWidget.saveable){
         var saveButton = dojo.widget.createWidget(
                         "cosmo:Button",
                         { text: _("Main.CollectionDetails.Save"),

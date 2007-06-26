@@ -65,7 +65,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             }
             else {
                 self.showPrompt('normal', _('Login.Prompt.Processing'));
-                dojo.io.cookie.set('username', un);
 
                 postData = { 'j_username': un, 'j_password': pw };
 

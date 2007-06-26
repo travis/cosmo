@@ -21,6 +21,7 @@ dojo.require("dojo.io.*");
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.auth");
 dojo.require("cosmo.topics");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.popup");
@@ -41,7 +42,7 @@ cosmo.app = new function () {
     // List of any queued-up error messages
     this.errorList = [];
     // Quick access to the currently logged-in user
-    this.currentUsername =  dojo.io.cookie.getCookie('username');
+    this.currentUsername =  cosmo.util.auth.getUsername();
     //select boxes to show/hide when displaying modal dialog box
     this._selectBoxIds = {};
 

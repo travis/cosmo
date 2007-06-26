@@ -80,9 +80,7 @@ if (location.search){
 		cosmo.app.initParams.ticketKey = params['ticket'];
 }
 
-// If this is true, we are not in anonymous ticketed mode, 
-// and the user better have logged in
-cosmo.app.initParams.authAccess = !cosmo.app.initParams.ticketKey;
+cosmo.app.initParams.authAccess = cosmo.util.auth.currentlyAuthenticated();
 
 <authz:authorize ifAnyGranted="ROLE_USER">
 cosmo.app.initParams.roleUser = true;

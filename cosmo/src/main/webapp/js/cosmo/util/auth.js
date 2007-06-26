@@ -67,6 +67,10 @@ cosmo.util.auth = new function() {
     this.getCred = function(){
 		return dojo.io.cookie.get(COSMO_AUTH_COOKIE);
     }
+    
+    this.currentlyAuthenticated = function(){
+        return !!this.getCred();
+    }
 
     this.getAuthorizedRequest = function(request, kwArgs){
         kwArgs = kwArgs || {};

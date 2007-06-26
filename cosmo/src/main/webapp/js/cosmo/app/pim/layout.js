@@ -310,8 +310,8 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     this.baseLayout.menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data
 
-    // Subscription selector thinger -- show only in anon view
-    if (!cosmo.app.initParams.authAccess) {
+    // Subscription selector thinger -- show only in ticketed view
+    if (cosmo.app.initParams.ticketKey) {
         var s = _createElem('span');
         s.id = 'subscribeSelector';
         var form = _createElem('form');

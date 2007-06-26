@@ -55,7 +55,8 @@ cosmo.ui.detail = new function () {
                 return;
             }
             this.item.makeSnapshot();
-            dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':this.item});
+            dojo.event.topic.publish('/calEvent', {
+              action: 'saveConfirm', delta: delta, data: this.item });
         }
     };
 
@@ -258,7 +259,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
 
     this.id = '';
     this.domNode = null; // Main node
-    this.triageSection = {};
+    this.triageSection = null;
 
     // Override defaults with params passed in
     for (var n in params) { this[n] = params[n] };
@@ -269,28 +270,78 @@ cosmo.ui.detail.MarkupBar = function (p) {
         var d = this.domNode;
         var writeable = cosmo.app.pim.currentCollection.getWriteable();
         var item = cosmo.ui.detail.item;
-        var statuses = cosmo.view.list.triageStatusCodeNumbers;
         var enabled = !!(item);
+
         this.clearAll();
 
-        this.triageSection.currTriageStatus = item ? item.data.getTriageStatus() : null;
-
+        addTriageSection();
+        addEmailThisIcon();
         // Read-only collections
         if (!writeable) {
             addReadOnlyIcon();
         }
         // Add e-mail icon when it's added to the image grid
-        addEmailThisIcon();
-        addTriageButtons();
         breakFloat();
 
+        function addTriageSection() {
+            var t = _createElem('div');
+            t.id = 'triageButtonSection';
+            t.className = 'floatLeft';
+            var c = new cosmo.ui.detail.TriageSection({
+              domNode: t, id: t.id, parent: self });
+            self.children.push(c);
+            d.appendChild(c.domNode);
+            self.triageSection = c;
+        }
         function addEmailThisIcon() {
+            var doEMail = function () {
+                var data = item.data;
+                var timeFormat = _("Sidebar.Email.TimeFormat");
+                var subject = cosmo.app.pim.currentCollection.getDisplayName() + ": " + data.getDisplayName();
+                var body = [_("Sidebar.Email.Title") , data.getDisplayName() , "%0d%0a"];
+                var eventStamp = data.getEventStamp();
+                var startDate = eventStamp.getStartDate();
+                var endDate = eventStamp.getEndDate();
+
+                if (startDate.tzId) {
+                    body = body.concat([
+                     _("Sidebar.Email.Timezone"), startDate.tzId , "%0d%0a"]);
+                }
+                body = body.concat([
+                     _("Sidebar.Email.Starts") , dojo.date.strftime(startDate, timeFormat) , "%0d%0a" ,
+                     _("Sidebar.Email.Ends") , dojo.date.strftime(endDate, timeFormat) , "%0d%0a"]);
+                if (eventStamp.getAllDay()) {
+                    body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
+                }
+
+                if (eventStamp.getRrule()) {
+                    var rrule = eventStamp.getRrule();
+                    body = body.concat([_("Sidebar.Email.Recurs") ,
+                        rrule.getFrequency()]);
+                    if (rrule.getEndDate()) {
+                        body = body.concat([_("Sidebar.Email.EndingOn") ,
+                            dojo.date.strftime(rrule.getEndDate(), timeFormat)]);
+                    }
+                    body.push(".%0d%0a");
+                }
+                if (eventStamp.getStatus()) {
+                    body.concat([_("Sidebar.Email.Status") , eventStamp.getStatus() , "%0d%0a"]);
+                }
+                if (data.getBody()) {
+                    body = body.concat([ ,
+                        _("Sidebar.Email.Description") , data.getBody(), "%0d%0a"]);
+                }
+                var s = "mailto:?subject=" + subject + "&body=" + body.join("");
+                console.log(s);
+                location = s;
+            };
+
             var t = _createElem('div');
             t.id = 'emailThisItemButton';
             t.className = 'floatRight';
             t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
                 enabled: enabled,
-                handleClick: function () { alert('Not implemented yet.'); },
+                handleClick: enabled ? doEMail : null,
                 defaultState: 'emailButtonDefault',
                 rolloverState: 'emailButtonRollover' });
             d.appendChild(t);
@@ -306,60 +357,6 @@ cosmo.ui.detail.MarkupBar = function (p) {
             t.style.marginRight = '6px';
             d.appendChild(t);
         }
-        function addTriageButtons() {
-            var c = $('triageButtonSection');
-            if (c) {
-                c.innerHTML = '';
-            }
-            else {
-                c = _createElem('div');
-                c.id = 'triageButtonSection';
-                c.className = 'floatLeft';
-                d.appendChild(c);
-            }
-            var t = _createElem('div');
-            var stat = self.triageSection.currTriageStatus;
-            // Click handler -- grab the desired status from the id
-            var hand = function (e) {
-                if (e.target && e.target.id) {
-                    var s = e.target.id.replace('triageButton', '').toUpperCase();
-                    self.triageSection.currTriageStatus = statuses[s];
-                    addTriageButtons();
-                }
-            };
-            t.id = 'triageButtonNow';
-            t.className = 'floatLeft';
-            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
-                enabled: enabled,
-                selected: (stat == statuses.NOW),
-                handleClick: enabled ? hand : null,
-                defaultState: 'triageNowButtonDefault',
-                rolloverState: 'triageNowButtonRollover' });
-            c.appendChild(t);
-            var t = _createElem('div');
-            t.id = 'triageButtonLater';
-            t.className = 'floatLeft';
-            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
-                enabled: enabled,
-                selected: (stat == statuses.LATER),
-                handleClick: enabled ? hand : null,
-                defaultState: 'triageLaterButtonDefault',
-                rolloverState: 'triageLaterButtonRollover' });
-            c.appendChild(t);
-            var t = _createElem('div');
-            t.id = 'triageButtonDone';
-            t.className = 'floatLeft';
-            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
-                enabled: enabled,
-                selected: (stat == statuses.DONE),
-                handleClick: enabled ? hand : null,
-                defaultState: 'triageDoneButtonDefault',
-                rolloverState: 'triageDoneButtonRollover' });
-            c.appendChild(t);
-            var t = _createElem('div');
-            t.className = 'clearBoth';
-            c.appendChild(t);
-        }
         function breakFloat() {
             var t = _createElem('div');
             t.className = 'clearBoth';
@@ -369,6 +366,56 @@ cosmo.ui.detail.MarkupBar = function (p) {
 }
 
 cosmo.ui.detail.MarkupBar.prototype =
+    new cosmo.ui.ContentBox();
+
+cosmo.ui.detail.TriageSection = function (p) {
+    var self = this;
+    var params = p || {};
+    var statuses = cosmo.view.list.triageStatusCodeNumbers;
+    var item = cosmo.ui.detail.item;
+    var enabled = !!(item);
+
+    this.domNode = null;
+    this.currTriageStatus = item ? item.data.getTriageStatus() : null;
+
+    for (var n in params) { this[n] = params[n]; }
+
+    this.renderSelf = function () {
+        var d = self.domNode;
+        var stat = self.currTriageStatus;
+        // Click handler -- grab the desired status from the id
+        var hand = function (e) {
+            if (e.target && e.target.id) {
+                var s = e.target.id.replace('triageButton', '').toUpperCase();
+                self.currTriageStatus = statuses[s];
+                self.renderSelf();
+            }
+        };
+        var createTriageButton = function (key) {
+          var t = _createElem('div');
+          var keyUpper = key.toUpperCase();
+          t.id = 'triageButton' + key;
+          t.className = 'floatLeft';
+          t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
+              enabled: enabled,
+              selected: (stat == statuses[keyUpper]),
+              handleClick: enabled ? hand : null,
+              defaultState: 'triage' + key + 'ButtonDefault',
+              rolloverState: 'triage' + key + 'ButtonRollover' });
+          d.appendChild(t);
+
+        }
+        this.clearAll();
+        createTriageButton('Now');
+        createTriageButton('Later');
+        createTriageButton('Done');
+        var t = _createElem('div');
+        t.className = 'clearBoth';
+        d.appendChild(t);
+    };
+};
+
+cosmo.ui.detail.TriageSection.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.StampSection = function (p) {

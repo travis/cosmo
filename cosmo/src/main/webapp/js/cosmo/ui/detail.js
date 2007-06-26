@@ -61,7 +61,8 @@ cosmo.ui.detail = new function () {
     };
 
     this.removeItem = function () {
-        alert('remove');
+        dojo.event.topic.publish('/calEvent',
+            { 'action': 'removeConfirm', 'data':this.item });
     };
 
     // Utility functions

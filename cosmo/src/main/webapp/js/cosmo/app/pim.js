@@ -108,7 +108,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Tell the calendar view what week we're on
         cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
-        this.loadCollections(collectionUrl);
+        this.loadCollections(params);
 
         // Base layout
         // ===============================
@@ -213,16 +213,17 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     // ==========================
     // Collections
     // ==========================
-    this.loadCollections = function (collectionUrl) {
+    this.loadCollections = function (params) {
         // Load/create calendar to view
         // --------------
-        // If we received a ticket, just grab the specified collection
 
         // Uid of the first calendar to select.
-        var selectUid;
-        if (collectionUrl) {
+        var selectUid = params.collectionUid;
+        
+        //If we are not authenticated, use the collectionUrl in params to load a collection
+        if (!params.authAccess) {
             try {
-               var collection = this.serv.getCollection(collectionUrl, {sync:true}).results[0];
+               var collection = this.serv.getCollection(params.collectionUrl, {sync:true}).results[0];
                selectUid = collection.getUid();
             }
             catch(e) {

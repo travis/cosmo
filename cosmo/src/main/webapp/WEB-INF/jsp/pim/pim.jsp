@@ -71,6 +71,8 @@ var collectionUrlIndex = location.pathname.indexOf("collection");
 if (collectionUrlIndex >= 0){
 	cosmo.app.initParams.collectionUrl = 
 		location.pathname.substring(collectionUrlIndex) + location.search
+	cosmo.app.initParams.collectionUid = 
+		location.pathname.substring(collectionUrlIndex + 11);
 }
 if (location.search){
 	var params = cosmo.util.uri.parseQueryString(location.search);

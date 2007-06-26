@@ -125,7 +125,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                 dojo.debug(z)
                                 // Log the user into Cosmo and display the current collection
                                 this._showPrompt(this.authAction.successPrompt);
-//                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
                                 
                             }));
                             deferred.addErrback(dojo.lang.hitch(this, function(err, y, z){

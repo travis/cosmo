@@ -34,6 +34,7 @@ cosmo.view.dialog = new function() {
     // All available buttons for the dialog
     var buttons = {
         'removeAllEvents': function(){
+           dojo.debug("create removeAllEvents button called.");
            return new Button('allButtonDialog', btnWideWidth,
                 function() { doPublish('remove', 
                 cosmo.view.service.recurringEventOptions.ALL_EVENTS); }, 
@@ -41,6 +42,7 @@ cosmo.view.dialog = new function() {
         },
 
         'removeFutureEvents': function(){
+            dojo.debug("create removeFutureEvents button called.");
             return new Button('allFutureButtonDialog', btnWiderWidth,
                 function() { doPublish('remove', 
                 cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS); }, 
@@ -48,6 +50,7 @@ cosmo.view.dialog = new function() {
         },
 
         'removeOnlyThisEvent': function(){
+            dojo.debug("create removeOnlyThisEvent button called.");
             return new Button('onlyThisButtonDialog', btnWiderWidth,
                 function() { 
                     doPublish('remove', 
@@ -100,6 +103,7 @@ cosmo.view.dialog = new function() {
     };
 
     props.removeConfirm = function(){
+        dojo.debug("removeConfirm dialog called.");
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
@@ -179,9 +183,10 @@ cosmo.view.dialog = new function() {
             }
         }
         else if (key == 'removeRecurConfirm') {
+           var item = cosmo.view.cal.canvas.getSelectedEvent();
             p.btnsRight = [];
             p.btnsRight.push(buttons.removeAllEvents());
-            if (!opts.masterEvent) {
+            if (!item.data.isFirstOccurrence()) {
                 p.btnsRight.push(buttons.removeFutureEvents());
             }
             p.btnsRight.push(buttons.removeOnlyThisEvent());

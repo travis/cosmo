@@ -404,25 +404,22 @@ cosmo.view.service = new function () {
      * confirmation dialog for recurring items.
      * @param item A ListItem/CalItem object, the item to be removed.
      */
-     //XINT
     function removeItemConfirm(item) {
+        dojo.debug("removeItemConfirm!");
         var str = '';
         var opts = {};
         opts.masterEvent = false;
-        // Recurrence is a ball-buster
         // Display the correct confirmation dialog based on
         // whether or not the item recurs
-        if (item.data.recurrenceRule) {
+        if (item.data.hasRecurrence()) {
             str = 'removeRecurConfirm';
-            if (item.data.masterEvent) {
-                opts.masterEvent = true;
-            }
         }
         else {
             str = 'removeConfirm';
         }
         cosmo.app.showDialog(cosmo.view.dialog.getProps(str, opts));
     }
+    
     /**
      * Called for after passthrough from removeItemConfirm. Routes to
      * the right remove operation (i.e., for recurring items, 'All Future,'
@@ -433,11 +430,15 @@ cosmo.view.service = new function () {
      */
      //XINT
     function removeItem(item, qual) {
+        dojo.debug("remove Item: item: " +item);
+        dojo.debug("qual: "+ qual);
+        
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
         // setTimeout to allow the 'processing ...' state to
         // display
         var f = null;
+        
         // A second function object used as a callback from
         // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
@@ -455,77 +456,16 @@ cosmo.view.service = new function () {
             switch(qual) {
                 // This is easy -- remove the master item
                 case opts.ALL_EVENTS:
-                    // User is removing the master item directly --
-                    // no need to go look it up
-                    if (item.data.masterEvent) {
-                        f = function () { doRemoveItem(item, { 'removeType': 'recurrenceMaster' }) };
-                    }
-                    // User is removing all the items in the recurrence from an
-                    // instance -- have to look up the master item. This means
-                    // two chained async calls
-                    else {
-                        h = function (itemData, err) {
-                            if (err) {
-                                cosmo.app.showErr('Could not retrieve master item for this recurrence.', getErrDetailMessage(err));
-                                // Broadcast failure
-                                dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
-                                    'data': item });
-                            }
-                            else {
-                                // Just use BaseItem as the only thing the remove
-                                // op is interested in is the data prop
-                                var removeEv = new cosmo.view.BaseItem();
-                                removeEv.data = itemData;
-                                doRemoveItem(removeEv, { 'removeType': 'recurrenceMaster',
-                                    'instanceEvent': item });
-                            }
-                        };
-                        f = function () {
-                            var reqId = cosmo.app.pim.currentCollection.conduit.getEvent(
-                                cosmo.app.pim.currentCollection.collection.uid, item.data.id,
-                                cosmo.app.pim.currentCollection.transportInfo, h);
-                        };
-                    }
+                    f = function () {
+                        doRemoveItem(item, { 'removeType': opts.ALL_EVENTS});
+                    };
                     break;
                 // 'Removing' all future items really just means setting the
                 // end date on the recurrence
                 case opts.ALL_FUTURE_EVENTS:
-                        // Have to go get the recurrence rule -- this means two chained async calls
-                        h = function (hashMap, err) {
-                            if (err) {
-                                cosmo.app.showErr('Could not retrieve recurrence rule for this recurrence.', getErrDetailMessage(err));
-                                // Broadcast failure
-                                dojo.event.topic.publish('/calEvent', { 'action': 'removeFailed',
-                                    'data': item });
-                            }
-                            else {
-                                // JS object with only one item in it -- get the RecurrenceRule
-                                for (var a in hashMap) {
-                                    var saveRule = hashMap[a];
-                                }
-                                var freq = item.data.recurrenceRule.frequency;
-                                var start = item.data.start;
-                                // Use the date of the selected item to figure the
-                                // new end date for the recurrence
-                                var recurEnd = new cosmo.datetime.Date(start.getFullYear(),
-                                    start.getMonth(), start.getDate());
-                                var unit = ranges[freq][0];
-                                var incr = (ranges[freq][1] * -1);
-                                // New end should be one 'recurrence span' back -- e.g.,
-                                // the previous day for a daily recurrence, one week back
-                                // for a weekly, etc.
-                                recurEnd = cosmo.datetime.Date.add(recurEnd, unit, incr);
-                                saveRule.endDate = recurEnd;
-                                doSaveRecurrenceRule(item, saveRule, { 'saveAction': 'remove',
-                                    'removeType': 'instanceAllFuture', 'recurEnd': recurEnd });
-                            }
-                        };
-                        // Look up the RecurrenceRule and pass the result on to function h
-                        f = function () {
-                            var reqId = cosmo.app.pim.currentCollection.conduit.getRecurrenceRules(
-                                cosmo.app.pim.currentCollection.collection.uid, [item.data.id],
-                                cosmo.app.pim.currentCollection.transportInfo, h);
-                            };
+                    f = function () {
+                        doRemoveItem(item, { 'removeType': opts.ALL_FUTURE_EVENTS});
+                    };
                     break;
                 // Save the RecurrenceRule with a new exception added for this instance
                 case opts.ONLY_THIS_EVENT:
@@ -545,6 +485,7 @@ cosmo.view.service = new function () {
         }
         // Normal one-shot item
         else {
+            dojo.debug("normal one shot item");
             f = function () { doRemoveItem(item, { 'removeType': 'singleEvent' }) }
         }
         // Give a sec for the processing state to show
@@ -557,16 +498,53 @@ cosmo.view.service = new function () {
      * @param item A ListItem/CalItem object, the item to be saved.
      * @param opts A JS Object, options for the remove operation.
      */
-     //XINT
     function doRemoveItem(item, opts) {
+        dojo.debug("doRemoveItem: opts.removeType:" + opts.removeType);
+        var OPTIONS = self.recurringEventOptions;
+        var deferred = null;
+        var reqId = null;
+
+
+        if (opts.saveType == "singleEvent"){
+            deferred = cosmo.app.pim.serv.deleteItem(item.data);
+            reqId = deferred.id;
+        } else if (opts.removeType == OPTIONS.ALL_EVENTS){
+            deferred = cosmo.app.pim.serv.deleteItem(item.data.getMaster());
+            reqId = deferred.id;
+        } else if (opts.removeType == OPTIONS.ALL_FUTURE_EVENTS){
+            var data = item.data;
+            var endDate = data.getEventStamp().getEndDate().clone();
+            var master = data.getMaster();
+            var masterEventStamp = master.getEventStamp();
+            var oldRecurrenceRule = masterEventStamp.getRrule();
+            var unit = ranges[oldRecurrenceRule.getFrequency()][0];
+            var incr = (ranges[oldRecurrenceRule.getFrequency()][1] * -1);
+            // New end should be one 'recurrence span' back -- e.g.,
+            // the previous day for a daily recurrence, one week back
+            // for a weekly, etc.
+            endDate.add(unit, incr);
+            endDate.setHours(0);
+            endDate.setMinutes(0);
+            endDate.setSeconds(0);
+
+            var newRecurrenceRule = new cosmo.model.RecurrenceRule({
+                frequency: oldRecurrenceRule.getFrequency(),
+                endDate: endDate,
+                isSupported: oldRecurrenceRule.isSupported(),
+                unsupportedRule: oldRecurrenceRule.getUnsupportedRule()
+            });
+           masterEventStamp.setRrule(newRecurrenceRule);
+           deferred = cosmo.app.pim.serv.saveItem(master);
+           reqId = deferred.id;
+        }
+        
         // Pass the original item and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function (newItemId, err, reqId) {
-            handleRemoveResult(item, newItemId, err, reqId, opts); };
-
-        var requestId = cosmo.app.pim.currentCollection.conduit.removeEvent(
-            cosmo.app.pim.currentCollection.collection.uid, item.data.id,
-            cosmo.app.pim.currentCollection.transportInfo, f);
+        var f = function (newItemId, err) {
+            handleRemoveResult(item, newItemId, err, reqId, opts); 
+        };
+        
+        deferred.addCallback(f);
     }
     /**
      * Handles the response from the async call when removing an item.
@@ -594,75 +572,6 @@ cosmo.view.service = new function () {
         // Broadcast success
         dojo.event.topic.publish('/calEvent', { 'action': act,
             'data': removeEv, 'opts': opts });
-    }
-    /**
-     * Call the service to save a recurrence rule -- creates an anonymous
-     * function to pass as the callback for the async service call.
-     * Response to the async request is handled by handleSaveRecurrenceRule.
-     * @param item A ListItem/CalItem object, the item originally clicked on.
-     * @param rrule A RecurrenceRule, the updated rule for saving.
-     * @param opts A JS Object, options for the remove operation.
-     */
-    //XINT
-    function doSaveRecurrenceRule(item, rrule, opts) {
-        // Pass the original item and opts object to the handler function
-        // along with the original params passed back in from the async response
-        var f = function (ret, err, reqId) {
-            handleSaveRecurrenceRule(item, err, reqId, opts); };
-        var requestId = cosmo.app.pim.currentCollection.conduit.saveRecurrenceRule(
-            cosmo.app.pim.currentCollection.collection.uid,
-            item.data.id, rrule,
-            cosmo.app.pim.currentCollection.transportInfo, f);
-    }
-    /**
-     * Handles the response from the async call when saving changes
-     * to a RecurrenceRule.
-     * @param item A ListItem/CalItem object, the original item clicked on,
-     * or created by double-clicking on the cal canvas.
-     * @param err A JS object, the error returned from the server when
-     * a remove operation fails.
-     * @param reqId Number, the id of the async request.
-     * @param opts A JS Object, options for the save operation.
-     */
-    //XINT
-    function handleSaveRecurrenceRule(item, err, reqId, opts) {
-
-        var rruleEv = item;
-        // Saving the RecurrenceRule can be part of a 'remove'
-        // or 'save' -- set the message for an error appropriately
-        var errMsgKey = opts.saveAction == 'remove' ?
-            'EventRemoveFailed' : 'EventEditSaveFailed';
-        // Simple error message to go along with details from Error obj
-        var errMsg = _('Main.Error.' + errMsgKey);
-        var qual = {};
-
-        if (err) {
-            act = opts.saveAction + 'Failed';
-            cosmo.app.showErr(errMsg, getErrDetailMessage(err));
-        }
-        else {
-            act = opts.saveAction + 'Success';
-        }
-
-        // If the item has been edited such that it is now out of
-        // the viewable range, remove the item from display
-        if (rruleEv.isOutOfViewRange()) {
-            qual.onCanvas = false;
-        }
-        // Otherwise update display
-        else {
-            qual.onCanvas = true;
-        }
-
-        // Sync changes to the modifications/exceptions in the
-        // RecurrenceRule to all the other instances on the canvas
-        if (syncRecurrence(rruleEv)) {
-            // Broadcast success
-            dojo.event.topic.publish('/calEvent',
-                { 'action': act,
-                'data': rruleEv, 'opts': opts, 'qualifier': qual
-                });
-        }
     }
 
     function getErrDetailMessage(err) {

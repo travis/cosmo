@@ -1133,5 +1133,6 @@ td.dataDisplayLabel {
 }
 
 #markupBar {
-    height: 24px;
+    height: 18px;
+    border-bottom: 1px solid #ccc;
 }

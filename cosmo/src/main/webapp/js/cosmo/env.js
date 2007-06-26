@@ -130,7 +130,8 @@ cosmo.env.setTimeoutSeconds = function(timeoutSeconds) {
 }
 
 cosmo.env.getImagesUrl = function(){
-	return cosmo.env.getBaseUrl() + '/templates/default/images/';
+	s = cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/images/';
+  return s;
 }
 
 cosmo.env.getRedirectUrl = function(){

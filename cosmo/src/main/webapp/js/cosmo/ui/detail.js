@@ -31,6 +31,7 @@ dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.datetime.timezone');
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.ui.DetailFormConverter");
 
 cosmo.ui.detail = new function () {
@@ -114,14 +115,12 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     for (var n in params) { this[n] = params[n]; }
 
     // Markup bar
-    /*
     var d = _createElem('div');
     var c = new cosmo.ui.detail.MarkupBar({ id: 'markupBar',
         parent: this, domNode: d });
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.markupBar = c;
-    */
 
     // Main section
     var d = _createElem('div');
@@ -167,6 +166,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
             case 'setSelected':
                 if (item) {
                     self.updateFromItem(item);
+                    self.markupBar.render();
                 }
                 break;
             case 'saveSuccess':
@@ -258,40 +258,113 @@ cosmo.ui.detail.MarkupBar = function (p) {
 
     this.id = '';
     this.domNode = null; // Main node
+    this.triageSection = {};
+
     // Override defaults with params passed in
     for (var n in params) { this[n] = params[n] };
 
     this.domNode.id = this.id;
-    var d = this.domNode;
 
     this.renderSelf = function () {
+        var d = this.domNode;
+        var writeable = cosmo.app.pim.currentCollection.getWriteable();
+        var item = cosmo.ui.detail.item;
+        var statuses = cosmo.view.list.triageStatusCodeNumbers;
+        var enabled = !!(item);
         this.clearAll();
 
+        this.triageSection.currTriageStatus = item ? item.data.getTriageStatus() : null;
+
+        // Read-only collections
+        if (!writeable) {
+            addReadOnlyIcon();
+        }
         // Add e-mail icon when it's added to the image grid
         addEmailThisIcon();
-
-        // Do test for read-only collection here
-        addReadOnlyIcon();
-
+        addTriageButtons();
         breakFloat();
-    }
-    function addEmailThisIcon() {}
-    function addReadOnlyIcon() {
-        var t = _createElem('div');
-        t.id = 'readOnlyIcon';
-        t.className = 'floatRight';
-        t.style.width = '12px';
-        t.style.height = '12px';
-        t.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() +
-            'image_grid.png)';
-        t.style.backgroundPosition = '-280px -45px';
-        t.style.margin = '6px';
-        d.appendChild(t);
-    }
-    function breakFloat() {
-        var t = _createElem('div');
-        t.className = 'clearBoth';
-        d.appendChild(t);
+
+        function addEmailThisIcon() {
+            var t = _createElem('div');
+            t.id = 'emailThisItemButton';
+            t.className = 'floatRight';
+            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
+                enabled: enabled,
+                handleClick: function () { alert('Not implemented yet.'); },
+                defaultState: 'emailButtonDefault',
+                rolloverState: 'emailButtonRollover' });
+            d.appendChild(t);
+        }
+        function addReadOnlyIcon() {
+            var t = _createElem('div');
+            t.id = 'readOnlyIcon';
+            t.className = 'floatRight';
+            t = cosmo.ui.imagegrid.createImageIcon({ domNode: t,
+                iconState: 'readOnlyIcon' });
+            t.style.marginTop = '3px';
+            t.style.marginLeft = '6px';
+            t.style.marginRight = '6px';
+            d.appendChild(t);
+        }
+        function addTriageButtons() {
+            var c = $('triageButtonSection');
+            if (c) {
+                c.innerHTML = '';
+            }
+            else {
+                c = _createElem('div');
+                c.id = 'triageButtonSection';
+                c.className = 'floatLeft';
+                d.appendChild(c);
+            }
+            var t = _createElem('div');
+            var stat = self.triageSection.currTriageStatus;
+            // Click handler -- grab the desired status from the id
+            var hand = function (e) {
+                if (e.target && e.target.id) {
+                    var s = e.target.id.replace('triageButton', '').toUpperCase();
+                    self.triageSection.currTriageStatus = statuses[s];
+                    addTriageButtons();
+                }
+            };
+            t.id = 'triageButtonNow';
+            t.className = 'floatLeft';
+            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
+                enabled: enabled,
+                selected: (stat == statuses.NOW),
+                handleClick: enabled ? hand : null,
+                defaultState: 'triageNowButtonDefault',
+                rolloverState: 'triageNowButtonRollover' });
+            c.appendChild(t);
+            var t = _createElem('div');
+            t.id = 'triageButtonLater';
+            t.className = 'floatLeft';
+            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
+                enabled: enabled,
+                selected: (stat == statuses.LATER),
+                handleClick: enabled ? hand : null,
+                defaultState: 'triageLaterButtonDefault',
+                rolloverState: 'triageLaterButtonRollover' });
+            c.appendChild(t);
+            var t = _createElem('div');
+            t.id = 'triageButtonDone';
+            t.className = 'floatLeft';
+            t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
+                enabled: enabled,
+                selected: (stat == statuses.DONE),
+                handleClick: enabled ? hand : null,
+                defaultState: 'triageDoneButtonDefault',
+                rolloverState: 'triageDoneButtonRollover' });
+            c.appendChild(t);
+            var t = _createElem('div');
+            t.className = 'clearBoth';
+            c.appendChild(t);
+        }
+        function breakFloat() {
+            var t = _createElem('div');
+            t.className = 'clearBoth';
+            d.appendChild(t);
+        }
     }
 }
 

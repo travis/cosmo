@@ -25,6 +25,8 @@ dojo.kwCompoundRequire({
 		"cosmo.ui.minical",
 		"cosmo.ui.resize_area",
 		"cosmo.ui.menu"
+		"cosmo.ui.navbar"
+		"cosmo.ui.imagegrid"
 		]
 });
 

@@ -27,6 +27,7 @@ dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.list.common");
 
@@ -121,21 +122,26 @@ cosmo.ui.navbar.Bar = function (p) {
     this._addViewToggle = function () {
         var d = this.domNode;
         var _pim = cosmo.app.pim;
+        var _img = cosmo.ui.imagegrid;
         var selButtonIndex = _pim.currentView == _pim.views.LIST ? 0 : 1;
         var _radio = cosmo.ui.widget.GraphicRadioButtonSet.Button;
+        var listBase = _img.getImage('listViewDefault');
+        var listSel = _img.getImage('listViewSelected');
+        var calBase = _img.getImage('calViewDefault');
+        var calSel = _img.getImage('calViewSelected');
         var w = 24;
         var btns = [
             new _radio({ width: w,
-                defaultImgPos: [-360, 0],
-                mouseoverImgPos: [-405, 0],
-                downStateImgPos: [-450, 0],
+                defaultImgPos: [listBase.left, listBase.top],
+                mouseoverImgPos: [listSel.left, listSel.top],
+                downStateImgPos: [listSel.left, listSel.top],
                 handleClick: function () {
                     self.displayView(cosmo.app.pim.views.LIST); }
                 }),
             new _radio({ width: w,
-                defaultImgPos: [-495, 0],
-                mouseoverImgPos: [-540, 0],
-                downStateImgPos: [-585, 0],
+                defaultImgPos: [calBase.left, calBase.top],
+                mouseoverImgPos: [calSel.left, calSel.top],
+                downStateImgPos: [calSel.left, calSel.top],
                 handleClick: function () {
                     self.displayView(cosmo.app.pim.views.CAL); }
                 })

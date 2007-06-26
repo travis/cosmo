@@ -138,7 +138,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 // Load the selected item's stuff into the detail-view form
                 if (item) {
                     self.currSelectedItem = item;
-                    cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.updateFromItem(item);
+                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                        'data': item });
                 }
             }
         }

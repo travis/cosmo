@@ -27,8 +27,8 @@ module Cosmo
     MEAN_COL_SIZE = 50
     SECONDS_IN_WEEK = 60*60*24*7
     
-    OPERATIONS = [:rangeQuery, :fullFeed, :createEvent, :updateEvent]
-    PROBS = [0.70, 0.10, 0.15, 0.05]
+    OPERATIONS = [:rangeQuery, :fullFeed, :createEvent, :updateEvent, :dashBoardQuery]
+    PROBS = [0.60, 0.05, 0.15, 0.05, 0.15]
     
     class CollectionHolder
       def initialize(uid, itemUids)
@@ -59,6 +59,7 @@ module Cosmo
       @stats.registerStatMap(:atomFullFeed, "atom full feed")
       @stats.registerStatMap(:atomCreateEntry, "atom create entry")
       @stats.registerStatMap(:atomUpdateEntry, "atom update entry")
+      @stats.registerStatMap(:dashboardQuery, "atom dashboard query")
     end
     
     
@@ -93,6 +94,9 @@ module Cosmo
             when :updateEvent
               collection = @collections[rand(@collections.size)]
               updateEvent(collection)
+            when :dashBoardQuery
+              collection = @collections[rand(@collections.size)]
+              dashboardQuery(collection)
           end
         end
     end
@@ -134,6 +138,16 @@ module Cosmo
         @stats.reportStat(:atomRangeQuery, true, resp.time, nil, resp.data.length, 200)
       else
         @stats.reportStat(:atomRangeQuery, false, nil, nil, nil, resp.code)
+      end
+    end
+    
+    def dashboardQuery(collection)
+      triage_status = get_triage_status
+      resp = @atomClient.getDashboardFeed(collection.uid, triage_status, "eim-json")
+      if(resp.code==200)
+        @stats.reportStat(:dashboardQuery, true, resp.time, nil, resp.data.length, 200)
+      else
+        @stats.reportStat(:dashboardQuery, false, nil, nil, nil, resp.code)
       end
     end
     
@@ -330,6 +344,17 @@ EOF
       endTime = startTime + SECONDS_IN_WEEK
       
       return format_date_range(startTime), format_date_range(endTime)
+    end
+    
+    def get_triage_status
+      case rand
+        when 0..0.333 
+          "dashboard-now"
+        when 0.333..0.666
+          "dashboard-later"
+        else
+          "dashboard-done"     
+      end
     end
     
     def format_date_range(date)

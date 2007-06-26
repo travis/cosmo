@@ -20,8 +20,8 @@ module Cosmo
   class CalDAVUser < CosmoUser
   
     SECONDS_IN_WEEK = 60*60*24*7
-    OPERATIONS = [:makeCalendar, :putEvent, :deleteEvent, :rangeQuery]
-    PROBS = [0.005, 0.25, 0.005, 0.74]
+    OPERATIONS = [:makeCalendar, :putEvent, :deleteEvent, :rangeQuery, :getEvent]
+    PROBS = [0.005, 0.25, 0.005, 0.69, 0.05]
     
     class CollectionHolder
       def initialize(uid)
@@ -47,6 +47,7 @@ module Cosmo
     def registerStats
       @stats.registerStatMap(:calDavMkCalendar, "CalDAV MKCALENDAR")
       @stats.registerStatMap(:calDavPut, "CalDAV PUT")
+      @stats.registerStatMap(:calDavGet, "CalDAV GET")
       @stats.registerStatMap(:calDavDeleteEvent, "CalDAV DELETE Event")
       @stats.registerStatMap(:calDavRangeQuery, "CalDAV time-range REPORT")
     end
@@ -81,6 +82,9 @@ module Cosmo
             when :deleteEvent
               collection = @collections.to_a[rand(@collections.size)][1]
               deleteEvent(collection)
+            when :getEvent
+              collection = @collections.to_a[rand(@collections.size)][1]
+              get_event(collection)
             when :rangeQuery
               collection = @collections.to_a[rand(@collections.size)][1]
               rangeQueryCalendar(collection)
@@ -134,6 +138,19 @@ module Cosmo
         collection.itemUids.delete(eventUid)
       else
         @stats.reportStat(:calDavDeleteEvent, false, nil, nil, nil, resp.code)
+      end
+    end
+    
+    def get_event(collection)
+      return if(collection.itemUids.size==0)
+      eventUid = collection.randomItemUid
+      
+      resp = @calDavClient.get("#{@user}/#{collection.uid}/#{eventUid}.ics")
+      
+      if(resp.code==200)
+        @stats.reportStat(:calDavGet, true, resp.time, resp.data.length, nil, 200)
+      else
+        @stats.reportStat(:calDavGet, false, nil, nil, nil, resp.code)
       end
     end
     

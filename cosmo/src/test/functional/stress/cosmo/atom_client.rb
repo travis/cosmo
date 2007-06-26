@@ -57,6 +57,28 @@ module Cosmo
       end
     end
     
+    def getDashboardFeed(collection, triage_status="dashboard-now", format=nil)
+      @@log.debug "getDashboardFeed #{collection} begin"
+      @http.start do |http|
+        
+        if(format.nil?)
+          strRequest = "#{COL_PATH}collection/#{collection}/#{triage_status}"
+        else
+          strRequest = "#{COL_PATH}collection/#{collection}/#{triage_status}/#{format}"
+        end
+        
+        req = Net::HTTP::Get.new(strRequest)
+        http.read_timeout=600
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        resp, data = time_block { http.request(req) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "getDashboardFeed (#{triage_status}) for #{collection} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
+      end
+    end
+    
     def createEntry(collection, body)
       @@log.debug "post #{collection} begin"
       @http.start do |http|

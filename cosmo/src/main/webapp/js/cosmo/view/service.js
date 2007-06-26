@@ -428,7 +428,6 @@ cosmo.view.service = new function () {
      * @param qual String, flag for different variations of removing
      * recurring items. Will be one of the three recurringEventOptions.
      */
-     //XINT
     function removeItem(item, qual) {
         dojo.debug("remove Item: item: " +item);
         dojo.debug("qual: "+ qual);
@@ -553,8 +552,8 @@ cosmo.view.service = new function () {
         
         // Pass the original item and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function (newItemId, err) {
-            handleRemoveResult(item, newItemId, err, reqId, opts); 
+        var f = function () {
+            handleRemoveResult(item, deferred.results[1], reqId, opts); 
         };
         
         deferred.addCallback(f);
@@ -563,14 +562,12 @@ cosmo.view.service = new function () {
      * Handles the response from the async call when removing an item.
      * @param item A ListItem/CalItem object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
-     * @param newItemId String, FIXME -- Why is this included in Remove?
      * @param err A JS object, the error returned from the server when
      * a remove operation fails.
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
-    //XINT
-    function handleRemoveResult(item, newItemId, err, reqId, opts) {
+    function handleRemoveResult(item, err, reqId, opts) {
         var removeEv = item;
         // Simple error message to go along with details from Error obj
         var errMsg = _('Main.Error.EventRemoveFailed');

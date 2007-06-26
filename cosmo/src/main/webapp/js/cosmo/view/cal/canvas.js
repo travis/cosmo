@@ -561,9 +561,6 @@ cosmo.view.cal.canvas = new function () {
                 for (var n in opts) { _c[n] = opts[n]; }
                 _c.render();
                 break;
-            case 'eventsAddSuccess':
-                addSuccess(cmd.data);
-                break;
             case 'setSelected':
                 var ev = cmd.data;
                 setSelectedCalItem(ev);
@@ -773,14 +770,11 @@ cosmo.view.cal.canvas = new function () {
                 case (str.indexOf(',' + ev.data.getUid() + ',') > -1):
                     var eventStamp = ev.data.getEventStamp();
                     var startDate = eventStamp.getStartDate();
-                    var endDate = eventStamp.getEndDate();                    // If also filtering by date, check the start date of
+                    var endDate = eventStamp.getEndDate();                    
+                    // If also filtering by date, check the start date of
                     // matching events as well
                     if (compDt && (startDate.toUTC() < compDt.toUTC())) {
                         keep = true;
-                        // Reset the end date for the recurrence on the
-                        // events not removed
-                        ev.data.getEventStamp().getRrule().getEndDate() = new cosmo.datetime.Date(dt.getFullYear(),
-                            dt.getMonth(), dt.getDate());
                     }
                     break;
                 default:
@@ -989,172 +983,42 @@ cosmo.view.cal.canvas = new function () {
     }
 
     /**
-     * Handles a successful update of an event, for recurring
-     * events -- for:
-     * (1) Edits to an entire recurrence, 'All Events'
-     * (2) Breaking a recurrence and creating a new event,
-     * 'All Future Events' -- the new event may or may not
-     * have recurrence
-     * @param data JS Object, the data passed from the published
-     * 'success' event (data.idArr, the array of event ids to use
-     * for removing the recurrence instances; data.itemRegistry,
-     * the Hash of expanded events; data.saveEvent, the originally
-     * clicked-on event; data.opts, the JS Object of options that
-     * tells you what kind of save operation is happening)
-     */
-    function addSuccess(data) {
-        var idArr = data.idArr;
-        var evReg = data.eventRegistry;
-        var ev = data.saveEvent;
-        var opts = data.opts;
-        var h = null;
-        var idArr = [];
-
-        // Copy the eventRegistry to remove any recurrence
-        // instances associated with the edit
-        h = cosmo.view.cal.itemRegistry.clone();
-
-        // Splitting the recurrence, new event is set to frequency
-        // of 'once' -- just remove previous recurrence instances
-        // and keep original single lozenge for new event
-        if (opts.saveType == 'instanceAllFuture' &&
-            !ev.data.recurrenceRule) {
-            // Master recurrence event id
-            idArr.push(opts.masterEventDataId);
-            h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd, ev.id);
-            removeAllEvents();
-            cosmo.view.cal.itemRegistry = h;
-            cosmo.view.cal.itemRegistry.each(appendLozenge);
-        }
-        // Normal split where original and new are both recurring, or
-        // Change to master that just updates all of a single recurrence
-        else {
-            // 'All Future Events'
-            if (opts.saveType == 'instanceAllFuture') {
-                // Master recurrence event id
-                idArr.push(opts.instanceEvent.data.id);
-                // id for first event in new recurrence
-                idArr.push(ev.data.getUid());
-            }
-            // 'All Events'
-            else {
-                // Master recurrence id
-                idArr.push(ev.data.getUid());
-            }
-
-            // Remove some of all of the recurrence instances for re-render
-            // ----------------------
-            // 'All Events' -- remove all instances of the recurrence
-            if (opts.saveType == 'recurrenceMaster') {
-                // Before wiping, remember the position of the currently selected
-                // event. If the canvas renders immediately after this update,
-                // we need to keep the selection where it was.
-                var currSel = cosmo.view.cal.itemRegistry.getPos(self.getSelectedEvent().id);
-                h = removeEventRecurrenceGroup(h, idArr);
-            }
-            // 'All Future Events' -- remove instances appearing after the
-            // new end date
-            else if (opts.saveType == 'instanceAllFuture') {
-                h = removeEventRecurrenceGroup(h, idArr, opts.recurEnd);
-            }
-
-            // Remove the original clicked-on event -- the new master
-            // will be in the recurrence expansion from the server
-            // ----------------------
-            if (opts.saveType == 'instanceAllFuture' ||
-                opts.saveType == 'singleEventAddRecurrence') {
-                h.removeItem(opts.instanceEvent.id);
-            }
-            // Append the new recurrence expansions from the server
-            // onto the eventRegistry
-            h.append(evReg);
-            // Clear the canvas
-            removeAllEvents();
-            // Swap out the eventRegistry with the new one
-            cosmo.view.cal.itemRegistry = h;
-            // Stick all the event lozenges on the canvas
-            cosmo.view.cal.itemRegistry.each(appendLozenge);
-        }
-
-        // Repaint and restore selection if there are no
-        // more requests processing
-        if (!cosmo.view.service.processingQueue.length) {
-            updateEventsDisplay();
-            if (!cosmo.view.cal.lastSent) {
-                // ==========================================================
-                // Nasty, tricksy selection fu -- daily recurrence can have
-                // multiple events, but can't move off of their day
-                // weekly and above can move off their day, but will only
-                // have a single instance visible on the canvas
-                // 'instanceAllFuture' creates a new event that may or may
-                // not recur
-                // ==========================================================
-                // Either a master recurring or a recurring new event after
-                // breaking recurrence -- figuring selection is a party
-                var eventStamp = ev.data.getEventStamp();
-                var startDate = eventStamp.getStartDate();
-                var endDate = eventStamp.getEndDate();
-                var rrule = eventStamp.getRrule();
-                if (rrule) {
-                    ev = evReg.getAtPos(0);
-                    // If changing a recurrence-end results in the expansion
-                    // ending before the start of the orignal clicked instance,
-                    // lozenge selection needs to go somewhere
-                    if (opts.instanceEvent && ev.data.recurrenceRule.endDate &&
-                        (rrule.getEndDate().toUTC() <
-                            opts.instanceEvent.data.getEventStamp().getStartDate().toUTC())) {
-                        ev =  cosmo.view.cal.itemRegistry.getLast();
-                    }
-                    else {
-                        // Daily recurrence events
-                        if (rrule.getFrequency() == 'daily') {
-                            // Persist selection when editing an instance, and
-                            // selecting 'All Events'
-                            if (opts.saveType == 'recurrenceMaster' &&
-                                opts.instanceEvent && opts.instanceEvent.data.isInstance()) {
-                                ev = cosmo.view.cal.itemRegistry.getAtPos(currSel);
-                            }
-                            else {
-                                // Do nothing -- if original selection was on the master
-                                // event, selection just stays on the first item in the
-                                // recurrence expansion
-                            }
-                        }
-                    }
-                }
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                    'data': ev });
-            }
-            else {
-                dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                    'data': cosmo.view.cal.lastSent });
-            }
-        }
-    }
-    /**
      * Handles a successful removal of an event
      * @param ev CalItem object, the removed event
      * @param opts JS Object, options for the removal that
      * tell you what kind of remove is happening
      */
     function removeSuccess(ev, opts) {
-        if (opts && (opts.removeType == 'recurrenceMaster' ||
-            opts.removeType == 'instanceAllFuture')) {
-            var h = cosmo.view.cal.itemRegistry.clone();
-            var dt = null;
-            if (opts.removeType == 'instanceAllFuture') {
-                dt = opts.recurEnd;
-            }
-            h = removeEventRecurrenceGroup(h, [ev.data.id], dt);
-            removeAllEvents();
-            cosmo.view.cal.itemRegistry = h;
-            cosmo.view.cal.itemRegistry.each(appendLozenge);
-        }
-        else {
-            removeEvent(ev);
+        var OPTIONS = cosmo.view.service.recurringEventOptions;
+        var removeType = opts.removeType;
+        dojo.debug("removeSuccess, removeType: " + removeType);
+
+        switch(removeType){
+            case 'singleEvent':
+                removeEvent(ev);
+                break;
+            case OPTIONS.ALL_EVENTS:
+                var eventRegistry = cosmo.view.cal.itemRegistry.clone();
+                eventRegistry = filterOutRecurrenceGroup(eventRegistry, [ev.data.getUid()]);
+                removeAllEvents();
+                cosmo.view.cal.itemRegistry = eventRegistry;
+                cosmo.view.cal.itemRegistry.each(appendLozenge);
+                break;
+            case OPTIONS.ALL_FUTURE_EVENTS:
+                var eventRegistry = cosmo.view.cal.itemRegistry.clone();
+                eventRegistry = filterOutRecurrenceGroup(eventRegistry, [ev.data.getUid()],  
+                    ev.data.getEventStamp().getRrule().getEndDate());
+                removeAllEvents();
+                cosmo.view.cal.itemRegistry = eventRegistry;
+                cosmo.view.cal.itemRegistry.each(appendLozenge);
+                break;
+            case OPTIONS.ONLY_THIS_EVENT:
+                removeEvent(ev);
+                break;
         }
         updateEventsDisplay();
     }
+    
     /**
      * Single-clicks -- do event dispatch based on ID of event's
      * DOM-element source. Includes selecting/moving/resizing event lozenges

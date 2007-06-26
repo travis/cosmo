@@ -16,8 +16,13 @@
 package org.osaf.cosmo.service.impl;
 
 import java.security.MessageDigest;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
+
+import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.id.StringIdentifierGenerator;
@@ -29,13 +34,20 @@ import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.MessageStamp;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.TaskStamp;
+import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.account.AccountActivator;
 import org.osaf.cosmo.service.account.ActivationContext;
+import org.osaf.cosmo.util.DateUtil;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
 
@@ -153,16 +165,8 @@ public class StandardUserService implements UserService {
         User newUser = userDao.getUser(user.getUsername());
 
         HomeCollectionItem home = contentDao.createRootItem(newUser);
-        
-        CollectionItem collection = new CollectionItem();
-        String fullName = newUser.getFirstName() + " " + newUser.getLastName();
-        collection.setName(fullName);
-        collection.setOwner(user);
-        collection.setDisplayName(fullName);
-        CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
-        collection.addStamp(ccs);
-        
-        contentDao.createCollection(home, collection);
+
+        createOutOfTheBoxStuff(home);
 
         return newUser;
     }
@@ -460,5 +464,166 @@ public class StandardUserService implements UserService {
         HomeCollectionItem home = contentDao.getRootItem(user);
         contentDao.removeCollection(home);
         userDao.removeUser(user);
+    }
+
+    private void createOutOfTheBoxStuff(HomeCollectionItem home) {
+        CollectionItem initial =
+            contentDao.createCollection(home,
+                                        makeInitialCollection(home.getOwner()));
+
+        contentDao.createContent(initial, makeWelcomeItem(home.getOwner()));
+        contentDao.createContent(initial, makeTryOutItem(home.getOwner()));
+        contentDao.createContent(initial, makeSubscribeItem(home.getOwner()));
+        contentDao.createContent(initial, makeSignUpItem(home.getOwner()));
+    }
+
+    private CollectionItem makeInitialCollection(User owner) {
+        CollectionItem collection = new CollectionItem();
+
+        // XXX i18n
+
+        String fullName = owner.getFirstName() + " " + owner.getLastName();
+        collection.setName(fullName);
+        collection.setDisplayName(collection.getName());
+        collection.setOwner(owner);
+
+        CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+        collection.addStamp(ccs);
+
+        return collection;
+    }
+
+    private NoteItem makeWelcomeItem(User owner) {
+        NoteItem item = new NoteItem();
+
+        // XXX i18n
+        // XXX timezone
+
+        item.setUid(contentDao.generateUid());
+        item.setName("Welcome to Chandler Server");
+        item.setDisplayName(item.getName());
+        item.setOwner(owner);
+        item.setClientCreationDate(Calendar.getInstance().getTime());
+        item.setClientModifiedDate(item.getClientCreationDate());
+        item.setTriageStatus(TriageStatus.createInitialized());
+        item.setLastModifiedBy(item.getOwner().getUsername());
+        item.setLastModification(ContentItem.Action.CREATED);
+        item.setSent(Boolean.FALSE);
+        item.setNeedsReply(Boolean.FALSE);
+        item.setIcalUid(item.getUid());
+        item.setBody("<INSERT COPY FROM SHEILA>");
+
+        Calendar start = Calendar.getInstance();
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+
+        EventStamp es = new EventStamp();
+        item.addStamp(es);
+        es.createCalendar();
+        es.setStartDate(Dates.getInstance(start.getTime(), Value.DATE_TIME));
+        es.setDuration(new Dur(0, 1, 0, 0));
+
+        TaskStamp ts = new TaskStamp();
+        item.addStamp(ts);
+
+        MessageStamp ms = new MessageStamp();
+        item.addStamp(ms);
+        ms.setFrom("OSAF");
+        ms.setTo(item.getOwner().getUsername());
+        ms.setOriginators("OSAF");
+        ms.setDateSent(DateUtil.formatDate(MessageStamp.FORMAT_DATE_SENT,
+                                           item.getClientCreationDate()));
+
+        return item;
+    }
+
+    private NoteItem makeTryOutItem(User owner) {
+        NoteItem item = new NoteItem();
+
+        // XXX i18n
+        // XXX timezone
+
+        item.setUid(contentDao.generateUid());
+        item.setName("Try out Chandler Desktop");
+        item.setDisplayName(item.getName());
+        item.setOwner(owner);
+        item.setClientCreationDate(Calendar.getInstance().getTime());
+        item.setClientModifiedDate(item.getClientCreationDate());
+        item.setTriageStatus(TriageStatus.createInitialized());
+        item.setLastModifiedBy(item.getOwner().getUsername());
+        item.setLastModification(ContentItem.Action.CREATED);
+        item.setSent(Boolean.FALSE);
+        item.setNeedsReply(Boolean.FALSE);
+        item.setIcalUid(item.getUid());
+        item.setBody("<INSERT PRODUCT DESCRIPTION>\n<INSERT DOWNLOAD LINK>");
+
+        Calendar start = Calendar.getInstance();
+        start.add(Calendar.DAY_OF_MONTH, 1);
+        start.add(Calendar.HOUR_OF_DAY, 10);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+
+        EventStamp es = new EventStamp();
+        item.addStamp(es);
+        es.createCalendar();
+        es.setStartDate(Dates.getInstance(start.getTime(), Value.DATE_TIME));
+        es.setDuration(new Dur(0, 1, 0, 0));
+
+        TaskStamp ts = new TaskStamp();
+        item.addStamp(ts);
+
+        return item;
+    }
+
+    private NoteItem makeSubscribeItem(User owner) {
+        NoteItem item = new NoteItem();
+
+        // XXX i18n
+
+        TriageStatus triage = TriageStatus.createInitialized();
+        triage.setCode(TriageStatus.CODE_LATER);
+
+        item.setUid(contentDao.generateUid());
+        item.setName("Subscribe to a Chandler Desktop Collection");
+        item.setDisplayName(item.getName());
+        item.setOwner(owner);
+        item.setClientCreationDate(Calendar.getInstance().getTime());
+        item.setClientModifiedDate(item.getClientCreationDate());
+        item.setTriageStatus(triage);
+        item.setLastModifiedBy(item.getOwner().getUsername());
+        item.setLastModification(ContentItem.Action.CREATED);
+        item.setSent(Boolean.FALSE);
+        item.setNeedsReply(Boolean.FALSE);
+        item.setIcalUid(item.getUid());
+        item.setBody("Use the Dashboard and Calendar to manage notes, tasks, and events with others.");
+
+        return item;
+    }
+
+    private NoteItem makeSignUpItem(User owner) {
+        NoteItem item = new NoteItem();
+
+        // XXX i18n
+
+        TriageStatus triage = TriageStatus.createInitialized();
+        triage.setCode(TriageStatus.CODE_DONE);
+
+        item.setUid(contentDao.generateUid());
+        item.setName("Sign up for a Chandler Server account");
+        item.setDisplayName(item.getName());
+        item.setOwner(owner);
+        item.setClientCreationDate(Calendar.getInstance().getTime());
+        item.setClientModifiedDate(item.getClientCreationDate());
+        item.setTriageStatus(triage);
+        item.setLastModifiedBy(item.getOwner().getUsername());
+        item.setLastModification(ContentItem.Action.CREATED);
+        item.setSent(Boolean.FALSE);
+        item.setNeedsReply(Boolean.FALSE);
+        item.setIcalUid(item.getUid());
+
+        TaskStamp ts = new TaskStamp();
+        item.addStamp(ts);
+
+        return item;
     }
 }

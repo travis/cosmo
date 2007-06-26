@@ -211,4 +211,10 @@ public interface ItemDao extends Dao {
      * @return set of items matching any of the filters
      */
     public Set<Item> findItems(ItemFilter[] filters);
+
+    /**
+     * Generates a unique ID. Provided for consumers that need to
+     * manipulate an item's UID before creating the item.
+     */
+    public String generateUid();
 }

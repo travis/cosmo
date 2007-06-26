@@ -381,6 +381,10 @@ public class MockItemDao implements ItemDao {
         return null;
     }
 
+    public String generateUid() {
+        return storage.calculateUid();
+    }
+
     // Dao methods
     /**
      * Initializes the DAO, sanity checking required properties

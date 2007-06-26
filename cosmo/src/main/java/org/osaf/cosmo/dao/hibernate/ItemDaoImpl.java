@@ -470,6 +470,13 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         }
     }
 
+    /**
+     * Generates a unique ID. Provided for consumers that need to
+     * manipulate an item's UID before creating the item.
+     */
+    public String generateUid() {
+        return idGenerator.nextIdentifier().toString();
+    }
 
     /**
      * Set the unique ID generator for new items
@@ -614,7 +621,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected Item findItemByDbId(Long dbId) {
         return (Item) getSession().get(Item.class, dbId);
     }
-
 
     // Set server generated item properties
     protected void setBaseItemProps(Item item) {

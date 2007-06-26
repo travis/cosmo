@@ -251,7 +251,7 @@ public class MockDaoStorage {
         return getItemPath(getItemByUid(uid));
     }
 
-    private String calculateUid() {
+    public String calculateUid() {
         return idGenerator.nextStringIdentifier();
     }
 

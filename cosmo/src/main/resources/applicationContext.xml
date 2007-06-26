@@ -327,7 +327,9 @@
     <property name="messageSource">
       <ref local="messageSource" />
     </property>
-
+    <property name="required">
+        <value>${cosmo.service.account.requireActivation}</value>
+    </property>
   </bean>
   
   <bean id="passwordRecoverer"
@@ -372,12 +374,6 @@
     </property>
     <property name="passwordGenerator">
       <ref bean="passwordGenerator"/>
-    </property>
-    <property name="accountActivator">
-      <ref bean="accountActivator"/>
-    </property>
-    <property name="accountActivationRequired">
-        <value>${cosmo.service.account.requireActivation}</value>
     </property>
   </bean>
 

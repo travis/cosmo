@@ -18,16 +18,15 @@ package org.osaf.cosmo.service.account;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.User;
 
-public abstract class AbstractCosmoAccountActivator implements
-        AccountActivator {
+public abstract class AbstractCosmoAccountActivator
+    implements AccountActivator {
 
     private UserDao userDao;
+    private boolean required;
 
-    public void setUserDao(UserDao userDao){
-        this.userDao = userDao;
-    }
+    // AccountActivator methods
 
-    /**
+/**
      * Given an activation token, look up and return a user.
      *
      * @param activationToken
@@ -36,5 +35,26 @@ public abstract class AbstractCosmoAccountActivator implements
      */
     public User getUserFromToken(String activationToken){
         return this.userDao.getUserByActivationId(activationToken);
+    }
+
+    /**
+     * Determines whether or not activation is required.
+     */
+    public boolean isRequired() {
+        return required;
+    }
+
+    // our methods
+
+    public UserDao getUserDao() {
+        return userDao;
+    }
+
+    public void setUserDao(UserDao userDao){
+        this.userDao = userDao;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }

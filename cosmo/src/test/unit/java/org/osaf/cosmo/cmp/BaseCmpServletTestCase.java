@@ -58,6 +58,9 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
         SingleVMLockManager lockManager = new SingleVMLockManager();
+        AutomaticAccountActivator accountActivator =
+            new AutomaticAccountActivator();
+        accountActivator.setUserDao(userDao);
         MockPasswordRecoverer passwordRecoverer = 
             new MockPasswordRecoverer();
 
@@ -80,6 +83,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         servlet.setContentService(contentService);
         servlet.setUserService(userService);
         servlet.setSecurityManager(getSecurityManager());
+        servlet.setAccountActivator(accountActivator);
         servlet.setPasswordRecoverer(passwordRecoverer);
         servlet.init(getServletConfig());
     }

@@ -51,7 +51,10 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.OverlordDeletionException;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.service.ServiceListener;
+import org.osaf.cosmo.service.account.AccountActivator;
 import org.osaf.cosmo.service.account.ActivationContext;
+import org.osaf.cosmo.service.account.ActivationListener;
 import org.osaf.cosmo.service.account.PasswordRecoveryMessageContext;
 import org.osaf.cosmo.service.account.PasswordRecoverer;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -99,6 +102,8 @@ public class CmpServlet extends HttpServlet {
         "serviceLocatorFactory";
     private static final String BEAN_SECURITY_MANAGER =
         "securityManager";
+    private static final String BEAN_ACCOUNT_ACTIVATOR =
+        "accountActivator";
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
@@ -112,6 +117,8 @@ public class CmpServlet extends HttpServlet {
     private ServiceLocatorFactory serviceLocatorFactory;
     private CosmoSecurityManager securityManager;
     private PasswordRecoverer passwordRecoverer;
+    private AccountActivator accountActivator;
+
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
      * and wires up dependencies. If no
@@ -140,10 +147,12 @@ public class CmpServlet extends HttpServlet {
                 serviceLocatorFactory = (ServiceLocatorFactory)
                     getBean(BEAN_SERVICE_LOCATOR_FACTORY,
                             ServiceLocatorFactory.class);
+            if (accountActivator == null)
+                accountActivator = (AccountActivator)
+                    getBean(BEAN_ACCOUNT_ACTIVATOR, AccountActivator.class);
             if (passwordRecoverer == null)
                 passwordRecoverer = (PasswordRecoverer)
-                    getBean(BEAN_PASSWORD_RECOVERER,
-                            PasswordRecoverer.class);
+                    getBean(BEAN_PASSWORD_RECOVERER, PasswordRecoverer.class);
         }
 
         if (contentService == null)
@@ -152,6 +161,8 @@ public class CmpServlet extends HttpServlet {
             throw new ServletException("user service must not be null");
         if (securityManager == null)
             throw new ServletException("security manager must not be null");
+        if (accountActivator == null)
+            throw new ServletException("account activator must not be null");
         if (passwordRecoverer == null)
             throw new ServletException("password recoverer must not be null");
     }
@@ -421,6 +432,14 @@ public class CmpServlet extends HttpServlet {
      */
     public void setServiceLocatorFactory(ServiceLocatorFactory factory) {
         this.serviceLocatorFactory = factory;
+    }
+
+    public AccountActivator getAccountActivator() {
+        return accountActivator;
+    }
+
+    public void setAccountActivator(AccountActivator activator) {
+        this.accountActivator = activator;
     }
     
     public PasswordRecoverer getPasswordRecoverer() {
@@ -799,7 +818,9 @@ public class CmpServlet extends HttpServlet {
             User user = resource.getUser();
             user.setAdmin(Boolean.FALSE);
             user.setLocked(Boolean.FALSE);
-            user = userService.createUser(user, createActivationContext(req));
+            ActivationListener listener = createActivationListener(req);
+            user = userService.createUser(user,
+                                          new ServiceListener[] { listener });
             resource = new UserResource(user, getUrlBase(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
@@ -899,7 +920,8 @@ public class CmpServlet extends HttpServlet {
                                "Username does not match request URI");
                 return;
             }
-            userService.createUser(user, createActivationContext(req));
+            ActivationListener listener = createActivationListener(req);
+            userService.createUser(user, new ServiceListener[] { listener });
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {
@@ -1176,8 +1198,8 @@ public class CmpServlet extends HttpServlet {
         }
         return buf.toString();
     }
-    
-    private ActivationContext createActivationContext(HttpServletRequest req) {
+
+    private ActivationListener createActivationListener(HttpServletRequest req) {
         ActivationContext activationContext = new ActivationContext();
         String urlBase = getUrlBase(req);
         activationContext.setLocale(req.getLocale());
@@ -1185,7 +1207,10 @@ public class CmpServlet extends HttpServlet {
                 urlBase+ "/account/activate/" + "{" + 
                 ActivationContext.LINK_TEMPLATE_VAR_ACTIVATION_ID + "}");
         activationContext.setHostname(urlBase);
-        return activationContext;
+        activationContext.
+            setSender(userService.getUser(User.USERNAME_OVERLORD));
+
+        return new ActivationListener(accountActivator, activationContext);
     }
     
     private PasswordRecoveryMessageContext 

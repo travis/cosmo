@@ -44,5 +44,8 @@ public interface AccountActivator extends Service {
      */
     public User getUserFromToken(String activationToken);
 
-
+    /**
+     * Determines whether or not activation is required.
+     */
+    public boolean isRequired();
 }

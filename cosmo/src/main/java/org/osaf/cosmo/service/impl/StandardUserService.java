@@ -44,9 +44,9 @@ import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.OverlordDeletionException;
+import org.osaf.cosmo.service.ServiceEvent;
+import org.osaf.cosmo.service.ServiceListener;
 import org.osaf.cosmo.service.UserService;
-import org.osaf.cosmo.service.account.AccountActivator;
-import org.osaf.cosmo.service.account.ActivationContext;
 import org.osaf.cosmo.util.DateUtil;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
@@ -54,7 +54,7 @@ import org.osaf.cosmo.util.PageCriteria;
 /**
  * Standard implementation of {@link UserService}.
  */
-public class StandardUserService implements UserService {
+public class StandardUserService extends BaseService implements UserService {
     private static final Log log = LogFactory.getLog(StandardUserService.class);
 
     /**
@@ -67,9 +67,6 @@ public class StandardUserService implements UserService {
     private StringIdentifierGenerator passwordGenerator;
     private ContentDao contentDao;
     private UserDao userDao;
-
-    private AccountActivator accountActivator;
-    private boolean accountActivationRequired;
 
     // UserService methods
 
@@ -152,6 +149,22 @@ public class StandardUserService implements UserService {
      * email address is already in use
      */
     public User createUser(User user) {
+        return createUser(user, new ServiceListener[] {});
+    }
+
+    /**
+     * Creates a user account in the repository as per
+     * {@link #createUser(User)}. Sends the <code>CREATE_USER</code>
+     * event to each provided listener, providing the newly created
+     * user and home collection as state.
+     *
+     * @param user the account to create
+     * @param listeners an array of listeners to notify
+     * @throws DataIntegrityViolationException if the username or
+     * email address is already in use
+     */
+    public User createUser(User user,
+                           ServiceListener[] listeners) {
         if (log.isDebugEnabled())
             log.debug("creating user " + user.getUsername());
 
@@ -161,35 +174,16 @@ public class StandardUserService implements UserService {
         user.setDateCreated(new Date());
         user.setDateModified(user.getDateCreated());
 
+        fireBeforeEvent(new ServiceEvent("CREATE_USER", user), listeners);
+
         userDao.createUser(user);
         User newUser = userDao.getUser(user.getUsername());
 
         HomeCollectionItem home = contentDao.createRootItem(newUser);
 
+        fireAfterEvent(new ServiceEvent("CREATE_USER", user, home), listeners);
+
         createOutOfTheBoxStuff(home);
-
-        return newUser;
-    }
-
-    public User createUser(User user, ActivationContext activationContext) {
-        activationContext.setSender(
-                this.getUser(User.USERNAME_OVERLORD));
-        
-        boolean accountActivationRequired =
-            (!user.isOverlord() &&
-             (this.accountActivator != null) &&
-             this.isAccountActivationRequired() &&
-             activationContext.isActivationRequired());
-
-        if (accountActivationRequired){
-            user.setActivationId(
-                    this.accountActivator.generateActivationToken());
-        }
-        User newUser = createUser(user);
-
-        if (accountActivationRequired){
-            accountActivator.sendActivationMessage(newUser, activationContext);
-        }
 
         return newUser;
     }
@@ -392,10 +386,6 @@ public class StandardUserService implements UserService {
         this.passwordGenerator = generator;
     }
 
-    public void setAccountActivator(AccountActivator accountActivator){
-        this.accountActivator = accountActivator;
-    }
-
     /**
      */
     public ContentDao getContentDao() {
@@ -418,14 +408,6 @@ public class StandardUserService implements UserService {
      */
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
-    }
-
-    public boolean isAccountActivationRequired() {
-        return accountActivationRequired;
-    }
-
-    public void setAccountActivationRequired(boolean accountActivationRequired) {
-        this.accountActivationRequired = accountActivationRequired;
     }
 
     public PasswordRecovery getPasswordRecovery(String key) {

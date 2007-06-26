@@ -49,7 +49,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     urlNameHash: {
         "edit": "atom-edit",
         "self": "self", 
-        "alternate": "alternate", 
+        "alternate": "pim", 
         "morse code": "mc", 
         "dav": "dav",
         "webcal": "webcal"

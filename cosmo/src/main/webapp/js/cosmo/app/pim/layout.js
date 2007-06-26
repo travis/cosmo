@@ -326,10 +326,9 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
             // option is not the one selected
             var sel = e.target;
             if (sel.selectedIndex != 0) {
-            //XINT
             cosmo.app.showDialog(
                 cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                    self.currentCollection.collection,
+                    cosmo.app.pim.currentCollection,
                     sel.options[sel.selectedIndex].value));
             }
         };

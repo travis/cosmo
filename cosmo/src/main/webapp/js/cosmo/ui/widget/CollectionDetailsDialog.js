@@ -21,6 +21,7 @@ dojo.require("dojo.html.common");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
@@ -85,7 +86,8 @@ dojo.widget.HtmlWidget, function(){
             Chandler: "mc",
             iCal: "webcal",
             FeedReader: "atom",
-            Download: "webcal"
+            Download: "webcal",
+            Pim: "pim"
         },
         
         protocolUrls: null,
@@ -96,13 +98,18 @@ dojo.widget.HtmlWidget, function(){
            this.protocolUrls = ((this.collection instanceof cosmo.model.Subscription)? 
                                 this.collection.getCollection().getUrls() : this.collection.getUrls());
            this.displayName = this.collection.getDisplayName();
+           this.saveable = this.isCollectionSaveable(this.collection);
+        },
+        
+        isCollectionSaveable: function(/*cosmo.model.[Collection|Subscription]*/collection){
+           return (collection instanceof cosmo.model.Collection && collection.isWriteable())
         },
         
         fillInTemplate: function () {
            var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
            cosmo.util.html.setSelectOptions(this.clientSelector, options);
 
-           if (true /*XINT figure out when to not be able to save */){
+           if (this.saveable){
                this.collectionNameInputSpan.style.display = "";
            } else {
                this.collectionNameText.style.display = "";
@@ -116,7 +123,7 @@ dojo.widget.HtmlWidget, function(){
 
            // Show the selection choice if passed from the selector in
            // ticket view -- otherwise default to 'Chandler'
-           var selectedIndex =0
+           var selectedIndex = 0;
            if (this.displayedSelection) {
                selectedIndex = cosmo.ui.widget.CollectionDetailsDialog.clientMappings[
                    this.displayedSelection];
@@ -131,18 +138,16 @@ dojo.widget.HtmlWidget, function(){
            this._handleClientChanged();
         },
 
-        //XINT
         saveDisplayName: function(){
-            //this.conduit.saveDisplayName(this.calendar.uid, this._getDisplayName(), this.transportInfo);
+            this.collection.setDisplayName(this._getDisplayName());
+            cosmo.app.pim.serv.saveCollection(this.collection);
             //TODO - This should not here. The publishing should happen at the service level,
             //otherwise everyone who wants to user a service level method has to publish. Hard to do right
             //now with current RPC setup
-            if (this.transportInfo instanceof cosmo.model.Subscription){
-                 this.transportInfo.displayName = this._getDisplayName();
-                 cosmo.topics.publish(cosmo.topics.SubscriptionUpdatedMessage,[this.transportInfo]);
+            if (this.collection instanceof cosmo.model.Subscription){
+                 cosmo.topics.publish(cosmo.topics.SubscriptionUpdatedMessage,[this.collection]);
             } else {
-                 this.calendar.name = this._getDisplayName();
-                 cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage,[this.calendar]);
+                 cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage,[this.collection]);
             }
         },
 
@@ -252,8 +257,7 @@ dojo.widget.HtmlWidget, function(){
     btnsRight.push(closeButton);
     dummyNode.removeChild(closeButton.domNode);
 
-    //XINT figure out when save button should be shown/not shown
-    if (true){
+    if (this.saveable){
         var saveButton = dojo.widget.createWidget(
                         "cosmo:Button",
                         { text: _("Main.CollectionDetails.Save"),

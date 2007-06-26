@@ -310,8 +310,6 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         }
     };
 
-    //XINT
-    //TODO
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
         var filteredSubscriptions = dojo.lang.filter(subscriptions,

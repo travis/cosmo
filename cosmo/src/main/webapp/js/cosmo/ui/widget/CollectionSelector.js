@@ -294,7 +294,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var updatedCollection = message.collection;
             for (var x = 0; x < this.collections.length;x++){
                 var collection = this.collections[x];
-                if (collection.getUid() = updatedCollection.getUid()){
+                if (collection.getUid() == updatedCollection.getUid()){
                     if (collection instanceof cosmo.model.Subscription){
                         collection.setCollection(updatedCollection);
                     } else {

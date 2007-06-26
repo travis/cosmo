@@ -150,6 +150,7 @@ cosmo.view.list.createItemRegistry = function (arrParam) {
         var note = arr[i];
         var id = note.getUid();
         var item = new cosmo.view.list.ListItem();
+        item.id = id;
         item.data = note;
         // Precalculate values used for sort/display
         // to avoid doing the same calculations twice
@@ -216,6 +217,7 @@ cosmo.view.list.createNoteItem = function (s) {
     else {
         var note = new cosmo.model.Note();
         var id = note.getUid();
+        item.id = id;
         note.setDisplayName(title);
         note.setBody('');
         //normally the delta does the autotriaging, but since this is a new event

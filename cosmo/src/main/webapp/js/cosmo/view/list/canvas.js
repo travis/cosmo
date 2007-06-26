@@ -27,15 +27,21 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 
-dojo.lang.mixin(cosmo.view.list.canvas, cosmo.view.canvasBase);
 
 cosmo.view.list.canvas.Canvas = function (p) {
     var self = this;
     var params = p || {};
+
+    dojo.lang.mixin(this, cosmo.view.canvasBase);
+
     this.domNode = null;
     this.id = '';
-    this.currSelectedId = '';
-    this.currSelectedItem = null;
+    this.view = cosmo.view.list;
+    //this.currSelectedId = '';
+    // UIDs for selected events keyed by the uid of
+    // the currently displayed collection
+    this.selectedEventIdRegistry = {};
+    //this.currSelectedItem = null;
     this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';
     this.itemsPerPage = 20;
@@ -78,9 +84,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
         cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
         this.displayTable();
-        if (this.currSelectedItem) {
+        var sel = this.getSelectedEvent();
+        if (sel) {
             cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.updateFromItem(
-                this.currSelectedItem);
+                sel);
         }
 
     }
@@ -99,7 +106,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (e && e.target) {
             // get the UID from the row's DOM node id
             var p = e.target.parentNode;
-            if (!p.id || (p.id ==  self.currSelectedId)) { return false; }
+            if (!p.id || (p.id ==  'listView_item' + self.getSelectedEventId())) { return false; }
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
                 ch[i].className = 'listViewDataCell';
@@ -118,7 +125,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 var p = targ.parentNode;
                 if (!p.id) { return false; }
                 // Deselect any original selection
-                var orig = $(self.currSelectedId);
+                var orig = $('listView_item' + self.getSelectedEventId());
                 if (orig) {
                     ch = orig.childNodes;
                     for (var i = 0; i < ch.length; i++) {
@@ -126,18 +133,22 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     }
                 }
                 // The new selection
-                self.currSelectedId = p.id;
                 var ch = p.childNodes;
                 for (var i = 0; i < ch.length; i++) {
                     ch[i].className = 'listViewDataCell listViewSelectedCell';
                 }
                 var id = p.id.replace('listView_item', '');
-                var item = cosmo.view.list.itemRegistry.getItem(id);
+                var item = this.view.itemRegistry.getItem(id);
                 // Load the selected item's stuff into the detail-view form
                 if (item) {
-                    self.currSelectedItem = item;
-                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                    self.setSelectedEvent(item);
+                    var f = function () {
+                      dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                         'data': item });
+                    };
+                    // Free up the UI thread so we don't see two items
+                    // selected at once while the detail view is being populated
+                    setTimeout(f, 0);
                 }
             }
         }
@@ -147,6 +158,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.displayTable = function () {
         var _list = cosmo.view.list;
         var hash = _list.itemRegistry;
+        var selId = 'listView_item' + self.getSelectedEventId();
         var map = cosmo.view.list.triageStatusCodeNumberMappings;
         var t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">';
         var r = '';
@@ -161,7 +173,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var getRow = function (key, val) {
             var item = val;
             var display = item.display;
-            var selCss = 'listView_item' + display.uid == self.currSelectedId ? ' listViewSelectedCell' : '';
+            var selCss = 'listView_item' + display.uid == selId ? ' listViewSelectedCell' : '';
             var updatedBy = '';
             r = '';
             r += '<tr id="listView_item' + display.uid + '">';

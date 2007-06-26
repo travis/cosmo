@@ -51,12 +51,16 @@ cosmo.view.cal.canvas = new function () {
     // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
     var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
 
+    dojo.lang.mixin(this, cosmo.view.canvasBase);
+
     // Public props
     // ****************
     // Width of day col in week view, width of event lozenges --
     // Calc'd based on client window size
     // Other pieces of the app use this, so make it public
     this.dayUnitWidth = 0;
+    // Set this value from the view
+    this.view = cosmo.view.cal;
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
     this.selectedEventIdRegistry = {};
@@ -1363,8 +1367,6 @@ cosmo.view.cal.canvas = new function () {
     };
 }
 
-dojo.lang.mixin(cosmo.view.cal.canvas, cosmo.view.canvasBase);
-
 cosmo.view.cal.canvas.Canvas = function (p) {
     var self = this;
     var params = p || {}
@@ -1375,9 +1377,9 @@ cosmo.view.cal.canvas.Canvas = function (p) {
     this.currDate = null;
     for (var n in params) { this[n] = params[n]; }
     this.renderSelf = function () {
-        
+
         if (!cosmo.view.cal.isCurrentView()) { return false; }
-        
+
         this.width = this.parent.width;
         this.height = this.parent.height;
         this.domNode.style.position = 'absolute';

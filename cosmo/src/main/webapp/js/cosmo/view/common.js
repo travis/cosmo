@@ -28,7 +28,7 @@ cosmo.view.canvasBase = new function () {
     this.getSelectedEvent = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         var id = this.selectedEventIdRegistry[key];
-        return cosmo.view.cal.itemRegistry.getItem(id);
+        return this.view.itemRegistry.getItem(id);
     };
     this.setSelectedEvent = function (ev) {
         var key = cosmo.app.pim.currentCollection.getUid();
@@ -40,5 +40,10 @@ cosmo.view.canvasBase = new function () {
         this.selectedEventIdRegistry[key] = '';
         return true;
     };
+    this.getSelectedEventId = function () {
+        var key = cosmo.app.pim.currentCollection.getUid();
+        var id = this.selectedEventIdRegistry[key];
+        return id;
+    }
 };
 

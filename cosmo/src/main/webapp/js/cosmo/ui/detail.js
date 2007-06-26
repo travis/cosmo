@@ -332,7 +332,6 @@ cosmo.ui.detail.MarkupBar = function (p) {
                         _("Sidebar.Email.Description") , data.getBody(), "%0d%0a"]);
                 }
                 var s = "mailto:?subject=" + subject + "&body=" + body.join("");
-                console.log(s);
                 location = s;
             };
 

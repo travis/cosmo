@@ -36,7 +36,6 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.service.exception");
 
@@ -46,8 +45,11 @@ cosmo.ui.minical.MiniCal = function (p) {
     var self = this;
     // Initialize these to the start/ends of the
     // viewable span in the calendar canvas
-    var viewStart = cosmo.view.cal.viewStart;
-    var viewEnd = cosmo.view.cal.viewEnd;
+    // after init these vals will always be passed in
+    // in the opts obj in the published message
+    var defaultDate = cosmo.app.pim.currDate;
+    var viewStart = cosmo.datetime.util.getWeekStart(defaultDate);
+    var viewEnd = cosmo.datetime.util.getWeekEnd(defaultDate);
 
     /** helper method to pull day data. This is a cleaner implementation
      * when we start rendering busybars.
@@ -568,7 +570,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         var viewEndMonth = viewEnd.getMonth();
         var isStartDateMonthRendered = !isNaN(self.monthMappings[viewStartMonth]);
         var isEndDateMonthRendered = !isNaN(self.monthMappings[viewEndMonth]);
-        var crossMonth = dt.getDate() > cosmo.view.cal.viewEnd.getDate();
+        var crossMonth = dt.getDate() > viewEnd.getDate();
         var monIndex =  null;
         var idPrefix = self.id + '_month';
 
@@ -592,7 +594,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             var datIndex = 0;
             var idStr = '';
             var selDiv = null;
-            while (dt <= cosmo.view.cal.viewEnd) {
+            while (dt <= viewEnd) {
                 idSuffix = dt.getDate() <
                     viewStart.getDate() ? suffA : suffB;
                 datIndex = dt.getDate();

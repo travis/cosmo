@@ -30,7 +30,6 @@ dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
-dojo.require('cosmo.view.cal.common');
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.uri');
 dojo.require('cosmo.service.conduits.common');
@@ -106,7 +105,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Localized date strings
         this.loadLocaleDateInfo();
         // Tell the calendar view what week we're on
-        cosmo.view.cal.setQuerySpan(this.currDate)
+        //cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
         this.loadCollections(params);
 
@@ -114,7 +113,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // ===============================
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
         this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
-
+        // Display the default view
         this.baseLayout.mainApp.centerColumn.navBar.displayView(this.currentView);
 
         // Show errors for deleted subscriptions -- deletedSubscriptions

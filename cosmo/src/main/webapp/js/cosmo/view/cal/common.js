@@ -29,11 +29,16 @@ dojo.require("cosmo.service.exception");
 
 dojo.require("cosmo.util.debug");
 
+dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
+
 // Subscribe to the '/calEvent' channel
 dojo.event.topic.subscribe('/calEvent', cosmo.view.cal, 'handlePub_calEvent');
 // Subscribe to the '/app' channel
 dojo.event.topic.subscribe('/app', cosmo.view.cal, 'handlePub_app');
 
+cosmo.view.cal.viewId = cosmo.app.pim.views.CAL;
+cosmo.view.cal.viewStart = null;
+cosmo.view.cal.viewEnd = null;
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.cal.itemRegistry = null;
 
@@ -169,11 +174,12 @@ cosmo.view.cal.triggerLoadEvents = function (o) {
  * @return Boolean, true
  */
 cosmo.view.cal.loadEvents = function (o) {
-    var opts = o;
+    var opts = o || {};
+    var _cal = cosmo.view.cal; // Scope-ness
     // Default to the app's currentCollection if one isn't passed
     var collection = opts.collection || cosmo.app.pim.currentCollection;
-    var start = opts.viewStart;
-    var end = opts.viewEnd;
+    var start = null;
+    var end = null;
     var eventLoadList = null;
     var eventLoadHash = new Hash();
     var isErr = false;
@@ -181,6 +187,18 @@ cosmo.view.cal.loadEvents = function (o) {
     var evData = null;
     var id = '';
     var ev = null;
+
+    // If nothing explicit is passed for the query time-bounds,
+    // initialize viewStart and viewEnd to the current week
+    if (!opts.viewStart || !opts.viewEnd) {
+        _cal.setQuerySpan(cosmo.app.pim.currDate);
+        opts.viewStart = _cal.viewStart;
+        opts.viewEnd = _cal.viewEnd;
+    }
+
+    start = opts.viewStart;
+    end = opts.viewEnd;
+
     var showErr = function (e) {
         cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
     };
@@ -251,7 +269,6 @@ cosmo.view.cal.createEventRegistry = function(arrParam) {
 }
 /**
  * Get the start and end for the span of time to view in the cal
- * Eventually this will change depending on what type of view is selected
  */
 cosmo.view.cal.setQuerySpan = function (dt) {
     this.viewStart = cosmo.datetime.util.getWeekStart(dt);
@@ -277,10 +294,6 @@ cosmo.view.cal.getNewViewStart = function (key) {
     queryDate = cosmo.datetime.Date.add(this.viewStart,
         dojo.date.dateParts.WEEK, incr);
     return queryDate;
-};
-
-cosmo.view.cal.isCurrentView = function () {
-    return (cosmo.app.pim.currentView == cosmo.app.pim.views.CAL);
 };
 
 

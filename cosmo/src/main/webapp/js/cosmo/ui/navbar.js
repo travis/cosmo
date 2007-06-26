@@ -103,8 +103,7 @@ cosmo.ui.navbar.Bar = function (p) {
         }
         else if (v == _pim.views.CAL) {
             // Only switch views if the data for the view loads successfully
-            if (cosmo.view.cal.loadEvents({ viewStart: cosmo.view.cal.viewStart, 
-                viewEnd: cosmo.view.cal.viewEnd })) {
+            if (cosmo.view.cal.loadEvents()) {
                 self.listCanvas.domNode.style.display = 'none';
                 self.calCanvas.domNode.style.display = 'block';
                 cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();

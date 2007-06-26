@@ -33,6 +33,7 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
+dojo.require("cosmo.view.common");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.view.cal.common");
 dojo.require('cosmo.view.cal.lozenge');
@@ -438,25 +439,6 @@ cosmo.view.cal.canvas = new function () {
         // Subtract height of navbar -- this lives outside the cal view
         top -=  CAL_TOP_NAV_HEIGHT;
         return top;
-    };
-    /**
-     * Get the currently selected event
-     * @return CalItem object, the currently selected event
-     */
-    this.getSelectedEvent = function () {
-        var key = cosmo.app.pim.currentCollection.getUid();
-        var id = self.selectedEventIdRegistry[key];
-        return cosmo.view.cal.itemRegistry.getItem(id);
-    };
-    this.setSelectedEvent = function (ev) {
-        var key = cosmo.app.pim.currentCollection.getUid();
-        self.selectedEventIdRegistry[key] = ev.id;
-        return true;
-    };
-    this.clearSelectedEvent = function (ev) {
-        var key = cosmo.app.pim.currentCollection.getUid();
-        self.selectedEventIdRegistry[key] = '';
-        return true;
     };
     this.calcColors = function () {
         var getRGB = function (h, s, v) {
@@ -1517,6 +1499,8 @@ cosmo.view.cal.canvas = new function () {
     };
 }
 
+dojo.lang.mixin(cosmo.view.cal.canvas, cosmo.view.canvasBase);
+
 cosmo.view.cal.canvas.Canvas = function (p) {
     var self = this;
     var params = p || {}
@@ -1663,7 +1647,5 @@ cosmo.view.cal.canvas.Canvas = function (p) {
 cosmo.view.cal.canvas.Canvas.prototype =
     new cosmo.ui.ContentBox();
 
-// Cleanup
-dojo.event.browser.addListener(window, "onunload", cosmo.view.cal.canvas.cleanup, false);
 
 

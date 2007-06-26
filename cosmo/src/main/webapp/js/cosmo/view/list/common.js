@@ -26,7 +26,11 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
 
+dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
+
 dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
+
+cosmo.view.list.viewId = cosmo.app.pim.views.LIST;
 
 cosmo.view.list.ListItem = function () {
     this.sort = null;
@@ -229,10 +233,5 @@ cosmo.view.list.createNoteItem = function (s) {
         return cosmo.view.list.itemRegistry.getItem(id);
     }
 };
-
-cosmo.view.list.isCurrentView = function () {
-    return (cosmo.app.pim.currentView == cosmo.app.pim.views.LIST);
-};
-
 
 

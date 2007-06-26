@@ -19,6 +19,7 @@ dojo.provide('cosmo.view.list.canvas');
 dojo.require('dojo.event.*');
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
+dojo.require("cosmo.view.common");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.view.list.sort");
 dojo.require("cosmo.util.i18n");
@@ -26,6 +27,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 
+dojo.lang.mixin(cosmo.view.list.canvas, cosmo.view.canvasBase);
 
 cosmo.view.list.canvas.Canvas = function (p) {
     var self = this;
@@ -42,17 +44,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.currPageNum = 1;
 
     for (var n in params) { this[n] = params[n]; }
-      
+
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     // Interface methods
     this.handlePub_calEvent = function (cmd) {
 
-        // Ignore input when not the current view
-        var _pim = cosmo.app.pim;
-        if (_pim.currentView != _pim.views.LIST) {
-            return false;
-        }
+        if (!cosmo.view.list.isCurrentView()) { return false; }
 
         var act = cmd.action;
         var qual = cmd.qualifier || null;
@@ -70,9 +68,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     this.renderSelf = function () {
-        
+
         if (!cosmo.view.list.isCurrentView()) { return false; }
-        
+
         var reg = cosmo.view.list.itemRegistry;
         this._updateSize();
         this.setPosition(0, CAL_TOP_NAV_HEIGHT);
@@ -167,7 +165,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var updatedBy = '';
             r = '';
             r += '<tr id="listView_item' + display.uid + '">';
-            r += '<td class="listViewDataCell' + selCss + 
+            r += '<td class="listViewDataCell' + selCss +
                 '" style="text-align: center;">' + display.task + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.title + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.who + '</td>';
@@ -187,7 +185,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         dojo.event.connect($('listViewTable'), 'onmouseover', this, 'handleMouseOver');
         dojo.event.connect($('listViewTable'), 'onmouseout', this, 'handleMouseOut');
         dojo.event.connect($('listViewTable'), 'onclick', this, 'handleClick');
-        
+
         dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
             opts: null });
     };

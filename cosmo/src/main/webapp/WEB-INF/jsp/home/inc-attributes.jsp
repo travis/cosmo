@@ -43,6 +43,7 @@
       </td>
     </tr>
     <c:forEach var="attr" items="${Item.attributes}">
+      <c:if test="${! fn:startsWith(attr.key.namespace, 'org.osaf.cosmo')}">
     <tr>
       <td class="smTableData" width="50%">
         ${attr.key.namespace}
@@ -54,6 +55,7 @@
         ${attr.value.value}
       </td>
     </tr>
+      </c:if>
     </c:forEach>
   </table>
 </div>

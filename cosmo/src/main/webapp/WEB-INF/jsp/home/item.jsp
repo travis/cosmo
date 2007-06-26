@@ -117,6 +117,14 @@
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
+        Last Modification:
+      </td>
+      <td class="mdData">
+        <cosmo:lastmodification value="${Item.lastModification}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
         Created on Client:
       </td>
       <td class="mdData">
@@ -145,6 +153,22 @@
       </td>
       <td class="mdData">
         <fmt:formatDate value="${Item.modifiedDate}" type="both"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        iCalendar UID:
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${Item.icalUid}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Body:
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${Item.body}"/>
       </td>
     </tr>
   </table>
@@ -265,6 +289,107 @@
       </td>
     </tr>
   </table>
+</div>
+</c:if>
+
+<c:if test="${messagestamp != null}">
+<div class="hd" style="margin-top: 12px;">
+  Message Properties
+</div>
+
+<div style="margin-top:12px;">
+  <table cellpadding="3" cellspacing="1" border="0">
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Message ID
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.messageId}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Headers
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.headers}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        From
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.from}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        To
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.to}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Cc
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.cc}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Bcc
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.bcc}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Originators
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.originators}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Date Sent
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.dateSent}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        In Reply To
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.inReplyTo}"/>
+      </td>
+    </tr>
+    <tr>
+      <td class="mdLabel" style="text-align:right;">
+        References
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${messagestamp.references}"/>
+      </td>
+    </tr>
+  </table>
+</div>
+</c:if>
+
+<c:if test="${taskstamp != null}">
+<div class="hd" style="margin-top: 12px;">
+  Task Properties
+</div>
+
+<div style="margin-top: 12px;">
+  Tasks have no properties.
 </div>
 </c:if>
 

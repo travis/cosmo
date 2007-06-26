@@ -26,7 +26,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
       ["atTime", Boolean, {"default":false}],
       ["location", String, {"default":""}],
       ["rrule", cosmo.model.RecurrenceRule, {"default":null}],
-      ["exdates", [Array, cosmo.datetime.Date], {}],
+      ["exdates", [Array, cosmo.datetime.Date], {"default": cosmo.model.NEW_ARRAY}],
       ["status", String, {}]
     ],
     //mixins for master item stamps		 
@@ -77,29 +77,47 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
            if (this.getPreserveEndDate() && endDate != null){
                this.setEndDate(endDate);    
            }
-           
-           //if there are modifications, we need to move the recurrenceid's for all of them
-           if (this.item && oldDate && !dojo.lang.isEmpty(this.item._modifications)){
-              var diff = dojo.date.diff(oldDate.toUTC(), newStartDate.toUTC(), dojo.date.dateParts.SECOND);
-           
-               //first copy the modifications into a new hash
-               var mods = this.item._modifications;
-               var oldMods = {};
-               dojo.lang.mixin(oldMods, mods);
-               for (var x in mods){
-                   delete mods[x];
+
+           //if this event stamp is attached to an item, and already has a previous start date
+           //we may have some updating to do
+           if (this.item && oldDate){
+               var diff = dojo.date.diff(oldDate.toUTC(), newStartDate.toUTC(), dojo.date.dateParts.SECOND);
+               
+               //if there are modifications, we need to move the recurrenceid's for all of them
+               if (!dojo.lang.isEmpty(this.item._modifications)){
+               
+                   //first copy the modifications into a new hash
+                   var mods = this.item._modifications;
+                   var oldMods = {};
+                   dojo.lang.mixin(oldMods, mods);
+                   for (var x in mods){
+                       delete mods[x];
+                   }
+                   for (var x in oldMods){
+                       var mod = oldMods[x];
+                       var rId = mod.getRecurrenceId().clone();
+                       rId.add(dojo.date.dateParts.SECOND, diff);
+                       mod.setRecurrenceId(rId);
+                       this.item.addModification(mod);
+                   }
                }
-               for (var x in oldMods){
-                   var mod = oldMods[x];
-                   var rId = mod.getRecurrenceId().clone();
-                   rId.add(dojo.date.dateParts.SECOND, diff);
-                   mod.setRecurrenceId(rId);
-                   this.item.addModification(mod);
+               
+               //also, if there are exdates, we need to move the recurrenceid's for all of them too
+               if (this._exdates && this._exdates.length > 0){
+                   var oldExdates = this._exdates;
+                   var newExdates = [];
+                   for (var x = 0; x < oldExdates.length; x++){
+                       var exdate = oldExdates[x];
+                       exdate.add(dojo.date.dateParts.SECOND, diff);
+                       newExdates.push(exdate);                   
+                   }
+                   this._exates = newExdates;
                }
            }
+           
         },
         
-        applyChange: function(propertyName, changeValue, type){
+       applyChange: function(propertyName, changeValue, type){
             //TODO - make sure to fix the rId....
             
             //this handles the case of setting the master start date or end date 

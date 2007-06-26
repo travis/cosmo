@@ -38,7 +38,8 @@ cosmo.ui.menu = new function () {
     this.loadItems = function () {
         var _c = cosmo.ui.menu.MenuItem;
         var items =  cosmo.ui.menu.allItems;
-        var prefs = cosmo.account.preferences.getPreferences();
+        var prefs = cosmo.app.initParams.authAccess? 
+            cosmo.account.preferences.getPreferences() : {};
         // Instantiate all the items as MenuItem obj
         for (var i = 0; i < items.length; i++) {
             var item = items[i];

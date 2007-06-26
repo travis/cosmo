@@ -102,7 +102,7 @@ dojo.widget.HtmlWidget, function(){
         },
         
         isCollectionSaveable: function(/*cosmo.model.[Collection|Subscription]*/collection){
-           return (collection instanceof cosmo.model.Collection && collection.isWriteable())
+           return !(collection instanceof cosmo.model.Collection && !collection.isWriteable())
         },
         
         fillInTemplate: function () {

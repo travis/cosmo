@@ -15,11 +15,13 @@
  */
 package org.osaf.cosmo.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -56,10 +58,7 @@ public class StandardTriageStatusQueryProcessor implements
 
     private ContentDao contentDao = null;
     private static final Log log = LogFactory.getLog(StandardTriageStatusQueryProcessor.class);
-    private static final Comparator<NoteItem> TRIAGE_COMPARATOR_ASC = new NoteItemTriageStatusComparator(false);
-    private static final Comparator<NoteItem> TRIAGE_COMPARATOR_DESC = new NoteItemTriageStatusComparator(true);
-    
-    
+   
     // Duration to search forward/backward for recurring events
     // is set to 30 days by default
     private Dur laterDur = new Dur("P30D");
@@ -101,7 +100,7 @@ public class StandardTriageStatusQueryProcessor implements
         NoteItemFilter eventFilter = getRecurringEventFilter(collection);
         
         // store all results here
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(TRIAGE_COMPARATOR_ASC);
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(new NoteItemTriageStatusComparator(pointInTime.getTime()));
         
         // Add all non-recurring items that are have an explicit NOW triage,
         // modifications with NOW triage, or no triage (null triage)
@@ -154,7 +153,7 @@ public class StandardTriageStatusQueryProcessor implements
        // recurring event filter
        NoteItemFilter eventFilter = getRecurringEventFilter(collection);
        
-       TreeSet<NoteItem> results = new TreeSet<NoteItem>(TRIAGE_COMPARATOR_ASC);
+       TreeSet<NoteItem> results = new TreeSet<NoteItem>(new NoteItemTriageStatusComparator(pointInTime.getTime()));
        
        // Add all items that are have an explicit LATER triage
        for(Item item : contentDao.findItems(laterFilter))
@@ -206,12 +205,14 @@ public class StandardTriageStatusQueryProcessor implements
         // filter for recurring events
         NoteItemFilter eventFilter = getRecurringEventFilter(collection);
         
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(TRIAGE_COMPARATOR_DESC);
+        Comparator<NoteItem> comparator = new NoteItemTriageStatusComparator(pointInTime.getTime());
+        List<NoteItem> allResults = new ArrayList<NoteItem>();
+        TreeSet<NoteItem> limitResults = new TreeSet<NoteItem>(comparator);
         Set<NoteItem> masters = new HashSet<NoteItem>();
         
         // Add all items that are have an explicit DONE triage
         for(Item item : contentDao.findItems(doneFilter))
-            results.add((NoteItem) item);
+            allResults.add((NoteItem) item);
         
         Date currentDate = pointInTime;
         Date pastDate = doneDur.getTime(currentDate);
@@ -231,27 +232,34 @@ public class StandardTriageStatusQueryProcessor implements
                 masters.add(note);
                 if(instance.isOverridden()==false) {
                     // add occurrence
-                    results.add(new NoteOccurrence(instance.getRid(), note));
+                    allResults.add(new NoteOccurrence(instance.getRid(), note));
                     
                 }
                 else {
                     // add modification
                     ModificationUid modUid = new ModificationUid(note, instance.getRid());
-                    results.add((NoteItem) contentDao.findItemByUid(modUid.toString()));
+                    allResults.add((NoteItem) contentDao.findItemByUid(modUid.toString()));
                 }
             }
         }
         
+        // sort
+        Collections.sort(allResults, comparator);
+        
         // limit to maxDone items
-        int resultsSize = results.size();
-        for(int i=0;i<(resultsSize - maxDone);i++)
-            results.remove(results.last());
+        int toAdd = allResults.size();
+        if(toAdd>maxDone)
+            toAdd = maxDone;
+        
+        for(int i=0;i<toAdd;i++) {
+            limitResults.add(allResults.get(i));
+        }
         
         // add masters
         for(NoteItem master : masters)
-            results.add(master);
+            limitResults.add(master);
         
-        return results;
+        return limitResults;
     }
 
     public void setContentDao(ContentDao contentDao) {

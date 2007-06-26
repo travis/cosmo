@@ -9,8 +9,13 @@ import java.util.Comparator;
 public class NoteItemTriageStatusComparator implements Comparator<NoteItem> {
 
     boolean reverse = false;
+    long pointInTime = 0;
     
     public NoteItemTriageStatusComparator() {
+    }
+    
+    public NoteItemTriageStatusComparator(long pointInTime) {
+        this.pointInTime = pointInTime;
     }
     
     public NoteItemTriageStatusComparator(boolean reverse) {
@@ -21,8 +26,11 @@ public class NoteItemTriageStatusComparator implements Comparator<NoteItem> {
         if(note1.getUid().equals(note2.getUid()))
             return 0;
      
-        long rank1 = getRank(note1);
-        long rank2 = getRank(note2);
+        // Calculate a rank based the proximity of a timestamp 
+        // (one of triageStatusRank, eventStart, lastModifiedDate) 
+        // to a point in time.
+        long rank1 = Math.abs(pointInTime - getRank(note1));
+        long rank2 = Math.abs(pointInTime - getRank(note2));
         
         if(rank1>rank2)
             return reverse? -1 : 1;

@@ -1081,7 +1081,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         var triageArray = triageString.split(" ");
 
-        props.triageStatus = triageArray[0];
+        props.triageStatus = parseInt(triageArray[0]);
 
         props.rank = triageArray[1];
 

@@ -920,8 +920,7 @@ public class CmpServlet extends HttpServlet {
                                "Username does not match request URI");
                 return;
             }
-            ActivationListener listener = createActivationListener(req);
-            userService.createUser(user, new ServiceListener[] { listener });
+            userService.createUser(user);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {

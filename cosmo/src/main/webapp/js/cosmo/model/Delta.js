@@ -287,7 +287,7 @@ dojo.declare("cosmo.model.Delta", null, {
     _needsAutoTriage: function(){
         //summary: determines whether auto triage might be needed. 
         //descripiton: If any properties which might cause a triage change have been changed,
-        //              return strue. Called by autoTriage().
+        //              returns true. Called by autoTriage().
         var note = this._note;
         
         if (!note.getAutoTriage() || !note.getEventStamp()){

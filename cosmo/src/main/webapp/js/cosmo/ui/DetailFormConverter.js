@@ -37,11 +37,12 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             errorMessage += this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }
 
+        this._populateDeltaFromTriageWidget(delta);
+        
         if (!errorMessage){
             errorMessage += this._performInterPropertyValidations(delta);
         }
         
-        xxx = delta;
         delta.deltafy();
         return [delta, errorMessage];  
     },
@@ -100,7 +101,15 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         }
         return errors;
     },
-
+    
+    _populateDeltaFromTriageWidget: function(delta){
+        var formTriageStatus = parseInt(cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.markupBar.triageSection.currTriageStatus);
+        if (formTriageStatus != this._item.getTriageStatus()){
+            delta.addProperty("triageStatus", formTriageStatus);
+            delta.addProperty("autoTriage", false);
+        }
+     },
+    
     _isStampEnabled: function(stampName){
         var checkBox = $("section"+ this._upperFirstChar(stampName) +"EnableToggle");
         return checkBox.checked;

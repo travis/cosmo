@@ -320,7 +320,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
             if (this.currentCollection.getUid() == updatedCollection.getUid()){
                 this.currentCollection.collection = updatedCollection;
-                if (currentCollection instanceof cosmo.model.Subscription){
+                if (this.currentCollection instanceof cosmo.model.Subscription){
                     this.currentCollection.setCollection(updatedCollection);
                 } else {
                     this.currentCollection = updatedCollection;

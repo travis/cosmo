@@ -274,6 +274,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
         var enabled = !!(item);
 
         this.clearAll();
+        this.children = [];
 
         addTriageSection();
         addEmailThisIcon();

@@ -25,22 +25,22 @@ cosmo.view.viewBase = new function () {
 };
 
 cosmo.view.canvasBase = new function () {
-    this.getSelectedEvent = function () {
+    this.getSelectedItem = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         var id = this.selectedEventIdRegistry[key];
         return this.view.itemRegistry.getItem(id);
     };
-    this.setSelectedEvent = function (ev) {
+    this.setSelectedItem = function (ev) {
         var key = cosmo.app.pim.currentCollection.getUid();
         this.selectedEventIdRegistry[key] = ev.id;
         return true;
     };
-    this.clearSelectedEvent = function (ev) {
+    this.clearSelectedItem = function (ev) {
         var key = cosmo.app.pim.currentCollection.getUid();
         this.selectedEventIdRegistry[key] = '';
         return true;
     };
-    this.getSelectedEventId = function () {
+    this.getSelectedItemId = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         var id = this.selectedEventIdRegistry[key];
         return id;

@@ -220,7 +220,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setState = function (isProc) {
     // 'selected' color if this lozenge is the most recently
     // clicked one
     else {
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        var selEv = cosmo.view.cal.canvas.getSelectedItem();
         stateId = (selEv && (this.id == selEv.id)) ?
             1 : 2;
     }

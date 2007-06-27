@@ -88,7 +88,7 @@ cosmo.view.cal.handlePub_app = function (cmd) {
     if (t == 'keyboardInput') {
         // Grab any elem above the event that has an id
         var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
-        var ev = cosmo.view.cal.canvas.getSelectedEvent();
+        var ev = cosmo.view.cal.canvas.getSelectedItem();
         switch (e.keyCode) {
             // Enter key
             case 13:

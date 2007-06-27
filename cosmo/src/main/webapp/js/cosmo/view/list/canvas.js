@@ -84,7 +84,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
         cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
         this.displayTable();
-        var sel = this.getSelectedEvent();
+        var sel = this.getSelectedItem();
         if (sel) {
             cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.updateFromItem(
                 sel);
@@ -106,7 +106,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (e && e.target) {
             // get the UID from the row's DOM node id
             var p = e.target.parentNode;
-            if (!p.id || (p.id ==  'listView_item' + self.getSelectedEventId())) { return false; }
+            if (!p.id || (p.id ==  'listView_item' + self.getSelectedItemId())) { return false; }
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
                 ch[i].className = 'listViewDataCell';
@@ -125,7 +125,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 var p = targ.parentNode;
                 if (!p.id) { return false; }
                 // Deselect any original selection
-                var orig = $('listView_item' + self.getSelectedEventId());
+                var orig = $('listView_item' + self.getSelectedItemId());
                 if (orig) {
                     ch = orig.childNodes;
                     for (var i = 0; i < ch.length; i++) {
@@ -141,7 +141,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 var item = this.view.itemRegistry.getItem(id);
                 // Load the selected item's stuff into the detail-view form
                 if (item) {
-                    self.setSelectedEvent(item);
+                    self.setSelectedItem(item);
                     var f = function () {
                       dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                         'data': item });
@@ -159,7 +159,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.displayTable = function () {
         var _list = cosmo.view.list;
         var hash = _list.itemRegistry;
-        var selId = 'listView_item' + self.getSelectedEventId();
+        var selId = 'listView_item' + self.getSelectedItemId();
         var map = cosmo.view.list.triageStatusCodeNumberMappings;
         var t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">';
         var r = '';

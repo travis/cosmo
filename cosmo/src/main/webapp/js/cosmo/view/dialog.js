@@ -142,7 +142,7 @@ cosmo.view.dialog = new function() {
 
     // Publish via topics
     function doPublish(act, qual) {
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        var selEv = cosmo.view.cal.canvas.getSelectedItem();
         dojo.event.topic.publish('/calEvent', { 'action': act, 'qualifier': qual, data: selEv });
     }
 
@@ -153,7 +153,7 @@ cosmo.view.dialog = new function() {
     // Call a method on the currently selected event
     // FIXME: Use topics
     function doEvMethod(key) {
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        var selEv = cosmo.view.cal.canvas.getSelectedItem();
         selEv[key]();
     }
 
@@ -183,7 +183,7 @@ cosmo.view.dialog = new function() {
             }
         }
         else if (key == 'removeRecurConfirm') {
-           var item = cosmo.view.cal.canvas.getSelectedEvent();
+           var item = cosmo.view.cal.canvas.getSelectedItem();
             p.btnsRight = [];
             p.btnsRight.push(buttons.removeAllEvents());
             if (!item.data.isFirstOccurrence()) {

@@ -41,10 +41,10 @@ dojo.require("cosmo.view.cal.canvas");
  */
 cosmo.view.cal.draggable.Draggable = function (id) {
 
-    // Unused -- TO-DO: Get rid of this property
+    // Same as the UID of the selected CalItem
     this.id = id;
-    // Unused -- TO-DO: Get rid of this property
-    this.div = null;
+    // The selected CalItem
+    this.ev = null;
     // Dragged/resized or not
     this.dragged = false;
     // Vertical offset of the hosting div for calc'ing Y pos
@@ -178,7 +178,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         ret = parseInt(size);
         // Single-day events only
         // Min size is 30 minutes -- two 15-min. chunks
-        if (!cosmo.view.cal.canvas.getSelectedEvent().lozenge.auxDivList.length) {
+        if (!this.ev.lozenge.auxDivList.length) {
             ret = ret < this.unit ? this.unit : ret;
         }
         return ret;
@@ -192,7 +192,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * changes to the event to the backend
      */
     this.doUpdate = function () {
-        var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+        var selEv = this.ev; 
         // Make backup snapshot of event data in case save/remove
         // operation fails
         selEv.makeSnapshot();
@@ -229,7 +229,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
     };
     this.doDragEffect = function (dragState) {
         var o = dragState == 'on' ? 60 : 100;
-        cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(o);
+        this.ev.lozenge.setOpacity(o);
     };
 }
 
@@ -283,7 +283,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resize = function () {
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
     // The selected event
-    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = this.ev; 
     // Where the top edge of the lozenge should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
@@ -304,7 +304,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeBottom = function (y) {
    // The selected event
-    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = this.ev; 
     // Where the bottom edge of the lozenge should go -- this is a
     // relative measurement based on pos on the scrollable area
     var b = (y - this.absTop) + this.scrollOffset;
@@ -330,7 +330,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
         return false;
     }
 
-    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = this.ev; 
     var unit = HOUR_UNIT_HEIGHT/4; // 15-min. increments
     var top = 0;
     var size = 0;
@@ -446,12 +446,12 @@ cosmo.view.cal.draggable.NoTimeDraggable.prototype.drop = function () {
     var left = 0;
     var deltaX = 0;
     var deltaY = 0;
-    var selEv = cosmo.view.cal.canvas.getSelectedEvent();
+    var selEv = this.ev;
     top = selEv.lozenge.getTop();
     left = selEv.lozenge.getLeft();
 
     // Reset opacity to normal
-    cosmo.view.cal.canvas.getSelectedEvent().lozenge.setOpacity(100);
+    this.doDragEffect('off');
 
     // Side-to-side snap
     if (this.dragMode == 'drag') {

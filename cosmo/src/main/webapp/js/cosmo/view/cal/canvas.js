@@ -672,11 +672,11 @@ cosmo.view.cal.canvas = new function () {
             throw('No CalItem passed to setSelectedCalItem.');
         }
         // Deselect previously selected event if any
-        var sel = self.getSelectedEvent();
+        var sel = self.getSelectedItem();
         if (sel) {
             sel.lozenge.setDeselected();
         }
-        self.setSelectedEvent(ev);
+        self.setSelectedItem(ev);
         // Show the associated lozenge as selected
         ev.lozenge.setSelected();
     };
@@ -693,12 +693,12 @@ cosmo.view.cal.canvas = new function () {
      * @param ev CalItem obj, the event to be removed
      */
     function removeEventFromDisplay(id, ev) {
-        var selEv = self.getSelectedEvent();
+        var selEv = self.getSelectedItem();
         // Remove the lozenge
         ev.lozenge.remove();
         // Remove selection if need be
         if (selEv && (selEv.id == ev.id)) {
-            self.clearSelectedEvent();
+            self.clearSelectedItem();
         }
         return true;
     }
@@ -820,12 +820,12 @@ cosmo.view.cal.canvas = new function () {
                 positionLozenges()) {
                 // If no currently selected event, put selection on
                 // the final one loaded
-                //if (!self.getSelectedEvent()) {
+                //if (!self.getSelectedItem()) {
                 //    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
                 //        'data': cosmo.view.cal.itemRegistry.getLast() });
                 //}
                 dojo.event.topic.publish('/calEvent', { 'action':
-                    'eventsDisplaySuccess', 'data': self.getSelectedEvent() });
+                    'eventsDisplaySuccess', 'data': self.getSelectedItem() });
             }
         }
         // No items displayed in the current collection
@@ -1062,7 +1062,7 @@ cosmo.view.cal.canvas = new function () {
 
                 // Publish selection
                 var c = cosmo.view.cal.canvas;
-                var sel = c.getSelectedEvent();
+                var sel = c.getSelectedItem();
                 // If no currently selected item, or the item clicked
                 // is not the currently selected item, update the selection
                 if ((!sel) || (item.id != sel.id)) {

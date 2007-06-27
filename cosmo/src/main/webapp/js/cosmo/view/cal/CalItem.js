@@ -61,8 +61,9 @@ cosmo.view.cal.CalItem = function(id, lozenge) {
     this.cancelSave = function () {
         // Put the lozenge back where it was
         // FIXME: Use topics
-        var ev = cosmo.view.cal.canvas.getSelectedEvent();
-        ev.restoreEvent();
+        //var ev = cosmo.view.cal.canvas.getSelectedEvent();
+        //ev.restoreEvent();
+        this.restoreEvent();
         // Hide the confirmation dialog
         if (cosmo.app.modalDialog) {
             cosmo.app.hideDialog();
@@ -97,9 +98,11 @@ cosmo.view.cal.CalItem = function(id, lozenge) {
             this.lozenge.updateFromEvent(this);
             // Update lozenge and event detail form display
             // FIXME: Use topics
-            var ev = cosmo.view.cal.canvas.getSelectedEvent();
-            ev.lozenge.updateDisplayMain();
-            ev.lozenge.setInputDisabled(false);
+            //var ev = cosmo.view.cal.canvas.getSelectedEvent();
+            //ev.lozenge.updateDisplayMain();
+            //ev.lozenge.setInputDisabled(false);
+            this.lozenge.updateDisplayMain();
+            this.lozenge.setInputDisabled(false);
         }
     };
     /**

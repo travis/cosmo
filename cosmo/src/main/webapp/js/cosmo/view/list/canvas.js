@@ -147,7 +147,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
                         'data': item });
                     };
                     // Free up the UI thread so we don't see two items
-                    // selected at once while the detail view is being populated
+                    // selected at once while the message is being published
+                    // to all parts of the UI
                     setTimeout(f, 0);
                 }
             }

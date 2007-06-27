@@ -1066,7 +1066,18 @@ cosmo.view.cal.canvas = new function () {
                 // If no currently selected item, or the item clicked
                 // is not the currently selected item, update the selection
                 if ((!sel) || (item.id != sel.id)) {
-                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected', 'data': item });
+                    // Call setSelectedCalItem here directly, and publish the 
+                    // selected-item message on a setTimeout to speed up UI 
+                    // response for direct clicks -- publishing 'setSelected' 
+                    // will cause setSelectedCalItem to be called a second time
+                    // as the canvas responds to this message, but it doesn't
+                    // hurt to re-select the currently selected item
+                    setSelectedCalItem(item);
+                    var f = function () {
+                        dojo.event.topic.publish('/calEvent', { 
+                            'action': 'setSelected', 'data': item });
+                    }
+                    setTimeout(f, 0);
                 }
 
                 // No move/resize for read-only collections
@@ -1084,15 +1095,15 @@ cosmo.view.cal.canvas = new function () {
                         case id.indexOf('Content') > -1:
                         case id.indexOf('Title') > -1:
                         case id.indexOf('Start') > -1:
-                            dragItem.init('drag');
+                            dragItem.init('drag', item);
                             break;
                         // Top lip -- resize top
                         case id.indexOf('Top') > -1:
-                            dragItem.init('resizetop');
+                            dragItem.init('resizetop', item);
                             break;
                         // Bottom lip -- resize bottom
                         case id.indexOf('Bottom') > -1:
-                            dragItem.init('resizebottom');
+                            dragItem.init('resizebottom', item);
                             break;
                         default:
                             // Do nothing

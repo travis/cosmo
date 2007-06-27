@@ -76,10 +76,10 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * Sets up the Draggable -- putting in 'init' func allows code
      * to be shared between the sub-classes
      */
-    this.init = function (dragMode) {
-        var ev = cosmo.view.cal.canvas.getSelectedEvent();
+    this.init = function (dragMode, ev) {
         var lozenge = ev.lozenge;
         var div = lozenge.div;
+        this.ev = ev;
         this.vertOffset = cosmo.app.pim.baseLayout.mainApp.top +
             cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.timedCanvas.top;
         this.dragMode = dragMode;
@@ -134,15 +134,10 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * until the actual drop occurs
      */
     this.move = function () {
-        // Compensate for crack-fiend clicking -- make sure there's
-        // a selected lozenge
-        if (!cosmo.view.cal.canvas.getSelectedEvent()) {
-            return false;
-        }
         // Not just a simple click
         this.dragged = true;
         // Lozenge associated with this Draggable
-        var moveLozenge = cosmo.view.cal.canvas.getSelectedEvent().lozenge;
+        var moveLozenge = this.ev.lozenge;
         // Subtract the offset to get where the left/top
         // of the lozenge should be
         var moveX = (xPos - this.clickOffsetX);
@@ -223,7 +218,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * or doesn't have a valid dragMode
      */
     this.paranoia = function () {
-        var ev = cosmo.view.cal.canvas.getSelectedEvent();
+        var ev = this.ev; 
         if (!ev || !cosmo.app.dragItem.dragMode ||
             ev.lozenge.getInputDisabled()) {
             return false;

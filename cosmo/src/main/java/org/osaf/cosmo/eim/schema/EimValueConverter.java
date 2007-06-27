@@ -153,6 +153,8 @@ public class EimValueConverter implements EimSchemaConstants {
     }
 
     public static String fromIcalTrigger(Trigger trigger) {
+        if(trigger==null)
+            return null;
         
         if(trigger.getDateTime()!=null)
             return ";VALUE=DATE-TIME:" + trigger.getDateTime().toString();

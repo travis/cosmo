@@ -157,6 +157,13 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 log.warn("usupported eim field " + field.getName()
                         + " found in " + record.getNamespace());
         }
+        
+        // Make sure trigger is present and if not, delete the alarm
+        if(eventStamp.getDisplayAlarm()!=null) {
+            if(!isModification() && eventStamp.getDisplayAlarmTrigger()==null) {
+                eventStamp.removeDisplayAlarm();
+            }
+        }
     }
     
     public void applyRecordNonEvent(EimRecord record) throws EimSchemaException {

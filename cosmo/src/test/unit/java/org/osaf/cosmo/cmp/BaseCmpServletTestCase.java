@@ -29,10 +29,13 @@ import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.account.MockPasswordRecoverer;
+import org.osaf.cosmo.service.account.OutOfTheBoxHelper;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
+
+import org.springframework.context.support.StaticMessageSource;
 
 /**
  * Base class for CMP servlet test cases.
@@ -58,11 +61,17 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         MockContentDao contentDao = new MockContentDao(storage);
         MockUserDao userDao = new MockUserDao();
         SingleVMLockManager lockManager = new SingleVMLockManager();
+        StaticMessageSource messageSource =
+            new StaticMessageSource();
+        messageSource.setUseCodeAsDefaultMessage(true);
         AutomaticAccountActivator accountActivator =
             new AutomaticAccountActivator();
         accountActivator.setUserDao(userDao);
         MockPasswordRecoverer passwordRecoverer = 
             new MockPasswordRecoverer();
+        OutOfTheBoxHelper ootbHelper = new OutOfTheBoxHelper();
+        ootbHelper.setContentDao(contentDao);
+        ootbHelper.setMessageSource(messageSource);
 
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
@@ -85,6 +94,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         servlet.setSecurityManager(getSecurityManager());
         servlet.setAccountActivator(accountActivator);
         servlet.setPasswordRecoverer(passwordRecoverer);
+        servlet.setOutOfTheBoxHelper(ootbHelper);
         servlet.init(getServletConfig());
     }
 

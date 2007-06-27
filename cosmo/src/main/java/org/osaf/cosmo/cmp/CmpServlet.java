@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,9 @@ import org.osaf.cosmo.service.ServiceListener;
 import org.osaf.cosmo.service.account.AccountActivator;
 import org.osaf.cosmo.service.account.ActivationContext;
 import org.osaf.cosmo.service.account.ActivationListener;
+import org.osaf.cosmo.service.account.OutOfTheBoxContext;
+import org.osaf.cosmo.service.account.OutOfTheBoxHelper;
+import org.osaf.cosmo.service.account.OutOfTheBoxListener;
 import org.osaf.cosmo.service.account.PasswordRecoveryMessageContext;
 import org.osaf.cosmo.service.account.PasswordRecoverer;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -92,18 +96,14 @@ public class CmpServlet extends HttpServlet {
     private static final String URL_PASSWORD_RESET = "/account/password/reset/";
     private static final String URL_ACTIVATE = "/activate/";
 
-    private static final String BEAN_CONTENT_SERVICE =
-        "contentService";
-    private static final String BEAN_USER_SERVICE =
-        "userService";
-    private static final String BEAN_PASSWORD_RECOVERER = 
-        "passwordRecoverer";
+    private static final String BEAN_CONTENT_SERVICE = "contentService";
+    private static final String BEAN_USER_SERVICE = "userService";
+    private static final String BEAN_PASSWORD_RECOVERER = "passwordRecoverer";
     private static final String BEAN_SERVICE_LOCATOR_FACTORY =
         "serviceLocatorFactory";
-    private static final String BEAN_SECURITY_MANAGER =
-        "securityManager";
-    private static final String BEAN_ACCOUNT_ACTIVATOR =
-        "accountActivator";
+    private static final String BEAN_SECURITY_MANAGER = "securityManager";
+    private static final String BEAN_ACCOUNT_ACTIVATOR = "accountActivator";
+    private static final String BEAN_OOTB_HELPER = "ootbHelper";
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
@@ -118,6 +118,7 @@ public class CmpServlet extends HttpServlet {
     private CosmoSecurityManager securityManager;
     private PasswordRecoverer passwordRecoverer;
     private AccountActivator accountActivator;
+    private OutOfTheBoxHelper ootbHelper;
 
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
@@ -153,6 +154,9 @@ public class CmpServlet extends HttpServlet {
             if (passwordRecoverer == null)
                 passwordRecoverer = (PasswordRecoverer)
                     getBean(BEAN_PASSWORD_RECOVERER, PasswordRecoverer.class);
+            if (ootbHelper == null)
+                ootbHelper = (OutOfTheBoxHelper)
+                    getBean(BEAN_OOTB_HELPER, OutOfTheBoxHelper.class);
         }
 
         if (contentService == null)
@@ -165,6 +169,8 @@ public class CmpServlet extends HttpServlet {
             throw new ServletException("account activator must not be null");
         if (passwordRecoverer == null)
             throw new ServletException("password recoverer must not be null");
+        if (ootbHelper == null)
+            throw new ServletException("ootb helper must not be null");
     }
 
     // HttpServlet methods
@@ -450,6 +456,13 @@ public class CmpServlet extends HttpServlet {
         this.passwordRecoverer = passwordRecoverer;
     }
 
+    public OutOfTheBoxHelper getOutOfTheBoxHelper() {
+        return ootbHelper;
+    }
+
+    public void setOutOfTheBoxHelper(OutOfTheBoxHelper helper) {
+        ootbHelper = helper;
+    }
 
     // private methods
 
@@ -818,9 +831,7 @@ public class CmpServlet extends HttpServlet {
             User user = resource.getUser();
             user.setAdmin(Boolean.FALSE);
             user.setLocked(Boolean.FALSE);
-            ActivationListener listener = createActivationListener(req);
-            user = userService.createUser(user,
-                                          new ServiceListener[] { listener });
+            user = userService.createUser(user, createSignupListeners(req));
             resource = new UserResource(user, getUrlBase(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
@@ -920,7 +931,7 @@ public class CmpServlet extends HttpServlet {
                                "Username does not match request URI");
                 return;
             }
-            userService.createUser(user);
+            userService.createUser(user, createUserCreateListeners(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {
@@ -1198,6 +1209,15 @@ public class CmpServlet extends HttpServlet {
         return buf.toString();
     }
 
+    private ServiceListener[] createSignupListeners(HttpServletRequest req) {
+        return new ServiceListener[] { createActivationListener(req),
+                                       createOotbListener(req) };
+    }
+
+    private ServiceListener[] createUserCreateListeners(HttpServletRequest req) {
+        return new ServiceListener[] { createOotbListener(req) };
+    }
+
     private ActivationListener createActivationListener(HttpServletRequest req) {
         ActivationContext activationContext = new ActivationContext();
         String urlBase = getUrlBase(req);
@@ -1210,6 +1230,14 @@ public class CmpServlet extends HttpServlet {
             setSender(userService.getUser(User.USERNAME_OVERLORD));
 
         return new ActivationListener(accountActivator, activationContext);
+    }
+
+    private OutOfTheBoxListener createOotbListener(HttpServletRequest req) {
+        OutOfTheBoxContext context = new OutOfTheBoxContext();
+        context.setLocale(req.getLocale());
+        // XXX get timezone from user somehow
+        context.setTimeZone(TimeZone.getDefault());
+        return new OutOfTheBoxListener(ootbHelper, context);
     }
     
     private PasswordRecoveryMessageContext 

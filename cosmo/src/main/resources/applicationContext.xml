@@ -346,6 +346,16 @@
     </property>
   </bean>
 
+  <bean id="ootbHelper"
+        class="org.osaf.cosmo.service.account.OutOfTheBoxHelper">
+    <property name="contentDao">
+      <ref local="contentDao"/>
+    </property>
+    <property name="messageSource">
+      <ref local="messageSource" />
+    </property>
+  </bean>
+
   <bean id="triageStatusQueryProcessor"
       class="org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor">
     <property name="contentDao">

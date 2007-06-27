@@ -151,12 +151,6 @@ cosmo.view.service = new function () {
         // master item rather than the instance -- basically
         // just a way of chaining two async calls together
         var h = null;
-
-        // Kill any confirmation dialog that might be showing
-        if (cosmo.app.modalDialog.isDisplayed) {
-            cosmo.app.hideDialog();
-        }
-
         var opts = self.recurringEventOptions;
 
         // Recurring item
@@ -446,10 +440,6 @@ cosmo.view.service = new function () {
         var h = null;
         var opts = self.recurringEventOptions;
 
-        // Kill any confirmation dialog that might be showing
-        if (cosmo.app.modalDialog.isDisplayed) {
-            cosmo.app.hideDialog();
-        }
         // Recurring item
         if (qual) {
             switch(qual) {

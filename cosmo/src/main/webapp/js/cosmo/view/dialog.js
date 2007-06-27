@@ -30,6 +30,8 @@ cosmo.view.dialog = new function() {
     var OnlyThisMsg = 'Only This Event';
     var btnWideWidth = 84;
     var btnWiderWidth = 120;
+    
+    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
 
     // All available buttons for the dialog
     var buttons = {
@@ -131,7 +133,7 @@ cosmo.view.dialog = new function() {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74,
-                function() { doEvMethod('cancelSave') },
+                doCancelSave,
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
             'defaultAction': function() {},
@@ -143,22 +145,45 @@ cosmo.view.dialog = new function() {
     // Publish via topics
     function doPublish(act, qual) {
         var selEv = cosmo.view.cal.canvas.getSelectedItem();
-        dojo.event.topic.publish('/calEvent', { 'action': act, 'qualifier': qual, data: selEv });
+        dojo.event.topic.publish('/calEvent', { 
+            action: act, qualifier: qual, data: selEv });
+        closeSelf();
     }
 
     function doPublishSave(qual, saveItem, delta) {
-        dojo.event.topic.publish('/calEvent', { 'action': 'save', 'qualifier': qual, data:saveItem, delta:delta });
+        dojo.event.topic.publish('/calEvent', { 
+            action: 'save', qualifier: qual, 
+            data: saveItem, delta: delta });
+        closeSelf();
     }
 
     // Call a method on the currently selected event
     // FIXME: Use topics
-    function doEvMethod(key) {
-        var selEv = cosmo.view.cal.canvas.getSelectedItem();
-        selEv[key]();
+    function doCancelSave() {
+        self.item.cancelSave();
+        closeSelf();
     }
+    function closeSelf() {
+        if (cosmo.app.modalDialog) {
+            cosmo.app.hideDialog();
+        }
+    }
+
+    // Public members
+    // ********************
+    this.item = null;
 
     // Public methods
     // ********************
+    this.handlePub = function (cmd) {
+        var act = cmd.action;
+        var item = cmd.data;
+        switch (act) {
+            case 'setSelected':
+                this.item = item;
+                break;
+        }
+    }
     this.getProps = function(key, opts) {
         var OPTIONS = cosmo.view.service.recurringEventOptions;
         var p = props[key]();

@@ -55,7 +55,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     // Interface methods
     this.handlePub_calEvent = function (cmd) {
-
         if (!cosmo.view.list.isCurrentView()) { return false; }
 
         var act = cmd.action;
@@ -65,6 +64,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var delta = cmd.delta;
         switch (act) {
             case 'saveSuccess':
+                var item = data;
+                this.view.setSortAndDisplay(item);
                 self._doSortAndDisplay();
                 break;
             default:
@@ -74,7 +75,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     this.renderSelf = function () {
-
         if (!cosmo.view.list.isCurrentView()) { return false; }
 
         var reg = cosmo.view.list.itemRegistry;

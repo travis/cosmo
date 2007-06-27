@@ -33,8 +33,9 @@ dojo.require('cosmo.view.cal.lozenge');
  * Lozenge and CalItemDate objects
  */
 cosmo.view.cal.CalItem = function(id, lozenge) {
-    // Randomly generated ID for each CalItem
-    // Lozenge div elements get their id suffixes from this
+    // Same as the UID for the stamped Note, used as the
+    // key for the itemRegistry Hash
+    // Lozenge div elements also get their id suffixes from this
     this.id = id;
     // Points to this event's Lozenge obj
     this.lozenge = lozenge;
@@ -53,85 +54,84 @@ cosmo.view.cal.CalItem = function(id, lozenge) {
     this.maxDepth = 0;
     // Row occupied for an untimed event
     this.allDayRow = 0;
-
-    /**
-     * Allows the user to cancel before saving changes to an event
-     * Restores event to its position previous to the aborted save
-     */
-    this.cancelSave = function () {
-        // Put the lozenge back where it was
-        // FIXME: Use topics
-        //var ev = cosmo.view.cal.canvas.getSelectedEvent();
-        //ev.restoreEvent();
-        this.restoreEvent();
-        // Hide the confirmation dialog
-        if (cosmo.app.modalDialog) {
-            cosmo.app.hideDialog();
-        }
-    };
-    /**
-     * Creates a brand-new lozenge for the event
-     * Resets the lozenge because we may be changing to the new type --
-     * e.g., between all-day and normal, or between normal single
-     * and normal composite
-     */
-    this.replaceLozenge = function () {
-        // Remove the current lozenge
-        this.lozenge.remove();
-        // Replace with new one
-        if (this.data.allDay) {
-            this.lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(this.id);
-        }
-        else {
-            this.lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(this.id);
-        }
-        this.lozenge.insert(this.id);
-    };
-    /**
-     * Puts an event lozenge back where it originally was using the
-     * snapshot backup clone of its data in the dataOrig property
-     * Used when canceling a save from the confirmation dialog
-     * and when a save operation fails
-     */
-    this.restoreEvent = function () {
-        if (this.restoreFromSnapshot()) {
-            this.lozenge.updateFromEvent(this);
-            // Update lozenge and event detail form display
-            // FIXME: Use topics
-            //var ev = cosmo.view.cal.canvas.getSelectedEvent();
-            //ev.lozenge.updateDisplayMain();
-            //ev.lozenge.setInputDisabled(false);
-            this.lozenge.updateDisplayMain();
-            this.lozenge.setInputDisabled(false);
-        }
-    };
-    /**
-     * Whether the start and end properties of an event put it
-     * on one side or the other of the current view span
-     */
-    this.isOutOfViewRange = function () {
-        // Note event data dates are cosmo.datetime.Date, viewStart/viewEnd are Date
-        // Return true only if both start and end are before view range
-        // or both are after view range
-        var ret = ((this.startsBeforeViewRange() && this.endsBeforeViewRange()) ||
-            (this.startsAfterViewRange() && this.endsAfterViewRange()));
-        return ret;
-
-    };
-    this.startsBeforeViewRange = function () {
-        return (this.data.getEventStamp().getStartDate().toUTC() < cosmo.view.cal.viewStart.getTime());
-    };
-    this.endsBeforeViewRange = function () {
-        return (this.data.getEventStamp().getEndDate().toUTC() < cosmo.view.cal.viewStart.getTime());
-    };
-    this.startsAfterViewRange = function () {
-        return (this.data.getEventStamp().getStartDate().toUTC() > cosmo.view.cal.viewEnd.getTime());
-    };
-    this.endsAfterViewRange = function () {
-        return (this.data.getEventStamp().getEndDate().toUTC() > cosmo.view.cal.viewEnd.getTime());
-    };
 };
 
 cosmo.view.cal.CalItem.prototype = new cosmo.view.BaseItem();
 
+/**
+ * Allows the user to cancel before saving changes to an event
+ * Restores event to its position previous to the aborted save
+ */
+cosmo.view.cal.CalItem.prototype.cancelSave = function () {
+    this.restoreEvent();
+};
+/**
+ * Creates a brand-new lozenge for the event
+ * Resets the lozenge because we may be changing to the new type --
+ * e.g., between all-day and normal, or between normal single
+ * and normal composite
+ */
+cosmo.view.cal.CalItem.prototype.replaceLozenge = function () {
+    // Remove the current lozenge
+    this.lozenge.remove();
+    // Replace with new one
+    if (this.data.allDay) {
+        this.lozenge = 
+            new cosmo.view.cal.lozenge.NoTimeLozenge(this.id);
+    }
+    else {
+        this.lozenge = 
+            new cosmo.view.cal.lozenge.HasTimeLozenge(this.id);
+    }
+    this.lozenge.insert(this.id);
+};
+/**
+ * Puts an event lozenge back where it originally was using the
+ * snapshot backup clone of its data in the dataOrig property
+ * Used when canceling a save from the confirmation dialog
+ * and when a save operation fails
+ */
+cosmo.view.cal.CalItem.prototype.restoreEvent = function () {
+    if (this.restoreFromSnapshot()) {
+        this.lozenge.updateFromEvent(this);
+        // Update lozenge and event detail form display
+        this.lozenge.updateDisplayMain();
+        this.lozenge.setInputDisabled(false);
+    }
+};
+/**
+ * Whether the start and end properties of an event put it
+ * on one side or the other of the current view span
+ */
+cosmo.view.cal.CalItem.prototype.isOutOfViewRange = function () {
+    // Note event data dates are cosmo.datetime.Date, viewStart/viewEnd are Date
+    // Return true only if both start and end are before view range
+    // or both are after view range
+    var ret = ((this.startsBeforeViewRange() && 
+        this.endsBeforeViewRange()) ||
+        (this.startsAfterViewRange() && 
+        this.endsAfterViewRange()));
+    return ret;
+
+};
+cosmo.view.cal.CalItem.prototype.startsBeforeViewRange = 
+    function () {
+    return (this.data.getEventStamp().getStartDate().toUTC() < 
+        cosmo.view.cal.viewStart.getTime());
+};
+cosmo.view.cal.CalItem.prototype.endsBeforeViewRange = 
+    function () {
+    return (this.data.getEventStamp().getEndDate().toUTC() < 
+        cosmo.view.cal.viewStart.getTime());
+};
+cosmo.view.cal.CalItem.prototype.startsAfterViewRange = 
+    function () {
+    return (this.data.getEventStamp().getStartDate().toUTC() > 
+        cosmo.view.cal.viewEnd.getTime());
+};
+cosmo.view.cal.CalItem.prototype.endsAfterViewRange = 
+    function () {
+    return (this.data.getEventStamp().getEndDate().toUTC() > 
+        cosmo.view.cal.viewEnd.getTime());
+};
 

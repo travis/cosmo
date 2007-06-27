@@ -547,12 +547,7 @@ cosmo.view.cal.canvas = new function () {
      * how to handle the published event.
      */
     this.handlePub_calEvent = function (cmd) {
-
-        // Ignore input when not the current view
-        var _pim = cosmo.app.pim;
-        if (_pim.currentView != _pim.views.CAL) {
-            return false;
-        }
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
 
         var act = cmd.action;
         var opts = cmd.opts;
@@ -624,12 +619,7 @@ cosmo.view.cal.canvas = new function () {
     };
 
     this.handlePub_app = function (cmd) {
-
-        // Ignore input when not the current view
-        var _pim = cosmo.app.pim;
-        if (_pim.currentView != _pim.views.CAL) {
-            return false;
-        }
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
 
         var t = cmd.type;
         switch (t) {
@@ -774,7 +764,7 @@ cosmo.view.cal.canvas = new function () {
                 case (str.indexOf(',' + ev.data.getUid() + ',') > -1):
                     var eventStamp = ev.data.getEventStamp();
                     var startDate = eventStamp.getStartDate();
-                    var endDate = eventStamp.getEndDate();                    
+                    var endDate = eventStamp.getEndDate();
                     // If also filtering by date, check the start date of
                     // matching events as well
                     if (compDt && (startDate.toUTC() < compDt.toUTC())) {
@@ -1010,7 +1000,7 @@ cosmo.view.cal.canvas = new function () {
                 break;
             case OPTIONS.ALL_FUTURE_EVENTS:
                 var eventRegistry = cosmo.view.cal.itemRegistry.clone();
-                eventRegistry = filterOutRecurrenceGroup(eventRegistry, [ev.data.getUid()],  
+                eventRegistry = filterOutRecurrenceGroup(eventRegistry, [ev.data.getUid()],
                     ev.data.getEventStamp().getRrule().getEndDate());
                 removeAllEvents();
                 cosmo.view.cal.itemRegistry = eventRegistry;
@@ -1022,7 +1012,7 @@ cosmo.view.cal.canvas = new function () {
         }
         updateEventsDisplay();
     }
-    
+
     /**
      * Single-clicks -- do event dispatch based on ID of event's
      * DOM-element source. Includes selecting/moving/resizing event lozenges
@@ -1066,15 +1056,15 @@ cosmo.view.cal.canvas = new function () {
                 // If no currently selected item, or the item clicked
                 // is not the currently selected item, update the selection
                 if ((!sel) || (item.id != sel.id)) {
-                    // Call setSelectedCalItem here directly, and publish the 
-                    // selected-item message on a setTimeout to speed up UI 
-                    // response for direct clicks -- publishing 'setSelected' 
+                    // Call setSelectedCalItem here directly, and publish the
+                    // selected-item message on a setTimeout to speed up UI
+                    // response for direct clicks -- publishing 'setSelected'
                     // will cause setSelectedCalItem to be called a second time
                     // as the canvas responds to this message, but it doesn't
                     // hurt to re-select the currently selected item
                     setSelectedCalItem(item);
                     var f = function () {
-                        dojo.event.topic.publish('/calEvent', { 
+                        dojo.event.topic.publish('/calEvent', {
                             'action': 'setSelected', 'data': item });
                     }
                     setTimeout(f, 0);

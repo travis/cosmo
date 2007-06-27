@@ -21,6 +21,7 @@ dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require('cosmo.view.BaseItem');
+dojo.require('cosmo.view.list.ListItem');
 dojo.require('cosmo.view.dialog');
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
@@ -31,13 +32,6 @@ dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
 dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
 
 cosmo.view.list.viewId = cosmo.app.pim.views.LIST;
-
-cosmo.view.list.ListItem = function () {
-    this.sort = null;
-    this.display = null;
-    this.data = null;
-}
-cosmo.view.list.ListItem.prototype = new cosmo.view.BaseItem();
 
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;
@@ -60,12 +54,6 @@ cosmo.view.list.triageStatusCodeStrings = {
 cosmo.view.list.handlePub_calEvent = function (cmd) {
 
     if (!cosmo.view.list.isCurrentView()) { return false; }
-
-    // Ignore input when not the current view
-    var _pim = cosmo.app.pim;
-    if (_pim.currentView != _pim.views.LIST) {
-        return false;
-    }
 
     var act = cmd.action;
     var qual = cmd.qualifier || null;
@@ -148,7 +136,7 @@ cosmo.view.list.createItemRegistry = function (arrParam) {
 
     for (var i = 0; i < arr.length; i++) {
         var note = arr[i];
-        var id = note.getUid();
+        var id = note.getItemUid();
         var item = new cosmo.view.list.ListItem();
         item.id = id;
         item.data = note;

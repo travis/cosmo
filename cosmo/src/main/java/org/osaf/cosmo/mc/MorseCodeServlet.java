@@ -292,6 +292,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                msg + ": " + e.getMessage());
                 return;
+            } catch (RuntimeException e) {
+                String msg ="Unexpected server error";
+                log.error(msg + " " + cp.getUid(), e);
+                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        msg + ": " + e.getMessage());
             }
         }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

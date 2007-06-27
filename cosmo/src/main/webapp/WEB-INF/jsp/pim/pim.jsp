@@ -74,11 +74,13 @@ if (collectionUrlIndex >= 0){
 	cosmo.app.initParams.collectionUid = 
 		location.pathname.substring(collectionUrlIndex + 11);
 }
-if (location.search){
-	var params = cosmo.util.uri.parseQueryString(location.search);
-	if (params['ticket']) 
-		cosmo.app.initParams.ticketKey = params['ticket'];
-}
+var params = (location.search)? cosmo.util.uri.parseQueryString(location.search) : {};
+
+if (params.ticket) 
+    cosmo.app.initParams.ticketKey = params.ticket[0];
+
+if (params.view)
+	cosmo.app.initParams.initialView = cosmo.app.pim.views[params.view[0].toUpperCase()];
 
 cosmo.app.initParams.authAccess = cosmo.util.auth.currentlyAuthenticated();
 

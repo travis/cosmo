@@ -93,6 +93,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.init = function (p) {
         var params = p || {};
         var collectionUrl = params.collectionUrl;
+        var startView = params.initialView || this.currentView;
 
         this.authAccess = params.authAccess;
         this.ticketKey = params.ticketKey;
@@ -114,7 +115,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
         this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
         // Display the default view
-        this.baseLayout.mainApp.centerColumn.navBar.displayView(this.currentView);
+        this.baseLayout.mainApp.centerColumn.navBar.displayView(startView);
 
         // Show errors for deleted subscriptions -- deletedSubscriptions
         // is a private var populated in the loadCollections method

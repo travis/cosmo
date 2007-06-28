@@ -26,7 +26,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
-
+dojo.require("cosmo.ui.imagegrid");
 
 cosmo.view.list.canvas.Canvas = function (p) {
     var self = this;
@@ -66,6 +66,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
             case 'saveSuccess':
                 this._saveSuccess(cmd)
                 break;
+            case 'removeSuccess':
+                var ev = cmd.data;
+                this._removeSuccess(cmd);
             default:
                 // Do nothing
                 break;
@@ -75,7 +78,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.renderSelf = function () {
         if (!cosmo.view.list.isCurrentView()) { return false; }
 
-        var reg = cosmo.view.list.itemRegistry;
+        var reg = this.view.itemRegistry;
         this._updateSize();
         this.setPosition(0, CAL_TOP_NAV_HEIGHT);
         this.setSize();
@@ -159,30 +162,40 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var hash = _list.itemRegistry;
         var selId = 'listView_item' + self.getSelectedItemId();
         var map = cosmo.view.list.triageStatusCodeNumberMappings;
-        var t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">';
+        var d = _createElem('div'); // Dummy div
+        var taskIcon = cosmo.ui.imagegrid.createImageIcon({ domNode: d,
+            iconState: 'listViewTaskIcon' });
+        var taskIconStyle = taskIcon.style;
+        var t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
         var r = '';
         r += '<tr>';
-        r += '<td id="listViewTaskHeader" class="listViewHeaderCell" style="width: 24px;">&nbsp;</td>';
+        r += '<td id="listViewTaskHeader" class="listViewHeaderCell" style="width: 16px;">&nbsp;</td>';
         r += '<td id="listViewTitleHeader" class="listViewHeaderCell">Title</td>';
         r += '<td id="listViewWhoHeader" class="listViewHeaderCell">Updated By</td>';
         r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">Starts On</td>';
         r += '<td id="listViewTriageHeader" class="listViewHeaderCell" style="border-right: 0px;">Triage</td>';
-        r += '</tr>';
+        r += '</tr>\n';
         t += r;
         var getRow = function (key, val) {
             var item = val;
             var display = item.display;
             var selCss = 'listView_item' + display.uid == selId ? ' listViewSelectedCell' : '';
-            var updatedBy = '';
             r = '';
             r += '<tr id="listView_item' + display.uid + '">';
-            r += '<td class="listViewDataCell' + selCss +
-                '" style="text-align: center;">' + display.task + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">';
+            if (display.task) {
+                r += '<div style="margin: 0px 2px; width: ' + taskIconStyle.width +
+                    '; height: ' + taskIconStyle.height +
+                    '; font-size: 1px; background-image: ' +
+                    taskIconStyle.backgroundImage + '; background-position: ' +
+                    taskIconStyle.backgroundPosition + '">&nbsp;</div>';
+            }
+            r += '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.title + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.who + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.startDate + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + display.triage + '</td>';
-            r += '</tr>';
+            r += '</tr>\n';
             t += r;
         }
         var size = this.itemsPerPage;
@@ -230,7 +243,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this._saveSuccess = function (cmd) {
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var item = cmd.data;
-        var data = item.data;
         var saveType = cmd.saveType || null;
         var delta = cmd.delta;
         var deferred = null;
@@ -240,10 +252,28 @@ cosmo.view.list.canvas.Canvas = function (p) {
             self.view.loadItems();
         }
         else {
-            this.view.setSortAndDisplay(item);
+            self.view.setSortAndDisplay(item);
             self._doSortAndDisplay();
         }
+    };
+    this._removeSuccess = function (cmd) {
+        var recurOpts = cosmo.view.service.recurringEventOptions;
+        var item = cmd.data;
+        var opts = cmd.opts;
+        var removeType = opts.removeType;
 
+        self.clearSelectedItem();
+        switch (removeType){
+            case recurOpts.ALL_EVENTS:
+            case recurOpts.ALL_FUTURE_EVENTS:
+                self.view.loadItems();
+                break;
+            case recurOpts.ONLY_THIS_EVENT:
+            case 'singleEvent':
+                self.view.itemRegistry.removeItem(item.id);
+                self._doSortAndDisplay();
+                break;
+        }
     };
     this._doSortAndDisplay = function (id) {
         var s = '';

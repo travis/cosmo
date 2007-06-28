@@ -11,5 +11,6 @@
 "triageLaterButtonDefault": { "row": 3, "column": 11, "width": 43, "height": 20 },
 "triageLaterButtonRollover": { "row": 3, "column": 8, "width": 43, "height": 20 },
 "triageDoneButtonDefault": { "row": 3, "column": 12, "width": 43, "height": 20 },
-"triageDoneButtonRollover": { "row": 3, "column": 9, "width": 43, "height": 20 }
+"triageDoneButtonRollover": { "row": 3, "column": 9, "width": 43, "height": 20 },
+"listViewTaskIcon": { "row": 3, "column": 19, "width": 12, "height": 12 }
 }

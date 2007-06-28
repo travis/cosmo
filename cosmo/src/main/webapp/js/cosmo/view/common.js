@@ -88,7 +88,8 @@ cosmo.view.canvasBase = new function () {
     this.getSelectedItem = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         var id = this.selectedEventIdRegistry[key];
-        return this.view.itemRegistry.getItem(id);
+        var reg = this.view.itemRegistry;
+        return reg ? reg.getItem(id) : null;
     };
     this.setSelectedItem = function (ev) {
         var key = cosmo.app.pim.currentCollection.getUid();

@@ -146,7 +146,7 @@ cosmo.view.dialog = new function() {
     function doPublish(act, qual) {
         var selEv = cosmo.view.cal.canvas.getSelectedItem();
         dojo.event.topic.publish('/calEvent', { 
-            action: act, qualifier: qual, data: selEv });
+            action: act, qualifier: qual, data: self.item });
         closeSelf();
     }
 

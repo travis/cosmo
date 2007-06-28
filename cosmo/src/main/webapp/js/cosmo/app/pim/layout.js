@@ -41,6 +41,7 @@ dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.detail");
+dojo.require("cosmo.ui.imagegrid");
 
 
 cosmo.app.pim.layout = new function () {
@@ -244,10 +245,30 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
-
+  
+    var menuBar = this.baseLayout.menuBar;
     var centerColumn = this.baseLayout.mainApp.centerColumn;
     var leftSidebar = this.baseLayout.mainApp.leftSidebar;
     var rightSidebar = this.baseLayout.mainApp.rightSidebar;
+
+    // Main logo graphic
+    var d = _createElem('div');
+    d.id = 'mainLogoContainer';
+    d = cosmo.ui.imagegrid.createImageIcon({ domNode: d,
+        iconState: 'mainLogoGraphic' });
+    d.style.position = 'absolute';
+    d.style.top = '0px';
+    d.style.left = '6px';
+    menuBar.domNode.appendChild(d);
+
+    // Main menu of links at the top of the UI
+    var d = _createElem('div');
+    d.id = 'menuNavItems';
+    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top:
+        (TOP_MENU_HEIGHT - 20) });
+    menuBar.addChild(cB);
+    menuBar.mainMenu = cB;
+    cB.render(); // Go ahead and render the menubar -- no waiting for data
 
     // List view canvas
     var d = _createElem('div');
@@ -257,7 +278,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         height: centerColumn.height - CAL_TOP_NAV_HEIGHT });
     centerColumn.addChild(list);
     centerColumn.listCanvas = list;
-    
+
     // Cal view canvas -- namespace singleton and Canvas ContentBox obj
     // are bolted together in an unpleasant way here
     var cal = new cosmo.view.cal.canvas.Canvas({
@@ -300,15 +321,6 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     leftSidebar.addChild(cB);
     leftSidebar.minical = cB;
     cB.render();
-
-    // Main menu of links at the top of the UI
-    var d = _createElem('div');
-    d.id = 'menuNavItems';
-    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top:
-        (TOP_MENU_HEIGHT - 20) });
-    this.baseLayout.menuBar.addChild(cB);
-    this.baseLayout.menuBar.mainMenu = cB;
-    cB.render(); // Go ahead and render the menubar -- no waiting for data
 
     // Subscription selector thinger -- show only in ticketed view
     if (cosmo.app.initParams.ticketKey) {

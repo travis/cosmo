@@ -1,4 +1,5 @@
 {
+"mainLogoGraphic": { "row": 1, "column": 1, "width": 192, "height": 45 },
 "readOnlyIcon": { "row": 2, "column": 7, "width": 12, "height": 12 },
 "listViewDefault": { "row": 1, "column": 9, "width": 24, "height": 35 },
 "listViewSelected": { "row": 1, "column": 17, "width": 24, "height": 35 },

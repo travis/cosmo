@@ -9,15 +9,10 @@ import java.util.Comparator;
 public class NoteItemTriageStatusComparator implements Comparator<NoteItem> {
 
     boolean reverse = false;
-    long pointInTime = 0;
     
     public NoteItemTriageStatusComparator() {
     }
-    
-    public NoteItemTriageStatusComparator(long pointInTime) {
-        this.pointInTime = pointInTime;
-    }
-    
+     
     public NoteItemTriageStatusComparator(boolean reverse) {
         this.reverse = reverse;
     }
@@ -26,11 +21,10 @@ public class NoteItemTriageStatusComparator implements Comparator<NoteItem> {
         if(note1.getUid().equals(note2.getUid()))
             return 0;
      
-        // Calculate a rank based the proximity of a timestamp 
-        // (one of triageStatusRank, eventStart, lastModifiedDate) 
-        // to a point in time.
-        long rank1 = Math.abs(pointInTime - getRank(note1));
-        long rank2 = Math.abs(pointInTime - getRank(note2));
+        // Calculate a rank depending on the type of item and
+        // the attributes present
+        long rank1 = getRank(note1);
+        long rank2 = getRank(note2);
         
         if(rank1>rank2)
             return reverse? -1 : 1;
@@ -46,22 +40,22 @@ public class NoteItemTriageStatusComparator implements Comparator<NoteItem> {
      */
     private long getRank(NoteItem note) {
         // Use triageStatusRank * 1000 to normalize to
-        // unix timestamp in milliseconds
+        // unix timestamp in milliseconds. 
         if(note.getTriageStatus()!=null && note.getTriageStatus().getRank()!=null)
-            return Math.abs(note.getTriageStatus().getRank().longValue())*1000;
+            return note.getTriageStatus().getRank().scaleByPowerOfTen(3).longValue();
         
-        // otherwise use startDate
+        // otherwise use startDate * -1
         BaseEventStamp eventStamp = BaseEventStamp.getStamp(note);
         if(eventStamp!=null) {
-            return eventStamp.getStartDate().getTime();
+            return eventStamp.getStartDate().getTime()*-1;
         }
         
-        // or occurrence date
+        // or occurrence date * -1
         if(note instanceof NoteOccurrence) {
-            return ((NoteOccurrence) note).getOccurrenceDate().getTime();
+            return ((NoteOccurrence) note).getOccurrenceDate().getTime()*-1;
         }
         
-        // use modified date as a last resort
-        return note.getModifiedDate().getTime();
+        // use modified date * -1 as a last resort
+        return note.getModifiedDate().getTime()*-1;
     }
 }

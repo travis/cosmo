@@ -59,7 +59,9 @@ public class StandardTriageStatusQueryProcessor implements
 
     private ContentDao contentDao = null;
     private static final Log log = LogFactory.getLog(StandardTriageStatusQueryProcessor.class);
-   
+    private static final Comparator<NoteItem> COMPARE_ASC = new NoteItemTriageStatusComparator(false);
+    private static final Comparator<NoteItem> COMPARE_DESC = new NoteItemTriageStatusComparator(true);
+    
     // Duration to search forward/backward for recurring events
     // is set to 30 days by default
     private Dur laterDur = new Dur("P30D");
@@ -145,7 +147,7 @@ public class StandardTriageStatusQueryProcessor implements
         }
         
         // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, -1); 
         // add masters
         sortedResults.addAll(masters);
         return sortedResults;
@@ -176,7 +178,7 @@ public class StandardTriageStatusQueryProcessor implements
         results.addAll(occurrences);
         
         // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, -1); 
         // add master if necessary
         if(sortedResults.size()>0)
             sortedResults.add(master);
@@ -252,7 +254,7 @@ public class StandardTriageStatusQueryProcessor implements
        }
        
        // sort results before returning
-       SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+       SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_DESC, -1); 
        // add masters
        sortedResults.addAll(masters);
        return sortedResults;
@@ -264,8 +266,7 @@ public class StandardTriageStatusQueryProcessor implements
      *     with triage status LATER or the next occurrence, whichever occurs sooner
      */
     private SortedSet<NoteItem> getLater(NoteItem master, Date pointInTime, TimeZone timezone) {
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(
-                new NoteItemTriageStatusComparator(pointInTime.getTime()));
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(COMPARE_DESC);
         // get the next occurring modification or occurrence
         NoteItem result = getLaterFromRecurringNote(master, pointInTime, timezone);
         
@@ -351,7 +352,7 @@ public class StandardTriageStatusQueryProcessor implements
         }
         
         // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, maxDone); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, maxDone); 
         // add masters
         sortedResults.addAll(masters);
         return sortedResults;
@@ -364,8 +365,7 @@ public class StandardTriageStatusQueryProcessor implements
      *     most recently
      */
     private SortedSet<NoteItem> getDone(NoteItem master, Date pointInTime, TimeZone timezone) {
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(
-                new NoteItemTriageStatusComparator(pointInTime.getTime()));
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(COMPARE_ASC);
         
         // get the most recently occurred modification or occurrence
         NoteItem result = getDoneFromRecurringNote(master, pointInTime, timezone);
@@ -413,8 +413,7 @@ public class StandardTriageStatusQueryProcessor implements
      *Sort results using rank calculated from triageStatusRank, eventStart,
      *or lastModified date.  Limit results.
      */
-    private SortedSet<NoteItem> sortResults(List<NoteItem> results, Date pointInTime, int limit) {
-        Comparator<NoteItem> comparator = new NoteItemTriageStatusComparator(pointInTime.getTime());
+    private SortedSet<NoteItem> sortResults(List<NoteItem> results, Comparator<NoteItem> comparator, int limit) {
         TreeSet<NoteItem> sortedResults = new TreeSet<NoteItem>(comparator);
         Collections.sort(results, comparator);
         

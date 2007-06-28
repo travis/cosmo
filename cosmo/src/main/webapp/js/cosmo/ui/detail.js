@@ -372,7 +372,7 @@ cosmo.ui.detail.MarkupBar.prototype =
 cosmo.ui.detail.TriageSection = function (p) {
     var self = this;
     var params = p || {};
-    var statuses = cosmo.view.list.triageStatusCodeNumbers;
+    var statuses = cosmo.model.Item.triageStatusCodeNumbers;
     var item = cosmo.ui.detail.item;
     var enabled = !!(item);
 

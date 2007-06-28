@@ -35,8 +35,9 @@ dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
 dojo.event.topic.subscribe('/calEvent', cosmo.view.cal, 'handlePub_calEvent');
 // Subscribe to the '/app' channel
 dojo.event.topic.subscribe('/app', cosmo.view.cal, 'handlePub_app');
-
-cosmo.view.cal.viewId = cosmo.app.pim.views.CAL;
+dojo.addOnLoad(function(){
+    cosmo.view.cal.viewId = cosmo.app.pim.views.CAL;
+});
 cosmo.view.cal.viewStart = null;
 cosmo.view.cal.viewEnd = null;
 // The list of items -- cosmo.util.hash.Hash obj

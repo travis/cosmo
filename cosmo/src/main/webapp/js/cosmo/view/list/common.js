@@ -30,16 +30,12 @@ dojo.require("cosmo.service.exception");
 dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
 
 dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
-
-cosmo.view.list.viewId = cosmo.app.pim.views.LIST;
+dojo.addOnLoad(function (){
+    cosmo.view.list.viewId = cosmo.app.pim.views.LIST;
+});
 
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;
-
-cosmo.view.list.triageStatusCodeNumbers = {
-    DONE: 300,
-    NOW: 100,
-    LATER: 200 };
 
 cosmo.view.list.triageStatusCodeNumberMappings = {
     300: 'done',

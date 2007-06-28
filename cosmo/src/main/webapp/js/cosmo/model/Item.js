@@ -139,6 +139,10 @@ cosmo.model.declare("cosmo.model.Item", null,
             this.initializeProperties(kwArgs);
       }
   });
+cosmo.model.Item.triageStatusCodeNumbers = {
+    DONE: 300,
+    NOW: 100,
+    LATER: 200 };
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
     [ ["body", {"default": null}],

@@ -38,7 +38,7 @@ cosmo.ui.menu = new function () {
     this.loadItems = function () {
         var _c = cosmo.ui.menu.MenuItem;
         var items =  cosmo.ui.menu.allItems;
-        var prefs = cosmo.app.initParams.authAccess? 
+        var prefs = cosmo.app.initParams.authAccess?
             cosmo.account.preferences.getPreferences() : {};
         // Instantiate all the items as MenuItem obj
         for (var i = 0; i < items.length; i++) {
@@ -50,7 +50,7 @@ cosmo.ui.menu = new function () {
             }
         }
     };
-    
+
     this.calculateDisplayMode = function(){
         var mode = 0;
         var modes = cosmo.ui.menu.displayModes;
@@ -59,7 +59,7 @@ cosmo.ui.menu = new function () {
         if (cosmo.app.initParams.ticketKey) mode |= modes.TICKETED;
         return mode;
     };
-    
+
     this.itemShownInDisplayMode = function (item, displayMode) {
         return displayMode & item.displayMode;
     };
@@ -97,7 +97,7 @@ cosmo.ui.menu.requiredRoles = {
 
 cosmo.ui.menu.urls = {
     HELP: 'http://wiki.osafoundation.org/Projects/CosmoHelpRel0dot6',
-    ACCOUNT_BROWSER: cosmo.env.getBaseUrl() + '/browse/' + 
+    ACCOUNT_BROWSER: cosmo.env.getBaseUrl() + '/browse/' +
         cosmo.app.currentUsername,
     ADMIN_CONSOLE: cosmo.env.getBaseUrl() + '/admin/users'
 };
@@ -120,14 +120,14 @@ cosmo.ui.menu.allItems = [
         requiredRoles: [cosmo.ui.menu.requiredRoles.ROOT]
         },
     { id: 'settingsMenuItem',
-        displayText: _('Main.Settings'), 
-        onclickFunc: function () { cosmo.account.settings.showDialog(); }, 
+        displayText: _('Main.Settings'),
+        onclickFunc: function () { cosmo.account.settings.showDialog(); },
         displayMode: cosmo.ui.menu.displayModes.AUTH,
         requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
         },
     { id: 'accountBrowserMenuItem',
-        displayText: _('Main.AccountBrowser'), 
-        onclickFunc: function (e) { 
+        displayText: _('Main.AccountBrowser'),
+        onclickFunc: function (e) {
             window.open(cosmo.ui.menu.urls.ACCOUNT_BROWSER); e.preventDefault(); },
         urlString: cosmo.ui.menu.urls.ACCOUNT_BROWSER,
         displayMode: cosmo.ui.menu.displayModes.AUTH,
@@ -135,27 +135,27 @@ cosmo.ui.menu.allItems = [
         //requiredPref: cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK
         },
     { id: 'signupMenuItem',
-        displayText: _('Main.SignUp'), 
-        onclickFunc: function () { cosmo.account.create.showForm() }, 
+        displayText: _('Main.SignUp'),
+        onclickFunc: function () { cosmo.account.create.showForm() },
         displayMode: cosmo.ui.menu.displayModes.ANON,
         requiredRoles: []
         },
     { id: 'helpMenuItem',
-        displayText: _('Main.Help'), 
-        onclickFunc: function (e) { 
+        displayText: _('Main.Help'),
+        onclickFunc: function (e) {
             window.open(cosmo.ui.menu.urls.HELP); e.preventDefault(); },
         urlString: cosmo.ui.menu.urls.HELP,
         displayMode: cosmo.ui.menu.displayModes.ANY,
         requiredRoles: []
         },
     { id: 'loginMenuItem',
-        displayText: _('Main.LogIn'), 
+        displayText: _('Main.LogIn'),
         onclickFunc: function(){location = cosmo.env.getLoginRedirect()},
         displayMode: cosmo.ui.menu.displayModes.ANON,
         requiredRoles: []
         },
     { id: 'logoutMenuItem',
-        displayText: _('Main.LogOut'), 
+        displayText: _('Main.LogOut'),
         urlString: cosmo.env.getRedirectUrl(),
         displayMode: cosmo.ui.menu.displayModes.AUTH,
         requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
@@ -220,7 +220,7 @@ cosmo.ui.menu.MainMenu = function (p) {
         this.domNode.appendChild(s);
     };
     this.insertItem = function (item, referenceItem) {
-        
+
     };
     this.renderSelf = function () {
         if (!this.hasBeenRendered) {

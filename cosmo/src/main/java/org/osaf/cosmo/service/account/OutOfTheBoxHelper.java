@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.service.account;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -67,10 +68,21 @@ public class OutOfTheBoxHelper {
             contentDao.createCollection(context.getHomeCollection(),
                                         makeCollection(context));
 
-        contentDao.createContent(initial, makeWelcomeItem(context));
-        contentDao.createContent(initial, makeTryOutItem(context));
-        contentDao.createContent(initial, makeSubscribeItem(context));
-        contentDao.createContent(initial, makeSignUpItem(context));
+        NoteItem welcome = (NoteItem)
+            contentDao.createContent(initial, makeWelcomeItem(context));
+
+        NoteItem tryOut = (NoteItem)
+            contentDao.createContent(initial, makeTryOutItem(context));
+        // tryOut note should sort below welcome note
+        BigDecimal tryOutRank = tryOut.getTriageStatus().getRank().
+            subtract(BigDecimal.valueOf(1, 2));
+        tryOut.getTriageStatus().setRank(tryOutRank);
+
+        NoteItem subscribe = (NoteItem)
+            contentDao.createContent(initial, makeSubscribeItem(context));
+
+        NoteItem signUp = (NoteItem)
+            contentDao.createContent(initial, makeSignUpItem(context));
 
         return initial;
     }

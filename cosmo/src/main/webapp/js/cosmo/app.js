@@ -20,6 +20,7 @@ dojo.require("dojo.event.*");
 dojo.require("dojo.io.*");
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.timeout");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.topics");
@@ -267,5 +268,36 @@ cosmo.app = new function () {
         if (show) {
            selectBoxVisibility = {};
         }
+    };
+    this.handleTimeout = function (){
+        
+        var logoutFunction = function () {
+            location = cosmo.env.getRedirectUrl();
+        }
+        
+        var autoLogoutTimeout = 
+            dojo.lang.setTimeout(logoutFunction,
+                cosmo.ui.conf.timeoutDialogAutoLogout * 1000)
+        
+        
+        
+        var dialogHash = {};
+        var cancelLogoutButton = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+            handleOnClick: function () { 
+                cosmo.app.hideDialog();
+                dojo.lang.clearTimeout(autoLogoutTimeout)
+                cosmo.ui.timeout.updateLastActionTime() 
+            } });
+        dialogHash.btnsLeft = [cancelLogoutButton];
+        var logoutButton = new cosmo.ui.button.Button({ text:_('App.Button.OK'), width:74,
+            handleOnClick: logoutFunction
+            });
+        dialogHash.btnsRight = [logoutButton];
+        dialogHash.title = _('App.Timeout.Title');
+        dialogHash.prompt = _('App.Timeout.Prompt', 
+                              cosmo.env.getTimeoutMinutes(), 
+                              cosmo.ui.conf.timeoutDialogAutoLogout);
+        self.showDialog(dialogHash);
+        
     };
 };

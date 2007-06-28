@@ -46,3 +46,9 @@ dj_global.LOGO_GRAPHIC = 'logo_main.gif';
 dj_global.LOGO_GRAPHIC_SM = 'logo_sm.gif';
 dj_global.BUTTON_DIR_PATH = cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/images/';
 
+// Non global configuration
+try { 
+    dojo.lang.mixin(cosmo.ui.conf, eval("(" + dojo.hostenv.getText(djConfig['confLocation']) + ")"));
+} catch (e){
+    throw new Error("Could not load configuration file.");
+}

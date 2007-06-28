@@ -30,6 +30,7 @@ dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
+dojo.require("cosmo.ui.timeout");
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.uri');
 dojo.require('cosmo.service.conduits.common');
@@ -125,6 +126,8 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                     deletedSubscriptions[x].getDisplayName()));
             }
         }
+        
+        cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
     };
 
     // ==========================

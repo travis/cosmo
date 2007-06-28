@@ -81,10 +81,6 @@ cosmo.ui.event.handlers.mouseDownHandler = function (e) {
     // =================
     // Check for client-side timeout on all mouse clicks
     // =================
-    //XINT 
-    if (cosmo.ui.timeout.timedOut()){
-        alert("Logout needs to happen!")
-    }
     cosmo.ui.timeout.updateLastActionTime();
 }
 
@@ -145,8 +141,7 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     // Have to return false to keep event from continuing to bubble
     // otherwise it actually ends up refreshing the session before
     // we have a chance to time out
-    //XINT
-    //TODO: add timeout check
+    cosmo.ui.timeout.updateLastActionTime();
 
     e = !e ? window.event : e;
 

@@ -36,7 +36,8 @@
 
     var djConfig = {isDebug: false,
                     staticBaseUrl: "${staticBaseUrl}",
-                    i18nLocation: "${staticBaseUrl}/i18n.js"};
+                    i18nLocation: "${staticBaseUrl}/i18n.js",
+                    confLocation: "${staticBaseUrl}/webui.conf"};
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>
@@ -50,6 +51,7 @@ function bootstrap(){
     dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
 
     dojo.require("cosmo.env");
+    dojo.require("cosmo.ui.conf");
 
     cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
     cosmo.env.version = "${PRODUCT_VERSION}";
@@ -58,7 +60,9 @@ function bootstrap(){
       Setting the canonical client-side value with a function ensures
       we end up with reasonable numbers in getTimeoutSeconds and getTimeoutMinutes
     --%>
-    cosmo.env.setTimeoutSeconds(<%=session.getMaxInactiveInterval()%>);
+    cosmo.env.setTimeoutSeconds(
+    	cosmo.ui.conf.uiTimeout ||
+    	<%=session.getMaxInactiveInterval()%>);
 
     dojo.require("cosmo.ui.widget.Debug");
 

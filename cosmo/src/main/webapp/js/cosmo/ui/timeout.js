@@ -15,17 +15,19 @@
  */
  
 dojo.provide("cosmo.ui.timeout");
+dojo.require("cosmo.env");
+dojo.require("dojo.lang.common");
 
-cosmo.ui.timeout.lastActionTime = new Date();
-
-// Timeout in milliseconds
-cosmo.ui.timeout.TIMEOUT = 30*1000*60;
-
-cosmo.ui.timeout.timedOut = function timedOut(){
-    var now = new Date();
-    return (now.getTime() > this.lastActionTime + this.TIMEOUT);
+cosmo.ui.timeout.updateLastActionTime = function (){
+    dojo.lang.clearTimeout(this.timeoutObject);
+    this.setTimeout();    
 }
 
-cosmo.ui.timeout.updateLastActionTime = function updateLastActionTime(){
-    this.lastActionTime = new Date();
+cosmo.ui.timeout.timeoutObject = null;
+cosmo.ui.timeout.timeoutFunction = null;
+
+cosmo.ui.timeout.setTimeout = function (func, timeout){
+   if (func) this.timeoutFunction = func;
+   timeout = timeout || cosmo.env.getTimeoutSeconds() * 1000;
+   this.timeoutObject = dojo.lang.setTimeout(this.timeoutFunction, timeout);
 }

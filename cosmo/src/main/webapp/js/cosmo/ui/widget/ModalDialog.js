@@ -31,6 +31,7 @@ dojo.provide("cosmo.ui.widget.ModalDialog");
 
 dojo.require("dojo.widget.*");
 dojo.require("dojo.html.common");
+dojo.require("dojo.Deferred");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.ButtonPanel");
@@ -68,6 +69,10 @@ dojo.widget.HtmlWidget, {
         uiFullMask: null,
         defaultAction: null,
         isDisplayed: false,
+        
+        // A deferred that will be fired with "this.content" as the result
+        // when the dialog is hidden.
+        deferred: new dojo.Deferred(),
 
         // Instance methods
         setTop: function (n) {
@@ -420,11 +425,16 @@ dojo.widget.HtmlWidget, {
                 this.domNode.style.visibility = 'visible';
 
                 this.isDisplayed = true;
+                
+                this.deferred = new dojo.Deferred();
+                return this.deferred;
 
             };
 
             // Clear buttons and actually take the div off the page
             this.hide = function () {
+                this.deferred.callback(this.content);
+
                 var bDiv = this.buttonPanelNode;
 
                 // Clean up previous panel if any

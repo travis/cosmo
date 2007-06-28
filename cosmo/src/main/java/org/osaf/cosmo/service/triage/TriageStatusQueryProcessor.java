@@ -25,9 +25,11 @@ import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Defines API for processing a TriageStatus query.
- * A TriageStatus query is run against a collection and
- * returns all NoteItems that belong to a specified 
- * TriageStatus (NOW,DONE,LATER).  The criteria that
+ * A TriageStatus query is run against a collection or
+ * a master recurring note and returns all NoteItems that 
+ * belong to a specified  TriageStatus (NOW,DONE,LATER).  
+ * 
+ * The criteria that
  * determines if a NoteItem belongs to a certain status
  * is complicated and based on different rules depending
  * on the status queried.
@@ -46,6 +48,23 @@ public interface TriageStatusQueryProcessor {
      * @return the set of NoteItems that match the given parameters
      */
     public Set<NoteItem> processTriageStatusQuery(CollectionItem collection,
+            String triageStatusLabel,
+            Date pointInTime,
+            TimeZone timezone);
+    
+    /**
+     * Return modification and occurrence NoteItems 
+     * from a master recurring NoteItem that fall into a 
+     * given triage status category.
+     * @param note master recurring note to search
+     * @param triageStatusLabel triage status label to match
+     * @param pointInTime time that is considered "NOW"
+     * @param timezone Optional timezone to use in interpreting
+     *                 floating times. If null, the system default
+     *                 will be used.
+     * @return the set of NoteItems that match the given parameters
+     */
+    public Set<NoteItem> processTriageStatusQuery(NoteItem note,
             String triageStatusLabel,
             Date pointInTime,
             TimeZone timezone);

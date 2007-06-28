@@ -770,16 +770,35 @@ public class StandardContentService implements ContentService {
     
     
     /**
-     * Find note items by triage status.
+     * Find note items by triage status that belong to a collection.
      * @param collection collection
      * @param statusLabel triage status to find
      * @param pointInTime point in time to triage
      * @param timezone Optional timezone to use for floating dates.  If null, the
      *        system default is used.
-     * @return set of notes that match the specified triage status label
+     * @return set of notes that match the specified triage status label and
+     *         belong to the specified collection
      */
-    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection, String statusLabel, Date pointInTime, TimeZone timezone) {
-        return triageStatusQueryProcessor.processTriageStatusQuery(collection, statusLabel, pointInTime, timezone);
+    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection,
+            String statusLabel, Date pointInTime, TimeZone timezone) {
+        return triageStatusQueryProcessor.processTriageStatusQuery(collection,
+                statusLabel, pointInTime, timezone);
+    }
+    
+    /**
+     * Find note items by triage status that belong to a recurring note series.
+     * @param note recurring note
+     * @param statusLabel triage status to find
+     * @param pointInTime point in time to triage
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
+     * @return set of notes that match the specified triage status label and belong
+     *         to the specified recurring note series
+     */
+    public Set<NoteItem> findNotesByTriageStatus(NoteItem note,
+            String statusLabel, Date pointInTime, TimeZone timezone) {
+        return triageStatusQueryProcessor.processTriageStatusQuery(note,
+                statusLabel, pointInTime, timezone);
     }
 
     /**

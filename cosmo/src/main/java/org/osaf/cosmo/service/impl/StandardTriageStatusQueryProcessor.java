@@ -80,6 +80,18 @@ public class StandardTriageStatusQueryProcessor implements
             throw new IllegalArgumentException("invalid status: " + triageStatusLabel);
     }
     
+    public Set<NoteItem> processTriageStatusQuery(NoteItem note,
+            String triageStatusLabel, Date pointInTime, TimeZone timezone) {
+        if(TriageStatus.LABEL_DONE.equalsIgnoreCase(triageStatusLabel))
+            return getDone(note, pointInTime, timezone);
+        else if(TriageStatus.LABEL_NOW.equalsIgnoreCase(triageStatusLabel))
+            return getNow(note, pointInTime, timezone);
+        else if(TriageStatus.LABEL_LATER.equalsIgnoreCase(triageStatusLabel))
+            return getLater(note, pointInTime, timezone);
+        else
+            throw new IllegalArgumentException("invalid status: " + triageStatusLabel);
+    }
+    
     /**
      * NOW Query:<br/>
      *   - Non-recurring with no or null triage status<br/>
@@ -99,8 +111,11 @@ public class StandardTriageStatusQueryProcessor implements
         // recurring event filter
         NoteItemFilter eventFilter = getRecurringEventFilter(collection);
         
-        // store all results here
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(new NoteItemTriageStatusComparator(pointInTime.getTime()));
+        // store results here
+        ArrayList<NoteItem> results = new ArrayList<NoteItem>();
+        
+        // keep track of masters as we have to include them in the result set
+        HashSet<NoteItem> masters = new HashSet<NoteItem>();
         
         // Add all non-recurring items that are have an explicit NOW triage,
         // modifications with NOW triage, or no triage (null triage)
@@ -109,34 +124,86 @@ public class StandardTriageStatusQueryProcessor implements
             EventStamp eventStamp = EventStamp.getStamp(note);
             
             // Don't add recurring events
-            if(eventStamp==null || eventStamp.isRecurring()==false)
+            if(eventStamp==null || eventStamp.isRecurring()==false) {
                 results.add(note);
+                // keep track of master
+                if(note.getModifies()!=null)
+                    masters.add(note.getModifies());
+            }
         }
-            
-        RecurrenceExpander expander = new RecurrenceExpander();
-        DateTime currentDate = new DateTime(pointInTime); 
         
         // Now process recurring events, returning only occurrences that overlap
         // current instant in time
         for(Item item: contentDao.findItems(eventFilter)) {
             NoteItem note = (NoteItem) item;
-            EventStamp eventStamp = EventStamp.getStamp(note);
-           
-            // Get all occurrences that overlap current instance in time
-            InstanceList occurrences = expander.getOcurrences(eventStamp.getCalendar(), currentDate, currentDate, timezone);
-            
-            for(Instance instance: (Collection<Instance>) occurrences.values()) {
-                // Not interested in modifications
-                if(!instance.isOverridden()) {
-                    // add occurrence
-                    results.add(new NoteOccurrence(instance.getRid(), note));
-                    // add master
-                    results.add(note);
-                }
+            Set<NoteItem> occurrences = getNowFromRecurringNote(note, pointInTime, timezone);
+            if(occurrences.size()>0) {
+                results.addAll(occurrences);
+                masters.add(note);
             }
         }
         
-        return results; 
+        // sort results before returning
+        Set<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+        // add masters
+        sortedResults.addAll(masters);
+        return sortedResults;
+    }
+    
+    /**
+     * NOW Query for a specific master NoteItem:<br/>
+     *   - Modifications with triage status NOW<br/>
+     *   - Occurrences whose period overlaps the current point in time 
+     */
+    private Set<NoteItem> getNow(NoteItem master, Date pointInTime, TimeZone timezone) {
+        
+        // filter for NOW modifications
+        NoteItemFilter nowFilter = getTriageStatusFilter(master, TriageStatus.CODE_NOW);
+        
+        // store all results here
+        ArrayList<NoteItem> results = new ArrayList<NoteItem>();
+        
+        // Add all modifications triaged as NOW
+        for(Item item : contentDao.findItems(nowFilter)) {
+            NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                results.add(note);
+        }
+        
+        // add all occurrences that occur NOW
+        Set<NoteItem> occurrences = getNowFromRecurringNote(master, pointInTime, timezone);
+        results.addAll(occurrences);
+        
+        // sort results before returning
+        Set<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+        // add master if necessary
+        if(sortedResults.size()>0)
+            sortedResults.add(master);
+            
+        return sortedResults; 
+    }
+    
+    /**
+     * Get all instances that are occuring during a given point in time
+     */
+    private Set<NoteItem> getNowFromRecurringNote(NoteItem note, Date pointInTime, TimeZone timezone) {
+        EventStamp eventStamp = EventStamp.getStamp(note);
+        DateTime currentDate = new DateTime(pointInTime); 
+        RecurrenceExpander expander = new RecurrenceExpander();
+        HashSet<NoteItem> results = new HashSet<NoteItem>();
+        
+        // Get all occurrences that overlap current instance in time
+        InstanceList occurrences = expander.getOcurrences(eventStamp.getCalendar(), currentDate, currentDate, timezone);
+        
+        for(Instance instance: (Collection<Instance>) occurrences.values()) {
+            // Not interested in modifications
+            if(!instance.isOverridden()) {
+                // add occurrence
+                results.add(new NoteOccurrence(instance.getRid(), note));
+            }
+        }
+        
+        return results;
     }
     
     /**
@@ -153,41 +220,89 @@ public class StandardTriageStatusQueryProcessor implements
        // recurring event filter
        NoteItemFilter eventFilter = getRecurringEventFilter(collection);
        
-       TreeSet<NoteItem> results = new TreeSet<NoteItem>(new NoteItemTriageStatusComparator(pointInTime.getTime()));
+       // store results here
+       ArrayList<NoteItem> results = new ArrayList<NoteItem>();
+       HashSet<NoteItem> masters = new HashSet<NoteItem>();
        
        // Add all items that are have an explicit LATER triage
-       for(Item item : contentDao.findItems(laterFilter))
-           results.add((NoteItem) item);
-       
-       Date currentDate = pointInTime;
-       Date futureDate = laterDur.getTime(currentDate);
-       RecurrenceExpander expander = new RecurrenceExpander();
+       for(Item item : contentDao.findItems(laterFilter)) {
+           NoteItem note = (NoteItem) item;
+           EventStamp eventStamp = EventStamp.getStamp(note);
+           
+           // Don't add recurring events
+           if(eventStamp==null || eventStamp.isRecurring()==false) {
+               results.add(note);
+               // keep track of masters
+               if(note.getModifies()!=null)
+                   masters.add(note.getModifies());
+           }
+       }
        
        // Now process recurring events
        for(Item item: contentDao.findItems(eventFilter)) {
            NoteItem note = (NoteItem) item;
-           EventStamp eventStamp = EventStamp.getStamp(note);
+           NoteItem laterItem = getLaterFromRecurringNote(note, pointInTime, timezone);
            
-           // calculate the next occurrence or modification of the recurring event
-           Instance instance = 
-               expander.getFirstInstance(eventStamp.getCalendar(), new DateTime(currentDate), new DateTime(futureDate), timezone);
-       
-           if(instance!=null) {
-               // add master
-               results.add(note);
-               if(instance.isOverridden()==false) {
-                   // add occurrence
-                   results.add(new NoteOccurrence(instance.getRid(), note));
-               }
-               else {
-                   // add modification
-                   ModificationUid modUid = new ModificationUid(note, instance.getRid());
-                   results.add((NoteItem) contentDao.findItemByUid(modUid.toString()));
-               }
+           // add laterItem and master if present
+           if(laterItem!=null) {
+               results.add(laterItem);
+               masters.add(note);
            }
        }
        
-       return results;
+       // sort results before returning
+       Set<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+       // add masters
+       sortedResults.addAll(masters);
+       return sortedResults;
+    }
+    
+    /**
+     * LATER Query for a specific master NoteItem:<br/>
+     *   - the next occurring modification 
+     *     with triage status LATER or the next occurrence, whichever occurs sooner
+     */
+    private Set<NoteItem> getLater(NoteItem master, Date pointInTime, TimeZone timezone) {
+        HashSet<NoteItem> results = new HashSet<NoteItem>();
+        // get the next occurring modification or occurrence
+        NoteItem result = getLaterFromRecurringNote(master, pointInTime, timezone);
+        
+        // add result and master if present
+        if(result!=null) {
+            results.add(master);
+            results.add(result);
+        }
+        
+        return results;
+    }
+    
+    /**
+     * Get the next occurrence or modification for a recurring event, whichever
+     * occurrs sooner relative to a point in time.
+     */
+    private NoteItem getLaterFromRecurringNote(NoteItem note, Date pointInTime, TimeZone timezone) {
+        EventStamp eventStamp = EventStamp.getStamp(note);
+        Date currentDate = pointInTime;
+        Date futureDate = laterDur.getTime(currentDate);
+        RecurrenceExpander expander = new RecurrenceExpander();
+        
+        // calculate the next occurrence or modification
+        Instance instance = 
+            expander.getFirstInstance(eventStamp.getCalendar(), new DateTime(currentDate), new DateTime(futureDate), timezone);
+    
+        if(instance!=null) {
+            if(instance.isOverridden()==false) {
+                // return occurrence
+                return new NoteOccurrence(instance.getRid(), note);
+            }
+            else {
+                // return modification
+                ModificationUid modUid = new ModificationUid(note, instance.getRid());
+                return (NoteItem) contentDao.findItemByUid(modUid.toString());
+            }
+        }
+       
+        return null;
     }
     
     /**
@@ -205,67 +320,110 @@ public class StandardTriageStatusQueryProcessor implements
         // filter for recurring events
         NoteItemFilter eventFilter = getRecurringEventFilter(collection);
         
-        Comparator<NoteItem> comparator = new NoteItemTriageStatusComparator(pointInTime.getTime());
-        List<NoteItem> allResults = new ArrayList<NoteItem>();
-        TreeSet<NoteItem> limitResults = new TreeSet<NoteItem>(comparator);
+        List<NoteItem> results = new ArrayList<NoteItem>();
         Set<NoteItem> masters = new HashSet<NoteItem>();
         
         // Add all items that are have an explicit DONE triage
-        for(Item item : contentDao.findItems(doneFilter))
-            allResults.add((NoteItem) item);
-        
-        Date currentDate = pointInTime;
-        Date pastDate = doneDur.getTime(currentDate);
-        RecurrenceExpander expander = new RecurrenceExpander();
+        for(Item item : contentDao.findItems(doneFilter)) {
+            NoteItem note = (NoteItem) item;
+            EventStamp eventStamp = EventStamp.getStamp(note);
+            
+            // Don't add recurring events
+            if(eventStamp==null || eventStamp.isRecurring()==false) {
+                results.add(note);
+                // keep track of masters
+                if(note.getModifies()!=null)
+                    masters.add(note.getModifies());
+            }
+        }
         
         // Now process recurring events
         for(Item item: contentDao.findItems(eventFilter)) {
             NoteItem note = (NoteItem) item;
-            EventStamp eventStamp = EventStamp.getStamp(note);
-           
-            // calculate the previous occurrence or modification
-            Instance instance = 
-                expander.getLatestInstance(eventStamp.getCalendar(), new DateTime(pastDate), new DateTime(currentDate), timezone);
-        
-            if(instance!=null) {
-                // keep track of master
+            NoteItem doneItem = getDoneFromRecurringNote(note, pointInTime, timezone);
+            // add doneItem and master if present
+            if(doneItem!=null) {
+                results.add(doneItem);
                 masters.add(note);
-                if(instance.isOverridden()==false) {
-                    // add occurrence
-                    allResults.add(new NoteOccurrence(instance.getRid(), note));
-                    
-                }
-                else {
-                    // add modification
-                    ModificationUid modUid = new ModificationUid(note, instance.getRid());
-                    allResults.add((NoteItem) contentDao.findItemByUid(modUid.toString()));
-                }
             }
         }
         
-        // sort
-        Collections.sort(allResults, comparator);
-        
-        // limit to maxDone items
-        int toAdd = allResults.size();
-        if(toAdd>maxDone)
-            toAdd = maxDone;
-        
-        for(int i=0;i<toAdd;i++) {
-            limitResults.add(allResults.get(i));
-        }
-        
+        // sort results before returning
+        Set<NoteItem> sortedResults =  sortResults(results, pointInTime, maxDone); 
         // add masters
-        for(NoteItem master : masters)
-            limitResults.add(master);
-        
-        return limitResults;
-    }
-
-    public void setContentDao(ContentDao contentDao) {
-        this.contentDao = contentDao;
+        sortedResults.addAll(masters);
+        return sortedResults;
     }
     
+    /**
+     * DONE Query for a specific master NoteItem:<br/>
+     *   - the last occurring modification 
+     *     with triage status DONE or the last occurrence, whichever occurred
+     *     most recently
+     */
+    private Set<NoteItem> getDone(NoteItem master, Date pointInTime, TimeZone timezone) {
+        HashSet<NoteItem> results = new HashSet<NoteItem>();
+        // get the most recently occurred modification or occurrence
+        NoteItem result = getDoneFromRecurringNote(master, pointInTime, timezone);
+        
+        // add result and master if present
+        if(result!=null) {
+            results.add(master);
+            results.add(result);
+        }
+        
+        return results;
+    }
+    
+    /**
+     * Get the last occurring modification or occurrence, whichever occurred
+     * last.
+     */
+    private NoteItem getDoneFromRecurringNote(NoteItem note, Date pointInTime, TimeZone timezone) {
+        EventStamp eventStamp = EventStamp.getStamp(note);
+        Date currentDate = pointInTime;
+        Date pastDate = doneDur.getTime(currentDate);
+        RecurrenceExpander expander = new RecurrenceExpander();
+        
+        // calculate the previous occurrence or modification
+        Instance instance = 
+            expander.getLatestInstance(eventStamp.getCalendar(), new DateTime(pastDate), new DateTime(currentDate), timezone);
+    
+        if(instance!=null) {
+            if(instance.isOverridden()==false) {
+                // add occurrence
+                return new NoteOccurrence(instance.getRid(), note);
+            }
+            else {
+                // add modification
+                ModificationUid modUid = new ModificationUid(note, instance.getRid());
+                return (NoteItem) contentDao.findItemByUid(modUid.toString());
+            }
+        }
+       
+        return null;
+    }
+
+    
+    /**
+     *Sort results using rank calculated from triageStatusRank, eventStart,
+     *or lastModified date.  Limit results.
+     */
+    private Set<NoteItem> sortResults(List<NoteItem> results, Date pointInTime, int limit) {
+        Comparator<NoteItem> comparator = new NoteItemTriageStatusComparator(pointInTime.getTime());
+        TreeSet<NoteItem> sortedResults = new TreeSet<NoteItem>(comparator);
+        Collections.sort(results, comparator);
+        
+        int toAdd = results.size();
+        if(limit > 0 && toAdd > limit)
+            toAdd = limit;
+        
+        for(int i=0;i<toAdd;i++) {
+            sortedResults.add(results.get(i));
+        }
+        
+        return sortedResults;
+    }
     
     /**
      * Create NoteItemFilter that matches a parent collection and a specific
@@ -275,6 +433,18 @@ public class StandardTriageStatusQueryProcessor implements
         NoteItemFilter triageStatusFilter = new NoteItemFilter();
         triageStatusFilter.setParent(collection);
         triageStatusFilter.setIsModification(Boolean.FALSE);
+        triageStatusFilter.setTriageStatus(code);
+        return triageStatusFilter;
+    }
+    
+    /**
+     * Create NoteItemFilter that matches modifications for a master item with
+     * a specific triageStatus
+     */
+    private NoteItemFilter getTriageStatusFilter(NoteItem master, int code) {
+        NoteItemFilter triageStatusFilter = new NoteItemFilter();
+        triageStatusFilter.setMasterNoteItem(master);
+        triageStatusFilter.setIsModification(Boolean.TRUE);
         triageStatusFilter.setTriageStatus(code);
         return triageStatusFilter;
     }
@@ -290,6 +460,10 @@ public class StandardTriageStatusQueryProcessor implements
         eventNoteFilter.setParent(collection);
         eventNoteFilter.getStampFilters().add(eventFilter);
         return eventNoteFilter;
+    }
+
+    public void setContentDao(ContentDao contentDao) {
+        this.contentDao = contentDao;
     }
 
     public void setDoneDuration(String doneDuration) {

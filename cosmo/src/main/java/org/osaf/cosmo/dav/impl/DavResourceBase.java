@@ -578,7 +578,8 @@ public abstract class DavResourceBase
 
         if (item.getUid() == null) {
             item.setName(PathUtil.getBasename(getResourcePath()));
-            item.setDisplayName(item.getName());
+            if (item.getDisplayName() == null)
+                item.setDisplayName(item.getName());
         }
 
         // if we don't know specifically who the user is, then the
@@ -618,8 +619,10 @@ public abstract class DavResourceBase
                 setResourceProperty(property);
                 msr.add(property.getName(), DavServletResponse.SC_OK);
             } catch (ModelConversionException e) {
+                log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());
                 msr.add(property.getName(), DavServletResponse.SC_CONFLICT);
             } catch (ModelValidationException e) {
+                log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());
                 msr.add(property.getName(), DavServletResponse.SC_CONFLICT);
             } catch (DataSizeException e) {
                 log.warn("Property " + property.getName() + " cannot be stored: " + e.getMessage());

@@ -366,8 +366,8 @@ public class StandardContentService implements ContentService {
     public CollectionItem createCollection(CollectionItem parent,
                                            CollectionItem collection) {
         if (log.isDebugEnabled()) {
-            log.debug("creating collection " + collection.getUid() +
-                      " in " + parent.getUid());
+            log.debug("creating collection " + collection.getName() +
+                      " in " + parent.getName());
         }
         
         // add CalendarCollectionStamp if parent is the home collection
@@ -395,8 +395,8 @@ public class StandardContentService implements ContentService {
     public CollectionItem createCollection(CollectionItem parent,
             CollectionItem collection, Set<Item> children) {
         if (log.isDebugEnabled()) {
-            log.debug("creating collection " + collection.getUid() + " in "
-                    + parent.getUid());
+            log.debug("creating collection " + collection.getName() + " in "
+                    + parent.getName());
         }
 
         // Obtain locks to all collections involved.  A collection is involved
@@ -589,8 +589,8 @@ public class StandardContentService implements ContentService {
     public ContentItem createContent(CollectionItem parent,
                                      ContentItem content) {
         if (log.isDebugEnabled()) {
-            log.debug("creating content item " + content.getUid() +
-                      " in " + parent.getUid());
+            log.debug("creating content item " + content.getName() +
+                      " in " + parent.getName());
         }
         
         if (! lockManager.lockCollection(parent, lockTimeout))
@@ -618,7 +618,7 @@ public class StandardContentService implements ContentService {
     public void createContentItems(CollectionItem parent,
                                      Set<ContentItem> contentItems) {
         if (log.isDebugEnabled()) {
-            log.debug("creating content items in " + parent.getUid());
+            log.debug("creating content items in " + parent.getName());
         }
         
         if (! lockManager.lockCollection(parent, lockTimeout))

@@ -136,7 +136,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 var newDate = masterDate.clone();
                 newDate.add(dojo.date.dateParts.SECOND, diff);
                 this.getMaster().getEventStamp()[setterName](newDate);
-                this.item.recurrenceId = this.recurrenceId.add(dojo.dateParts.SECOND,diff);
+                this.item.recurrenceId = this.recurrenceId.add(dojo.date.dateParts.SECOND,diff);
                 return;  
             }
             this._inherited("applyChange", arguments);

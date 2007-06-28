@@ -32,7 +32,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.util.uri");
 dojo.require("cosmo.service.transport.Rest");
-dojo.require("cosmo.service.exception")
+dojo.require("cosmo.service.exception");
 
 dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
@@ -46,7 +46,9 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             var queryString = base.substring(queryIndex);
             var params = cosmo.util.uri.parseQueryString(queryString);
             dojo.lang.mixin(queryHash, params);
-        } else queryIndex = base.length;
+        } else {
+            queryIndex = base.length;
+        }
         
         return base.substring(0, queryIndex) + projection + this.queryHashToString(queryHash);
     },

@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.fortuna.ical4j.model.DateTime;
@@ -68,7 +69,7 @@ public class StandardTriageStatusQueryProcessor implements
     /* (non-Javadoc)
      * @see org.osaf.cosmo.service.triage.TriageStatusQueryProcessor#processTriageStatusQuery(org.osaf.cosmo.model.CollectionItem, java.lang.String, java.util.Date, net.fortuna.ical4j.model.TimeZone)
      */
-    public Set<NoteItem> processTriageStatusQuery(CollectionItem collection,
+    public SortedSet<NoteItem> processTriageStatusQuery(CollectionItem collection,
             String triageStatusLabel, Date pointInTime, TimeZone timezone) {
         if(TriageStatus.LABEL_DONE.equalsIgnoreCase(triageStatusLabel))
             return getDone(collection, pointInTime, timezone);
@@ -80,7 +81,7 @@ public class StandardTriageStatusQueryProcessor implements
             throw new IllegalArgumentException("invalid status: " + triageStatusLabel);
     }
     
-    public Set<NoteItem> processTriageStatusQuery(NoteItem note,
+    public SortedSet<NoteItem> processTriageStatusQuery(NoteItem note,
             String triageStatusLabel, Date pointInTime, TimeZone timezone) {
         if(TriageStatus.LABEL_DONE.equalsIgnoreCase(triageStatusLabel))
             return getDone(note, pointInTime, timezone);
@@ -99,7 +100,7 @@ public class StandardTriageStatusQueryProcessor implements
      *   - Modifications with triage status NOW<br/>
      *   - Occurrences whose period overlaps the current point in time 
      */
-    private Set<NoteItem> getNow(CollectionItem collection, Date pointInTime, TimeZone timezone) {
+    private SortedSet<NoteItem> getNow(CollectionItem collection, Date pointInTime, TimeZone timezone) {
         
         // filter for NOW triage notes
         NoteItemFilter nowFilter = getTriageStatusFilter(collection, TriageStatus.CODE_NOW);
@@ -144,7 +145,7 @@ public class StandardTriageStatusQueryProcessor implements
         }
         
         // sort results before returning
-        Set<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
         // add masters
         sortedResults.addAll(masters);
         return sortedResults;
@@ -155,7 +156,7 @@ public class StandardTriageStatusQueryProcessor implements
      *   - Modifications with triage status NOW<br/>
      *   - Occurrences whose period overlaps the current point in time 
      */
-    private Set<NoteItem> getNow(NoteItem master, Date pointInTime, TimeZone timezone) {
+    private SortedSet<NoteItem> getNow(NoteItem master, Date pointInTime, TimeZone timezone) {
         
         // filter for NOW modifications
         NoteItemFilter nowFilter = getTriageStatusFilter(master, TriageStatus.CODE_NOW);
@@ -175,7 +176,7 @@ public class StandardTriageStatusQueryProcessor implements
         results.addAll(occurrences);
         
         // sort results before returning
-        Set<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
         // add master if necessary
         if(sortedResults.size()>0)
             sortedResults.add(master);
@@ -212,7 +213,7 @@ public class StandardTriageStatusQueryProcessor implements
      *   - For each recurring item, either the next occurring modification 
      *     with triage status LATER or the next occurrence, whichever occurs sooner 
      */
-    private Set<NoteItem> getLater(CollectionItem collection, Date pointInTime, TimeZone timezone) {
+    private SortedSet<NoteItem> getLater(CollectionItem collection, Date pointInTime, TimeZone timezone) {
        
        // filter for LATER triage status 
        NoteItemFilter laterFilter = getTriageStatusFilter(collection, TriageStatus.CODE_LATER);
@@ -251,7 +252,7 @@ public class StandardTriageStatusQueryProcessor implements
        }
        
        // sort results before returning
-       Set<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
+       SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, -1); 
        // add masters
        sortedResults.addAll(masters);
        return sortedResults;
@@ -262,8 +263,9 @@ public class StandardTriageStatusQueryProcessor implements
      *   - the next occurring modification 
      *     with triage status LATER or the next occurrence, whichever occurs sooner
      */
-    private Set<NoteItem> getLater(NoteItem master, Date pointInTime, TimeZone timezone) {
-        HashSet<NoteItem> results = new HashSet<NoteItem>();
+    private SortedSet<NoteItem> getLater(NoteItem master, Date pointInTime, TimeZone timezone) {
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(
+                new NoteItemTriageStatusComparator(pointInTime.getTime()));
         // get the next occurring modification or occurrence
         NoteItem result = getLaterFromRecurringNote(master, pointInTime, timezone);
         
@@ -312,7 +314,7 @@ public class StandardTriageStatusQueryProcessor implements
      *     modification with triage status DONE or the most recent occurrence,
      *     whichever occurred most recently 
      */
-    private Set<NoteItem> getDone(CollectionItem collection, Date pointInTime, TimeZone timezone) {
+    private SortedSet<NoteItem> getDone(CollectionItem collection, Date pointInTime, TimeZone timezone) {
         
         // filter for DONE triage status
         NoteItemFilter doneFilter = getTriageStatusFilter(collection, TriageStatus.CODE_DONE);
@@ -349,7 +351,7 @@ public class StandardTriageStatusQueryProcessor implements
         }
         
         // sort results before returning
-        Set<NoteItem> sortedResults =  sortResults(results, pointInTime, maxDone); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, pointInTime, maxDone); 
         // add masters
         sortedResults.addAll(masters);
         return sortedResults;
@@ -361,8 +363,10 @@ public class StandardTriageStatusQueryProcessor implements
      *     with triage status DONE or the last occurrence, whichever occurred
      *     most recently
      */
-    private Set<NoteItem> getDone(NoteItem master, Date pointInTime, TimeZone timezone) {
-        HashSet<NoteItem> results = new HashSet<NoteItem>();
+    private SortedSet<NoteItem> getDone(NoteItem master, Date pointInTime, TimeZone timezone) {
+        TreeSet<NoteItem> results = new TreeSet<NoteItem>(
+                new NoteItemTriageStatusComparator(pointInTime.getTime()));
+        
         // get the most recently occurred modification or occurrence
         NoteItem result = getDoneFromRecurringNote(master, pointInTime, timezone);
         
@@ -409,7 +413,7 @@ public class StandardTriageStatusQueryProcessor implements
      *Sort results using rank calculated from triageStatusRank, eventStart,
      *or lastModified date.  Limit results.
      */
-    private Set<NoteItem> sortResults(List<NoteItem> results, Date pointInTime, int limit) {
+    private SortedSet<NoteItem> sortResults(List<NoteItem> results, Date pointInTime, int limit) {
         Comparator<NoteItem> comparator = new NoteItemTriageStatusComparator(pointInTime.getTime());
         TreeSet<NoteItem> sortedResults = new TreeSet<NoteItem>(comparator);
         Collections.sort(results, comparator);

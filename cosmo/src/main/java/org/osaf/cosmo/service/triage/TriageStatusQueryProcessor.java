@@ -17,6 +17,7 @@ package org.osaf.cosmo.service.triage;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.SortedSet;
 
 import net.fortuna.ical4j.model.TimeZone;
 
@@ -47,7 +48,7 @@ public interface TriageStatusQueryProcessor {
      *                 will be used.
      * @return the set of NoteItems that match the given parameters
      */
-    public Set<NoteItem> processTriageStatusQuery(CollectionItem collection,
+    public SortedSet<NoteItem> processTriageStatusQuery(CollectionItem collection,
             String triageStatusLabel,
             Date pointInTime,
             TimeZone timezone);
@@ -64,7 +65,7 @@ public interface TriageStatusQueryProcessor {
      *                 will be used.
      * @return the set of NoteItems that match the given parameters
      */
-    public Set<NoteItem> processTriageStatusQuery(NoteItem note,
+    public SortedSet<NoteItem> processTriageStatusQuery(NoteItem note,
             String triageStatusLabel,
             Date pointInTime,
             TimeZone timezone);

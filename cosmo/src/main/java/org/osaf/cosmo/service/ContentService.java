@@ -17,6 +17,7 @@ package org.osaf.cosmo.service;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.SortedSet;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
@@ -335,7 +336,7 @@ public interface ContentService extends Service {
      * @return set of notes that match the specified triage status label and
      *         belong to the specified collection
      */
-    public Set<NoteItem> findNotesByTriageStatus(CollectionItem collection,
+    public SortedSet<NoteItem> findNotesByTriageStatus(CollectionItem collection,
             String statusLabel, Date pointInTime, TimeZone timezone);
     
     /**
@@ -348,7 +349,7 @@ public interface ContentService extends Service {
      * @return set of notes that match the specified triage status label and belong
      *         to the specified recurring note series
      */
-    public Set<NoteItem> findNotesByTriageStatus(NoteItem note,
+    public SortedSet<NoteItem> findNotesByTriageStatus(NoteItem note,
             String statusLabel, Date pointInTime, TimeZone timezone);
     
     

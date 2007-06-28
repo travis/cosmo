@@ -379,7 +379,7 @@ public abstract class BaseItemFeedGenerator
      */
     protected Link newEditLink(CollectionItem collection)
         throws GeneratorException {
-        return newLink(Link.REL_EDIT, MimeUtil.MEDIA_TYPE_FORM_ENCODED,
+        return newLink(Link.REL_EDIT, MimeUtil.MEDIA_TYPE_XHTML,
                        selfIri(collection, false));
     }
 

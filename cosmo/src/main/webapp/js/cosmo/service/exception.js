@@ -27,3 +27,7 @@ function(){}, {});
 dojo.declare("cosmo.service.exception.CantSaveException", cosmo.service.exception.ServiceException,
     // summary: Thrown when we encounter problems with saving an entity.
 function(){}, {});
+
+dojo.declare("cosmo.service.exception.ConflictException", cosmo.service.exception.ServiceException,
+    // summary: Thrown when we receive a 409.
+function(){}, {});

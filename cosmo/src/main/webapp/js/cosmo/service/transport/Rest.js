@@ -69,9 +69,9 @@ dojo.declare("cosmo.service.transport.Rest", null,
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
             // Fight the dark powers of IE's evil caching mechanism
-            //if (document.all) {
+            if (dojo.render.html.ie) {
                 request.preventCache = request.preventCache || true;
-            //}
+            }
             if (request.method){
                 if (!this.methodIsSupported[request.method.toLowerCase()]){
                     request.headers['X-Http-Method-Override'] = request.method;
@@ -107,7 +107,9 @@ dojo.declare("cosmo.service.transport.Rest", null,
                     // implementation. 
                     // TODO: find a better way to do this
                     if (!(dojo.render.html.ie && xhr.status == 404 && !xhr.send)){
-            			deferredRequestHandler.errback(new Error(e.message), xhr);
+                        var err = new Error(e.message);
+                        err.xhr = xhr;
+            			deferredRequestHandler.errback(err);
                     }
                 }
     		}
@@ -121,7 +123,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
     				if (obj && obj["error"] != null) {
     					var err = new Error(obj.error);
     					err.id = obj.id;
-    					deferredRequestHandler.errback(err, xhr);
+    					err.xhr = xhr;
+    					deferredRequestHandler.errback(err);
     				} else {
     				    obj = xhr.responseXML || obj;
     				    if (dojo.render.html.ie) {

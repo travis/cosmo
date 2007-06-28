@@ -32,6 +32,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.util.uri");
 dojo.require("cosmo.service.transport.Rest");
+dojo.require("cosmo.service.exception")
 
 dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
@@ -80,19 +81,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.url = cosmo.env.getBaseUrl() +
           "/atom/user/" + cosmo.util.auth.getUsername() + "/subscribed";
 
-        return this.bind(r, kwArgs);
-    },
-    
-    createSubscription: function(subscription, postContent, kwArgs){
-        kwArgs = kwArgs || {};
-        
-        var r = {};
-        r.url = cosmo.env.getBaseUrl() +
-          "/atom/user/" + cosmo.util.auth.getUsername() + "/subscribed";
-        r.contentType = "application/atom+xml";
-        r.postContent = postContent;
-        r.method = "POST";
-             
         return this.bind(r, kwArgs);
     },
     
@@ -191,7 +179,16 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.postContent = postContent;
         r.method = "POST";
         
-        return this.bind(r, kwArgs);
+        var deferred = this.bind(r, kwArgs)
+        
+        deferred.addErrback(function (err){
+            if (err.xhr.status == 409){
+                err = new cosmo.service.exception.ConflictException(err);
+            }
+            return err;
+        });
+        
+        return deferred;
     },
 
     saveSubscription: function(subscription, postContent, kwArgs){

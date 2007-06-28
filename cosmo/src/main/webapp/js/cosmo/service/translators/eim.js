@@ -589,7 +589,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '<id>urn:uuid:', this.getUid(object), '</id>',
          '<updated>', dojo.date.toRfc3339(new Date()), '</updated>',
          '<author><name>', cosmo.util.auth.getUsername(), '</name></author>',
-         '<content type="application/eim+json">', dojo.json.serialize(this.objectToRecordSet(object)), '</content>',
+         '<content type="application/eim+json"><![CDATA[', dojo.json.serialize(this.objectToRecordSet(object)), ']]></content>',
          '</entry>'].join("");
     },
     

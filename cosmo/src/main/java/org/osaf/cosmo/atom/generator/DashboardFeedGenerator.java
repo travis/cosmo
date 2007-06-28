@@ -76,14 +76,11 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      * include as entries in the feed.
      * </p>
      * <p>
-     * Calls {@link ContentService#findNotesByTriageStatus(CollectionItem, String, Date)} to find all relevant <code>NoteItem</code>s for the
-     * generator's triage status at the current point in time. Returns
-     * the notes sorted according to triage status rank. Limits
-     * the number of <code>DONE</code> items to {@link #MAX_DONE}.
-     * Performs a dashboard query for the generator's triage status
+     * Calls {@link ContentService#findNotesByTriageStatus(CollectionItem, String, Date, TimeZone)} to find all relevant <code>NoteItem</code>s for the
+     * generator's triage status at the current point in time.
      * </p>
      *
-     * @param the collection whose contents are to be listed
+     * @param collection the collection whose contents are to be listed
      */
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
         String label = TriageStatus.label(triageStatus);
@@ -95,10 +92,36 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             tz = esf.getTimezone();
         }
 
-        return (SortedSet<NoteItem>) getFactory().getContentService().
+        return getFactory().getContentService().
             findNotesByTriageStatus(collection, label, now, tz);
     }
 
+    /**
+     * <p>
+     * Returns a sorted set of occurrences for the given item to
+     * include as entries in the feed.
+     * </p>
+     * <p>
+     * Calls {@link ContentService#findNotesByTriageStatus(NoteItem, String, Date, TimeZone)} to find all relevant <code>NoteItem</code>s for the
+     * generator's triage status at the current point in time.
+     * </p>
+     *
+     * @param item the item whose contents are to be listed
+     */
+    protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
+        String label = TriageStatus.label(triageStatus);
+        Date now = Calendar.getInstance().getTime();
+        TimeZone tz = null;
+        if (getFilter() != null) {
+            EventStampFilter esf = (EventStampFilter)
+                getFilter().getStampFilter(EventStampFilter.class);
+            tz = esf.getTimezone();
+        }
+
+        return getFactory().getContentService().
+            findNotesByTriageStatus(item, label, now, tz);
+    }
+  
     /**
      * Returns one of {@link AtomConstants#PROJECTION_DASHBOARD_NOW},
      * {@link AtomConstants#PROJECTION_DASHBOARD_LATER}, or

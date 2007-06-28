@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
@@ -52,19 +52,17 @@ public class AccountViewController extends AbstractController {
             HttpServletResponse response) throws Exception {
        
         User user = securityManager.getSecurityContext().getUser();
-        
-        CollectionItem collection =
-                (CollectionItem) contentService.getRootItem(user);
 
         Map<String, Object> model = new HashMap<String, Object>();
         
-        Map<String, String> relationLinks = serviceLocatorFactory.
-            createServiceLocator(request).getCollectionUrls(collection);
-        
-        model.put("relationLinks", relationLinks);
-        
+        if (! user.isOverlord()) {
+            HomeCollectionItem home = contentService.getRootItem(user);
+            Map<String, String> relationLinks = serviceLocatorFactory.
+                createServiceLocator(request).getCollectionUrls(home);
+            model.put("relationLinks", relationLinks);
+        }
+
         return new ModelAndView(accountView, model);
-        
     }
 
     public void setAccountView(String accountView) {

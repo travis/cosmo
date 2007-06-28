@@ -87,18 +87,17 @@ public class EventApplicator extends BaseStampApplicator
                         .getMasterStamp().getStartDate();
                 
                 // Master's start date must be a DateTime also
-                if(! (masterStart instanceof DateTime) )
-                    throw new EimValidationException("event modification date types must match master");
-                
-                DateTime modDt = (DateTime) recurrenceId;
-                DateTime masterDt = (DateTime) masterStart;
-                
-                // If the modification's RECURRENCE-ID is in UTC and the master's 
-                // isn't, then update the modification's timezone to be the same
-                // as the master.  Although its technically legal to specify date
-                // properties in different timezones, some clients don't like this.
-                if(modDt.isUtc() && !masterDt.isUtc())
-                    modDt.setTimeZone(masterDt.getTimeZone());
+                if((masterStart instanceof DateTime) ) {
+                    DateTime modDt = (DateTime) recurrenceId;
+                    DateTime masterDt = (DateTime) masterStart;
+                    
+                    // If the modification's RECURRENCE-ID is in UTC and the master's 
+                    // isn't, then update the modification's timezone to be the same
+                    // as the master.  Although its technically legal to specify date
+                    // properties in different timezones, some clients don't like this.
+                    if(modDt.isUtc() && !masterDt.isUtc())
+                        modDt.setTimeZone(masterDt.getTimeZone());
+                }
             }
             eventStamp.setRecurrenceId(modUid.getRecurrenceId()); 
         }

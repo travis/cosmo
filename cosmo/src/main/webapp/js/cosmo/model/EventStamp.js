@@ -118,7 +118,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         },
         
        applyChange: function(propertyName, changeValue, type){
-            //TODO - make sure to fix the rId....
             
             //this handles the case of setting the master start date or end date 
             // from an occurrence
@@ -137,6 +136,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 var newDate = masterDate.clone();
                 newDate.add(dojo.date.dateParts.SECOND, diff);
                 this.getMaster().getEventStamp()[setterName](newDate);
+                this.recurrenceId = this.recurrenceId.add(dojo.dateParts.SECOND,diff);
                 return;  
             }
             this._inherited("applyChange", arguments);

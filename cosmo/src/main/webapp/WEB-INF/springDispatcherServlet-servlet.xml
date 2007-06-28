@@ -72,7 +72,6 @@
            	/browse/**=accountBrowsingController
     	    /i18n.js=i18nController
     	    /account/activate=accountActivationController
-    	    /account/view=accountViewController
     	    /pim/collection/*=collectionBookmarkController
     	    
 	        /**/*=jspViewController
@@ -104,16 +103,6 @@
     </property>
     <property name="userService"><ref bean="userService"/></property>
     
-	
- </bean>
-
- <bean id="accountViewController" class="org.osaf.cosmo.ui.account.AccountViewController">
- 	<property name="accountView"><value>account_view</value></property>
-	<property name="contentService"><ref bean="contentService" /></property>
-	<property name="securityManager"><ref bean="securityManager" /></property>
-	<property name="serviceLocatorFactory">
-      <ref bean="serviceLocatorFactory"/>
-    </property>
 	
  </bean>
 

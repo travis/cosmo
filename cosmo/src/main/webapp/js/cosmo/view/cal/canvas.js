@@ -522,16 +522,6 @@ cosmo.view.cal.canvas = new function () {
         pos = parseInt(pos);
         return pos;
     };
-    /**
-     * Clean up event listeners and DOM refs
-     */
-    this.cleanup = function () {
-        // Let's be tidy
-        cosmo.view.cal.itemRegistry = null;
-        if (allDayArea){
-            allDayArea.cleanup();
-        }
-    };
 
     // Topic subscriptions
     // ****************
@@ -721,66 +711,6 @@ cosmo.view.cal.canvas = new function () {
         return true;
     }
     /**
-     * Returns a new hash registry, filtering the recurring items with the
-     * specified  a set or sets of recurring events for an id or ids
-     *
-     * WARNING: this destroys the event registry (Hash) that is passed into it!
-     *
-     * @param reg An itemRegistry Hash from which to remove a group or
-     * groups of recurring events
-     * @param arr Array of Item ids for the recurrences to
-     * remove
-     * @param dt A cosmo.datetime.Date,represents the end date of a
-     * recurrence -- if the dt param is present, it will remove
-     * only the event instances which occur after the date
-     * It will also reset the recurrence endDate for all dates
-     * to the dt (the new recurrence end date) for all the events
-     * that it leaves
-     * @param ignore String, the CalItem id of a single event to ignore from
-     * the removal process -- used when you need to leave the
-     * master event in a recurrence
-     * @return a new Hash to be used as your event registry
-     */
-    function filterOutRecurrenceGroup(reg, arr, dt, ignore) {
-        // Default behavior is to remove the lozenge
-        var str = ',' + arr.join() + ',';
-        var h = new Hash();
-        var ev = null;
-        var compDt = dt ? new cosmo.datetime.Date(dt.getFullYear(),
-            dt.getMonth(), dt.getDate(), 23, 59) : null;
-        while (ev = reg.pop()) {
-            var removeForDate = true;
-            var keep = false;
-            switch (true) {
-                // Any to be specifically ignored -- this is all-mighty
-                case (ev.id == ignore):
-                    keep = true;
-                    break;
-                // Any that don't have matching ids -- keep these too
-                case (str.indexOf(',' + ev.data.getUid() + ',') == -1):
-                    keep = true;
-                    break;
-                // Matching ids -- candidates for removal
-                case (str.indexOf(',' + ev.data.getUid() + ',') > -1):
-                    var eventStamp = ev.data.getEventStamp();
-                    var startDate = eventStamp.getStartDate();
-                    var endDate = eventStamp.getEndDate();
-                    // If also filtering by date, check the start date of
-                    // matching events as well
-                    if (compDt && (startDate.toUTC() < compDt.toUTC())) {
-                        keep = true;
-                    }
-                    break;
-                default:
-                    // Throw it out
-                    break;
-            }
-            if (keep) { h.setItem(ev.id, ev); }
-        }
-        return h;
-    };
-
-    /**
      * Append an calendar event lozenge to the canvas -- likely
      * called in a loop with the Hash's 'each' method
      * @param key String, the Hash key for the itemRegistry
@@ -891,9 +821,9 @@ cosmo.view.cal.canvas = new function () {
      */
      function saveSuccess(cmd) {
         dojo.debug("saveSuccess: ");
-        var OPTIONS = cosmo.view.service.recurringEventOptions;
-        var ev = cmd.data
-        var item = ev.data;
+        var recurOpts = cosmo.view.service.recurringEventOptions;
+        var item = cmd.data
+        var data = item.data;
         var saveType = cmd.saveType || null;
         dojo.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
@@ -902,20 +832,21 @@ cosmo.view.cal.canvas = new function () {
 
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
-        if (ev.data.hasRecurrence() && saveType != OPTIONS.ONLY_THIS_EVENT){
+        if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
             dojo.debug("saveSuccess: has recurrence");
             //first remove the event and recurrences from the registry.
-            var idsToRemove = [item.getUid()];
-            if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
+            var idsToRemove = [data.getUid()];
+            if (saveType == recurOpts.ALL_FUTURE_EVENTS){
                 idsToRemove.push(newItem.getUid());
             }
-            var newRegistry = filterOutRecurrenceGroup(cosmo.view.cal.itemRegistry.clone(), idsToRemove);
+            var newRegistry = self.view.filterOutRecurrenceGroup(
+                cosmo.view.cal.itemRegistry.clone(), idsToRemove);
 
 
             //now we have to expand out the item for the viewing range
-            var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(item.getMaster(),
+            var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)];
-            if (saveType == OPTIONS.ALL_FUTURE_EVENTS){
+            if (saveType == recurOpts.ALL_FUTURE_EVENTS){
               deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItem,
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
             }
@@ -939,15 +870,17 @@ cosmo.view.cal.canvas = new function () {
             }
             deferred.addCallback(addExpandedOccurrences);
 
-        } else {
+        } 
+        // Non-recurring / "only this item' 
+        else {
             // Saved event is still in view
-            var inRange = !ev.isOutOfViewRange();
+            var inRange = !item.isOutOfViewRange();
             if (inRange) {
-                ev.lozenge.setInputDisabled(false);
-                ev.lozenge.updateDisplayMain();
+                item.lozenge.setInputDisabled(false);
+                item.lozenge.updateDisplayMain();
             }
             else if (cmd.qualifier.offCanvas) {
-                removeEvent(ev);
+                removeEvent(item);
             }
         }
 
@@ -983,7 +916,7 @@ cosmo.view.cal.canvas = new function () {
      * tell you what kind of remove is happening
      */
     function removeSuccess(ev, opts) {
-        var OPTIONS = cosmo.view.service.recurringEventOptions;
+        var recurOpts = cosmo.view.service.recurringEventOptions;
         var removeType = opts.removeType;
         dojo.debug("removeSuccess, removeType: " + removeType);
 
@@ -991,22 +924,24 @@ cosmo.view.cal.canvas = new function () {
             case 'singleEvent':
                 removeEvent(ev);
                 break;
-            case OPTIONS.ALL_EVENTS:
+            case recurOpts.ALL_EVENTS:
                 var eventRegistry = cosmo.view.cal.itemRegistry.clone();
-                eventRegistry = filterOutRecurrenceGroup(eventRegistry, [ev.data.getUid()]);
+                eventRegistry = self.view.filterOutRecurrenceGroup(
+                    eventRegistry, [ev.data.getUid()]);
                 removeAllEvents();
                 cosmo.view.cal.itemRegistry = eventRegistry;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
                 break;
-            case OPTIONS.ALL_FUTURE_EVENTS:
+            case recurOpts.ALL_FUTURE_EVENTS:
                 var eventRegistry = cosmo.view.cal.itemRegistry.clone();
-                eventRegistry = filterOutRecurrenceGroup(eventRegistry, [ev.data.getUid()],
+                eventRegistry = self.viw.filterOutRecurrenceGroup(
+                    eventRegistry, [ev.data.getUid()],
                     ev.data.getEventStamp().getRrule().getEndDate());
                 removeAllEvents();
                 cosmo.view.cal.itemRegistry = eventRegistry;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
                 break;
-            case OPTIONS.ONLY_THIS_EVENT:
+            case recurOpts.ONLY_THIS_EVENT:
                 removeEvent(ev);
                 break;
         }

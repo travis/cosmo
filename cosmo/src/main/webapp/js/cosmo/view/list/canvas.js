@@ -64,9 +64,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var delta = cmd.delta;
         switch (act) {
             case 'saveSuccess':
-                var item = data;
-                this.view.setSortAndDisplay(item);
-                self._doSortAndDisplay();
+                this._saveSuccess(cmd)
                 break;
             default:
                 // Do nothing
@@ -228,6 +226,24 @@ cosmo.view.list.canvas.Canvas = function (p) {
             this.width = this.parent.width - 2; // 2px for borders
             this.height = this.parent.height - CAL_TOP_NAV_HEIGHT;
         }
+    };
+    this._saveSuccess = function (cmd) {
+        var recurOpts = cosmo.view.service.recurringEventOptions;
+        var item = cmd.data;
+        var data = item.data;
+        var saveType = cmd.saveType || null;
+        var delta = cmd.delta;
+        var deferred = null;
+        var newItem = cmd.newItem;
+
+        if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
+            self.view.loadItems();
+        }
+        else {
+            this.view.setSortAndDisplay(item);
+            self._doSortAndDisplay();
+        }
+
     };
     this._doSortAndDisplay = function (id) {
         var s = '';

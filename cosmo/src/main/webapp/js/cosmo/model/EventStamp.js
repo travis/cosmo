@@ -118,7 +118,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         },
         
        applyChange: function(propertyName, changeValue, type){
-            dojo.debug("applyMASTERchange");
             //this handles the case of setting the master start date or end date 
             // from an occurrence
             if ( (propertyName == "startDate" || propertyName =="endDate") 

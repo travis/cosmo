@@ -116,15 +116,8 @@ cosmo.view.service = new function () {
             }
         }
 
-        //only one type of change
-        if (size == 1){
-            delta.applyChangeType(change);
-            dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
-        }
-        else {
-          cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm',
-            { changeTypes: changeTypes, delta: delta, saveItem: item }));
-        }
+      cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm',
+          { changeTypes: changeTypes, delta: delta, saveItem: item }));
     }
 
     /**

@@ -83,7 +83,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var col = this.collections;
             var curr = this.currentCollection;
             var passedKey = this.ticketKey; // Indicates we're in ticket view
-
+            var _collectionWithUidExists = this._collectionWithUidExists;
+            var _collectionWithDisplayNameExists = this._collectionWithDisplayNameExists;
+            var _validateDisplayName = this._validateDisplayName;
             // The 'currently viewing' prompt above the
             // collection selector / label
             var promptNode = _createElem('div');
@@ -105,13 +107,39 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     imgTitle = strings.imgTitleAdd;
                     // Set up the authAction obj for the AuthBox -- this tells it
                     // what to do if the user auths successfully
-                    
                     var subscribeFunction = function (){
+                            var collections = cosmo.app.pim.serv.getCollections({sync:true}).results[0];
+                            var alreadySubscribed = _collectionWithUidExists(collections, curr.getUid());
+                            if (alreadySubscribed){
+                                var message = alreadySubscribed == "cosmo.model.Collection" 
+                                    ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection") 
+                                    : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
+                                    var doContinue = confirm(message);
+                                    if (!doContinue){
+                                        return null;
+                                    } 
+                            }
+                            
+                            var displayName = ""; 
+
+                            while (!_validateDisplayName(displayName)){
+                                displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"));
+                            }
+                            
+                            while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)){
+                                displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt",displayName));
+                            }
+
+                            if (displayName == null){
+                                return null;
+                            }
+                            
                             var subscription = new cosmo.model.Subscription({
-                                displayName: curr.getDisplayName(),
+                                displayName: displayName,
                                 uid: curr.getUid(),
                                 ticketKey: passedKey
                             })
+                            
                             return cosmo.app.pim.serv.createSubscription(subscription);
                     }
                     var authAction = {
@@ -121,25 +149,31 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         // Action to take after successful auth -- try to add the
                         // collection subscription
                         attemptFunc: function () {
+                            dojo.debug("attemptFunc");
                             var deferred = subscribeFunction();
-                            deferred.addCallback(dojo.lang.hitch(this, function(x,y,z){
-                                dojo.debug(x)
-                                dojo.debug(y)
-                                dojo.debug(z)
-                                // Log the user into Cosmo and display the current collection
-                                this._showPrompt(this.authAction.successPrompt);
-                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-                                
-                            }));
-                            deferred.addErrback(dojo.lang.hitch(this, function(err, y, z){
-                                dojo.debug(err)
-                                dojo.debug(y)
-                                dojo.debug(z)
+                            dojo.debug("after subbie.");
+                            if (deferred != null){
+                                dojo.debug("deferred != null");
+                                deferred.addCallback(dojo.lang.hitch(this, function(x,y,z){
+                                    dojo.debug(x)
+                                    dojo.debug(y)
+                                    dojo.debug(z)
+                                    // Log the user into Cosmo and display the current collection
+                                    this._showPrompt(this.authAction.successPrompt);
+                                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+                                    
+                                }));
+                                deferred.addErrback(dojo.lang.hitch(this, function(err, y, z){
+                                    dojo.debug(err)
+                                    dojo.debug(y)
+                                    dojo.debug(z)
+                                    cosmo.app.hideDialog();
+                                    cosmo.app.showErr(self.strings.collectionAddError, err);
+                                    return false;
+                                }));
+                            } else {
                                 cosmo.app.hideDialog();
-                                cosmo.app.showErr(self.strings.collectionAddError, err);
-                                return false;
-                            }));
-                            
+                            }
                         },
                         attemptPrompt: strings.attemptPrompt,
                         successPrompt: strings.successPrompt };
@@ -151,6 +185,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             cosmo.app.modalDialog.content.usernameInput.focus();
                         } else {
                             var deferred = subscribeFunction();
+                            if (deferred == null){
+                                return;
+                            }
                             deferred.addCallback(function(){
                                 location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
                             });
@@ -355,6 +392,31 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 this.domNode.removeChild(this.domNode.firstChild);
             }
             this.fillInTemplate();
+        },
+        
+        _collectionWithDisplayNameExists: function(cols, displayName){
+            for (var x = 0; x < cols.length; x++){
+                dojo.debug("comparing: displayNames" + displayName + " and " + cols[x].getDisplayName());
+                if (cols[x].getDisplayName() == displayName){
+                    return true;
+                }
+            }
+            return false;
+        },
+        
+        _collectionWithUidExists: function(cols, uid){
+            for (var x = 0; x < cols.length; x++){
+                dojo.debug("comparing: uid" + uid + " and " + cols[x].getUid());
+                if (cols[x].getUid() == uid){
+                    return cols[x].declaredClass;
+                }
+            }
+            return false;
+        },
+        
+        _validateDisplayName: function(displayName){
+            //is there anything else?
+            return displayName != "";
         }
 } );
 

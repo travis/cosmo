@@ -965,7 +965,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     uuid: [type.TEXT, this.getUid(note)],
                     userid: [type.TEXT, note.getModifiedBy().getUserId() || 
                                         cosmo.util.auth.getUsername()],
-                    action: [type.INTEGER, 100], //TODO: figure this out
+                    action: [type.INTEGER, note.getModifiedBy().getAction()], //TODO: figure this out
                     timestamp: [type.DECIMAL, new Date().getTime()]
                 }
             }

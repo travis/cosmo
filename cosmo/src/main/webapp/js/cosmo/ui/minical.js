@@ -37,6 +37,8 @@ dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime");
+dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.service.exception");
 
 cosmo.ui.minical.MiniCal = function (p) {

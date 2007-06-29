@@ -40,7 +40,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     //this.currSelectedId = '';
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
-    this.selectedEventIdRegistry = {};
+    this.selectedItemIdRegistry = {};
     //this.currSelectedItem = null;
     this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';

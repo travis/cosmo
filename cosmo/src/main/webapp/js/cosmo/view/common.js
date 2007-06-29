@@ -87,23 +87,24 @@ cosmo.view.viewBase = new function () {
 cosmo.view.canvasBase = new function () {
     this.getSelectedItem = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
-        var id = this.selectedEventIdRegistry[key];
+        var id = this.selectedItemIdRegistry[key];
         var reg = this.view.itemRegistry;
         return reg ? reg.getItem(id) : null;
     };
-    this.setSelectedItem = function (ev) {
+    this.setSelectedItem = function (p) {
         var key = cosmo.app.pim.currentCollection.getUid();
-        this.selectedEventIdRegistry[key] = ev.id;
+        var id = typeof p == 'string' ? p : p.id
+        this.selectedItemIdRegistry[key] = id;
         return true;
     };
     this.clearSelectedItem = function (ev) {
         var key = cosmo.app.pim.currentCollection.getUid();
-        this.selectedEventIdRegistry[key] = '';
+        this.selectedItemIdRegistry[key] = '';
         return true;
     };
     this.getSelectedItemId = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
-        var id = this.selectedEventIdRegistry[key];
+        var id = this.selectedItemIdRegistry[key];
         return id;
     }
 };

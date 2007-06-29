@@ -63,7 +63,7 @@ cosmo.view.cal.canvas = new function () {
     this.view = cosmo.view.cal;
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
-    this.selectedEventIdRegistry = {};
+    this.selectedItemIdRegistry = {};
     // Available lozenge colors
     this.colors = {};
     // The scrolling div for timed events
@@ -645,20 +645,27 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Set the passed calendar event as the selected one on
      * canvas
-     * @param ev CalItem object, the event to select
+     * @param p CalItem object or CalItem id string, the event to select
      */
-    function setSelectedCalItem(ev) {
-        if (!ev) {
-            throw('No CalItem passed to setSelectedCalItem.');
+    function setSelectedCalItem(/* Can be CalItem object or String id */ p) {
+        if (!p) {
+            throw('No CalItem or CalItem id passed to setSelectedCalItem.');
         }
         // Deselect previously selected event if any
         var sel = self.getSelectedItem();
         if (sel) {
             sel.lozenge.setDeselected();
         }
-        self.setSelectedItem(ev);
+        // Pass the item or id, set as the selected item
+        // for the current collection
+        self.setSelectedItem(p);
+
+        // Grab the selected item -- have to do this lookup
+        // because the passed-in param might be an id string
+        var sel = self.getSelectedItem();
+
         // Show the associated lozenge as selected
-        ev.lozenge.setSelected();
+        sel.lozenge.setSelected();
     };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
@@ -828,7 +835,7 @@ cosmo.view.cal.canvas = new function () {
         dojo.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
         var deferred = null;
-        var newItem = cmd.newItem;
+        var newItemNote = cmd.newItemNote; // stamped Note
 
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
@@ -837,7 +844,7 @@ cosmo.view.cal.canvas = new function () {
             //first remove the event and recurrences from the registry.
             var idsToRemove = [data.getUid()];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
-                idsToRemove.push(newItem.getUid());
+                idsToRemove.push(newItemNote.getUid());
             }
             var newRegistry = self.view.filterOutRecurrenceGroup(
                 cosmo.view.cal.itemRegistry.clone(), idsToRemove);
@@ -847,7 +854,7 @@ cosmo.view.cal.canvas = new function () {
             var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
-              deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItem,
+              deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItemNote,
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
             }
             deferred = new dojo.DeferredList(deferredArray);
@@ -870,8 +877,8 @@ cosmo.view.cal.canvas = new function () {
             }
             deferred.addCallback(addExpandedOccurrences);
 
-        } 
-        // Non-recurring / "only this item' 
+        }
+        // Non-recurring / "only this item'
         else {
             // Saved event is still in view
             var inRange = !item.isOutOfViewRange();
@@ -888,16 +895,40 @@ cosmo.view.cal.canvas = new function () {
             dojo.debug("updateEventsCallback")
             // Don't re-render when requests are still processing
             if (!cosmo.view.service.processingQueue.length) {
-              if (false /*&& cmd.qualifier.newEvent ||
-                    (cmd.qualifier.onCanvas && opts.saveType != 'instanceOnlyThisEvent')*/) {
-                    var sel = cosmo.view.cal.lastSent;
-                    sel.lozenge.setInputDisabled(false);
-                    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                        'data': sel });
-                }
                 updateEventsDisplay();
-            } else {
-                dojo.debug("how many left in queue: " +cosmo.view.service.processingQueue.length);
+
+                // Anything except editing an existing event requires
+                // adding the selection to an item in the itemRegistry
+                if (saveType) {
+                    var sel = null;
+                    switch (saveType) {
+                        case 'new':
+                            sel = item;
+                            sel.lozenge.setInputDisabled(false);
+                            break;
+                        case recurOpts.ALL_EVENTS:
+                        case recurOpts.ONLY_THIS_EVENT:
+                            sel = item.data.getItemUid();
+                            break;
+                        case recurOpts.ALL_FUTURE_EVENTS:
+                            sel = newItemNote.getNoteOccurrence(
+                                newItemNote.getEventStamp().getStartDate()).getItemUid();
+                            break;
+                            break;
+                        default:
+                            throw('Undefined saveType of "' + saveType +
+                                '" in command object passed to saveSuccess');
+                            break;
+
+                    }
+                    setSelectedCalItem(sel);
+                    sel = self.getSelectedItem();
+                    dojo.event.topic.publish('/calEvent', { action: 'setSelected',
+                        data: sel });
+                }
+            }
+            else {
+                dojo.debug("how many left in queue: " + cosmo.view.service.processingQueue.length);
             }
         }
 

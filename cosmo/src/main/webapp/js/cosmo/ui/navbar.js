@@ -22,6 +22,7 @@ dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.button");
@@ -201,8 +202,15 @@ cosmo.ui.navbar.Bar = function (p) {
         d.appendChild(t);
     };
     this._showMonthHeader = function () {
-        var vS = cosmo.view.cal.viewStart;
-        var vE =  cosmo.view.cal.viewEnd;
+        if (!cosmo.view.cal.viewStart || !cosmo.view.cal.viewEnd) {
+            var defaultDate = cosmo.app.pim.currDate;
+            var vS = cosmo.datetime.util.getWeekStart(defaultDate);
+            var vE = cosmo.datetime.util.getWeekEnd(defaultDate);
+        }
+        else {
+            var vS = cosmo.view.cal.viewStart;
+            var vE =  cosmo.view.cal.viewEnd;
+        }
         var mS = vS.getMonth();
         var mE = vE.getMonth();
         var headerDiv = this.monthHeader;

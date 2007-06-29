@@ -245,7 +245,7 @@ dojo.declare("cosmo.model.Delta", null, {
         
         //set the old note's rrule end date to just before the break.
         var newEndDate = occurrence.getEventStamp().getStartDate().clone();
-        newEndDate.add(dojo.date.dateParts.HOUR, -1);
+        newEndDate.add(dojo.date.dateParts.DAY, -1);
         var oldRrule = master.getEventStamp().getRrule();
 
         //we have to make a new RRule object, since we can't change them, since they

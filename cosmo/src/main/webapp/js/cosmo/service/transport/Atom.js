@@ -179,7 +179,10 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.postContent = postContent;
         r.method = "POST";
         
-        return this.bind(r, kwArgs);
+        var deferred = this.bind(r, kwArgs);
+        this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
+        
+        return deferred;
     },
 
     createSubscription: function(subscription, postContent, kwArgs){

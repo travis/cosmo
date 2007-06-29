@@ -116,7 +116,9 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             item instanceof cosmo.model.Subscription){
             
             transportFunc = "getItems";
-        } else if (item instanceof cosmo.model.Note){
+        } else if (item instanceof cosmo.model.Note
+                   && !!item.getEventStamp()
+                   && !!item.getEventStamp().getRrule()){
             transportFunc = "expandRecurringItem";
         } else {
             throw new Error("Can not get dashboard items for " + item);

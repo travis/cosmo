@@ -234,13 +234,12 @@ cosmotest.service.conduits.test_conduits = {
             ).results[0];
             jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);
             
-            console.log("noo")
+			// Test dashboard projection for single
+			// recurring events
             var item0DashboardOccurrences = conduit.getDashboardItems(item0, 
                {sync: true}
             ).results[0];
             jum.assertEquals("wrong number of occurrences", 2, item0DashboardOccurrences.length);
-            
-            
 
             var item4 = item0Occurrences[3];
             var item4Rid = item4.recurrenceId;

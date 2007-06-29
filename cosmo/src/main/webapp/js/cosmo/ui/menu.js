@@ -96,7 +96,7 @@ cosmo.ui.menu.requiredRoles = {
 };
 
 cosmo.ui.menu.urls = {
-    HELP: 'http://wiki.osafoundation.org/Projects/CosmoHelpRel0dot6',
+    HELP: _("Main.CollectionDetails.HelpLink"),
     ACCOUNT_BROWSER: cosmo.env.getBaseUrl() + '/browse/' +
         cosmo.app.currentUsername,
     ADMIN_CONSOLE: cosmo.env.getBaseUrl() + '/admin/users'

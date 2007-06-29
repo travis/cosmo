@@ -90,7 +90,7 @@ dojo.addOnLoad(function(){
         <a href='<c:url value="${davPath}?ticket=${ticket.key}" />'>[dav]</a>
         <c:if test="${isCollection}">
           <a href='<c:url value="${feedPath}?ticket=${ticket.key}" />'>[feed]</a>
-          <a href='<c:url value="${pimPath}?ticket=${ticket.key}" />'>[pim]</a>
+          <a href='<c:url value="${pimPath}?ticket=${ticket.key}" />'>[Chandler]</a>
         </c:if>
       </td>
       <td class="smTableData" style="text-align:center;">

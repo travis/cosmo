@@ -118,7 +118,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         },
         
        applyChange: function(propertyName, changeValue, type){
-            
+            dojo.debug("applyMASTERchange");
             //this handles the case of setting the master start date or end date 
             // from an occurrence
             if ( (propertyName == "startDate" || propertyName =="endDate") 
@@ -131,12 +131,12 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 var diff =  dojo.date.diff(this[getterName]().toUTC(), 
                             changeValue.toUTC(), 
                             dojo.date.dateParts.SECOND);
-                
+
                 var masterDate = this.getMaster().getEventStamp()[getterName]();
                 var newDate = masterDate.clone();
                 newDate.add(dojo.date.dateParts.SECOND, diff);
                 this.getMaster().getEventStamp()[setterName](newDate);
-                this.item.recurrenceId = this.recurrenceId.add(dojo.date.dateParts.SECOND,diff);
+                this.item.recurrenceId.add(dojo.date.dateParts.SECOND,diff);
                 return;  
             }
             this._inherited("applyChange", arguments);

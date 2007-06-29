@@ -122,8 +122,10 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "PUT";
-
-        return this.bind(r, kwArgs);
+        var deferred = this.bind(r, kwArgs);
+        this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
+ 
+        return deferred;
     },
     
     getItem: function(uid, kwArgs){
@@ -144,9 +146,18 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
 
         var query = this._generateSearchQuery(searchCrit);
+
+        var projection = (this.getItemsProjections[searchCrit.triage] || "full") + "/eim-json";
         var r = {};
-        r.url = cosmo.env.getBaseUrl() + "/atom/" + 
-                item.getUrls()['expanded'] + this.queryHashToString(query);
+        
+        var expandedLink = item.getUrls()['expanded'];
+        var projectionIndex = expandedLink.indexOf("/full");
+        if (projectionIndex > 0) {
+            expandedLink = expandedLink.substring(0, projectionIndex)
+        }
+
+        r.url = this.generateUri(cosmo.env.getBaseUrl() +
+          "/atom/" + expandedLink, "/" + projection, query);
 
         r.method = "GET";
         
@@ -182,13 +193,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.method = "POST";
         
         var deferred = this.bind(r, kwArgs)
-        
-        deferred.addErrback(function (err){
-            if (err.xhr.status == 409){
-                err = new cosmo.service.exception.ConflictException(err);
-            }
-            return err;
-        });
+        this.addErrorCodeToExceptionErrback(deferred, 409, cosmo.service.exception.ConflictException);
         
         return deferred;
     },
@@ -213,7 +218,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.contentType = "application/xhtml+xml";
         r.postContent = postContent;
         r.method = "PUT";
-        
         return this.bind(r, kwArgs);
     },
 
@@ -224,8 +228,10 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         r.url = cosmo.env.getBaseUrl() +
           "/atom/" + editLink;
         r.method = "DELETE";
-        
-        return this.bind(r, kwArgs);
+        var deferred = this.bind(r, kwArgs);
+        this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
+         
+        return deferred;
     },
 
     removeItem: function(collection, item, kwArgs){

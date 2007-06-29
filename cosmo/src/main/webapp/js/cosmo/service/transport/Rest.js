@@ -191,6 +191,15 @@ dojo.declare("cosmo.service.transport.Rest", null,
             dojo.lang.mixin(request, r);
             dojo.io.bind(request);
             return deferred;
+        },
+        
+        addErrorCodeToExceptionErrback: function(deferred, responseCode, exception){
+            deferred.addErrback(function (err){
+                if (err.xhr.status == responseCode){
+                    err = new exception(err);
+                }
+                return err;
+            });
         }
     }
 );

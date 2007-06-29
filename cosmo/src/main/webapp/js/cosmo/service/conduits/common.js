@@ -110,7 +110,18 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
        }
     },
     
-    getDashboardItems: function(collection, kwArgs){
+    getDashboardItems: function(item, kwArgs){
+        var transportFun = "";
+        if (item instanceof cosmo.model.Collection || 
+            item instanceof cosmo.model.Subscription){
+            
+            transportFunc = "getItems";
+        } else if (item instanceof cosmo.model.Note){
+            transportFunc = "expandRecurringItem";
+        } else {
+            throw new Error("Can not get dashboard items for " + item);
+        }
+        
         var entries = [];
         var addEntriesCallback = function (partialEntries){
             for (var i = 0; i < partialEntries.length; i++){
@@ -119,21 +130,21 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         }
         var deferred = new dojo.Deferred();
         
-        var dNow = this._transport.getItems(collection, {triage: "now"}, kwArgs)
+        var dNow = this._transport[transportFunc](item, {triage: "now"}, kwArgs)
         this._addTranslation(dNow, "translateGetDashboardItems");
         dNow.addCallback(addEntriesCallback);
         deferred.addCallback(dojo.lang.hitch(this, function () {
             return dNow;
         }));
         
-        var dLater = this._transport.getItems(collection, {triage: "later"}, kwArgs)
+        var dLater = this._transport[transportFunc](item, {triage: "later"}, kwArgs)
         this._addTranslation(dLater, "translateGetDashboardItems");
         dLater.addCallback(addEntriesCallback);
         deferred.addCallback(dojo.lang.hitch(this, function () {
             return dLater;
         }));
         
-        var dDone = this._transport.getItems(collection, {triage: "done"}, kwArgs)
+        var dDone = this._transport[transportFunc](item, {triage: "done"}, kwArgs)
         this._addTranslation(dDone, "translateGetDashboardItems");
         dDone.addCallback(addEntriesCallback);
         deferred.addCallback(dojo.lang.hitch(this, function () {

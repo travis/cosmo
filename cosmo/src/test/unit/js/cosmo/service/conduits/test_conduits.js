@@ -66,7 +66,7 @@ cosmotest.service.conduits.test_conduits = {
             var items = conduit.getItems(c0, {}, {sync: true}).results[0];
 
             jum.assertTrue("items", !!items);
-            jum.assertEquals("items length", 1, items.length);
+            jum.assertEquals("items length", 5, items.length);
 
             jum.assertTrue("no edit link on item", !!newItem.getUrls()['atom-edit']);
 
@@ -86,7 +86,7 @@ cosmotest.service.conduits.test_conduits = {
             item0 = conduit.getItem(newItem.getUid(), {sync: true}).results[0];
      
             jum.assertEquals("item display name", item0DisplayName, item0.getDisplayName());
- 
+            
             // Test getItems
             conduit.createItem(new cosmo.model.Note(
             {
@@ -97,7 +97,7 @@ cosmotest.service.conduits.test_conduits = {
             var items = conduit.getItems(c0, {}, {sync: true}).results[0];
 
             jum.assertTrue("items", !!items);
-            jum.assertEquals("items length", 2, items.length);
+            jum.assertEquals("items length", 6, items.length);
             
             // Test deleteItem 
 
@@ -105,7 +105,7 @@ cosmotest.service.conduits.test_conduits = {
             
             items = conduit.getItems(c0, {}, {sync: true}).results[0];
             jum.assertTrue("deleteItem: items", !!items);
-            jum.assertEquals("deleteItem: items length", 1, items.length);
+            jum.assertEquals("deleteItem: items length", 5, items.length);
             
             
             // Test dashboard projections
@@ -233,6 +233,14 @@ cosmotest.service.conduits.test_conduits = {
                {sync: true}
             ).results[0];
             jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);
+            
+            console.log("noo")
+            var item0DashboardOccurrences = conduit.getDashboardItems(item0, 
+               {sync: true}
+            ).results[0];
+            jum.assertEquals("wrong number of occurrences", 2, item0DashboardOccurrences.length);
+            
+            
 
             var item4 = item0Occurrences[3];
             var item4Rid = item4.recurrenceId;

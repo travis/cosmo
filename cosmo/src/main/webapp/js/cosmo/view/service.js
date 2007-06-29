@@ -488,7 +488,7 @@ cosmo.view.service = new function () {
         var deferred = null;
         var reqId = null;
 
-
+        
         if (opts.removeType == "singleEvent"){
             deferred = cosmo.app.pim.serv.deleteItem(item.data);
             reqId = deferred.id;
@@ -529,8 +529,8 @@ cosmo.view.service = new function () {
             if (masterEventStamp.getStartDate().isFloating()){
                 exDate = recurrenceId.clone()
             } else {
-                var tzId = masterEvent.getStartDate().tzId || "utc";
-                recurrenceId.createDateForTimezone(tzId);
+                var tzId = masterEventStamp.getStartDate().tzId || "utc";
+                exDate = recurrenceId.createDateForTimezone(tzId);
             }
             if (masterEventStamp.getExdates() == null){
                 masterEventStamp.setExdates([]);

@@ -115,9 +115,14 @@ cosmo.view.service = new function () {
                 size++;
             }
         }
-
-      cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm',
-          { changeTypes: changeTypes, delta: delta, saveItem: item }));
+     
+        if (!item.data.hasRecurrence()){   
+            delta.applyChangeType(change);
+            dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
+        } else {
+            cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm',
+                { changeTypes: changeTypes, delta: delta, saveItem: item }));
+        }
     }
 
     /**
@@ -165,13 +170,13 @@ cosmo.view.service = new function () {
                 // Break the previous recurrence and start a new one
                 case opts.ALL_FUTURE_EVENTS:
                     dojo.debug("ALL_FUTURE");
-                    var newItemNote  = delta.applyToOccurrenceAndFuture();
+                    var newItem  = delta.applyToOccurrenceAndFuture();
                     f = function () {
                         doSaveItem(item,
                         {
                           'saveType': opts.ALL_FUTURE_EVENTS,
                           'delta': delta,
-                          'newItemNote': newItemNote
+                          'newItem': newItem
                         });
                     };
                     break;
@@ -233,7 +238,7 @@ cosmo.view.service = new function () {
         var isNew = opts['new'] || false;
         var note = item.data;
         var delta = opts.delta;
-        var newItemNote = opts.newItemNote;
+        var newItem = opts.newItem;
         dojo.debug("Do save: savetype: " + opts.saveType)
         dojo.debug("Do save: iznew: " + isNew)
 
@@ -248,17 +253,17 @@ cosmo.view.service = new function () {
                     break;
                 case OPTIONS.ALL_FUTURE_EVENTS:
                     dojo.debug("about to save note in ALL FUTURE EVENTS")
-                    var newItemNoteDeferred = cosmo.app.pim.serv.
-                        createItem(newItemNote, cosmo.app.pim.currentCollection);
-                    var requestId = newItemNoteDeferred.id;
+                    var newItemDeferred = cosmo.app.pim.serv.
+                        createItem(newItem, cosmo.app.pim.currentCollection);
+                    var requestId = newItemDeferred.id;
                     self.processingQueue.push(requestId);
 
-                    newItemNoteDeferred.addCallback(function(){
-                        dojo.debug("in newItemNoteDeferred call back")
-                        if (newItemNoteDeferred.results[1] != null){
+                    newItemDeferred.addCallback(function(){
+                        dojo.debug("in newItemDeferred call back")
+                        if (newItemDeferred.results[1] != null){
                             //if there was an error, pass it to handleSaveItem, with the original
                             //item
-                            handleSaveItem(item, newItemNoteDeferred.results[1], requestId,opts.saveType, delta);
+                            handleSaveItem(item, newItemDeferred.results[1], requestId,opts.saveType, delta);
                         }
                         else {
                             //get rid of the id from the processing queue
@@ -273,7 +278,7 @@ cosmo.view.service = new function () {
                                     originalDeferred.id,
                                     opts.saveType,
                                     delta,
-                                    newItemNote);
+                                    newItem);
                             });
                             self.processingQueue.push(originalDeferred.id);
                             self.lastSent = item;
@@ -336,14 +341,14 @@ cosmo.view.service = new function () {
      * @param item A ListItem/CalItem object, the original item clicked on,
      * or created by double-clicking on the cal canvas.
      * FIXME: Comments below are hopelessly out of date
-     * @param newItemNoteId String, the id for the item returned when creating a
+     * @param newItemId String, the id for the item returned when creating a
      * new item
      * @param err A JS object, the error returned from the server when
      * a save operation fails.
      * @param reqId Number, the id of the async request.
      * @param optsParam A JS Object, options for the save operation.
      */
-    function handleSaveItem(item, err, reqId, saveType, delta, newItemNote) {
+    function handleSaveItem(item, err, reqId, saveType, delta, newItem) {
         dojo.debug("handleSaveItem");
         var OPTIONS = self.recurringEventOptions;
         var errMsg = '';
@@ -376,11 +381,11 @@ cosmo.view.service = new function () {
         self.processingQueue.shift();
         // Broadcast message for success/failure
         dojo.event.topic.publish('/calEvent', {
-             action: act,
-             data: item,
-             saveType: saveType,
-             delta: delta,
-             newItemNote: newItemNote
+             'action': act,
+             'data': item,
+             'saveType': saveType,
+             'delta':delta,
+             'newItem':newItem
         });
     }
 

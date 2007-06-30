@@ -248,3 +248,11 @@ hr {
     background-color: #555;
 }
 
+.activationPrompt {
+	border: 1px solid #ff6600;
+	background: #ffffcc;
+	font-size: 12px;
+	padding: 8px;
+	font-weight: bold;
+}
+

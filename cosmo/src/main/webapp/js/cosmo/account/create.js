@@ -129,8 +129,8 @@ cosmo.account.create = new function () {
             p = _createElem('div');
             p.style.marginBottom = '16px';
             p.style.textAlign = 'center';
-            p.className = 'borderBox';
-            p.appendChild(_createText(_('Signup.Prompt.AccountActivation')));
+            p.className = 'activationPrompt';
+            p.innerHTML = _('Signup.Prompt.AccountActivation');
             dO.appendChild(p);
         }
 

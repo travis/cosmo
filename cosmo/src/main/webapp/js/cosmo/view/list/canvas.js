@@ -240,21 +240,114 @@ cosmo.view.list.canvas.Canvas = function (p) {
             this.height = this.parent.height - CAL_TOP_NAV_HEIGHT;
         }
     };
+    /**
+     * Handles a successful update of a CalEvent item
+     * @param cmd JS Object, the command object passed in the
+     * published 'success' message 
+     */
     this._saveSuccess = function (cmd) {
+        dojo.debug("saveSuccess: ");
         var recurOpts = cosmo.view.service.recurringEventOptions;
-        var item = cmd.data;
+        var item = cmd.data
+        var data = item.data;
         var saveType = cmd.saveType || null;
+        dojo.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
         var deferred = null;
-        var newItem = cmd.newItem;
+        var newItemNote = cmd.newItemNote; // stamped Note
 
+        //if the event is recurring and all future or all events are changed, we need to
+        //re expand the event
         if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
-            self.view.loadItems();
+            dojo.debug("saveSuccess: has recurrence");
+            //first remove the event and recurrences from the registry.
+            var idsToRemove = [data.getUid()];
+            if (saveType == recurOpts.ALL_FUTURE_EVENTS){
+                idsToRemove.push(newItemNote.getUid());
+            }
+            var newRegistry = self.view.filterOutRecurrenceGroup(
+                self.view.itemRegistry.clone(), idsToRemove);
+
+            
+            //now we have to expand out the item for the viewing range
+            var deferredArray = [self.view.loadItems({ item: data.getMaster() })];
+            if (saveType == recurOpts.ALL_FUTURE_EVENTS){
+              deferredArray.push(self.view.loadItems({ item: newItemNote }));
+            }
+            deferred = new dojo.DeferredList(deferredArray);
+
+            var addExpandedOccurrences = function () {
+                dojo.debug("saveSuccess: addExpandedRecurrences");
+                // [0][0][1] - this is where the results are
+                //stored in a DeferredList
+                var occurrences = deferred.results[0][0][1];
+                if (deferred.results[0][1]){
+                    var otherOccurrences = deferred.results[0][1][1]
+                    occurrences = occurrences.concat(otherOccurrences);
+                }
+                var newHash = cosmo.view.cal.createEventRegistry(occurrences);
+                newRegistry.append(newHash);
+
+                self.view.itemRegistry = newRegistry;
+                self.view.itemRegistry.eachValue(self.view.setSortAndDisplay);
+            };
+            deferred.addCallback(addExpandedOccurrences);
         }
+        // Non-recurring / "only this item'
         else {
             self.view.setSortAndDisplay(item);
-            self._doSortAndDisplay();
         }
+
+        var updateEventsCallback = function () {
+            dojo.debug("updateEventsCallback")
+            // Don't re-render when requests are still processing
+            if (!cosmo.view.service.processingQueue.length) {
+
+                // Anything except editing an existing event requires
+                // adding the selection to an item in the itemRegistry
+                if (saveType) {
+                    var sel = null;
+                    switch (saveType) {
+                        case 'new':
+                            sel = item;
+                            break;
+                        case recurOpts.ALL_EVENTS:
+                        case recurOpts.ONLY_THIS_EVENT:
+                            sel = item.data.getItemUid();
+                            break;
+                        case recurOpts.ALL_FUTURE_EVENTS:
+                            sel = newItemNote.getNoteOccurrence(
+                                newItemNote.getEventStamp().getStartDate()).getItemUid();
+                            break;
+                            break;
+                        default:
+                            throw('Undefined saveType of "' + saveType +
+                                '" in command object passed to saveSuccess');
+                            break;
+
+                    }
+                    // Needs to be set and then gotten because sel may be
+                    // an itemUID string, or the ListItem it points to
+                    // has been replaced in the itemRegistry
+                    self.setSelectedItem(sel);
+                    sel = self.getSelectedItem();
+                    dojo.event.topic.publish('/calEvent', { action: 'setSelected',
+                        data: sel });
+                }
+            }
+            else {
+                dojo.debug("how many left in queue: " + cosmo.view.service.processingQueue.length);
+            }
+        }
+
+        if (deferred){
+            deferred.addCallback(updateEventsCallback);
+        }
+        else {
+            updateEventsCallback();
+        }
+
+        self._doSortAndDisplay();
     };
     this._removeSuccess = function (cmd) {
         var recurOpts = cosmo.view.service.recurringEventOptions;

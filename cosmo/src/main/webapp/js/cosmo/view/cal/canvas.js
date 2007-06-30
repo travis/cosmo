@@ -817,14 +817,9 @@ cosmo.view.cal.canvas = new function () {
         updateEventsDisplay();
     }
     /**
-     * Handles a successful update of an event, for:
-     * (1) Plain ol' single-event upates
-     * (2) Removing the recurrence from a recurrence master
-     *     (results in a plain, single event).
-     * (3) Modifications to recurrences
+     * Handles a successful update of a CalEvent item
      * @param cmd JS Object, the command object passed in the
-     * published 'success' event (contains the originally edited
-     * event, cmd.data, and the update options, cmd.opts).
+     * published 'success' message 
      */
      function saveSuccess(cmd) {
         dojo.debug("saveSuccess: ");
@@ -847,7 +842,7 @@ cosmo.view.cal.canvas = new function () {
                 idsToRemove.push(newItemNote.getUid());
             }
             var newRegistry = self.view.filterOutRecurrenceGroup(
-                cosmo.view.cal.itemRegistry.clone(), idsToRemove);
+                self.view.itemRegistry.clone(), idsToRemove);
 
 
             //now we have to expand out the item for the viewing range
@@ -859,7 +854,7 @@ cosmo.view.cal.canvas = new function () {
             }
             deferred = new dojo.DeferredList(deferredArray);
 
-            var addExpandedOccurrences = function(){
+            var addExpandedOccurrences = function () {
                 dojo.debug("saveSuccess: addExpandedRecurrences");
                 // [0][0][1] - this is where the results are
                 //stored in a DeferredList
@@ -872,11 +867,10 @@ cosmo.view.cal.canvas = new function () {
                 newRegistry.append(newHash);
 
                 removeAllEvents();
-                cosmo.view.cal.itemRegistry = newRegistry;
-                cosmo.view.cal.itemRegistry.each(appendLozenge);
-            }
+                self.view.itemRegistry = newRegistry;
+                self.view.itemRegistry.each(appendLozenge);
+            };
             deferred.addCallback(addExpandedOccurrences);
-
         }
         // Non-recurring / "only this item'
         else {
@@ -938,7 +932,7 @@ cosmo.view.cal.canvas = new function () {
         else {
             updateEventsCallback();
         }
-    }
+    };
 
     /**
      * Handles a successful removal of an event

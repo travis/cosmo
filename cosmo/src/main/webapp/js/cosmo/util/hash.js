@@ -179,9 +179,25 @@ cosmo.util.hash.Hash = function () {
         for (var i = start; i < ceiling; i++) {
             var key = this.order[i];
             var val = this.items[key];
-            func(key, val);
+            if (opts.keyOnly) {
+                func(key);
+            }
+            else if (opts.valueOnly) {
+                func(val);
+            }
+            else {
+                func(key, val);
+            }
         }
         return true;
+    };
+    this.eachKey = function (func, o) {
+        o.keyOnly = true;
+        this.each(func, o);
+    };
+    this.eachValue = function (func, o) {
+        o.valueOnly = true;
+        this.each(func, o);
     };
     this.clone = function () {
         var h = new Hash();

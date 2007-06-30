@@ -69,6 +69,7 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
 
 cosmo.view.list.loadItems = function (o) {
     var opts = o || {};
+    var note = opts.note || null;
     // Default to the app's currentCollection if one isn't passed
     var collection = opts.collection || cosmo.app.pim.currentCollection;
     var itemLoadList = null;
@@ -81,7 +82,10 @@ cosmo.view.list.loadItems = function (o) {
     // Load the array of items
     // ======================
     try {
-        var deferred = cosmo.app.pim.serv.getDashboardItems(collection,
+        // Look up for Note if passed a Note, otherwise get for
+        // the entire collection
+        var target = note || collection;
+        var deferred = cosmo.app.pim.serv.getDashboardItems(target,
             { sync: true });
         var results = deferred.results;
         // Catch any error stuffed in the deferred

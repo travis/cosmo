@@ -47,8 +47,6 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
-import org.springframework.dao.CannotAcquireLockException;
-import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 
@@ -195,9 +193,6 @@ public class StandardMorseCodeController implements MorseCodeController {
             // throws UidinUseException
             collection =
                 contentService.createCollection(parent, collection, children);
-        } catch (CannotAcquireLockException e) {
-            log.debug("DEADLOCK(PUBLISH):" + uid);
-            throw new ServerBusyException("Database is busy", e);
         } catch (OptimisticLockingFailureException e) {
             log.warn("Publish of " +  uid + " failed due to concurrent requests");
             throw new ServerBusyException("Database is busy", e);
@@ -368,9 +363,7 @@ public class StandardMorseCodeController implements MorseCodeController {
             // throws CollectionLockedException, and may throw
             // ConcurrencyFailureException
             collection = contentService.updateCollection(collection, children);
-        } catch (ConcurrencyFailureException cfe) {
-            if(cfe instanceof CannotAcquireLockException)
-                log.debug("DEADLOCK(UPDATE)");
+        } catch (OptimisticLockingFailureException cfe) {
             // This means the data has been updated since the last sync token,
             // so a StaleCollectionException should be thrown
             throw new StaleCollectionException(uid);

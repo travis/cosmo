@@ -57,6 +57,10 @@
     </listener-class>
   </listener>
   <filter>
+    <filter-name>deadlock-retry-filter</filter-name>
+    <filter-class>org.osaf.cosmo.filters.DeadlockRetryFilter</filter-class>
+  </filter>
+  <filter>
     <filter-name>version-header</filter-name>
     <filter-class>org.osaf.cosmo.ui.VersionHeaderFilter</filter-class>
   </filter>
@@ -176,6 +180,10 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>dav-security</filter-name>
+    <url-pattern>/mc/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>deadlock-retry-filter</filter-name>
     <url-pattern>/mc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>

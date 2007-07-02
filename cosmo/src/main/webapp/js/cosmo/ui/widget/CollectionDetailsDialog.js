@@ -92,6 +92,7 @@ dojo.widget.HtmlWidget, function(){
         
         protocolUrls: null,
         displayName: null,
+        httpSupported: !dojo.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
         
         // Lifecycle functions
         postMixInProperties: function(){
@@ -203,6 +204,9 @@ dojo.widget.HtmlWidget, function(){
         _setClientInstructions: function(client){
             var x = 1;
             var d = document.createElement("div");
+            if (!this.httpSupported && client == "iCal"){
+                client = "icalNotSupported";
+            }
             while (true){
                 var key = "Main.CollectionDetails.Instructions." + client + "." + x;
                 if (cosmo.util.i18n.messageExists(key)){
@@ -218,8 +222,16 @@ dojo.widget.HtmlWidget, function(){
             }
             dojo.dom.replaceChildren(this.clientInstructions, d);
         },
+
         _setClientCollectionAddress: function(client){
             var url =  this.protocolUrls[this.clientsToProtocols[client]];
+            if (client == "iCal"){
+                if (this.httpSupported){
+                    url = url.replace("https", "http");
+                } else {
+                    url = _("Main.CollectionDetails.na");
+                }
+            }
             this.clientCollectionAddress.value = url;
             this.clientCollectionLink.href = url;
         },

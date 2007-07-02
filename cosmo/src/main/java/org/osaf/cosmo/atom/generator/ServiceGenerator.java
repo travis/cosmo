@@ -30,7 +30,7 @@ import org.osaf.cosmo.model.User;
 public interface ServiceGenerator {
 
     public static final String WORKSPACE_HOME = "home";
-    public static final String WORKSPACE_META = "meta";
+    public static final String WORKSPACE_ACCOUNT = "account";
     public static final String COLLECTION_SUBSCRIBED = "subscribed";
     public static final String COLLECTION_PREFERENCES = "preferences";
 

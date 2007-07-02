@@ -58,11 +58,11 @@ public class StandardServiceGenerator
      * describing the collections accessible for a user:
      * </p>
      * <dl>
-     * <dt>{@link #WORKSPACE_HOME}</dt>
-     * <dd>Contains an Atom collection for each of the collections in
-     * a user's home collection (not including any
+     * <dt>{@link ServiceGenerator#WORKSPACE_HOME}</dt>
+     * <dd>Contains an Atom collection for each of the collections
+     * published in a user's home collection (not including any
      * sub-collections).</dd>
-     * <dt>{@link @WORKSPACE_LOCAL}</dt>
+     * <dt>{@link ServiceGenerator#WORKSPACE_ACCOUNT}</dt>
      * <dd>Contains an Atom collection for each of the local
      * collections (those on the same server) that the user to which
      * the user is subscribed.
@@ -86,7 +86,7 @@ public class StandardServiceGenerator
                 hw.addCollection(createCollection((CollectionItem)child));
         }
 
-        Workspace mw = createMetaWorkspace();
+        Workspace mw = createAccountWorkspace();
         service.addWorkspace(mw);
 
         mw.addCollection(createSubscribedCollection(user));
@@ -136,10 +136,10 @@ public class StandardServiceGenerator
      *
      * @throws GeneratorException
      */
-    protected Workspace createMetaWorkspace()
+    protected Workspace createAccountWorkspace()
         throws GeneratorException {
         Workspace workspace = factory.getAbdera().getFactory().newWorkspace();
-        workspace.setTitle(WORKSPACE_META);
+        workspace.setTitle(WORKSPACE_ACCOUNT);
         return workspace;
     }
 

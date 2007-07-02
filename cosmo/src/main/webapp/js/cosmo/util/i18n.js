@@ -19,15 +19,7 @@
  */
 
 dojo.provide("cosmo.util.i18n");
-
-cosmo.util.i18n.loadI18n = function (uri){
-    var s = dojo.hostenv.getText(uri);
-    cosmo.util.i18n._localtext = eval("(" + s + ")");
-}
-
-cosmo.util.i18n.init = function (uri){
-    cosmo.util.i18n.loadI18n(uri);
-}
+dojo.require("cosmo.ui.conf");
 
 cosmo.util.i18n.replacePat = /\{\d+\}/g;
 
@@ -46,6 +38,11 @@ cosmo.util.i18n.getText = function () {
     return str;
 };
 
+cosmo.util.i18n.setLocalizationMessages = function(messages){
+    dojo.debug("setLocalizationMessages...");
+    this._localtext = messages;
+};
+
 // Legacy
 var getText = cosmo.util.i18n.getText;
 
@@ -57,6 +54,4 @@ cosmo.util.i18n.messageExists = function (str){
      }
 }
 
-if (djConfig['i18nLocation']){
-    cosmo.util.i18n.init(djConfig['i18nLocation']);
-}
+

@@ -60,66 +60,70 @@
         </list> 
     </property>   
     <property name="alwaysUseFullPath">
-		<value>true</value>
+        <value>true</value>
     </property>
     <property name="mappings"> 
-		<value>
-	        /admin/status/*=statusController
-        	/login=appEntryController
-        	/logout=appEntryController
-        	/=appEntryController
-			/welcome=appEntryController
-           	/browse/**=accountBrowsingController
-    	    /i18n.js=i18nController
-    	    /account/activate=accountActivationController
-    	    /pim/collection/*=collectionBookmarkController
-    	    
-	        /**/*=jspViewController
-		</value>
+        <value>
+            /admin/status/*=statusController
+            /login=appEntryController
+            /logout=appEntryController
+            /=appEntryController
+            /welcome=appEntryController
+               /browse/**=accountBrowsingController
+            /i18n.js=i18nController
+            /account/activate=accountActivationController
+            /pim/collection/*=collectionBookmarkController
+            
+            /**/*=jspViewController
+        </value>
     </property> 
 </bean> 
 
 <!-- TODO set cache settings here.... -->
-<bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" />
+<bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" >
+    <property name="propertyPlaceHolderConifgurer">
+        <ref bean="propertyPlaceholderConfigurer"/>
+    </property>
+</bean>
 
 <bean id="jspViewController" class="org.osaf.cosmo.ui.CosmoUrlFilenameViewController"> 
-	<property name="alwaysUseFullPath">
-		<value>true</value>
+    <property name="alwaysUseFullPath">
+        <value>true</value>
     </property>
 </bean> 
 
 <!-- 
 
-	Controller for bookmarkable collection urls
+    Controller for bookmarkable collection urls
 
  -->
  
  <bean id="collectionBookmarkController" class="org.osaf.cosmo.ui.pim.CollectionBookmarkController">
- 	<property name="pimView"><value>pim</value></property>
-	<property name="contentService"><ref bean="contentService" /></property>
-	<property name="securityManager"><ref bean="securityManager" /></property>
-	<property name="serviceLocatorFactory">
+     <property name="pimView"><value>pim</value></property>
+    <property name="contentService"><ref bean="contentService" /></property>
+    <property name="securityManager"><ref bean="securityManager" /></property>
+    <property name="serviceLocatorFactory">
       <ref bean="serviceLocatorFactory"/>
     </property>
     <property name="userService"><ref bean="userService"/></property>
     
-	
+    
  </bean>
 
 <!-- 
 
-	Controller for server status ui 
-	
+    Controller for server status ui 
+    
 -->
 
 <bean id="internalPathMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
 </bean>
 
 <bean id="statusController" class="org.osaf.cosmo.ui.admin.StatusController">
-	<property name="methodNameResolver"><ref bean="internalPathMethodNameResolver"/></property>
-	<property name="dumpView"><value>admin_status_dump</value></property>
-	<property name="viewView"><value>admin_status_view</value></property>
-	<property name="gcView"><value>redirect:/admin/status/view</value></property>
+    <property name="methodNameResolver"><ref bean="internalPathMethodNameResolver"/></property>
+    <property name="dumpView"><value>admin_status_dump</value></property>
+    <property name="viewView"><value>admin_status_view</value></property>
+    <property name="gcView"><value>redirect:/admin/status/view</value></property>
 </bean>
 
 <!-- Account browser -->
@@ -150,12 +154,12 @@
 
 <!-- 
 
-	Controller for login, logout, and welcome page
-	
+    Controller for login, logout, and welcome page
+    
  -->
 
 <bean id="appEntryController" class="org.osaf.cosmo.ui.ApplicationEntryController"> 
-	<property name="methodNameResolver"><ref bean="appEntryMethodNameResolver"/></property>
+    <property name="methodNameResolver"><ref bean="appEntryMethodNameResolver"/></property>
 
     <property name="loginView" value="login" />
     <property name="securityManager"><ref bean="securityManager"/></property>
@@ -170,19 +174,19 @@
     /login=login
     /logout=logout
     /welcome=welcome
-	/=root
+    /=root
   </value></property>
 </bean>
 
 <!-- 
 
-	Controller for account activation
+    Controller for account activation
 
  -->
 
 <bean id="accountActivationController" 
-	  class="org.osaf.cosmo.ui.account.activation.AccountActivationController"> 
-	  
+      class="org.osaf.cosmo.ui.account.activation.AccountActivationController"> 
+      
     <property name="accountActivationView" value="account_activate" />
     <property name="notFoundView" value="error_notfound" />
     <property name="userService"><ref bean="userService"/></property>
@@ -191,7 +195,7 @@
 <!--
  ********************	
  
-	View resolvers
+    View resolvers
   
  ********************
  -->
@@ -199,19 +203,19 @@
 
 <bean id="resourceBundleViewResolver" 
       class="org.springframework.web.servlet.view.ResourceBundleViewResolver"> 
-	<property name="order" value="1"/>
-	<property name="basename" value="views" />
-	<property name="defaultParentView" value="default" />
+    <property name="order" value="1"/>
+    <property name="basename" value="views" />
+    <property name="defaultParentView" value="default" />
 </bean> 
 
 <!--
-	 
-	Final view resolver.
+     
+    Final view resolver.
 
-	This resolver checks for redirect: or forward: prefixes and performs
-	the InternalResourceViewResolver standard behavior if found.
-	
-	If neither is found, it forwards to a pretty "resource not found" page. 
+    This resolver checks for redirect: or forward: prefixes and performs
+    the InternalResourceViewResolver standard behavior if found.
+    
+    If neither is found, it forwards to a pretty "resource not found" page. 
 -->	 
 
 <bean id="defaultViewResolver" 

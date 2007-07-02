@@ -17,6 +17,7 @@
 dojo.provide("cosmo.ui.conf");
 
 dojo.require("cosmo.env");
+dojo.require("cosmo.util.i18n");
 // Configurable UI options
 
 
@@ -46,9 +47,45 @@ dj_global.LOGO_GRAPHIC = 'logo_main.gif';
 dj_global.LOGO_GRAPHIC_SM = 'logo_sm.gif';
 dj_global.BUTTON_DIR_PATH = cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/images/';
 
-// Non global configuration
-try { 
-    dojo.lang.mixin(cosmo.ui.conf, eval("(" + dojo.hostenv.getText(djConfig['confLocation']) + ")"));
-} catch (e){
-    throw new Error("Could not load configuration file.");
+//****************** Overidable Defaults. *************************************
+// These can be overridden in cosmo.properties in the Cosmo Server Bundle
+
+// UI timeout in seconds. If not set, inherited from session timeout.
+//cosmo.ui.conf.uiTimeout = 30*60
+
+// Amount of time in seconds between the timeout dialog
+// showing and auto logout.
+cosmo.ui.conf.timeoutDialogAutoLogout = 30
+
+// Determines whether services are also availble over http on port 80, when the 
+// current page's url is https
+cosmo.ui.conf.httpSupported="false";
+
+//****************** End Overidable Defaults. *********************************
+
+cosmo.ui.conf.load = function (uri){
+    var s = dojo.hostenv.getText(uri);
+    var propertymaps = eval("(" + s + ")");
+    cosmo.ui.conf._localtext = propertymaps[0];
+    cosmo.util.i18n.setLocalizationMessages(this._localtext);
+        
+    var configProperties = propertymaps[1];
+    dojo.lang.mixin(cosmo.ui.conf, configProperties);
+}
+
+cosmo.ui.conf.init = function (uri){
+    cosmo.ui.conf.load(uri);
+}
+
+cosmo.ui.conf.getBooleanValue = function(propertyName){
+    //summary: called to get the boolean value of a string. 
+    //description: Anything starting with "t" returns true. Properties returned from the server
+    //             are strings, not integers, booleans, etc, so this method is necessary to do
+    //             the proper "casting"
+    var rawValue = this[propertyName];
+    return (""+rawValue).toLowerCase()[0] == "t";
+} 
+
+if (djConfig['i18nLocation']){
+    cosmo.ui.conf.init(djConfig['i18nLocation']);
 }

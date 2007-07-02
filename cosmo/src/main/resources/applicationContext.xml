@@ -40,7 +40,7 @@
   </bean>
 
   <bean id="propertyPlaceholderConfigurer"
-        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        class="org.osaf.cosmo.spring.CosmoPropertyPlaceholderConfigurer">
     <property name="locations">
       <list>
         <ref local="cosmoConfigPath"/>
@@ -333,8 +333,8 @@
   </bean>
   
   <bean id="passwordRecoverer"
-  		class="org.osaf.cosmo.service.account.EmailPasswordRecoverer">
-  		
+          class="org.osaf.cosmo.service.account.EmailPasswordRecoverer">
+          
     <property name="idGenerator">
       <ref local="idGenerator" />
     </property>

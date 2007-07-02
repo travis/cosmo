@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,32 @@
 package org.osaf.cosmo.spring.mvc;
 
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osaf.cosmo.spring.CosmoPropertyPlaceholderConfigurer;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
 public class InternationalizationController extends AbstractController {
+    public static final String UI_PREFIX = "ui.";
+    private  HashMap<String, String> properties = new HashMap<String, String>();
+
+    public void setPropertyPlaceHolderConifgurer(CosmoPropertyPlaceholderConfigurer configurer) {
+        Properties configProps = configurer.getProperties();
+        Enumeration propertyNames = configProps.propertyNames();
+        while (propertyNames.hasMoreElements()){
+            String propName = (String) propertyNames.nextElement();
+            if (propName.startsWith(UI_PREFIX)){
+               properties.put(propName.substring(UI_PREFIX.length()), configProps.getProperty(propName)); 
+            }
+        }
+
+    }
 
     public ModelAndView handleRequestInternal(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
@@ -33,6 +50,7 @@ public class InternationalizationController extends AbstractController {
                 request.getLocale());
         Enumeration messages = bundle.getKeys();
         mav.addObject("messages", messages);
+        mav.addObject("configProperties", properties);
         return mav;
     }
 }

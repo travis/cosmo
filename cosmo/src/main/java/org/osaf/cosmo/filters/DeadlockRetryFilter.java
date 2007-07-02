@@ -16,7 +16,6 @@
 package org.osaf.cosmo.filters;
 
 import java.io.IOException;
-import java.lang.reflect.Proxy;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -29,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.dav.impl.BufferedServletInputStream;
 import org.springframework.dao.PessimisticLockingFailureException;
 
 /**
@@ -37,11 +35,12 @@ import org.springframework.dao.PessimisticLockingFailureException;
  * (catches PessimisticLockingFailureException) and retries
  * the request a number of times before failing.  The filter
  * only applies to "update" operations, that is PUT, POST, DELETE.
- * TODO:  make filter configurable for retries, method and exception types.
+ * TODO:  make filter configurable for method and exception types.
  */
 public class DeadlockRetryFilter implements Filter {
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
     private int maxRetries = 10;
+    private static final String PARAM_RETRIES = "retries";
     
     public void destroy() {
     }
@@ -85,7 +84,11 @@ public class DeadlockRetryFilter implements Filter {
         }
     }
 
-    public void init(FilterConfig arg0) throws ServletException {
+    public void init(FilterConfig config) throws ServletException {
+        // initialize maxRetries from config parameter
+        String retries = config.getInitParameter(PARAM_RETRIES);
+        if(retries!=null)
+            maxRetries = Integer.parseInt(retries);
     }
 
 }

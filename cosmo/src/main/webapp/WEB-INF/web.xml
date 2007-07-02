@@ -59,6 +59,10 @@
   <filter>
     <filter-name>deadlock-retry-filter</filter-name>
     <filter-class>org.osaf.cosmo.filters.DeadlockRetryFilter</filter-class>
+    <init-param>
+      <param-name>retries</param-name>
+      <param-value>10</param-value>
+    </init-param>
   </filter>
   <filter>
     <filter-name>version-header</filter-name>

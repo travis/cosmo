@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +41,7 @@ import org.springframework.dao.PessimisticLockingFailureException;
  */
 public class DeadlockRetryFilter implements Filter {
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
-    private int maxRetries = 5;
+    private int maxRetries = 10;
     
     public void destroy() {
     }
@@ -53,29 +54,30 @@ public class DeadlockRetryFilter implements Filter {
            "POST".equals(method) ||
            "DELETE".equals(method)) {
             
-            // Buffer request content
-            BufferedServletInputStream bis = new BufferedServletInputStream(request
-                    .getInputStream());
-            
-            // Wrap request in proxy so we can utilize buffered content
-            HttpServletRequestInvocationHandler handler = new HttpServletRequestInvocationHandler((HttpServletRequest) request, bis);
-            request = (ServletRequest) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {HttpServletRequest.class}, handler);
+            // Wrap request so we can utilize buffered content
+            request = (ServletRequest) new BufferedRequestWrapper((HttpServletRequest) request);
             int attempts = 0;
            
-            while(attempts < maxRetries) {
+            while(attempts <= maxRetries) {
                 try {
                     chain.doFilter(request, response);
                     break;
                 } catch (PessimisticLockingFailureException e) {
-                    if(log.isDebugEnabled())
-                        log.debug("retrying request " + attempts);
+                    log.warn("retrying request " + attempts);
                     attempts++;
                     
                     // Retry and fail after maxRetries attempts
-                    if(attempts > maxRetries)
-                        throw e;
-                    else
-                        handler.retryRequest();
+                    if(attempts > maxRetries) {
+                        log.error("reached maximum deadlock retries");
+                        ((HttpServletResponse) response)
+                                .sendError(
+                                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                                        "the server was unable to complete the request");
+                    }
+                    else {
+                        ((BufferedRequestWrapper) request).retryRequest();
+                        Thread.yield();
+                    }
                 }
             }
         } else {

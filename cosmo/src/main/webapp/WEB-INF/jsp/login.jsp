@@ -81,18 +81,17 @@
       <div dojoType="cosmo:LoginDialog" widgetId="loginDialog">
       </div>
       <div style="padding-top:24px; text-align:center">
-          <fmt:message key="Login.NoAccount"/>
-      </div>
-      <div style="padding-top:4px; text-align:center">
-        <a href="javascript:cosmo.account.create.showForm();">
-          <fmt:message key="Login.CreateAccount"/>
-        </a>
+        <fmt:message key="Login.CreateAccount">
+        <fmt:param value="<a href=\"javascript:cosmo.account.create.showForm();\">"/>
+        <fmt:param value="</a>"/>
+        </fmt:message>
       </div>
 
       <div style="padding-top:4px; text-align:center;">
-      	<a href="${staticBaseUrl}/account/password/recover">
-      	  <fmt:message key="Login.Forgot"/>
-      	</a>
+        <fmt:message key="Login.Forgot">
+        <fmt:param value="<a href=\"${staticBaseUrl}/account/password/recover\">"/>
+        <fmt:param value="</a>"/>
+        </fmt:message>
 	  </div>
       
       <div style="padding-top:36px; text-align:center;">

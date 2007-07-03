@@ -65,7 +65,6 @@ import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.PathUtil;
@@ -347,7 +346,7 @@ public abstract class DavResourceBase
         throws DavException {
         if (! exists())
             throw new DavException(DavServletResponse.SC_NOT_FOUND);
-
+       
         if (log.isDebugEnabled())
             log.debug("moving resource " + getResourcePath() + " to " +
                       destination.getResourcePath());

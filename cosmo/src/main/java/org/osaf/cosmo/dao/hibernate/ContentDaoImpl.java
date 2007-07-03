@@ -76,12 +76,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             // verify uid not in use
             checkForDuplicateUid(collection);
             
-            // We need to enforce a content hierarchy to support WebDAV
-            // In a hierarchy, can't have two items with same name with
-            // same owner and parent
-            checkForDuplicateItemName(owner.getId(), parent.getId(), collection
-                    .getName());
-            
             setBaseItemProps(collection);
             collection.getParents().add(parent);
             
@@ -182,11 +176,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             // verify uid not in use
             checkForDuplicateUid(content);
             
-            // Enforce hiearchy for WebDAV support
-            // In a hierarchy, can't have two items with same name with
-            // same parent
-            checkForDuplicateItemName(owner.getId(), parent.getId(), content.getName());
-
             setBaseItemProps(content);
             
             // add parent to new content
@@ -266,12 +255,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             // verify uid not in use
             checkForDuplicateUid(content);
             
-            // Enforce hiearchy for WebDAV support
-            // In a hierarchy, can't have two items with same name with
-            // same parent
-            for(Item parent: parents)
-                checkForDuplicateItemName(owner.getId(), parent.getId(), content.getName());
-
             setBaseItemProps(content);
             for(CollectionItem parent: parents) {
                 content.getParents().add(parent);
@@ -387,12 +370,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if (collection.getOwner() == null)
                 throw new IllegalArgumentException("collection must have owner");
             
-            // In a hierarchy, can't have two items with same name with
-            // same parent
-            if (collection.getParents().size() > 0)
-                checkForDuplicateItemNameMinusItem(collection.getOwner().getId(), 
-                    collection.getParents(), collection.getName(), collection.getId());
-            
             collection.setModifiedDate(new Date());
             
             getSession().flush();
@@ -421,11 +398,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             if (content.getOwner() == null)
                 throw new IllegalArgumentException("content must have owner");
-            
-            // In a hierarchy, can't have two items with same name with
-            // same parent
-            checkForDuplicateItemNameMinusItem(content.getOwner().getId(), 
-                    content.getParents(), content.getName(), content.getId());
             
             content.setModifiedDate(new Date());
             

@@ -34,6 +34,7 @@ import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -201,6 +202,10 @@ public class StandardContentService implements ContentService {
      */
     public void copyItem(Item item, String path, boolean deepCopy) {
         
+        Item toItem = findItemByPath(path);
+        if(toItem!=null)
+            throw new DuplicateItemNameException(path + " exists");
+        
         // handle case of copying ContentItem (need to sync on dest collection)
         if(item != null && item instanceof ContentItem) {
             
@@ -246,6 +251,10 @@ public class StandardContentService implements ContentService {
      *         CollectionItem is lockecd.
      */
     public void moveItem(String fromPath, String toPath) {
+        
+        Item toItem = findItemByPath(toPath);
+        if(toItem!=null)
+            throw new DuplicateItemNameException(toPath + " exists");
         
         CollectionItem oldParent = (CollectionItem) contentDao
                 .findItemParentByPath(fromPath);

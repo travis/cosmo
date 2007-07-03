@@ -35,7 +35,6 @@ import org.hibernate.validator.InvalidValue;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
@@ -340,9 +339,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             if(parent==null)
                 throw new ItemNotFoundException("parent collection not found");
             
-            checkForDuplicateItemName(item.getOwner().getId(), 
-                    parent.getId(), copyName);
-            
             verifyNotInLoop(item, parent);
             
             Item newItem = copyItem(item,parent,deepCopy);
@@ -387,9 +383,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             
             // Current parent
             CollectionItem oldParent = (CollectionItem) itemPathTranslator.findItemParent(fromPath);
-            
-            checkForDuplicateItemName(item.getOwner().getId(), 
-                    parent.getId(), moveName);
             
             verifyNotInLoop(item, parent);
             
@@ -695,29 +688,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
                         + " already in use");
             }
         }
-    }
-    
-    protected void checkForDuplicateItemName(Long userDbId, Long parentDbId,
-            String name) {
-        if (findItemByParentAndName(userDbId, parentDbId, name) != null)
-            throw new DuplicateItemNameException(name);
-    }
-    
-
-    protected void checkForDuplicateItemNameMinusItem(Long userDbId,
-            Set<CollectionItem> parents, String name, Long itemId) {
-
-        for (CollectionItem parent : parents) {
-            if (findItemByParentAndNameMinusItem(userDbId, parent.getId(),
-                    name, itemId) != null)
-                throw new DuplicateItemNameException(name);
-        }
-    }
-    
-    protected void checkForDuplicateItemNameMinusItem(Long userDbId, Long parentDbId,
-            String name, Long itemId) {
-        if (findItemByParentAndNameMinusItem(userDbId, parentDbId, name, itemId) != null)
-            throw new DuplicateItemNameException(name);
     }
     
     protected Ticket getTicketRecursive(Item item, String key) {

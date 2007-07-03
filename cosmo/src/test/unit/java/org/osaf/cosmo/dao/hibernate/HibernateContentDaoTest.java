@@ -36,7 +36,6 @@ import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
-import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
@@ -467,29 +466,6 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
                 queryItem2.getModifiedDate()));
     }
 
-    public void testContentDaoUpdateError() throws Exception {
-        User user = getUser(userDao, "testuser");
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
-
-        ContentItem item1 = generateTestContent("test", "testuser");
-        ContentItem item2 = generateTestContent("test2", "testuser");
-
-        ContentItem newItem1 = contentDao.createContent(root, item1);
-        ContentItem newItem2 = contentDao.createContent(root, item2);
-
-        clearSession();
-
-        ContentItem queryItem2 = contentDao.findContentByUid(newItem2.getUid());
-
-        queryItem2.setName("test");
-        try {
-            contentDao.updateContent(queryItem2);
-            Assert.fail("able to update item with duplicate name");
-        } catch (DuplicateItemNameException dine) {
-        }
-
-    }
-
     public void testContentDaoDeleteContent() throws Exception {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
@@ -719,25 +695,6 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         d = contentDao.createContent(a, d);
 
         clearSession();
-
-        // test duplicates
-        CollectionItem a2 = new CollectionItem();
-        a2.setName("a");
-        a2.setOwner(getUser(userDao, "testuser2"));
-
-        ContentItem d2 = generateTestContent("d", "testuser2");
-
-        try {
-            contentDao.createCollection(root, a2);
-            Assert.fail("Should not be able to create duplicate collection");
-        } catch (DuplicateItemNameException dine) {
-        }
-
-        try {
-            contentDao.createContent(a, d2);
-            Assert.fail("Should not be able to create duplicate content");
-        } catch (DuplicateItemNameException dine) {
-        }
 
         a = contentDao.findCollectionByUid(a.getUid());
         b = contentDao.findCollectionByUid(b.getUid());

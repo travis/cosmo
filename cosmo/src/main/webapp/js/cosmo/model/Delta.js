@@ -369,6 +369,13 @@ dojo.declare("cosmo.model.Delta", null, {
            original.applyChange("startDate", changeValue, type);
            delete changes["startDate"];
         }
+        
+        if (changes["allDay"]){
+           var changeValue = changes["allDay"];
+           original.applyChange("allDay", changeValue, type);
+           delete changes["allDay"];
+        }
+        
         this._applyProperties(original, changes, type);
     },
     

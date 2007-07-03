@@ -42,7 +42,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         if (!errorMessage){
             errorMessage += this._performInterPropertyValidations(delta);
         }
-        
         delta.deltafy();
         return [delta, errorMessage];  
     },
@@ -167,7 +166,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 dateField: "startDate",
                 timeField: "startTime",
                 meridianField: "startMeridian",
-                tzIdField: "tzId"                
+                tzIdField: "tzId",
+                allDayField: "eventAllDay"                
             },
 
             endDate: {
@@ -175,7 +175,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 dateField: "endDate",
                 timeField: "endTime",
                 meridianField: "endMeridian",
-                tzIdField: "tzId"                
+                tzIdField: "tzId",
+                allDayField: "eventAllDay"             
             },
             
             "location": {
@@ -237,6 +238,10 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         var timeFieldValue = this._getFormValue(form, info.timeField);
         var meridianFieldValue = this._getFormValue(form, info.meridianField);
         var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
+        dojo.debug("IHTHERE : " +info.allDayField )
+        var allDayFieldValue = this._getFormValue(form, info.allDayField);
+        dojo.debug("IHTHERE2: ")
+        
         var errMsg = ""
         
         if (timeFieldValue){
@@ -246,11 +251,13 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 errMsg += '\n';
             }
         }
-        
-        var err = cosmo.util.validate.required(meridianFieldValue);
-        if (err){
-            errMsg += '"'+propertyDisplayName+'" AM/PM field: ' + err;
-            errMsg += '\n';
+
+        if(!allDayFieldValue){  
+            var err = cosmo.util.validate.required(meridianFieldValue);
+            if (err){
+                errMsg += '"'+propertyDisplayName+'" AM/PM field: ' + err;
+                errMsg += '\n';
+            }
         }
         
         var jsDate  = new Date(dateFieldValue);
@@ -266,7 +273,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         } 
         
         var date = new cosmo.datetime.Date();
-        if (tzIdFieldValue){
+        if (tzIdFieldValue && !allDayFieldValue){
             date.tzId = tzIdFieldValue;
             date.utc = false;
             date.updateFromLocalDate(jsDate);

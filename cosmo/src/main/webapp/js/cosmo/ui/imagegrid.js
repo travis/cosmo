@@ -30,21 +30,22 @@ dojo.require("cosmo.convenience");
 
 cosmo.ui.imagegrid.config = {};
 cosmo.ui.imagegrid.DISABLED_OPACITY = 0.3;
-cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImagesUrl() + 
+cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImagesUrl() +
   'image_grid.png';
 
 cosmo.ui.imagegrid.readConfig = function (type, data, obj) {
     cosmo.ui.imagegrid.config = data;
 };
 
-// Get the config data file that tells us 
+// Get the config data file that tells us
 // which images are where, and what sizes
 dojo.io.bind({ url: cosmo.env.getImagesUrl() + 'imagegrid.json',
     method: 'POST', // This is not RESTful, but POST avoids Prototype hijacking
     sync: true,
     mimetype: 'application/json',
     content: '',
-    load: function(type, data, obj) { cosmo.ui.imagegrid.readConfig(type, data, obj); },
+    load: function(type, data, obj) {
+        cosmo.ui.imagegrid.readConfig(type, data, obj); },
     error: function(type, error) { alert(error.message); } });
 
 cosmo.ui.imagegrid.Image = function (p) {
@@ -90,7 +91,7 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
     var enabled = typeof p.enabled == 'boolean' ? p.enabled : true;
     d.style.width = img.width;
     d.style.height = img.height;
-    d.style.backgroundImage = img.bgImg; 
+    d.style.backgroundImage = img.bgImg;
     d.style.backgroundPosition = img.bgPos;
     if (enabled) {
         // Give buttons the hand
@@ -127,5 +128,5 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
             d.style.filter = "alpha(opacity=" + opac * 100 + ")";
         }
     }
-    return d;    
+    return d;
 };

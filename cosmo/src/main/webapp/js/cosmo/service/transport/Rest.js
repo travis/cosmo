@@ -69,9 +69,9 @@ dojo.declare("cosmo.service.transport.Rest", null,
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
             // Fight the dark powers of IE's evil caching mechanism
-            if (dojo.render.html.ie) {
+            //if (dojo.render.html.ie) {
                 request.preventCache = request.preventCache || true;
-            }
+            //}
             if (request.method){
                 if (!this.methodIsSupported[request.method.toLowerCase()]){
                     request.headers['X-Http-Method-Override'] = request.method;

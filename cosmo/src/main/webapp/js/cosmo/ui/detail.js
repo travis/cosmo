@@ -108,10 +108,21 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     var params = p || {};
 
     this.domNode = null;
+    // If this is set, only one expando section of the
+    // form will be visible at one time -- kicks in
+    // automatically when the browser window is too
+    // short to accommodate the entire form.
+    this.accordionMode = false;
+    // Title/description
     this.mainSection = null;
+    // Stamp sections
     this.mailSection = null;
     this.eventSection = null;
     this.taskSection = null;
+    // The total height of this ui widget, including
+    // Triage Section and buttons at the bottom
+    this.height = 0;
+
     this.stamps = cosmo.ui.detail.itemStamps;
 
     for (var n in params) { this[n] = params[n]; }
@@ -146,11 +157,41 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         this.domNode.appendChild(c.domNode);
         this[st.stampType.toLowerCase() + 'Section'] = c;
     }
-
     var c = new cosmo.ui.detail.ButtonSection();
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.buttonSection = c;
+
+    this.renderSelf = function () {
+        // Get the real, full height -- with all sections expanded
+        // the first time the detail-view form renders
+        if (!this.hasRendered) {
+            this.height = this.domNode.offsetHeight + TOP_MENU_HEIGHT;
+            this.hasRendered = true;
+        }
+        // Turn on accordion mode if height is too tall
+        // Also check to see if we need to hide all the sections
+        // to make sure the buttons show
+        var winHeight = cosmo.app.pim.layout.baseLayout.height;
+        if (this.height > winHeight) {
+            this.accordionMode = true;
+            // If the current height of the detail-view form (perhaps with
+            // some sections collapsed) is too tall, collapse all the sections
+            if ((this.domNode.offsetHeight +  + TOP_MENU_HEIGHT) > winHeight) {
+                var stamps = this.stamps;
+                for (var i = 0; i < stamps.length; i++) {
+                    var st = stamps[i];
+                    var sec = self[st.stampType.toLowerCase() + 'Section'];
+                    if (sec.hasBody) {
+                        sec.toggleExpando(false);
+                    }
+                }
+            }
+        }
+        else {
+            this.accordionMode = false;
+        }
+    };
 
     dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
 
@@ -160,9 +201,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         switch (act) {
             case 'eventsLoadPrepare':
                 //self.clear();
-                break;
-            case 'saveFromForm':
-                //saveCalEvent(ev);
                 break;
             case 'eventsDisplaySuccess':
             case 'setSelected':
@@ -395,14 +433,19 @@ cosmo.ui.detail.TriageSection = function (p) {
         var createTriageButton = function (key) {
           var t = _createElem('div');
           var keyUpper = key.toUpperCase();
+          var sel = (stat == statuses[keyUpper]);
+          var def = sel ? 'triage' + key + 'ButtonSelected' :
+              'triage' + key + 'ButtonDefault';
+          var roll = sel ? 'triage' + key + 'ButtonSelected' :
+              'triage' + key + 'ButtonRollover';
           t.id = 'triageButton' + key;
           t.className = 'floatLeft';
           t = cosmo.ui.imagegrid.createImageButton({ domNode: t,
               enabled: enabled,
               selected: (stat == statuses[keyUpper]),
               handleClick: enabled ? hand : null,
-              defaultState: 'triage' + key + 'ButtonDefault',
-              rolloverState: 'triage' + key + 'ButtonRollover' });
+              defaultState: def,
+              rolloverState: roll });
           d.appendChild(t);
 
         }
@@ -543,19 +586,27 @@ cosmo.ui.detail.StampSection = function (p) {
 cosmo.ui.detail.StampSection.prototype =
     new cosmo.ui.ContentBox();
 
-cosmo.ui.detail.StampSection.prototype.toggleExpando = function (e) {
-    var self = this;
-    var s = '';
-    if (!this.expanded) {
+cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
+    var doShow = typeof p == 'boolean' ? p : !this.expanded;
+    if (doShow) {
+        var dvForm = this.parent;
+        if (dvForm.accordionMode) {
+            var stamps = dvForm.stamps;
+            for (var i = 0; i < stamps.length; i++) {
+                var st = stamps[i];
+                var sec = dvForm[st.stampType.toLowerCase() + 'Section'];
+                if (sec != this && sec.hasBody) {
+                    sec.toggleExpando(false);
+                }
+            }
+        }
         this.expanded = true;
         dojo.lfx.wipeIn(this.bodyNode, 500).play();
-        //$(self.domNode.id + 'Expander').innerHTML = 'v'
         this.showHideSwitch.textContent = '[hide]';
     }
     else {
         this.expanded = false;
         dojo.lfx.wipeOut(this.bodyNode, 500).play();
-        //$(self.domNode.id + 'Expander').innerHTML = '>';
         this.showHideSwitch.textContent = '[show]';
     }
 }

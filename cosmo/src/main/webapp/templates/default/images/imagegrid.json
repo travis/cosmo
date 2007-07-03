@@ -1,17 +1,52 @@
 {
-"mainLogoGraphic": { "row": 1, "column": 1, "width": 192, "height": 45 },
-"readOnlyIcon": { "row": 2, "column": 7, "width": 12, "height": 12 },
-"listViewDefault": { "row": 1, "column": 9, "width": 24, "height": 35 },
-"listViewSelected": { "row": 1, "column": 17, "width": 24, "height": 35 },
-"calViewDefault": { "row": 1, "column": 12, "width": 24, "height": 35 },
-"calViewSelected": { "row": 1, "column": 20, "width": 24, "height": 35 },
-"emailButtonDefault": { "row": 2, "column": 10, "width": 24, "height": 18 },
-"emailButtonRollover": { "row": 2, "column": 9, "width": 24, "height": 18 },
-"triageNowButtonDefault": { "row": 3, "column": 10, "width": 43, "height": 20 },
-"triageNowButtonRollover": { "row": 3, "column": 7, "width": 43, "height": 20 },
-"triageLaterButtonDefault": { "row": 3, "column": 11, "width": 43, "height": 20 },
-"triageLaterButtonRollover": { "row": 3, "column": 8, "width": 43, "height": 20 },
-"triageDoneButtonDefault": { "row": 3, "column": 12, "width": 43, "height": 20 },
-"triageDoneButtonRollover": { "row": 3, "column": 9, "width": 43, "height": 20 },
-"listViewTaskIcon": { "row": 3, "column": 19, "width": 12, "height": 12 }
+"mainLogoGraphic": { "row": 1, "column": 1, "width": 216, "height": 45 },
+"listViewDefault": { "row": 1, "column": 6, "width": 24, "height": 35 },
+"listViewRollover": { "row": 1, "column": 7, "width": 24, "height": 35 },
+"listViewSelected": { "row": 1, "column": 9, "width": 24, "height": 35 },
+"calViewDefault": { "row": 1, "column": 10, "width": 25, "height": 35 },
+"calViewRollover": { "row": 1, "column": 11, "width": 25, "height": 35 },
+"calViewSelected": { "row": 1, "column": 13, "width": 25, "height": 35 },
+
+"collectionDetailsDefault": { "row": 2, "column": 1, "width": 18, "height": 18 },
+"collectionDetailsRollover": { "row": 2, "column": 2, "width": 18, "height": 18 },
+"collectionDetailsSelected": { "row": 2, "column": 3, "width": 18, "height": 18 },
+
+"showLinkDefault": { "row": 2, "column": 4, "width": 18, "height": 18 },
+"showLinkRollover": { "row": 2, "column": 5, "width": 18, "height": 18 },
+"showLinkSelected": { "row": 2, "column": 6, "width": 18, "height": 18 },
+
+"enterDefault": { "row": 2, "column": 7, "width": 19, "height": 19 },
+"enterRollover": { "row": 2, "column": 8, "width": 19, "height": 19 },
+"enterSelected": { "row": 2, "column": 9, "width": 19, "height": 19 },
+
+"previousDefault": { "row": 2, "column": 10, "width": 8, "height": 12 },
+"previousRollover": { "row": 2, "column": 11, "width": 8, "height": 12 },
+"previousSelected": { "row": 2, "column": 12, "width": 8, "height": 12 },
+"nextDefault": { "row": 2, "column": 13, "width": 8, "height": 12 },
+"nextRollover": { "row": 2, "column": 14, "width": 8, "height": 12 },
+"nextSelected": { "row": 2, "column": 15, "width": 8, "height": 12 },
+
+"triageNowButtonDefault": { "row": 3, "column": 1, "width": 43, "height": 18 },
+"triageNowButtonRollover": { "row": 3, "column": 2, "width": 43, "height": 18 },
+"triageNowButtonSelected": { "row": 3, "column": 4, "width": 43, "height": 18 },
+"triageLaterButtonDefault": { "row": 3, "column": 5, "width": 43, "height": 18 },
+"triageLaterButtonRollover": { "row": 3, "column": 6, "width": 43, "height": 18 },
+"triageLaterButtonSelected": { "row": 3, "column": 8, "width": 43, "height": 18 },
+"triageDoneButtonDefault": { "row": 3, "column": 9, "width": 43, "height": 18 },
+"triageDoneButtonRollover": { "row": 3, "column": 10, "width": 43, "height": 18 },
+"triageDoneButtonSelected": { "row": 3, "column": 12, "width": 43, "height": 18 },
+
+"emailButtonDefault": { "row": 3, "column": 13, "width": 24, "height": 18 },
+"emailButtonRollover": { "row": 3, "column": 14, "width": 24, "height": 18 },
+"readOnlyIcon": { "row": 3, "column": 16, "width": 12, "height": 12 },
+
+"triageStatusColumnDefault": { "row": 4, "column": 1, "width": 36, "height": 15 },
+"triageStatusColumnRollover": { "row": 4, "column": 2, "width": 36, "height": 15 },
+"triageStatusColumnSelected": { "row": 4, "column": 4, "width": 36, "height": 15 },
+
+"taskColumnDefault": { "row": 4, "column": 5, "width": 22, "height": 15 },
+"taskColumnRollover": { "row": 4, "column": 6, "width": 22, "height": 15 },
+"taskColumnSelected": { "row": 4, "column": 8, "width": 22, "height": 15 },
+"listViewTaskIcon": { "row": 4, "column": 9, "width": 12, "height": 12 }
 }
+

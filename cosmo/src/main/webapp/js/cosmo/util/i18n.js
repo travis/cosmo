@@ -39,7 +39,6 @@ cosmo.util.i18n.getText = function () {
 };
 
 cosmo.util.i18n.setLocalizationMessages = function(messages){
-    dojo.debug("setLocalizationMessages...");
     this._localtext = messages;
 };
 

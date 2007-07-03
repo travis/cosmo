@@ -26,8 +26,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.abdera.protocol.server.servlet.RequestHandler;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.dao.PessimisticLockingFailureException;
 
 /**
@@ -45,74 +48,81 @@ public class DeadlockRetryFilter implements Filter {
     private static final String PARAM_RETRIES = "retries";
     private static final String PARAM_METHODS = "methods";
     private static final String PARAM_EXCEPTIONS = "exceptions";
-    
-    
+
+
     public void destroy() {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String method = httpRequest.getMethod();
-        
+
         // only care about certain methods
         if(isFilterMethod(method)) {
             // Wrap request so we can utilize buffered content
             request = new BufferedRequestWrapper((HttpServletRequest) request);
             int attempts = 0;
-           
+
             while(attempts <= maxRetries) {
                 try {
                     chain.doFilter(request, response);
-                    break;
                 } catch (Exception e) {
-                    if(isFilterException(e)) {
-                        attempts++;
-                        log.warn("caught: " + e.getMessage() + " : retrying request " + httpRequest.getMethod()
-                                + " " + httpRequest.getRequestURI() + " "
-                                + attempts);
-                        
-                        // Retry and fail after maxRetries attempts
-                        if(attempts > maxRetries) {
-                            log.error("reached maximum retries for "
-                                    + httpRequest.getMethod() + " "
-                                    + httpRequest.getRequestURI());
-                            sendError((HttpServletResponse) response);
-                        }
-                        else {
-                            ((BufferedRequestWrapper) request).retryRequest();
-                            Thread.yield();
-                        }
-                    } else {
-                        log.error("the server encountered an unexpexted error", e);
+                    // should never happen, since abdera catches all
+                    // Throwables and returns 500
+                    log.error("the server encountered an unexpected error", e);
+                    sendError((HttpServletResponse) response);
+                    return;
+                }
+
+                Exception fe = findFilterException(httpRequest);
+                if (fe != null) {
+                    attempts++;
+                    log.warn("caught: " + fe.getMessage() + " : retrying request " + httpRequest.getMethod()
+                        + " " + httpRequest.getRequestURI() + " "
+                        + attempts);
+
+                    // Retry and fail after maxRetries attempts
+                    if(attempts > maxRetries) {
+                        log.error("reached maximum retries for "
+                            + httpRequest.getMethod() + " "
+                            + httpRequest.getRequestURI());
                         sendError((HttpServletResponse) response);
-                        return;
                     }
+                    else {
+                        ((BufferedRequestWrapper) request).retryRequest();
+                        Thread.yield();
+                    }
+                    break;
                 }
             }
         } else {
             chain.doFilter(request, response);
         }
     }
-    
+
     private boolean isFilterMethod(String method) {
         for(String filterMethod: methods)
             if(filterMethod.equalsIgnoreCase(method))
-                return true;
-        
+            return true;
+
         return false;
     }
-    
-    private boolean isFilterException(Exception e) {
+
+    private Exception findFilterException(HttpServletRequest request) {
+        Exception e = (Exception)
+            request.getAttribute(RequestHandler.ATTR_EXCEPTION);
+        if (e == null)
+            return null;
         for(Class exception: exceptions)
             if(exception.isInstance(e))
-                return true;
-        return false;
+            return e;
+        return null;
     }
-    
+
     private void sendError(HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                "the server was unable to complete the request");
+            "the server was unable to complete the request");
     }
 
     public void init(FilterConfig config) throws ServletException {
@@ -121,13 +131,13 @@ public class DeadlockRetryFilter implements Filter {
             String param = config.getInitParameter(PARAM_RETRIES);
             if(param!=null)
                 maxRetries = Integer.parseInt(param);
-            
+
             // initialize methods to filter
             param = config.getInitParameter(PARAM_METHODS);
             if(param!=null) {
                 methods = param.split(",");
             }
-            
+
             // initialize exceptions to catch and retry
             param = config.getInitParameter(PARAM_EXCEPTIONS);
             if(param!=null) {

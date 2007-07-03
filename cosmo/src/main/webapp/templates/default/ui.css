@@ -583,6 +583,7 @@ td.dataDisplayLabel {
     border-right: 1px solid #ddd;
     background-image: url(images/day_col_header_background.gif);
     cursor: pointer;
+    white-space: nowrap;
 }
 .listViewDataCell {
     cursor: pointer;

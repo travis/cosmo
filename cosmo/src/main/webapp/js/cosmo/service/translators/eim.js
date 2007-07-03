@@ -161,7 +161,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             var title = cosmo.util.html.getElementsByTagName(workspace, "atom", "title")[0];
 
-            if (title.firstChild.nodeValue == "meta") continue;
+            if (title.firstChild.nodeValue == "account") continue;
 
             var collectionElements = workspace.getElementsByTagName("collection");
             

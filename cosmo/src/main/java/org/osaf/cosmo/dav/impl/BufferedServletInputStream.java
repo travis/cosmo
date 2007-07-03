@@ -106,6 +106,16 @@ public class BufferedServletInputStream extends ServletInputStream {
             is = new ByteArrayInputStream(buffer);
     }
     
+    /**
+     * @return length of buffered content
+     */
+    public long getLength() {
+        if(file != null)
+            return file.length();
+        else
+            return buffer.length;
+    }
+    
     private void createBuffer(InputStream is) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         byte[] buf = new byte[BUFFER_SIZE];

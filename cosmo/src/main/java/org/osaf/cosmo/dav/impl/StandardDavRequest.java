@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -58,8 +56,8 @@ public class StandardDavRequest extends WebdavRequestImpl
     private DavPropertySet mkcalendarSet;
     private Ticket ticket;
     private ReportInfo reportInfo;
-    private File requestContentFile;
     private boolean bufferRequestContent = false;
+    private long bufferedContentLength = -1;
 
     /**
      */
@@ -387,35 +385,19 @@ public class StandardDavRequest extends WebdavRequestImpl
         if(!bufferRequestContent)
             return super.getInputStream();
         
-        // If request is configured to buffer the content, then read
-        // content into a temp file
-        if(requestContentFile==null) {
-            requestContentFile = IOUtil.getTempFile(super.getInputStream());
-        }
-        return new FileServletInputStream(requestContentFile);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        try {
-            if(requestContentFile!=null)
-                requestContentFile.delete();
-        } catch(Exception e) {
-            log.error("error deleting temp file: "
-                    + requestContentFile.getAbsolutePath(), e);
-        }
-    }
-    
-    public long getBufferedContentLength() {
-        if(bufferRequestContent)
-            return requestContentFile.length();
-        else
-            return -1;
+        BufferedServletInputStream is = 
+            new BufferedServletInputStream(super.getInputStream());
+        
+        bufferedContentLength = is.getLength();
+        
+        return is;
     }
     
     public boolean isRequestContentBuffered() {
         return bufferRequestContent;
     }
-    
+
+    public long getBufferedContentLength() {
+        return bufferedContentLength;
+    }
 }

@@ -687,19 +687,12 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected void checkForDuplicateUid(Item item) {
         // verify uid not in use
         if (item.getUid() != null) {
-            Item duplicate  = findItemByUid(item.getUid());
+            Item duplicate = findItemByUid(item.getUid());
             
-            // if uid is in use and item is active, throw exception
-            if(duplicate!=null && duplicate.getIsActive()) {
+            // if uid is in use throw exception
+            if(duplicate!=null) {
                 throw new UidInUseException("uid " + item.getUid()
                         + " already in use");
-            }
-            else if(duplicate!=null){
-                // Otherwise remove deleted item to make way for new one.
-                // Initialize new Item with old Item's version to generate
-                // correct CollectionItem hash codes.
-                item.setVersion(duplicate.getVersion()+1);
-                getSession().delete(duplicate);
             }
         }
     }

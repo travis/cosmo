@@ -19,20 +19,19 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.abdera.protocol.server.ServiceContext;
+import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
 import org.apache.abdera.protocol.server.provider.Provider;
+import org.apache.abdera.protocol.server.provider.ProviderManager;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.provider.TargetType;
 import org.apache.abdera.protocol.server.servlet.DefaultRequestHandler;
-import org.apache.abdera.protocol.server.servlet.RequestHandler;
-import org.apache.abdera.util.EntityTag;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.AuditableTarget;
 import org.osaf.cosmo.atom.provider.ExtendedProvider;
@@ -48,6 +47,38 @@ public class StandardRequestHandler extends DefaultRequestHandler
     private static final Log log =
         LogFactory.getLog(StandardRequestHandler.class);
 
+    /**
+     * Override to not swallow RuntimeExceptions 
+     */
+    @Override
+    public void process(ServiceContext context, HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+
+        ProviderManager manager = context.getProviderManager();
+        RequestContext requestContext = getRequestContext(context, request);
+        Provider provider = manager.getProvider(requestContext);
+
+        try {
+            if (preconditions(provider, requestContext, response)) {
+                try {
+                    output(request, response, process(provider, requestContext));
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    log.error("Error producing output", t);
+                    try {
+                        output(request, response, new EmptyResponseContext(500));
+                    } catch (Exception ex) {
+                        log.error("Error outputting error", ex);
+                        response.sendError(500);
+                    }
+                }
+            }
+        } finally {
+            manager.release(provider);
+        }
+    }
+    
     /**
      * <p>
      * Extends the superclass method to implement the following APP

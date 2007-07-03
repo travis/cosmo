@@ -40,7 +40,12 @@ import org.springframework.dao.PessimisticLockingFailureException;
 public class DeadlockRetryFilter implements Filter {
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
     private int maxRetries = 10;
+    private Class[] exceptions = new Class[] {PessimisticLockingFailureException.class};
+    private String[] methods = new String[] {"PUT", "POST", "DELETE", "MKCALENDAR" };
     private static final String PARAM_RETRIES = "retries";
+    private static final String PARAM_METHODS = "methods";
+    private static final String PARAM_EXCEPTIONS = "exceptions";
+    
     
     public void destroy() {
     }
@@ -49,33 +54,39 @@ public class DeadlockRetryFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String method = httpRequest.getMethod();
-        if("PUT".equals(method) ||
-           "POST".equals(method) ||
-           "DELETE".equals(method)) {
-            
+        
+        // only care about certain methods
+        if(isFilterMethod(method)) {
             // Wrap request so we can utilize buffered content
-            request = (ServletRequest) new BufferedRequestWrapper((HttpServletRequest) request);
+            request = new BufferedRequestWrapper((HttpServletRequest) request);
             int attempts = 0;
            
             while(attempts <= maxRetries) {
                 try {
                     chain.doFilter(request, response);
                     break;
-                } catch (PessimisticLockingFailureException e) {
-                    log.warn("retrying request " + attempts);
-                    attempts++;
-                    
-                    // Retry and fail after maxRetries attempts
-                    if(attempts > maxRetries) {
-                        log.error("reached maximum deadlock retries");
-                        ((HttpServletResponse) response)
-                                .sendError(
-                                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                                        "the server was unable to complete the request");
-                    }
-                    else {
-                        ((BufferedRequestWrapper) request).retryRequest();
-                        Thread.yield();
+                } catch (Exception e) {
+                    if(isFilterException(e)) {
+                        attempts++;
+                        log.warn("caught: " + e.getMessage() + " : retrying request " + httpRequest.getMethod()
+                                + " " + httpRequest.getRequestURI() + " "
+                                + attempts);
+                        
+                        // Retry and fail after maxRetries attempts
+                        if(attempts > maxRetries) {
+                            log.error("reached maximum retries for "
+                                    + httpRequest.getMethod() + " "
+                                    + httpRequest.getRequestURI());
+                            sendError((HttpServletResponse) response);
+                        }
+                        else {
+                            ((BufferedRequestWrapper) request).retryRequest();
+                            Thread.yield();
+                        }
+                    } else {
+                        log.error("the server encountered an unexpexted error", e);
+                        sendError((HttpServletResponse) response);
+                        return;
                     }
                 }
             }
@@ -83,12 +94,52 @@ public class DeadlockRetryFilter implements Filter {
             chain.doFilter(request, response);
         }
     }
+    
+    private boolean isFilterMethod(String method) {
+        for(String filterMethod: methods)
+            if(filterMethod.equalsIgnoreCase(method))
+                return true;
+        
+        return false;
+    }
+    
+    private boolean isFilterException(Exception e) {
+        for(Class exception: exceptions)
+            if(exception.isInstance(e))
+                return true;
+        return false;
+    }
+    
+    private void sendError(HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                "the server was unable to complete the request");
+    }
 
     public void init(FilterConfig config) throws ServletException {
-        // initialize maxRetries from config parameter
-        String retries = config.getInitParameter(PARAM_RETRIES);
-        if(retries!=null)
-            maxRetries = Integer.parseInt(retries);
+        try {
+            // initialize maxRetries from config parameter
+            String param = config.getInitParameter(PARAM_RETRIES);
+            if(param!=null)
+                maxRetries = Integer.parseInt(param);
+            
+            // initialize methods to filter
+            param = config.getInitParameter(PARAM_METHODS);
+            if(param!=null) {
+                methods = param.split(",");
+            }
+            
+            // initialize exceptions to catch and retry
+            param = config.getInitParameter(PARAM_EXCEPTIONS);
+            if(param!=null) {
+                String[] classes = param.split(","); 
+                exceptions = new Class[classes.length];
+                for(int i=0;i<classes.length;i++)
+                    exceptions[i] = Class.forName(classes[i]);
+            }
+        } catch (Exception e) {
+            log.error("error configuring filter", e);
+            throw new ServletException(e);
+        }
     }
 
 }

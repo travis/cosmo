@@ -206,14 +206,22 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this.domNode.innerHTML = t;
 
         // Attach event listeners -- event will be delagated by row
-        dojo.event.connect($('listViewTable'), 'onmouseover', this, 'handleMouseOver');
-        dojo.event.connect($('listViewTable'), 'onmouseout', this, 'handleMouseOut');
-        dojo.event.connect($('listViewTable'), 'onclick', this, 'handleClick');
+        dojo.event.connect($('listViewTable'), 'onmouseover',
+            this, 'handleMouseOver');
+        dojo.event.connect($('listViewTable'), 'onmouseout',
+            this, 'handleMouseOut');
+        dojo.event.connect($('listViewTable'), 'onclick',
+            this, 'handleClick');
+        // HACK: Do explicit single selection on right-click
+        // Because the appearance of the context menu in
+        // Safari 2 breaks the normal mouseout event and makes
+        // it look like multi-select is enabled
+        dojo.event.connect($('listViewTable'), 'oncontextmenu',
+            this, 'handleClick');
 
         dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
             opts: null });
-    };
-    this.initListProps = function () {
+    }; this.initListProps = function () {
         var items = cosmo.view.list.itemRegistry.length;
         var pages = parseInt(items/this.itemsPerPage);
         if (items % this.itemsPerPage > 0) {
@@ -243,7 +251,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     /**
      * Handles a successful update of a CalEvent item
      * @param cmd JS Object, the command object passed in the
-     * published 'success' message 
+     * published 'success' message
      */
     this._saveSuccess = function (cmd) {
         dojo.debug("saveSuccess: ");
@@ -268,7 +276,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var newRegistry = self.view.filterOutRecurrenceGroup(
                 self.view.itemRegistry.clone(), idsToRemove);
 
-            
+
             //now we have to expand out the item for the viewing range
             var deferredArray = [self.view.loadItems({ item: data.getMaster() })];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){

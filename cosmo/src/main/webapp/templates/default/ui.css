@@ -125,7 +125,7 @@ body.adminPage {
     padding-bottom: 4px;
 }
 #loginDialogLoginPrompt {
-    padding-bottom: 1em;                          
+    padding-bottom: 1em;
 }
 
 #loginDialogLogo {
@@ -539,7 +539,7 @@ td.dataDisplayLabel {
     left: 0px;
     width: 100%;
     height: 100%;
-    background: #fff; 
+    background: #fff;
     z-index: 10000;
     border-top: 0px;
     border-bottom: 0px;
@@ -710,7 +710,7 @@ td.dataDisplayLabel {
     padding: 0 8px;
 }
 .dropShadowTable {
-  /* 
+  /*
   Requires a specific width & height set -- some of the cells in
   this type of table also require a specific height or width
   set relative to the overall size of this table for cell
@@ -722,11 +722,11 @@ td.dataDisplayLabel {
   position: absolute;
 }
 .dropShadowTop {
-  /* 
+  /*
   Empty top row -- makes sure there's an even 16px all the
   way around the box the drop shadow is on
   */
-  height: 16px; 
+  height: 16px;
   font-size: 1px;
 }
 .dropShadowLeft {
@@ -736,15 +736,15 @@ td.dataDisplayLabel {
   width: 16px;
 }
 .dropShadowTopRightCorner {
-  width: 16px; 
+  width: 16px;
   height: 16px;
   font-size: 1px;
-  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png);
   background-position: 0px 0px;
 }
 .dropShadowCenter {
   /*
-  Inner box with borders -- darker color for border on 
+  Inner box with borders -- darker color for border on
   right and bottom where drop shadow appears. Any content
   should sit inside this box
   */
@@ -760,16 +760,16 @@ td.dataDisplayLabel {
   This cell needs a height specified of total
   dropShadowTable's height minus 32px
   */
-  opacity: 0.8; 
-  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
-  background-repeat: repeat-y; background-position: -16px 0px; 
-  font-size: 1px; 
+  opacity: 0.8;
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png);
+  background-repeat: repeat-y; background-position: -16px 0px;
+  font-size: 1px;
 }
 .dropShadowBottomLeft {
-  width: 16px; 
-  height: 16px; 
-  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png); 
-  background-position: 0px 0px; 
+  width: 16px;
+  height: 16px;
+  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png);
+  background-position: 0px 0px;
   font-size: 1px;
 }
 .dropShadowBottom {
@@ -777,21 +777,21 @@ td.dataDisplayLabel {
   Requires a specific width set of total dropShadowTable's
   width minus 48px
   */
-  opacity: 0.8; 
-  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png); 
-  background-repeat: repeat-x; 
-  background-position: 0px -16px; 
+  opacity: 0.8;
+  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png);
+  background-repeat: repeat-x;
+  background-position: 0px -16px;
   font-size: 1px;
 }
 .dropShadowBottomRightCorner {
-  width: 16px; 
-  background-image: url(templates/default/images/drop_shadow_side_imgs.png); 
-  background-position: -32px 0px; 
+  width: 16px;
+  background-image: url(templates/default/images/drop_shadow_side_imgs.png);
+  background-position: -32px 0px;
   font-size: 1px;
 }
 
 
-/* Tab container 
+/* Tab container
  * --------------------- */
 .tabPanel {
     height: 20px;
@@ -803,10 +803,10 @@ td.dataDisplayLabel {
     margin-top: 24px;
 }
 .tabSelected {
-    color: #339; 
-    border-left: 1px solid #aaa; 
+    color: #339;
+    border-left: 1px solid #aaa;
     border-top: 1px solid #aaa;
-    border-right: 1px solid #aaa; 
+    border-right: 1px solid #aaa;
     height: 19px;
     line-height: 20px;
     vertical-align: middle;
@@ -816,7 +816,7 @@ td.dataDisplayLabel {
     cursor: pointer;
 }
 .tabUnselected {
-    color: #339; 
+    color: #339;
     border-left: 1px solid #aaa;
     border-top: 1px solid #aaa;
     border-right: 1px solid #aaa;
@@ -1006,7 +1006,7 @@ td.dataDisplayLabel {
 
 
 .footer {
-    font-size: 
+    font-size:
     10px; font-style: italic;
     color: #333333;
 }
@@ -1089,7 +1089,7 @@ td.dataDisplayLabel {
     left: 100%;
     margin-left: -3px;
     position: absolute;
-    
+
 }
 .viewport {
     position: absolute;
@@ -1097,7 +1097,7 @@ td.dataDisplayLabel {
     height: 20px;
     width: 20px;
     left: -30px;
-    top: -30px;            
+    top: -30px;
 }
 /* Expando detail-view form */
 .expando {

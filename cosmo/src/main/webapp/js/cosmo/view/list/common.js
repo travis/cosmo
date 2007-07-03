@@ -58,7 +58,9 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
     var delta = cmd.delta;
     switch (act) {
         case 'loadCollection':
-            cosmo.view.list.loadItems();
+            if (opts.loadType == 'changeCollection') {
+                cosmo.view.list.loadItems();
+            }
             break;
         default:
             // Do nothing

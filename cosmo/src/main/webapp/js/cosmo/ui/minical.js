@@ -50,8 +50,9 @@ cosmo.ui.minical.MiniCal = function (p) {
     // after init these vals will always be passed in
     // in the opts obj in the published message
     var defaultDate = cosmo.app.pim.currDate;
-    var viewStart = cosmo.datetime.util.getWeekStart(defaultDate);
-    var viewEnd = cosmo.datetime.util.getWeekEnd(defaultDate);
+    var viewStart = null;
+    var viewEnd = null;
+    setSelectionSpan(defaultDate);
 
     /** helper method to pull day data. This is a cleaner implementation
      * when we start rendering busybars.
@@ -73,6 +74,10 @@ cosmo.ui.minical.MiniCal = function (p) {
     function show() {
         self.domNode.style.visibility = 'visible';
     };
+    function setSelectionSpan(dt) {
+        viewStart = cosmo.datetime.util.getWeekStart(dt);
+        viewEnd = cosmo.datetime.util.getWeekEnd(dt);
+    }
 
     this.parent = null;
     this.domNode = null;
@@ -101,6 +106,7 @@ cosmo.ui.minical.MiniCal = function (p) {
     this.tileCanvas = null;
     // Height of the widget
     this.height = 0;
+    // Signals initial render has been completed
     this.hasBeenRendered = false;
 
     // Set any props based on passed-in params
@@ -116,10 +122,9 @@ cosmo.ui.minical.MiniCal = function (p) {
         var opts = cmd.opts || {};
         var ev = cmd.data;
         switch (act) {
-            case 'eventsLoadSuccess':
+            case 'loadCollection':
                 // Span of time for selection
-                viewStart = opts.viewStart;
-                viewEnd = opts.viewEnd;
+                setSelectionSpan(opts.goTo);
                 // If the update originated here at minical,
                 // just update the selection, don't re-render
                 if (opts.source == 'minical') {
@@ -143,7 +148,7 @@ cosmo.ui.minical.MiniCal = function (p) {
      * gives a brief glimpse as styles are being applied
      */
     this.init = function (domNode, parent, currDate) {
-        self.miniCalNode = domNode || null;
+        self.domNode = domNode || null;
         self.id = 'miniCal';
         self.currDate = currDate;
         this.parent = parent;
@@ -161,9 +166,6 @@ cosmo.ui.minical.MiniCal = function (p) {
      * @return Boolean true
      */
     this.renderSelf = function () {
-        /**
-         *
-         */
         function createGoToDate() {
             var table = _createElem('table');
             var tbody = _createElem('tbody');
@@ -192,10 +194,17 @@ cosmo.ui.minical.MiniCal = function (p) {
             self.goToDateForm = f;
             f.onsubmit = function () { return false; };
             d.appendChild(f);
-            cosmo.util.html.createInput('text', 'jumpto', 'jumpto',
-                10, 10, null, 'inputText', f);
-            cosmo.util.html.setTextInput(f.jumpto, 'mm/dd/yyyy', true, false);
-            dojo.event.connect(f.jumpto, 'onfocus', cosmo.util.html, 'handleTextInputFocus');
+            var tInput = cosmo.util.html.createInput( { type: 'text',
+                name: 'goToDateInput',
+                id: 'goToDateInput',
+                size: 10,
+                maxlength: 10,
+                value: '',
+                className: 'inputText' });
+            f.appendChild(tInput);
+            cosmo.util.html.setTextInput(tInput, 'mm/dd/yyyy', true, false);
+            dojo.event.connect(tInput, 'onfocus', cosmo.util.html,
+                'handleTextInputFocus');
             td.appendChild(f);
             tr.appendChild(td);
 
@@ -206,9 +215,9 @@ cosmo.ui.minical.MiniCal = function (p) {
 
             // Button
             td = _createElem('td');
-            var butJump = new Button('jumpToButton', 32, self.goJumpToDate,
+            var buttonGoTo = new Button('goToDateButton', 32, self.doGoToDate,
                 _('App.Button.Go'), true);
-            td.appendChild(butJump.domNode);
+            td.appendChild(buttonGoTo.domNode);
             tr.appendChild(td);
 
             self.goToDateNode.appendChild(table);
@@ -270,6 +279,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             // Tile container
             var tc = _createElem('div');
             self.miniCalNode.appendChild(tc);
+            tc.id = 'miniCalTileCanvas';
             self.tileCanvas = tc;
         }
 
@@ -306,32 +316,35 @@ cosmo.ui.minical.MiniCal = function (p) {
             throw 'No domNode on which to render this component.';
         }
 
-        var d = _createElem('div');
-        d.id = 'goToDateNode';
-        self.goToDateNode = d;
-        self.domNode.appendChild(d);
+        // Go-to date node -- don't re-render this every time
+        // the widget renders
+        // ----------
+        if (!self.hasBeenRendered) {
+            var d = _createElem('div');
+            d.id = 'goToDateNode';
+            self.goToDateNode = d;
+            self.domNode.appendChild(d);
+            createGoToDate();
+        }
+
+        // Minical node -- re-render every time. First remove
+        // the old miniCalNode, then rebuild and re-append
+        // ----------
+        if (self.miniCalNode) {
+            self.domNode.removeChild(self.miniCalNode);
+        }
 
         var d = _createElem('div');
         d.id = 'miniCalNode';
         self.miniCalNode = d;
         self.domNode.appendChild(d);
-
-
-        createGoToDate();
         createNavPanel();
+        createTileCanvas();
 
-        if (!self.tileCanvas) {
-            createTileCanvas();
-        }
-
-        // Init and week-to-week nav from main cal
         var compMonthDate =  new Date(viewStart.getFullYear(),
             viewStart.getMonth(), 1);
-        if (!self.firstMonthDate ||
-            (self.firstMonthDate.getTime() != compMonthDate.getTime())) {
-            self.firstMonthDate = compMonthDate;
-            self.renderMonths();
-        }
+        self.firstMonthDate = compMonthDate;
+        self.renderMonths();
 
         // Set size/pos
         setContainerSize();
@@ -662,8 +675,9 @@ cosmo.ui.minical.MiniCal = function (p) {
      */
     this.goToday = function () {
         dojo.event.topic.publish('/calEvent', {
-            action: 'loadCollection', opts: { goTo: self.currDate }, data: {}
-        });
+            action: 'loadCollection',
+            opts: { loadType: 'changeTimespan', goTo: self.currDate },
+            data: {} });
     }
     /**
      * Handle clicks on normal dates within minical
@@ -683,14 +697,14 @@ cosmo.ui.minical.MiniCal = function (p) {
 
         dojo.event.topic.publish('/calEvent', {
             action: 'loadCollection',
-            opts: { goTo: dt, source: 'minical' },
-            data: {}
-        });
+            opts: { loadType: 'changeTimespan', goTo: dt,
+                  source: 'minical' },
+            data: {} });
     };
-    this.goJumpToDate = function () {
+    this.doGoToDate = function () {
         var e = null;
         var err = '';
-        var val = self.goToDateForm.jumpto.value;
+        var val = self.goToDateForm.goToDateInput.value;
         err = cosmo.util.validate.dateFormat(val);
         if (err) {
             err += '\n';
@@ -709,8 +723,9 @@ cosmo.ui.minical.MiniCal = function (p) {
         else {
             var d = new Date(val);
             dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { goTo: d }, data: {}
-            });
+                action: 'loadCollection',
+                opts: { loadType: 'changeTimespan', goTo: d },
+                    data: {} });
         }
     };
     /**

@@ -186,13 +186,15 @@ cosmo.ui.navbar.Bar = function (p) {
         self.viewNavButtons = td;
         var back = function back() {
             dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { goTo: 'back' }, data: {}
-            });
+                action: 'loadCollection',
+                opts: { loadType: 'changeTimespan', goTo: 'back' }, 
+                    data: {} });
         }
         var next = function next() {
             dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { goTo: 'next' }, data: {}
-            });
+                action: 'loadCollection', 
+                opts: { loadType: 'changeTimespan', goTo: 'next' }, 
+                    data: {} });
         }
         var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
         self.viewNavButtons.appendChild(navButtons.domNode);

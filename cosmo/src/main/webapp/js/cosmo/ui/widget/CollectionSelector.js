@@ -56,7 +56,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // select box doesn't just sit open while waiting for
             // the collection data to load and the UI to render
             var f = function () { dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { collection: c }, data: {}
+                action: 'loadCollection', opts: { loadType: 'changeCollection', 
+                collection: c }, data: {}
             }); };
             setTimeout(f, 0);
         },

@@ -570,6 +570,7 @@ cosmo.view.service = new function () {
         // Broadcast success
         dojo.event.topic.publish('/calEvent', { 'action': act,
             'data': removeEv, 'opts': opts });
+        dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});            
     }
 
     function getErrDetailMessage(err) {

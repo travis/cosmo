@@ -207,37 +207,13 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 if (item) {
                     self.updateFromItem(item);
                     self.markupBar.render();
-                }
-                break;
-            case 'saveSuccess':
-                /*
-                // Changes have placed the saved event off-canvas
-                if (!cmd.qualifier.onCanvas) {
-                    self.setButtons(false, false);
+                } else {
                     self.clear();
+                    self.buttonSection.setButtons(false);
                 }
-                // Saved event is still in view
-                else {
-                    self.updateFromEvent(ev);
-                    self.setButtons(true, true);
-                    // If event title is 'New Event', auto-focus/select
-                    // title field to make it easy to give it a real title
-                    if (ev.data.title == _('Main.NewEvent')) {
-                        var f = function () {
-                            self.form.eventtitle.select();
-                            self.form.eventtitle.focus();
-                        }
-                        setTimeout(f, 10);
-                    }
-                }
-                */
                 break;
             case 'saveFailed':
                 //self.setButtons(true, true);
-                break;
-            case 'noItems':
-                //self.setButtons(false, false);
-                //self.clear();
                 break;
             default:
                 // Do nothing

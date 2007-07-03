@@ -648,14 +648,17 @@ cosmo.view.cal.canvas = new function () {
      * @param p CalItem object or CalItem id string, the event to select
      */
     function setSelectedCalItem(/* Can be CalItem object or String id */ p) {
-        if (!p) {
-            throw('No CalItem or CalItem id passed to setSelectedCalItem.');
-        }
+
         // Deselect previously selected event if any
         var sel = self.getSelectedItem();
         if (sel) {
             sel.lozenge.setDeselected();
         }
+
+        if (!p){
+            return;
+        }
+        
         // Pass the item or id, set as the selected item
         // for the current collection
         self.setSelectedItem(p);

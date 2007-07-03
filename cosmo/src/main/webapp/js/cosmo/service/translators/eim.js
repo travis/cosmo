@@ -161,15 +161,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             var title = cosmo.util.html.getElementsByTagName(workspace, "atom", "title")[0];
 
-            if (title.firstChild.nodeValue == "account") continue;
-
-            var collectionElements = workspace.getElementsByTagName("collection");
-            
-            for (var j = 0; j < collectionElements.length; j++){
-                var collection = this.collectionXmlToCollection(collectionElements[j]);
-                collection.href = collectionElements[j].getAttribute("href");
-                this.setLazyLoader(collection, ["urls", "uid", "writeable"], kwArgs.lazyLoader);
-                collections.push(collection);
+            if (title.firstChild.nodeValue == "home"){
+                var collectionElements = workspace.getElementsByTagName("collection");
+                
+                for (var j = 0; j < collectionElements.length; j++){
+                    var collection = this.collectionXmlToCollection(collectionElements[j]);
+                    collection.href = collectionElements[j].getAttribute("href");
+                    this.setLazyLoader(collection, ["urls", "uid", "writeable"], kwArgs.lazyLoader);
+                    collections.push(collection);
+                }
             }
         }
         return collections;

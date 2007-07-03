@@ -187,13 +187,13 @@ cosmo.ui.navbar.Bar = function (p) {
         var back = function back() {
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection',
-                opts: { loadType: 'changeTimespan', goTo: 'back' }, 
+                opts: { loadType: 'changeTimespan', goTo: 'back' },
                     data: {} });
         }
         var next = function next() {
             dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', 
-                opts: { loadType: 'changeTimespan', goTo: 'next' }, 
+                action: 'loadCollection',
+                opts: { loadType: 'changeTimespan', goTo: 'next' },
                     data: {} });
         }
         var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
@@ -268,7 +268,7 @@ cosmo.ui.navbar.Bar = function (p) {
             text: _('App.Button.Create'),
             handleOnClick: func,
             small: true,
-            width: 42,
+            width: 52,
             enabled: true },
             f, 'last');
         d.appendChild(t);
@@ -312,7 +312,7 @@ cosmo.ui.navbar.Bar = function (p) {
             text: 'Prev',
             handleOnClick: fPrev,
             small: true,
-            width: 32,
+            width: 44,
             enabled: (typeof fPrev == 'function') },
             td, 'last');
         tr.appendChild(td);
@@ -349,7 +349,7 @@ cosmo.ui.navbar.Bar = function (p) {
             text: 'Next',
             handleOnClick: fNext,
             small: true,
-            width: 32,
+            width: 44,
             enabled: (typeof fNext == 'function') },
             td, 'last');
         tr.appendChild(td);

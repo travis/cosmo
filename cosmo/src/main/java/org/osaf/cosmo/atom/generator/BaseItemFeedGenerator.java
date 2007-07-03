@@ -204,7 +204,7 @@ public abstract class BaseItemFeedGenerator
         Feed feed = newFeed(collection.getUid());
 
         feed.setTitle(collection.getDisplayName());
-        feed.setUpdated(collection.getClientModifiedDate());
+        feed.setUpdated(collection.getModifiedDate());
         feed.setGenerator(newGenerator());
         feed.addAuthor(newPerson(collection.getOwner()));
         feed.addLink(newSelfLink(collection));
@@ -259,8 +259,8 @@ public abstract class BaseItemFeedGenerator
         Entry entry = newEntry(item.getUid(), isDocument);
 
         entry.setTitle(item.getDisplayName());
-        entry.setUpdated(item.getClientModifiedDate());
-        entry.setPublished(item.getClientCreationDate());
+        entry.setUpdated(item.getModifiedDate());
+        entry.setPublished(item.getCreationDate());
         if (isDocument)
             entry.addAuthor(newPerson(item.getOwner()));
         setEntryContent(entry, item);

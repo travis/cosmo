@@ -38,7 +38,10 @@ import org.springframework.dao.PessimisticLockingFailureException;
  * (catches PessimisticLockingFailureException) and retries
  * the request a number of times before failing.  The filter
  * only applies to "update" operations, that is PUT, POST, DELETE.
- * TODO:  make filter configurable for method and exception types.
+ * 
+ * The filter can also be configured to catch other exception
+ * types and be applied to other methods using filter init
+ * parameters.
  */
 public class DeadlockRetryFilter implements Filter {
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
@@ -54,46 +57,73 @@ public class DeadlockRetryFilter implements Filter {
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
-    FilterChain chain) throws IOException, ServletException {
+            FilterChain chain) throws IOException, ServletException {
+        
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String method = httpRequest.getMethod();
 
         // only care about certain methods
         if(isFilterMethod(method)) {
-            // Wrap request so we can utilize buffered content
+            // wrap request so we can utilize buffered content
             request = new BufferedRequestWrapper((HttpServletRequest) request);
+            
+            // Wrap response so we can veto a sendError() set by the
+            // abdera RequestProcessor
+            response = new ResponseErrorWrapper((HttpServletResponse) response);
+            
             int attempts = 0;
 
             while(attempts <= maxRetries) {
+                
+                Exception ex = null;
+                
                 try {
                     chain.doFilter(request, response);
                 } catch (Exception e) {
-                    // should never happen, since abdera catches all
-                    // Throwables and returns 500
-                    log.error("the server encountered an unexpected error", e);
-                    sendError((HttpServletResponse) response);
-                    return;
+                    // Shouldn't happen but this filter supports
+                    // catching the exception and looking for it
+                    // in the request.
+                    if(isFilterException(e)) {
+                        ex = e;
+                    } else {
+                        log.error("the server encountered an unexpected error", e);
+                        sendError((HttpServletResponse) response);
+                    }
                 }
-
-                Exception fe = findFilterException(httpRequest);
-                if (fe != null) {
+                
+                // If we didn't catch it, then look for the exception
+                // in the request
+                if(ex==null)
+                    ex = findFilterException(httpRequest);
+                
+                // If there was an exception that we were looking for
+                // (either caught or found in the request, then prepare
+                // to retry.
+                if (ex != null) {
                     attempts++;
-                    log.warn("caught: " + fe.getMessage() + " : retrying request " + httpRequest.getMethod()
+                    ((ResponseErrorWrapper) response).clearError();
+                    log.warn("caught: " + ex.getMessage() + " : retrying request " + httpRequest.getMethod()
                         + " " + httpRequest.getRequestURI() + " "
                         + attempts);
 
-                    // Retry and fail after maxRetries attempts
+                    // Fail after maxRetries attempts
                     if(attempts > maxRetries) {
                         log.error("reached maximum retries for "
                             + httpRequest.getMethod() + " "
                             + httpRequest.getRequestURI());
                         sendError((HttpServletResponse) response);
                     }
+                    // Otherwise, prepare to retry
                     else {
                         ((BufferedRequestWrapper) request).retryRequest();
                         Thread.yield();
                     }
-                    break;
+                } 
+                // Otherwise flush the error if necessary and
+                // proceed as normal.
+                else {
+                    ((ResponseErrorWrapper) response).flushError();
+                    return;
                 }
             }
         } else {
@@ -108,14 +138,21 @@ public class DeadlockRetryFilter implements Filter {
 
         return false;
     }
+    
+    private boolean isFilterException(Exception e) {
+        for(Class exception: exceptions)
+            if(exception.isInstance(e))
+            return true;
+
+        return false;
+    }
 
     private Exception findFilterException(HttpServletRequest request) {
         Exception e = (Exception)
             request.getAttribute(RequestHandler.ATTR_EXCEPTION);
         if (e == null)
             return null;
-        for(Class exception: exceptions)
-            if(exception.isInstance(e))
+        if(isFilterException(e))
             return e;
         return null;
     }

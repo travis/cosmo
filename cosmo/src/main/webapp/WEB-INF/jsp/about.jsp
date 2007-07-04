@@ -24,6 +24,7 @@
 
 <cosmo:dialogLayout prefix="About.">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<cosmoui:cosmoProperties var="logoUri" propertyName="ui.logoUri"/>
 
 <style type="text/css">
 
@@ -43,12 +44,12 @@ a {
 
 <div style="width:100%;" align="center">
 
-  <div style="width:300px; margin-top:28px;">
+  <div style="width:333px; margin-top:28px;">
 
     <div>
     <a href="http://cosmo.osafoundation.org/"
                onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
-               return false;"><img src="${staticBaseUrl}/cosmo_logo.gif" alt="<fmt:message 
+               return false;"><img src="${staticBaseUrl}${logoUri}" alt="<fmt:message 
                key="About.LogoAltText"/>" style="border: 0px"/></a>    
     </div>
     <div class="smLabel"><fmt:message 

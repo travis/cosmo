@@ -36,7 +36,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             d = _createElem('div');
             d.style.paddingTop = '16px';
             var img = _createElem('img');
-            img.src = cosmo.env.getBaseUrl() + '/cosmo_logo.gif';
+            img.src = cosmo.env.getBaseUrl() + cosmo.ui.conf.logoUri;
             d.appendChild(img);
             node.appendChild(d);
             // Version

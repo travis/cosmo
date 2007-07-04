@@ -117,8 +117,8 @@ body.adminPage {
 }
 #loginDialog{
     margin: auto;
-    width: 280px;
-    text-align: left;
+    width: 100%;/*280px;*/
+    text-align: center;
     padding-top: 16px;
 }
 #loginDialogInputsBox td {
@@ -134,8 +134,10 @@ body.adminPage {
     padding-bottom: 4px;
 }
 #loginDialogFormContainer {
+	margin: auto;
     padding: 12px;
     border: 1px solid #999;
+    width: 280px;
 }
 
 #loginDialogInputsBox{

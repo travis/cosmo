@@ -67,6 +67,13 @@ cosmo.util.html.createSelect = function (id, name, size,
     }
     return sel;
 };
+
+cosmo.util.html.getChildrenByTagName = function (node, tagName){
+    return dojo.lang.filter(node.getElementsByTagName(tagName), 
+        function(filterTarget){
+            return (filterTarget.nodeName == tagName) && (filterTarget.parentNode == node);
+        });
+};
     
 cosmo.util.html.setSelectOptions = function (selectElement, options){
     while (selectElement.firstChild){

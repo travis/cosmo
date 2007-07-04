@@ -61,6 +61,9 @@ cosmo.ui.conf.timeoutDialogAutoLogout = 30
 // current page's url is https
 cosmo.ui.conf.httpSupported="false";
 
+// Logo uri
+cosmo.ui.conf.logoUri="logo.png";
+
 //****************** End Overidable Defaults. *********************************
 
 cosmo.ui.conf.load = function (uri){

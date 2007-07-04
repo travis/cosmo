@@ -32,6 +32,8 @@
   <cosmoui:user var="user"/>
 </c:if>
 
+<cosmoui:cosmoProperties var="logoUri" propertyName="ui.logoUri"/>
+
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -65,7 +67,7 @@
         <td align="left" valign="top">
           <div class="lg">
             <a href="<c:url value="/account/view"/>">
-              <img src="<c:url value="/cosmo_logo.gif"/>" alt="Cosmo Sharing Server"/>
+              <img src="<c:url value="${logoUri}"/>" alt="Cosmo Sharing Server"/>
             </a>
           </div>
         </td>

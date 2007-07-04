@@ -246,6 +246,8 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
     var titleDiv = document.getElementById(this.divId + 'Title' +
         '__' + ev.id);
     colors = cosmo.view.cal.canvas.colors;
+    
+   // mainDiv.event = ev;
 
     // If this lozenge is processing, change to 'processing' color
     switch (stateId) {

@@ -62,7 +62,7 @@
         dojo.event.browser.addListener(window, "onload", init, false);
 
         function init() {
-            cosmo.util.cookie.destroy('JSESSIONID', '/cosmo');
+            cosmo.util.cookie.destroy('JSESSIONID', '${staticBaseUrl}');
             cosmo.util.cookie.destroy('inputTimestamp');
             cosmo.util.cookie.destroy('username');
 		    cosmo.util.auth.clearAuth();
@@ -95,7 +95,7 @@
 	  </div>
       
       <div style="padding-top:36px; text-align:center;">
-        <a href="javascript:cosmo.util.popup.open('${staticBaseUrl}/help/about', 340, 280);">
+        <a href="javascript:cosmo.util.popup.open('${staticBaseUrl}/help/about', 360, 280);">
           <fmt:message key="Login.AboutCosmo"/>
         </a>
       </div>

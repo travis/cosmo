@@ -32,6 +32,9 @@ cosmo.account.settings = new function () {
     var self = this; // Stash a copy of this
     this.detailsForm = null; // The form containing the signup fields
     this.advancedForm = null;
+    // The field that has focus
+    this.focusedField = null;
+    
     // Localized strings
     var strings = {
         title: _('AccountSettings.Title'),
@@ -43,9 +46,13 @@ cosmo.account.settings = new function () {
         about: _('AccountSettings.About'),
         advancedAccountBrowser: _('AccountSettings.Advanced.AccountBrowser')
     }
+    
+    dojo.lang.mixin(this, cosmo.account.accountBase);
 
     // Public memebers
     // ==============
+    // Identify whether this is 'create' or 'settings'
+    this.formType = cosmo.account.formTypes.SETTTINGS;
     // Cache of user account data
     this.accountInfo = null;
     // Array of form input fields for basic account data
@@ -110,7 +117,7 @@ cosmo.account.settings = new function () {
         // Build the list of fields based on the account info
         this.fieldList = cosmo.account.getFieldList(this.accountInfo);
         // Build the form using the list of input fields
-        this.detailsForm = cosmo.account.getFormTable(this.fieldList, false);
+        this.detailsForm = cosmo.account.getFormTable(this.fieldList, this);
 
         // Add the notice to the right of the password field
         // to indicate that leaving the fields blank mean 'no change'
@@ -181,6 +188,12 @@ cosmo.account.settings = new function () {
      * Validate the form input and submit via XHR
      */
     this.submitSave = function () {
+        
+        // Don't submit from keyboard input if focus is on a text field
+        // Otherwise saved form field values selected by Enter key
+        // will give you spurious submissions
+        if (this.focusedField) { return false; }
+
         // Save preferences syncronously first
         var prefs = {};
 

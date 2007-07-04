@@ -14,11 +14,29 @@
  * limitations under the License.
 */
 
+dojo.require("dojo.event.*");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 
 dojo.provide('cosmo.account.common');
+
+cosmo.account.formTypes = {
+  CREATE: 'create',
+  SETTINGS: 'settings' };
+
+cosmo.account.accountBase = new function () {
+    this.handleInputFocusChange = function (e) {
+        if (e.target) {
+          if (e.type == 'focus' && e.target.type != 'password') {
+              this.focusedField = e.target;
+          }
+          else {
+              this.focusedField = null;
+          }
+        }
+    };
+};
 
 cosmo.account.getFieldList = function (accountInfo) {
     var list = [];
@@ -112,7 +130,8 @@ cosmo.account.getFieldList = function (accountInfo) {
  * @return Object (HtmlFormElement), form to append to the
  *     content area of the modal dialog box.
  */
-cosmo.account.getFormTable = function (fieldList, isCreate) {
+cosmo.account.getFormTable = function (fieldList, callingContext) {
+    var isCreate = (callingContext.formType == cosmo.account.formTypes.CREATE);
     var table = null;
     var body = null;
     var tr = null;
@@ -166,6 +185,8 @@ cosmo.account.getFormTable = function (fieldList, isCreate) {
         elem.style.width = type == 'text' ? '240px' : '140px';
         elem.className = 'inputText';
         elem.value = f.value || '';
+        dojo.event.connect(elem, 'onfocus', callingContext, 'handleInputFocusChange');
+        dojo.event.connect(elem, 'onblur', callingContext, 'handleInputFocusChange');
         inputs.push(elem);
         td.appendChild(elem);
 

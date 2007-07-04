@@ -31,6 +31,98 @@ cosmo.account.create = new function () {
     var fieldList = cosmo.account.getFieldList();
     var f = null; // Temp var
 
+    dojo.lang.mixin(this, cosmo.account.accountBase);
+
+    // Public members
+    // =============================
+    // Identify whether this is 'create' or 'settings'
+    this.formType = cosmo.account.formTypes.CREATE;
+    // The field that has focus
+    this.focusedField = null;
+
+    // Public methods
+    // =============================
+    /**
+     * Sets up the dialog box with the table of form elements
+     * and appropriate buttons for creating a new account.
+     */
+    this.showForm = function () {
+        var o = {};
+        var b = null;
+
+        o.width = 540;
+        o.height = 480;
+        o.title = 'Create an Account';
+        o.prompt = _('Signup.Prompt.AllFieldsRequired');
+        form = cosmo.account.getFormTable(fieldList, this);
+        o.content = form;
+
+        b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+            handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
+        o.btnsLeft = [b];
+        // Have to set empty center set of buttons -- showForm will be called
+        // without buttons getting cleared by 'hide.'
+        o.btnsCenter = [];
+        b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
+            handleOnClick: function () { self.submitCreate(); } });
+        o.btnsRight = [b];
+        o.defaultAction = function () { self.submitCreate(); };
+
+        cosmo.app.showDialog(o);
+		form.username.focus();
+    };
+    /**
+     * Submit the call via XHR to cosmo.cmp to sign the user
+     * up for a new account.
+     */
+    this.submitCreate = function () {
+        // Don't submit from keyboard input if focus is on a text field
+        // Otherwise saved form field values selected by Enter key
+        // will give you spurious submissions
+        if (this.focusedField) { return false; }
+
+        // Validate the form input using each field's
+        // attached validators
+        var err = cosmo.account.validateForm(form, fieldList);
+
+        if (err) {
+            cosmo.app.modalDialog.setPrompt(err);
+        }
+        else {
+            var hand = { load: handleCreateResult, error: handleCreateResult };
+            var user = {};
+            // Create a hash from the form field values
+            for (var i = 0; i < fieldList.length; i++) {
+                f = fieldList[i];
+                user[f.elemName] = form[f.elemName].value;
+            }
+            // Hand off to CMP
+            cosmo.cmp.signup(user, hand);
+        }
+    };
+    /**
+     * Set up and display the table of settings needed to
+     * use the new account with an external cal client.
+     * Append the Close button for the dialog
+     */
+    this.showResultsTable = function (user) {
+        var cfg = getClientConfig(user);
+        var content = getResultsTable(user, cfg);
+        var prompt = _('Signup.Prompt.Success');
+        var d = cosmo.app.modalDialog;
+        var btnsCenter = [dojo.widget.createWidget("cosmo:Button",
+            { text:_('App.Button.Close'), width:74,
+            handleOnClick: function () { cosmo.app.hideDialog(); } })];
+
+        // Update dialog in place
+        d.setPrompt(prompt);
+        d.setContent(content);
+        d.setButtons([], btnsCenter, []);
+        d.defaultAction = function () { cosmo.app.modalDialog.hide(); };
+    };
+
+    // Private methods
+    // =============================
     /**
      * Handler function for XHR call to cosmo.cmp for signup.
      * Sets error prompt if request fails, set up the results
@@ -101,7 +193,7 @@ cosmo.account.create = new function () {
         cfg['Password'] = '(Hidden)';
         cfg['PortNumber'] = portNum;
         cfg['UseSSL'] = isSSL;
-        cfg['FullURL'] = homedirUrl.scheme + "://" + homedirUrl.host + ":" + 
+        cfg['FullURL'] = homedirUrl.scheme + "://" + homedirUrl.host + ":" +
             portNum + cosmo.env.getBaseUrl();
 
         return cfg;
@@ -184,80 +276,4 @@ cosmo.account.create = new function () {
         // Return the div containing the content
         return dO;
     }
-
-    // Public methods
-    // =============================
-    /**
-     * Sets up the dialog box with the table of form elements
-     * and appropriate buttons for creating a new account.
-     */
-    this.showForm = function () {
-        var o = {};
-        var b = null;
-
-        o.width = 540;
-        o.height = 480;
-        o.title = 'Create an Account';
-        o.prompt = _('Signup.Prompt.AllFieldsRequired');
-        form = cosmo.account.getFormTable(fieldList, true);
-        o.content = form;
-
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
-            handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
-        o.btnsLeft = [b];
-        // Have to set empty center set of buttons -- showForm will be called
-        // without buttons getting cleared by 'hide.'
-        o.btnsCenter = [];
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
-            handleOnClick: function () { self.submitCreate(); } });
-        o.btnsRight = [b];
-        o.defaultAction = function () { self.submitCreate(); };
-
-        cosmo.app.showDialog(o);
-		form.username.focus();
-    };
-    /**
-     * Submit the call via XHR to cosmo.cmp to sign the user
-     * up for a new account.
-     */
-    this.submitCreate = function () {
-        // Validate the form input using each field's
-        // attached validators
-        var err = cosmo.account.validateForm(form, fieldList);
-
-        if (err) {
-            cosmo.app.modalDialog.setPrompt(err);
-        }
-        else {
-            var hand = { load: handleCreateResult, error: handleCreateResult };
-            var user = {};
-            // Create a hash from the form field values
-            for (var i = 0; i < fieldList.length; i++) {
-                f = fieldList[i];
-                user[f.elemName] = form[f.elemName].value;
-            }
-            // Hand off to CMP
-            cosmo.cmp.signup(user, hand);
-        }
-    };
-    /**
-     * Set up and display the table of settings needed to
-     * use the new account with an external cal client.
-     * Append the Close button for the dialog
-     */
-    this.showResultsTable = function (user) {
-        var cfg = getClientConfig(user);
-        var content = getResultsTable(user, cfg);
-        var prompt = _('Signup.Prompt.Success');
-        var d = cosmo.app.modalDialog;
-        var btnsCenter = [dojo.widget.createWidget("cosmo:Button",
-            { text:_('App.Button.Close'), width:74,
-            handleOnClick: function () { cosmo.app.hideDialog(); } })];
-
-        // Update dialog in place
-        d.setPrompt(prompt);
-        d.setContent(content);
-        d.setButtons([], btnsCenter, []);
-        d.defaultAction = function () { cosmo.app.modalDialog.hide(); };
-    };
 }

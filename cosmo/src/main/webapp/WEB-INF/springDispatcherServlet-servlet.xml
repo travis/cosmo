@@ -81,7 +81,7 @@
 
 <!-- TODO set cache settings here.... -->
 <bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" >
-    <property name="propertyPlaceHolderConifgurer">
+    <property name="propertyPlaceholderConfigurer">
         <ref bean="propertyPlaceholderConfigurer"/>
     </property>
 </bean>

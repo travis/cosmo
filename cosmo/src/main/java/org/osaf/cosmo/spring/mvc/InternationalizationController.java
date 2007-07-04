@@ -31,7 +31,7 @@ public class InternationalizationController extends AbstractController {
     public static final String UI_PREFIX = "ui.";
     private  HashMap<String, String> properties = new HashMap<String, String>();
 
-    public void setPropertyPlaceHolderConifgurer(CosmoPropertyPlaceholderConfigurer configurer) {
+    public void setPropertyPlaceholderConfigurer(CosmoPropertyPlaceholderConfigurer configurer) {
         Properties configProps = configurer.getProperties();
         Enumeration propertyNames = configProps.propertyNames();
         while (propertyNames.hasMoreElements()){

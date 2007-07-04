@@ -238,9 +238,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         var timeFieldValue = this._getFormValue(form, info.timeField);
         var meridianFieldValue = this._getFormValue(form, info.meridianField);
         var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
-        dojo.debug("IHTHERE : " +info.allDayField )
-        var allDayFieldValue = this._getFormValue(form, info.allDayField);
-        dojo.debug("IHTHERE2: ")
+        var allDayFieldValue = this._getFormValue(form, info.allDayField) == "1";
         
         var errMsg = ""
         

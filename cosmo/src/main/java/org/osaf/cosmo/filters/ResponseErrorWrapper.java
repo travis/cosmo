@@ -49,13 +49,19 @@ public class ResponseErrorWrapper extends HttpServletResponseWrapper {
     /**
      * Invoke sendError() on wrapped response if sendError() was
      * invoked on wrapper.
+     * @returns true if an error was flushed, otherwise false
      * @throws IOException
      */
-    public void flushError() throws IOException {
-        if(code!=null && msg!=null)
+    public boolean flushError() throws IOException {
+        if(code!=null && msg!=null) {
             super.sendError(code, msg);
-        else if(code!=null)
+            return true;
+        }
+        else if(code!=null) {
             super.sendError(code);
+            return true;
+        }
+        return false;
     }
     
     /**

@@ -189,15 +189,10 @@ public class StandardMorseCodeController implements MorseCodeController {
         for (Ticket.Type type : ticketTypes)
             collection.addTicket(new Ticket(type));
 
-        try {
-            // throws UidinUseException
-            collection =
-                contentService.createCollection(parent, collection, children);
-        } catch (OptimisticLockingFailureException e) {
-            log.warn("Publish of " +  uid + " failed due to concurrent requests");
-            throw new ServerBusyException("Database is busy", e);
-        }
-
+        // throws UidinUseException
+        collection =
+            contentService.createCollection(parent, collection, children);
+       
         return new PubCollection(collection);
     }
 

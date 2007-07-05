@@ -27,15 +27,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.abdera.protocol.server.servlet.RequestHandler;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.ConcurrencyFailureException;
 
 /**
  * Filter that detects database deadlocks 
- * (catches PessimisticLockingFailureException) and retries
+ * (catches ConcurrencyFailureException) and retries
  * the request a number of times before failing.  The filter
  * only applies to "update" operations, that is PUT, POST, DELETE.
  * 
@@ -46,7 +44,7 @@ import org.springframework.dao.PessimisticLockingFailureException;
 public class DeadlockRetryFilter implements Filter {
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
     private int maxRetries = 10;
-    private Class[] exceptions = new Class[] {PessimisticLockingFailureException.class};
+    private Class[] exceptions = new Class[] {ConcurrencyFailureException.class};
     private String[] methods = new String[] {"PUT", "POST", "DELETE", "MKCALENDAR" };
     private static final String PARAM_RETRIES = "retries";
     private static final String PARAM_METHODS = "methods";
@@ -158,6 +156,12 @@ public class DeadlockRetryFilter implements Filter {
     }
 
     private void sendError(ResponseErrorWrapper response) throws IOException {
+        
+        // if error was already queued, flush it
+        if(response.flushError())
+            return;
+        
+        // otherwise send a generic error and flush
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
             "the server was unable to complete the request");
         response.flushError();

@@ -124,7 +124,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             this.submitButtonContainer.appendChild(button.domNode);
             this.submitButton = button;
 
-            logo.src = cosmo.env.getImagesUrl() + cosmo.ui.conf.logoUri;
+            logo.src = cosmo.env.getImagesUrl() + _("App.LogoUri");
             this.logoContainer.appendChild(logo);
             dojo.event.connect(this.passwordInput, "onfocus", this, 'setFocus');
             dojo.event.connect(this.passwordInput, "onblur", this, 'setFocus');

@@ -32,7 +32,10 @@
   <cosmoui:user var="user"/>
 </c:if>
 
-<cosmoui:cosmoProperties var="logoUri" propertyName="ui.logoUri"/>
+<fmt:setBundle basename="PimMessageResources"/>
+<fmt:message key="App.LogoUri" var="logoUri"/>
+<fmt:message key="App.TemplateName" var="templateName"/>
+<fmt:setBundle basename="MessageResources"/>
 
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -48,7 +51,7 @@
     </title>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
+    <link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/global.css"/>
     
     
     <c:if test="${not empty selfLink}">
@@ -67,7 +70,7 @@
         <td align="left" valign="top">
           <div class="lg">
             <a href="<c:url value="/account/view"/>">
-              <img src="<c:url value="${logoUri}"/>" alt="Cosmo Sharing Server"/>
+              <img src="${staticBaseUrl}/templates/${templateName}/images/${logoUri}" alt="Cosmo Sharing Server"/>
             </a>
           </div>
         </td>

@@ -1,7 +1,6 @@
 var dependencies = [
     "cosmo.app",
     "cosmo.app.pim", 
-    "cosmo.ui.cal_main",
     "cosmo.ui.global_css",
     "cosmo.ui.event.listeners",
     "dojo.debug.console",

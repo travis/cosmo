@@ -45,6 +45,12 @@
 <link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
 <link rel="stylesheet" href="${staticBaseUrl}/templates/default/ui.css"/>
 
+<!--[if IE]>
+<style type="text/css">
+  html, body { overflow: hidden; }
+</style>
+<![endif]-->
+
 <c:if test="${not empty relationLinks}">
 <link rel="self" type="text/html" href="${relationLinks['pim']}"/>
 <link rel="alternate" type="application/atom+xml" href="${relationLinks['atom']}"/>

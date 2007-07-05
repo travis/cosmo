@@ -177,7 +177,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
             this.accordionMode = true;
             // If the current height of the detail-view form (perhaps with
             // some sections collapsed) is too tall, collapse all the sections
-            if ((this.domNode.offsetHeight +  + TOP_MENU_HEIGHT) > winHeight) {
+            if ((this.domNode.offsetHeight + TOP_MENU_HEIGHT) > winHeight) {
                 var stamps = this.stamps;
                 for (var i = 0; i < stamps.length; i++) {
                     var st = stamps[i];

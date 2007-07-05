@@ -161,6 +161,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         getStamp: function(/*String*/ stampName, /*Boolean?*/ createIfDoesntExist, /*Object*/ initialProps) {
+           initialProps =  initialProps || {};
            var stamp = this._stamps[stampName];
            
            if (stamp){

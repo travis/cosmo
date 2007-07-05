@@ -176,6 +176,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
         r += '<td id="listViewTriageHeader" class="listViewHeaderCell" style="border-right: 0px;">Triage</td>';
         r += '</tr>\n';
         t += r;
+
+        var fillCell = function (s) { return s || '&nbsp;'; };
         var getRow = function (key, val) {
             var item = val;
             var display = item.display;
@@ -191,10 +193,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     taskIconStyle.backgroundPosition + '">&nbsp;</div>';
             }
             r += '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + display.title + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + display.who + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + display.startDate + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + display.triage + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.title) + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.who) + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.startDate) + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.triage) + '</td>';
             r += '</tr>\n';
             t += r;
         }

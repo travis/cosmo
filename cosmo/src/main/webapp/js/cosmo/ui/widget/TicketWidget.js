@@ -27,8 +27,7 @@ dojo.require("dojo.validate.*");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.auth");
 dojo.require("dojo.lang");
-
-_ = cosmo.util.i18n.getText;
+dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.TicketWidget", dojo.widget.HtmlWidget, {
 

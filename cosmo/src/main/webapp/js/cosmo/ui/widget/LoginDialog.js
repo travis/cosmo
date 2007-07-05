@@ -8,8 +8,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.cookie");
-
-_ = cosmo.util.i18n.getText
+dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
     {

@@ -17,7 +17,6 @@
 dojo.provide("cosmo.ui.conf");
 
 dojo.require("cosmo.env");
-dojo.require("cosmo.util.i18n");
 // Configurable UI options
 
 
@@ -62,7 +61,7 @@ cosmo.ui.conf.timeoutDialogAutoLogout = 30
 cosmo.ui.conf.httpSupported="false";
 
 // Logo uri
-cosmo.ui.conf.logoUri="logo.png";
+cosmo.ui.conf.logoUri="logo_en.png";
 
 //****************** End Overidable Defaults. *********************************
 
@@ -70,10 +69,14 @@ cosmo.ui.conf.load = function (uri){
     var s = dojo.hostenv.getText(uri);
     var propertymaps = eval("(" + s + ")");
     cosmo.ui.conf._localtext = propertymaps[0];
-    cosmo.util.i18n.setLocalizationMessages(this._localtext);
         
     var configProperties = propertymaps[1];
     dojo.lang.mixin(cosmo.ui.conf, configProperties);
+}
+
+// Return the hash of localization keys to localized strings
+cosmo.ui.conf.getLocalText = function () {
+    return this._localtext;
 }
 
 cosmo.ui.conf.init = function (uri){

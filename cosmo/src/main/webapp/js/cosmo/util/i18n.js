@@ -24,11 +24,15 @@ dojo.require("cosmo.ui.conf");
 cosmo.util.i18n.replacePat = /\{\d+\}/g;
 
 cosmo.util.i18n.getText = function () {
+    if (!this._localtext) {
+        this.setLocalizationMessages(cosmo.ui.conf.getLocalText());
+    }
+    
     var args = Array.prototype.slice.apply(arguments);
     var key = args.shift();
-    var str = cosmo.util.i18n._localtext[key] || "[[" + key + "]]";
+    var str = this._localtext[key] || "[[" + key + "]]";
     if (args.length) {
-        var arr = str.match(cosmo.util.i18n.replacePat);
+        var arr = str.match(this.replacePat);
         if (arr) {
             for (var i = 0; i < arr.length; i++) {
                 str = str.replace(arr[i], args[i]);
@@ -52,5 +56,3 @@ cosmo.util.i18n.messageExists = function (str){
          return false;
      }
 }
-
-

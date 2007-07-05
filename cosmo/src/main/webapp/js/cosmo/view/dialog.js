@@ -19,7 +19,6 @@ dojo.provide('cosmo.view.dialog');
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
-var _ = cosmo.util.i18n.getText;
 
 cosmo.view.dialog = new function() {
 

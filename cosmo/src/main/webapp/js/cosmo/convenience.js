@@ -27,4 +27,4 @@ dj_global._createElem = function (s) {
 dj_global._createText = function (s) {
     return document.createTextNode(s);
 }
-dj_global._ = cosmo.util.i18n.getText;
+dj_global._ = dojo.lang.hitch(cosmo.util.i18n, cosmo.util.i18n.getText);

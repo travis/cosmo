@@ -28,8 +28,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("dojo.validate.web");
 dojo.require("dojo.event");
-
-var _ = cosmo.util.i18n.getText;
+dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWidget,
     {

@@ -31,8 +31,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.i18n");
-
-_ = cosmo.util.i18n.getText
+dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWidget,
     function(){

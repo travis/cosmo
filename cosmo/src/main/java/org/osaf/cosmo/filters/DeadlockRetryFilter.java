@@ -87,7 +87,7 @@ public class DeadlockRetryFilter implements Filter {
                         ex = e;
                     } else {
                         log.error("the server encountered an unexpected error", e);
-                        sendError((HttpServletResponse) response);
+                        sendError((ResponseErrorWrapper) response);
                     }
                 }
                 
@@ -111,7 +111,7 @@ public class DeadlockRetryFilter implements Filter {
                         log.error("reached maximum retries for "
                             + httpRequest.getMethod() + " "
                             + httpRequest.getRequestURI());
-                        sendError((HttpServletResponse) response);
+                        sendError((ResponseErrorWrapper) response);
                     }
                     // Otherwise, prepare to retry
                     else {
@@ -157,9 +157,10 @@ public class DeadlockRetryFilter implements Filter {
         return null;
     }
 
-    private void sendError(HttpServletResponse response) throws IOException {
+    private void sendError(ResponseErrorWrapper response) throws IOException {
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
             "the server was unable to complete the request");
+        response.flushError();
     }
 
     public void init(FilterConfig config) throws ServletException {

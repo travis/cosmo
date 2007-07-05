@@ -17,7 +17,6 @@ package org.osaf.cosmo.dav;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -55,31 +54,5 @@ public class DavPutTest extends BaseDavServletTestCase {
         assertEquals("Content content incorrect","test!",new String(content.getContent()));
         assertEquals("Content parent not home collection", home, content
                 .getParents().iterator().next());
-    }
-    
-    /** */
-    public void testPutContentConcurrent() throws Exception {
-        testHelper.logIn();
-        HomeCollectionItem home = testHelper.getHomeCollection();
-       
-        // tell the mock dao to throw an exception
-        MockContentDao.THROW_CONCURRENT_EXCEPTION = true;
-        
-        MockHttpServletRequest request =
-            createMockRequest("PUT", toCanonicalPath("testConcurrContent"));
-        request.setContent("test!".getBytes());
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        servlet.service(request, response);
-
-        assertEquals("PUT content did not return Server Error.",
-                     MockHttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                     response.getStatus());
-        
-        assertEquals("PUT content did not return Concurrency failure.",
-                "Concurrency failure.",
-                response.getErrorMessage());
-        
-        // tell the mock dao to not throw an exception
-        MockContentDao.THROW_CONCURRENT_EXCEPTION = false;
     }
 }

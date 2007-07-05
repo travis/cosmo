@@ -290,46 +290,7 @@ public class DavServlet extends AbstractWebdavServlet
             return;
         }
 
-        // Catch DataAccessException (concurrency failure or data integrity
-        // failure) and retry a maximum of 5 attempts and return 500 
-        // if all attempts fail.
-        boolean success = false;
-        int tries = 0;
-        while (!success && tries<5) {
-            tries++;
-            try {
-                super.doPut(request, response, resource);
-                success = true;
-            } catch (org.springframework.dao.DataAccessException e) {
-                log.warn("Concurrency failure during PUT", e);
-                
-                // Need to re-initialze resource because it has changed.
-                // check matching if=header for lock-token relevant operations
-                resource = getResourceFactory().createResource(request.getRequestLocator(), request, response);
-                if (!isPreconditionValid(request, resource)) {
-                    response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
-                    return;
-                }
-
-                // check If-None-Match header
-                if (ifNoneMatch(request, resource)) {
-                    response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
-                    return;
-                }
-
-                // check If-Match header
-                if (ifMatch(request, resource)) {
-                    response.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
-                    return;
-                }
-            }
-        }
-
-        if (!success) {
-            response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Concurrency failure.");
-            return;
-        }
+        super.doPut(request, response, resource);
         
         response.setHeader("ETag", resource.getETag());
     }

@@ -183,6 +183,10 @@
     <url-pattern>/dav/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>deadlock-retry-filter</filter-name>
+    <url-pattern>/dav/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>feed-security</filter-name>
     <url-pattern>/atom/*</url-pattern>
   </filter-mapping>

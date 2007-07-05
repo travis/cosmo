@@ -56,6 +56,7 @@
     @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="select item from Item item where item.id!=:itemid and item.owner.id=:ownerid and size(item.parents)=0 and item.name=:name"),
     @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="select item from Item item join item.parents parent where item.id!=:itemid and item.owner.id=:ownerid and parent.id=:parentid and item.name=:name"),
     @NamedQuery(name="item.by.uid", query="from Item i where i.uid=:uid"),
+    @NamedQuery(name="itemid.by.uid", query="select i.id from Item i where i.uid=:uid"),
     @NamedQuery(name="collectionItem.by.uid", query="from CollectionItem i where i.uid=:uid"),
     @NamedQuery(name="contentItem.by.uid", query="from ContentItem i where i.uid=:uid"),
     @NamedQuery(name="item.by.parent.name", query="select item from Item item join item.parents parent where parent=:parent and item.name=:name"),

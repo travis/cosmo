@@ -37,7 +37,6 @@ import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.StampHandler;
-import org.osaf.cosmo.model.User;
 
 /**
  * Implementation of ContentDao using hibernate persistence objects
@@ -71,8 +70,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         
         
         try {
-            User owner = collection.getOwner();
-            
             // verify uid not in use
             checkForDuplicateUid(collection);
             
@@ -98,49 +95,35 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
         
         try {
-            collection = updateCollection(collection);
+            updateCollectionInternal(collection);
             
             // Either create, update, or delete each item
             for (ContentItem item : children) {
                 
-                // clear the session each iteration to improve performance
-                getSession().clear();
-                getSession().load(collection, collection.getId());
-                 
                 // create item
                 if(item.getId()==-1) {
-                    
-                    // If item is a NoteItem modification, then make sure
-                    // the master NoteItem is loaded, otherwise we may get
-                    // LazyInitializationException later
-                    if(item instanceof NoteItem) {
-                        NoteItem note = (NoteItem) item;
-                        if(note.getModifies()!=null)
-                            getSession().load(note.getModifies(), note.getModifies().getId());    
-                    }
-                    item = createContent(collection, item);
+                    createContentInternal(collection, item);
                 }
                 // delete item
                 else if(item.getIsActive()==false) {
-                    getSession().load(item, item.getId());
-                    removeItemFromCollection(item, collection);
+                    removeItemFromCollectionInternal(item, collection);
                 }
                 // update item
                 else {
-                    // Here is the tricky part.  If the session has
-                    // been cleared, then in order to prevent Hibernate
-                    // exceptions like "found two representations of the
-                    // same collection..", we need to merge the transient
-                    // item state with the persistent state, and pass the
-                    // peristent object into updateContent().
-                    item = (ContentItem) getSession().merge(item);
-                    
                     if(!item.getParents().contains(collection)) {
-                        addItemToCollection(item, collection);
+                        addItemToCollectionInternal(item, collection);
                     }
-                    updateContent(item);
+                    updateContentInternal(item);
                 }
             }
+            
+            getSession().flush();
+            
+            // clear the session to improve subsequent flushes
+            getSession().clear();
+            
+            // load collection to get it back into the session
+            getSession().load(collection, collection.getId());
             
             return collection;
         } catch (HibernateException e) {
@@ -157,37 +140,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      *      org.osaf.cosmo.model.ContentItem)
      */
     public ContentItem createContent(CollectionItem parent, ContentItem content) {
-
-        if(parent==null)
-            throw new IllegalArgumentException("parent cannot be null");
-        
-        if (content == null)
-            throw new IllegalArgumentException("content cannot be null");
-
-        if (content.getId()!=-1)
-            throw new IllegalArgumentException("invalid content id (expected -1)");
-        
-        if (content.getOwner() == null)
-            throw new IllegalArgumentException("content must have owner");
         
         try {
-            User owner = content.getOwner();
-
-            // verify uid not in use
-            checkForDuplicateUid(content);
-            
-            setBaseItemProps(content);
-            
-            // add parent to new content
-            content.getParents().add(parent);
-            
-            // remove tomstone (if it exists) from parent
-            if(parent.removeTombstone(content)==true)
-                getSession().update(parent);
-            
-            applyStampHandlerCreate(content);
-            
-            getSession().save(content);
+            createContentInternal(parent, content);
             getSession().flush();
             return content;
         } catch (HibernateException e) {
@@ -249,9 +204,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if(parents.size()==0)
                 throw new IllegalArgumentException("content must have at least one parent");
             
-            
-            User owner = content.getOwner();
-
             // verify uid not in use
             checkForDuplicateUid(content);
             
@@ -362,16 +314,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     public CollectionItem updateCollection(CollectionItem collection) {
         try {
             
-            if (collection == null)
-                throw new IllegalArgumentException("collection cannot be null");
-            
-            getSession().update(collection);
-            
-            if (collection.getOwner() == null)
-                throw new IllegalArgumentException("collection must have owner");
-            
-            collection.setModifiedDate(new Date());
-            
+            updateCollectionInternal(collection);
             getSession().flush();
             
             return collection;
@@ -390,21 +333,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public ContentItem updateContent(ContentItem content) {
         try {     
-            
-            if (content == null)
-                throw new IllegalArgumentException("content cannot be null");
-             
-            getSession().update(content);
-            
-            if (content.getOwner() == null)
-                throw new IllegalArgumentException("content must have owner");
-            
-            content.setModifiedDate(new Date());
-            
-            applyStampHandlerUpdate(content);
-            
+            updateContentInternal(content);
             getSession().flush();
-            
             return content;
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
@@ -654,6 +584,72 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 continue;
             }
         }
+    }
+    
+    protected void createContentInternal(CollectionItem parent, ContentItem content) {
+
+        if(parent==null)
+            throw new IllegalArgumentException("parent cannot be null");
+        
+        if (content == null)
+            throw new IllegalArgumentException("content cannot be null");
+
+        if (content.getId()!=-1)
+            throw new IllegalArgumentException("invalid content id (expected -1)");
+        
+        if (content.getOwner() == null)
+            throw new IllegalArgumentException("content must have owner");
+        
+        // verify uid not in use
+        checkForDuplicateUid(content);
+        
+        setBaseItemProps(content);
+        
+        // add parent to new content
+        content.getParents().add(parent);
+        
+        // remove tomstone (if it exists) from parent
+        if(parent.removeTombstone(content)==true)
+            getSession().update(parent);
+        
+        applyStampHandlerCreate(content);
+        
+        getSession().save(content);    
+    }
+    
+    protected void updateContentInternal(ContentItem content) {
+        
+        if (content == null)
+            throw new IllegalArgumentException("content cannot be null");
+         
+        getSession().update(content);
+        
+        if (content.getOwner() == null)
+            throw new IllegalArgumentException("content must have owner");
+        
+        content.setModifiedDate(new Date());
+        
+        applyStampHandlerUpdate(content); 
+    }
+    
+    protected void updateCollectionInternal(CollectionItem collection) {
+        if (collection == null)
+            throw new IllegalArgumentException("collection cannot be null");
+        
+        getSession().update(collection);
+        
+        if (collection.getOwner() == null)
+            throw new IllegalArgumentException("collection must have owner");
+        
+        collection.setModifiedDate(new Date());
+    }
+    
+    @Override
+    protected void removeItemFromCollectionInternal(Item item, CollectionItem collection) {
+        if(item instanceof NoteItem)
+            removeNoteItemFromCollectionInternal((NoteItem) item, collection);
+        else
+            super.removeItemFromCollectionInternal(item, collection);
     }
     
 }

@@ -380,14 +380,6 @@ public class StandardContentService implements ContentService {
                       " in " + parent.getName());
         }
         
-        // add CalendarCollectionStamp if parent is the home collection
-//        if(parent instanceof HomeCollectionItem) {
-//            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
-//                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
-//                collection.addStamp(ccs);
-//            }
-//        }
-        
         return contentDao.createCollection(parent, collection);
     }
 
@@ -413,14 +405,6 @@ public class StandardContentService implements ContentService {
         // if it is the parent of one of the children.  If all children are new
         // items, then no locks are obtained.
         Set<CollectionItem> locks = acquireLocks(collection, children);
-        
-        // add CalendarCollectionStamp if parent is the home collection
-//        if(parent instanceof HomeCollectionItem) {
-//            if(collection.getStamp(CalendarCollectionStamp.class)==null) {
-//                CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
-//                collection.addStamp(ccs);
-//            }
-//        }
         
         try {
             // Create the new collection

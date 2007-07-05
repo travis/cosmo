@@ -196,10 +196,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     public void addItemToCollection(Item item, CollectionItem collection) {
         try {
-            getSession().update(item);
-            getSession().update(collection);
-            collection.removeTombstone(item);
-            item.getParents().add(collection);
+            addItemToCollectionInternal(item, collection);
             getSession().flush();
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
@@ -208,22 +205,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     public void removeItemFromCollection(Item item, CollectionItem collection) {
         try {
-            
-            getSession().update(collection);
-            getSession().update(item);
-            
-            // do nothing if item doesn't belong to collection
-            if(!item.getParents().contains(collection))
-                return;
-            
-            collection.addTombstone(new ItemTombstone(collection, item));
-            item.getParents().remove(collection);
-            
-            // If the item belongs to no collection, then it should
-            // be purged.
-            if(item.getParents().size()==0)
-                getSession().delete(item);
-            
+            removeItemFromCollectionInternal(item, collection);
             getSession().flush();
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
@@ -680,10 +662,16 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected void checkForDuplicateUid(Item item) {
         // verify uid not in use
         if (item.getUid() != null) {
-            Item duplicate = findItemByUid(item.getUid());
-            
+
+            // Lookup item by uid
+            Query hibQuery = getSession().getNamedQuery("itemid.by.uid")
+                    .setParameter("uid", item.getUid());
+            hibQuery.setFlushMode(FlushMode.MANUAL);
+
+            Long itemId = (Long) hibQuery.uniqueResult();
+
             // if uid is in use throw exception
-            if(duplicate!=null) {
+            if (itemId != null) {
                 throw new UidInUseException("uid " + item.getUid()
                         + " already in use");
             }
@@ -722,6 +710,32 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
                 log.debug("property name: " + iv.getPropertyName() + " value: "
                         + iv.getValue());
         }
+    }
+    
+    protected void removeItemFromCollectionInternal(Item item, CollectionItem collection) {
+       
+        getSession().update(collection);
+        getSession().update(item);
+        
+        // do nothing if item doesn't belong to collection
+        if(!item.getParents().contains(collection))
+            return;
+        
+        collection.addTombstone(new ItemTombstone(collection, item));
+        item.getParents().remove(collection);
+        
+        // If the item belongs to no collection, then it should
+        // be purged.
+        if(item.getParents().size()==0)
+            getSession().delete(item);
+    }
+    
+    protected void addItemToCollectionInternal(Item item, CollectionItem collection) {
+        
+        getSession().update(item);
+        getSession().update(collection);
+        collection.removeTombstone(item);
+        item.getParents().add(collection);  
     }
     
 }

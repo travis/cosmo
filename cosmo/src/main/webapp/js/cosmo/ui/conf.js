@@ -20,7 +20,7 @@ dojo.require("cosmo.env");
 // Configurable UI options
 
 
-dj_global.TEMPLATE_DIRECTORY = '/default'; // Template directory to use
+dj_global.TEMPLATE_DIRECTORY = "/" + (djConfig.templateName || 'default'); // Template directory to use
 dj_global.DISPLAY_WIDTH_PERCENT = 1.0; // Percent of window width to draw entire display
 dj_global.DISPLAY_HEIGHT_PERCENT = 1.0; // Percent of window height to draw entire display
 dj_global.TOP_MENU_HEIGHT = 48; // Height for top navigation area -- Month name and nav arrows

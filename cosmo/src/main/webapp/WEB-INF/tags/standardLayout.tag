@@ -32,10 +32,9 @@
   <cosmoui:user var="user"/>
 </c:if>
 
-<fmt:setBundle basename="PimMessageResources"/>
-<fmt:message key="App.LogoUri" var="logoUri"/>
-<fmt:message key="App.TemplateName" var="templateName"/>
-<fmt:setBundle basename="MessageResources"/>
+<fmt:setBundle basename="PimMessageResources" var="uiBundle"/>
+
+<fmt:message key="App.TemplateName" var="templateName" bundle="${uiBundle}"/>
 
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -70,7 +69,8 @@
         <td align="left" valign="top">
           <div class="lg">
             <a href="<c:url value="/account/view"/>">
-              <img src="${staticBaseUrl}/templates/${templateName}/images/${logoUri}" alt="Cosmo Sharing Server"/>
+              <img src="${staticBaseUrl}/templates/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
+              	   alt="<fmt:message key="App.Name"  bundle="${uiBundle}"/>"/>
             </a>
           </div>
         </td>

@@ -24,6 +24,10 @@
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
         field="PRODUCT_VERSION"/>
+        
+<fmt:setBundle basename="PimMessageResources"/>
+<fmt:message key="App.TemplateName" var="templateName"/>
+        
 
 <c:if test="${empty timezones}">
   <c:set var="timezones" value="false"/>
@@ -37,7 +41,9 @@
     var djConfig = {isDebug: false,
                     staticBaseUrl: "${staticBaseUrl}",
                     i18nLocation: "${staticBaseUrl}/i18n.js",
-                    confLocation: "${staticBaseUrl}/webui.conf"};
+                    confLocation: "${staticBaseUrl}/webui.conf",
+                    templateName: "${templateName}"};
+
 </script>
 
 <script type="text/javascript" src="${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>

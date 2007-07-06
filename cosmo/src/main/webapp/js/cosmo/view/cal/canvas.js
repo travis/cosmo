@@ -39,6 +39,7 @@ dojo.require("cosmo.view.cal.common");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.ui.DetailFormConverter");
 
 cosmo.view.cal.canvas = new function () {
 
@@ -404,10 +405,9 @@ cosmo.view.cal.canvas = new function () {
             this.timedCanvas = $('timedCanvas');
         }
         allDayArea = new cosmo.ui.resize_area.ResizeArea(
-            'allDayResizeMainDiv', 'allDayResizeHandleDiv');
+            $('allDayResizeMainDiv'), $('allDayResizeHandleDiv'));
         allDayArea.init('down');
-        allDayArea.addAdjacent('timedCanvas');
-        allDayArea.setDragLimit();
+        allDayArea.addAdjacent($('timedCanvas'));
         showHours();
         setCurrentDayStatus();
 
@@ -418,10 +418,14 @@ cosmo.view.cal.canvas = new function () {
         hasBeenRendered = true;
     };
     this.saveTimedCanvasScrollOffset = function () {
-        this.timedCanvasScrollTop = this.timedCanvas.scrollTop;
+        if (this.timedCanvas) {
+            this.timedCanvasScrollTop = this.timedCanvas.scrollTop;
+        }
     };
     this.resetTimedCanvasScrollOffset = function () {
-        this.timedCanvas.scrollTop = this.timedCanvasScrollTop;
+        if (this.timedCanvas) {
+            this.timedCanvas.scrollTop = this.timedCanvasScrollTop;
+        }
     };
     /**
      * Get the scroll offset for the timed canvas
@@ -1019,6 +1023,21 @@ cosmo.view.cal.canvas = new function () {
                 // If no currently selected item, or the item clicked
                 // is not the currently selected item, update the selection
                 if ((!sel) || (item.id != sel.id)) {
+                    // Make sure the user isn't leaving unsaved edits
+                    if (sel) {
+                        var converter = new cosmo.ui.DetailFormConverter(sel.data);
+                        var deltaAndError = converter.createDelta();
+                        var error = deltaAndError[1];
+                        var delta = deltaAndError[0];
+                        /*
+                        if (error || delta.hasChanges()) {
+                            cosmo.app.showErr(_('Main.DetailForm.Error'), 'You have unsaved changes, dude.');
+                            console.log('Delta:');
+                            console.log(delta);
+                            return false;
+                        }
+                        */
+                    }
                     // Call setSelectedCalItem here directly, and publish the
                     // selected-item message on a setTimeout to speed up UI
                     // response for direct clicks -- publishing 'setSelected'
@@ -1459,7 +1478,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         allDaySpacer.setPosition(0, 0);
 
         // Scrollable view area
-        vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT;
+        vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT + 1;
         calcHeight = self.height - vOffset;
         // Subtract the navbar height -- this lives outside the cal view
         calcHeight -= CAL_TOP_NAV_HEIGHT;

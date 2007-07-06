@@ -16,79 +16,90 @@
 
 dojo.provide("cosmo.ui.resize_area");
 
+dojo.require("dojo.html.common");
+dojo.require("dojo.event.*");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 
-cosmo.ui.resize_area.ResizeAreaAdjacent = function (div, origPos, origSize) {
+cosmo.ui.resize_area.ResizeAreaAdjacent = function (div) {
     this.div = div;
-    this.origPos = origPos;
-    this.origSize = origSize;
 }
-ResizeAreaAdjacent = cosmo.ui.resize_area.ResizeAreaAdjacent;
 
-cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
+cosmo.ui.resize_area.ResizeArea = function (content, handle) {
 
     var self = this;
 
-    this.id = id;
-    this.handleId = handleId;
-    this.contentDiv = null;
-    this.handleDiv = null;
+    this.id = content.id;
+    this.contentDiv = content;
+    this.handleDiv = handle;
     this.direction = 'down';
-    this.size = 0;
-    this.dragLimit = 0;
-    this.origSize = 0;
     this.dragSize = 0;
     this.adjacentArea = [];
+    // Offset used to calc the local Y position of the cursor
+    this.absTop = TOP_MENU_HEIGHT + CAL_TOP_NAV_HEIGHT;
+    // Ensures the cursor sits in the middle of the
+    // drag handle as you drag
+    this.handleCenteringSpace = ALL_DAY_RESIZE_HANDLE_HEIGHT / 2;
+    // Upward dragging constraint -- 2px fudge factor
+    // This value is relative, local Y
+    this.upConstraint = (DAY_LIST_DIV_HEIGHT - 2);
+    // Downward dragging constraint -- 2px fudge factor
+    // This value is relative, local Y
+    this.downConstraint = (dojo.html.getViewport().height -
+        this.absTop - 2);
 
     this.init = function(dir, off) {
-        self.contentDiv = document.getElementById(this.id);
-        self.handleDiv = document.getElementById(this.handleId);
-        self.handleDiv.onmousedown = function() { cosmo.app.dragItem = self };
-        self.direction = dir ? dir : this.direction;
-        self.origSize = this.getHeight(this.contentDiv) +
-            self.getHeight(this.handleDiv);
-        self.dragSize = self.origSize;
-        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
-            self.contentDiv.style.height = this.dragSize + 'px';
-        }
+        this.direction = dir ? dir : this.direction;
+        this.origSize =
+            this.getHeight(this.contentDiv) +
+            this.getHeight(this.handleDiv);
+        this.dragSize = this.origSize;
+        dojo.event.connect(self.handleDiv, 'onmousedown',
+            function () { cosmo.app.dragItem = self });
     };
-    this.addAdjacent = function(id) {
-        var div = document.getElementById(id);
-        var incr = this.adjacentArea.length;
-        this.adjacentArea[incr] = new ResizeAreaAdjacent(
-            div, this.getAbsTop(div), this.getHeight(div));
+    // Right now the only adjacent area is the timed canvas
+    this.addAdjacent = function(node) {
+        this.adjacentArea.push(
+            new cosmo.ui.resize_area.ResizeAreaAdjacent(node));
     };
-    this.setDragLimit = function() {
-        /*
-        this.dragLimit = this.adjacentArea[0].origPos +
-            this.adjacentArea[0].origSize - TOP_MENU_HEIGHT -
-            ALL_DAY_RESIZE_HANDLE_HEIGHT;
-        */
-        // FIXME
-        this.dragLimit = 9999999;
-    };
-    this.compareNumbers = function(a, b) { return a - b };
     this.doDrag = function () {
         this.resize();
     };
     this.resize = function() {
-        var offset = this.contentDiv.offsetTop;
-        var pos = yPos - TOP_MENU_HEIGHT;
-        var size = (pos - offset);
-        var div = null;
+        var localY = yPos - this.absTop;
+        // The context area is a sub-div that's got the day
+        // list sitting up above it
+        var contentAreaSize = localY - DAY_LIST_DIV_HEIGHT;
+        // Pull the top of the resize handle up by half its
+        // vertical size, so the cursor sits in the middle
+        // while dragging
+        var handleTop = localY - this.handleCenteringSpace;
+        // Hide the contents during drag for IE6
         if (navigator.appVersion.indexOf('MSIE 6') > -1) {
             self.contentDiv.style.display = 'none';
         }
-        if (pos > offset && pos < this.dragLimit) {
-            this.contentDiv.style.height = size + 'px';
-            this.dragSize = (size + ALL_DAY_RESIZE_HANDLE_HEIGHT);
-            this.handleDiv.style.top = pos + 'px';
+        if (handleTop > this.upConstraint &&
+            handleTop < this.downConstraint) {
+            this.contentDiv.style.height = contentAreaSize + 'px';
+            // Save the size -- needed to hard-code the height
+            // of the inner divs for IE6, done in the drop method
+            this.dragSize = contentAreaSize;
+            this.handleDiv.style.top = handleTop + 'px';
             for (var i = 0; i < this.adjacentArea.length; i++) {
-                div = this.adjacentArea[i].div;
-                div.style.top = (pos+8) + 'px';
-                div.style.height = (((this.adjacentArea[i].origPos-yPos) +
-                    this.adjacentArea[i].origSize) - 8 + TOP_MENU_HEIGHT) + 'px';
+                // Place the timed event canvas below the resize
+                // handle
+                var pos = (handleTop + ALL_DAY_RESIZE_HANDLE_HEIGHT + 1);
+                // Size of the timed event canvas should be the bottom
+                // local Y px of the browser window, minus the top local
+                // Y pos of the timed event canvas
+                var size = (this.downConstraint - pos);
+                // There may be some overlap at the bottom -- don't
+                // resize timed canvas below 0px
+                size = size < 0 ? 0 : size;
+                // Re-position and resize the timed canvas
+                var div = this.adjacentArea[i].div;
+                div.style.top = pos + 'px';
+                div.style.height = size + 'px';
             }
         }
     };
@@ -100,19 +111,8 @@ cosmo.ui.resize_area.ResizeArea = function (id, handleId) {
             self.contentDiv.style.display= 'block';
         }
     };
-    this.getAbsTop = function(div) {
-        return div.offsetTop + cosmo.app.pim.top;
-    };
     this.getHeight = function(div) {
         return div.offsetHeight;
-    };
-    this.cleanup = function() {
-        self.contentDiv = null;
-        self.handleDiv.onmousedown = null;
-        self.handleDiv = null;
-        for (var i = 0; i < self.adjacentArea.length; i++) {
-            self.adjacentArea[i].div = null;
-        }
     };
 }
 

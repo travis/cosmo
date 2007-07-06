@@ -199,8 +199,10 @@ cosmo.account.settings = new function () {
 
         prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] =
             this.advancedForm.showAccountBrowser.checked.toString();
-
-        cosmo.account.preferences.setMultiplePreferences(prefs);
+        
+        for (var pref in prefs){
+            cosmo.account.preferences.setPreference(pref, prefs[pref]);
+        }
 
         // Validate the form input using each field's
         // attached validators

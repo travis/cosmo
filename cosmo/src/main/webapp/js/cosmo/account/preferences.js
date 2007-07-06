@@ -31,22 +31,12 @@ cosmo.account.preferences = new function () {
         cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [{key:val}])
     };
 
-    this.removePreference = function(key){
-		cosmo.app.pim.serv.removePreferences(key);
+    this.deletePreference = function(key){
+		cosmo.app.pim.serv.deletePreferences(key);
     };
     
     this.getPreferences = function(){
 		return cosmo.app.pim.serv.getPreferences();
     };
 
-    this.setPreferences = function(prefs){
-    	cosmo.app.pim.serv.setPreferences({"javaClass":"java.util.HashMap", "map":prefs});
-        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs])
-    };
-
-    this.setMultiplePreferences = function(prefs){
-    	cosmo.app.pim.serv.setMultiplePreferences({"javaClass":"java.util.HashMap", "map":prefs});
-        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [prefs]);
-    };
-    
 };

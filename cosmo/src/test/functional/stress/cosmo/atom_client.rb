@@ -44,7 +44,7 @@ module Cosmo
           strRequest = "#{COL_PATH}collection/#{collection}/full/#{format}"
         end
         
-        strRequest << "?start-min=#{startRange}&start-max=#{endRange}" if !startRange.nil?
+        strRequest << "?start=#{startRange}&end=#{endRange}" if !startRange.nil?
         req = Net::HTTP::Get.new(strRequest)
         http.read_timeout=600
         # we make an HTTP basic auth by passing the

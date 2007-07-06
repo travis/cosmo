@@ -668,13 +668,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             records.note = this.modifiedOccurrenceToNoteRecord(noteOccurrence);
         else records.note = this.generateEmptyNote(noteOccurrence);
         
-        records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence)
+        // There will always be an event stamp
+        records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence);
         
-        if (modification.getModifiedStamps().task){
-            records.task = this.modifiedOccurrenceToTaskRecord(modification)
-        }
-        if (modification.getModifiedStamps().mail){
-            records.mail = this.modifiedOccurrenceToMailRecord(noteOccurrence)
+        if (modification.getModifiedStamps().task || noteOccurrence.getMaster().getTaskStamp()){
+            records.task = this.noteToTaskRecord(noteOccurrence);
+        } 
+        if (modification.getModifiedStamps().mail || noteOccurrence.getMaster().getMailStamp()){
+            records.mail = this.modifiedOccurrenceToMailRecord(noteOccurrence);
         }
 
         var recordSet =  {
@@ -777,7 +778,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     generateEmptyNote: function (note){
-        var record = this.propsToItemRecord({uuid: note.getUid()});
+        var record = this.propsToNoteRecord({uuid: note.getUid()});
         record.missingFields = [
             "body"
         ];
@@ -939,8 +940,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     noteToTaskRecord: function (note){
-
-        var stamp = note.getTaskStamp();
 
         with (cosmo.service.eim.constants){
             return {

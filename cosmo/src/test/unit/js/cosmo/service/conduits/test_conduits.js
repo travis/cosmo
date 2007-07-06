@@ -291,6 +291,18 @@ cosmotest.service.conduits.test_conduits = {
             item4 = item0Occurrences[0].getMaster().getNoteOccurrence(item4Rid);
             jum.assertEquals("modification deletion didn't work", item4.getMaster().getDisplayName(), item4.getDisplayName());
             
+            // Test for bug 9693
+            item4.getMaster().getTaskStamp(true);
+            conduit.saveItem(item4.getMaster(), {sync: true});
+            
+            jum.assertTrue("task stamping didn't work", !!item4.getMaster().getTaskStamp());
+
+            item4.setDisplayName("booshark");
+            booshark=true
+            conduit.createItem(item4, c0, {sync:true});
+            
+            jum.assertTrue("bug 9693", !!item4.getTaskStamp());
+            
             // Test stamp deletion
             var masterUid = item4.getMaster().getUid()
             item4.getMaster().removeStamp('event');

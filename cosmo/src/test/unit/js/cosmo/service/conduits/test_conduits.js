@@ -298,7 +298,6 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertTrue("task stamping didn't work", !!item4.getMaster().getTaskStamp());
 
             item4.setDisplayName("booshark");
-            booshark=true
             conduit.createItem(item4, c0, {sync:true});
             
             jum.assertTrue("bug 9693", !!item4.getTaskStamp());

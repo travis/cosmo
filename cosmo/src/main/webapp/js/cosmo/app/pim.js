@@ -36,6 +36,7 @@ dojo.require('cosmo.util.uri');
 dojo.require('cosmo.service.conduits.common');
 dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
+dojo.require("cosmo.view.names");
 
 // Global variables for X and Y position for mouse
 xPos = 0;
@@ -50,10 +51,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     // Private variable for the list of any deleted subscriptions
     var deletedSubscriptions = [];
     // Available views
-    this.views = {
-        LIST: 'list',
-        CAL: 'cal'
-    };
+    this.views = cosmo.view.names;
     // The Cosmo service -- used to talk to the backend
     this.serv = null;
     // The base layout for the PIM -- cosmo.ui.ContentBox obj

@@ -22,6 +22,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
 dojo.require("cosmo.view.cal.CalItem");
+dojo.require("cosmo.view.names");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.service');
@@ -35,9 +36,8 @@ dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
 dojo.event.topic.subscribe('/calEvent', cosmo.view.cal, 'handlePub_calEvent');
 // Subscribe to the '/app' channel
 dojo.event.topic.subscribe('/app', cosmo.view.cal, 'handlePub_app');
-dojo.addOnLoad(function(){
-    cosmo.view.cal.viewId = cosmo.app.pim.views.CAL;
-});
+
+cosmo.view.cal.viewId = cosmo.view.names.CAL;
 cosmo.view.cal.viewStart = null;
 cosmo.view.cal.viewEnd = null;
 // The list of items -- cosmo.util.hash.Hash obj

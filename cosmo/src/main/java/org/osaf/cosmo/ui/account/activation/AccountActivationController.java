@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.ui.account.activation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,7 +52,9 @@ public class AccountActivationController extends AbstractController {
         if (user != null){
             user.activate();
             userService.updateUser(user);
-            return new ModelAndView(accountActivationView);    
+            Map<String, Object> model = new HashMap<String, Object>();
+            model.put("user", user);
+            return new ModelAndView(accountActivationView, model);    
         } else {
             return new ModelAndView(notFoundView);
         }

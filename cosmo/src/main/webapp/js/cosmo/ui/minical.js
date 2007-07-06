@@ -74,6 +74,14 @@ cosmo.ui.minical.MiniCal = function (p) {
     function show() {
         self.domNode.style.visibility = 'visible';
     };
+    // FIXME: There is similar logic is dup'd in ...
+    // view.cal.common.triggerLoadEvents
+    // ui.minical.handlePub
+    // ui.minical -- setSelectionSpan private function
+    // ui.navbar._showMonthheader
+    // These different UI widgets have to be independent
+    // of the calendar view, but still display sync'd
+    // information -- what's a good way to consolidate this?
     function setSelectionSpan(dt) {
         viewStart = cosmo.datetime.util.getWeekStart(dt);
         viewEnd = cosmo.datetime.util.getWeekEnd(dt);
@@ -123,8 +131,29 @@ cosmo.ui.minical.MiniCal = function (p) {
         var ev = cmd.data;
         switch (act) {
             case 'loadCollection':
+                // FIXME: There is similar logic is dup'd in ...
+                // view.cal.common.triggerLoadEvents
+                // ui.minical.handlePub
+                // ui.minical -- setSelectionSpan private function
+                // ui.navbar._showMonthheader
+                // These different UI widgets have to be independent
+                // of the calendar view, but still display sync'd
+                // information -- what's a good way to consolidate this?
+                var goToNav = opts.goTo;
+                var queryDate = null;
+                // param is 'back' or 'next'
+                if (typeof goToNav == 'string') {
+                    var key = goToNav.toLowerCase();
+                    var incr = key.indexOf('back') > -1 ? -1 : 1;
+                    queryDate = cosmo.datetime.Date.add(viewStart,
+                        dojo.date.dateParts.WEEK, incr);
+                }
+                // param is actual Date
+                else {
+                    queryDate = goToNav;
+                }
                 // Span of time for selection
-                setSelectionSpan(opts.goTo);
+                setSelectionSpan(queryDate);
                 // If the update originated here at minical,
                 // just update the selection, don't re-render
                 if (opts.source == 'minical') {

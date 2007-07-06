@@ -203,7 +203,17 @@ cosmo.ui.navbar.Bar = function (p) {
         t.appendChild(table);
         d.appendChild(t);
     };
+    // FIXME: There is similar logic is dup'd in ...
+    // view.cal.common.triggerLoadEvents
+    // ui.minical.handlePub
+    // ui.minical -- setSelectionSpan private function
+    // ui.navbar._showMonthheader
+    // These different UI widgets have to be independent
+    // of the calendar view, but still display sync'd
+    // information -- what's a good way to consolidate this?
     this._showMonthHeader = function () {
+        // FIXME; Logic for getting week start / week end is
+        // dup'd in view.cal.common, and ui.minical
         if (!cosmo.view.cal.viewStart || !cosmo.view.cal.viewEnd) {
             var defaultDate = cosmo.app.pim.currDate;
             var vS = cosmo.datetime.util.getWeekStart(defaultDate);

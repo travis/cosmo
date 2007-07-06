@@ -136,6 +136,14 @@ cosmo.view.cal.triggerLoadEvents = function (o) {
     var goToNav = o.goTo;
 
     // Changing dates
+    // FIXME: There is similar logic is dup'd in ...
+    // view.cal.common.triggerLoadEvents
+    // ui.minical.handlePub
+    // ui.minical -- setSelectionSpan private function
+    // ui.navbar._showMonthheader
+    // These different UI widgets have to be independent
+    // of the calendar view, but still display sync'd
+    // information -- what's a good way to consolidate this?
     // --------
     if (goToNav) {
         dojo.debug("goto");

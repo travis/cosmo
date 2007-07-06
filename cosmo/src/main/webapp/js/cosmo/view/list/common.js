@@ -23,6 +23,7 @@ dojo.require("cosmo.app.pim.layout");
 dojo.require('cosmo.view.BaseItem');
 dojo.require('cosmo.view.list.ListItem');
 dojo.require('cosmo.view.dialog');
+dojo.require('cosmo.view.names');
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
@@ -30,9 +31,7 @@ dojo.require("cosmo.service.exception");
 dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
 
 dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
-dojo.addOnLoad(function (){
-    cosmo.view.list.viewId = cosmo.app.pim.views.LIST;
-});
+cosmo.view.list.viewId = cosmo.view.names.LIST;
 
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;

@@ -312,7 +312,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    		this.emailError.innerHTML = _("Signup.Error.RequiredField");
 	    		return false;
 	    	}
-	    	if (!dojo.validate.isEmailAddress(email)){
+	    	if (!dojo.validate.isEmailAddress(email, {allowLocal: true})){
 	    		this.emailError.innerHTML = _("Signup.Error.ValidEMail");
 	    		return false;
 	    	}

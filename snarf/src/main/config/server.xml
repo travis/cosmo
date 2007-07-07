@@ -99,7 +99,7 @@
         <Context path="/cosmo-docs" docBase="cosmo-docs-${pom.version}.war" 
                reloadable="false"/>
  -->
-        <Context path="/cosmo" docBase="cosmo-${pom.version}.war"
+        <Context path="/chandler" docBase="cosmo-${pom.version}.war"
                  reloadable="false">
           <Environment name="cosmo/config" value="file:etc/cosmo.properties"
                        type="java.lang.String" override="false"/>

@@ -476,19 +476,33 @@ cosmo.datetime.Date.prototype.getTimezoneAbbrName = function(){
     return "";
 }
 
-cosmo.datetime.Date.prototype.equals = function (/*cosmo.datetime.Date*/ that){
-return  that != null &&
-        this.year == that.year &&
-        this.month == that.month &&
-        this.date == that.date &&
-        this.hours == that.hours &&
-        this.minutes == that.minutes &&
-        this.seconds == that.seconds &&
-        this.milliseconds == that.milliseconds &&
-        this.tzId == that.tzId &&
-        this.utc == that.utc;
-
+cosmo.datetime.Date.prototype.getCanonicalTzId = function(){
+    if (!this.tzId){
+        return null;
+    }
+    
+    var tz = cosmo.datetime.timezone.getTimezone(this.tzId);
+    
+    if (!tz){
+        return this.tzId;
+    }
+    
+    return tz.tzId;
 }
+    
+cosmo.datetime.Date.prototype.equals = function (/*cosmo.datetime.Date*/ that){
+    return  that != null &&
+            this.year == that.year &&
+            this.month == that.month &&
+            this.date == that.date &&
+            this.hours == that.hours &&
+            this.minutes == that.minutes &&
+            this.seconds == that.seconds &&
+            this.milliseconds == that.milliseconds &&
+            this.getCanonicalTzId() == that.getCanonicalTzId() &&
+            this.utc == that.utc;
+}
+    
 
 cosmo.datetime.Date.prototype.hash = function (){
     var hash =   this.year + ":"

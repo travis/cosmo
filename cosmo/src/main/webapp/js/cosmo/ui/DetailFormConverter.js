@@ -42,7 +42,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         if (!errorMessage){
             errorMessage += this._performInterPropertyValidations(delta);
         }
-        delta.deltafy();
+        delta.deltafy(true);
         return [delta, errorMessage];  
     },
     

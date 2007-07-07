@@ -207,18 +207,36 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         return clone;
     },
           
-    _genericIsChanged: function(propertyName, changedProperty){
+    _genericIsChanged: function(propertyName, changedProperty, looseStringComparisons){
         var getterName = cosmo.model.util.getGetterAndSetterName(propertyName)[0];
         var origProperty = this[getterName]();
-        return !cosmo.model.util.equals(origProperty, changedProperty);
+        return !cosmo.model.util.equals(origProperty, changedProperty, looseStringComparisons);
     }
     
 });
 //instantiate the singleton 
 cosmo.model.util.simplePropertyApplicator = new cosmo.model.util.SimplePropertyApplicator();
 
-cosmo.model.util.equals = function (a,b){
+cosmo.model.util.equals = function (a, b, looseStringComparisons){
+    //summary: generic equals method which takes primitives and objects as operands
+    //description: compares primimives using "==", and makes sure they are of the same type, or
+    //             an error is thrown.
+    //params a,b: things to be compared
+    //param looseStringComparisons: if true the empty string, null and undefined 
+    //                              are treated as equal
+
+    looseStringComparisons = !!looseStringComparisons;
+    
     var type = typeof (a);
+    
+    if (looseStringComparisons){
+        if (a === "" || a == undefined || a == null){
+            return b === "" || b == null || b == undefined;
+        }
+        if (b === "" || b == undefined || b == null){
+            return a === "" || a == null || a == undefined;
+        }
+    }
     
     if (type == "undefined" && typeof b != "undefined"){
         return false;

@@ -109,12 +109,12 @@ dojo.declare("cosmo.model.Delta", null, {
         return true;
     },
       
-    deltafy: function (){
+    deltafy: function ( /*boolean?*/ looseStringComparisons){
         // summary: removes all properties which are the same as its note
         // description: removes all properties from the delta which are the same
         //              same as the properties in its note and its stamps,
         //              leaving you with just the delta, hence "deltafy"
-        this._filterOutEqualProperties(this._note, this._propertyProps);
+        this._filterOutEqualProperties(this._note, this._propertyProps, looseStringComparisons);
         for (var stampName in this._stampProps){
             var stamp = this._note.getStamp(stampName);
             if (stamp == null){
@@ -125,7 +125,7 @@ dojo.declare("cosmo.model.Delta", null, {
             if (stampChanges == null){
                 continue;
             }
-            this._filterOutEqualProperties(stamp, stampChanges);
+            this._filterOutEqualProperties(stamp, stampChanges, looseStringComparisons);
         }
         
         for (var stampName in this._addedStamps){
@@ -283,7 +283,43 @@ dojo.declare("cosmo.model.Delta", null, {
         //HACK - this might break with custom recurrence rules
     },
     
+    toString: function(){
+        var string = "note properties: \n";
+        string += this._propsToString(this._propertyProps, "note");
+        for (var stamp in this._stampProps){
+            string += stamp + " properties: \n";
+            string += this._propsToString(this._stampProps[stamp], stamp);
+        }
+        return string;
+    },
     
+    _propsToString: function(props, stampName){
+        var string = "";
+        for (var propName in props){
+            string += "    " + propName + ": \n";
+            string += "       ORIG:" + this._getOriginalValue(stampName, propName) + "\n";
+            string += "     CHANGE:" + props[propName] + "\n";
+        }
+        return string;
+    },
+    
+    _getOriginalValue: function(stampName, propName){
+        var original = null;
+        if (stampName && stampName != "note"){
+            var stamp = this._note.getStamp(stampName);
+            if (stamp){
+                original = 
+                    stamp[cosmo.model.util.getGetterAndSetterName(propName)[0]]();
+            } else {
+                original = undefined;
+            }
+        } else {
+            original = this._note[cosmo.model.util.getGetterAndSetterName(propName)[0]]();
+        }
+        
+        return original;
+        
+    },
     _needsAutoTriage: function(){
         //summary: determines whether auto triage might be needed. 
         //descripiton: If any properties which might cause a triage change have been changed,
@@ -313,21 +349,21 @@ dojo.declare("cosmo.model.Delta", null, {
     
 
     _apply: function(type, note){
-        dojo.debug("delta._apply(), type: " + type);
+//        dojo.debug("delta._apply(), type: " + type);
         note = note || this._note;
         for (var stampName in this._deletedStamps){
             note.removeStamp(stampName);
         }
         
-        dojo.debug("delta._apply(): adding stamps.");
+//        dojo.debug("delta._apply(): adding stamps.");
         for (var stampName in this._addedStamps){
             note.getStamp(stampName, true);
         }
         
-        dojo.debug("delta._apply(): applying note properties.");
+//        dojo.debug("delta._apply(): applying note properties.");
         this._applyProperties(note, this._propertyProps, type);
         
-        dojo.debug("delta._apply(): applying stamp changes");
+//        dojo.debug("delta._apply(): applying stamp changes");
         for (var stampName in this._stampProps){
             dojo.debug("delta._apply(): applying stamp changes for stamp: " +stampName);
             var stampChanges = this._stampProps[stampName];
@@ -337,11 +373,11 @@ dojo.declare("cosmo.model.Delta", null, {
             }
             
             //create the stamp if it doesn't exist yet
-            dojo.debug("delta._apply():getting Stamp!");
+//            dojo.debug("delta._apply():getting Stamp!");
             var stamp = note.getStamp(stampName,true);
             
             if (stampName == "event"){
-                dojo.debug("delta._apply(): eventStamp application!");
+//                dojo.debug("delta._apply(): eventStamp application!");
                 this._applyPropertiesToEventStamp(stamp, stampChanges, type);
             } else {
                 this._applyProperties(stamp, stampChanges, type);
@@ -379,10 +415,10 @@ dojo.declare("cosmo.model.Delta", null, {
         this._applyProperties(original, changes, type);
     },
     
-    _filterOutEqualProperties: function (original, changes){
+    _filterOutEqualProperties: function (original, changes, looseStringComparisons){
         for (var propName in changes){
             var changeValue = changes[propName];
-            if (!original.isChanged(propName, changeValue)){
+            if (!original.isChanged(propName, changeValue, looseStringComparisons)){
                 delete changes[propName];
             } 
        }

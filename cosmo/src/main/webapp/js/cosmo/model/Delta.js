@@ -370,7 +370,6 @@ dojo.declare("cosmo.model.Delta", null, {
         
 //        dojo.debug("delta._apply(): applying stamp changes");
         for (var stampName in this._stampProps){
-            dojo.debug("delta._apply(): applying stamp changes for stamp: " +stampName);
             var stampChanges = this._stampProps[stampName];
             if (stampChanges == null || this._isEmpty(stampChanges)){
                 dojo.debug("delta.apply(): no actual changes for stamp '" + stampName +"'");

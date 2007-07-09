@@ -161,6 +161,11 @@ dojo.declare("cosmo.model.Delta", null, {
             return {master:true};
         }
          
+        //triage status can only be applied to a single occurrence
+        if (this.getProperty("triageStatus")){
+            return {occurrence:true};
+        }
+        
         var eventStampDeleted = this._deletedStamps["event"];
 
         //if the eventStamp has been deleted, change can only apply to master. 

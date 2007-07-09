@@ -32,7 +32,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         errorMessage += this._populateDelta(delta, "note", true);
         for (var x = 0; x < cosmo.ui.detail.itemStamps.length; x++){
             var stampName = cosmo.ui.detail.itemStamps[x].stampType;
-            dojo.debug("populating stamp: " + stampName);
             var hasFields = cosmo.ui.detail.itemStamps[x].hasBody;
             errorMessage += this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }

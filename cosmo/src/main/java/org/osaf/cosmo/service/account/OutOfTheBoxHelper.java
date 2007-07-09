@@ -78,9 +78,6 @@ public class OutOfTheBoxHelper {
             subtract(BigDecimal.valueOf(1, 2));
         tryOut.getTriageStatus().setRank(tryOutRank);
 
-        NoteItem subscribe = (NoteItem)
-            contentDao.createContent(initial, makeSubscribeItem(context));
-
         NoteItem signUp = (NoteItem)
             contentDao.createContent(initial, makeSignUpItem(context));
 
@@ -168,13 +165,16 @@ public class OutOfTheBoxHelper {
         String name = _("Ootb.TryOut.Title", locale);
         String body = _("Ootb.TryOut.Body", locale);
 
+        TriageStatus triage = TriageStatus.createInitialized();
+        triage.setCode(TriageStatus.CODE_LATER);
+
         item.setUid(contentDao.generateUid());
         item.setName(name);
         item.setDisplayName(item.getName());
         item.setOwner(user);
         item.setClientCreationDate(Calendar.getInstance(tz, locale).getTime());
         item.setClientModifiedDate(item.getClientCreationDate());
-        item.setTriageStatus(TriageStatus.createInitialized());
+        item.setTriageStatus(triage);
         item.setLastModifiedBy(user.getUsername());
         item.setLastModification(ContentItem.Action.CREATED);
         item.setSent(Boolean.FALSE);
@@ -199,35 +199,6 @@ public class OutOfTheBoxHelper {
 
         TaskStamp ts = new TaskStamp();
         item.addStamp(ts);
-
-        return item;
-    }
-
-    private NoteItem makeSubscribeItem(OutOfTheBoxContext context) {
-        NoteItem item = new NoteItem();
-        TimeZone tz= context.getTimeZone();
-        Locale locale = context.getLocale();
-        User user = context.getUser();
-
-        String name = _("Ootb.Subscribe.Title", locale);
-        String body = _("Ootb.Subscribe.Body", locale);
-
-        TriageStatus triage = TriageStatus.createInitialized();
-        triage.setCode(TriageStatus.CODE_LATER);
-
-        item.setUid(contentDao.generateUid());
-        item.setName(name);
-        item.setDisplayName(item.getName());
-        item.setOwner(user);
-        item.setClientCreationDate(Calendar.getInstance(tz, locale).getTime());
-        item.setClientModifiedDate(item.getClientCreationDate());
-        item.setTriageStatus(triage);
-        item.setLastModifiedBy(user.getUsername());
-        item.setLastModification(ContentItem.Action.CREATED);
-        item.setSent(Boolean.FALSE);
-        item.setNeedsReply(Boolean.FALSE);
-        item.setIcalUid(item.getUid());
-        item.setBody(body);
 
         return item;
     }

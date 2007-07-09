@@ -78,7 +78,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
            var endDate = this.getEndDate();
            var oldDate = this.getStartDate();
            this.__setProperty("startDate", newStartDate);
-           
            if (this.getPreserveEndDate() && endDate != null){
                this.setEndDate(endDate);    
            }
@@ -139,6 +138,8 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 var masterDate = this.getMaster().getEventStamp()[getterName]();
                 var newDate = masterDate.clone();
                 newDate.add(dojo.date.dateParts.SECOND, diff);
+                var tzId = changeValue.tzId || (changeValue.utc ? "utc" : null);
+                newDate = newDate.createDateForTimezone(tzId);
                 this.getMaster().getEventStamp()[setterName](newDate);
                 if (propertyName == "startDate"){
                     this.item.recurrenceId.add(dojo.date.dateParts.SECOND,diff);

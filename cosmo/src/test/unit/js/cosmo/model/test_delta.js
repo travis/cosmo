@@ -190,7 +190,24 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
        jum.assertTrue((new cosmo.datetime.Date(2000,0,1,13,0))
             .equals(note.getEventStamp().getStartDate()));
        
-   }
+       
+       //now let's try changing the timezone.
+       var note = getBaseNote();
+       var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date(2000,0,10,12,0));
+       var newStartDate = new cosmo.datetime.Date(2000,0,10,13,0);
+       newStartDate.tzId = "America/Los_Angeles";
+       var delta = new cosmo.model.Delta(occurrence);
+       delta.addStampProperty("event", "startDate", newStartDate);
+       delta.deltafy(occurrence);
+       delta.applyToMaster();
+       var newMasterDate = new cosmo.datetime.Date(2000,0,1,13,0);
+       newMasterDate.tzId = "America/Los_Angeles";
+       jum.assertTrue("Timezone change failed.", newMasterDate
+            .equals(note.getEventStamp().getStartDate()));
+       
+       
+   },
+   
    
    
    //test editing end date on master, from an occurrence delta

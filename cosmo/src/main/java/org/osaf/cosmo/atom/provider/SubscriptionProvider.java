@@ -18,6 +18,8 @@ package org.osaf.cosmo.atom.provider;
 import java.io.IOException;
 import java.text.ParseException;
 
+import javax.activation.MimeTypeParseException;
+
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
@@ -27,6 +29,7 @@ import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
+import org.apache.abdera.util.MimeTypeHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -59,11 +62,12 @@ public class SubscriptionProvider extends BaseProvider
         SubscriptionsTarget target = (SubscriptionsTarget) request.getTarget();
         User user = target.getUser();
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
         try {
-            Entry entry = (Entry) request.getDocument().getRoot();
-            CollectionSubscription sub = readSubscription(entry);
+            CollectionSubscription sub = readSubscription(request);
 
             if (user.getSubscription(sub.getDisplayName()) != null)
                 return conflict(getAbdera(), request,
@@ -79,7 +83,7 @@ public class SubscriptionProvider extends BaseProvider
             ServiceLocator locator = createServiceLocator(request);
             SubscriptionFeedGenerator generator =
                 createSubscriptionFeedGenerator(locator);
-            entry = generator.generateEntry(sub);
+            Entry entry = generator.generateEntry(sub);
 
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument(), 201, "Created");
@@ -137,11 +141,12 @@ public class SubscriptionProvider extends BaseProvider
             log.debug("upudating subscription " + sub.getDisplayName() +
                       " for user " + user.getUsername());
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
         try {
-            Entry entry = (Entry) request.getDocument().getRoot();
-            CollectionSubscription newsub = readSubscription(entry);
+            CollectionSubscription newsub = readSubscription(request);
 
             if (user.getSubscription(newsub.getDisplayName()) != null &&
                 ! user.getSubscription(newsub.getDisplayName()).equals(sub))
@@ -157,7 +162,7 @@ public class SubscriptionProvider extends BaseProvider
             ServiceLocator locator = createServiceLocator(request);
             SubscriptionFeedGenerator generator =
                 createSubscriptionFeedGenerator(locator);
-            entry = generator.generateEntry(sub);
+            Entry entry = generator.generateEntry(sub);
 
             AbstractResponseContext rc =
                 createResponseContext(entry.getDocument());
@@ -284,9 +289,33 @@ public class SubscriptionProvider extends BaseProvider
         return getGeneratorFactory().
             createSubscriptionFeedGenerator(locator);
     }
+    
+    private ResponseContext checkWritePreconditions(RequestContext request) {
+        if (request.getContentLength() <= 0)
+            return lengthrequired(getAbdera(), request, "Length Required");
 
-    private CollectionSubscription readSubscription(Entry entry)
-        throws ValidationException {
+        try {
+            if (! MimeTypeHelper.isAtom(request.getContentType()))
+                return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
+        } catch (MimeTypeParseException e) {
+            return notsupported(getAbdera(), request, "Unable to parse content-type: " + e.getMessage());
+        }
+
+        try {
+            if (! (request.getDocument().getRoot() instanceof Entry))
+                return badrequest(getAbdera(), request, "Entity-body must be an Atom entry");
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e); 
+        }
+
+        return null;
+    }
+
+    private CollectionSubscription readSubscription(RequestContext request)
+        throws IOException, ValidationException {
+        Entry entry = (Entry) request.getDocument().getRoot();
         if (entry.getContentType() == null ||
             ! entry.getContentType().equals(Content.Type.XHTML))
             throw new ValidationException("Content must be XHTML");

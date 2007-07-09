@@ -28,6 +28,7 @@ import org.acegisecurity.ui.AuthenticationEntryPoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
 import org.osaf.cosmo.acegisecurity.providers.ticket.TicketedItemNotFoundException;
 
@@ -55,7 +56,7 @@ public class CosmoAuthenticationEntryPoint
      * <p>
      * For all other requests, returns <code>401</code> and sets the
      * <code>WWW-Authenticate</code> header to
-     * <code>Basic realm="Cosmo Sharing Server"</code>.
+     * <code>Basic realm="Chandler Server"</code>.
      * </p>
      */
     public void commence(ServletRequest request,
@@ -79,7 +80,8 @@ public class CosmoAuthenticationEntryPoint
         } else {
             // all other requests get basic
             httpResponse.addHeader("WWW-Authenticate",
-                                   "Basic realm=\"Cosmo Sharing Server\"");
+                                   "Basic realm=\"" +
+                                    CosmoConstants.PRODUCT_NAME + "\"");
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                    authException.getMessage());
         }

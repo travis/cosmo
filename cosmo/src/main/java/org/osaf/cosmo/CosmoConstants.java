@@ -33,14 +33,14 @@ public class CosmoConstants {
     /**
      * The "friendly" name of the product used for casual identification.
      */
-    public static final String PRODUCT_NAME = "Cosmo Sharing Server";
+    public static final String PRODUCT_NAME = "Chandler Server";
 
     /**
      * A string identifier for Cosmo used to distinguish it from other
      * software products.
      */
     public static final String PRODUCT_ID =
-        "-//Open Source Applications Foundation//NONSGML Cosmo Sharing Server//EN";
+        "-//Open Source Applications Foundation//NONSGML Chandler Server//EN";
 
     /**
      * The URL of the Cosmo product web site.

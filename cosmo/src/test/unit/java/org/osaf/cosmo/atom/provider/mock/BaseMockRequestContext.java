@@ -62,6 +62,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         getMockRequest().setContent(xml.getBytes());
         getMockRequest().setContentType(ATOM_MEDIA_TYPE);
         getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);
+        getMockRequest().addHeader("Content-Length", xml.getBytes().length);
     }
 
     public void setPropertiesAsEntry(Properties props)

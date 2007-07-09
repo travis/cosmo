@@ -92,8 +92,10 @@ public class SubscriptionProvider extends BaseProvider
             rc.setLastModified(sub.getModifiedDate());
 
             try {
-                rc.setLocation(entry.getSelfLink().getHref().toString());
-                rc.setContentLocation(entry.getSelfLink().getHref().toString());
+                String location = locator.getAtomBase() +
+                    entry.getSelfLink().getHref().toString();
+                rc.setLocation(location);
+                rc.setContentLocation(location);
             } catch (Exception e) {
                 throw new RuntimeException("Error parsing self link href", e);
             }

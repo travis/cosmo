@@ -249,3 +249,16 @@ hr {
 	font-weight: bold;
 }
 
+
+/* 
+ * Account signup related styles
+ */
+#tosLinkLabel {
+	padding-left: 1em;
+}
+
+#tosElemCell {
+	width: 100%;
+	text-align: center;
+	margin-top: 1em;
+}

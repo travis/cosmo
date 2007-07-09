@@ -135,6 +135,15 @@ cosmo.util.validate = new function () {
         }
         return err;
     }
+    
+    this.tosChecked = function(s) {
+        var err = '';
+        var val = typeof s == 'object' ? s.value : s;
+        if (!s.checked){
+            err = _('Signup.Error.TOS');
+        }
+        return err;
+    }
 }
 
 cosmo.util.validate.constructor = null;

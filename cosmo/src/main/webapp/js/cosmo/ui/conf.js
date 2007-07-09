@@ -60,6 +60,9 @@ cosmo.ui.conf.timeoutDialogAutoLogout = 30
 // current page's url is https
 cosmo.ui.conf.httpSupported="false";
 
+// Are terms of service required?
+cosmo.ui.conf.tosRequired=false;
+
 //****************** End Overidable Defaults. *********************************
 
 cosmo.ui.conf.load = function (uri){

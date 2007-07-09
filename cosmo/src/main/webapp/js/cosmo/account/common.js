@@ -120,6 +120,19 @@ cosmo.account.getFieldList = function (accountInfo) {
     f.value = a[f.elemName];
     list.push(f);
 
+    // If this is a new account creation attempt
+    // and Terms of Service are required
+    if (!accountInfo && cosmo.ui.conf.tosRequired){
+        f = { label: _('Signup.Form.TOS'),
+            elemName: 'tos',
+            elemType: 'checkbox'
+        };
+        f.validators = function (elem) {
+            return cosmo.util.validate.tosChecked(elem); };
+        f.value = a[f.elemName];
+        list.push(f);
+    }
+
     return list;
 };
 
@@ -152,49 +165,50 @@ cosmo.account.getFormTable = function (fieldList, callingContext) {
         table.style.width = '100%';
     }
     table.style.margin = 'auto';
+    
+    table.appendChild(body);
+    form.appendChild(table);
 
     var inputs = [];
 
-    // Table row for each form field
+    // Table row for each form field except TOS link
     for (var i = 0; i < fieldList.length; i++) {
         var f = fieldList[i];
-        var type = f.elemType;
+        if (f.elemName == 'tos') {
+            form.appendChild(cosmo.account.createTosInput(f));
+        } else {
+            var type = f.elemType;
 
-        // Create row
-        tr = _createElem('tr');
+            // Create row
+            tr = _createElem('tr');
 
-        // Label cell
-        td = _createElem('td');
-        td.id = f.elemName + 'LabelCell';
-        td.className = 'labelTextHoriz labelTextCell';
-        // Label
-        td.appendChild(_createText(f.label + ':'));
-        td.style.width = '1%';
-        tr.appendChild(td);
+            // Label cell
+            td = _createElem('td');
+            td.id = f.elemName + 'LabelCell';
+            td.className = 'labelTextHoriz labelTextCell';
+            // Label
+            td.appendChild(_createText(f.label + ':'));
+            td.style.width = '1%';
+            tr.appendChild(td);
 
-        // Form field cell
-        td = _createElem('td');
-        td.id = f.elemName + 'ElemCell';
-        // Form field
-        elem = _createElem('input');
-        elem.type = f.elemType;
-        elem.name = f.elemName;
-        elem.id = f.elemName;
-        elem.maxlength = type == 'text' ? 32 : 16;
-        elem.size = type == 'text' ? 32 : 16;
-        elem.style.width = type == 'text' ? '240px' : '140px';
-        elem.className = 'inputText';
-        elem.value = f.value || '';
-        dojo.event.connect(elem, 'onfocus', callingContext, 'handleInputFocusChange');
-        dojo.event.connect(elem, 'onblur', callingContext, 'handleInputFocusChange');
-        inputs.push(elem);
-        td.appendChild(elem);
+            // Form field cell
+            td = _createElem('td');
+            td.id = f.elemName + 'ElemCell';
 
-        tr.appendChild(td);
-        body.appendChild(tr);
+            var elem = cosmo.account.fieldToElement(f);
+            elem.maxlength = type == 'text' ? 32 : 16;
+            elem.size = type == 'text' ? 32 : 16;
+            elem.style.width = type == 'text' ? '240px' : '140px';
+            elem.className = 'inputText';
+            dojo.event.connect(elem, 'onfocus', callingContext, 'handleInputFocusChange');
+            dojo.event.connect(elem, 'onblur', callingContext, 'handleInputFocusChange');
+            inputs.push(elem);
+            td.appendChild(elem);
+
+            tr.appendChild(td);
+            body.appendChild(tr);
+        }
     }
-    table.appendChild(body);
-    form.appendChild(table);
 
     // BANDAID: Hack to get the checkbox into Safari's
     // form elements collection
@@ -202,6 +216,34 @@ cosmo.account.getFormTable = function (fieldList, callingContext) {
         cosmo.util.html.addInputsToForm(inputs, form);
     }
     return form;
+};
+
+cosmo.account.fieldToElement = function (field){
+        // Form field cell
+        td = _createElem('td');
+        td.id = field.elemName + 'ElemCell';
+        // Form field
+        elem = _createElem('input');
+        elem.type = field.elemType;
+        elem.name = field.elemName;
+        elem.id = field.elemName;
+        elem.value = field.value || '';
+        return elem;
+};
+
+cosmo.account.createTosInput = function (tosField){
+    var tosDiv = _createElem('div');
+    tosDiv.id = "tosElemCell"
+
+    var lab = _createElem('span');
+    lab.id = "tosLinkLabel";
+    lab.appendChild(_createText(tosField.label))
+
+    var input = cosmo.account.fieldToElement(tosField)
+
+    tosDiv.appendChild(input);
+    tosDiv.appendChild(lab);
+    return tosDiv;
 };
 
 /**

@@ -125,7 +125,7 @@ public class StandardSubscriptionFeedGenerator
      */
     protected Feed createFeed(User user)
         throws GeneratorException {
-        Feed feed = newFeed(user.getUsername()); // XXX: sufficiently unique?
+        Feed feed = newFeed(user.getUsername() + "-subscriptions");
 
         String title = user.getUsername() + "'s Subscriptions"; // XXX: i18n
         feed.setTitle(title);
@@ -186,34 +186,6 @@ public class StandardSubscriptionFeedGenerator
         entry.setContentAsXhtml(formatter.format(sub, collection, ticket));
 
         return entry;
-    }
-
-    /**
-     * <p>
-     * Creates a collection extension <code>Element</code> for the given
-     * collection uid based on the provided collection.
-     * </p>
-     * <p>
-     * If the collection is null then the element has an
-     * <code>exists</code> attribute with value
-     * <code>false</code>.
-     *
-     * @param uid the collection uid
-     * @param the collection described by the element; may be null
-     * @throws GeneratorException
-     */
-    protected Element newCollection(String uid,
-                                    CollectionItem collection)
-        throws GeneratorException {
-        Element extension = getFactory().getAbdera().getFactory().
-            newExtensionElement(QN_COLLECTION);
-        if (collection == null)
-            extension.setAttributeValue(QN_EXISTS, "false");
-        String href = getLocator().getAtomCollectionUrl(uid, false);
-        extension.setAttributeValue("href", href);
-        extension.setText(uid);
-
-        return extension;
     }
 
     /**

@@ -16,6 +16,11 @@
 	left: 30%
 }
 
+.aboutChandlerServer {
+	width: 100%;
+	text-align: center;
+}
+
 /* Title Bar */
 .dialogTitleBar{
     height: 20px;
@@ -140,27 +145,15 @@ Link styles
  * http://chandlerproject.org/Journal/CosmoSignUpWorkflow
  */
 .mainInfoBox{
-	position: relative;
-
 	border-left:1px solid lightgrey;
 	border-right:1px solid lightgrey;
 	border-bottom:0px;
 	border-top:0px;
-	bottom: 0;
-	left: 30%;
-	width: 40%;
 	height: 100%;
-	padding-right: 15px;		
-	padding-left: 15px;		
+	margin-right: 20%;
+	margin-left: 20%;
 	padding-top: 20px;
 	text-align: center;
-}
-
-.mainInfoBox>p{
-	padding-bottom: 20px;	
-	width: 40em;
-	margin-left: auto;
-	margin-right: auto;
 }
 
 #contentDiv{

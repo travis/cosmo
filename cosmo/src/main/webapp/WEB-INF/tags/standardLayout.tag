@@ -123,6 +123,7 @@
       <!-- end page body -->
     </div>
     <div id="debug"></div>
+    <div class="aboutChandlerServer"><cosmo:aboutPopupLink/></span>
   </body>
 </html>
 

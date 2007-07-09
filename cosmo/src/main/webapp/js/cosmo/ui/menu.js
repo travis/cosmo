@@ -24,6 +24,7 @@ dojo.require('cosmo.account.preferences');
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.hash");
+dojo.require("cosmo.util.popup");
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.account.settings');
 dojo.require('cosmo.account.create');
@@ -137,6 +138,12 @@ cosmo.ui.menu.allItems = [
     { id: 'signupMenuItem',
         displayText: _('Main.SignUp'),
         onclickFunc: function () { cosmo.account.create.showForm() },
+        displayMode: cosmo.ui.menu.displayModes.ANON,
+        requiredRoles: []
+        },
+    { id: 'aboutMenuItem',
+        displayText: _('Main.About'),
+        onclickFunc: function () {cosmo.util.popup.open(cosmo.env.getBaseUrl() + '/help/about', 360, 280)},
         displayMode: cosmo.ui.menu.displayModes.ANON,
         requiredRoles: []
         },

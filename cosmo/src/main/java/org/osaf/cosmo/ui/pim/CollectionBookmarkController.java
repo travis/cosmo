@@ -82,35 +82,30 @@ public class CollectionBookmarkController extends AbstractController {
 
         if (ticketKey != null) {
             Ticket ticket = contentService.getTicket(collection, ticketKey);
-            if (ticket != null){
-
+            if (ticket != null) {
                 Map<String, String> relationLinks = serviceLocatorFactory.
-                    createServiceLocator(request, ticket, false).getCollectionUrls(collection);
-
+                    createServiceLocator(request, ticket, false).
+                    getCollectionUrls(collection);
                 model.put("relationLinks", relationLinks);
-            
                 model.put("ticketKey", ticketKey);
                 return new ModelAndView(pimView, model);
             } else {
                 return new ModelAndView("error_forbidden");
             }
-            
-
         } else {
-
             // If we can't find a ticket principal, use the current user.
-            User currentUser = userService.getUser(
-                    securityManager.getSecurityContext().getUser().getUsername());
-            
-            if (collection.getOwner().equals(currentUser)
-                || currentUser.isSubscribedTo(collection)){
-                
+            User authUser = securityManager.getSecurityContext().getUser();
+            if (authUser != null) {
+                User currentUser =
+                    userService.getUser(authUser.getUsername());
+                if (collection.getOwner().equals(currentUser) ||
+                    currentUser.isSubscribedTo(collection))
                 return new ModelAndView(pimView, model);
-            } else {
-                return new ModelAndView("error_forbidden");
             }
         }
-        
+
+        // when all else fails...
+        return new ModelAndView("error_forbidden");
     }
 
     public void setPimView(String pimView) {

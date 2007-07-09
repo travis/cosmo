@@ -30,8 +30,18 @@ dojo.require("cosmo.service.exception");
 
 dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
 
+// Subscribe to the '/calEvent' channel
 dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
+// Subscribe to the '/app' channel
+dojo.event.topic.subscribe('/app', cosmo.view.list, 'handlePub_app');
+
 cosmo.view.list.viewId = cosmo.view.names.LIST;
+// Stupid order-of-loading -- this gets set in the
+// canvas instance. We'll just go ahead and declare
+// it here anyway, so there's an obvious declaration
+cosmo.view.list.canvasInstance =
+    typeof cosmo.view.list.canvasInstance == 'undefined' ?
+    null : cosmo.view.list.canvasInstance;
 
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;

@@ -215,6 +215,9 @@ cosmo.ui.detail.DetailViewForm = function (p) {
             case 'saveFailed':
                 //self.setButtons(true, true);
                 break;
+            case 'saveFromForm':
+                cosmo.ui.detail.saveItem(); 
+                break;
             default:
                 // Do nothing
                 break;
@@ -498,6 +501,8 @@ cosmo.ui.detail.StampSection = function (p) {
         // Put the toggling checkbox in its own form -- not related
         // to the form proper that has actual values for the stamp
         var f = _createElem('form');
+        // Kill form submission
+        f.onsubmit = function () { return false; };
         var ch = _createElem('input');
         ch.type = 'checkbox';
         ch.id = id + 'EnableToggle';
@@ -625,6 +630,8 @@ cosmo.ui.detail.StampFormElements = function () {
     this.enabled = false;
     // Hint text for text inputs, default dimmed states, etc.
     this.elementDefaultStates = {};
+    // Kill form submission
+    this.formNode.onsubmit = function () { return false; };
 
     // Private methods
     // -------
@@ -733,6 +740,8 @@ cosmo.ui.detail.MainSection = function () {
     var _html = cosmo.util.html;
     var d = _createElem('div');
     var f = _createElem('form');
+    // Kill form submission
+    f.onsubmit = function () { return false; };
 
     d.id = 'mainFormSection';
     d.style.padding = '4px 8px 8px 8px';

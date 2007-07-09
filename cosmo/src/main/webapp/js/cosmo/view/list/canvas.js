@@ -37,11 +37,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.domNode = null;
     this.id = '';
     this.view = cosmo.view.list;
-    //this.currSelectedId = '';
+    // Set self to the view's canvasInstance
+    this.view.canvasInstance = this;
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
     this.selectedItemIdRegistry = {};
-    //this.currSelectedItem = null;
     this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';
     this.itemsPerPage = 20;
@@ -76,6 +76,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     this.renderSelf = function () {
+        
+        // Rendering can be messages published to calEvent
+        // or by window resizing
         if (!cosmo.view.list.isCurrentView()) { return false; }
 
         var reg = this.view.itemRegistry;

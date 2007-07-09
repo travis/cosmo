@@ -34,6 +34,18 @@ cosmo.view.list.ListItem = function () {
 }
 cosmo.view.list.ListItem.prototype = new cosmo.view.BaseItem();
 
+/**
+ * Is the item currently in a 'processing' state -- i.e.,
+ * is something being done to it server-side
+ * FIXME: This is a stub, have to decide how/if disabling
+ * items in list view works
+ */
+cosmo.view.cal.ListItem.prototype.isDisabled = function () {
+    return false; 
+};
+/**
+ * Restores item to its state previous to an aborted save
+ */
 cosmo.view.list.ListItem.prototype.cancelSave = function () {
     this.restoreFromSnapshot();
 };

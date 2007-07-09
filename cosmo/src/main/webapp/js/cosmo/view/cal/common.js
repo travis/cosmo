@@ -38,6 +38,12 @@ dojo.event.topic.subscribe('/calEvent', cosmo.view.cal, 'handlePub_calEvent');
 dojo.event.topic.subscribe('/app', cosmo.view.cal, 'handlePub_app');
 
 cosmo.view.cal.viewId = cosmo.view.names.CAL;
+// Stupid order-of-loading -- this gets set in the
+// canvas instance. We'll just go ahead and declare
+// it here anyway, so there's an obvious declaration
+cosmo.view.cal.canvasInstance =
+    typeof cosmo.view.cal.canvasInstance == 'undefined' ?
+    null : cosmo.view.cal.canvasInstance;
 cosmo.view.cal.viewStart = null;
 cosmo.view.cal.viewEnd = null;
 // The list of items -- cosmo.util.hash.Hash obj
@@ -71,61 +77,6 @@ cosmo.view.cal.handlePub_calEvent = function (cmd) {
         default:
             // Do nothing
             break;
-    }
-};
-/**
- * Handle events published on the '/app' channel -- app-wide
- * events
- * @param cmd A JS Object, the command containing orders for
- * how to handle the published event.
- */
-cosmo.view.cal.handlePub_app = function (cmd) {
-
-    if (!cosmo.view.cal.isCurrentView()) { return false; }
-
-    var e = cmd.appEvent;
-    var t = cmd.type;
-    // Handle keyboard input
-    if (t == 'keyboardInput') {
-        // Grab any elem above the event that has an id
-        var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
-        var ev = cosmo.view.cal.canvas.getSelectedItem();
-        switch (e.keyCode) {
-            // Enter key
-            case 13:
-                // Go-to date
-                if (elem.id.toLowerCase() == 'jumpto') {
-                    //cosmo.app.pim.calForm.goJumpToDate();
-                }
-                // Save an event from the Enter key -- requires:
-                //  * a selected event, not in 'processing' state
-                //  * Enter key input from either one of the event
-                //    detail form text inputs, or the document body
-                //  * Write access for the current collection
-                // Currently all other text inputs belong to the event detail form
-                // FIXME -- check for custom prop that says this field belongs
-                // to the event detail form
-                else if (ev && !ev.lozenge.getInputDisabled() &&
-                    ((elem.id == 'body') || (elem.className == 'inputText' &&
-                        elem.type == 'text')) &&
-                    cosmo.app.pim.currentCollection.isWriteable()) {
-                    dojo.event.topic.publish('/calEvent',
-                        { 'action': 'saveFromForm' });
-                }
-                break;
-            // Delete key
-            case 46:
-                // Remove an event from the Delete key -- requires:
-                //  * A selected event, not in 'processing' state
-                //  * Enter key input must be from the document body
-                //  * Write access for the current collection
-                if (ev && !ev.lozenge.getInputDisabled() && (elem.id == 'body') &&
-                    cosmo.app.pim.currentCollection.isWriteable()) {
-                    dojo.event.topic.publish('/calEvent',
-                        { 'action': 'removeConfirm', 'data': ev });
-                }
-                break;
-        }
     }
 };
 

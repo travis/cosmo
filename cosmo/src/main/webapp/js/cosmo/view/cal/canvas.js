@@ -62,6 +62,8 @@ cosmo.view.cal.canvas = new function () {
     this.dayUnitWidth = 0;
     // Set this value from the view
     this.view = cosmo.view.cal;
+    // Set self to the view's canvasInstance
+    this.view.canvasInstance = self;
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
     this.selectedItemIdRegistry = {};
@@ -1361,6 +1363,8 @@ cosmo.view.cal.canvas.Canvas = function (p) {
     for (var n in params) { this[n] = params[n]; }
     this.renderSelf = function () {
 
+        // Rendering can be messages published to calEvent
+        // or by window resizing
         if (!cosmo.view.cal.isCurrentView()) { return false; }
 
         this.width = this.parent.width;

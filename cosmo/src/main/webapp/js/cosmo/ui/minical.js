@@ -234,6 +234,8 @@ cosmo.ui.minical.MiniCal = function (p) {
             cosmo.util.html.setTextInput(tInput, 'mm/dd/yyyy', true, false);
             dojo.event.connect(tInput, 'onfocus', cosmo.util.html,
                 'handleTextInputFocus');
+            dojo.event.connect(tInput, 'onkeyup', self,
+                'handleKeyUp');
             td.appendChild(f);
             tr.appendChild(td);
 
@@ -755,6 +757,17 @@ cosmo.ui.minical.MiniCal = function (p) {
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: d },
                     data: {} });
+        }
+    };
+    this.handleKeyUp = function (e) {
+        // Accept Enter key input
+        if (e.keyCode == 13) {
+            self.doGoToDate();
+            // Stop the keyup event from propagating
+            // otherwise the Enter key input will continue
+            // on to *close* the error dialog box. :)
+            e.stopPropagation();
+            return false;
         }
     };
     /**

@@ -30,14 +30,14 @@ cosmo.view.viewBase = new function () {
      * WARNING: this destroys the itemRegistry (Hash) that is passed into it!
      *
      * @param reg An itemRegistry Hash from which to remove a group or
-     * groups of recurring items 
+     * groups of recurring items
      * @param arr Array of Item ids for the recurrences to
      * remove
      * @param dt A cosmo.datetime.Date,represents the end date of a
      * recurrence -- if the dt param is present, it will remove
      * only the item occurrences which occur after the date
      * It will also reset the recurrence endDate for all dates
-     * to the dt (the new recurrence end date) for all the items 
+     * to the dt (the new recurrence end date) for all the items
      * that it leaves
      * @param ignore String, the CalItem id of a single item to ignore from
      * the removal process -- used when you need to leave the
@@ -82,6 +82,72 @@ cosmo.view.viewBase = new function () {
         }
         return h;
     };
+    /**
+     * Handle events published on the '/app' channel -- app-wide
+     * events
+     * @param cmd A JS Object, the command containing orders for
+     * how to handle the published event.
+     */
+    this.handlePub_app = function (cmd) {
+
+        if (!this.isCurrentView()) { return false; }
+
+        var e = cmd.appEvent;
+        var t = cmd.type;
+        var isValidEventSource = function (e, elem) {
+            // Source of keyboard input should be
+            // either the doc body, or a cal event lozenge
+            var isValidDomNode = ((elem.id == 'body') ||
+                (elem.id.indexOf('eventDiv') > -1));
+            // Accept input from text elems, not textareas
+            // (enter/delete needs to work normally in textarea)
+            var isValidFormElem = ((elem.className == 'inputText' &&
+                elem.type == 'text'));
+            var testByCode = {
+                // Enter
+                13: function () { return isValidDomNode || isValidFormElem },
+                // Delete -- can't work in text boxes
+                46: function () { return isValidDomNode }
+            };
+            return testByCode[e.keyCode]();
+        }
+        // Handle keyboard input
+        if (t == 'keyboardInput') {
+            // Don't bother executing all these tests unless it's the Enter
+            // or Delete key -- use case statement here so we can cleanly 
+            // add other keys as needed
+            switch (e.keyCode) {
+                case 13:
+                case 46:
+                    // Must have a currently selected item and a 
+                    // writable collection, and the caret/focus has
+                    // to be somewhere appropriate for the key input
+                    // in question
+                    // Find whwatever elem in the DOM hier above 
+                    // the event source that has an id
+                    var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+                    // Currently selected item, if any
+                    var item = this.canvasInstance.getSelectedItem();
+                    if (item &&
+                        cosmo.app.pim.currentCollection.isWriteable() &&
+                        isValidEventSource(e, elem)) {
+                        switch (e.keyCode) {
+                            // Enter
+                            case 13:
+                                dojo.event.topic.publish('/calEvent',
+                                    { 'action': 'saveFromForm' });
+                                break;
+                            // Delete
+                            case 46:
+                                dojo.event.topic.publish('/calEvent',
+                                    { 'action': 'removeConfirm', 'data': item });
+                                break;
+                        }
+                    }
+                    break;
+            }
+        }
+    };
 };
 
 cosmo.view.canvasBase = new function () {
@@ -97,7 +163,7 @@ cosmo.view.canvasBase = new function () {
         this.selectedItemIdRegistry[key] = id;
         return true;
     };
-    this.clearSelectedItem = function (ev) {
+    this.clearSelectedItem = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         this.selectedItemIdRegistry[key] = '';
         return true;

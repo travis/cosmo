@@ -59,8 +59,14 @@ cosmo.view.cal.CalItem = function(id, lozenge) {
 cosmo.view.cal.CalItem.prototype = new cosmo.view.BaseItem();
 
 /**
- * Allows the user to cancel before saving changes to an event
- * Restores event to its position previous to the aborted save
+ * Is the item currently in a 'processing' state -- i.e.,
+ * is something being done to it server-side
+ */
+cosmo.view.cal.CalItem.prototype.isDisabled = function () {
+    return this.lozenge.getInputDisabled()
+};
+/**
+ * Restores event to its position previous to an aborted save
  */
 cosmo.view.cal.CalItem.prototype.cancelSave = function () {
     this.restoreEvent();

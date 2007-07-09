@@ -267,13 +267,18 @@ cosmo.ui.navbar.Bar = function (p) {
         var func = cosmo.util.html.handleTextInputFocus;
         cosmo.util.html.setTextInput(text, _('Main.NavBar.QuickItemEntryHint'), true);
         dojo.event.connect(text, 'onfocus', func);
-
         f.appendChild(text);
         f.appendChild(cosmo.util.html.nbsp());
         var func = function () {
             var title = f.listViewQuickItemEntry.value;
             cosmo.view.list.createNoteItem(title);
         };
+        dojo.event.connect(text, 'onkeyup', function (e) {
+            if (e.keyCode == 13) {
+                func();
+                e.stopPropagation();
+            }
+        });
         button = dojo.widget.createWidget("cosmo:Button", {
             text: _('App.Button.Create'),
             handleOnClick: func,

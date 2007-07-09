@@ -65,7 +65,7 @@ public class StandardServiceGenerator
      * <dt>{@link ServiceGenerator#WORKSPACE_ACCOUNT}</dt>
      * <dd>Contains an Atom collection for each of the local
      * collections (those on the same server) that the user to which
-     * the user is subscribed.
+     * the user is subscriptions.
      * </dl>
      *
      * @param the user
@@ -89,7 +89,7 @@ public class StandardServiceGenerator
         Workspace mw = createAccountWorkspace();
         service.addWorkspace(mw);
 
-        mw.addCollection(createSubscribedCollection(user));
+        mw.addCollection(createSubscriptionsCollection(user));
         mw.addCollection(createPreferencesCollection(user));
 
         return service;
@@ -168,22 +168,22 @@ public class StandardServiceGenerator
     }
 
     /**
-     * Creates the <code>subscribed Collection</code> describing a
+     * Creates the <code>subscriptions Collection</code> describing a
      * user's collection subscriptions.
      *
      * @param user the user
      * @throws GeneratorException
      */
-    protected Collection createSubscribedCollection(User user)
+    protected Collection createSubscriptionsCollection(User user)
         throws GeneratorException {
         Collection collection =
             factory.getAbdera().getFactory().newCollection();
-        String href = serviceLocator.getAtomUrl(user, false) + "/subscribed";
+        String href = serviceLocator.getAtomUrl(user, false) + "/subscriptions";
 
         try {
             collection.setAccept("entry");
             collection.setHref(href);
-            collection.setTitle(COLLECTION_SUBSCRIBED);
+            collection.setTitle(COLLECTION_SUBSCRIPTIONS);
         } catch (IRISyntaxException e) {
             throw new GeneratorException("Attempted to set invalid collection href " + href, e);
         }

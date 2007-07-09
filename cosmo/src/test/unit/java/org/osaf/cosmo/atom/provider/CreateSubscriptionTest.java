@@ -21,7 +21,7 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.provider.mock.MockSubscribedRequestContext;
+import org.osaf.cosmo.atom.provider.mock.MockSubscriptionsRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
 
 /**
@@ -100,9 +100,9 @@ public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase {
 
     private RequestContext createRequestContext(CollectionSubscription sub)
         throws Exception {
-        MockSubscribedRequestContext rc =
-            new MockSubscribedRequestContext(helper.getServiceContext(),
-                                             helper.getUser(), "POST");
+        MockSubscriptionsRequestContext rc =
+            new MockSubscriptionsRequestContext(helper.getServiceContext(),
+                                                helper.getUser(), "POST");
         rc.setXhtmlContentAsEntry(serialize(sub));
         return rc;
     }

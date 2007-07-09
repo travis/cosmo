@@ -56,7 +56,7 @@ public class SubscriptionProvider extends BaseProvider
     // Provider methods
 
     public ResponseContext createEntry(RequestContext request) {
-        SubscribedTarget target = (SubscribedTarget) request.getTarget();
+        SubscriptionsTarget target = (SubscriptionsTarget) request.getTarget();
         User user = target.getUser();
 
         // XXX: check write preconditions?
@@ -191,10 +191,11 @@ public class SubscriptionProvider extends BaseProvider
     }
 
     public ResponseContext getFeed(RequestContext request) {
-        SubscribedTarget target = (SubscribedTarget) request.getTarget();
+        SubscriptionsTarget target = (SubscriptionsTarget) request.getTarget();
         User user = target.getUser();
         if (log.isDebugEnabled())
-            log.debug("getting subscribed feed for user " + user.getUsername());
+            log.debug("getting subscriptions feed for user " +
+                      user.getUsername());
 
         try {
             ServiceLocator locator = createServiceLocator(request);

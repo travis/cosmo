@@ -31,7 +31,7 @@ public interface ServiceGenerator {
 
     public static final String WORKSPACE_HOME = "home";
     public static final String WORKSPACE_ACCOUNT = "account";
-    public static final String COLLECTION_SUBSCRIBED = "subscribed";
+    public static final String COLLECTION_SUBSCRIPTIONS = "subscriptions";
     public static final String COLLECTION_PREFERENCES = "preferences";
 
     /**
@@ -52,7 +52,7 @@ public interface ServiceGenerator {
      * subscriptions and preferences. These collections include:
      * </p>
      * <dl>
-     * <dt><code>subscribed</code></dt>
+     * <dt><code>subscriptions</code></dt>
      * <dd>Lists the user's collection subscriptions.</dd>
      * <dt><code>preferences</code></dt>
      * <dd>Lists the user's preferences.</dd>

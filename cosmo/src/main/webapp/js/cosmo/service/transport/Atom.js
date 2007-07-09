@@ -81,7 +81,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         
         var r = {};
         r.url = cosmo.env.getBaseUrl() +
-          "/atom/user/" + cosmo.util.auth.getUsername() + "/subscribed";
+          "/atom/user/" + cosmo.util.auth.getUsername() + "/subscriptions";
 
         return this.bind(r, kwArgs);
     },
@@ -190,7 +190,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
         var r = {};
         r.url = cosmo.env.getBaseUrl() + "/atom/user/" + 
-            cosmo.util.auth.getUsername() + "/subscribed";
+            cosmo.util.auth.getUsername() + "/subscriptions";
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "POST";

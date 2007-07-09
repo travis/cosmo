@@ -20,30 +20,30 @@ import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.provider.SubscribedTarget;
+import org.osaf.cosmo.atom.provider.SubscriptionsTarget;
 import org.osaf.cosmo.model.User;
 
 /**
  * Mock implementation of {@link RequestContext} representing requests
- * to the user subscribed collection.
+ * to the user subscriptions collection.
  */
-public class MockSubscribedRequestContext extends BaseMockRequestContext {
+public class MockSubscriptionsRequestContext extends BaseMockRequestContext {
     private static final Log log =
-        LogFactory.getLog(MockSubscribedRequestContext.class);
+        LogFactory.getLog(MockSubscriptionsRequestContext.class);
 
-    public MockSubscribedRequestContext(ServiceContext context,
-                                        User user) {
+    public MockSubscriptionsRequestContext(ServiceContext context,
+                                           User user) {
         this(context, user, "GET");
     }
 
-    public MockSubscribedRequestContext(ServiceContext context,
-                                        User user,
-                                        String method) {
+    public MockSubscriptionsRequestContext(ServiceContext context,
+                                           User user,
+                                           String method) {
         super(context, method, toRequestUri(user));
-        this.target = new SubscribedTarget(this, user);
+        this.target = new SubscriptionsTarget(this, user);
     }
 
     private static String toRequestUri(User user) {
-        return TEMPLATE_SUBSCRIBED.bind(user.getUsername());
+        return TEMPLATE_SUBSCRIPTIONS.bind(user.getUsername());
     }
 }

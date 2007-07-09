@@ -21,14 +21,15 @@ import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.atom.provider.mock.MockSubscribedRequestContext;
+import org.osaf.cosmo.atom.provider.mock.MockSubscriptionsRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
 
 /**
  * Test class for {@link SubscriptionProvider#getFeed()} tests.
  */
-public class GetSubscribedTest extends BaseSubscriptionProviderTestCase {
-    private static final Log log = LogFactory.getLog(GetSubscribedTest.class);
+public class GetSubscriptionsTest extends BaseSubscriptionProviderTestCase {
+    private static final Log log =
+        LogFactory.getLog(GetSubscriptionsTest.class);
 
     public void testGetSubscriptionFeed() throws Exception {
         RequestContext req = createRequestContext();
@@ -51,7 +52,7 @@ public class GetSubscribedTest extends BaseSubscriptionProviderTestCase {
     }
 
     public RequestContext createRequestContext() {
-        return new MockSubscribedRequestContext(helper.getServiceContext(),
-                                                helper.getUser());
+        return new MockSubscriptionsRequestContext(helper.getServiceContext(),
+                                                   helper.getUser());
     }
 }

@@ -132,7 +132,7 @@ public class StandardSubscriptionFeedGenerator
         feed.setUpdated(new Date());
         feed.setGenerator(newGenerator());
         feed.addAuthor(newPerson(user));
-        feed.addLink(newSelfLink(subscribedIri(user)));
+        feed.addLink(newSelfLink(subscriptionsIri(user)));
 
         return feed;
     }
@@ -217,13 +217,13 @@ public class StandardSubscriptionFeedGenerator
     }
 
     /**
-     * Returns the IRI of the given user's subscribed collection.
+     * Returns the IRI of the given user's subscriptions collection.
      *
      * @param user the user
      */
-    protected String subscribedIri(User user) {
+    protected String subscriptionsIri(User user) {
         StringBuffer iri = new StringBuffer(personIri(user));
-        iri.append("/subscribed");
+        iri.append("/subscriptions");
         return iri.toString();
     }
 

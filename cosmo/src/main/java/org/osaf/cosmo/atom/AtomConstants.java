@@ -109,8 +109,8 @@ public interface AtomConstants {
         new UriTemplate("/item/{uid}/{projection}?/{format}?");
     public static final UriTemplate TEMPLATE_EXPANDED =
         new UriTemplate("/expanded/{uid}/{projection}?/{format}?");
-    public static final UriTemplate TEMPLATE_SUBSCRIBED =
-        new UriTemplate("/user/{username}/subscribed");
+    public static final UriTemplate TEMPLATE_SUBSCRIPTIONS =
+        new UriTemplate("/user/{username}/subscriptions");
     public static final UriTemplate TEMPLATE_SUBSCRIPTION =
         new UriTemplate("/user/{username}/subscription/{name}");
     public static final UriTemplate TEMPLATE_PREFERENCES =

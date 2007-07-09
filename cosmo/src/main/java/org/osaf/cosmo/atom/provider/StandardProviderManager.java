@@ -42,7 +42,7 @@ public class StandardProviderManager implements ProviderManager {
             return expandedItemProvider;
         if (target instanceof BaseItemTarget)
             return itemProvider;
-        if (target instanceof SubscribedTarget ||
+        if (target instanceof SubscriptionsTarget ||
             target instanceof SubscriptionTarget)
             return subscriptionProvider;
         if (target instanceof PreferencesTarget ||

@@ -85,9 +85,9 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
         if (match != null)
             return createExpandedItemTarget(context, match);
 
-        match = TEMPLATE_SUBSCRIBED.match(uri);
+        match = TEMPLATE_SUBSCRIPTIONS.match(uri);
         if (match != null)
-            return createSubscribedTarget(context, match);
+            return createSubscriptionsTarget(context, match);
 
         match = TEMPLATE_SUBSCRIPTION.match(uri);
         if (match != null)
@@ -164,14 +164,14 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
     }
 
     /**
-     * Creates a target representing the subscribed collection.
+     * Creates a target representing the subscriptions collection.
      */
-    protected Target createSubscribedTarget(RequestContext context,
-                                            UriTemplate.Match match) {
+    protected Target createSubscriptionsTarget(RequestContext context,
+                                               UriTemplate.Match match) {
         User user = userService.getUser(match.get("username"));
         if (user == null)
             return null;
-        return new SubscribedTarget(context, user);
+        return new SubscriptionsTarget(context, user);
     }
 
     /**

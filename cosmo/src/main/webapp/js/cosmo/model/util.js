@@ -303,17 +303,18 @@ cosmo.model._occurrenceSetProperty = function (propertyName, value){
     var masterProperty = this._getMasterProperty(propertyName);
 
     //is there a modification?
-
     var modification = master.getModification(this.recurrenceId);
     if (modification){
+        //has this particular property been set already on the modification?
         if (!typeof(this._getModifiedProperty(propertyName)) == "undefined"){
             this._setModifiedProperty(propertyName, value);
             return;                    
-        } else if (!cosmo.model.util.equals(value, masterProperty)){
+        } else {
             this._setModifiedProperty(propertyName, value);
             return;
         }
     } 
+
     //if the new value is the same as the master property, 
     // no need to do anything
     if (cosmo.model.util.equals(value, masterProperty)){

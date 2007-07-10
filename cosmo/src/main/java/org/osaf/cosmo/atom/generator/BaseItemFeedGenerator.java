@@ -21,8 +21,11 @@ import java.util.TreeSet;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
+import org.apache.abdera.util.Constants;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
@@ -34,8 +37,6 @@ import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
-import org.osaf.cosmo.util.MimeUtil;
-
 /**
  * A base class for feed generators that work with collectoins and items.
  *
@@ -224,7 +225,7 @@ public abstract class BaseItemFeedGenerator
         Feed feed = newFeed(item.getUid());
 
         feed.setTitle(item.getDisplayName());
-        feed.setUpdated(item.getClientModifiedDate());
+        feed.setUpdated(item.getModifiedDate());
         feed.setGenerator(newGenerator());
         feed.addAuthor(newPerson(item.getOwner()));
         feed.addLink(newSelfLink(item));
@@ -379,7 +380,7 @@ public abstract class BaseItemFeedGenerator
      */
     protected Link newEditLink(CollectionItem collection)
         throws GeneratorException {
-        return newLink(Link.REL_EDIT, MimeUtil.MEDIA_TYPE_XHTML,
+        return newLink(Link.REL_EDIT, Constants.XHTML_MEDIA_TYPE,
                        selfIri(collection, false));
     }
 

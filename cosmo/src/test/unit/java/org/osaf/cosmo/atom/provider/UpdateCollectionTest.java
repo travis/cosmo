@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.util.MimeUtil;
 
 /**
  * Test class for {@link ItemProvider#updateCollection()} tests.
@@ -49,16 +48,6 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
         assertNotNull("Null last modified", res.getLastModified());
         assertEquals("Display name not updated", collection.getDisplayName(),
                      "New Name");
-    }
-
-    public void testUpdateCollectionWrongContentType() throws Exception {
-        CollectionItem collection = helper.makeAndStoreDummyCollection(); 
-        RequestContext req = createRequestContext(collection, null);
-        helper.setContentType(req, "multipart/form-data");
-
-        ResponseContext res = provider.updateCollection(req);
-        assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 415, res.getStatus());
     }
 
     public void testUpdateCollectionNullName() throws Exception {

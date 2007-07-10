@@ -69,7 +69,6 @@ import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
-import org.osaf.cosmo.util.MimeUtil;
 
 public class ItemProvider extends BaseProvider implements AtomConstants {
     private static final Log log = LogFactory.getLog(ItemProvider.class);
@@ -313,11 +312,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             Feed feed = generator.generateFeed(collection);
 
-            AbstractResponseContext rc =
-                createResponseContext(feed.getDocument());
-            rc.setEntityTag(new EntityTag(collection.getEntityTag()));
-            rc.setLastModified(collection.getModifiedDate());
-            return rc;
+            return ok(feed, collection);
         } catch (InvalidQueryException e) {
             return badrequest(getAbdera(), request, e.getMessage());
         } catch (UnsupportedProjectionException e) {
@@ -394,10 +389,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         if (log.isDebugEnabled())
             log.debug("updating details for collection " + collection.getUid());
 
-        try {
-            if (! MimeUtil.isXhtml(request.getContentType()))
-                return notsupported(getAbdera(), request, "Entity-body must be " + MimeUtil.MEDIA_TYPE_XHTML);
+        ResponseContext frc = checkCollectionWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
+        try {
             CollectionItem content = readCollection(request);
 
             if (! content.getDisplayName().
@@ -408,12 +404,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 collection = contentService.updateCollection(collection);
             }
 
-            AbstractResponseContext rc = createResponseContext(204);
-            rc.setEntityTag(new EntityTag(collection.getEntityTag()));
-            rc.setLastModified(collection.getModifiedDate());
-            return rc;
-        } catch (MimeTypeParseException e) {
-            return notsupported(getAbdera(), request, "Invalid content type");
+            return updated(collection);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);

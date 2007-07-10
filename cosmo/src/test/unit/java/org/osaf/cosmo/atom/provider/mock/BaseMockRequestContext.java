@@ -100,6 +100,8 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         getMockRequest().setContent(content.getBytes());
         getMockRequest().setContentType("text/plain");
         getMockRequest().addHeader("Content-Type", "text/plain");
+        getMockRequest().addHeader("Content-Length",
+                                   content.getBytes().length);
     }
 
     public void setContentAsXhtml(String content)
@@ -108,5 +110,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext
             getMockRequest().setContent(content.getBytes());
         getMockRequest().setContentType("application/xhtml+xml");
         getMockRequest().addHeader("Content-Type", "application/xhtml+xml");
+        getMockRequest().addHeader("Content-Length",
+                                   content.getBytes().length);
     }
 }

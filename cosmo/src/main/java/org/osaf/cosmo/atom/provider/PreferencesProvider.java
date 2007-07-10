@@ -53,7 +53,7 @@ public class PreferencesProvider extends BaseProvider
         PreferencesTarget target = (PreferencesTarget) request.getTarget();
         User user = target.getUser();
 
-        ResponseContext frc = checkWritePreconditions(request);
+        ResponseContext frc = checkEntryWritePreconditions(request);
         if (frc != null)
             return frc;
 
@@ -118,7 +118,7 @@ public class PreferencesProvider extends BaseProvider
             log.debug("upudating preference " + pref.getKey() + " for user " +
                       user.getUsername());
 
-        ResponseContext frc = checkWritePreconditions(request);
+        ResponseContext frc = checkEntryWritePreconditions(request);
         if (frc != null)
             return frc;
 

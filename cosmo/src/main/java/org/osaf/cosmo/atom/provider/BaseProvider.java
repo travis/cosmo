@@ -150,7 +150,23 @@ public abstract class BaseProvider extends AbstractProvider
             throw new IllegalStateException("serviceLocatorFactory is required");
     }
 
-    protected ResponseContext checkWritePreconditions(RequestContext request) {
+    protected ResponseContext
+        checkCollectionWritePreconditions(RequestContext request) {
+        if (request.getContentLength() <= 0)
+            return lengthrequired(getAbdera(), request, "Length Required");
+
+        try {
+            if (! MimeTypeHelper.isXhtml(request.getContentType()))
+                return notsupported(getAbdera(), request, "Content-Type must be " + Constants.XHTML_MEDIA_TYPE);
+        } catch (MimeTypeParseException e) {
+            return notsupported(getAbdera(), request, "Unable to parse content-type: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    protected ResponseContext
+        checkEntryWritePreconditions(RequestContext request) {
         if (request.getContentLength() <= 0)
             return lengthrequired(getAbdera(), request, "Length Required");
 
@@ -180,7 +196,20 @@ public abstract class BaseProvider extends AbstractProvider
     }
 
     protected ResponseContext ok(Feed feed) {
-        return createResponseContext(feed.getDocument());
+        return ok(feed, null);
+    }
+
+    protected ResponseContext ok(Feed feed,
+                                 AuditableObject auditable) {
+        AbstractResponseContext rc =
+            createResponseContext(feed.getDocument());
+
+        if (auditable != null) {
+            rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
+            rc.setLastModified(auditable.getModifiedDate());
+        }
+
+        return rc;
     }
 
     protected ResponseContext ok(Entry entry,
@@ -222,6 +251,17 @@ public abstract class BaseProvider extends AbstractProvider
             rc.setContentLocation(location);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing self link href", e);
+        }
+
+        return rc;
+    }
+
+    protected ResponseContext updated(AuditableObject auditable) {
+        AbstractResponseContext rc = createResponseContext(204);
+
+        if (auditable != null) {
+            rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
+            rc.setLastModified(auditable.getModifiedDate());
         }
 
         return rc;

@@ -57,15 +57,15 @@ cosmotest.model.test_eventStamp = {
         var occurrenceDate = new cosmo.datetime.Date(2007,0,8,13,0);
         var occurrence = note.getNoteOccurrence(occurrenceDate);
         var occurStamp = occurrence.getEventStamp();
-        jum.assertTrue(occurrenceDate.equals(occurStamp.getStartDate()));
+        jum.assertTrue("Occurence start date is inherited.", occurrenceDate.equals(occurStamp.getStartDate()));
     
         //test overriding start on an occurrence
         var newOccurrenceStart = new cosmo.datetime.Date(2007,0,8,14,0);
         occurStamp.setStartDate(newOccurrenceStart);
-        jum.assertTrue(newOccurrenceStart.equals(occurStamp.getStartDate()));
+        jum.assertTrue("Occurrence start date is overridden", newOccurrenceStart.equals(occurStamp.getStartDate()));
         
         //see if the enddate is set properly
-        jum.assertTrue( (new cosmo.datetime.Date(2007,0,8,15,0)).equals(occurStamp.getEndDate()));
+        jum.assertEquals("Occurrence end date has changed properly", (new cosmo.datetime.Date(2007,0,8,15,0)).equals(occurStamp.getEndDate()));
         
         //make sure the original stamp didn't get messed with
         jum.assertTrue(stamp.getStartDate().equals(new cosmo.datetime.Date(2007,0,1,13,0)));

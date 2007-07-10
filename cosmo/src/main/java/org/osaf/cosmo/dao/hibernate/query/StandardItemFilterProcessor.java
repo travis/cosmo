@@ -40,7 +40,6 @@ import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
-import org.osaf.cosmo.model.filter.MissingStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.filter.StampFilter;
 import org.osaf.cosmo.model.filter.TextAttributeFilter;
@@ -55,8 +54,6 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     private static final Log log = LogFactory.getLog(StandardItemFilterProcessor.class);
     
     public StandardItemFilterProcessor() {}
-    
-    
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor#processFilter(org.hibernate.Session, org.osaf.cosmo.model.filter.ItemFilter)
@@ -141,6 +138,8 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         for(AttributeFilter attrFilter: filter.getAttributeFilters()) {
             if(attrFilter instanceof TextAttributeFilter)
                 handleTextAttributeFilter(selectBuf, whereBuf, params, (TextAttributeFilter) attrFilter);
+            else
+                handleAttributeFilter(selectBuf, whereBuf, params, attrFilter);
         }
     }
     
@@ -161,18 +160,36 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         for(StampFilter stampFilter: filter.getStampFilters()) {
             if(stampFilter instanceof EventStampFilter)
                 handleEventStampFilter(selectBuf, whereBuf, params, (EventStampFilter) stampFilter);
-            else if(stampFilter instanceof MissingStampFilter)
-                handleMissingStampFilter(selectBuf, whereBuf, params, (MissingStampFilter) stampFilter);
+            else
+                handleStampFilter(selectBuf, whereBuf, params, stampFilter);
         }
     }
     
-    private void handleMissingStampFilter(StringBuffer selectBuf,
+    private void handleStampFilter(StringBuffer selectBuf,
             StringBuffer whereBuf, HashMap<String, Object> params,
-            MissingStampFilter filter) {
+            StampFilter filter) {
         
-        String toAppend = "not exists (select s.id from Stamp s where s.item=i and s.class="
-                + filter.getMissingStampClass().getSimpleName() + ")";
+        String toAppend = "";
+        if(filter.isMissing())
+            toAppend += "not ";
+        toAppend += "exists (select s.id from Stamp s where s.item=i and s.class="
+                    + filter.getStampClass().getSimpleName() + ")";
         appendWhere(whereBuf, toAppend);
+    }
+    
+    private void handleAttributeFilter(StringBuffer selectBuf,
+            StringBuffer whereBuf, HashMap<String, Object> params,
+            AttributeFilter filter) {
+        
+        String param = "param" + params.size();
+        String toAppend = "";
+        if(filter.isMissing())
+            toAppend += "not ";
+        
+        toAppend += "exists (select a.id from Attribute a where a.item=i and a.QName=:"
+                + param + ")";
+        appendWhere(whereBuf, toAppend);
+        params.put(param, filter.getQname());
     }
     
     private void handleEventStampFilter(StringBuffer selectBuf,

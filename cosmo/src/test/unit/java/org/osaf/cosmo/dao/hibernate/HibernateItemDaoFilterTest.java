@@ -35,8 +35,8 @@ import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
-import org.osaf.cosmo.model.filter.MissingStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.StampFilter;
 
 /**
  * Test findItems() api in ItemDao.
@@ -189,7 +189,10 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
         ItemFilter filter = new NoteItemFilter();
         filter.setParent(calendar1);
-        filter.getStampFilters().add(new MissingStampFilter(EventStamp.class));
+        StampFilter missingStamp = new StampFilter();
+        missingStamp.setStampClass(EventStamp.class);
+        missingStamp.setMissing(true);
+        filter.getStampFilters().add(missingStamp);
         
         Set<Item> results = contentDao.findItems(filter);
         Assert.assertEquals(2, results.size());
@@ -299,7 +302,10 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter2.setParent(calendar1);
         filter2.setIsModification(false);
         
-        MissingStampFilter missingFilter = new MissingStampFilter(EventStamp.class);
+        
+        StampFilter missingFilter = new StampFilter();
+        missingFilter.setStampClass(EventStamp.class);
+        missingFilter.setMissing(true);
         filter2.setParent(calendar1);
         filter2.getStampFilters().add(missingFilter);
         

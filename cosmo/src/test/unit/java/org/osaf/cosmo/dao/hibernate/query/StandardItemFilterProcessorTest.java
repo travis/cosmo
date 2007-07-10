@@ -26,12 +26,14 @@ import org.osaf.cosmo.dao.hibernate.AbstractHibernateDaoTestCase;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
-import org.osaf.cosmo.model.filter.MissingStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.StampFilter;
 
 
 /**
@@ -159,12 +161,29 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and es.item=i and ((es.timeRangeIndex.dateStart < case when es.timeRangeIndex.isFloating=true then '20070101T040000' else '20070101T100000Z' end and es.timeRangeIndex.dateEnd > case when es.timeRangeIndex.isFloating=true then '20070101T040000' else '20070101T100000Z' end) or (es.timeRangeIndex.dateStart >= case when es.timeRangeIndex.isFloating=true then '20070101T040000' else '20070101T100000Z' end and es.timeRangeIndex.dateStart < case when es.timeRangeIndex.isFloating=true then '20070201T040000' else '20070201T100000Z' end))", query.getQueryString());
     }
     
-    public void testMissingStampQuery() throws Exception {
+    public void testBasicStampQuery() throws Exception {
         NoteItemFilter filter = new NoteItemFilter();
-        MissingStampFilter missingFilter = new MissingStampFilter(EventStamp.class);
+        StampFilter missingFilter = new StampFilter();
+        missingFilter.setStampClass(EventStamp.class);
         filter.getStampFilters().add(missingFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where exists (select s.id from Stamp s where s.item=i and s.class=EventStamp)", query.getQueryString());
+        missingFilter.setMissing(true);
+        query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from NoteItem i where not exists (select s.id from Stamp s where s.item=i and s.class=EventStamp)", query.getQueryString());
+    }
+    
+    public void testBasicAttributeQuery() throws Exception {
+        NoteItemFilter filter = new NoteItemFilter();
+        AttributeFilter missingFilter = new AttributeFilter();
+        missingFilter.setQname(new QName("ns","name"));
+        filter.getAttributeFilters().add(missingFilter);
+        Query query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where exists (select a.id from Attribute a where a.item=i and a.QName=:param0)", query.getQueryString());
+        missingFilter.setMissing(true);
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from NoteItem i where not exists (select a.id from Attribute a where a.item=i and a.QName=:param0)", query.getQueryString());
+        query.list();
     }
 
 }

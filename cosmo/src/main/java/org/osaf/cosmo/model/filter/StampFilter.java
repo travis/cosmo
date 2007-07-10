@@ -17,10 +17,38 @@ package org.osaf.cosmo.model.filter;
 
 
 /**
- * Represents a filter that matches an Item's stamp.
+ * Represents a filter that matches an Item with
+ * a specified Stamp.
  *
  */
-public abstract class StampFilter {
+public class StampFilter {
   
-    public abstract String getType();
+    private boolean isMissing = false;
+    private Class stampClass = null;
+    
+    public boolean isMissing() {
+        return isMissing;
+    }
+    
+    /**
+     * If true, match Items that do not have the
+     * specified Stamp.
+     * @param isMissing
+     */
+    public void setMissing(boolean isMissing) {
+        this.isMissing = isMissing;
+    }
+    
+    public Class getStampClass() {
+        return stampClass;
+    }
+    
+    /**
+     * Match Items that contain the specified Stamp
+     * type.
+     * @param stampClass
+     */
+    public void setStampClass(Class stampClass) {
+        this.stampClass = stampClass;
+    }
 }

@@ -19,11 +19,13 @@ import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.QName;
 
 /**
- * A filter that matches an Item with a given attribute.
+ * A filter that matches an Item with a given Attribute.
  */
-public abstract class AttributeFilter {
+public class AttributeFilter {
+    
     private QName qname;
-   
+    private boolean isMissing = false;
+    
     public AttributeFilter() {}
     
     public AttributeFilter(Attribute attribute) {
@@ -40,5 +42,18 @@ public abstract class AttributeFilter {
      */
     public void setQname(QName qname) {
         this.qname = qname;
+    }
+    
+    public boolean isMissing() {
+        return isMissing;
+    }
+    
+    /**
+     * If true, this filter matches items that do not 
+     * contain the specified Attribute.
+     * @param isMissing
+     */
+    public void setMissing(boolean isMissing) {
+        this.isMissing = isMissing;
     }
 }

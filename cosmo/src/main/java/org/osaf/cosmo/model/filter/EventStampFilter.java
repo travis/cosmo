@@ -143,11 +143,6 @@ public class EventStampFilter extends StampFilter {
         this.isRecurring = isRecurring;
     }
 
-    @Override
-    public String getType() {
-        return "EventStamp";
-    }
-
     private void updateFloatingTimes() {
         if(dstart!=null) {
             Value v = dstart instanceof DateTime ?

@@ -166,8 +166,9 @@ public class StandardPreferencesFeedGenerator
         Date now = new Date();
 
         entry.setTitle(pref.getKey());
-        entry.setUpdated(now);
-        entry.setPublished(now);
+        entry.setUpdated(pref.getModifiedDate());
+        entry.setEdited(pref.getModifiedDate());
+        entry.setPublished(pref.getCreationDate());
         if (isDocument)
             entry.addAuthor(newPerson(pref.getUser()));
         entry.addLink(newSelfLink(iri));

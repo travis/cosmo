@@ -261,6 +261,7 @@ public abstract class BaseItemFeedGenerator
 
         entry.setTitle(item.getDisplayName());
         entry.setUpdated(item.getModifiedDate());
+        entry.setEdited(item.getModifiedDate());
         entry.setPublished(item.getCreationDate());
         if (isDocument)
             entry.addAuthor(newPerson(item.getOwner()));

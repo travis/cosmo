@@ -176,6 +176,7 @@ public class StandardSubscriptionFeedGenerator
 
         entry.setTitle(sub.getDisplayName());
         entry.setUpdated(sub.getModifiedDate());
+        entry.setEdited(sub.getModifiedDate());
         entry.setPublished(sub.getCreationDate());
         if (isDocument)
             entry.addAuthor(newPerson(sub.getOwner()));

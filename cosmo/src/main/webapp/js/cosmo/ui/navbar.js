@@ -107,6 +107,11 @@ cosmo.ui.navbar.Bar = function (p) {
             }
         }
         else if (v == _pim.views.CAL) {
+            // Set up topic subscriptions in the canvas -- published
+            // message "data has loaded" tells the canvas to render
+            if (!_view.canvas.hasBeenRendered) {
+                _view.canvas.init();
+            }
             // Only switch views if the data for the view loads successfully
             if (_view.loadEvents()) {
                 self.listCanvas.domNode.style.display = 'none';

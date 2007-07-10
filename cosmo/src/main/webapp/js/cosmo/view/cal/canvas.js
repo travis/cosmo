@@ -76,6 +76,12 @@ cosmo.view.cal.canvas = new function () {
 
     // Public methods
     // ****************
+    this.init = function () {
+        // Subscribe to the '/calEvent' channel
+        dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+        // Subscribe to the '/app' channel
+        dojo.event.topic.subscribe('/app', self, 'handlePub_app');
+    };
     /**
      * Main rendering function for the calendar canvas called
      * on init load, and week-to-week nav
@@ -93,22 +99,6 @@ cosmo.view.cal.canvas = new function () {
         var hoursNode = null;
         var dayNameHeadersNode = null;
         var allDayColsNode = null;
-
-        /**
-         * Set up key container elements
-         * @return Boolean, true.
-         */
-        function init() {
-            // Link local variables to DOM nodes
-            monthHeaderNode = $('monthHeaderDiv');
-            timelineNode = $('timedHourListDiv');
-            dayNameHeadersNode = $('dayListDiv');
-            hoursNode = $('timedContentDiv');
-            allDayColsNode = $('allDayContentDiv');
-
-            // All done, woot
-            return true;
-        }
 
         /**
          * Shows list of days at the head of each column in the week view
@@ -389,7 +379,12 @@ cosmo.view.cal.canvas = new function () {
         // Do it!
         // -----------
         // Init and call all the rendering functions
-        init();
+        // Link local variables to DOM nodes
+        monthHeaderNode = $('monthHeaderDiv');
+        timelineNode = $('timedHourListDiv');
+        dayNameHeadersNode = $('dayListDiv');
+        hoursNode = $('timedContentDiv');
+        allDayColsNode = $('allDayContentDiv');
         showMonthHeader();
         showDayNameHeaders();
         showAllDayCols();
@@ -528,13 +523,6 @@ cosmo.view.cal.canvas = new function () {
         pos = parseInt(pos);
         return pos;
     };
-
-    // Topic subscriptions
-    // ****************
-    // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
-    // Subscribe to the '/app' channel
-    dojo.event.topic.subscribe('/app', self, 'handlePub_app');
 
     /**
      * Handle events published on the '/calEvent' channel, including

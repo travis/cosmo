@@ -19,14 +19,18 @@ import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.server.provider.AbstractProvider;
 import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.BaseResponseContext;
@@ -34,12 +38,16 @@ import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
+import org.apache.abdera.util.Constants;
+import org.apache.abdera.util.EntityTag;
+import org.apache.abdera.util.MimeTypeHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
+import org.osaf.cosmo.model.AuditableObject;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.util.DateUtil;
@@ -142,10 +150,115 @@ public abstract class BaseProvider extends AbstractProvider
             throw new IllegalStateException("serviceLocatorFactory is required");
     }
 
+    protected ResponseContext checkWritePreconditions(RequestContext request) {
+        if (request.getContentLength() <= 0)
+            return lengthrequired(getAbdera(), request, "Length Required");
+
+        try {
+            if (! MimeTypeHelper.isAtom(request.getContentType()))
+                return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
+        } catch (MimeTypeParseException e) {
+            return notsupported(getAbdera(), request, "Unable to parse content-type: " + e.getMessage());
+        }
+
+        try {
+            if (! (request.getDocument().getRoot() instanceof Entry))
+                return badrequest(getAbdera(), request, "Entity-body must be an Atom entry");
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e); 
+        }
+
+        return null;
+    }
+
     protected ServiceLocator createServiceLocator(RequestContext context) {
         HttpServletRequest request =
             ((HttpServletRequestContext)context).getRequest();
         return serviceLocatorFactory.createServiceLocator(request);
+    }
+
+    protected ResponseContext ok(Feed feed) {
+        return createResponseContext(feed.getDocument());
+    }
+
+    protected ResponseContext ok(Entry entry,
+                                 AuditableObject auditable) {
+         AbstractResponseContext rc =
+             createResponseContext(entry.getDocument());
+
+         if (auditable != null) {
+             rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
+             rc.setLastModified(auditable.getModifiedDate());
+         }
+
+         // override Abdera which sets content type to include the
+         // type attribute because IE chokes on it
+         rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+
+         return rc;
+    }
+
+    protected ResponseContext created(Entry entry,
+                                      AuditableObject auditable,
+                                      ServiceLocator locator) {
+        AbstractResponseContext rc =
+            createResponseContext(entry.getDocument(), 201, "Created");
+
+        if (auditable != null) {
+            rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
+            rc.setLastModified(auditable.getModifiedDate());
+        }
+
+        // override Abdera which sets content type to include the
+        // type attribute because IE chokes on it
+        rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+
+        try {
+            String location = locator.getAtomBase() +
+                entry.getSelfLink().getHref().toString();
+            rc.setLocation(location);
+            rc.setContentLocation(location);
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing self link href", e);
+        }
+
+        return rc;
+    }
+
+    protected ResponseContext updated(Entry entry,
+                                      AuditableObject auditable,
+                                      ServiceLocator locator,
+                                      boolean locationChanged) {
+        AbstractResponseContext rc =
+            createResponseContext(entry.getDocument());
+
+        if (auditable != null) {
+            rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
+            rc.setLastModified(auditable.getModifiedDate());
+        }
+
+        // override Abdera which sets content type to include the
+        // type attribute because IE chokes on it
+        rc.setContentType(Constants.ATOM_MEDIA_TYPE);
+
+        if (locationChanged) {
+            try {
+                String location = locator.getAtomBase() +
+                    entry.getSelfLink().getHref().toString();
+                rc.setLocation(location);
+                rc.setContentLocation(location);
+            } catch (Exception e) {
+                throw new RuntimeException("Error parsing self link href", e);
+            }
+        }
+
+        return rc;
+    }
+
+    protected ResponseContext deleted() {
+        return createResponseContext(204);
     }
 
     protected ResponseContext preconditionfailed(Abdera abdera,

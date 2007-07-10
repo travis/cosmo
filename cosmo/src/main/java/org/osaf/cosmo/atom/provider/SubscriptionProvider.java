@@ -18,20 +18,12 @@ package org.osaf.cosmo.atom.provider;
 import java.io.IOException;
 import java.text.ParseException;
 
-import javax.activation.MimeTypeParseException;
-
 import org.apache.abdera.model.Content;
-import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
-import org.apache.abdera.util.Constants;
-import org.apache.abdera.util.EntityTag;
-import org.apache.abdera.util.MimeTypeHelper;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,22 +77,7 @@ public class SubscriptionProvider extends BaseProvider
                 createSubscriptionFeedGenerator(locator);
             Entry entry = generator.generateEntry(sub);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument(), 201, "Created");
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            rc.setEntityTag(new EntityTag(sub.getEntityTag()));
-            rc.setLastModified(sub.getModifiedDate());
-
-            try {
-                String location = locator.getAtomBase() +
-                    entry.getSelfLink().getHref().toString();
-                rc.setLocation(location);
-                rc.setContentLocation(location);
-            } catch (Exception e) {
-                throw new RuntimeException("Error parsing self link href", e);
-            }
-
-            return rc;
+            return created(entry, sub, locator);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
@@ -128,7 +105,7 @@ public class SubscriptionProvider extends BaseProvider
         user.removeSubscription(sub);
         userService.updateUser(user);
 
-        return createResponseContext(204);
+        return deleted();
     }
   
     public ResponseContext deleteMedia(RequestContext request) {
@@ -155,6 +132,7 @@ public class SubscriptionProvider extends BaseProvider
                 return conflict(getAbdera(), request,
                                 "Named subscription exists");
 
+            String oldName = sub.getDisplayName();
             sub.setDisplayName(newsub.getDisplayName());
             sub.setCollectionUid(newsub.getCollectionUid());
             sub.setTicketKey(newsub.getTicketKey());
@@ -166,13 +144,8 @@ public class SubscriptionProvider extends BaseProvider
                 createSubscriptionFeedGenerator(locator);
             Entry entry = generator.generateEntry(sub);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument());
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            rc.setEntityTag(new EntityTag(sub.getEntityTag()));
-            rc.setLastModified(sub.getModifiedDate());
-
-            return rc;
+            boolean locationChanged = ! oldName.equals(sub.getDisplayName());
+            return updated(entry, sub, locator, locationChanged);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
@@ -210,8 +183,7 @@ public class SubscriptionProvider extends BaseProvider
                 createSubscriptionFeedGenerator(locator);
             Feed feed = generator.generateFeed(user);
 
-            // no entity tag for this synthetic feed
-            return createResponseContext(feed.getDocument());
+            return ok(feed);
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
             log.error(reason, e);
@@ -233,14 +205,7 @@ public class SubscriptionProvider extends BaseProvider
                 createSubscriptionFeedGenerator(locator);
             Entry entry = generator.generateEntry(sub);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument());
-            rc.setEntityTag(new EntityTag(sub.getEntityTag()));
-            rc.setLastModified(sub.getModifiedDate());
-            // override Abdera which sets content type to include the
-            // type attribute because IE chokes on it
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            return rc;
+            return ok(entry, sub);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -290,29 +255,6 @@ public class SubscriptionProvider extends BaseProvider
         createSubscriptionFeedGenerator(ServiceLocator locator) {
         return getGeneratorFactory().
             createSubscriptionFeedGenerator(locator);
-    }
-    
-    private ResponseContext checkWritePreconditions(RequestContext request) {
-        if (request.getContentLength() <= 0)
-            return lengthrequired(getAbdera(), request, "Length Required");
-
-        try {
-            if (! MimeTypeHelper.isAtom(request.getContentType()))
-                return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
-        } catch (MimeTypeParseException e) {
-            return notsupported(getAbdera(), request, "Unable to parse content-type: " + e.getMessage());
-        }
-
-        try {
-            if (! (request.getDocument().getRoot() instanceof Entry))
-                return badrequest(getAbdera(), request, "Entity-body must be an Atom entry");
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e); 
-        }
-
-        return null;
     }
 
     private CollectionSubscription readSubscription(RequestContext request)

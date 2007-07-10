@@ -20,6 +20,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -80,6 +81,27 @@ public abstract class AuditableObject extends BaseModelObject {
         this.modifiedDate = modifiedDate;
     }
 
+    /**
+     * <p>
+     * Returns a string representing the state of the object. Entity tags can
+     * be used to compare two objects in remote environments where the
+     * equals method is not available.
+     * </p>
+     * <p>
+     * This implementation simply returns the empty string. Subclasses should
+     * override it when necessary.
+     * </p>
+     */
+    @Transient
+    public String getEntityTag() {
+        return "";
+    }
+
+    /**
+     * <p>
+     * Returns a Base64-encoded SHA-1 digest of the provided bytes.
+     * </p>
+     */
     protected String encodeEntityTag(byte[] bytes) {
         return new String(etagEncoder.encode(etagDigest.digest(bytes)));
     }

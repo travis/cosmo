@@ -21,11 +21,8 @@ import java.text.ParseException;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
-import org.apache.abdera.util.Constants;
-import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,11 +53,12 @@ public class PreferencesProvider extends BaseProvider
         PreferencesTarget target = (PreferencesTarget) request.getTarget();
         User user = target.getUser();
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
         try {
-            Entry entry = (Entry) request.getDocument().getRoot();
-            Preference pref = readPreference(entry);
+            Preference pref = readPreference(request);
 
             if (user.getPreference(pref.getKey()) != null)
                 return conflict(getAbdera(), request, "Preference exists");
@@ -75,22 +73,9 @@ public class PreferencesProvider extends BaseProvider
             ServiceLocator locator = createServiceLocator(request);
             PreferencesFeedGenerator generator =
                 createPreferencesFeedGenerator(locator);
-            entry = generator.generateEntry(pref);
-
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument(), 201, "Created");
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            rc.setEntityTag(new EntityTag(pref.getEntityTag()));
-            rc.setLastModified(pref.getModifiedDate());
-
-            try {
-                rc.setLocation(entry.getSelfLink().getHref().toString());
-                rc.setContentLocation(entry.getSelfLink().getHref().toString());
-            } catch (Exception e) {
-                throw new RuntimeException("Error parsing self link href", e);
-            }
-
-            return rc;
+            Entry entry = generator.generateEntry(pref);
+            
+            return created(entry, pref, locator);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
@@ -118,7 +103,7 @@ public class PreferencesProvider extends BaseProvider
         user.removePreference(pref);
         userService.updateUser(user);
 
-        return createResponseContext(204);
+        return deleted();
     }
   
     public ResponseContext deleteMedia(RequestContext request) {
@@ -133,16 +118,18 @@ public class PreferencesProvider extends BaseProvider
             log.debug("upudating preference " + pref.getKey() + " for user " +
                       user.getUsername());
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
         try {
-            Entry entry = (Entry) request.getDocument().getRoot();
-            Preference newpref = readPreference(entry);
+            Preference newpref = readPreference(request);
 
             if (user.getPreference(newpref.getKey()) != null &&
                 ! user.getPreference(newpref.getKey()).equals(pref))
                 return conflict(getAbdera(), request, "Preference exists");
 
+            String oldKey = pref.getKey();
             pref.setKey(newpref.getKey());
             pref.setValue(newpref.getValue());
 
@@ -151,15 +138,10 @@ public class PreferencesProvider extends BaseProvider
             ServiceLocator locator = createServiceLocator(request);
             PreferencesFeedGenerator generator =
                 createPreferencesFeedGenerator(locator);
-            entry = generator.generateEntry(pref);
+            Entry entry = generator.generateEntry(pref);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument());
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            rc.setEntityTag(new EntityTag(pref.getEntityTag()));
-            rc.setLastModified(pref.getModifiedDate());
-
-            return rc;
+            boolean locationChanged = ! oldKey.equals(pref.getKey());
+            return updated(entry, pref, locator, locationChanged);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
@@ -197,8 +179,7 @@ public class PreferencesProvider extends BaseProvider
                 createPreferencesFeedGenerator(locator);
             Feed feed = generator.generateFeed(user);
 
-            // no entity tag for this synthetic feed
-            return createResponseContext(feed.getDocument());
+            return ok(feed);
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
             log.error(reason, e);
@@ -220,12 +201,7 @@ public class PreferencesProvider extends BaseProvider
                 createPreferencesFeedGenerator(locator);
             Entry entry = generator.generateEntry(pref);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument());
-            rc.setEntityTag(new EntityTag(pref.getEntityTag()));
-            rc.setLastModified(pref.getModifiedDate());
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            return rc;
+            return ok(entry, pref);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -277,8 +253,9 @@ public class PreferencesProvider extends BaseProvider
             createPreferencesFeedGenerator(locator);
     }
 
-    private Preference readPreference(Entry entry)
-        throws ValidationException {
+    private Preference readPreference(RequestContext request)
+        throws IOException, ValidationException {
+        Entry entry = (Entry) request.getDocument().getRoot();
         if (entry.getContentType() == null ||
             ! entry.getContentType().equals(Content.Type.XHTML))
             throw new ValidationException("Content must be XHTML");

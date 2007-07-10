@@ -65,7 +65,7 @@ cosmotest.model.test_eventStamp = {
         jum.assertTrue("Occurrence start date is overridden", newOccurrenceStart.equals(occurStamp.getStartDate()));
         
         //see if the enddate is set properly
-        jum.assertEquals("Occurrence end date has changed properly", (new cosmo.datetime.Date(2007,0,8,15,0)).equals(occurStamp.getEndDate()));
+        jum.assertEquals("Occurrence end date has changed properly", new cosmo.datetime.Date(2007,0,8,15,0),occurStamp.getEndDate());
         
         //make sure the original stamp didn't get messed with
         jum.assertTrue(stamp.getStartDate().equals(new cosmo.datetime.Date(2007,0,1,13,0)));

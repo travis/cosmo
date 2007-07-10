@@ -220,7 +220,7 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
        jum.assertEquals("Start date, set correctly after second change",
          occurrence.getEventStamp().getStartDate(), new cosmo.datetime.Date(2000,0,10,12,0));
        jum.assertEquals("End Date, set correctly after second change",
-         occurrence.getEventStamp().getEndDate(), new cosmo.datetime.Date(2000,0,10,14,0));
+         occurrence.getEventStamp().getEndDate(), new cosmo.datetime.Date(2000,0,10,13,0));
        
    },
  

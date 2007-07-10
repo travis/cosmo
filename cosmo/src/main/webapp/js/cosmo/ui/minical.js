@@ -139,21 +139,23 @@ cosmo.ui.minical.MiniCal = function (p) {
                 // These different UI widgets have to be independent
                 // of the calendar view, but still display sync'd
                 // information -- what's a good way to consolidate this?
-                var goToNav = opts.goTo;
-                var queryDate = null;
-                // param is 'back' or 'next'
-                if (typeof goToNav == 'string') {
-                    var key = goToNav.toLowerCase();
-                    var incr = key.indexOf('back') > -1 ? -1 : 1;
-                    queryDate = cosmo.datetime.Date.add(viewStart,
-                        dojo.date.dateParts.WEEK, incr);
+                if (opts.loadType == 'changeTimespan') {
+                    var goToNav = opts.goTo;
+                    var queryDate = null;
+                    // param is 'back' or 'next'
+                    if (typeof goToNav == 'string') {
+                        var key = goToNav.toLowerCase();
+                        var incr = key.indexOf('back') > -1 ? -1 : 1;
+                        queryDate = cosmo.datetime.Date.add(viewStart,
+                            dojo.date.dateParts.WEEK, incr);
+                    }
+                    // param is actual Date
+                    else {
+                        queryDate = goToNav;
+                    }
+                    // Span of time for selection
+                    setSelectionSpan(queryDate);
                 }
-                // param is actual Date
-                else {
-                    queryDate = goToNav;
-                }
-                // Span of time for selection
-                setSelectionSpan(queryDate);
                 // If the update originated here at minical,
                 // just update the selection, don't re-render
                 if (opts.source == 'minical') {

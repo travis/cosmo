@@ -27,6 +27,9 @@ import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.DateProperty;
 
 import org.osaf.cosmo.calendar.InstanceList;
@@ -63,20 +66,36 @@ public class CalendarFilterEvaluater {
             
             // If any component filter fails to match, then the calendar filter
             // does not match
-            if(!evaluate(calendar, compFilter))
+            if(!evaluateComps(calendar.getComponents(), compFilter))
                 return false;
         }
         
         return true;
     }
     
-    private boolean evaluate(Calendar calendar, ComponentFilter filter) {
+    private boolean evaluate(ComponentList comps, ComponentFilter filter) {
+        for(Iterator<Component> it=comps.iterator();it.hasNext();) {
+            if(evaluateComps(getSubComponents(it.next()),filter)==false)
+                return false;
+        }
+        return true;
+    }
+    
+    private boolean evaluate(ComponentList comps, PropertyFilter filter) {
+        for(Iterator<Component> it=comps.iterator();it.hasNext();) {
+            if(evaluate(it.next(),filter)==false)
+                return false;
+        }
+        return true;
+    }
+    
+    private boolean evaluateComps(ComponentList components, ComponentFilter filter) {
         
-        /*The CALDAV:comp-filter XML element is empty and the calendar
-        object or calendar component type specified by the "name"
+        /*The CALDAV:comp-filter XML element is empty and the
+        calendar component type specified by the "name"
         attribute exists in the current scope;*/
         if(filter.getComponentFilters().size()==0 && filter.getPropFilters().size()==0 && filter.getTimeRangeFilter()==null && filter.getIsNotDefinedFilter()==null) {
-            ComponentList comps = calendar.getComponents(filter.getName().toUpperCase());
+            ComponentList comps = components.getComponents(filter.getName().toUpperCase());
             return comps.size()>0;
         }
         
@@ -85,12 +104,12 @@ public class CalendarFilterEvaluater {
         component type specified by the "name" attribute does not exist
         in the current scope;*/
         if(filter.getIsNotDefinedFilter()!=null) {
-            ComponentList comps = calendar.getComponents(filter.getName().toUpperCase());
+            ComponentList comps = components.getComponents(filter.getName().toUpperCase());
             return comps.size()==0;
         }
         
         // Match the component
-        ComponentList comps = calendar.getComponents(filter.getName().toUpperCase());
+        ComponentList comps = components.getComponents(filter.getName().toUpperCase());
         if(comps.size()==0)
             return false;
         
@@ -103,7 +122,7 @@ public class CalendarFilterEvaluater {
         
         // Evaulate time-range filter
         if(filter.getTimeRangeFilter()!=null) {
-            if(evaulate(comps, filter.getTimeRangeFilter())==false)
+            if(evaluate(comps, filter.getTimeRangeFilter())==false)
                 return false;
         }
         
@@ -120,29 +139,7 @@ public class CalendarFilterEvaluater {
         return true;
     }
     
-    private boolean evaluate(ComponentList comps, ComponentFilter filter) {
-        for(Iterator<Component> it=comps.iterator();it.hasNext();) {
-            if(evaulate(it.next(),filter)==false)
-                return false;
-        }
-        return true;
-    }
-    
-    private boolean evaluate(ComponentList comps, PropertyFilter filter) {
-        for(Iterator<Component> it=comps.iterator();it.hasNext();) {
-            if(evaulate(it.next(),filter)==false)
-                return false;
-        }
-        return true;
-    }
-    
-    private boolean evaulate(Component component, ComponentFilter filter) {
-        // TODO: implement nested comp-filters such as 
-        //       VEVENT/VALARM
-        throw new UnsupportedQueryException("unsupported comp-filter: " + filter.getName());
-    }
-    
-    private boolean evaulate(Component component, PropertyFilter filter) {
+    private boolean evaluate(Component component, PropertyFilter filter) {
         
         /*The CALDAV:prop-filter XML element is empty and a property of
         the type specified by the "name" attribute exists in the
@@ -173,7 +170,7 @@ public class CalendarFilterEvaluater {
         
         // Evaulate time-range filter
         if(filter.getTimeRangeFilter()!=null) {
-            if(evaulate(props, filter.getTimeRangeFilter())==false)
+            if(evaluate(props, filter.getTimeRangeFilter())==false)
                 return false;
         }
         
@@ -276,7 +273,7 @@ public class CalendarFilterEvaluater {
             return matched;
     }
     
-    private boolean evaulate(ComponentList comps, TimeRangeFilter filter) {
+    private boolean evaluate(ComponentList comps, TimeRangeFilter filter) {
         
         Component comp = (Component) comps.get(0);
        
@@ -302,7 +299,7 @@ public class CalendarFilterEvaluater {
         return false;
     }
     
-    private boolean evaulate(PropertyList props, TimeRangeFilter filter) {
+    private boolean evaluate(PropertyList props, TimeRangeFilter filter) {
         for(Iterator<Property> it = props.iterator(); it.hasNext();) {
             if(evaluate(it.next(),filter)==false)
                 return false;
@@ -320,5 +317,16 @@ public class CalendarFilterEvaluater {
         return (  (date.before(filter.getPeriod().getEnd()) &&
               date.after(filter.getPeriod().getStart())) ||
               date.equals(filter.getPeriod().getStart()) );
+    }
+    
+    private ComponentList getSubComponents(Component component) {
+        if(component instanceof VEvent)
+            return ((VEvent) component).getAlarms();
+        else if(component instanceof VTimeZone)
+            return ((VTimeZone) component).getObservances();
+        else if(component instanceof VToDo)
+            return ((VToDo) component).getAlarms();
+        
+        return new ComponentList();
     }
 }

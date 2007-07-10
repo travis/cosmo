@@ -173,10 +173,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var r = '';
         r += '<tr>';
         r += '<td id="listViewTaskHeader" class="listViewHeaderCell" style="width: 16px;">&nbsp;</td>';
-        r += '<td id="listViewTitleHeader" class="listViewHeaderCell">Title</td>';
-        r += '<td id="listViewWhoHeader" class="listViewHeaderCell">Updated By</td>';
-        r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">Starts On</td>';
-        r += '<td id="listViewTriageHeader" class="listViewHeaderCell" style="border-right: 0px;">Triage</td>';
+        r += '<td id="listViewTitleHeader" class="listViewHeaderCell">' + _('Dashboard.ColHeaders.Title') + '</td>';
+        r += '<td id="listViewWhoHeader" class="listViewHeaderCell">' + _('Dashboard.ColHeaders.UpdatedBy') + '</td>';
+        r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">' + _('Dashboard.ColHeaders.StartsOn') + '</td>';
+        r += '<td id="listViewTriageHeader" class="listViewHeaderCell" style="border-right: 0px;">' + _('Dashboard.ColHeaders.Triage') + '</td>';
         r += '</tr>\n';
         t += r;
 

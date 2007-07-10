@@ -124,7 +124,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             var displayName = ""; 
 
                             while (!_validateDisplayName(displayName)){
-                                displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"));
+                                displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
                             }
                             
                             while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)){

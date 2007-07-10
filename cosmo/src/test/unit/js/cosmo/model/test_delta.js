@@ -139,17 +139,9 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
  
    test_applyDeltaToMaster: function(){
        //creates a basic event, recurs daily, starts on 1/1/2000 12pm
-       var getBaseNote = function(){
-           var note = getSimpleEventNote();
-           var stamp = note.getEventStamp(true);
-           stamp.setStartDate(new cosmo.datetime.Date(2000,0,1,12,0));
-           stamp.setEndDate(new cosmo.datetime.Date(2000,0,1,13,0));
-           stamp.setRrule(new cosmo.model.RecurrenceRule({
-               frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY
-           }));
-           return note;
-       }
-       //first test that setting a properties on the base object and stamps works.
+       var getBaseNote = cosmotest.model.test_delta.getBaseNote;
+
+      //first test that setting a properties on the base object and stamps works.
        var note = getBaseNote();
        var delta = new cosmo.model.Delta(note);
        delta.addProperty("body", "newBody");
@@ -167,17 +159,7 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
    
    //test editing start date on master, from an occurrence delta
    test_applyStartDateToMasterFromOccurrence: function(){
-       //creates a basic event, recurs daily, starts on 1/1/2000 12pm
-       var getBaseNote = function(){
-           var note = getSimpleEventNote();
-           var stamp = note.getEventStamp(true);
-           stamp.setStartDate(new cosmo.datetime.Date(2000,0,1,12,0));
-           stamp.setEndDate(new cosmo.datetime.Date(2000,0,1,13,0));
-           stamp.setRrule(new cosmo.model.RecurrenceRule({
-               frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY
-           }));
-           return note;
-       }
+       var getBaseNote = cosmotest.model.test_delta.getBaseNote;
        var note = getBaseNote();
        var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date(2000,0,10,12,0));
        //sanity check
@@ -208,11 +190,53 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
        
    },
    
+   test_applyDeltaToOccurrenceTimeChanges: function(){
+        var getBaseNote = cosmotest.model.test_delta.getBaseNote;
+       //let's try changing start date AND end date on an occurrence
+       var note = getBaseNote();
+       var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date(2000,0,10,12,0));
+       
+       //we'll move it up one hour.
+       var newStartDate = new cosmo.datetime.Date(2000,0,10,13,0);
+       var newEndDate = new cosmo.datetime.Date(2000,0,10,14,0);  
+       var delta = new cosmo.model.Delta(occurrence);
+       delta.addStampProperty("event", "startDate", newStartDate);
+       delta.addStampProperty("event", "endDate", newEndDate);
+       delta.deltafy();
+       delta.applyToOccurrence();
+       jum.assertEquals("Start date, set correctly",
+         occurrence.getEventStamp().getStartDate(), new cosmo.datetime.Date(2000,0,10,13,0));
+       jum.assertEquals("End Date, set correctly",
+         occurrence.getEventStamp().getEndDate(), new cosmo.datetime.Date(2000,0,10,14,0));
+       
+       //move it back an hour, but set the endDate the same - should be deltafy'd out
+       var newStartDate = new cosmo.datetime.Date(2000,0,10,12,0);
+       var newEndDate = new cosmo.datetime.Date(2000,0,10,14,0);  
+       var delta = new cosmo.model.Delta(occurrence);
+       delta.addStampProperty("event", "startDate", newStartDate);
+       delta.addStampProperty("event", "endDate", newEndDate);
+       delta.deltafy();
+       delta.applyToOccurrence();
+       jum.assertEquals("Start date, set correctly after second change",
+         occurrence.getEventStamp().getStartDate(), new cosmo.datetime.Date(2000,0,10,12,0));
+       jum.assertEquals("End Date, set correctly after second change",
+         occurrence.getEventStamp().getEndDate(), new cosmo.datetime.Date(2000,0,10,14,0));
+       
+   },
+ 
+  //test editing end date on master, from an occurrence delta
    
-   
-   //test editing end date on master, from an occurrence delta
-   //test editing occurrence end date
-   //test editing occurrence start date
+   //creates a basic event, recurs daily, starts on 1/1/2000 12pm
+   getBaseNote: function(){
+       var note = getSimpleEventNote();
+       var stamp = note.getEventStamp(true);
+       stamp.setStartDate(new cosmo.datetime.Date(2000,0,1,12,0));
+       stamp.setEndDate(new cosmo.datetime.Date(2000,0,1,13,0));
+       stamp.setRrule(new cosmo.model.RecurrenceRule({
+           frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY
+       }));
+       return note;
+   }
 });
 
     

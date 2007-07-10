@@ -595,9 +595,8 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
     
     var delta = new cosmo.model.Delta(ev.data);
     delta.addStampProperty("event","startDate", startDate);
-    delta.addStampProperty("event","endDate", endDate);
+    delta.addStampProperty("event","duration", new cosmo.model.Duration(startDate, endDate));
     delta.deltafy();
-    
     return delta;
 }
 

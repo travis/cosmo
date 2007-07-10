@@ -440,6 +440,8 @@ public class StandardMorseCodeController implements MorseCodeController {
                     // a new modification NoteItem needs to be created
                     if(child instanceof NoteOccurrence)
                         child = createChildItem((NoteOccurrence) child, collection, recordset);
+                    else if(child!=null)
+                        collection.getChildren().add(child);
                     
                     // Handle case where item doesn't exist, so create a new one
                     if(child==null)

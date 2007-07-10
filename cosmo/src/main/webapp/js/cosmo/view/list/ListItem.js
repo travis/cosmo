@@ -40,8 +40,8 @@ cosmo.view.list.ListItem.prototype = new cosmo.view.BaseItem();
  * FIXME: This is a stub, have to decide how/if disabling
  * items in list view works
  */
-cosmo.view.cal.ListItem.prototype.isDisabled = function () {
-    return false; 
+cosmo.view.list.ListItem.prototype.isDisabled = function () {
+    return false;
 };
 /**
  * Restores item to its state previous to an aborted save

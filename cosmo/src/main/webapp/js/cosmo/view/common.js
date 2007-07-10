@@ -20,6 +20,14 @@ dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime.Date");
 
 cosmo.view.viewBase = new function () {
+    this.init = function () {
+        // Subscribe to the '/calEvent' channel
+        dojo.event.topic.subscribe('/calEvent', this, 'handlePub_calEvent');
+        // Subscribe to the '/app' channel
+        dojo.event.topic.subscribe('/app', this, 'handlePub_app');
+        this.hasBeenInitialized = true;
+    };
+
     this.isCurrentView = function () {
         return (cosmo.app.pim.currentView == this.viewId);
     };
@@ -114,16 +122,16 @@ cosmo.view.viewBase = new function () {
         // Handle keyboard input
         if (t == 'keyboardInput') {
             // Don't bother executing all these tests unless it's the Enter
-            // or Delete key -- use case statement here so we can cleanly 
+            // or Delete key -- use case statement here so we can cleanly
             // add other keys as needed
             switch (e.keyCode) {
                 case 13:
                 case 46:
-                    // Must have a currently selected item and a 
+                    // Must have a currently selected item and a
                     // writable collection, and the caret/focus has
                     // to be somewhere appropriate for the key input
                     // in question
-                    // Find whwatever elem in the DOM hier above 
+                    // Find whwatever elem in the DOM hier above
                     // the event source that has an id
                     var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
                     // Currently selected item, if any

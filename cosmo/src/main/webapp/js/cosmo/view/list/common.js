@@ -30,10 +30,7 @@ dojo.require("cosmo.service.exception");
 
 dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
 
-// Subscribe to the '/calEvent' channel
-dojo.event.topic.subscribe('/calEvent', cosmo.view.list, 'handlePub_calEvent');
-// Subscribe to the '/app' channel
-dojo.event.topic.subscribe('/app', cosmo.view.list, 'handlePub_app');
+cosmo.view.list.hasBeenInitialized = false;
 
 cosmo.view.list.viewId = cosmo.view.names.LIST;
 // Stupid order-of-loading -- this gets set in the

@@ -28,14 +28,9 @@ dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.service');
 dojo.require("cosmo.service.exception");
 
-dojo.require("cosmo.util.debug");
-
 dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
 
-// Subscribe to the '/calEvent' channel
-dojo.event.topic.subscribe('/calEvent', cosmo.view.cal, 'handlePub_calEvent');
-// Subscribe to the '/app' channel
-dojo.event.topic.subscribe('/app', cosmo.view.cal, 'handlePub_app');
+cosmo.view.cal.hasBeenInitialized = false;
 
 cosmo.view.cal.viewId = cosmo.view.names.CAL;
 // Stupid order-of-loading -- this gets set in the

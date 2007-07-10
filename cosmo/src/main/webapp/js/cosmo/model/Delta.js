@@ -115,6 +115,17 @@ dojo.declare("cosmo.model.Delta", null, {
         //              same as the properties in its note and its stamps,
         //              leaving you with just the delta, hence "deltafy"
         this._filterOutEqualProperties(this._note, this._propertyProps, looseStringComparisons);
+
+        //if eventStamp startDate and endDate are present, convert endDate to duration
+        if (this._stampProps["event"]){
+            var eventStamp = this._stampProps["event"];
+            if (eventStamp["startDate"] && eventStamp["endDate"]){
+                var duration = new cosmo.model.Duration(eventStamp["startDate"], eventStamp["endDate"] );
+                eventStamp["duration"] = duration;
+                delete eventStamp["endDate"];
+            }    
+        }
+        
         for (var stampName in this._stampProps){
             var stamp = this._note.getStamp(stampName);
             if (stamp == null){
@@ -408,6 +419,7 @@ dojo.declare("cosmo.model.Delta", null, {
            original.applyChange("startDate", changeValue, type);
            delete changes["startDate"];
         }
+        
         
         if (changes["allDay"]){
            var changeValue = changes["allDay"];

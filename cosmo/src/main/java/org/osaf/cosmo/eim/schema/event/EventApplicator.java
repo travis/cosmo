@@ -99,7 +99,10 @@ public class EventApplicator extends BaseStampApplicator
                         modDt.setTimeZone(masterDt.getTimeZone());
                 }
             }
-            eventStamp.setRecurrenceId(modUid.getRecurrenceId()); 
+            eventStamp.setRecurrenceId(modUid.getRecurrenceId());
+            
+            // default dtstart to recurrenceId
+            eventStamp.setStartDate(modUid.getRecurrenceId());
         }
         
         // need to copy reminderTime to alarm in event

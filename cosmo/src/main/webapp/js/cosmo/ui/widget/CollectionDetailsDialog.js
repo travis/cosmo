@@ -63,6 +63,7 @@ dojo.widget.HtmlWidget, function(){
         //i18n
         strings: {
             nameLabel: _("Main.CollectionDetails.NameLabel"),
+            changeNameButton: _("Main.CollectionDetails.ChangeName"),
             calendarLabel: _("Main.CollectionDetails.CalendarLabel"),
             selectYourClient: _("Main.CollectionDetails.SelectYourClient"),
             collectionAddress: _("Main.CollectionDetails.CollectionAddress"),
@@ -78,8 +79,8 @@ dojo.widget.HtmlWidget, function(){
             clickHere:_("Main.CollectionDetails.ClickHere"),
             helpLink:_("Main.CollectionDetails.HelpLink"),
             chandlerPlug: _('Main.CollectionDetails.ChandlerPlug',
-                '<span style="font-variant:small-caps;"><a href="http://chandler.osafoundation.org/">',
-                '</a></span>')
+                '<a href="http://chandler.osafoundation.org/">',
+                '</a>')
         },
 
         clientsToProtocols: {
@@ -89,54 +90,65 @@ dojo.widget.HtmlWidget, function(){
             Download: "webcal",
             Pim: "pim"
         },
-        
+
         protocolUrls: null,
         displayName: null,
         httpSupported: !dojo.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
-        
+
         // Lifecycle functions
         postMixInProperties: function(){
-           this.protocolUrls = ((this.collection instanceof cosmo.model.Subscription)? 
+           this.protocolUrls = ((this.collection instanceof cosmo.model.Subscription)?
                                 this.collection.getCollection().getUrls() : this.collection.getUrls());
            this.displayName = this.collection.getDisplayName();
            this.saveable = this.isCollectionSaveable(this.collection);
         },
-        
+
         isCollectionSaveable: function(/*cosmo.model.[Collection|Subscription]*/collection){
            return !(collection instanceof cosmo.model.Collection && !collection.isWriteable())
         },
-        
+
         fillInTemplate: function () {
-           var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
-           cosmo.util.html.setSelectOptions(this.clientSelector, options);
+            var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
+            cosmo.util.html.setSelectOptions(this.clientSelector, options);
 
-           if (this.saveable){
+            if (this.saveable){
                this.collectionNameInputSpan.style.display = "";
-           } else {
+            } else {
                this.collectionNameText.style.display = "";
-           }
+            }
 
-           var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png");
-           var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);
-           linkImg.title = toolTip;
-           linkImg.alt = toolTip;
-           this.linkSpan.appendChild(linkImg);
+            var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png");
+            var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);
+            linkImg.title = toolTip;
+            linkImg.alt = toolTip;
+            this.linkSpan.appendChild(linkImg);
 
-           // Show the selection choice if passed from the selector in
-           // ticket view -- otherwise default to 'Chandler'
-           var selectedIndex = 0;
-           if (this.displayedSelection) {
+            // Show the selection choice if passed from the selector in
+            // ticket view -- otherwise default to 'Chandler'
+            var selectedIndex = 0;
+            if (this.displayedSelection) {
                selectedIndex = cosmo.ui.widget.CollectionDetailsDialog.clientMappings[
                    this.displayedSelection];
-           }
-           this.clientSelector.selectedIndex = selectedIndex;
+            }
+            this.clientSelector.selectedIndex = selectedIndex;
 
-           // Chandler plug contains a URL path with quotes. The Dojo widget
-           // template variable substitution 'helpfully' escapes these into
-           // two quotes each
-           this.chandlerPlug.innerHTML = '| ' + this.strings.chandlerPlug;
+            // Chandler plug contains a URL path with quotes. The Dojo widget
+            // template variable substitution 'helpfully' escapes these into
+            // two quotes each
+            this.chandlerPlug.innerHTML = '<span class="menuBarDivider">|</span> ' + this.strings.chandlerPlug;
 
-           this._handleClientChanged();
+            this._showChandlerPlug(true);
+            this._handleClientChanged();
+
+            // Add behaviors to the form inputs to select all the text
+            // automatically on field focus
+            var inputs = this.domNode.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+                var inp = inputs[i];
+                if (inp.type == 'text') {
+                    inp.onfocus = cosmo.util.html.handleTextInputFocus;
+                }
+            }
         },
 
         saveDisplayName: function(){
@@ -162,6 +174,10 @@ dojo.widget.HtmlWidget, function(){
             this.helpText.style.visibility = "visible";
         },
 
+        _handleSave: function () {
+              this.saveDisplayName();
+              cosmo.app.hideDialog();
+        },
         //handles when the user selects a client
         _handleClientChanged: function(){
             var client = this._getClientChoice();
@@ -179,8 +195,6 @@ dojo.widget.HtmlWidget, function(){
                 this._setClientInstructions(client);
                 this._setClientCollectionAddress(client);
             }
-
-            this._showChandlerPlug(client == "Chandler");
         },
 
         // Instance methods
@@ -256,40 +270,20 @@ dojo.widget.HtmlWidget, function(){
                  dummyNode, 'last');
 
     dummyNode.removeChild(contentWidget.domNode);
-    var btnsRight = [];
 
     var closeButton = dojo.widget.createWidget(
-                    "cosmo:Button",
-                    { text: _("Main.CollectionDetails.Close"),
-                      width: "60px",
-                      handleOnClick: cosmo.app.hideDialog,
-                      small: true },
-                      dummyNode, 'last');
-
-    btnsRight.push(closeButton);
+        "cosmo:Button",
+        { text: _("Main.CollectionDetails.Close"),
+            width: 74,
+            handleOnClick: cosmo.app.hideDialog },
+            dummyNode, 'last');
     dummyNode.removeChild(closeButton.domNode);
-
-    if (contentWidget.saveable){
-        var saveButton = dojo.widget.createWidget(
-                        "cosmo:Button",
-                        { text: _("Main.CollectionDetails.Save"),
-                          width: "60px",
-                          //TODO - Handle Errors properly!
-                          handleOnClick: function(){
-                                             contentWidget.saveDisplayName();
-                                             cosmo.app.hideDialog();
-                                         },
-                          small: true },
-                          dummyNode, 'last');
-        btnsRight.push(saveButton);
-        dummyNode.removeChild(saveButton.domNode);
-    }
 
     return {
         content: contentWidget,
-        height: "300",
-        width: "450",
-        btnsRight: btnsRight
+        height: "320",
+        width: "500",
+        btnsLeft: [closeButton]
     };
  };
 

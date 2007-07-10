@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright 2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,18 +31,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
     ],
     //mixins for master item stamps		 
     {
-        _preserveEndDate: true,
-        
-        getPreserveEndDate: function(){
-            //summary: if true, end dates will be preserved when setting start dates. Otherwise, 
-            //         duration is preserved.
-            return this._preserveEndDate;
-        },
-        
-        setPreserveEndDate: function(preserveEndDate){
-            this._preserveEndDate = preserveEndDate;
-        },
-        
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
@@ -75,12 +63,8 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         },
     
         setStartDate: function (/*cosmo.datetime.Date*/ newStartDate){
-           var endDate = this.getEndDate();
            var oldDate = this.getStartDate();
            this.__setProperty("startDate", newStartDate);
-           if (this.getPreserveEndDate() && endDate != null){
-               this.setEndDate(endDate);    
-           }
 
            //if this event stamp is attached to an item, and already has a previous start date
            //we may have some updating to do

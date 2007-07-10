@@ -71,14 +71,10 @@ public class BasicFeedGenerator extends BaseItemFeedGenerator {
     protected void setEntryContent(Entry entry,
                                    NoteItem item)
         throws GeneratorException {
-        ContentBean content = null;
-        try {
-            content = getFactory().getContentFactory().
-                createContent(FORMAT_HTML, item);
-            entry.setContent(content.getValue(), content.getMediaType());
-        } catch (MimeTypeParseException e) {
-            throw new GeneratorException("Attempted to set invalid content media type " + content.getMediaType(), e);
-        }
+        ContentBean content = getFactory().getContentFactory().
+            createContent(FORMAT_HTML, item);
+        if (content != null)
+            entry.setContentAsHtml(content.getValue());
 
         ContentBean summary = getFactory().getContentFactory().
             createContent(FORMAT_TEXT, item);

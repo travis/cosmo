@@ -142,11 +142,18 @@ public class ContentFactory
         ContentBean content = new ContentBean();
         content.setMediaType(MEDIA_TYPE_HTML);
 
-        EventStamp stamp = EventStamp.getStamp(item);
-        String value = stamp != null ?
-            new EventEntryFormatter(stamp).formatHtmlContent() : "";
-        content.setValue(value);
+        String value = null;
+        EventStamp es = EventStamp.getStamp(item);
+        if (es != null)
+            value = new EventEntryFormatter(es).formatHtmlContent();
+        if (value == null)
+            value = item.getBody();
+        if (value == null)
+                value = item.getDisplayName();
+        if (value == null)
+            value = "";
 
+        content.setValue(value);
         return content;
     }
 
@@ -154,11 +161,16 @@ public class ContentFactory
         ContentBean content = new ContentBean();
         content.setMediaType(MEDIA_TYPE_TEXT);
 
-        EventStamp stamp = EventStamp.getStamp(item);
-        String value = stamp != null ?
-            new EventEntryFormatter(stamp).formatTextSummary() : "";
-        content.setValue(value);
+        String value = null;
+        EventStamp es = EventStamp.getStamp(item);
+        if (es != null)
+            value = new EventEntryFormatter(es).formatTextSummary();
+        if (value == null)
+            value = item.getDisplayName();
+        if (value == null)
+            value = "";
 
+        content.setValue(value);
         return content;
     }
 }

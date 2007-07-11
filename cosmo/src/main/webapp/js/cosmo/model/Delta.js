@@ -43,6 +43,10 @@ dojo.declare("cosmo.model.Delta", null, {
         return stamp[propertyName]; 
     },
     
+    removeStampProperty: function(stampName, propertyName){
+        delete this._getStamp(stampName)[propertyName];
+    },
+    
     isPropertyChanged: function(propertyName){
         return typeof(this.getProperty(propertyName)) != "undefined";
     },

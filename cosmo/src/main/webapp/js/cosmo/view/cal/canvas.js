@@ -1171,7 +1171,6 @@ cosmo.view.cal.canvas = new function () {
         var ev = null; // New event
         var evSource = '';
         var evType = '';
-        var allDay = false;
         var lozenge = null; // New blank lozenge
         var startstr = '';
         var evdate = '';
@@ -1187,7 +1186,6 @@ cosmo.view.cal.canvas = new function () {
         var id = note.getUid(); // Won't be recurring, don't need to use getItemUid
         var eventStamp = note.getEventStamp(true);
 
-        dojo.debug("createNewCalItem 2");
         // Create the CalItem obj, attach the Note obj
         // as .data with EventStamp, create the Lozenge
         // ================================
@@ -1197,7 +1195,6 @@ cosmo.view.cal.canvas = new function () {
         if (evType =='normal') {
             dojo.debug("createNewCalItem 3");
             lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(id);
-            allDay = false;
             startstr = getIndexFromHourDiv(evParam);
             dayind = extractDayIndexFromId(startstr);
             evdate = calcDateFromIndex(dayind);
@@ -1213,7 +1210,6 @@ cosmo.view.cal.canvas = new function () {
         }
         else if (evType == 'allDayMain') {
             lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(id);
-            allDay = true;
             dayind = getIndexFromAllDayDiv(evParam);
             start = calcDateFromIndex(dayind);
             start = new cosmo.datetime.Date(start.getFullYear(),
@@ -1222,6 +1218,7 @@ cosmo.view.cal.canvas = new function () {
             start.minutes = 0;
             end = new cosmo.datetime.Date(start.getFullYear(),
                 start.getMonth(), start.getDate());
+            eventStamp.setAnyTime(true);
         }
 
 
@@ -1233,7 +1230,6 @@ cosmo.view.cal.canvas = new function () {
         note.setDisplayName(_('Main.NewEvent'));
         note.setBody('');
         eventStamp.setStartDate(start);
-        eventStamp.setAllDay(allDay);
         eventStamp.setEndDate(end);
         //normally the delta does the autotriaging, but since this is a new event
         //there is no delta, so we do it manually.

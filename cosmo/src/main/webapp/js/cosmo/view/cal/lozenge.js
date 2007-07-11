@@ -1023,11 +1023,11 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getDelta = function (ev, dragMode
     startDate = cosmo.datetime.Date.add(startDate,
         dojo.date.dateParts.DAY, diff);
     endDate = cosmo.datetime.Date.add(endDate,
-        dojo.date.dateParts.DAY, diff);
+        dojo.date.dateParts.DAY, diff + 1);
         
     var delta = new cosmo.model.Delta(ev.data);
     delta.addStampProperty("event","startDate", startDate);
-    delta.addStampProperty("event","endDate", endDate);
+    delta.addStampProperty("event","duration", new cosmo.model.Duration(startDate, endDate));
     delta.deltafy();
     
     return delta;

@@ -504,7 +504,7 @@ td.dataDisplayLabel {
 /* Left sidebar
  * --------------------- */
 /* Left sidebar main */
-#leftSidebarDiv {
+#leftSidebar {
     position: absolute;
     background: #fff;
 }
@@ -527,9 +527,9 @@ td.dataDisplayLabel {
 /* Right sidebar
  * --------------------- */
 /* Right sidebar main */
-#rightSidebarDiv {
+#rightSidebar {
     position: absolute;
-    background: #fff;
+    background: #ededed;
 }
 /* Center column for main content
  * --------------------- */
@@ -1104,8 +1104,10 @@ td.dataDisplayLabel {
 /* Expando detail-view form */
 .expando {
     width: 100%;
+    background-color: #fbfbfb;
 }
 .expandoHead {
+    position: relative;
     width: 100%;
     border-top: 1px solid #ccc;
     height: 21px;
@@ -1113,15 +1115,31 @@ td.dataDisplayLabel {
     vertical-align: middle;
     line-height: 21px;
 }
+.expandoHeadBg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 17px;
+    z-index = 0;
+    background-image: url(images/tiling_horizontal.png);
+    background-position: 0px -80px;
+    
+}
+.expandoHeadFg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index = 1;
+}
 .expandoEnableCheckbox {
     padding-left: 4px;
     padding-right: 6px;
+    z-index: 1;
 }
-.expandoTriangle {
+.expandoToggle {
     padding-right: 4px;
-}
-.expandoIcon {
-    padding-right: 8px;
 }
 .expandoPrompt {
     padding-right: 8px;
@@ -1132,9 +1150,14 @@ td.dataDisplayLabel {
     width: 100%;
     top: 20px;
     overflow: hidden;
+    background-color: #fbfbfb;
 }
-
+#detailViewMainFormSection {
+    padding: 4px 8px 8px 8px;
+    background-color: #fbfbfb;
+}
 #markupBar {
     height: 18px;
+    background-color: #fbfbfb; 
     border-bottom: 1px solid #ccc;
 }

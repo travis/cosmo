@@ -127,6 +127,8 @@ cosmo.ui.detail.DetailViewForm = function (p) {
 
     for (var n in params) { this[n] = params[n]; }
 
+    this.domNode.id = this.id;
+
     // Markup bar
     var d = _createElem('div');
     var c = new cosmo.ui.detail.MarkupBar({ id: 'markupBar',
@@ -494,6 +496,18 @@ cosmo.ui.detail.StampSection = function (p) {
         header = _createElem('div');
         header.id = id + 'Header';
         header.className = 'expandoHead';
+        // Use absolute-positioned foreground
+        // and background divs so we can use a limited-height graphic
+        // from the horizontal tiling image for a background-image
+        // Background -- for bg gradient
+        var bg = _createElem('div');
+        bg.className = 'expandoHeadBg';
+        bg.innerHTML = '&nbsp;';
+        header.appendChild(bg);
+        // Foreground -- append all the UI elems to this
+        var fg = _createElem('div');
+        fg.className = 'expandoHeadFg';
+        header.appendChild(fg);
         var label = _createElem('label');
         // Enable/disable checkbox
         d = _createElem('div');
@@ -512,7 +526,7 @@ cosmo.ui.detail.StampSection = function (p) {
         d.appendChild(f);
         d.className = 'expandoEnableCheckbox floatLeft';
         label.appendChild(d);
-        header.appendChild(label);
+        fg.appendChild(label);
         // Title
         d = _createElem('div');
         d.className = 'expandoPrompt floatLeft';
@@ -523,14 +537,14 @@ cosmo.ui.detail.StampSection = function (p) {
         if (self.hasBody) {
             // Show/hide link
             d = _createElem('div');
-            d.className = 'expandoTriangle';
+            d.className = 'expandoToggle';
             d.id = id + 'Expander';
             var a = _createElem('a');
             a.id = id + 'showHideToggle';
             self.showHideSwitch = a;
             a.appendChild(_createText('[hide]'));
             d.appendChild(a);
-            header.appendChild(d);
+            fg.appendChild(d);
         }
         d = _createElem('div');
         d.className = 'clearBoth';
@@ -743,8 +757,7 @@ cosmo.ui.detail.MainSection = function () {
     // Kill form submission
     f.onsubmit = function () { return false; };
 
-    d.id = 'mainFormSection';
-    d.style.padding = '4px 8px 8px 8px';
+    d.id = 'detailViewMainFormSection';
 
     // Title
     var t = cosmo.ui.detail.createLabelDiv(_(

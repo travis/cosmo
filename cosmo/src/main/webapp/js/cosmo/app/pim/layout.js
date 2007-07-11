@@ -264,8 +264,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     // Main menu of links at the top of the UI
     var d = _createElem('div');
     d.id = 'menuNavItems';
-    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top:
-        (TOP_MENU_HEIGHT - 20) });
+    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top: 4});
     menuBar.addChild(cB);
     menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data

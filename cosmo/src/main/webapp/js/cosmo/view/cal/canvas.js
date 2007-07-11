@@ -51,6 +51,10 @@ cosmo.view.cal.canvas = new function () {
     var allDayArea = null;
     // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
     var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
+    // Ref to timed canvas content area to save DOM lookup
+    var timedCanvasContentArea = null;
+    // Ref to untimed canvas content area to save DOM lookup
+    var untimedCanvasContentArea = null;
 
     dojo.lang.mixin(this, cosmo.view.canvasBase);
 
@@ -400,6 +404,9 @@ cosmo.view.cal.canvas = new function () {
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
             // Get a reference to the main scrolling area for timed events;
             this.timedCanvas = $('timedCanvas');
+            // Refs for appending lozenges to avoid lookup by id
+            timedCanvasContentArea = $('timedContentDiv');
+            untimedCanvasContentArea = $('allDayContentDiv');
         }
         allDayArea = new cosmo.ui.resize_area.ResizeArea(
             $('allDayResizeMainDiv'), $('allDayResizeHandleDiv'));
@@ -522,6 +529,19 @@ cosmo.view.cal.canvas = new function () {
         pos += ((m/60)*HOUR_UNIT_HEIGHT);
         pos = parseInt(pos);
         return pos;
+    };
+    this.getCanvasAreaByLozengeType = function (lozengeType) {
+        var types = cosmo.view.cal.lozenge.lozengeTypes;
+        var r = null;
+        if (lozengeType == types.TIMED) {
+            return timedCanvasContentArea;
+        }
+        else if (lozengeType == types.UNTIMED) {
+            return untimedCanvasContentArea;
+        }
+        else {
+            throw(lozengeType + 'is not a valid lozenge type.');
+        }
     };
 
     /**
@@ -652,7 +672,7 @@ cosmo.view.cal.canvas = new function () {
         if (!p){
             return;
         }
-        
+
         // Pass the item or id, set as the selected item
         // for the current collection
         self.setSelectedItem(p);
@@ -727,10 +747,12 @@ cosmo.view.cal.canvas = new function () {
         var eventStamp = ev.data.getEventStamp();
         var allDay = eventStamp.getAllDay();
         var anyTime = eventStamp.getAnyTime();
+        var types = cosmo.view.cal.lozenge.lozengeTypes;
+        var t = (allDay || anyTime) ? types.UNTIMED : types.TIMED;
         // Create the lozenge and link it to the event
-        ev.lozenge = (allDay || anyTime) ? new cosmo.view.cal.lozenge.NoTimeLozenge(id) :
-            new cosmo.view.cal.lozenge.HasTimeLozenge(id);
-        ev.lozenge.insert(id);
+        ev.lozenge = cosmo.view.cal.lozenge.createNewLozenge(id, t);
+        ev.lozenge.setUpDomAndAppend(ev.id,
+            self.getCanvasAreaByLozengeType(t));
     }
     /**
      * Main function for rendering/re-rendering the cal canvas
@@ -816,7 +838,7 @@ cosmo.view.cal.canvas = new function () {
     /**
      * Handles a successful update of a CalEvent item
      * @param cmd JS Object, the command object passed in the
-     * published 'success' message 
+     * published 'success' message
      */
      function saveSuccess(cmd) {
         dojo.debug("saveSuccess: ");
@@ -1135,7 +1157,13 @@ cosmo.view.cal.canvas = new function () {
         if (ev.dataOrig &&
             !((allDay || anyTime) &&
             (origAllDay || origAnyTime))) {
-            ev.replaceLozenge();
+            var types = cosmo.view.cal.lozenge.lozengeTypes;
+            var t = (allDay || anyTime) ? types.UNTIMED : types.TIMED;
+            // Remove the current lozenge and replace
+            ev.lozenge.remove();
+            ev.lozenge = cosmo.view.cal.lozenge.createNewLozenge(ev.id, t);
+            ev.lozenge.setUpDomAndAppend(ev.id,
+                self.getCanvasAreaByLozengeType(t));
         }
         // Reset the lozenge properties from the event
         ev.lozenge.updateFromEvent(ev, true);
@@ -1170,8 +1198,8 @@ cosmo.view.cal.canvas = new function () {
         dojo.debug("createNewCalItem 1");
         var ev = null; // New event
         var evSource = '';
-        var evType = '';
-        var lozenge = null; // New blank lozenge
+        var lozType = ''; // Lozenge type
+        var types = cosmo.view.cal.lozenge.lozengeTypes;
         var startstr = '';
         var evdate = '';
         var dayind = 0;
@@ -1189,12 +1217,11 @@ cosmo.view.cal.canvas = new function () {
         // Create the CalItem obj, attach the Note obj
         // as .data with EventStamp, create the Lozenge
         // ================================
-        evType = (evParam.indexOf('allDayListDiv') > -1) ? 'allDayMain' : 'normal';
+        lozType = (evParam.indexOf('allDayListDiv') > -1) ? types.UNTIMED : types.TIMED;
         evSource = 'click';
-        // Create the lozenge
-        if (evType =='normal') {
+        // Set props based on when and what canvas was clicked
+        if (lozType == types.TIMED) {
             dojo.debug("createNewCalItem 3");
-            lozenge = new cosmo.view.cal.lozenge.HasTimeLozenge(id);
             startstr = getIndexFromHourDiv(evParam);
             dayind = extractDayIndexFromId(startstr);
             evdate = calcDateFromIndex(dayind);
@@ -1208,8 +1235,7 @@ cosmo.view.cal.canvas = new function () {
             start = new cosmo.datetime.Date(yea, mon, dat, hou, min);
             end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
         }
-        else if (evType == 'allDayMain') {
-            lozenge = new cosmo.view.cal.lozenge.NoTimeLozenge(id);
+        else if (lozType == types.UNTIMED) {
             dayind = getIndexFromAllDayDiv(evParam);
             start = calcDateFromIndex(dayind);
             start = new cosmo.datetime.Date(start.getFullYear(),
@@ -1222,8 +1248,8 @@ cosmo.view.cal.canvas = new function () {
         }
 
 
-        // Create the CalItem, connect it to its lozenge
-        ev = new cosmo.view.cal.CalItem(id, lozenge);
+        // Create the CalItem
+        ev = new cosmo.view.cal.CalItem(id);
 
         // Set EventStamp start and end calculated from click position
         // --------
@@ -1240,12 +1266,15 @@ cosmo.view.cal.canvas = new function () {
         // ================================
         cosmo.view.cal.itemRegistry.setItem(id, ev);
 
-        // Update the lozenge
-        // ================================
-        if (lozenge.insert(id)) { // Insert the lozenge on the view
-            // Save new event
-            dojo.event.topic.publish('/calEvent', { 'action': 'save', 'data': ev, 'qualifier': 'new' })
-        }
+        // Set up the lozenge for the event, and put it
+        // on the appropriate canvas
+        ev.lozenge = cosmo.view.cal.lozenge.createNewLozenge(ev.id, lozType);
+        ev.lozenge.setUpDomAndAppend(ev.id,
+            self.getCanvasAreaByLozengeType(lozType));
+
+        // Save new event
+        dojo.event.topic.publish('/calEvent', { 'action': 'save',
+            'data': ev, 'qualifier': 'new' })
         return cosmo.view.cal.itemRegistry.getItem(id);
     };
     /**

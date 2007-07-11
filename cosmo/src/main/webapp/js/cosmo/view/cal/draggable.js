@@ -78,22 +78,22 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      */
     this.init = function (dragMode, ev) {
         var lozenge = ev.lozenge;
-        var div = lozenge.div;
+        var node = lozenge.domNode;
         this.ev = ev;
         this.vertOffset = cosmo.app.pim.baseLayout.mainApp.top +
             cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.timedCanvas.top;
         this.dragMode = dragMode;
         // Snapshot measurements
-        this.origDivLeft = div.offsetLeft;
-        this.origDivWidth = div.offsetWidth;
+        this.origDivLeft = node.offsetLeft;
+        this.origDivWidth = node.offsetWidth;
         this.plantonicLozengeLeft = lozenge.getPlatonicLeft();
         this.platonicLozengeWidth = lozenge.getPlatonicWidth();
-        this.height = div.offsetHeight;
-        this.absTop = div.offsetTop + this.vertOffset;
-        this.bottom = div.offsetTop + this.height;
+        this.height = node.offsetHeight;
+        this.absTop = node.offsetTop + this.vertOffset;
+        this.bottom = node.offsetTop + this.height;
         this.min = this.bottom-(HOUR_UNIT_HEIGHT/2)+2;
         this.clickOffsetX = xPos - this.origDivLeft;
-        this.clickOffsetY = yPos - div.offsetTop;
+        this.clickOffsetY = yPos - node.offsetTop;
         this.rLimit = (cosmo.app.pim.baseLayout.mainApp.centerColumn.width - cosmo.view.cal.canvas.dayUnitWidth -
             SCROLLBAR_SPACER_WIDTH - 2);
         this.scrollOffset = cosmo.view.cal.canvas.getTimedCanvasScrollTop();
@@ -102,7 +102,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
             var list = lozenge.auxDivList;
             var last = list[list.length-1];
             var offsetBottom = last.offsetTop + last.offsetHeight;
-            this.clickOffsetLozengeTop = this.getLocalMouseYPos(yPos) - div.offsetTop;
+            this.clickOffsetLozengeTop = this.getLocalMouseYPos(yPos) - node.offsetTop;
             this.clickOffsetLozengeBottom = this.getLocalMouseYPos(yPos) - offsetBottom;
         }
 

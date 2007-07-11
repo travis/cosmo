@@ -29,11 +29,38 @@ dojo.provide('cosmo.view.cal.lozenge');
 
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
+dojo.require("cosmo.convenience");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.cal.canvas");
 
-cosmo.view.cal.lozenge = {};
+cosmo.view.cal.lozenge.lozengeTypes = {
+    TIMED: 'timed',
+    UNTIMED: 'untimed'
+};
+
+cosmo.view.cal.lozenge.lozengeStates = {
+    SELECTED: 1,
+    NORMAL: 2,
+    PROCESSING: 3
+};
+
+// Factory method -- create a new HasTime/NoTime Lozenge
+cosmo.view.cal.lozenge.createNewLozenge = function (id, lozengeType) {
+    var _loz = cosmo.view.cal.lozenge;
+    var types = _loz.lozengeTypes;
+    var r = null;
+    if (lozengeType == types.TIMED) {
+        r = new _loz.HasTimeLozenge(id);
+    }
+    else if (lozengeType == types.UNTIMED) {
+        r = new _loz.NoTimeLozenge(id);
+    }
+    else {
+        throw(lozengeType + 'is not a valid lozenge type.');
+    }
+    return r;
+};
 
 /**
  * @object A visual lozenge to represent the span of time of a calendar
@@ -52,9 +79,9 @@ cosmo.view.cal.lozenge.Lozenge = function () {
     // per retarded CSS spec for borders
     this.unit = (HOUR_UNIT_HEIGHT/(60/this.minimumMinutes))-2;
     // DOM elem ref to the primary div for the Lozenge
-    this.div = null;
+    this.domNode = null;
     // DOM elem ref for inner div of the Lozenge
-    this.innerDiv = null;
+    this.contentNode = null;
     // The separator plus ID -- convenience to avoid
     // concatenating the same thing over and over
     this.idPrefix = '';
@@ -122,9 +149,9 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     if (startDate.tzId) {
         strtime += ' (' + startDate.getTimezoneAbbrName() + ')';
     }
-    var timeDiv = document.getElementById(this.divId + 'Start' +
+    var timeDiv = $(this.domNodeId + 'Start' +
         '__' + ev.id);
-    var titleDiv = document.getElementById(this.divId + 'Title' +
+    var titleDiv = $(this.domNodeId + 'Title' +
         '__' + ev.id);
     if (timeDiv) {
         this.setText(timeDiv, strtime);
@@ -135,8 +162,8 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
  * A bit of a misnomer -- just static text at the moment
  * FIXME: Add animation -- either GIF or using CSS effects
  */
-cosmo.view.cal.lozenge.Lozenge.prototype.showStatusAnim = function () {
-    var titleDiv = document.getElementById(this.divId + 'Title' +
+cosmo.view.cal.lozenge.Lozenge.prototype._showProcessingMessage = function () {
+    var titleDiv = $(this.domNodeId + 'Title' +
         '__' + this.id);
     this.setText(titleDiv, 'Processing ...');
 };
@@ -144,7 +171,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.showStatusAnim = function () {
  * Toggle cursor to 'default' while lozenge is in processing
  * state -- should not appear to be draggable
  */
-cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc) {
+cosmo.view.cal.lozenge.Lozenge.prototype._mainAreaCursorChange = function (isProc) {
     var cursorChange = '';
     // Read-only collection -- clickable but not draggable/resizable
     if (!cosmo.app.pim.currentCollection.isWriteable()) {
@@ -154,7 +181,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.mainAreaCursorChange = function (isProc
     else {
         cursorChange = isProc ? 'progress' : 'move';
     }
-    document.getElementById(this.divId + 'Content' +
+    $(this.domNodeId + 'Content' +
         '__' + this.id).style.cursor = cursorChange;
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
@@ -188,7 +215,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setOpacity = function (opac) {
         elem.style.opacity = nDecOpacity;
 
     }
-    setOpac(this.div, opac);
+    setOpac(this.domNode, opac);
     if (this.composite()) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             setOpac(this.auxDivList[i], opac);
@@ -208,21 +235,20 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setText = function (node, str) {
  * Change color of lozenge to indicate (1) selected (2) normal
  * or (3) processing
  */
-cosmo.view.cal.lozenge.Lozenge.prototype.setState = function (isProc) {
-    var isSel = null;
-    var stateId = 0; // 1 selected 2 normal 3 processing
-    // If this lozenge is processing, change to 'processing' color
-    if (isProc) {
-        stateId = 3;
-    }
-    // Change lozenge back after completing processing --
-    // change it back to normal 'unselected' color, or
-    // 'selected' color if this lozenge is the most recently
-    // clicked one
-    else {
-        var selEv = cosmo.view.cal.canvas.getSelectedItem();
-        stateId = (selEv && (this.id == selEv.id)) ?
-            1 : 2;
+cosmo.view.cal.lozenge.Lozenge.prototype._setLozengeState = function (isProc) {
+    var states = cosmo.view.cal.lozenge.lozengeStates;
+    var selEv = cosmo.view.cal.canvas.getSelectedItem();
+    var stateId = 0;
+    switch (true) {
+        case isProc:
+            stateId = states.PROCESSING;
+            break;
+        case (selEv && (this.id == selEv.id)):
+            stateId = states.SELECTED;
+            break;
+        default:
+            stateId = states.NORMAL;
+            break;
     }
     this.setLozengeAppearance(stateId);
 }
@@ -239,20 +265,19 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
     var borderColor = '';
     var borderStyle = 'solid';
     var lozengeColor = '';
-    var mainDiv = document.getElementById(this.divId + '__' +
+    var mainDiv = $(this.domNodeId + '__' +
         this.id);
-    var timeDiv = document.getElementById(this.divId + 'Start' +
+    var timeDiv = $(this.domNodeId + 'Start' +
         '__' + ev.id);
-    var titleDiv = document.getElementById(this.divId + 'Title' +
+    var titleDiv = $(this.domNodeId + 'Title' +
         '__' + ev.id);
-    colors = cosmo.view.cal.canvas.colors;
-    
-   // mainDiv.event = ev;
+    var colors = cosmo.view.cal.canvas.colors;
+    var states = cosmo.view.cal.lozenge.lozengeStates;
 
     // If this lozenge is processing, change to 'processing' color
     switch (stateId) {
         // Selected
-        case 1:
+        case states.SELECTED:
             if (useLightColor) {
                 textColor = colors['darkSel'];
                 borderColor = colors['darkUnsel'];
@@ -267,7 +292,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
             }
             break;
         // Unselected
-        case 2:
+        case states.NORMAL:
             if (useLightColor) {
                 textColor = colors['darkSel'];
                 borderColor = colors['darkUnsel'];
@@ -282,7 +307,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
             }
             break;
         // Processing
-        case 3:
+        case states.PROCESSING:
             textColor = '#ffffff';
             borderColor = '#ffffff';
             lozengeColor = colors['proc'];
@@ -293,7 +318,8 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
             break;
     }
 
-    if (ev.data.getEventStamp().getStatus() && ev.data.getEventStamp().getStatus().indexOf('TENTATIVE') > -1) {
+    if (ev.data.getEventStamp().getStatus() &&
+        ev.data.getEventStamp().getStatus().indexOf('TENTATIVE') > -1) {
         borderStyle = 'dashed';
     }
 
@@ -384,7 +410,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setSelected = function () {
     this.setLozengeAppearance(1);
 
     // Set the z-index to the front
-    this.div.style.zIndex = 25;
+    this.domNode.style.zIndex = 25;
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
@@ -403,7 +429,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setDeselected = function () {
     this.setLozengeAppearance(2);
 
     // Set the z-index to the back
-    this.div.style.zIndex = 1;
+    this.domNode.style.zIndex = 1;
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
@@ -425,7 +451,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype = new cosmo.view.cal.lozenge.Loz
 
 // Div elem prefix -- all component divs of normal event lozenges
 // begin with this
-cosmo.view.cal.lozenge.HasTimeLozenge.prototype.divId = 'eventDiv';
+cosmo.view.cal.lozenge.HasTimeLozenge.prototype.domNodeId = 'eventDiv';
 // Does a multi-day event start before the viewable area
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.startsBeforeViewRange = false;
 // Does a multi-day event extend past the viewable area
@@ -438,17 +464,17 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.endsAfterViewRange = false;
  * Display status animation
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.showProcessing = function () {
-    this.setState(true);
-    this.resizeHandleCursorChange(true);
-    this.mainAreaCursorChange(true);
-    this.showStatusAnim();
+    this._setLozengeState(true);
+    this._resizeHandleCursorChange(true);
+    this._mainAreaCursorChange(true);
+    this._showProcessingMessage();
 }
 
 /**
  * Change the cursors for the resize handles at top and bottom
  * Change to 'default' when processing so it won't look draggable
  */
-cosmo.view.cal.lozenge.HasTimeLozenge.prototype.resizeHandleCursorChange = function (isProc) {
+cosmo.view.cal.lozenge.HasTimeLozenge.prototype._resizeHandleCursorChange = function (isProc) {
     var topChange = '';
     var bottomChange = '';
     // Read-only collection -- clickable but not draggable/resizable
@@ -461,9 +487,9 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.resizeHandleCursorChange = funct
         topChange = isProc ? 'default' : 'n-resize';
         bottomChange = isProc ? 'default' : 's-resize';
     }
-    var topDiv = document.getElementById(this.divId + 'Top' +
+    var topDiv = $(this.domNodeId + 'Top' +
         '__' + this.id);
-    var bottomDiv = document.getElementById(this.divId + 'Bottom' +
+    var bottomDiv = $(this.domNodeId + 'Bottom' +
         '__' + this.id);
     topDiv.style.cursor = topChange;
     // Timed events that extend beyond the viewable area
@@ -477,9 +503,9 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.resizeHandleCursorChange = funct
  * Return the lozenge to normal after processing
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.hideProcessing = function () {
-    this.resizeHandleCursorChange(false);
-    this.mainAreaCursorChange(false);
-    this.setState(false);
+    this._resizeHandleCursorChange(false);
+    this._mainAreaCursorChange(false);
+    this._setLozengeState(false);
 }
 
 /**
@@ -592,7 +618,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
     // Update cosmo.datetime.Date with new UTC values
     startDate.updateFromUTC(evStart.getTime());
     endDate.updateFromUTC(evEnd.getTime());
-    
+
     var delta = new cosmo.model.Delta(ev.data);
     delta.addStampProperty("event","startDate", startDate);
     delta.addStampProperty("event","duration", new cosmo.model.Duration(startDate, endDate));
@@ -601,14 +627,15 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
 }
 
 /**
- * Insert a new event lozenge
+ * Set up the DOM structure for a new event lozenge, append it to
+ * the appropriate canvas area
  * This method places the lozenge (single- or multi-div) on the
  * scrollable area for normal events. This just puts them on the
  * canvas in a hidden state. After this we have two more steps:
  * (1) Update lozenge to reflect event's times using updateFromEvent
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
  */
-cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
+cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setUpDomAndAppend = function (id, canvasArea) {
 
     var ev = this.getItem(id);
     var startDay = 0;
@@ -617,7 +644,6 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     var lozengeDiv = null;
     var lozengeDivSub = null;
     var d = null;
-    var view = null;
     var eventStamp = ev.data.getEventStamp();
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();
@@ -645,50 +671,40 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     this.width = 1;
     this.auxDivList = [];
 
-    // Append event lozenge to appropriate screen area for the type of Lozenge
-    view = document.getElementById('timedContentDiv');
-
-    lozengeDiv = document.createElement('div');
-    lozengeDivSub = document.createElement('div');
-
+    lozengeDiv = _createElem('div');
     // Event lozenge main div and components
     // -----------------------
     // Main lozenge div
-    lozengeDiv.id = this.divId + this.idPrefix;
+    lozengeDiv.id = this.domNodeId + this.idPrefix;
     lozengeDiv.className = 'eventLozenge';
     lozengeDiv.style.width = this.width + 'px';
+    this.domNode = lozengeDiv;
 
-    /*
-    // Just a small little bit of fun to change the border style of a lozenge
-    // depending on the status of the event.
-    if (ev.data.status && ev.data.status.indexOf('TENTATIVE') > -1) {
-        lozengeDiv.style.borderStyle = 'dashed';
-    }
-    */
-
+    lozengeDivSub = _createElem('div');
     // Resize-up handle
-    lozengeDivSub.id = this.divId + 'Top' + this.idPrefix;
+    lozengeDivSub.id = this.domNodeId + 'Top' + this.idPrefix;
     lozengeDivSub.className = 'eventResizeTop';
     lozengeDivSub.style.height = BLOCK_RESIZE_LIP_HEIGHT + 'px';
     lozengeDiv.appendChild(lozengeDivSub);
 
     // Central content area
-    lozengeDivSub = document.createElement('div');
-    lozengeDivSub.id = this.divId + 'Content' + this.idPrefix;
+    lozengeDivSub = _createElem('div');
+    lozengeDivSub.id = this.domNodeId + 'Content' + this.idPrefix;
     lozengeDivSub.className = 'eventContent';
     lozengeDivSub.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
     lozengeDivSub.style.marginRight = BLOCK_RESIZE_LIP_HEIGHT + 'px';
+    this.contentNode = lozengeDivSub;
 
     // Start time display
-    d = document.createElement('div');
-    d.id = this.divId + 'Start' + this.idPrefix;
+    d = _createElem('div');
+    d.id = this.domNodeId + 'Start' + this.idPrefix;
     d.className = 'eventTime';
     d.style.width = '100%'; // Needed for IE, which sucks
     lozengeDivSub.appendChild(d);
 
     // Title
-    d = document.createElement('div');
-    d.id = this.divId + 'Title' + this.idPrefix
+    d = _createElem('div');
+    d.id = this.domNodeId + 'Title' + this.idPrefix
     d.className = 'eventTitle';
     d.style.width = '100%'; // Needed for IE, which sucks
     lozengeDivSub.appendChild(d);
@@ -704,17 +720,21 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     if (auxDivCount) {
         for (var i = 0; i < auxDivCount; i++) {
             // Append previous div
-            view.appendChild(lozengeDiv);
+            canvasArea.appendChild(lozengeDiv);
 
-            var lozengeDiv = document.createElement('div');
-            lozengeDiv.id = this.divId + '__' +
+            var lozengeDiv = _createElem('div');
+            lozengeDiv.id = this.domNodeId + '__' +
                 'aux' + (i+1) + this.idPrefix;
             lozengeDiv.className = 'eventLozenge';
             lozengeDiv.style.width = this.width + 'px';
 
+            // Save a ref for quick lookup when manipulating
+            // styles
+            this.auxDivList[i] = lozengeDiv;
+
             // Central content area
-            lozengeDivSub = document.createElement('div');
-            lozengeDivSub.id = this.divId + 'Content' + this.idPrefix;
+            lozengeDivSub = _createElem('div');
+            lozengeDivSub.id = this.domNodeId + 'Content' + this.idPrefix;
             lozengeDivSub.className = 'eventContent';
             lozengeDiv.appendChild(lozengeDivSub);
 
@@ -732,36 +752,25 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.insert = function (id) {
     // or to final div for multi-day event -- don't append when
     // event extends past view area
     if (!this.endsAfterViewRange) {
-        lozengeDivSub = document.createElement('div');
-        lozengeDivSub.id = this.divId + 'Bottom' + this.idPrefix;
+        lozengeDivSub = _createElem('div');
+        lozengeDivSub.id = this.domNodeId + 'Bottom' + this.idPrefix;
         lozengeDivSub.className = 'eventResizeBottom';
         lozengeDivSub.style.height = BLOCK_RESIZE_LIP_HEIGHT + 'px';
         lozengeDiv.appendChild(lozengeDivSub);
     }
 
-    view.appendChild(lozengeDiv);
+    canvasArea.appendChild(lozengeDiv);
 
-    // DOM node references
-    this.div = document.getElementById(this.divId + this.idPrefix);
-    this.innerDiv = document.getElementById(this.divId + 'Content' +
-        this.idPrefix);
-    // DOM node refs for multi-day divs
-    if (auxDivCount) {
-        for (var i = 0; i < auxDivCount; i++) {
-            this.auxDivList[i] = document.getElementById(this.divId +
-                '__' + 'aux' + (i+1) + this.idPrefix);
-        }
-    }
     // All done
-    return this.div;
+    return this.domNode;
 }
 
 /**
  * Removes the lozenge -- including multiple divs for multi-day events
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.remove = function (id) {
-    this.innerDiv.parentNode.removeChild(this.innerDiv);
-    this.div.parentNode.removeChild(this.div);
+    this.contentNode.parentNode.removeChild(this.contentNode);
+    this.domNode.parentNode.removeChild(this.domNode);
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
@@ -770,8 +779,8 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.remove = function (id) {
         }
     }
     // Close IE memleak hole
-    this.div = null;
-    this.innerDiv = null;
+    this.domNode = null;
+    this.contentNode = null;
 }
 
 /**
@@ -784,7 +793,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.remove = function (id) {
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setLeft = function (pos) {
     var leftPos = parseInt(pos);
     var auxDiv = null;
-    this.div.style.left = leftPos + 'px';
+    this.domNode.style.left = leftPos + 'px';
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             leftPos += cosmo.view.cal.canvas.dayUnitWidth;
@@ -802,7 +811,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setLeft = function (pos) {
  * @param pos The Y pixel position for the lozenge
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setTop = function (pos) {
-    this.div.style.top = parseInt(pos) + 'px';
+    this.domNode.style.top = parseInt(pos) + 'px';
 }
 
 /**
@@ -810,7 +819,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setTop = function (pos) {
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setWidth = function (width) {
     var w = parseInt(width);
-    this.div.style.width = w + 'px';
+    this.domNode.style.width = w + 'px';
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
@@ -856,8 +865,8 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setHeight = function (size, over
     // Set the values
     // -----------------------------------
     // Main div and the inner content div
-    this.div.style.height = mainSize + 'px';
-    this.innerDiv.style.height =
+    this.domNode.style.height = mainSize + 'px';
+    this.contentNode.style.height =
         (mainSize-(BLOCK_RESIZE_LIP_HEIGHT*2)) + 'px';
     // If multi-day event, do the inner aux divs and final aux div
     if (doMulti) {
@@ -892,7 +901,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateElements = function() {
 
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.makeVisible = function () {
     // Turn on visibility for all the divs
-    this.div.style.visibility = 'visible';
+    this.domNode.style.visibility = 'visible';
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
@@ -906,7 +915,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.makeVisible = function () {
  * the far-left div in a multi-day event
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getTop = function () {
-    var t = this.div.offsetTop;
+    var t = this.domNode.offsetTop;
     return parseInt(t);
 }
 
@@ -928,8 +937,8 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getBottom = function () {
     }
     // Single-day event
     else {
-        t = this.div.offsetTop;
-        h = this.div.offsetHeight;
+        t = this.domNode.offsetTop;
+        h = this.domNode.offsetHeight;
         ret = parseInt(t+h);
     }
     return ret;
@@ -940,7 +949,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getBottom = function () {
  * or lozenges in a muli-day event
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getLeft = function () {
-    var l = this.div.offsetLeft;
+    var l = this.domNode.offsetLeft;
     return parseInt(l);
 }
 
@@ -966,7 +975,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype = new cosmo.view.cal.lozenge.Loze
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.height = 16;
 // Div elem prefix -- all component divs of normal event lozenges
 // begin with this
-cosmo.view.cal.lozenge.NoTimeLozenge.prototype.divId = 'eventDivAllDay';
+cosmo.view.cal.lozenge.NoTimeLozenge.prototype.domNodeId = 'eventDivAllDay';
 
 /**
  * Change lozenge color to 'processing' color
@@ -975,17 +984,17 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.divId = 'eventDivAllDay';
  * Display status animation
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.showProcessing = function () {
-    this.setState(true);
-    this.mainAreaCursorChange(true);
-    this.showStatusAnim();
+    this._setLozengeState(true);
+    this._mainAreaCursorChange(true);
+    this._showProcessingMessage();
 }
 
 /**
  * Return the lozenge to normal after processing
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.hideProcessing = function () {
-    this.setState(false);
-    this.mainAreaCursorChange(false);
+    this._setLozengeState(false);
+    this._mainAreaCursorChange(false);
 }
 
 /**
@@ -1024,12 +1033,12 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getDelta = function (ev, dragMode
         dojo.date.dateParts.DAY, diff);
     endDate = cosmo.datetime.Date.add(endDate,
         dojo.date.dateParts.DAY, diff + 1);
-        
+
     var delta = new cosmo.model.Delta(ev.data);
     delta.addStampProperty("event","startDate", startDate);
     delta.addStampProperty("event","duration", new cosmo.model.Duration(startDate, endDate));
     delta.deltafy();
-    
+
     return delta;
 }
 
@@ -1058,65 +1067,60 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.calcWidth = function (startDay, e
 }
 
 /**
- * Insert a new event lozenge
+ * Set up the DOM structure for a new event lozenge and append
+ * it to the appropriate canvas area
  * This method places the lozenge on the resizable area for
  * all-day events. This just puts them on the canvas in a hidden state.
  * After this we have two more steps:
  * (1) Update lozenge to reflect event's times using updateFromEvent
  * (2) Do sizing/positioning, and turn on visibility with updateDisplayMain
  */
-cosmo.view.cal.lozenge.NoTimeLozenge.prototype.insert = function (id) {
+cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setUpDomAndAppend = function (id, canvasArea) {
     var ev = this.getItem(id);
-    var lozengeDiv = document.createElement('div');
-    var lozengeDivSub = document.createElement('div');
+    var lozengeDiv = _createElem('div');
+    var lozengeDivSub = _createElem('div');
     var d = null;
-    var view = null;
 
     this.idPrefix = '__' + id;
     this.width = 1;
 
-    // Append event lozenge to appropriate screen area for the type of Lozenge
-    view = document.getElementById('allDayContentDiv');
     // Event lozenge main div and components
     // -----------------------
     // Main lozenge div
-    lozengeDiv.id = this.divId + this.idPrefix;
+    lozengeDiv.id = this.domNodeId + this.idPrefix;
     lozengeDiv.className = 'eventLozenge';
     // Set other style props separately because setAttribute() is broken in IE
     lozengeDiv.style.width = this.width + 'px';
+    this.domNode = lozengeDiv;
 
     // Central content area
-    lozengeDivSub.id = this.divId + 'Content' + this.idPrefix;
+    lozengeDivSub.id = this.domNodeId + 'Content' + this.idPrefix;
     lozengeDivSub.className = 'eventContent';
     lozengeDivSub.style.whiteSpace = 'nowrap';
+    this.contentNode = lozengeDivSub;
 
     // Title
-    d = document.createElement('div');
-    d.id = this.divId + 'Title' + this.idPrefix;
+    d = _createElem('div');
+    d.id = this.domNodeId + 'Title' + this.idPrefix;
     d.className = 'eventTitle';
     d.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
     lozengeDivSub.appendChild(d);
 
     lozengeDiv.appendChild(lozengeDivSub);
 
-    view.appendChild(lozengeDiv);
+    canvasArea.appendChild(lozengeDiv);
 
-    // DOM node references
-    this.div = document.getElementById(this.divId + this.idPrefix);
-    this.innerDiv = document.getElementById(this.divId + 'Content' +
-        this.idPrefix);
-
-    return this.div;
+    return this.domNode;
 }
 
 /**
  * Removes the lozenge
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.remove = function (id) {
-    this.innerDiv.parentNode.removeChild(this.innerDiv);
-    this.div.parentNode.removeChild(this.div);
-    this.div = null;
-    this.innerDiv = null;
+    this.contentNode.parentNode.removeChild(this.contentNode);
+    this.domNode.parentNode.removeChild(this.domNode);
+    this.domNode = null;
+    this.contentNode = null;
 }
 
 /**
@@ -1127,7 +1131,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.remove = function (id) {
  * @param pos The X pixel position for the lozenge
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setLeft = function (pos) {
-    this.div.style.left = parseInt(pos) + 'px';
+    this.domNode.style.left = parseInt(pos) + 'px';
 }
 
 /**
@@ -1138,7 +1142,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setLeft = function (pos) {
  * @param pos The Y pixel position for the lozenge
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setTop = function (pos) {
-    this.div.style.top = parseInt(pos) + 'px';
+    this.domNode.style.top = parseInt(pos) + 'px';
 }
 
 /**
@@ -1146,10 +1150,10 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setTop = function (pos) {
  * div element
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setWidth = function (width) {
-    this.div.style.width = parseInt(width) + 'px';
+    this.domNode.style.width = parseInt(width) + 'px';
     // Needed for IE not to push the content out past
     // the width of the containing div
-    this.innerDiv.style.width = parseInt(
+    this.contentNode.style.width = parseInt(
         width - (BLOCK_RESIZE_LIP_HEIGHT*2)) + 'px';
 }
 
@@ -1159,8 +1163,8 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setWidth = function (width) {
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setHeight = function (size) {
     size = parseInt(size);
-    this.div.style.height = size + 'px';
-    this.innerDiv.style.height = size + 'px';
+    this.domNode.style.height = size + 'px';
+    this.contentNode.style.height = size + 'px';
 }
 
 /**
@@ -1175,14 +1179,14 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateElements = function () {
 }
 
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.makeVisible = function () {
-    this.div.style.visibility = 'visible';
+    this.domNode.style.visibility = 'visible';
 }
 
 /**
  * FIXME: Figure out if this is needed anymore
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getTop = function () {
-    var t = this.div.offsetTop;
+    var t = this.domNode.offsetTop;
     return parseInt(t);
 }
 
@@ -1190,8 +1194,8 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getTop = function () {
  * FIXME: Figure out if this is needed anymore
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getBottom = function () {
-    var t = this.div.offsetTop;
-    var h = this.div.offsetHeight;
+    var t = this.domNode.offsetTop;
+    var h = this.domNode.offsetHeight;
     return parseInt(t+h);
 }
 
@@ -1199,7 +1203,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getBottom = function () {
  * FIXME: Figure out if this is needed anymore
  */
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getLeft = function () {
-    var l = this.div.offsetLeft;
+    var l = this.domNode.offsetLeft;
     return parseInt(l);
 }
 

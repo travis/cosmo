@@ -72,26 +72,6 @@ cosmo.view.cal.CalItem.prototype.cancelSave = function () {
     this.restoreEvent();
 };
 /**
- * Creates a brand-new lozenge for the event
- * Resets the lozenge because we may be changing to the new type --
- * e.g., between all-day and normal, or between normal single
- * and normal composite
- */
-cosmo.view.cal.CalItem.prototype.replaceLozenge = function () {
-    // Remove the current lozenge
-    this.lozenge.remove();
-    // Replace with new one
-    if (this.data.allDay) {
-        this.lozenge = 
-            new cosmo.view.cal.lozenge.NoTimeLozenge(this.id);
-    }
-    else {
-        this.lozenge = 
-            new cosmo.view.cal.lozenge.HasTimeLozenge(this.id);
-    }
-    this.lozenge.insert(this.id);
-};
-/**
  * Puts an event lozenge back where it originally was using the
  * snapshot backup clone of its data in the dataOrig property
  * Used when canceling a save from the confirmation dialog

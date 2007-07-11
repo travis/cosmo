@@ -361,7 +361,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
            if (!endTimeFieldValue){
                delta.addStampProperty("event", "anyTime", true)
            } else {
-               return "ERRROR";
+               return _("App.Error.NoEndTimeWithoutStartTime");
            }
         } else {
            if (!endTimeFieldValue){

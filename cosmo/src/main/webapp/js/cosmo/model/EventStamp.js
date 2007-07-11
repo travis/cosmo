@@ -1,4 +1,4 @@
-    /*
+/*
  * Copyright 2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,6 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
       ["duration", cosmo.model.Duration, {}],
       ["anyTime", Boolean, {"default":false}],
       ["allDay", Boolean, {"default":false}],
-      ["atTime", Boolean, {"default":false}],
       ["location", String, {"default":""}],
       ["rrule", cosmo.model.RecurrenceRule, {"default":null}],
       ["exdates", [Array, cosmo.datetime.Date], {"default": cosmo.model.NEW_ARRAY}],
@@ -37,9 +36,14 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
 
         getEndDate: function (){
             var duration = this.getDuration();
-            if (duration == null || this.getStartDate() == null){
+            if (duration == null){
+                return this.getStartDate();
+            }
+            
+            if (this.getStartDate() == null){
                 return null;
             }
+            
             var endDate = this.getStartDate().clone();
             endDate.addDuration(duration);
             if (this.getAnyTime() || this.getAllDay()){
@@ -103,6 +107,10 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                }
            }
            
+        },
+        
+        getAtTime: function(){
+            return !this.getDuration();
         },
         
        applyChange: function(propertyName, changeValue, type){

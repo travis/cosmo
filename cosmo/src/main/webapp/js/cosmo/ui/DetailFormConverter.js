@@ -350,7 +350,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
     }, 
     _populateAnyTimeAtTime: function(delta){
         if (delta.getStampProperty("event", "allDay")){
-               delta.setStampProperty("event", "anyTime", false) 
+               delta.addStampProperty("event", "anyTime", false) 
                return "";
         }
         

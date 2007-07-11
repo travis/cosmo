@@ -23,13 +23,13 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Represents an EIM field whose value is a UTF-8 string.
  * 
- * A text value can be at most 1024 bytes long.
+ * A text value can be at most 32 kilobytes long.
  */
 public class TextField extends EimRecordField {
     private static final Log log = LogFactory.getLog(TextField.class);
 
     /** */
-    public static final int MAX_LENGTH = 1024;
+    public static final int MAX_LENGTH = 1024*32;
 
     /**
      * @throws IllegalArgumentException if the value is longer than

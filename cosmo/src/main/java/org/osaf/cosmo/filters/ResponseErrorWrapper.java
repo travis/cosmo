@@ -55,10 +55,12 @@ public class ResponseErrorWrapper extends HttpServletResponseWrapper {
     public boolean flushError() throws IOException {
         if(code!=null && msg!=null) {
             super.sendError(code, msg);
+            clearError();
             return true;
         }
         else if(code!=null) {
             super.sendError(code);
+            clearError();
             return true;
         }
         return false;

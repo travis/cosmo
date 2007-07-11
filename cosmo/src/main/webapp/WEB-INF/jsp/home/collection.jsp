@@ -189,4 +189,65 @@
 
 <jsp:include page="inc-attributes.jsp" />
 
+<c:if test="${User != null}">
+<script lang="JavaScript">
+dojo.require("cosmo.service.conduits.common");
+var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
+</script>
+
+<div class="hd" style="margin-top: 12px;">
+	Subscriptions
+</div>
+<div style="margin-top:12px;">
+
+<!-- Display subscribed collections -->
+  <table cellpadding="4" cellspacing="1" border="0" width="100%">
+    <tr>
+      <td class="smTableColHead" style="width:1%;">
+        &nbsp;
+      </td>
+      <td class="smTableColHead" style="text-align:center;">
+        Name
+      </td>
+      <td class="smTableColHead" style="text-align:center;">
+        Collection Uid
+      </td>
+      <td class="smTableColHead" style="text-align:center;">
+	 	Ticket
+      </td>
+      <td class="smTableColHead" style="text-align:center;">
+		Created
+      </td>
+      <td class="smTableColHead" style="text-align:center;">
+		Last Modified
+      </td>
+    </tr>
+  <c:forEach var="subscription" items="${User.collectionSubscriptions}">
+	<tr>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        <a href="<c:url value="/browse/remove_subscription/${User.username}/${subscription.displayName}"/>">
+        [remove]
+        </a>
+      </td>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        ${subscription.displayName}
+      </td>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        ${subscription.collectionUid}
+      </td>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        ${subscription.ticketKey}
+      </td>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        ${subscription.creationDate}
+      </td>
+      <td class="smTableData" style="text-align:center; white-space:nowrap;">
+        ${subscription.modifiedDate}
+      </td>
+    </tr>
+  </c:forEach>
+  </table>
+</div>
+</c:if>
+
 </cosmo:standardLayout>

@@ -17,7 +17,9 @@ package org.osaf.cosmo.ui.account;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,19 +38,23 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.Permission;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.ui.bean.CalendarBean;
 import org.osaf.cosmo.ui.bean.EventBean;
 import org.osaf.cosmo.util.PathUtil;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -69,6 +75,7 @@ public class AccountBrowsingController extends MultiActionController
         LogFactory.getLog(AccountBrowsingController.class);
 
     private ContentService contentService;
+    private UserService userService;
     private CosmoSecurityManager securityManager;
     private String calendarView;
     private String eventView;
@@ -77,6 +84,9 @@ public class AccountBrowsingController extends MultiActionController
     private String browseModificationView;
     private String removeViewBase;
     private String revokeTicketBaseView;
+    
+    private static final String collectionLocked = "HomeDirectory.Collection.Error.CollectionLocked";
+    private static final String concurrencyFailure = "HomeDirectory.Collection.Error.ConcurrencyFailure";    
 
     /**
      * Retrieves the requested item so that its attributes, properties
@@ -110,6 +120,17 @@ public class AccountBrowsingController extends MultiActionController
         if (item instanceof CollectionItem) {
             CollectionItem collection = (CollectionItem) item;
             request.setAttribute("Collection", item);
+            
+            /* Because this code is collection oriented, we need to 
+             * use a little bit of a hack to get a user when
+             * we want to display subscriptions */
+            
+            // If we are browseing a user's root collection, 
+            // the path will be only one section long
+            if (path.split("/").length == 2){
+                request.setAttribute("User", userService.getUser(path.split("/")[1]));
+            }
+            
             return new ModelAndView(browseCollectionView);
         }
 
@@ -140,11 +161,47 @@ public class AccountBrowsingController extends MultiActionController
         Item item = getItem(path);
         securityManager.checkPermission(item, Permission.WRITE);
 
+        
+        Map<String, Object[]> model = new HashMap<String, Object[]>();
         if (log.isDebugEnabled())
             log.debug("removing item " + item.getUid() + " from " + path);
+        try {
+            contentService.removeItem(item);
+        } catch (CollectionLockedException e){
+            model.put("messages", new Object[]{"HomeDirectory.Collection.Error.CollectionLocked"});
+            return new ModelAndView("error_general", model);
+        } catch (ConcurrencyFailureException e){
+            model.put("message", new Object[]{"HomeDirectory.Collection.Error.ConcurrencyFailure"});
+            return new ModelAndView("error_general", model);
+        }
+        String parentPath = PathUtil.getParentPath(path);
+        return new ModelAndView(removeViewBase + parentPath);
+    }
 
-        contentService.removeItem(item);
+    /**
+     * Removes the requested subscription. Returns the
+     * {@link #removeViewBase} with the item path appended.
+     *
+     * @throws ResourceNotFoundException if an item is not found at
+     * the given path
+     * @throws PermissionException if the logged-in user does not have
+     * write permission on the item
+     */
+    public ModelAndView removeSubscription(HttpServletRequest request,
+                               HttpServletResponse response)
+        throws Exception {
+        String path = getPath(request);
+        String[] pathParts = path.split("/");
+        String username = pathParts[1];
+        String subName = pathParts[2];
+        User user = userService.getUser(username);
 
+        if (log.isDebugEnabled())
+            log.debug("removing subscription " + subName + " from " + username + "'s account");
+
+        user.removeSubscription(subName);
+        userService.updateUser(user);
+        
         String parentPath = PathUtil.getParentPath(path);
         return new ModelAndView(removeViewBase + parentPath);
     }
@@ -448,5 +505,13 @@ public class AccountBrowsingController extends MultiActionController
     private String makeCalendarContentDisposition(Item item) {
         return makeContentDisposition(item.getDisplayName() + "." +
                                       ICALENDAR_FILE_EXTENSION);
+    }
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

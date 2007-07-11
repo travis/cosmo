@@ -28,7 +28,7 @@
 <cosmo:standardLayout prefix="Error.General." showNav="${showNav}">
 <c:forEach var="message" items="${messages}">
 <p>
-<c:out value="${message}"/>
+  <fmt:message key="${message}"/>
 </p>
 </c:forEach>
 </cosmo:standardLayout>

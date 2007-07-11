@@ -69,7 +69,7 @@
             /logout=appEntryController
             /=appEntryController
             /welcome=appEntryController
-               /browse/**=accountBrowsingController
+            /browse/**=accountBrowsingController
             /i18n.js=i18nController
             /account/activate=accountActivationController
             /pim/collection/*=collectionBookmarkController
@@ -138,6 +138,7 @@
   <property name="removeViewBase"><value>redirect:/browse</value></property>
   <property name="revokeTicketBaseView"><value>redirect:/browse</value></property>
   <property name="contentService"><ref bean="contentService" /></property>
+  <property name="userService"><ref bean="userService" /></property>
   <property name="securityManager"><ref bean="securityManager" /></property>
 </bean>
 
@@ -145,6 +146,7 @@
   <property name="alwaysUseFullPath"><value>true</value></property>
   <property name="mappings"><value>
     /browse=browse
+    /browse/remove_subscription=removeSubscription
     /browse/remove=remove
     /browse/view=view
     /browse/download=download

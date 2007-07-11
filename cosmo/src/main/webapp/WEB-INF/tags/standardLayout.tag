@@ -21,6 +21,7 @@
 <%@ attribute name="prefix" 		%>
 <%@ attribute name="showNav"        %>
 <%@ attribute name="selfLink"        %>
+<%@ attribute name="stylesheets"     %>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
@@ -51,6 +52,9 @@
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/global.css"/>
+    <c:forEach var="stylesheet" items="${stylesheets}">
+    <link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/${stylesheet}.css"/>
+    </c:forEach>
     
     
     <c:if test="${not empty selfLink}">

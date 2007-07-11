@@ -51,6 +51,10 @@
     <to>/browse/remove?path=$1</to>
   </rule>
   <rule>
+    <from>^/browse/remove_subscription(/.*)$</from>
+    <to>/browse/remove_subscription?path=$1</to>
+  </rule>
+  <rule>
     <from>^/browse/download(/.*)$</from>
     <to>/browse/download?path=$1</to>
   </rule>

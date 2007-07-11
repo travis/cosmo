@@ -125,10 +125,11 @@ public class AccountBrowsingController extends MultiActionController
              * use a little bit of a hack to get a user when
              * we want to display subscriptions */
             
-            // If we are browseing a user's root collection, 
+            // If we are browsing a user's root collection, 
             // the path will be only one section long
-            if (path.split("/").length == 2){
-                request.setAttribute("User", userService.getUser(path.split("/")[1]));
+            String[] pathParts = path.split("/");
+            if (pathParts.length == 2){
+                request.setAttribute("User", userService.getUser(pathParts[1]));
             }
             
             return new ModelAndView(browseCollectionView);

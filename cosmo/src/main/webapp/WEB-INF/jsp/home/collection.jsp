@@ -190,11 +190,6 @@
 <jsp:include page="inc-attributes.jsp" />
 
 <c:if test="${User != null}">
-<script lang="JavaScript">
-dojo.require("cosmo.service.conduits.common");
-var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
-</script>
-
 <div class="hd" style="margin-top: 12px;">
 	Subscriptions
 </div>

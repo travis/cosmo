@@ -48,12 +48,13 @@ cosmo.ui.detail = new function () {
         var delta = deltaAndError[0];
 
         if (error){
-            alert(error);
+            cosmo.app.showErr(_('Main.DetailForm.Error'), error);
             return;
         } else {
             if (!delta.hasChanges()){
                 return;
             }
+          
             this.item.makeSnapshot();
             dojo.event.topic.publish('/calEvent', {
               action: 'saveConfirm', delta: delta, data: this.item });

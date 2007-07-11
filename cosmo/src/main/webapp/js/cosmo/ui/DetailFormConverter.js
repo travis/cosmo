@@ -36,11 +36,12 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             errorMessage += this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }
 
+        errorMessage += this._populateAnyTimeAtTime(delta);
         this._populateDeltaFromTriageWidget(delta);
-        
         if (!errorMessage){
             errorMessage += this._performInterPropertyValidations(delta);
         }
+        
         delta.deltafy(true);
         return [delta, errorMessage];  
     },
@@ -263,7 +264,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var h = cosmo.datetime.util.hrStd2Mil(t.hours, (meridianFieldValue == "pm"));
             var m = t.minutes;
             jsDate.setHours(h, m);
-          }
+        }
 
         if (errMsg){
             return [null, errMsg];
@@ -346,6 +347,33 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         }
         
         return errMsg;
+    }, 
+    _populateAnyTimeAtTime: function(delta){
+        if (delta.getStampProperty("event", "allDay")){
+               delta.setStampProperty("event", "anyTime", false) 
+               return "";
+        }
+        
+        var form = this.getStampForm("event");
+        var startTimeFieldValue = this._getFormValue(form, "startTime");
+        var endTimeFieldValue = this._getFormValue(form, "endTime");
+        if (!startTimeFieldValue) {
+           if (!endTimeFieldValue){
+               delta.addStampProperty("event", "anyTime", true)
+           } else {
+               return "ERRROR";
+           }
+        } else {
+           if (!endTimeFieldValue){
+               //this is attime, so kill duration, end time
+               delta.removeStampProperty("event", "endDate");
+               delta.addStampProperty("event", "duration", null);
+               delta.addStampProperty("event", "anyTime", false) //just in case.
+           } else {
+               delta.addStampProperty("event", "anyTime", false) //just in case.
+           }
+        }
+        return "";
     }
     
 });

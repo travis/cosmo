@@ -31,3 +31,17 @@ function(){}, {});
 dojo.declare("cosmo.service.exception.ConflictException", cosmo.service.exception.ServiceException,
     // summary: Thrown when we receive a 409.
 function(){}, {});
+
+dojo.declare("cosmo.service.exception.ResourceNotFoundException", cosmo.service.exception.ServiceException, 
+{
+    initializer: function(id){
+        //sumamry: Thrown when a resource could not be retrieved from the service.
+        //id: The identifier that was used when try to retrieve the item. In RESTful services, this
+        //    would be the URL. 
+        this.id = id;        
+    }, 
+    
+    toString: function(){
+        return "The resource " + id + " does not exist";
+    }
+});

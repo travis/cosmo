@@ -115,8 +115,8 @@ cosmo.view.service = new function () {
                 size++;
             }
         }
-     
-        if (!item.data.hasRecurrence()){   
+
+        if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
             dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
         } else {
@@ -411,7 +411,7 @@ cosmo.view.service = new function () {
         }
         cosmo.app.showDialog(cosmo.view.dialog.getProps(str, opts));
     }
-    
+
     /**
      * Called for after passthrough from removeItemConfirm. Routes to
      * the right remove operation (i.e., for recurring items, 'All Future,'
@@ -423,13 +423,13 @@ cosmo.view.service = new function () {
     function removeItem(item, qual) {
         dojo.debug("remove Item: item: " +item);
         dojo.debug("qual: "+ qual);
-        
+
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
         // setTimeout to allow the 'processing ...' state to
         // display
         var f = null;
-        
+
         // A second function object used as a callback from
         // the first f callback function -- used when the save
         // operation needs to be made on a recurrence instance's
@@ -486,7 +486,7 @@ cosmo.view.service = new function () {
         var deferred = null;
         var reqId = null;
 
-        
+
         if (opts.removeType == "singleEvent"){
             deferred = cosmo.app.pim.serv.deleteItem(item.data);
             reqId = deferred.id;
@@ -523,7 +523,7 @@ cosmo.view.service = new function () {
             var master = data.getMaster();
             var masterEventStamp = master.getEventStamp();
             var recurrenceId = data.recurrenceId;
-            var exDate = null; 
+            var exDate = null;
             if (masterEventStamp.getStartDate().isFloating()){
                 exDate = recurrenceId.clone()
             } else {
@@ -537,13 +537,13 @@ cosmo.view.service = new function () {
             deferred = cosmo.app.pim.serv.saveItem(master);
             reqId = deferred.id;
         }
-        
+
         // Pass the original item and opts object to the handler function
         // along with the original params passed back in from the async response
         var f = function () {
-            handleRemoveResult(item, deferred.results[1], reqId, opts); 
+            handleRemoveResult(item, deferred.results[1], reqId, opts);
         };
-        
+
         deferred.addCallback(f);
     }
     /**
@@ -570,7 +570,7 @@ cosmo.view.service = new function () {
         // Broadcast success
         dojo.event.topic.publish('/calEvent', { 'action': act,
             'data': removeEv, 'opts': opts });
-        dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});            
+        dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});
     }
 
     function getErrDetailMessage(err) {

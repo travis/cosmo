@@ -100,36 +100,32 @@ public class MockUserDao implements UserDao {
     /**
      */
     public User getUser(String username) {
-        if (username == null) {
-            throw new IllegalArgumentException("null username");
-        }
+        if (username == null)
+            return null;
         return (User) usernameIdx.get(username);
     }
 
     /**
      */
     public User getUserByUid(String uid) {
-        if (uid == null) {
-            throw new IllegalArgumentException("null uid");
-        }
+        if (uid == null) 
+            return null;
         return (User) uidIdx.get(uid);
     }
 
     /**
      */
     public User getUserByActivationId(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("null activation id");
-        }
+        if (id == null)
+            return null;
         return (User) activationIdIdx.get(id);
     }
 
     /**
      */
     public User getUserByEmail(String email) {
-        if (email == null) {
-            throw new IllegalArgumentException("null email");
-        }
+        if (email == null)
+            return null;
         return (User) emailIdx.get(email);
     }
 

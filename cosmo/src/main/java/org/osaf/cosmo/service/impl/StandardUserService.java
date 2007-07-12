@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
+import org.osaf.cosmo.model.DuplicateEmailException;
+import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
@@ -36,6 +38,8 @@ import org.osaf.cosmo.service.ServiceListener;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.PageCriteria;
+
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Standard implementation of {@link UserService}.
@@ -162,7 +166,16 @@ public class StandardUserService extends BaseService implements UserService {
 
         fireBeforeEvent(new ServiceEvent("CREATE_USER", user), listeners);
 
-        userDao.createUser(user);
+        try {
+            userDao.createUser(user);
+        } catch (DataIntegrityViolationException e) {
+            if (userDao.getUser(user.getUsername()) != null)
+                throw new DuplicateUsernameException(user.getUsername());
+            if (userDao.getUserByEmail(user.getEmail()) != null)
+                throw new DuplicateEmailException(user.getEmail());
+            throw e;
+        }
+
         User newUser = userDao.getUser(user.getUsername());
 
         HomeCollectionItem home = null;

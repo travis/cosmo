@@ -43,15 +43,15 @@ cosmo.view.list.canvasInstance =
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;
 
-cosmo.view.list.triageStatusCodeNumberMappings = {
-    300: 'done',
-    100: 'now',
-    200: 'later' };
+cosmo.view.list.triageStatusCodeMappings = {
+    300: 'Done',
+    100: 'Now',
+    200: 'Later' };
 
-cosmo.view.list.triageStatusCodeStrings = {
-    DONE: 'done',
-    NOW: 'now',
-    LATER: 'later' };
+cosmo.view.list.triageStatusCodeReverseMappings = {
+    DONE: 300,
+    NOW: 100,
+    LATER: 200 };
 
 cosmo.view.list.handlePub_calEvent = function (cmd) {
 
@@ -189,7 +189,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     setVals('startDate', sr, fm);
     // Triage
     var tr = data.getTriageStatus();
-    var fm = this.triageStatusCodeNumberMappings[tr];
+    var fm = _('Dashboard.ListEntry.Triage' + this.triageStatusCodeMappings[tr]);
     setVals('triage', tr, fm);
 
     // Use two separate keyword/val objs since

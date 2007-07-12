@@ -594,6 +594,22 @@ td.dataDisplayLabel {
 .listViewSelectedCell {
     background-color: #deeeff;
 }
+.listViewTriageCell {
+    text-align: center;
+    font-size: 10px;
+}
+.listViewTriageNow {
+    color: #fff;
+    background-color: #3c0;
+}
+.listViewTriageLater {
+    color: #fff;
+    background-color: #fc0;
+}
+.listViewTriageDone {
+    color: #fff;
+    background-color: #545454;
+}
 /* Calendar canvas */
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */
 #dayListDiv {

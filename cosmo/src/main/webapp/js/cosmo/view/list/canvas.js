@@ -17,6 +17,7 @@
 dojo.provide('cosmo.view.list.canvas');
 
 dojo.require('dojo.event.*');
+dojo.require('dojo.html.common');
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.view.common");
@@ -76,7 +77,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     this.renderSelf = function () {
-        
+
         // Rendering can be messages published to calEvent
         // or by window resizing
         if (!cosmo.view.list.isCurrentView()) { return false; }
@@ -102,7 +103,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (!p.id) { return false; }
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
-                ch[i].className = 'listViewDataCell listViewSelectedCell';
+                dojo.html.addClass(ch[i], 'listViewSelectedCell');
             }
         }
     };
@@ -113,7 +114,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (!p.id || (p.id ==  'listView_item' + self.getSelectedItemId())) { return false; }
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
-                ch[i].className = 'listViewDataCell';
+                dojo.html.removeClass(ch[i], 'listViewSelectedCell');
             }
         }
     };
@@ -133,13 +134,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 if (orig) {
                     ch = orig.childNodes;
                     for (var i = 0; i < ch.length; i++) {
-                        ch[i].className = 'listViewDataCell';
+                        dojo.html.removeClass(ch[i], 'listViewSelectedCell');
                     }
                 }
                 // The new selection
                 var ch = p.childNodes;
                 for (var i = 0; i < ch.length; i++) {
-                    ch[i].className = 'listViewDataCell listViewSelectedCell';
+                    dojo.html.addClass(ch[i], 'listViewSelectedCell');
                 }
                 var id = p.id.replace('listView_item', '');
                 var item = this.view.itemRegistry.getItem(id);
@@ -162,21 +163,30 @@ cosmo.view.list.canvas.Canvas = function (p) {
     // lots of rows
     this.displayTable = function () {
         var _list = cosmo.view.list;
+        var _tMap = cosmo.view.list.triageStatusCodeMappings;
         var hash = _list.itemRegistry;
         var selId = 'listView_item' + self.getSelectedItemId();
-        var map = cosmo.view.list.triageStatusCodeNumberMappings;
+        var map = cosmo.view.list.triageStatusCodeMappings;
         var d = _createElem('div'); // Dummy div
         var taskIcon = cosmo.ui.imagegrid.createImageIcon({ domNode: d,
             iconState: 'listViewTaskIcon' });
         var taskIconStyle = taskIcon.style;
-        var t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
+        var t = '';
         var r = '';
+        
+        t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
+        // Header row
         r += '<tr>';
-        r += '<td id="listViewTaskHeader" class="listViewHeaderCell" style="width: 16px;">&nbsp;</td>';
-        r += '<td id="listViewTitleHeader" class="listViewHeaderCell">' + _('Dashboard.ColHeaders.Title') + '</td>';
-        r += '<td id="listViewWhoHeader" class="listViewHeaderCell">' + _('Dashboard.ColHeaders.UpdatedBy') + '</td>';
-        r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">' + _('Dashboard.ColHeaders.StartsOn') + '</td>';
-        r += '<td id="listViewTriageHeader" class="listViewHeaderCell" style="border-right: 0px;">' + _('Dashboard.ColHeaders.Triage') + '</td>';
+        r += '<td id="listViewTaskHeader" class="listViewHeaderCell"' +
+            ' style="width: 16px;">&nbsp;</td>';
+        r += '<td id="listViewTitleHeader" class="listViewHeaderCell">' +
+            _('Dashboard.ColHeaders.Title') + '</td>';
+        r += '<td id="listViewWhoHeader" class="listViewHeaderCell">' +
+            _('Dashboard.ColHeaders.UpdatedBy') + '</td>';
+        r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">' +
+            _('Dashboard.ColHeaders.StartsOn') + '</td>';
+        r += '<td id="listViewTriageHeader" class="listViewHeaderCell"' +
+            ' style="border-right: 0px;">' + _('Dashboard.ColHeaders.Triage') + '</td>';
         r += '</tr>\n';
         t += r;
 
@@ -184,6 +194,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var getRow = function (key, val) {
             var item = val;
             var display = item.display;
+            var sort = item.sort;
             var selCss = 'listView_item' + display.uid == selId ? ' listViewSelectedCell' : '';
             r = '';
             r += '<tr id="listView_item' + display.uid + '">';
@@ -199,7 +210,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.title) + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.who) + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.startDate) + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.triage) + '</td>';
+            r += '<td class="listViewDataCell' + 
+                ' listViewTriageCell listViewTriage' + 
+                _tMap[sort.triage] + selCss + '">' + 
+                fillCell(display.triage) + '</td>';
             r += '</tr>\n';
             t += r;
         }

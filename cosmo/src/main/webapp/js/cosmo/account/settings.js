@@ -150,39 +150,43 @@ cosmo.account.settings = new function () {
         // -------
         tabLabel = strings.advanced;
         tabContent = _createElem('div');
-        this.advancedForm = this.getAdvancedForm();
-        tabContent.appendChild(this.advancedForm);
-        tabs.push({ label: tabLabel, content: tabContent });
-
-        // About Cosmo tab
-        // -------
-        tabLabel = strings.about;
-        var about = dojo.widget.createWidget("cosmo:About", {}, s, 'last');
-        s.removeChild(about.domNode); // Detach from the throwaway node
-        tabContent = about;
-        originalAboutBox = about;
-        tabs.push({ label: tabLabel, content: tabContent });
-
-        var self = this; // For callback scope
-        // Submit button and default Enter-key action
-        var f = function () { self.submitSave.apply(self); };
-
-        var b = null; // For dialog buttons
-        var c = null; // For dialog content area
-        c = dojo.widget.createWidget("cosmo:TabContainer", {
-            tabs: tabs }, s, 'last');
-        s.removeChild(c.domNode); // Detach from the throwaway node
-        o.content = c;
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Close'),
-            width:60, small: true, handleOnClick: function () {
-                cosmo.app.hideDialog(); } });
-        o.btnsLeft = [b];
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Save'),
-            width:60, small: true, handleOnClick: f });
-        o.btnsRight = [b];
-        o.defaultAction = f;
-
-        cosmo.app.showDialog(o);
+        var advancedFormDeferred = this.getAdvancedForm();
+        advancedFormDeferred.addCallback(dojo.lang.hitch(this, function (advancedForm){
+            this.advancedForm = advancedForm;
+            tabContent.appendChild(this.advancedForm);
+            tabs.push({ label: tabLabel, content: tabContent });
+    
+            // About Cosmo tab
+            // -------
+            tabLabel = strings.about;
+            var about = dojo.widget.createWidget("cosmo:About", {}, s, 'last');
+            s.removeChild(about.domNode); // Detach from the throwaway node
+            tabContent = about;
+            originalAboutBox = about;
+            tabs.push({ label: tabLabel, content: tabContent });
+    
+            var self = this; // For callback scope
+            // Submit button and default Enter-key action
+            var f = function () { self.submitSave.apply(self); };
+    
+            var b = null; // For dialog buttons
+            var c = null; // For dialog content area
+            c = dojo.widget.createWidget("cosmo:TabContainer", {
+                tabs: tabs }, s, 'last');
+            s.removeChild(c.domNode); // Detach from the throwaway node
+            o.content = c;
+            b = new cosmo.ui.button.Button({ text:_('App.Button.Close'),
+                width:60, small: true, handleOnClick: function () {
+                    cosmo.app.hideDialog(); } });
+            o.btnsLeft = [b];
+            b = new cosmo.ui.button.Button({ text:_('App.Button.Save'),
+                width:60, small: true, handleOnClick: f });
+            o.btnsRight = [b];
+            o.defaultAction = f;
+    
+            cosmo.app.showDialog(o);
+        }));
+        return advancedFormDeferred;
     }
     /**
      * Validate the form input and submit via XHR
@@ -194,47 +198,62 @@ cosmo.account.settings = new function () {
         // will give you spurious submissions
         if (this.focusedField) { return false; }
 
-        // Save preferences syncronously first
+        // save preferences asynchronously
         var prefs = {};
 
         prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] =
-            this.advancedForm.showAccountBrowser.checked.toString();
+            this.advancedForm.showAccountBrowser.checked;
         
+        var setPreferencesDeferred = new dojo.Deferred();
         for (var pref in prefs){
-            cosmo.account.preferences.setPreference(pref, prefs[pref]);
-        }
-
-        // Validate the form input using each field's
-        // attached validators
-        var fieldList = this.fieldList;
-        // Validate fields with the attached validators
-        // and display any inline err messages
-        var err = cosmo.account.validateForm(this.detailsForm, fieldList, false);
-
-        // No error -- submit updated account info via CMP
-        if (!err) {
-            var self = this;
-            // Same handler for both success and error -- IE throws a
-            // freakish '1223' HTTP code when server returns a successful
-            // 204 'No content'. Dojo's io.bind doesn't recognize that as
-            // success, so we have to examine status codes manually
-            var f = function (type, data, resp) {
-                self.handleAccountSave(type, data, resp); };
-            var hand = { handle: f };
-            var account = {};
-            // Create a hash from the form field values
-            for (var i = 0; i < fieldList.length; i++) {
-                var f = fieldList[i];
-                var val = this.detailsForm[f.elemName].value;
-                // Only include fields with values -- throw out
-                // the 'confirm' field
-                if (val && (f.elemName != 'confirm')) {
-                    account[f.elemName] = val;
+            // create new function and call immediately to define scope
+            var throwAway = function (){
+                // capture preference key in scope
+                var capturedPref = pref;
+                setPreferencesDeferred.addCallback(function () {
+                    return cosmo.account.preferences.setPreference(capturedPref, 
+                        prefs[capturedPref]);
                 }
-            }
-            // Hand off to CMP
-            cosmo.cmp.modifyAccount(account, hand);
+                );
+            }();
         }
+        // Start preferences setting
+        setPreferencesDeferred.callback();
+        
+        setPreferencesDeferred.addCallback(dojo.lang.hitch(this, function () {
+            // Validate the form input using each field's
+            // attached validators
+            var fieldList = this.fieldList;
+            // Validate fields with the attached validators
+            // and display any inline err messages
+            var err = cosmo.account.validateForm(this.detailsForm, fieldList, false);
+    
+            // No error -- submit updated account info via CMP
+            if (!err) {
+                var self = this;
+                // Same handler for both success and error -- IE throws a
+                // freakish '1223' HTTP code when server returns a successful
+                // 204 'No content'. Dojo's io.bind doesn't recognize that as
+                // success, so we have to examine status codes manually
+                var f = function (type, data, resp) {
+                    self.handleAccountSave(type, data, resp); };
+                var hand = { handle: f };
+                var account = {};
+                // Create a hash from the form field values
+                for (var i = 0; i < fieldList.length; i++) {
+                    var f = fieldList[i];
+                    var val = this.detailsForm[f.elemName].value;
+                    // Only include fields with values -- throw out
+                    // the 'confirm' field
+                    if (val && (f.elemName != 'confirm')) {
+                        account[f.elemName] = val;
+                    }
+                }
+                // Hand off to CMP
+                cosmo.cmp.modifyAccount(account, hand);
+            }
+        }));
+        
     };
     /**
      * Handle both success and error responses from the CMP call
@@ -282,25 +301,28 @@ cosmo.account.settings = new function () {
         var form = _createElem('form');
         var div = _createElem('div');
         var nbsp = function () { return cosmo.util.html.nbsp(); };
-        var prefs = cosmo.account.preferences.getPreferences();
-        var checkedDefault = (prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true');
-        var check = cosmo.util.html.createInput({ type: 'checkbox',
-            id: 'showAccountBrowser', name: 'showAccountBrowser',
-            value: '', checked: checkedDefault });
-
-        div.appendChild(check);
-        div.appendChild(nbsp());
-        div.appendChild(nbsp());
-        div.appendChild(_createText(strings.advancedAccountBrowser));
-        form.appendChild(div);
-
-        // BANDAID: Hack to get the checkbox into Safari's
-        // form elements collection
-        if (navigator.userAgent.indexOf('Safari') > -1) {
-            cosmo.util.html.addInputsToForm([check], form);
-        }
-
-        return form;
+        var prefsDeferred = cosmo.account.preferences.getPreferences();
+        prefsDeferred.addCallback(function(prefs){
+            var checkedDefault = (prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] == 'true');
+            var check = cosmo.util.html.createInput({ type: 'checkbox',
+                id: 'showAccountBrowser', name: 'showAccountBrowser',
+                value: '', checked: checkedDefault });
+    
+            div.appendChild(check);
+            div.appendChild(nbsp());
+            div.appendChild(nbsp());
+            div.appendChild(_createText(strings.advancedAccountBrowser));
+            form.appendChild(div);
+    
+            // BANDAID: Hack to get the checkbox into Safari's
+            // form elements collection
+            if (navigator.userAgent.indexOf('Safari') > -1) {
+                cosmo.util.html.addInputsToForm([check], form);
+            }
+    
+            return form;
+        });
+        return prefsDeferred;
     };
 
 

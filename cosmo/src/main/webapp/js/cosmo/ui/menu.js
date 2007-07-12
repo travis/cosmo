@@ -29,27 +29,41 @@ dojo.require('cosmo.convenience');
 dojo.require('cosmo.account.settings');
 dojo.require('cosmo.account.create');
 dojo.require("cosmo.ui.ContentBox");
+dojo.require("cosmo.util.deferred");
 
 cosmo.ui.menu = new function () {
     var self = this;
-    this.items = new cosmo.util.hash.Hash();
+    this.items = null;
+    // A copy of the preferences, we need to watch the PreferencesUpdatedMessage topic
+    // to make sure we keep this up to date
+    this.preferences = {};
     this.init = function () {
-        this.loadItems();
+        return this.loadItems();
     }
-    this.loadItems = function () {
-        var _c = cosmo.ui.menu.MenuItem;
-        var items =  cosmo.ui.menu.allItems;
-        var prefs = cosmo.app.initParams.authAccess?
-            cosmo.account.preferences.getPreferences() : {};
-        // Instantiate all the items as MenuItem obj
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            if (this.itemShownInDisplayMode(item, this.calculateDisplayMode()) &&
-                this.userHasRequiredRolesForItem(item) &&
-                this.userHasRequiredPrefForItem(item, prefs)) {
-                this.items.addItem(items[i].id, new _c(items[i]));
+    this.loadItems = function (dontReloadPrefs) {
+        var prefsDeferred = (cosmo.app.initParams.authAccess && !dontReloadPrefs)?
+            cosmo.account.preferences.getPreferences() : 
+            cosmo.util.deferred.getFiredDeferred();
+            
+        prefsDeferred.addCallback(dojo.lang.hitch(this, function (prefs) {
+            if (prefs){
+                this.preferences = prefs;
             }
-        }
+            var items = cosmo.ui.menu.allItems;
+            this.items = new cosmo.util.hash.Hash();
+            // Instantiate all the items as MenuItem obj
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                if (this.itemShownInDisplayMode(item, this.calculateDisplayMode()) &&
+                    this.userHasRequiredRolesForItem(item) &&
+                    this.userHasRequiredPrefForItem(item)) {
+                    
+                    this.items.addItem(item.id, new cosmo.ui.menu.MenuItem(item));
+                }
+            }
+        }));
+        cosmo.util.deferred.addStdErrback(prefsDeferred);
+        return prefsDeferred;
     };
 
     this.calculateDisplayMode = function(){
@@ -73,10 +87,10 @@ cosmo.ui.menu = new function () {
         }
         return true;
     };
-    this.userHasRequiredPrefForItem = function (item, prefs) {
+    this.userHasRequiredPrefForItem = function (item) {
         var pref = item.requiredPref;
         if (pref) {
-            return !!(prefs[pref]);
+            return !!(this.preferences[pref]);
         }
         else {
             return true;
@@ -132,8 +146,8 @@ cosmo.ui.menu.allItems = [
             window.open(cosmo.ui.menu.urls.ACCOUNT_BROWSER); e.preventDefault(); },
         urlString: cosmo.ui.menu.urls.ACCOUNT_BROWSER,
         displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
-        //requiredPref: cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK
+        requiredRoles: [cosmo.ui.menu.requiredRoles.USER],
+        requiredPref: cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK
         },
     { id: 'signupMenuItem',
         displayText: _('Main.SignUp'),
@@ -176,6 +190,8 @@ cosmo.ui.menu.MenuItem = function (p) {
     this.displayMode = '';
     this.requiredRoles = [];
     this.requiredPref = null;
+    this.subscribeTo = {};
+    this.span = null;
     // Note that yes, there are sometimes that you want
     // *both* an onclickFunc and a urlString -- example
     // is opening something in a new window where you
@@ -186,7 +202,12 @@ cosmo.ui.menu.MenuItem = function (p) {
     // after exec'ing the function
     this.onclickFunc = null;
     this.urlString = '';
+    this.show = function (){this.span.style.display = this.divider.style.display = 'inline';};
+    this.hide = function (){this.span.style.display = this.divider.style.display = 'none';};
     for (var n in params) { this[n] = params[n]; }
+    for (topic in this.subscribeTo){
+        dojo.event.topic.subscribe(topic, dojo.lang.hitch(this, this.subscribeTo[topic]));
+    }
 };
 
 cosmo.ui.menu.MainMenu = function (p) {
@@ -217,6 +238,7 @@ cosmo.ui.menu.MainMenu = function (p) {
     this.appendItem = function (item, lastItem) {
         var s = this.createItem(item, lastItem);
         this.domNode.appendChild(s);
+        item.span = s;
         var s = _createElem('span');
         s.className = 'menuBarDivider';
         s.appendChild(cosmo.util.html.nbsp());
@@ -225,27 +247,52 @@ cosmo.ui.menu.MainMenu = function (p) {
         }
         s.appendChild(cosmo.util.html.nbsp());
         this.domNode.appendChild(s);
+        item.divider = s; 
     };
     this.insertItem = function (item, referenceItem) {
 
     };
     this.renderSelf = function () {
+        var initDeferred;
         if (!this.hasBeenRendered) {
-            cosmo.ui.menu.init();
-            this.hasBeenRendered = true;
+            initDeferred = cosmo.ui.menu.init();
+            initDeferred.addCallback(
+                dojo.lang.hitch(this, 
+                    function () {
+                        this.hasBeenRendered = true;
+                    }
+                    )
+            
+            );
+        } else {
+            initDeferred = cosmo.util.deferred.getFiredDeferred();
         }
-        this.clearAll();
-        // Render menu according to loaded items
-        var items = cosmo.ui.menu.items;
-        var last = (items.length - 1);
-        for (var i = 0; i < items.length; i++) {
-            var item = items.getAtPos(i);
-            var lastItem = i == last;
-            this.appendItem(item, lastItem);
-        }
-        this.setPosition();
+        
+        initDeferred.addCallback(dojo.lang.hitch(this, function () {
+            this.clearAll();
+            // Render menu according to loaded items
+            var items = cosmo.ui.menu.items;
+            var last = (items.length - 1);
+            for (var i = 0; i < items.length; i++) {
+                var item = items.getAtPos(i);
+                var lastItem = i == last;
+                this.appendItem(item, lastItem);
+            }
+            this.setPosition();
+        }));
+        cosmo.util.deferred.addStdErrback(initDeferred, _("Error.Rendering", this))
+        return initDeferred;
     }
     for (var n in params) { this[n] = params[n]; }
+    dojo.event.topic.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName, 
+                           dojo.lang.hitch(this, function (message) {
+                               for (var pref in message.preferences){
+                                   cosmo.ui.menu.preferences[pref] = message.preferences[pref];
+                               }
+                               cosmo.ui.menu.loadItems(true);
+                               this.renderSelf();
+                           }));
+    
 };
 cosmo.ui.menu.MainMenu.prototype =
     new cosmo.ui.ContentBox();

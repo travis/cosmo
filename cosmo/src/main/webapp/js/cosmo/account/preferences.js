@@ -28,7 +28,9 @@ cosmo.account.preferences = new function () {
 
     this.setPreference = function(key, val){
 		cosmo.app.pim.serv.setPreference(key, val);
-        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [{key:val}])
+		var preferences = {};
+		preferences[key] = val;
+        cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [preferences])
     };
 
     this.deletePreference = function(key){

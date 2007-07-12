@@ -281,6 +281,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         }
         return this.bind(
             {
+                contentType: "application/atom+xml",
                 url: url,
                 postContent: postContent,
                 method: method

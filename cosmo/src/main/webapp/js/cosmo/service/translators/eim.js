@@ -264,6 +264,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var key = keyEl.firstChild.nodeValue;
         var valueEl = this.getChildrenByClassName(xml, "value")[0];
         var value = valueEl.firstChild.nodeValue;
+        
+        // A little type converting
+        if (value == "false") value = false;
         return [key,value];
     },
     

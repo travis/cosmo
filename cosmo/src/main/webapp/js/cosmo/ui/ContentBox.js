@@ -15,7 +15,8 @@
 */
 
 dojo.provide("cosmo.ui.ContentBox");
-
+dojo.require("cosmo.util.deferred");
+dojo.require("dojo.Deferred");
 // Generic content container class
 // ==============================
 cosmo.ui.ContentBox = function (p) {
@@ -92,13 +93,19 @@ cosmo.ui.ContentBox.prototype.update = function (p) {
     for (var n in params) { this[n] = params[n]; }
 };
 cosmo.ui.ContentBox.prototype.render = function () {
+    var renderDeferred;
     if (typeof this.renderSelf == 'function') {
-        this.renderSelf();
+        renderDeferred = this.renderSelf();
     };
-    var ch = this.children;
-    for (var i = 0; i < ch.length; i++) {
-        ch[i].render();
+    if (!(renderDeferred instanceof dojo.Deferred)){
+        renderDeferred = cosmo.util.deferred.getFiredDeferred(renderDeferred);
     }
+    renderDeferred.addCallback(dojo.lang.hitch(this, function () {
+        var ch = this.children;
+        for (var i = 0; i < ch.length; i++) {
+            ch[i].render();
+        }
+    }));
 };
 cosmo.ui.ContentBox.prototype.addChild = function (c) {
     this.children.push(c);

@@ -122,9 +122,11 @@ public class EventApplicator extends BaseStampApplicator
         super.applyRecord(record);
         
         // Ensure that a startDate is present
-        BaseEventStamp event = (BaseEventStamp) getStamp();
-        if(event.getStartDate()==null)
-            throw new EimValidationException("field " + FIELD_DTSTART + " is required");
+        if(!record.isDeleted()) {
+            BaseEventStamp event = (BaseEventStamp) getStamp();
+            if(event.getStartDate()==null)
+                throw new EimValidationException("field " + FIELD_DTSTART + " is required");
+        }
     }
 
     /**

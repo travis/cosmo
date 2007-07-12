@@ -176,7 +176,7 @@ cosmo.view.service = new function () {
                         {
                           'saveType': opts.ALL_FUTURE_EVENTS,
                           'delta': delta,
-                          'newItem': newItem
+                          'newItemNote': newItem
                         });
                     };
                     break;
@@ -238,7 +238,7 @@ cosmo.view.service = new function () {
         var isNew = opts['new'] || false;
         var note = item.data;
         var delta = opts.delta;
-        var newItem = opts.newItem;
+        var newItem = opts.newItemNote;
         dojo.debug("Do save: savetype: " + opts.saveType)
         dojo.debug("Do save: iznew: " + isNew)
 
@@ -385,7 +385,7 @@ cosmo.view.service = new function () {
              'data': item,
              'saveType': saveType,
              'delta':delta,
-             'newItem':newItem
+             'newItemNote':newItem
         });
     }
 

@@ -38,7 +38,8 @@ dojo.declare("cosmo.service.exception.ResourceNotFoundException", cosmo.service.
         //sumamry: Thrown when a resource could not be retrieved from the service.
         //id: The identifier that was used when try to retrieve the item. In RESTful services, this
         //    would be the URL. 
-        this.id = id;        
+        this.id = id;
+        this.message = this.toString();
     }, 
     
     toString: function(){

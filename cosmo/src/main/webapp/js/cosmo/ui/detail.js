@@ -54,7 +54,7 @@ cosmo.ui.detail = new function () {
             if (!delta.hasChanges()){
                 return;
             }
-          
+
             this.item.makeSnapshot();
             dojo.event.topic.publish('/calEvent', {
               action: 'saveConfirm', delta: delta, data: this.item });
@@ -207,11 +207,14 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 break;
             case 'eventsDisplaySuccess':
             case 'setSelected':
+                // An item has been clicked on, selected
                 if (item) {
                     self.updateFromItem(item);
-                    self.markupBar.render();
-                } else {
-                    self.clear();
+                }
+                // No-item means 'nothing selected'
+                else {
+                    cosmo.ui.detail.item = null;
+                    self.clear(true);
                     self.buttonSection.setButtons(false);
                 }
                 break;
@@ -219,7 +222,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 //self.setButtons(true, true);
                 break;
             case 'saveFromForm':
-                cosmo.ui.detail.saveItem(); 
+                cosmo.ui.detail.saveItem();
                 break;
             default:
                 // Do nothing
@@ -242,12 +245,14 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     var stamps = this.stamps;
     var stamp = null;
 
-    // Clear out previous values
-    this.clear();
+    // Clear out previous values -- don't bother disabling elements;
+    // we'll just be filling them in anyway
+    this.clear(false);
 
     //save the item
     cosmo.ui.detail.item = item;
 
+    this.markupBar.render();
     this.mainSection.toggleEnabled(true);
     f = this.mainSection.formNode;
     f.noteTitle.value = data.getDisplayName();
@@ -263,12 +268,17 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
 };
 
 cosmo.ui.detail.DetailViewForm.prototype.clear =
-    function () {
-    this.mainSection.toggleEnabled(false);
+    function (doCompleteDisable) {
+    var opts = {};
+    opts.doCompleteDisable = doCompleteDisable;
+    opts.disableStampFormElem = doCompleteDisable;
+    this.markupBar.render();
+    this.mainSection.toggleEnabled(false, opts);
     var stamps = this.stamps;
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
-        this[st.stampType.toLowerCase() + 'Section'].toggleEnabled(false);
+        this[st.stampType.toLowerCase() + 'Section'].toggleEnabled(false,
+            opts);
     }
 };
 
@@ -583,7 +593,9 @@ cosmo.ui.detail.StampSection.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
+    // Allow to be passed in explicitly, or just trigger toggle
     var doShow = typeof p == 'boolean' ? p : !this.expanded;
+    var display = '';
     if (doShow) {
         var dvForm = this.parent;
         if (dvForm.accordionMode) {
@@ -598,17 +610,24 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
         }
         this.expanded = true;
         dojo.lfx.wipeIn(this.bodyNode, 500).play();
-        this.showHideSwitch.textContent = '[hide]';
+        display = '[hide]';
     }
     else {
         this.expanded = false;
         dojo.lfx.wipeOut(this.bodyNode, 500).play();
-        this.showHideSwitch.textContent = '[show]';
+        display = '[show]';
+    }
+    if (document.all) {
+        this.showHideSwitch.innerText = display;
+    }
+    else {
+        this.showHideSwitch.textContent = display;
     }
 }
 
-cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, setUp) {
-    var setUpDefaults = true;
+cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {
+    var opts = o || {};
+    this.enablerSwitch.disabled = opts.doCompleteDisable;
     // Allow explicit enabled state to be passed
     if (typeof e == 'boolean') {
         // Don't bother enabling and setting up default state
@@ -616,22 +635,25 @@ cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, setUp) {
         if (e == this.enabled) { return false; }
         this.enabled = e;
         this.enablerSwitch.checked = e;
-        setUpDefaults = (setUp == false) ? false : true;
+        opts.setUpDefaults = (opts.setUpDefaults == false) ? false : true;
+        opts.disableStampFormElem = (opts.disableStampFormElem == false) ? false : true;
     }
+    // Otherwise it's just a DOM event, trigger toggle
     else {
         this.enabled = !this.enabled;
         // Don't pass click event along to the expando
         // when enabled/expanded states already match
         if (this.hasBody && (this.enabled != this.expanded)) { this.toggleExpando(); }
-        setUpDefaults = true;
+        opts.setUpDefaults = true;
+        opts.disableStampFormElem = !this.enabled;
     }
     if (this.hasBody) {
-        this.formSection.toggleEnabled(this.enabled, setUpDefaults);
+        this.formSection.toggleEnabled(this.enabled, opts);
     }
 }
 
 cosmo.ui.detail.StampSection.prototype.updateFromStamp = function (stamp) {
-    this.toggleEnabled(true, false);
+    this.toggleEnabled(true, { disableStampFormElem: false, setUpDefaults: false });
     if (this.hasBody) {
         this.formSection.updateFromStamp(stamp);
     }
@@ -678,7 +700,8 @@ cosmo.ui.detail.StampFormElements.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
-    = function (explicit, setUpDefaults) {
+    = function (explicit, o) {
+    var opts = o || {};
     var toggleText = function (tags, isEnabled) {
         var key = isEnabled ? 'remove' : 'add';
         for (var i = 0; i < tags.length; i++) {
@@ -689,18 +712,26 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
     if (typeof explicit == 'boolean') {
         this.enabled = explicit;
     }
+    // Otherwise it's just the DOM event, trigger toggle
     else {
         this.enabled = !this.enabled;
     }
 
-    // Disable label text
-    var tagTypes = ['td','div','span'];
-    for (var i in tagTypes) {
-        var tags = this.domNode.getElementsByTagName(tagTypes[i]);
-        toggleText(tags, this.enabled);
+    // Disable/enable label text
+    // ----------
+    // Don't disable text when just clearing form for update
+    // with a new selected item, but always re-enabled text
+    // when toggling a form section on
+    if (opts.disableStampFormElem || this.enabled) {
+        var tagTypes = ['td','div','span'];
+        for (var i in tagTypes) {
+            var tags = this.domNode.getElementsByTagName(tagTypes[i]);
+            toggleText(tags, this.enabled);
+        }
     }
 
     // Disable/enable form elements
+    // ----------
     var f = this.formNode;
     var elems = cosmo.util.html.getFormElemNames(f);
     var d = this.elementDefaultStates;
@@ -710,7 +741,7 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
             var state = d[i];
             var elemType = elems[i];
             cosmo.util.html.enableFormElem(elem, elemType);
-            if (setUpDefaults != false) {
+            if (opts.setUpDefaults != false) {
                 this.setElemDefaultState(elem, elemType, state);
             }
             else {
@@ -722,7 +753,12 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
         for (var i in elems) {
             var elem = f[i];
             var elemType = elems[i];
-            cosmo.util.html.clearAndDisableFormElem(elem, elemType);
+            if (opts.disableStampFormElem) {
+                cosmo.util.html.clearAndDisableFormElem(elem, elemType);
+            }
+            else {
+                cosmo.util.html.clearFormElem(elem, elemType);
+            }
         }
     }
 };

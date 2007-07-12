@@ -42,13 +42,17 @@ import org.springframework.dao.ConcurrencyFailureException;
  * parameters.
  */
 public class DeadlockRetryFilter implements Filter {
+    
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
     private int maxRetries = 10;
+    private int maxMemoryBuffer = 1024*256;
     private Class[] exceptions = new Class[] {ConcurrencyFailureException.class};
     private String[] methods = new String[] {"PUT", "POST", "DELETE", "MKCALENDAR" };
+    
     private static final String PARAM_RETRIES = "retries";
     private static final String PARAM_METHODS = "methods";
     private static final String PARAM_EXCEPTIONS = "exceptions";
+    private static final String PARAM_MAX_MEM_BUFFER = "maxMemoryBuffer";
 
 
     public void destroy() {
@@ -63,7 +67,7 @@ public class DeadlockRetryFilter implements Filter {
         // only care about certain methods
         if(isFilterMethod(method)) {
             // wrap request so we can utilize buffered content
-            request = new BufferedRequestWrapper((HttpServletRequest) request);
+            request = new BufferedRequestWrapper((HttpServletRequest) request, maxMemoryBuffer);
             
             // Wrap response so we can veto a sendError() set by the
             // abdera RequestProcessor
@@ -180,6 +184,11 @@ public class DeadlockRetryFilter implements Filter {
                 methods = param.split(",");
             }
 
+            // initialize memory buffer size
+            param = config.getInitParameter(PARAM_MAX_MEM_BUFFER);
+            if(param!=null)
+                maxMemoryBuffer = Integer.parseInt(param);
+            
             // initialize exceptions to catch and retry
             param = config.getInitParameter(PARAM_EXCEPTIONS);
             if(param!=null) {

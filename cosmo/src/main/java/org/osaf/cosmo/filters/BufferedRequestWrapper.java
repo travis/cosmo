@@ -38,6 +38,20 @@ public class BufferedRequestWrapper extends HttpServletRequestWrapper {
         super(request);
         inputStream = new BufferedServletInputStream(request.getInputStream());
     }
+    
+    /**
+     * @param request servlet request
+     * @param maxMemoryBuffer Maximum size of request that will be 
+     *                        buffered in memory.  Larger requests
+     *                        will be buffered to disk.
+     * @throws IOException
+     */
+    public BufferedRequestWrapper(HttpServletRequest request,
+            int maxMemoryBuffer) throws IOException {
+        super(request);
+        inputStream = new BufferedServletInputStream(request.getInputStream(),
+                maxMemoryBuffer);
+    }
 
     /**
      * When called, next call to getInputStream() will reset the buffered

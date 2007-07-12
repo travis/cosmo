@@ -40,7 +40,9 @@ public class BufferedServletInputStream extends ServletInputStream {
     private InputStream is = null;
     private File file = null;
     private byte[] buffer = null;
-    private int maxMemoryBuffer = 1024*500;
+    
+    // default to 256K memory buffer
+    private int maxMemoryBuffer = 1024*256;
     private static final int BUFFER_SIZE = 4096;
     
     private static final Log log = LogFactory.getLog(BufferedServletInputStream.class);
@@ -48,6 +50,18 @@ public class BufferedServletInputStream extends ServletInputStream {
     public BufferedServletInputStream(InputStream is) throws IOException {
        createBuffer(is);
     }
+    
+    /**
+     * @param is InputStream to buffer
+     * @param maxMemoryBuffer Maximum size of stream to buffer into memory.
+     *                        InputStreams that exceed this will be buffered
+     *                        into a temp file.
+     * @throws IOException
+     */
+    public BufferedServletInputStream(InputStream is, int maxMemoryBuffer) throws IOException {
+        this.maxMemoryBuffer = maxMemoryBuffer;
+        createBuffer(is);
+     }
 
     @Override
     public int available() throws IOException {

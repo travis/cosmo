@@ -173,7 +173,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var taskIconStyle = taskIcon.style;
         var t = '';
         var r = '';
-        
+
         t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
         // Header row
         r += '<tr>';
@@ -210,9 +210,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.title) + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.who) + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.startDate) + '</td>';
-            r += '<td class="listViewDataCell' + 
-                ' listViewTriageCell listViewTriage' + 
-                _tMap[sort.triage] + selCss + '">' + 
+            r += '<td class="listViewDataCell' +
+                ' listViewTriageCell listViewTriage' +
+                _tMap[sort.triage] + selCss + '">' +
                 fillCell(display.triage) + '</td>';
             r += '</tr>\n';
             t += r;

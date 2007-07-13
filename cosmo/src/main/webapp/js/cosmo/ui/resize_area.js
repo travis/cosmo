@@ -50,9 +50,14 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
 
     this.init = function(dir, off) {
         this.direction = dir ? dir : this.direction;
-        this.origSize =
-            this.getHeight(this.contentDiv) +
-            this.getHeight(this.handleDiv);
+        if (!this.dragSize) {
+            this.origSize = ALL_DAY_RESIZE_AREA_HEIGHT +
+               ALL_DAY_RESIZE_HANDLE_HEIGHT; 
+        }
+        else {
+            this.origSize = this.contentDiv.offsetHeight +
+                this.handleDiv.offsetHeight;
+        }
         this.dragSize = this.origSize;
         dojo.event.connect(self.handleDiv, 'onmousedown',
             function () { cosmo.app.dragItem = self });
@@ -110,9 +115,6 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
             self.contentDiv.style.height = this.dragSize + 'px';
             self.contentDiv.style.display= 'block';
         }
-    };
-    this.getHeight = function(div) {
-        return div.offsetHeight;
     };
 }
 

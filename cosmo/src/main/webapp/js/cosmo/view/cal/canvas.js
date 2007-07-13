@@ -415,10 +415,17 @@ cosmo.view.cal.canvas = new function () {
         showHours();
         setCurrentDayStatus();
 
-        // Render event lozenges
+        // Calculate color palette for the currrent collection
         self.calcColors();
+        // Render event lozenges
         loadSuccess();
-
+        // HACK: IE6's pixel-calc for 'height: 100%' gets reset
+        // if you touch innerHTML on the DOM node -- the resize
+        // drop method will reset this to a valid pixel height
+        if (navigator.appVersion.indexOf('MSIE 6') > -1) {
+            allDayArea.drop();
+        }
+        // Set rendered flag, used for initial-render-only functions
         hasBeenRendered = true;
     };
     this.saveTimedCanvasScrollOffset = function () {

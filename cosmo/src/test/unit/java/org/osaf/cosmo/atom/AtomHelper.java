@@ -175,12 +175,12 @@ public class AtomHelper extends MockHelper {
         generatorFactory.setFailureMode(true);
     }
 
-    public void rememberMediaType(String mediaType) {
-        processorFactory.getMediaTypes().add(mediaType);
+    public void rememberContentType(String type) {
+        processorFactory.getContentTypes().add(type);
     }
 
-    public void forgetMediaTypes() {
-        processorFactory.getMediaTypes().clear();
+    public void forgetContentTypes() {
+        processorFactory.getContentTypes().clear();
     }
 
     public void enableProcessorFailure() {

@@ -36,8 +36,10 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         copy.setUid(item.getUid());
         copy.setName("item copy");
         RequestContext req = createRequestContext(item, copy);
+        log.error("content-type: " + req.getContentType());
 
         ResponseContext res = provider.updateMedia(req);
+        log.error(helper.getContent(res));
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -50,7 +52,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         copy.setUid(item.getUid());
         copy.setName("item copy");
         RequestContext req = createRequestContext(item, copy);
-        helper.forgetMediaTypes();
+        helper.forgetContentTypes();
 
         ResponseContext res = provider.updateMedia(req);
         assertNotNull("Null response context", res);
@@ -86,7 +88,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        helper.rememberMediaType("text/plain");
+        helper.rememberContentType("text/plain");
     }
 
     private RequestContext createRequestContext(NoteItem original,

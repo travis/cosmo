@@ -22,13 +22,19 @@ package org.osaf.cosmo.atom.processor;
 public interface ProcessorFactory {
 
     /**
-     * Creates an instance of <code>ContentProcessor</code> based on
-     * the given media type.
-     *
-     * @param mediaType the media type of the content to process
-     * @return the entry processor, or null if no processor is
-     * supported for the named media type
+     * Returns an array of content types supported by this processor.
      */
-    public ContentProcessor createProcessor(String mediaType)
-        throws UnsupportedMediaTypeException;
+    public String[] getSupportedContentTypes();
+
+    /**
+     * Creates an instance of <code>ContentProcessor</code> based on
+     * the given content type.
+     *
+     * @param type the type of ontent to process
+     * @return the content processor
+      * @throws UnsupportedContentTypeException if the given type is not
+      * supported
+     */
+    public ContentProcessor createProcessor(String type)
+        throws UnsupportedContentTypeException;
 }

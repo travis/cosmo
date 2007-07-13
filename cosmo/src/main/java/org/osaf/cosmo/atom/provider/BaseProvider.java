@@ -189,6 +189,14 @@ public abstract class BaseProvider extends AbstractProvider
         return null;
     }
 
+    protected ResponseContext
+        checkMediaWritePreconditions(RequestContext request) {
+        if (request.getContentLength() <= 0)
+            return lengthrequired(getAbdera(), request, "Length Required");
+
+        return null;
+    }
+
     protected ServiceLocator createServiceLocator(RequestContext context) {
         HttpServletRequest request =
             ((HttpServletRequestContext)context).getRequest();

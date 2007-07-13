@@ -16,18 +16,18 @@
 package org.osaf.cosmo.atom.processor;
 
 /**
- * An exception signifying that a content media type specified by a
+ * An exception signifying that a content Content type specified by a
  * client is not supported by the server.
  */
-public class UnsupportedMediaTypeException extends ProcessorException {
+public class UnsupportedContentTypeException extends ProcessorException {
 
     /** */
-    public UnsupportedMediaTypeException(String mediaType) {
-        super(mediaType);
+    public UnsupportedContentTypeException(String contentType) {
+        super(contentType);
     }
 
     /** */
-    public String getMediaType() {
+    public String getContentType() {
         return getMessage();
     }
 }

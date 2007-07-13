@@ -85,8 +85,7 @@ public class MockGeneratorFactory implements GeneratorFactory {
                                                      String format,
                                                      ServiceLocator locator)
         throws UnsupportedProjectionException, UnsupportedFormatException {
-        // projection is required
-        if (projection == null || ! projections.contains(projection))
+        if (projection != null && ! projections.contains(projection))
             throw new UnsupportedProjectionException(projection);
         if (format != null && ! formats.contains(format))
             throw new UnsupportedFormatException(format);

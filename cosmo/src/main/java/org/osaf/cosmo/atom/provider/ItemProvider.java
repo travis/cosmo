@@ -34,7 +34,6 @@ import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
-import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
 import org.apache.abdera.util.Constants;
@@ -53,7 +52,7 @@ import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.atom.processor.ContentProcessor;
 import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
-import org.osaf.cosmo.atom.processor.UnsupportedMediaTypeException;
+import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
@@ -88,41 +87,40 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         if (log.isDebugEnabled())
             log.debug("creating entry in collection " + collection.getUid());
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkEntryWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
-        NoteItem item = null;
         try {
             // XXX: does abdera automatically resolve external content?
             Entry entry = (Entry) request.getDocument().getRoot();
             ContentProcessor processor = createContentProcessor(entry);
-            item = processor.processCreation(entry.getContent(), collection);
+            NoteItem item =
+                processor.processCreation(entry.getContent(), collection);
             item = (NoteItem) contentService.createContent(collection, item);
 
             ItemTarget itemTarget =
-                new ItemTarget(request, item, PROJECTION_FULL, null);
+                new ItemTarget(request, item, target.getProjection(),
+                               target.getFormat());
             ServiceLocator locator = createServiceLocator(request);
             ItemFeedGenerator generator =
                 createItemFeedGenerator(itemTarget, locator);
             entry = generator.generateEntry(item);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument(), 201, "Created");
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLastModified(item.getModifiedDate());
-
-            try {
-                rc.setLocation(entry.getSelfLink().getHref().toString());
-                rc.setContentLocation(entry.getSelfLink().getHref().toString());
-            } catch (Exception e) {
-                throw new RuntimeException("Error parsing self link href", e);
-            }
-
-            return rc;
+            return created(entry, item, locator);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (UnsupportedContentTypeException e) {
+            return badrequest(getAbdera(), request, "Entry content type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
         } catch (ParseException e) {
-            return badrequest(getAbdera(), request, "Unable to parse entry: " + e.getMessage());
-        } catch (UnsupportedMediaTypeException e) {
-            return notsupported(getAbdera(), request, "invalid content type " + e.getMediaType());
+            String reason = "Unparseable content: ";
+            if (e.getCause() != null)
+                reason = reason + e.getCause().getMessage();
+            else
+                reason = reason + e.getMessage();
+            return badrequest(getAbdera(), request, reason);
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
@@ -130,10 +128,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             else
                 reason = reason + e.getMessage();
             return badrequest(getAbdera(), request, reason);
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
         } catch (UidInUseException e) {
             return conflict(getAbdera(), request, "Uid already in use");
         } catch (ProcessorException e) {
@@ -142,12 +136,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return servererror(getAbdera(), request, reason, e);
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
-        } catch (UnsupportedProjectionException e) {
-            // won't happen
-            throw new RuntimeException(e);
-        } catch (UnsupportedFormatException e) {
-            // won't happen
-            throw new RuntimeException(e);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -175,11 +163,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             } else {
                 contentService.removeItem(item);
             }
+
+            return deleted();
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
         }
-
-        return createResponseContext(204);
     }
   
     public ResponseContext deleteMedia(RequestContext request) {
@@ -192,7 +180,9 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         if (log.isDebugEnabled())
             log.debug("updating entry for item " + item.getUid());
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkEntryWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
         try {
             // XXX: does abdera automatically resolve external content?
@@ -200,23 +190,27 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             ContentProcessor processor = createContentProcessor(entry);
             item = processEntryUpdate(processor, entry, item);
 
-            target = new ItemTarget(request, item, PROJECTION_FULL, null);
+            target = new ItemTarget(request, item, target.getProjection(),
+                                    target.getFormat());
             ServiceLocator locator = createServiceLocator(request);
             ItemFeedGenerator generator =
                 createItemFeedGenerator(target, locator);
             entry = generator.generateEntry(item);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument());
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLastModified(item.getModifiedDate());
-
-            return rc;
+            return updated(entry, item, locator, false);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (UnsupportedContentTypeException e) {
+            return badrequest(getAbdera(), request, "Entry content type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
         } catch (ParseException e) {
-            return badrequest(getAbdera(), request, "Unable to parse entry: " + e.getMessage());
-        } catch (UnsupportedMediaTypeException e) {
-            return notsupported(getAbdera(), request, "invalid content type " + e.getMediaType());
+            String reason = "Unparseable content: ";
+            if (e.getCause() != null)
+                reason = reason + e.getCause().getMessage();
+            else
+                reason = reason + e.getMessage();
+            return badrequest(getAbdera(), request, reason);
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
@@ -224,24 +218,12 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             else
                 reason = reason + e.getMessage();
             return badrequest(getAbdera(), request, reason);
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
-        } catch (UidInUseException e) {
-            return conflict(getAbdera(), request, "Uid already in use");
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
-        } catch (UnsupportedProjectionException e) {
-            // won't happen
-            throw new RuntimeException(e);
-        } catch (UnsupportedFormatException e) {
-            // won't happen
-            throw new RuntimeException(e);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -255,7 +237,9 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         if (log.isDebugEnabled())
             log.debug("updating media for item " + item.getUid());
 
-        // XXX: check write preconditions?
+        ResponseContext frc = checkMediaWritePreconditions(request);
+        if (frc != null)
+            return frc;
 
         try {
             ContentProcessor processor =
@@ -263,15 +247,15 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             processor.processContent(request.getReader(), item);
             item = (NoteItem) contentService.updateItem(item);
 
-            AbstractResponseContext rc = createResponseContext(204);
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLastModified(item.getModifiedDate());
-
-            return rc;
+            return updated(item);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
         } catch (MimeTypeParseException e) {
-            return notsupported(getAbdera(), request, "invalid content type");
-        } catch (UnsupportedMediaTypeException e) {
-            return notsupported(getAbdera(), request, "invalid content type " + e.getMediaType());
+            return notsupported(getAbdera(), request, "Unparseable content type");
+        } catch (UnsupportedContentTypeException e) {
+            return notsupported(getAbdera(), request, "Unsupported media type " + e.getContentType());
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
@@ -279,12 +263,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             else
                 reason = reason + e.getMessage();
             return badrequest(getAbdera(), request, reason);
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
-        } catch (UidInUseException e) {
-            return conflict(getAbdera(), request, "Uid already in use");
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
@@ -340,14 +318,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 createItemFeedGenerator(target, locator);
             Entry entry = generator.generateEntry(item);
 
-            AbstractResponseContext rc =
-                createResponseContext(entry.getDocument());
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLastModified(item.getModifiedDate());
-            // override Abdera which sets content type to include the
-            // type attribute because IE chokes on it
-            rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-            return rc;
+            return ok(entry, item);
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";
             return badrequest(getAbdera(), request, reason);
@@ -454,7 +425,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     }
 
     protected ContentProcessor createContentProcessor(Entry entry)
-        throws UnsupportedMediaTypeException {
+        throws UnsupportedContentTypeException {
         String mediaType = null;
 
         // if the entry is text, HTML, XHTML or XML, we can use the
@@ -472,11 +443,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         if (mediaType != null)
             return createContentProcessor(mediaType);
 
-        throw new UnsupportedMediaTypeException("indeterminate media type");
+        throw new UnsupportedContentTypeException("indeterminate media type");
     }
 
     protected ContentProcessor createContentProcessor(String mediaType)
-        throws UnsupportedMediaTypeException {
+        throws UnsupportedContentTypeException {
         return processorFactory.createProcessor(mediaType);
     }
 

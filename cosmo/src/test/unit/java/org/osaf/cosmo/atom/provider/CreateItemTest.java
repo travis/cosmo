@@ -50,15 +50,15 @@ public class CreateItemTest extends BaseItemProviderTestCase
                       res.getHeader("Content-Location"));
     }
 
-    public void testUnsupportedMediaType() throws Exception {
+    public void testUnsupportedContentType() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         NoteItem item = helper.makeDummyItem(collection.getOwner());
         RequestContext req = createRequestContext(collection, item);
-        helper.forgetMediaTypes();
+        helper.forgetContentTypes();
 
         ResponseContext res = provider.createEntry(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 415, res.getStatus());
+        assertEquals("Incorrect response status", 400, res.getStatus());
     }
 
     public void testInvalidContent() throws Exception {
@@ -123,7 +123,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         super.setUp();
 
         helper.rememberProjection(PROJECTION_FULL);
-        helper.rememberMediaType(Content.Type.TEXT.toString());
+        helper.rememberContentType(Content.Type.TEXT.toString());
     }
 
     private RequestContext createRequestContext(CollectionItem collection,

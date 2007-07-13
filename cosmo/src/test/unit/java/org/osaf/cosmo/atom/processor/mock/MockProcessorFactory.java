@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.processor.ContentProcessor;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
-import org.osaf.cosmo.atom.processor.UnsupportedMediaTypeException;
+import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 
 /**
  * Mock implementation of {@link ProcessorFactory}.
@@ -34,12 +34,12 @@ public class MockProcessorFactory implements ProcessorFactory {
     private static final Log log =
         LogFactory.getLog(MockProcessorFactory.class);
 
-    private Set<String> mediaTypes;
+    private Set<String> contentTypes;
     private boolean failureMode;
     private boolean validationErrorMode;
 
     public MockProcessorFactory() {
-        mediaTypes = new HashSet<String>();
+        contentTypes = new HashSet<String>();
         failureMode = false;
         validationErrorMode = false;
     }
@@ -47,23 +47,31 @@ public class MockProcessorFactory implements ProcessorFactory {
     // ProcessorFactory methods
 
     /**
+     * Returns an array of content types supported by this processor.
+     */
+    public String[] getSupportedContentTypes() {
+        return (String[]) contentTypes.toArray(new String[0]);
+    }
+
+    /**
      * Creates an instance of <code>MockContentProcessor</code>.
      *
-     * @param mediaType the media type of the content to process
-     * @return the entry processor, or null if no processor is
-     * supported for the named media type
+     * @param type the type of content to process
+     * @return the content processor
+     * @throws UnsupportedContentTypeException if the given type is not
+     * supported
      */
-    public ContentProcessor createProcessor(String mediaType)
-        throws UnsupportedMediaTypeException {
-        if (mediaType == null || ! mediaTypes.contains(mediaType))
-            throw new UnsupportedMediaTypeException(mediaType);
+    public ContentProcessor createProcessor(String type)
+        throws UnsupportedContentTypeException {
+        if (type == null || ! contentTypes.contains(type))
+            throw new UnsupportedContentTypeException(type);
         return new MockContentProcessor(this);
     }
 
     // our methods
 
-    public Set<String> getMediaTypes() {
-        return mediaTypes;
+    public Set<String> getContentTypes() {
+        return contentTypes;
     }
 
     public boolean isFailureMode() {

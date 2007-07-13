@@ -30,8 +30,19 @@ public class StandardProcessorFactory
     implements ProcessorFactory, JsonConstants, EimmlConstants {
     private static final Log log =
         LogFactory.getLog(StandardProcessorFactory.class);
+    private static final String[] CONTENT_TYPES = {
+        MEDIA_TYPE_EIM_JSON,
+        MEDIA_TYPE_EIMML
+    };
 
     // ProcessorFactory methods
+
+    /**
+     * Returns an array of content types supported by this processor.
+     */
+    public String[] getSupportedContentTypes() {
+        return CONTENT_TYPES;
+    }
 
     /**
      * Creates an instance of <code>ContentProcessor</code>. The type of
@@ -44,18 +55,19 @@ public class StandardProcessorFactory
      * </dl>
      * <p>
      *
-     * @param mediaType the media type of the content to process
-     * @return the entry processor, or null if no processor is
-     * supported for the named media type
+     * @param type the type of content to process
+     * @return the content processor
+     * @throws UnsupportedContentTypeException if the given type is not
+     * supported
      */
-    public ContentProcessor createProcessor(String mediaType)
-        throws UnsupportedMediaTypeException {
-        if (mediaType != null) {
-            if (mediaType.equals(MEDIA_TYPE_EIM_JSON))
+    public ContentProcessor createProcessor(String type)
+        throws UnsupportedContentTypeException {
+        if (type != null) {
+            if (type.equals(MEDIA_TYPE_EIM_JSON))
                 return new JsonProcessor();
-            if (mediaType.equals(MEDIA_TYPE_EIMML))
+            if (type.equals(MEDIA_TYPE_EIMML))
                 return new EimmlProcessor();
         }
-        throw new UnsupportedMediaTypeException(mediaType);
+        throw new UnsupportedContentTypeException(type);
     }
 }

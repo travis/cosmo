@@ -134,14 +134,29 @@ cosmo.env.getImagesUrl = function(){
   return s;
 }
 
+cosmo.env.urls = {
+    "Login": "/login",
+    "ForgotPassword": "/account/password/recover",
+    "Logout": "/logout",
+    "Redirect": "/logout",
+    "Auth": "/security_check"
+}
+
+cosmo.env.getFullUrl = function (urlKey) {
+    return this.getBaseUrl() + this.urls[urlKey];
+}
+
 cosmo.env.getRedirectUrl = function(){
+    dojo.deprecated("cosmo.env.getRedirectUrl", "please use cosmo.env.getFullUrl instead", "0.8");
 	return cosmo.env.getBaseUrl() + '/logout';}
 
 cosmo.env.getLoginRedirect = function(){
+    dojo.deprecated("cosmo.env.getLoginRedirect", "please use cosmo.env.getFullUrl instead", "0.8");
 	return cosmo.env.getBaseUrl() + "/login";
 }
 
 cosmo.env.getAuthProc = function(){
+    dojo.deprecated("cosmo.env.getAuthProc", "please use cosmo.env.getFullUrl instead", "0.8");
 	return cosmo.env.getBaseUrl() + "/security_check";
 }
 

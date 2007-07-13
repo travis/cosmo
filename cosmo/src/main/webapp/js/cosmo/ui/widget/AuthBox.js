@@ -179,7 +179,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             tbody.appendChild(tr);
 
             this.domNode.appendChild(table);
+            var recoverPasswordDiv = _createElem("div");
+            recoverPasswordDiv.className = "authBoxRecoverPassword";
+            this.domNode.appendChild(recoverPasswordDiv);
+            
+            recoverPasswordDiv.innerHTML = [_("Login.Forgot"), "<a href=", cosmo.env.getFullUrl("ForgotPassword"), 
+                                            " target=\"_blank\"> ", _("Login.ClickHere"), "</a>"].join("");
         },
+
         postCreate: function () {
         }
     },

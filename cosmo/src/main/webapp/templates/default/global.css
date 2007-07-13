@@ -262,3 +262,11 @@ hr {
 	text-align: center;
 	margin-top: 1em;
 }
+
+/*
+ * AuthBox styles
+ */
+ 
+div.authBoxRecoverPassword {
+	margin-top: 2em;
+}

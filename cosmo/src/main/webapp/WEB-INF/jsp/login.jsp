@@ -21,6 +21,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
+<fmt:setBundle basename="PimMessageResources"/>
 <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -40,8 +41,6 @@
 	
 	<link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
     <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
-    
-    <fmt:setBundle basename="MessageResources"/>
     
     <%--
         Login and account-creation stuff
@@ -81,17 +80,17 @@
       <div dojoType="cosmo:LoginDialog" widgetId="loginDialog">
       </div>
       <div style="padding-top:24px; text-align:center">
-        <fmt:message key="Login.CreateAccount">
-        <fmt:param value="<a href=\"javascript:cosmo.account.create.showForm();\">"/>
-        <fmt:param value="</a>"/>
-        </fmt:message>
+        <fmt:message key="Login.CreateAccount"/>
+        <a href="javascript:cosmo.account.create.showForm();">
+        <fmt:message key="Login.ClickHere"/>
+        </a>
       </div>
 
       <div style="padding-top:4px; text-align:center;">
-        <fmt:message key="Login.Forgot">
-        <fmt:param value="<a href=\"${staticBaseUrl}/account/password/recover\">"/>
-        <fmt:param value="</a>"/>
-        </fmt:message>
+        <fmt:message key="Login.Forgot"/>
+        <a href="${staticBaseUrl}/account/password/recover">
+        <fmt:message key="Login.ClickHere"/>
+        </a>
 	  </div>
       
       <div style="padding-top:36px; text-align:center;">

@@ -619,7 +619,7 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
         dojo.lfx.wipeOut(this.bodyNode, 500).play();
         display = '[show]';
     }
-    if (document.all) {
+    if (dojo.render.html.ie || dojo.render.html.safari) {
         this.showHideSwitch.innerText = display;
     }
     else {

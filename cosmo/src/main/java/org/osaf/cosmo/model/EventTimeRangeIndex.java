@@ -83,6 +83,7 @@ public class EventTimeRangeIndex {
     }
 
     @Column(table="event_stamp", name = "isfloating")
+    @Index(name="idx_floating")
     public Boolean getIsFloating() {
         return isFloating;
     }
@@ -92,6 +93,7 @@ public class EventTimeRangeIndex {
     }
     
     @Column(table="event_stamp", name = "isrecurring")
+    @Index(name="idx_recurring")
     public Boolean getIsRecurring() {
         return isRecurring;
     }

@@ -19,8 +19,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -60,6 +64,8 @@ import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 
@@ -68,6 +74,8 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
  * Represents a calendar event.
  */
 @Entity
+@SecondaryTable(name="event_stamp", pkJoinColumns={
+        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @DiscriminatorValue("baseevent")
 public abstract class BaseEventStamp extends Stamp
     implements java.io.Serializable, ICalendarConstants {
@@ -79,15 +87,33 @@ public abstract class BaseEventStamp extends Stamp
     
     protected static final String VALUE_MISSING = "MISSING";
     
+    private Calendar eventCalendar = null;
+    private EventTimeRangeIndex timeRangeIndex = null;
+    
     @Transient
     public abstract VEvent getEvent();
     
     public abstract void setCalendar(Calendar calendar);
     
-    public abstract void setTimeRangeIndex(EventTimeRangeIndex index);
+    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
+    @Type(type="calendar_clob")
+    @NotNull
+    public Calendar getEventCalendar() {
+        return eventCalendar;
+    }
     
-    @Transient
-    public abstract EventTimeRangeIndex getTimeRangeIndex();
+    public void setEventCalendar(Calendar calendar) {
+        this.eventCalendar = calendar;
+    }
+    
+    @Embedded
+    public EventTimeRangeIndex getTimeRangeIndex() {
+        return timeRangeIndex;
+    }
+
+    public void setTimeRangeIndex(EventTimeRangeIndex timeRangeIndex) {
+        this.timeRangeIndex = timeRangeIndex;
+    }
     
       
     /**

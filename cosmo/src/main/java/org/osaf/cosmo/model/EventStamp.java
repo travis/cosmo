@@ -20,12 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -42,8 +38,6 @@ import net.fortuna.ical4j.model.property.DtStart;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Type;
-import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.hibernate.validator.Event;
 
 
@@ -52,8 +46,6 @@ import org.osaf.cosmo.hibernate.validator.Event;
  */
 @Entity
 @DiscriminatorValue("event")
-@SecondaryTable(name="event_stamp", pkJoinColumns={
-        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventStamp extends BaseEventStamp implements
         java.io.Serializable {
@@ -62,9 +54,6 @@ public class EventStamp extends BaseEventStamp implements
      * 
      */
     private static final long serialVersionUID = 3992468809776886156L;
-
-    private Calendar eventCalendar = null;
-    private EventTimeRangeIndex timeRangeIndex = null;
     
     /** default constructor */
     public EventStamp() {
@@ -78,27 +67,6 @@ public class EventStamp extends BaseEventStamp implements
     public String getType() {
         return "event";
     }
-    
-    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
-    @Type(type="calendar_clob")
-    @NotNull
-    @Event
-    public Calendar getEventCalendar() {
-        return eventCalendar;
-    }
-    
-    public void setEventCalendar(Calendar calendar) {
-        this.eventCalendar = calendar;
-    }
-    
-    @Embedded
-    public EventTimeRangeIndex getTimeRangeIndex() {
-        return timeRangeIndex;
-    }
-
-    public void setTimeRangeIndex(EventTimeRangeIndex timeRangeIndex) {
-        this.timeRangeIndex = timeRangeIndex;
-    }
 
     @Override
     @Transient
@@ -106,6 +74,13 @@ public class EventStamp extends BaseEventStamp implements
         return getMasterEvent();
     }
 
+    /** Used by the hibernate validator **/
+    @Transient
+    @Event
+    private Calendar getValidationCalendar() {
+        return getEventCalendar();
+    }
+    
     @Transient
     public Calendar getCalendar() {
         Calendar masterCal = null;

@@ -461,6 +461,13 @@
                             </includes>
                         </resource>
                         <resource>
+                            <directory>${basedir}/src/docs</directory>
+                            <filtering>false</filtering>
+                            <includes>
+                                <include>NOTICE.txt</include>
+                            </includes>
+                        </resource>
+                        <resource>
                             <directory>${basedir}/src/main/resources</directory>
                             <targetPath>WEB-INF</targetPath>
                             <filtering>true</filtering>

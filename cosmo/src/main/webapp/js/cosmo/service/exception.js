@@ -32,6 +32,10 @@ dojo.declare("cosmo.service.exception.ConflictException", cosmo.service.exceptio
     // summary: Thrown when we receive a 409.
 function(){}, {});
 
+dojo.declare("cosmo.service.exception.ConcurrencyException", cosmo.service.exception.ServiceException,
+    // summary: Thrown when we receive a 409.
+function(){}, {});
+
 dojo.declare("cosmo.service.exception.ResourceNotFoundException", cosmo.service.exception.ServiceException, 
 {
     initializer: function(id){

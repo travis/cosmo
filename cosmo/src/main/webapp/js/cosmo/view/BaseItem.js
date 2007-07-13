@@ -53,7 +53,11 @@ cosmo.view.BaseItem.prototype.makeSnapshot = function () {
  */
 cosmo.view.BaseItem.prototype.restoreFromSnapshot = function () {
     // Restore from backup snapshot
-    // ================
+    
+    if (!this.dataOrig){
+        return true;
+    }
+    
     if (!this.occurrence){
         this.data = this.dataOrig.clone();
     } else {

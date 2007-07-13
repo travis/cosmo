@@ -21,6 +21,8 @@ dojo.require("dojo.event.*");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 
+cosmo.ui.resize_area.dragSize = null;
+
 cosmo.ui.resize_area.ResizeAreaAdjacent = function (div) {
     this.div = div;
 }
@@ -49,16 +51,11 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
         this.absTop - 2);
 
     this.init = function(dir, off) {
+        var dragSize =  cosmo.ui.resize_area.dragSize;
+        dragSize = typeof dragSize == 'number' ?
+            dragSize : ALL_DAY_RESIZE_AREA_HEIGHT;
         this.direction = dir ? dir : this.direction;
-        if (!this.dragSize) {
-            this.origSize = ALL_DAY_RESIZE_AREA_HEIGHT +
-               ALL_DAY_RESIZE_HANDLE_HEIGHT; 
-        }
-        else {
-            this.origSize = this.contentDiv.offsetHeight +
-                this.handleDiv.offsetHeight;
-        }
-        this.dragSize = this.origSize;
+        this.dragSize = dragSize;
         dojo.event.connect(self.handleDiv, 'onmousedown',
             function () { cosmo.app.dragItem = self });
     };
@@ -115,6 +112,9 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
             self.contentDiv.style.height = this.dragSize + 'px';
             self.contentDiv.style.display= 'block';
         }
+        // Store the current size for canvas re-rendering
+        cosmo.ui.resize_area.dragSize =
+            (this.dragSize - this.handleCenteringSpace);
     };
 }
 

@@ -1473,25 +1473,23 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         }
     }
     function doPositioning() {
+        var untimedHeight = cosmo.ui.resize_area.dragSize;
+        untimedHeight = typeof untimedHeight == 'number' ?
+            untimedHeight : ALL_DAY_RESIZE_AREA_HEIGHT;
+
         // Center column
-        // Top nav
         vOffset = 0;
-        // 1px for border per retarded CSS spec
-        //var topNav = self.calTopNavDiv;
-        //topNav.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
-        //topNav.setPosition(0, vOffset);
         // Day listing
-        //vOffset += CAL_TOP_NAV_HEIGHT;
         var dayList = self.dayListDiv;
         dayList.setSize(self.width - 2, DAY_LIST_DIV_HEIGHT);
         dayList.setPosition(0, vOffset);
         // No-time event area
         vOffset += DAY_LIST_DIV_HEIGHT;
         var allDayMain = self.allDayResizeMainDiv;
-        allDayMain.setSize((self.width - 2), ALL_DAY_RESIZE_AREA_HEIGHT);
+        allDayMain.setSize((self.width - 2), untimedHeight);
         allDayMain.setPosition(0, vOffset);
         // Resize handle
-        vOffset += ALL_DAY_RESIZE_AREA_HEIGHT;
+        vOffset += untimedHeight;
         var allDayResize = self.allDayResizeHandleDiv;
         allDayResize.setSize(self.width - 1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
         allDayResize.setPosition(0, vOffset);

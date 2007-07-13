@@ -79,7 +79,7 @@ dojo.widget.HtmlWidget, function(){
             clickHere:_("Main.CollectionDetails.ClickHere"),
             helpLink:_("Main.CollectionDetails.HelpLink"),
             chandlerPlug: _('Main.CollectionDetails.ChandlerPlug',
-                '<a href="http://chandler.osafoundation.org/">',
+                '<a href="'+ _('Main.CollectionDetails.ChandlerPlugDownload') +'">',
                 '</a>')
         },
 

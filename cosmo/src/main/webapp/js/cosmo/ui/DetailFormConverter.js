@@ -36,7 +36,10 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             errorMessage += this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }
 
-        errorMessage += this._populateAnyTimeAtTime(delta);
+        if (this._isStampEnabled("event")){
+            errorMessage += this._populateAnyTimeAtTime(delta);
+        }
+        
         this._populateDeltaFromTriageWidget(delta);
         if (!errorMessage){
             errorMessage += this._performInterPropertyValidations(delta);

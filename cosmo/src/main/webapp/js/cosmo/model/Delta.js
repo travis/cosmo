@@ -125,8 +125,8 @@ dojo.declare("cosmo.model.Delta", null, {
             var eventStamp = this._stampProps["event"];
             if (eventStamp["startDate"] && eventStamp["endDate"]){
                 var duration = null;
-                if (this._note.getEventStamp().getAllDay() 
-                    || this._note.getEventStamp().getAnyTime() 
+                if ( (this._note.getEventStamp() && (this._note.getEventStamp().getAllDay() 
+                    || this._note.getEventStamp().getAnyTime())) 
                     || eventStamp["allDay"] || eventStamp["anyTime"]){
                     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
                         eventStamp["startDate"], eventStamp["endDate"]) + 1;
@@ -318,6 +318,19 @@ dojo.declare("cosmo.model.Delta", null, {
         for (var stamp in this._stampProps){
             string += stamp + " properties: \n";
             string += this._propsToString(this._stampProps[stamp], stamp);
+        }
+        string += "Added Stamps: \n"
+        for (var stamp in this._addedStamps){
+            if (this._addedStamps[stamp]){
+              string += "    " + stamp + "\n";
+            }
+        }
+
+        string += "Deleted Stamps: \n"
+        for (var stamp in this._deletedStamps){
+            if (this._deletedStamps[stamp]){
+              string += "    " + stamp + "\n";
+            }
         }
         return string;
     },

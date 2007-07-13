@@ -63,17 +63,23 @@ div {
 }
 /* Default link color --
  * generally color for text of active buttons should match */
-a {
-    color: #339;
-    cursor: pointer;
-}
 a span, a{
-    color: #339;
+    color: #0066ff;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #6633cc;
     text-decoration: none;
 }
 
 a:hover {
-    color: #9999cc;
+    text-decoration: underline;
+}
+
+a:active {
+    color: #4322e5;
+    text-decoration: underline;
 }
 
 /* Invisible elements */
@@ -132,7 +138,7 @@ body.adminPage {
     padding-bottom: 12px;
 }
 #loginDialogFormContainer {
-	margin: auto;
+    margin: auto;
     padding: 12px;
     border: 1px solid #999;
     width: 340px;

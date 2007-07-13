@@ -82,7 +82,6 @@ cosmo.app = new function () {
             }
             else if (sec instanceof Error && sec.message) {
                 secondaryMessage = sec.message;
-                trace = sec.javaStack;
             }
         }
 
@@ -141,6 +140,7 @@ cosmo.app = new function () {
                     }
                 }
             }
+        dojo.debug("s3");
             this.modalDialog.type = this.modalDialog.ERROR;
             var but = new Button('okButton', 64, self.hideDialog,
                 _('App.Button.OK'), true);
@@ -148,6 +148,7 @@ cosmo.app = new function () {
             this.modalDialog.defaultAction = self.hideDialog;
             this.modalDialog.content = msg;
             this.showDialog();
+        dojo.debug("s4");
         }
     };
     /**

@@ -841,7 +841,6 @@ cosmo.view.cal.canvas = new function () {
      * published 'success' message
      */
      function saveSuccess(cmd) {
-        dojo.debug("saveSuccess: ");
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var item = cmd.data
         var data = item.data;
@@ -854,7 +853,6 @@ cosmo.view.cal.canvas = new function () {
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
         if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
-            dojo.debug("saveSuccess: has recurrence");
             //first remove the event and recurrences from the registry.
             var idsToRemove = [data.getUid()];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
@@ -865,21 +863,24 @@ cosmo.view.cal.canvas = new function () {
 
 
             //now we have to expand out the item for the viewing range
-            var deferredArray = [cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
-                cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)];
+            var expandDeferred1 = cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
+                cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)
+            var deferredArray = [expandDeferred1];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
               deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItemNote,
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
             }
             deferred = new dojo.DeferredList(deferredArray);
 
-            var addExpandedOccurrences = function () {
-                dojo.debug("saveSuccess: addExpandedRecurrences");
-                // [0][0][1] - this is where the results are
-                //stored in a DeferredList
-                var occurrences = deferred.results[0][0][1];
-                if (deferred.results[0][1]){
-                    var otherOccurrences = deferred.results[0][1][1]
+            var addExpandedOccurrences = function (results) {
+                //check for errors!
+                if (!results[0][0] || (results[1] && !results[1][0])){
+                    cosmo.app.showErr(_$("Service.Error.ProblemGettingEvents"));
+                    return;
+                }
+                var occurrences = results[0][1];
+                if (results[1]){
+                    var otherOccurrences = results[1][1];
                     occurrences = occurrences.concat(otherOccurrences);
                 }
                 var newHash = cosmo.view.cal.createEventRegistry(occurrences);

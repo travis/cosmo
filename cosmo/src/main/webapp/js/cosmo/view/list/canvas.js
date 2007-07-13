@@ -303,13 +303,16 @@ cosmo.view.list.canvas.Canvas = function (p) {
             }
             deferred = new dojo.DeferredList(deferredArray);
 
-            var addExpandedOccurrences = function () {
-                dojo.debug("saveSuccess: addExpandedRecurrences");
-                // [0][0][1] - this is where the results are
-                //stored in a DeferredList
-                var occurrences = deferred.results[0][0][1];
-                if (deferred.results[0][1]){
-                    var otherOccurrences = deferred.results[0][1][1]
+            var addExpandedOccurrences = function (results) {
+                //check for errors!
+                if (!results[0][0] || (results[1] && !results[1][0])){
+                    cosmo.app.showErr(_$("Service.Error.ProblemGettingEvents"));
+                    return;
+                }
+
+                var occurrences = results[0][1];
+                if (results[1]){
+                    var otherOccurrences = results[1][1]
                     occurrences = occurrences.concat(otherOccurrences);
                 }
                 var newHash = cosmo.view.cal.createEventRegistry(occurrences);

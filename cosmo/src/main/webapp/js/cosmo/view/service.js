@@ -258,14 +258,7 @@ cosmo.view.service = new function () {
                     var requestId = newItemDeferred.id;
                     self.processingQueue.push(requestId);
 
-                    newItemDeferred.addCallback(function(){
-                        dojo.debug("in newItemDeferred call back")
-                        if (newItemDeferred.results[1] != null){
-                            //if there was an error, pass it to handleSaveItem, with the original
-                            //item
-                            handleSaveItem(item, newItemDeferred.results[1], requestId,opts.saveType, delta);
-                        }
-                        else {
+                    newItemDeferred.addCallback(function(result){
                             //get rid of the id from the processing queue
                             self.processingQueue.shift()
 
@@ -274,7 +267,15 @@ cosmo.view.service = new function () {
                             var originalDeferred = cosmo.app.pim.serv.saveItem(note.getMaster());
                             originalDeferred.addCallback(function(){
                                 handleSaveItem(item,
-                                    originalDeferred.results[1],
+                                    null,
+                                    originalDeferred.id,
+                                    opts.saveType,
+                                    delta,
+                                    newItem);
+                            });
+                            originalDeferred.addErrback(function(error){
+                                handleSaveItem(item,
+                                    error,
                                     originalDeferred.id,
                                     opts.saveType,
                                     delta,
@@ -282,7 +283,12 @@ cosmo.view.service = new function () {
                             });
                             self.processingQueue.push(originalDeferred.id);
                             self.lastSent = item;
-                        }
+                    });
+                    
+                    newItemDeferred.addErrback(function(error){
+                        //if there was an error, pass it to handleSaveItem, with the original
+                        //item
+                        handleSaveItem(item, newItemDeferred, error, requestId,opts.saveType, delta);
                     });
 
                     dojo.debug("about to save note in ALL FUTURE EVENTS")
@@ -307,10 +313,13 @@ cosmo.view.service = new function () {
         var f = function () {
             var saveType = isNew ? "new" : opts.saveType;
             dojo.debug("callback: saveType="+ saveType)
-            handleSaveItem(item, deferred.results[1], deferred.id, saveType, delta);
+            handleSaveItem(item, null, deferred.id, saveType, delta);
         };
 
         deferred.addCallback(f);
+        deferred.addErrback(function(error){
+            handleSaveItem(item, error, deferred.id, saveType, delta);
+        })
         requestId = deferred.id;
 
         // Add to processing queue -- canvas will not re-render until
@@ -540,11 +549,16 @@ cosmo.view.service = new function () {
 
         // Pass the original item and opts object to the handler function
         // along with the original params passed back in from the async response
-        var f = function () {
-            handleRemoveResult(item, deferred.results[1], reqId, opts);
+        var callback = function () {
+            handleRemoveResult(item, null, reqId, opts);
         };
+        
+        var errback = function(error){
+            handleRemoveResult(item, error, reqId, opts);
+        }
 
-        deferred.addCallback(f);
+        deferred.addCallback(callback);
+        deferred.addErrback(errback)
     }
     /**
      * Handles the response from the async call when removing an item.
@@ -562,6 +576,7 @@ cosmo.view.service = new function () {
         if (err) {
             act = 'removeFailed';
             cosmo.app.showErr(errMsg, getErrDetailMessage(err));
+            item.restoreEvent();
         }
         else {
             act = 'removeSuccess';
@@ -576,7 +591,7 @@ cosmo.view.service = new function () {
     function getErrDetailMessage(err) {
         var msg = '';
         switch (true) {
-            case (err instanceof cosmo.service.exception.ConcurrencyException):
+            case (err instanceof (cosmo.service.exception.ConcurrencyException)):
                 msg = _('Main.Error.Concurrency');
                 break;
             default:

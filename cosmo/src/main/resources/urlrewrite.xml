@@ -20,7 +20,7 @@
 
 <urlrewrite>
   <rule>
-    <from>/js-${pom.version}/</from>
+    <from>/js-${pom.version}-r${buildNumber}/</from>
      <to last="false">/js/</to>
   </rule>
   

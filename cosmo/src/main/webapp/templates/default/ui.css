@@ -757,7 +757,7 @@ td.dataDisplayLabel {
   width: 16px;
   height: 16px;
   font-size: 1px;
-  background-image: url(templates/default/images/drop_shadow_side_imgs.png);
+  background-image: url(images/drop_shadow_side_imgs.png);
   background-position: 0px 0px;
 }
 .dropShadowCenter {
@@ -779,14 +779,14 @@ td.dataDisplayLabel {
   dropShadowTable's height minus 32px
   */
   opacity: 0.8;
-  background-image: url(templates/default/images/drop_shadow_side_imgs.png);
+  background-image: url(images/drop_shadow_side_imgs.png);
   background-repeat: repeat-y; background-position: -16px 0px;
   font-size: 1px;
 }
 .dropShadowBottomLeft {
   width: 16px;
   height: 16px;
-  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png);
+  background-image: url(images/drop_shadow_bottom_imgs.png);
   background-position: 0px 0px;
   font-size: 1px;
 }
@@ -796,14 +796,14 @@ td.dataDisplayLabel {
   width minus 48px
   */
   opacity: 0.8;
-  background-image: url(templates/default/images/drop_shadow_bottom_imgs.png);
+  background-image: url(images/drop_shadow_bottom_imgs.png);
   background-repeat: repeat-x;
   background-position: 0px -16px;
   font-size: 1px;
 }
 .dropShadowBottomRightCorner {
   width: 16px;
-  background-image: url(templates/default/images/drop_shadow_side_imgs.png);
+  background-image: url(images/drop_shadow_side_imgs.png);
   background-position: -32px 0px;
   font-size: 1px;
 }

@@ -31,17 +31,16 @@ dojo.provide("cosmo.ui.widget.ModalDialog");
 
 dojo.require("dojo.widget.*");
 dojo.require("dojo.html.common");
-dojo.require("dojo.Deferred");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");
 
-dojo.widget.defineWidget("cosmo.ui.widget.ModalDialog",
+dojo.widget.defineWidget("cosmo.ui.widget.ModalDialog", 
 dojo.widget.HtmlWidget, {
         // Template stuff
         templateString: '<div id="modalDialog"></div>',
-
+        
         // Attach points
         dropShadowOuterNode: null,
         dropShadowRightNode: null,
@@ -52,7 +51,7 @@ dojo.widget.HtmlWidget, {
         imageNode: null,
         contentNode: null,
         buttonPanelNode: null,
-
+        
         INFO: 'info',
         ERROR: 'error',
         CONFIRM: 'confirm',
@@ -70,10 +69,6 @@ dojo.widget.HtmlWidget, {
         defaultAction: null,
         isDisplayed: false,
         
-        // A deferred that will be fired with "this.content" as the result
-        // when the dialog is hidden.
-        deferred: new dojo.Deferred(),
-
         // Instance methods
         setTop: function (n) {
             var s = n.toString();
@@ -105,7 +100,7 @@ dojo.widget.HtmlWidget, {
             var s = this.dropShadowOuterNode.offsetHeight;
             // Stash container height since Safari's DOM lookups
             // don't seem to happen in any particular order
-            this._containerHeight = s;
+            this._containerHeight = s; 
             this.containerNode.style.height = s + 'px';
             s += 16;
             this.dropShadowOuterNode.style.height = s + 'px';
@@ -137,8 +132,8 @@ dojo.widget.HtmlWidget, {
             }
             var o = this._containerHeight;
             this.contentNode.style.height = (o - spacer) + 'px';
-
-            // BANDAID: Hack to get Safari to render the height of the
+            
+            // BANDAID: Hack to get Safari to render the height of the 
             // content area properly
             if (navigator.userAgent.indexOf('Safari') > -1) {
                 this.contentNode.style.border = '1px solid #ffffff';
@@ -194,7 +189,7 @@ dojo.widget.HtmlWidget, {
             this.btnsLeft = l || this.btnsLeft;
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
-
+            
             // Clean up previous panel if any
             if (this.btnPanel) {
                 this.btnPanel.destroyButtons();
@@ -203,7 +198,7 @@ dojo.widget.HtmlWidget, {
                 }
                 this.btnPanel.destroy();
             }
-
+           
             // Create and append the panel
             // Append the panel as part of instantiation -- if done without
             // a parent element to append to, the widget parser uses document.body,
@@ -267,23 +262,23 @@ dojo.widget.HtmlWidget, {
             table.className = 'dropShadowTable';
 
             row = _createElem('tr');
-
+            
             cell = _createElem('td');
             cell.colSpan = 4;
             cell.className = 'dropShadowTop';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-
+            
             body.appendChild(row);
-
+            
             row = _createElem('tr');
-
+            
             cell = _createElem('td');
             cell.rowSpan = 3;
             cell.className = 'dropShadowLeft';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-
+            
             cell = _createElem('td');
             cell.rowSpan = 2;
             cell.colSpan = 2;
@@ -291,9 +286,9 @@ dojo.widget.HtmlWidget, {
             cell.className = 'dropShadowCenter';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-
+            
             this.containerNode = cell;
-
+            
             var d = _createElem('div');
             d.id = "modalDialogTitle";
             this.titleNode = d;
@@ -303,17 +298,17 @@ dojo.widget.HtmlWidget, {
             d.id = "modalDialogPrompt";
             this.promptNode = d;
             cell.appendChild(d);
-
+            
             var d = _createElem('div');
             d.id = "modalDialogImage";
             this.imageNode = d;
             cell.appendChild(d);
-
+            
             var d = _createElem('div');
             d.id = "modalDialogContent";
             this.contentNode = d;
             cell.appendChild(d);
-
+            
             var d = _createElem('div');
             d.id = "modalDialogButtonPanel";
             d.className = 'dialogButtonPanel';
@@ -324,63 +319,63 @@ dojo.widget.HtmlWidget, {
             cell.className = 'dropShadowTopRightCorner';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-
+            
             body.appendChild(row);
 
             row = _createElem('tr');
-
+            
             cell = _createElem('td');
             cell.className = 'dropShadowRight';
             cell.innerHTML = '&nbsp;';
             this.dropShadowRightNode = cell;
             row.appendChild(cell);
-
+            
             body.appendChild(row);
 
             row = _createElem('tr');
-
+            
             cell = _createElem('td');
             cell.className = 'dropShadowBottomLeft';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-
+            
             cell = _createElem('td');
             cell.className = 'dropShadowBottom';
             //cell.style.width = (w - 48) + 'px';
             cell.innerHTML = '&nbsp;';
             this.dropShadowBottomNode = cell;
             row.appendChild(cell);
-
+            
             cell = _createElem('td');
             cell.className = 'dropShadowBottomRightCorner';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-
+            
             body.appendChild(row);
             table.appendChild(body);
             this.dropShadowOuterNode = table;
-
+            
             this.domNode.appendChild(table);
         },
-
+        
         // Lifecycle functions
         postMixInProperties: function () {
             this.toggleObj =
                 dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;
-
+                
             // reference to original show method
             this.showOrig = this.show;
-
+            
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
-
+                
                 // Set style visibility to hidden -- display needs to be
                 // block in order to do sizing/positioning, but we don't
                 // want to see stuff shifting around after we can see the
                 // dialog box
                 this.domNode.style.visibility = 'hidden';
-
+                
                 // Accommodate either original multiple param or
                 // object param input
                 // FIXME: 'content' passed could be a DOM node, which is
@@ -402,10 +397,10 @@ dojo.widget.HtmlWidget, {
                 }
                 // Sizing
                 this.width = this.width || DIALOG_BOX_WIDTH;
-                this.height = this.height || DIALOG_BOX_HEIGHT;
-
+                this.height = this.height || DIALOG_BOX_HEIGHT;                
+                
                 this._setUpDialog();
-
+                
                 var waitForIt = this.render() && this.center();
                 this.renderUiMask();
                 this.domNode.style.display = 'block';
@@ -416,25 +411,20 @@ dojo.widget.HtmlWidget, {
                 this.setHeight()) {
                 this.setContentAreaHeight();
                 }
-                if (this.content instanceof dojo.widget.HtmlWidget
+                if (this.content instanceof dojo.widget.HtmlWidget 
                     && this.content.appendedToParent){
                     this.content.appendedToParent(this);
                 }
-
+                
                 // Re-set visibility to visible now that everything is sized/positioned
                 this.domNode.style.visibility = 'visible';
-
-                this.isDisplayed = true;
                 
-                this.deferred = new dojo.Deferred();
-                return this.deferred;
+                this.isDisplayed = true;
 
             };
 
             // Clear buttons and actually take the div off the page
             this.hide = function () {
-                this.deferred.callback(this.content);
-
                 var bDiv = this.buttonPanelNode;
 
                 // Clean up previous panel if any
@@ -444,7 +434,7 @@ dojo.widget.HtmlWidget, {
                     }
                     this.btnPanel.destroy();
                 }
-
+ 
                 this.title = '';
                 this.prompt = '';
                 this.btnsLeft = [];
@@ -461,9 +451,9 @@ dojo.widget.HtmlWidget, {
                 this.content = null;
                 // Cleanup -- wipe DOM inside container
                 this.domNode.innerHTML = '';
-
+                
             };
         },
-
+        
         // Toggling visibility
         toggle: 'plain' } );

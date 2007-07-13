@@ -36,8 +36,6 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
-import org.apache.abdera.util.Constants;
-import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

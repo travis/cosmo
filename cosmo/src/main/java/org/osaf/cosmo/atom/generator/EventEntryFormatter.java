@@ -23,13 +23,15 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.util.Dates;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.util.DateUtil;
 
 /**
- * Produces text and HTML representations of an
- * <code>EventStamp</code> for use in an Atom entry's summary and
- * content fields.
+ * Produces text and HTML representations of an event-stamped item for use
+ * in an Atom entry's summary and content fields.
  *
  * HTML representations use the
  * <a href="http://microformats.org/wiki/hcalendar">hCalendar</a>
@@ -48,38 +50,55 @@ public class EventEntryFormatter {
     private static final String PATTERN_HUMAN_DATE =
         "MMM d, yyyy";
 
+    private NoteItem master;
+    private NoteOccurrence occurrence;
     private EventStamp stamp;
+    private Date start;
+    private Date end;
+    private String summary;
+    private String location;
 
     /**
      * Returns an instance of <code>EventEntryFormatter</code> for the
-     * given event stamp and the system default locale.
+     * given item and the system default locale.
      */
-    public EventEntryFormatter(EventStamp stamp) {
-        this.stamp = stamp;
+    public EventEntryFormatter(NoteItem item) {
+        if (item instanceof NoteOccurrence) {
+            occurrence = (NoteOccurrence) item;
+            master = occurrence.getMasterNote();
+        } else {
+            master = item;
+        }    
+        stamp = EventStamp.getStamp(master);
+        if (stamp != null) {
+            if (occurrence != null) {
+                start = occurrence.getOccurrenceDate();
+                end = Dates.getInstance(stamp.getDuration().getTime(start),
+                                        start);
+            } else {
+                start = stamp.getStartDate();
+                end = stamp.getEndDate();
+            }
+            summary = stamp.getSummary();
+            location = stamp.getLocation();
+        }
     }
 
     /**
      * Returns an abbreviated plain text summary of the event.
-     *
-     * @param stamp the <code>EventStamp</code> to format
      */
     public String formatTextSummary() {
+        if (stamp == null)
+            return null;
+
         StringBuffer buf = new StringBuffer();
-
-        Date start = stamp.getStartDate();
-        Date end = stamp.getEndDate();
-
-        String summary = toSummary(stamp.getSummary());
-        String startDate = toHumanDate(start);
-        String endDate = toHumanDate(end);
-        String location = stamp.getLocation();
-
-        buf.append(summary).
+    
+        buf.append(toSummary(summary)).
             append(": ").
-            append(startDate);
+            append(toHumanDate(start));
         if (end != null && start.getTime() != end.getTime())
             buf.append(" to ").
-                append(endDate);
+                append(toHumanDate(end));
         if (location != null)
             buf.append(" at ").
                 append(location);
@@ -94,6 +113,9 @@ public class EventEntryFormatter {
      * the conversion. Only the master instance is considered.
      */
     public String formatHtmlContent() {
+         if (stamp == null)
+             return null;
+
         // XXX: named location with an address and/or geo may be
         // represented by a nested hcard
         // (http://microformats.org/wiki/hcard)
@@ -104,34 +126,24 @@ public class EventEntryFormatter {
         // XXX: geo location may be represented by a nested geo
         // (http://microformats.org/wiki/geo)
 
-        Date start = stamp.getStartDate();
-        Date end = stamp.getEndDate();
-
-        String summary = toSummary(stamp.getSummary());
-        String machineStartDate = toMachineDate(start);
-        String humanStartDate = toHumanDate(start);
-        String machineEndDate = toMachineDate(end);
-        String humanEndDate = toHumanDate(end);
-        String location = stamp.getLocation();
-
         StringBuffer buf = new StringBuffer();
 
         buf.append("<div class=\"vevent\">").
             append("<span class=\"summary\">").
-            append(StringEscapeUtils.escapeHtml(summary)).
+            append(StringEscapeUtils.escapeHtml(toSummary(summary))).
             append("</span>").
             append(": ").
             append("<abbr class=\"dtstart\" title=\"").
-            append(machineStartDate).
+            append(toMachineDate(start)).
             append("\">").
-            append(humanStartDate).
+            append(toHumanDate(start)).
             append("</abbr>");
         if (end != null && start.getTime() != end.getTime())
             buf.append(" to ").
                 append("<abbr class=\"dtend\" title=\"").
-                append(machineEndDate).
+                append(toMachineDate(end)).
                 append("\">").
-                append(humanEndDate).
+                append(toHumanDate(end)).
                 append("</abbr>");
         if (location != null)
             buf.append(" at " ).

@@ -48,7 +48,6 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(item, copy);
 
         ResponseContext res = provider.updateEntry(req);
-        log.error(helper.getContent(res));
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());

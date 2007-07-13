@@ -17,10 +17,8 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
-import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -80,11 +78,7 @@ public class ExpandedItemProvider extends ItemProvider {
 
             Feed feed = generator.generateFeed(item);
 
-            AbstractResponseContext rc =
-                createResponseContext(feed.getDocument());
-            rc.setEntityTag(new EntityTag(item.getEntityTag()));
-            rc.setLastModified(item.getModifiedDate());
-            return rc;
+            return ok(feed, item);
         } catch (InvalidQueryException e) {
             return badrequest(getAbdera(), request, e.getMessage());
         } catch (UnsupportedProjectionException e) {

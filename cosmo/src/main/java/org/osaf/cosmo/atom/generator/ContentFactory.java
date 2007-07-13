@@ -142,14 +142,11 @@ public class ContentFactory
         ContentBean content = new ContentBean();
         content.setMediaType(MEDIA_TYPE_HTML);
 
-        String value = null;
-        EventStamp es = EventStamp.getStamp(item);
-        if (es != null)
-            value = new EventEntryFormatter(es).formatHtmlContent();
+        String value = new EventEntryFormatter(item).formatHtmlContent();
         if (value == null)
             value = item.getBody();
         if (value == null)
-                value = item.getDisplayName();
+            value = item.getDisplayName();
         if (value == null)
             value = "";
 
@@ -161,10 +158,7 @@ public class ContentFactory
         ContentBean content = new ContentBean();
         content.setMediaType(MEDIA_TYPE_TEXT);
 
-        String value = null;
-        EventStamp es = EventStamp.getStamp(item);
-        if (es != null)
-            value = new EventEntryFormatter(es).formatTextSummary();
+        String value = new EventEntryFormatter(item).formatTextSummary();
         if (value == null)
             value = item.getDisplayName();
         if (value == null)

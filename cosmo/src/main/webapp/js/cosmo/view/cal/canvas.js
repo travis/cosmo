@@ -729,9 +729,8 @@ cosmo.view.cal.canvas = new function () {
      * @param rem Boolean, if explicit false is passed,
      * don't remove the lozenges along with the CalItem objs
      */
-    function removeAllEvents() {
+    function removeAllEventsFromDisplay() {
         cosmo.view.cal.itemRegistry.each(removeEventFromDisplay);
-        cosmo.view.cal.itemRegistry = new Hash();
         return true;
     }
     /**
@@ -818,7 +817,8 @@ cosmo.view.cal.canvas = new function () {
      * removes the current event selection
      */
     function wipe() {
-        removeAllEvents();
+        removeAllEventsFromDisplay();
+        cosmo.view.cal.itemRegistry = new cosmo.util.hash.Hash();
     }
     /**
      * Render the canvas after successfully loading events
@@ -828,7 +828,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function loadSuccess(ev) {
         if (ev) {
-            removeAllEvents();
+            removeAllEventsFromDisplay();
             cosmo.view.cal.itemRegistry = ev;
         }
         cosmo.view.cal.itemRegistry.each(appendLozenge);
@@ -885,7 +885,7 @@ cosmo.view.cal.canvas = new function () {
                 var newHash = cosmo.view.cal.createEventRegistry(occurrences);
                 newRegistry.append(newHash);
 
-                removeAllEvents();
+                removeAllEventsFromDisplay();
                 self.view.itemRegistry = newRegistry;
                 self.view.itemRegistry.each(appendLozenge);
             };
@@ -972,7 +972,7 @@ cosmo.view.cal.canvas = new function () {
                 var eventRegistry = cosmo.view.cal.itemRegistry.clone();
                 eventRegistry = self.view.filterOutRecurrenceGroup(
                     eventRegistry, [ev.data.getUid()]);
-                removeAllEvents();
+                removeAllEventsFromDisplay();
                 cosmo.view.cal.itemRegistry = eventRegistry;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
                 break;
@@ -981,7 +981,7 @@ cosmo.view.cal.canvas = new function () {
                 eventRegistry = self.viw.filterOutRecurrenceGroup(
                     eventRegistry, [ev.data.getUid()],
                     ev.data.getEventStamp().getRrule().getEndDate());
-                removeAllEvents();
+                removeAllEventsFromDisplay();
                 cosmo.view.cal.itemRegistry = eventRegistry;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
                 break;

@@ -38,6 +38,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
         
     EDIT_LINK: "atom-edit",
+    PROJECTION_FULL_EIM_JSON: "/full/eim-json",
         
     generateUri: function(base, projection, queryHash){
         queryHash = queryHash || {};
@@ -117,8 +118,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var editLink = item.getUrls()[this.EDIT_LINK];
 
         var r = {};
-        r.url = cosmo.env.getBaseUrl() + "/atom/" + 
-                editLink;
+        r.url = this.generateUri(cosmo.env.getBaseUrl() + "/atom/" + 
+                editLink, this.PROJECTION_FULL_EIM_JSON);
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "PUT";
@@ -174,7 +175,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
         var r = {};
         r.url = this.generateUri(cosmo.env.getBaseUrl() +
-          "/atom/" + editLink, "");
+          "/atom/" + editLink, this.PROJECTION_FULL_EIM_JSON);
         r.contentType = "application/atom+xml";
         r.postContent = postContent;
         r.method = "POST";

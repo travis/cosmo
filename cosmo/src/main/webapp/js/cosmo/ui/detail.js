@@ -332,32 +332,34 @@ cosmo.ui.detail.MarkupBar = function (p) {
                 var subject = cosmo.app.pim.currentCollection.getDisplayName() + ": " + data.getDisplayName();
                 var body = [_("Sidebar.Email.Title") , data.getDisplayName() , "%0d%0a"];
                 var eventStamp = data.getEventStamp();
-                var startDate = eventStamp.getStartDate();
-                var endDate = eventStamp.getEndDate();
-
-                if (startDate.tzId) {
-                    body = body.concat([
-                     _("Sidebar.Email.Timezone"), startDate.tzId , "%0d%0a"]);
-                }
-                body = body.concat([
-                     _("Sidebar.Email.Starts") , dojo.date.strftime(startDate, timeFormat) , "%0d%0a" ,
-                     _("Sidebar.Email.Ends") , dojo.date.strftime(endDate, timeFormat) , "%0d%0a"]);
-                if (eventStamp.getAllDay()) {
-                    body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
-                }
-
-                if (eventStamp.getRrule()) {
-                    var rrule = eventStamp.getRrule();
-                    body = body.concat([_("Sidebar.Email.Recurs") ,
-                        rrule.getFrequency()]);
-                    if (rrule.getEndDate()) {
-                        body = body.concat([_("Sidebar.Email.EndingOn") ,
-                            dojo.date.strftime(rrule.getEndDate(), timeFormat)]);
+                if (eventStamp){
+                    var startDate = eventStamp.getStartDate();
+                    var endDate = eventStamp.getEndDate();
+    
+                    if (startDate.tzId) {
+                        body = body.concat([
+                         _("Sidebar.Email.Timezone"), startDate.tzId , "%0d%0a"]);
                     }
-                    body.push(".%0d%0a");
-                }
-                if (eventStamp.getStatus()) {
-                    body.concat([_("Sidebar.Email.Status") , eventStamp.getStatus() , "%0d%0a"]);
+                    body = body.concat([
+                         _("Sidebar.Email.Starts") , dojo.date.strftime(startDate, timeFormat) , "%0d%0a" ,
+                         _("Sidebar.Email.Ends") , dojo.date.strftime(endDate, timeFormat) , "%0d%0a"]);
+                    if (eventStamp.getAllDay()) {
+                        body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
+                    }
+    
+                    if (eventStamp.getRrule()) {
+                        var rrule = eventStamp.getRrule();
+                        body = body.concat([_("Sidebar.Email.Recurs") ,
+                            rrule.getFrequency()]);
+                        if (rrule.getEndDate()) {
+                            body = body.concat([_("Sidebar.Email.EndingOn") ,
+                                dojo.date.strftime(rrule.getEndDate(), timeFormat)]);
+                        }
+                        body.push(".%0d%0a");
+                    }
+                    if (eventStamp.getStatus()) {
+                        body.concat([_("Sidebar.Email.Status") , eventStamp.getStatus() , "%0d%0a"]);
+                    }
                 }
                 if (data.getBody()) {
                     body = body.concat([ ,

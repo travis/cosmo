@@ -47,6 +47,6 @@ dojo.declare("cosmo.service.exception.ResourceNotFoundException", cosmo.service.
     }, 
     
     toString: function(){
-        return "The resource " + id + " does not exist";
+        return "The resource " + this.id + " does not exist";
     }
 });

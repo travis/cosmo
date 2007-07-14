@@ -189,17 +189,28 @@ dojo.declare("cosmo.service.transport.Rest", null,
             var deferred = new dojo.Deferred();
             var request = this.getDefaultRequest(deferred, r, kwArgs);
             dojo.lang.mixin(request, r);
+            this.add404Handling(deferred, request.url);
             dojo.io.bind(request);
             return deferred;
         },
         
         addErrorCodeToExceptionErrback: function(deferred, responseCode, exception){
             deferred.addErrback(function (err){
-                if (err.xhr.status == responseCode){
+                if (err.xhr && err.xhr.status == responseCode){
                     err = new exception(err);
                 }
                 return err;
             });
-        }
+        },
+
+        add404Handling: function (deferred, id){
+            deferred.addErrback(function (err) {
+
+            if (err.xhr.status == 404){
+                return new cosmo.service.exception.ResourceNotFoundException(id);
+            }
+        });
+    }  
+        
     }
 );

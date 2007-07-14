@@ -25,7 +25,8 @@ cosmotest.service.conduits.test_conduits = {
         try{
 
             var user = cosmotest.service.conduits.test_conduits.createTestAccount();
-            
+            // number of starting items;
+            var startingItems = 3;
             // test getCollections
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             var collections = conduit.getCollections({sync: true}).results[0];
@@ -66,7 +67,7 @@ cosmotest.service.conduits.test_conduits = {
             var items = conduit.getItems(c0, {}, {sync: true}).results[0];
 
             jum.assertTrue("items", !!items);
-            jum.assertEquals("items length", 5, items.length);
+            jum.assertEquals("items length", startingItems + 1, items.length);
 
             jum.assertTrue("no edit link on item", !!newItem.getUrls()['atom-edit']);
 
@@ -97,7 +98,7 @@ cosmotest.service.conduits.test_conduits = {
             var items = conduit.getItems(c0, {}, {sync: true}).results[0];
 
             jum.assertTrue("items", !!items);
-            jum.assertEquals("items length", 6, items.length);
+            jum.assertEquals("items length", startingItems + 2, items.length);
             
             // Test deleteItem 
 
@@ -105,7 +106,7 @@ cosmotest.service.conduits.test_conduits = {
             
             items = conduit.getItems(c0, {}, {sync: true}).results[0];
             jum.assertTrue("deleteItem: items", !!items);
-            jum.assertEquals("deleteItem: items length", 5, items.length);
+            jum.assertEquals("deleteItem: items length", startingItems + 1, items.length);
             
             
             // Test dashboard projections

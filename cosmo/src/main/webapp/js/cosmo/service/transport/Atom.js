@@ -55,7 +55,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     createCollection: function(name){
-        
+        dojo.unimplemented("cosmo.service.transport.Atom.createCollection");
     },
 
     getCollection: function(collectionUrl, kwArgs){

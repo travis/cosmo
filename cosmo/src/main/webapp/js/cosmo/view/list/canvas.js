@@ -18,6 +18,7 @@ dojo.provide('cosmo.view.list.canvas');
 
 dojo.require('dojo.event.*');
 dojo.require('dojo.html.common');
+dojo.require('dojo.string');
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.view.common");
@@ -192,7 +193,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
         var fillCell = function (s) { 
             var cell = s;
-            if (s) s = s.replace(/</g, "&lt;").replace(/>/g, "&gt;") ;
+            if (s) s = dojo.string.escapeXml(s);
             return  s || '&nbsp;';
         };
         var getRow = function (key, val) {

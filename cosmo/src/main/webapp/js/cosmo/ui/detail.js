@@ -1230,13 +1230,20 @@ cosmo.ui.detail.EventFormElements= function () {
                 timeElem.value = '';
             }
         };
+        var allDay = stamp.getAllDay();
+        var anyTime = stamp.getAnyTime();
+        f.eventAllDay.checked = allDay;
         _html.setTextInput(f.eventLocation, stamp.getLocation());
         var start = stamp.getStartDate();
         _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
-        setTimeElem(f, 'start', start);
+        if (!(allDay || anyTime)) {
+            setTimeElem(f, 'start', start);
+        }
         var end = stamp.getEndDate();
         _html.setTextInput(f.endDate, end.strftime('%m/%d/%Y'));
-        setTimeElem(f, 'end', end);
+        if (!(allDay || anyTime)) {
+            setTimeElem(f, 'end', end);
+        }
         if (start.tzId){
             var tz = cosmo.datetime.timezone.getTimezone(start.tzId);
             if (!tz){

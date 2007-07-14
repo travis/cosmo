@@ -190,7 +190,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
         r += '</tr>\n';
         t += r;
 
-        var fillCell = function (s) { return s || '&nbsp;'; };
+        var fillCell = function (s) { 
+            var cell = s;
+            if (s) s = s.replace(/</g, "&lt;").replace(/>/g, "&gt;") ;
+            return  s || '&nbsp;';
+        };
         var getRow = function (key, val) {
             var item = val;
             var display = item.display;

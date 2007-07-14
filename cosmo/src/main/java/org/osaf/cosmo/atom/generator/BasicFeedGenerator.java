@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import javax.activation.MimeTypeParseException;
+import java.util.SortedSet;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -26,6 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.filter.EventStampFilter;
+import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -42,6 +44,22 @@ public class BasicFeedGenerator extends BaseItemFeedGenerator {
     public BasicFeedGenerator(StandardGeneratorFactory factory,
                               ServiceLocator locator) {
         super(factory, locator);
+    }
+
+    /**
+     * <p>
+     * Overrides the superclass method to exclude the master item from
+     * the occurrence set.
+     * </p>
+     *
+     * @param the item whose contents are to be listed
+     */
+    protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
+        ItemFilter filter = getFilter();
+        if (filter != null)
+            filter.setFilterProperty(EventStampFilter.PROPERTY_INCLUDE_MASTER_ITEMS,
+                                     "false");
+        return super.findOccurrences(item);
     }
 
     /**

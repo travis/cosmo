@@ -63,13 +63,8 @@ div {
 }
 /* Default link color --
  * generally color for text of active buttons should match */
-a span, a{
+a span, a {
     color: #0066ff;
-    text-decoration: none;
-}
-
-a:visited {
-    color: #6633cc;
     text-decoration: none;
 }
 

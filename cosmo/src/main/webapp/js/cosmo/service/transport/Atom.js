@@ -159,7 +159,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             expandedLink = expandedLink.substring(0, projectionIndex) + 
                            expandedLink.substring(projectionIndex  + defaultProjection.length);
         }
-        dojo.debug(expandedLink)
+
         r.url = this.generateUri(cosmo.env.getBaseUrl() +
           "/atom/" + expandedLink, "/" + projection, query);
 

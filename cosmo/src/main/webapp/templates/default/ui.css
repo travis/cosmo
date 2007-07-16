@@ -364,17 +364,25 @@ td.dataDisplayLabel {
     position: absolute;
     border-right: 1px solid #dfdfdf;
 }
-/* Top half-hour of a one-hour block on the timed canvas */
+/* Top half-hour of a one-hour block on the timed canvas 
+ * NOTE: IE6 needs a background color of these DOM Nodes
+ * for the ondblclick event listener to fire
+ * */
 .hourDivTop {
     width: 100%;
     border-bottom: 1px dotted #ccc;
     vertical-align: top;
+    background-color: #fff;
 }
-/* Bottom half-hour of a one-hour block on the timed canvas */
+/* Bottom half-hour of a one-hour block on the timed canvas
+ * NOTE: IE6 needs a background color of these DOM Nodes
+ * for the ondblclick event listener to fire
+ * */
 .hourDivBottom {
     width: 100%;
     border-bottom: 1px solid #dddddd;
     vertical-align: top;
+    background-color: #fff;
 }
 /* Left-hand timeline containing times of day -- e.g., '11 AM' */
 .hourDivSubLeft {
@@ -392,13 +400,13 @@ td.dataDisplayLabel {
 }
 /* Adds colored background to current day column */
 .currentDayDay {
-    background: #e9e9e9;
+    background-color: #e9e9e9;
 }
 .workingHours {
-   background: #99ccff;
+   background-color: #99ccff;
 }
 .nonWorkingHours {
-    background: #dddddd;
+    background-color: #dddddd;
 }
 
 /* Event blocks

@@ -524,10 +524,10 @@ td.dataDisplayLabel {
     position: absolute;
     top: 8px;
 }
-/* Text for single collections */
-#collectionLabelPrompt {
-    color: #aaa;
-    padding-bottom: 2px;
+/* "All to my account" link */
+#addCollectionPrompt {
+    padding-top: 2px;
+    padding-left: 4px;
 }
 /* Jump-to date box */
 #jumpToDateDiv {

@@ -63,8 +63,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         },
 
         strings: {
-            mainCollectionPrompt: _('Main.Collection.Prompt'),
-            imgTitleAdd: _('Main.CollectionAdd.Tooltip'),
+            collectionAddPrompt: _('Main.CollectionAdd.Prompt'),
+            collectionAddAuthPrompt: _('Main.CollectionAdd.AuthPrompt'),
+            collectionAddTooltip: _('Main.CollectionAdd.Tooltip'),
             imgTitleInfo: _('Main.CollectionDetail.Tooltip'),
             attemptPrompt: _('Main.CollectionAdd.AttemptPrompt'),
             collectionAddError: _('Main.CollectionAdd.ErrorPrompt'),
@@ -87,177 +88,121 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var _collectionWithUidExists = this._collectionWithUidExists;
             var _collectionWithDisplayNameExists = this._collectionWithDisplayNameExists;
             var _validateDisplayName = this._validateDisplayName;
-            // The 'currently viewing' prompt above the
-            // collection selector / label
-            var promptNode = _createElem('div');
-            promptNode.id = 'collectionLabelPrompt';
-
             // Collection selector / label and 'add'/'info' icons
             var selectorNode = _createElem('div');
             selectorNode.id = 'collectionSelectorOrLabel';
-            selectorNode.style.height = this.verticalHeight + 'px';
-
-            // 'Add' or 'info' icons, with attached actions
-            function renderButton() {
-                var strings = self.strings;
-                var imgPath = '';
-                var clickFunction = null;
-                // If using a ticket, add the 'Add' button
-                if (passedKey) {
-                    imgPath = 'subscribe';
-                    imgTitle = strings.imgTitleAdd;
-                    // Set up the authAction obj for the AuthBox -- this tells it
-                    // what to do if the user auths successfully
-                    var subscribeFunction = function () {
-                            var collections = cosmo.app.pim.serv.getCollections({sync:true}).results[0];
-                            var alreadySubscribed = _collectionWithUidExists(collections, curr.getUid());
-                            if (alreadySubscribed) {
-                                var message = alreadySubscribed == "cosmo.model.Collection"
-                                    ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
-                                    : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
-                                    var doContinue = confirm(message);
-                                    if (!doContinue) {
-                                        return null;
-                                    }
-                            }
-
-                            var displayName = "";
-
-                            while (!_validateDisplayName(displayName)) {
-                                displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
-                            }
-
-                            while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)) {
-                                displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt",displayName));
-                            }
-
-                            if (displayName == null) {
-                                return null;
-                            }
-
-                            var subscription = new cosmo.model.Subscription({
-                                displayName: displayName,
-                                uid: curr.getUid(),
-                                ticketKey: passedKey
-                            })
-
-                            return cosmo.app.pim.serv.createSubscription(subscription);
-                    }
-                    var authAction = {
-                        execInline: false,
-                        authInitPrompt: 'Please enter the login information for your Cosmo account.',
-                        authProcessingPrompt: null, // Use the default
-                        // Action to take after successful auth -- try to add the
-                        // collection subscription
-                        attemptFunc: function () {
-                            dojo.debug("attemptFunc");
-                            var deferred = subscribeFunction();
-                            dojo.debug("after subbie.");
-                            if (deferred != null) {
-                                dojo.debug("deferred != null");
-                                deferred.addCallback(dojo.lang.hitch(this, function (x,y,z) {
-                                    dojo.debug(x)
-                                    dojo.debug(y)
-                                    dojo.debug(z)
-                                    // Log the user into Cosmo and display the current collection
-                                    this._showPrompt(this.authAction.successPrompt);
-                                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-
-                                }));
-                                deferred.addErrback(dojo.lang.hitch(this, function (err, y, z) {
-                                    dojo.debug(err)
-                                    dojo.debug(y)
-                                    dojo.debug(z)
-                                    cosmo.app.hideDialog();
-                                    cosmo.app.showErr(self.strings.collectionAddError, err);
-                                    return false;
-                                }));
-                            }
-                            else {
-                                cosmo.app.hideDialog();
-                            }
-                        },
-                        attemptPrompt: strings.attemptPrompt,
-                        successPrompt: strings.successPrompt };
-
-                    clickFunction = function () {
-                        if (!cosmo.util.auth.currentlyAuthenticated()) {
-                            var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
-                            cosmo.app.showDialog(authBoxProps);
-                            cosmo.app.modalDialog.content.usernameInput.focus();
-                        }
-                        else {
-                            var deferred = subscribeFunction();
-                            if (deferred == null) {
-                                return;
-                            }
-                            deferred.addCallback(function () {
-                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-                            });
-                            deferred.addErrback(function (err) {
-                                cosmo.app.showErr(self.strings.collectionAddError, err);
-                            });
-                        }
-                    };
-                }
-                // Otherwise the user is logged in -- use the 'Info' button
-                else {
-                    imgPath = 'details';
-                    imgTitle = self.strings.imgTitleInfo;
-                    clickFunction = function () {
-                        var _pim = cosmo.app.pim;
-                        cosmo.app.showDialog(
-                            cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            _pim.currentCollection));
-                    };
-                }
-
-                var collIcon = cosmo.util.html.createRollOverMouseDownImage(
-                    cosmo.env.getImagesUrl() + 'collection_' + imgPath + ".png");
-                collIcon.style.cursor = 'pointer';
-                collIcon.alt = imgTitle;
-                collIcon.title = imgTitle;
-                dojo.event.connect(collIcon, 'onclick', clickFunction);
-                // Img is an actual DOM element, so you set the vertical-align
-                // prop on the image, not on the enclosing div
-                collIcon.style.verticalAlign = 'middle';
-
-                // Image
-                var d = _createElem("div");
-                d.className = 'floatLeft';
-                var h = self.verticalHeight;
-                d.style.height = h + 'px';
-                d.style.linHeight = h + 'px';
-                // Use margin prop to do this in IE -- CSS vertical align
-                // is b0rken
-                if (document.all) {
-                    var m = parseInt((h - collIcon.height)/2);
-                    d.style.marginTop = m + 'px';
-                }
-                d.style.verticalAlign = 'middle';
-                d.appendChild(collIcon);
-                selectorNode.appendChild(d);
-            }
 
             // Ticket view
             function renderSingleCollectionName() {
-                // Add the 'add this collection button on the left
-                // ---
-                renderButton();
+                var imgPath = 'subscribe';
+                var imgTitle = self.strings.imgTitleAdd;
+                // Set up callback for deferred -- this is the action to take
+                // if auth succeeds
+                var subscribeFunction = function () {
+                        var collections = cosmo.app.pim.serv.getCollections({sync:true}).results[0];
+                        var alreadySubscribed = _collectionWithUidExists(collections, curr.getUid());
+                        if (alreadySubscribed) {
+                            var message = alreadySubscribed == "cosmo.model.Collection"
+                                ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
+                                : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
+                                var doContinue = confirm(message);
+                                if (!doContinue) {
+                                    return null;
+                                }
+                        }
 
-                // Spacer
-                // ---
-                var d = _createElem("div");
-                d.className = 'floatLeft';
-                d.appendChild(cosmo.util.html.nbsp());
-                selectorNode.appendChild(d);
+                        var displayName = "";
+
+                        while (!_validateDisplayName(displayName)) {
+                            displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
+                        }
+
+                        while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)) {
+                            displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt",displayName));
+                        }
+
+                        if (displayName == null) {
+                            return null;
+                        }
+
+                        var subscription = new cosmo.model.Subscription({
+                            displayName: displayName,
+                            uid: curr.getUid(),
+                            ticketKey: passedKey
+                        })
+
+                        return cosmo.app.pim.serv.createSubscription(subscription);
+                };
+                // Set up the authAction obj for the AuthBox
+                // Passed to cosmo.ui.widget.AuthBox.getInitProperties
+                var authAction = {
+                    execInline: false,
+                    authInitPrompt: self.strings.collectionAddAuthPrompt,
+                    authProcessingPrompt: null, // Use the default
+                    // Action to take after successful auth -- try to add the
+                    // collection subscription
+                    attemptFunc: function () {
+                        dojo.debug("attemptFunc");
+                        var deferred = subscribeFunction();
+                        dojo.debug("after subbie.");
+                        if (deferred != null) {
+                            dojo.debug("deferred != null");
+                            deferred.addCallback(dojo.lang.hitch(this, function (x,y,z) {
+                                dojo.debug(x)
+                                dojo.debug(y)
+                                dojo.debug(z)
+                                // Log the user into Cosmo and display the current collection
+                                this._showPrompt(this.authAction.successPrompt);
+                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+
+                            }));
+                            deferred.addErrback(dojo.lang.hitch(this, function (err, y, z) {
+                                dojo.debug(err)
+                                dojo.debug(y)
+                                dojo.debug(z)
+                                cosmo.app.hideDialog();
+                                cosmo.app.showErr(self.strings.collectionAddError, err);
+                                return false;
+                            }));
+                        }
+                        else {
+                            cosmo.app.hideDialog();
+                        }
+                    },
+                    attemptPrompt: self.strings.attemptPrompt,
+                    successPrompt: self.strings.successPrompt
+                };
+
+                // Called by clicking on the "Add to my account...: link
+                var clickFunction = function () {
+                    if (!cosmo.util.auth.currentlyAuthenticated()) {
+                        var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
+                        cosmo.app.showDialog(authBoxProps);
+                        cosmo.app.modalDialog.content.usernameInput.focus();
+                    }
+                    else {
+                        var deferred = subscribeFunction();
+                        if (deferred == null) {
+                            return;
+                        }
+                        deferred.addCallback(function () {
+                            location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+                        });
+                        deferred.addErrback(function (err) {
+                            cosmo.app.showErr(self.strings.collectionAddError, err);
+                        });
+                    }
+                };
+
+                var addCollectionPromptNode = _createElem('div');
+                addCollectionPromptNode.id = 'addCollectionPrompt';
 
                 // Collection name label
                 // ---
                 var displayName = curr.getDisplayName();
                 var d = _createElem("div");
                 d.id = 'collectionLabelName';
-                d.className = 'floatLeft labelTextHoriz';
+                d.className = 'labelTextHoriz';
                 if (displayName.length > 13) {
                     var textNode = _createText(displayName.substr(0, 12) + '\u2026');
                     d.title = curr.displayName;
@@ -266,22 +211,39 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     var textNode = _createText(displayName);
                 }
                 d.appendChild(textNode);
-                d.style.height = self.verticalHeight + 'px';
-                d.style.lineHeight = self.verticalHeight + 'px';
-                d.style.verticalAlign = 'middle';
-                // Shave off a couple of px in IE because its
-                // valign middle for text is wonky
-                if (document.all) {
-                    d.style.marginTop = '-2px';
-                }
                 selectorNode.appendChild(d);
                 self.displayNameText = textNode;
+
+                // Set up addCollectionPromptNode
+                // -----
+                var anchor = _createElem('a');
+                anchor.title = self.strings.collectionAddTooltip;
+                dojo.event.connect(anchor, 'onclick', clickFunction);
+                anchor.appendChild(_createText(self.strings.collectionAddPrompt));
+                addCollectionPromptNode.appendChild(anchor);
+
+                // Append to widget domNode
+                self.domNode.appendChild(selectorNode);
+                self.domNode.appendChild(addCollectionPromptNode);
             }
 
             // Logged-in view
             function renderSelector() {
                 var o = [];
                 var c = 0;
+                var imgPath = 'details';
+                var imgTitle = self.strings.imgTitleInfo;
+                var clickFunction = function () {
+                    var _pim = cosmo.app.pim;
+                    cosmo.app.showDialog(
+                        cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
+                        _pim.currentCollection));
+                };
+
+                // Logged-in view uses a select box -- set vertical height
+                // so we can get the info icon valigned properly
+                selectorNode.style.height = this.verticalHeight + 'px';
+
                 for (var i in col) {
                     // Grab the currently selected collection's index
                     if (col[i].getDisplayName() == curr.getDisplayName()) {
@@ -311,14 +273,41 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 d.appendChild(cosmo.util.html.nbsp());
                 selectorNode.appendChild(d);
 
-                // Add the 'collection info' button on the right
-                // ---
-                renderButton();
+                var collIcon = cosmo.util.html.createRollOverMouseDownImage(
+                    cosmo.env.getImagesUrl() + 'collection_' + imgPath + ".png");
+                collIcon.style.cursor = 'pointer';
+                collIcon.alt = imgTitle;
+                collIcon.title = imgTitle;
+                dojo.event.connect(collIcon, 'onclick', clickFunction);
+                // Img is an actual DOM element, so you set the vertical-align
+                // prop on the image, not on the enclosing div
+                collIcon.style.verticalAlign = 'middle';
+
+                // Image
+                var d = _createElem("div");
+                d.className = 'floatLeft';
+                var h = self.verticalHeight;
+                d.style.height = h + 'px';
+                d.style.linHeight = h + 'px';
+                // Use margin prop to do this in IE -- CSS vertical align
+                // is b0rken
+                if (document.all) {
+                    var m = parseInt((h - collIcon.height)/2);
+                    d.style.marginTop = m + 'px';
+                }
+                d.style.verticalAlign = 'middle';
+                d.appendChild(collIcon);
+                selectorNode.appendChild(d);
+
+                // Close left floats in selectorNode
+                var d = _createElem("div");
+                d.className = 'clearBoth';
+                selectorNode.appendChild(d);
+
+                // Append to widget domNode
+                self.domNode.appendChild(selectorNode);
             }
 
-            // Set up promptNode
-            // -----
-            promptNode.appendChild(_createText(this.strings.mainCollectionPrompt));
 
             // Set up selectorNode
             // -----
@@ -334,14 +323,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             else {
                 renderSelector();
             }
-            // Close left floats in selectorNode
-            var d = _createElem("div");
-            d.className = 'clearBoth';
-            selectorNode.appendChild(d);
-
-            // Append to widget domNode
-            this.domNode.appendChild(promptNode);
-            this.domNode.appendChild(selectorNode);
         },
 
         handleCollectionUpdated: function (/*cosmo.topics.CollectionUpdatedMessage*/ message) {

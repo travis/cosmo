@@ -66,6 +66,7 @@ div {
 a span, a {
     color: #0066ff;
     text-decoration: none;
+    cursor: pointer;
 }
 
 a:hover {

@@ -56,7 +56,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // select box doesn't just sit open while waiting for
             // the collection data to load and the UI to render
             var f = function () { dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection', opts: { loadType: 'changeCollection', 
+                action: 'loadCollection', opts: { loadType: 'changeCollection',
                 collection: c }, data: {}
             }); };
             setTimeout(f, 0);
@@ -108,39 +108,39 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     imgTitle = strings.imgTitleAdd;
                     // Set up the authAction obj for the AuthBox -- this tells it
                     // what to do if the user auths successfully
-                    var subscribeFunction = function (){
+                    var subscribeFunction = function () {
                             var collections = cosmo.app.pim.serv.getCollections({sync:true}).results[0];
                             var alreadySubscribed = _collectionWithUidExists(collections, curr.getUid());
-                            if (alreadySubscribed){
-                                var message = alreadySubscribed == "cosmo.model.Collection" 
-                                    ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection") 
+                            if (alreadySubscribed) {
+                                var message = alreadySubscribed == "cosmo.model.Collection"
+                                    ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
                                     : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
                                     var doContinue = confirm(message);
-                                    if (!doContinue){
+                                    if (!doContinue) {
                                         return null;
-                                    } 
+                                    }
                             }
-                            
-                            var displayName = ""; 
 
-                            while (!_validateDisplayName(displayName)){
+                            var displayName = "";
+
+                            while (!_validateDisplayName(displayName)) {
                                 displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
                             }
-                            
-                            while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)){
+
+                            while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)) {
                                 displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt",displayName));
                             }
 
-                            if (displayName == null){
+                            if (displayName == null) {
                                 return null;
                             }
-                            
+
                             var subscription = new cosmo.model.Subscription({
                                 displayName: displayName,
                                 uid: curr.getUid(),
                                 ticketKey: passedKey
                             })
-                            
+
                             return cosmo.app.pim.serv.createSubscription(subscription);
                     }
                     var authAction = {
@@ -153,18 +153,18 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             dojo.debug("attemptFunc");
                             var deferred = subscribeFunction();
                             dojo.debug("after subbie.");
-                            if (deferred != null){
+                            if (deferred != null) {
                                 dojo.debug("deferred != null");
-                                deferred.addCallback(dojo.lang.hitch(this, function(x,y,z){
+                                deferred.addCallback(dojo.lang.hitch(this, function (x,y,z) {
                                     dojo.debug(x)
                                     dojo.debug(y)
                                     dojo.debug(z)
                                     // Log the user into Cosmo and display the current collection
                                     this._showPrompt(this.authAction.successPrompt);
                                     location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-                                    
+
                                 }));
-                                deferred.addErrback(dojo.lang.hitch(this, function(err, y, z){
+                                deferred.addErrback(dojo.lang.hitch(this, function (err, y, z) {
                                     dojo.debug(err)
                                     dojo.debug(y)
                                     dojo.debug(z)
@@ -172,7 +172,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                     cosmo.app.showErr(self.strings.collectionAddError, err);
                                     return false;
                                 }));
-                            } else {
+                            }
+                            else {
                                 cosmo.app.hideDialog();
                             }
                         },
@@ -180,19 +181,20 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         successPrompt: strings.successPrompt };
 
                     clickFunction = function () {
-                        if (!cosmo.util.auth.currentlyAuthenticated()){
+                        if (!cosmo.util.auth.currentlyAuthenticated()) {
                             var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
                             cosmo.app.showDialog(authBoxProps);
                             cosmo.app.modalDialog.content.usernameInput.focus();
-                        } else {
+                        }
+                        else {
                             var deferred = subscribeFunction();
-                            if (deferred == null){
+                            if (deferred == null) {
                                 return;
                             }
-                            deferred.addCallback(function(){
+                            deferred.addCallback(function () {
                                 location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
                             });
-                            deferred.addErrback(function(err){
+                            deferred.addErrback(function (err) {
                                 cosmo.app.showErr(self.strings.collectionAddError, err);
                             });
                         }
@@ -342,80 +344,82 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             this.domNode.appendChild(selectorNode);
         },
 
-        handleCollectionUpdated: function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
+        handleCollectionUpdated: function (/*cosmo.topics.CollectionUpdatedMessage*/ message) {
             var updatedCollection = message.collection;
-            for (var x = 0; x < this.collections.length;x++){
+            for (var x = 0; x < this.collections.length;x++) {
                 var collection = this.collections[x];
-                if (collection.getUid() == updatedCollection.getUid()){
-                    if (collection instanceof cosmo.model.Subscription){
+                if (collection.getUid() == updatedCollection.getUid()) {
+                    if (collection instanceof cosmo.model.Subscription) {
                         collection.setCollection(updatedCollection);
-                    } else {
+                    }
+                else {
                         //we'll assume it's a "normal" collection
                         this.collections[x] = updatedCollection;
                     }
-                }                
+                }
             }
 
-            if (this.currentCollection.getUid() == updatedCollection.getUid()){
+            if (this.currentCollection.getUid() == updatedCollection.getUid()) {
                 this.currentCollection.collection = updatedCollection;
-                if (this.currentCollection instanceof cosmo.model.Subscription){
+                if (this.currentCollection instanceof cosmo.model.Subscription) {
                     this.currentCollection.setCollection(updatedCollection);
-                } else {
+                }
+            else {
                     this.currentCollection = updatedCollection;
                 }
             }
             this._redraw();
         },
 
-        handleSubscriptionUpdated: function(/*cosmo.topics.SubscriptionUpdatedMessage*/ message){
+        handleSubscriptionUpdated: function (/*cosmo.topics.SubscriptionUpdatedMessage*/ message) {
             var updatedSubscription = message.subscription;
-            for (var x = 0; x < this.collections.length;x++){
+            for (var x = 0; x < this.collections.length;x++) {
                 var col = this.collections[x];
                 if (col instanceof cosmo.model.Subscription
                      && col.getTicketKey() == updatedSubscription.getTicketKey()
-                     && col.getUid() == updatedSubscription.getUid()){
-                     
-                     this.collections[x] = updatedSubscription;                      
+                     && col.getUid() == updatedSubscription.getUid()) {
+
+                     this.collections[x] = updatedSubscription;
                      break;
                 }
             }
 
             if (this.currentCollection instanceof cosmo.model.Subscription
                      && this.currentCollection.getTicketKey() == updatedSubscription.getTicketKey()
-                     && this.currentCollection.getUid() == updatedSubscription.getUid()){
+                     && this.currentCollection.getUid() == updatedSubscription.getUid()) {
                 this.currentCollection = updatedSubscription;
             }
             this._redraw();
         } ,
 
-        _redraw: function(){
-            while (this.domNode.firstChild){
+        _redraw: function () {
+            while (this.domNode.firstChild) {
                 this.domNode.removeChild(this.domNode.firstChild);
             }
             this.fillInTemplate();
         },
-        
-        _collectionWithDisplayNameExists: function(cols, displayName){
-            for (var x = 0; x < cols.length; x++){
+
+        _collectionWithDisplayNameExists: function (cols, displayName) {
+            for (var x = 0; x < cols.length; x++) {
                 dojo.debug("comparing: displayNames" + displayName + " and " + cols[x].getDisplayName());
-                if (cols[x].getDisplayName() == displayName){
+                if (cols[x].getDisplayName() == displayName) {
                     return true;
                 }
             }
             return false;
         },
-        
-        _collectionWithUidExists: function(cols, uid){
-            for (var x = 0; x < cols.length; x++){
+
+        _collectionWithUidExists: function (cols, uid) {
+            for (var x = 0; x < cols.length; x++) {
                 dojo.debug("comparing: uid" + uid + " and " + cols[x].getUid());
-                if (cols[x].getUid() == uid){
+                if (cols[x].getUid() == uid) {
                     return cols[x].declaredClass;
                 }
             }
             return false;
         },
-        
-        _validateDisplayName: function(displayName){
+
+        _validateDisplayName: function (displayName) {
             //is there anything else?
             return displayName != "";
         }

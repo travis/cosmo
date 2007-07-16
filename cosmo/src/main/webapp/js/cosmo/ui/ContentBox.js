@@ -26,14 +26,19 @@ cosmo.ui.ContentBox = function (p) {
     this.left = 0;
     this.width = 0;
     this.height = 0;
+    // If the box contains a simple DOM node
+    // this is where it lives
     this.domNode = null;
+    // If the box contain a Dojo widget, this is
+    // a reference to the widget
+    this.widget = null;
     this.parent = null;
     this.children = [];
     this.hasBeenRendered = false;
     for (var i in params) { this[i] = params[i] }
 }
 cosmo.ui.ContentBox.prototype.cleanup =  function () {
-    this.domNode = null; 
+    this.domNode = null;
 };
 cosmo.ui.ContentBox.prototype.clearAll =  function () {
     while (this.domNode.hasChildNodes()) {

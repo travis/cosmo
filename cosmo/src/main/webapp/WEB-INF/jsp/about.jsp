@@ -38,7 +38,7 @@ a {
 }
 
 </style>
-
+<script type="text/javascript" src="${staticBaseUrl}/cosmo.js"></script>
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
         field="PRODUCT_VERSION"/>
@@ -57,14 +57,14 @@ a {
          key="About.VersionString"/> ${PRODUCT_VERSION}
     </div>
     <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/><br/>
-    <a href="http://www.apache.org/licenses/LICENSE-2.0" 
-               onclick="goURLMainWin('http://www.apache.org/licenses/LICENSE-2.0'); 
+    <a href="<fmt:message key="About.LicenseLink"/>" 
+               onclick="goURLMainWin('<fmt:message key="About.LicenseLink"/>'); 
                return false;">
     <fmt:message key="About.LicenseLinkText"/></a><fmt:message 
                  key="About.LicenseClose"/>
     </div>
     <div style="margin-top:16px;"><fmt:message key="About.InfoOpen"/>
-    <a href="http://cosmo.osafoundation.org/" 
+    <a href="<fmt:message key="About.InfoLink"/>" 
                onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
                return false;">
     <fmt:message key="About.InfoLinkText"/></a> <fmt:message 

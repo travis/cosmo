@@ -16,8 +16,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
         // Localized strings
         strings: {
             version: _('About.Version', cosmo.env.getVersion()),
-            license: _('About.License', '<a href="http://www.apache.org/licenses/LICENSE-2.0">', '</a>'),
-            info: _('About.Info', '<a href="http://cosmo.osafoundation.org/">', '</a>')
+            license: [_('About.LicenseOpen'), "<a href=\"", _("About.LicenseLink"),
+                      "\">", _('About.LicenseLinkText'), "</a>", _("About.LicenseClose")].join(""),
+            info: [_('About.InfoOpen'), "<a href=\"", _("About.InfoLink"),
+                      "\">", _('About.InfoLinkText'), "</a>", _("About.InfoClose")].join("")
         },
 
         // Attach points

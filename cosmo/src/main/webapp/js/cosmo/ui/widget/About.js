@@ -54,6 +54,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             d.style.marginTop = '12px';
             d.innerHTML = this.strings.info;
             node.appendChild(d);
+            
+            d = _createElem('div');
+            d.className = "notices";
+            d.innerHTML = dojo.hostenv.getText(cosmo.env.getFullUrl("Notices"));
+            node.appendChild(d);
         },
         postCreate: function () {
         }

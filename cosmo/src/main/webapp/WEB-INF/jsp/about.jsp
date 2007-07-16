@@ -45,7 +45,7 @@ a {
 
 <div style="width:100%;" align="center">
 
-  <div style="width:333px; margin-top:28px;">
+  <div style="margin-top:28px;">
 
     <div>
     <a href="http://cosmo.osafoundation.org/"
@@ -69,6 +69,11 @@ a {
                return false;">
     <fmt:message key="About.InfoLinkText"/></a> <fmt:message 
                  key="About.InfoClose"/></div>
+    
+    <div class="notices">
+        <fmt:message key="About.NoticesUrl" var="noticesUrl"/>
+    	<jsp:include page="${noticesUrl}"/>
+    </div>
     </div>
     
   </div>

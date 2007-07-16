@@ -94,9 +94,7 @@
 	  </div>
       
       <div style="padding-top:36px; text-align:center;">
-        <a href="javascript:cosmo.util.popup.open('${staticBaseUrl}/help/about', 360, 280);">
-          <fmt:message key="Login.AboutCosmo"/>
-        </a>
+	      <cosmo:aboutPopupLink/>
       </div>
     </div>
   </body>

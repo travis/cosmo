@@ -51,10 +51,7 @@
     </title>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/global.css"/>
-    <c:forEach var="stylesheet" items="${stylesheets}">
-    <link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/${stylesheet}.css"/>
-    </c:forEach>
+    <cosmo:stylesheets stylesheets="${stylesheets}"/>
     
     
     <c:if test="${not empty selfLink}">

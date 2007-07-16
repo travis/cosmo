@@ -19,11 +19,13 @@
 <%@ include   file="/WEB-INF/jsp/tagfiles.jsp"            %>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <fmt:setBundle basename="PimMessageResources"/>
+<fmt:message key="About.Width" var="width"/>
+<fmt:message key="About.Height" var="height"/>
 <script type="text/javascript">
 function openAboutLink(){
 window.open('${staticBaseUrl}/help/about',
 			'thePopupWin',
-			'width=360,height=280,location=0,menubar=0,resizable=1,scrollbars=0,status=0,titlebar=1,toolbar=0');
+			'width=${width},height=${height},location=0,menubar=0,resizable=1,scrollbars=0,status=0,titlebar=1,toolbar=0');
 }
 </script>
 <a href="javascript:openAboutLink();">

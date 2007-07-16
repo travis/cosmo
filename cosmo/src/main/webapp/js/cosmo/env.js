@@ -139,11 +139,14 @@ cosmo.env.urls = {
     "ForgotPassword": "/account/password/recover",
     "Logout": "/logout",
     "Redirect": "/logout",
-    "Auth": "/security_check"
+    "Auth": "/security_check",
+    "Notices": function(){return _("About.NoticesUrl")}
 }
 
 cosmo.env.getFullUrl = function (urlKey) {
-    return this.getBaseUrl() + this.urls[urlKey];
+    var url = this.urls[urlKey];
+    if (typeof url == "function") url = url();
+    return this.getBaseUrl() + url;
 }
 
 cosmo.env.getRedirectUrl = function(){

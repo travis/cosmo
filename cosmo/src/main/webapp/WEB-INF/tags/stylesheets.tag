@@ -18,28 +18,14 @@
 <%@ include   file="/WEB-INF/jsp/taglibs.jsp"            %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<%@ attribute name="prefix"         %>
-<%@ attribute name="stylesheets"     %>
+<%@ attribute name="prefix" %>
+<%@ attribute name="stylesheets" %>
 
 <fmt:setBundle basename="PimMessageResources"/>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
-  <head>
-    <title>
-      <fmt:message key="${prefix}HeadTitle">
-        <c:forEach var="p" items="${TitleParam}">
-          <fmt:param value="${p}"/>
-        </c:forEach>
-      </fmt:message>
-    </title>
-    <cosmo:stylesheets stylesheets="${stylesheets}"/>
-  </head>
-  <body class="bodystyle">
-    <div class="md">
-      <!-- page body -->
-        <jsp:doBody/>
-      <!-- end page body -->
-    </div>
-  </body>
-</html>
+<fmt:message key="App.TemplateName" var="templateName"/>
+<cosmo:staticbaseurl var="staticBaseUrl"/>
+<!-- Stylesheets -->
+<link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/global.css"/>
+<c:forEach var="stylesheet" items="${stylesheets}">
+<link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/${stylesheet}.css"/>
+</c:forEach>

@@ -882,7 +882,7 @@ cosmo.view.cal.canvas = new function () {
             var addExpandedOccurrences = function (results) {
                 //check for errors!
                 if (!results[0][0] || (results[1] && !results[1][0])){
-                    cosmo.app.showErr(_$("Service.Error.ProblemGettingEvents"));
+                    cosmo.app.showErr(_$("Service.Error.ProblemGettingItems"));
                     return;
                 }
                 var occurrences = results[0][1];

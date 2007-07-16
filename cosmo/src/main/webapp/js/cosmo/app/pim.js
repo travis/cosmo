@@ -228,7 +228,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                selectUid = collection.getUid();
             }
             catch(e) {
-                cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
+                cosmo.app.showErr(_('Main.Error.LoadItemsFailed'), e);
                 return false;
             }
             this.currentCollections.push(collection);

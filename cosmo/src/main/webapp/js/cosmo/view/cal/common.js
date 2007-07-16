@@ -155,7 +155,7 @@ cosmo.view.cal.loadEvents = function (o) {
     end = opts.viewEnd;
 
     var showErr = function (e) {
-        cosmo.app.showErr(_('Main.Error.LoadEventsFailed'), e);
+        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'), e);
     };
     // Load the array of events
     // ======================

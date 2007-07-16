@@ -82,7 +82,7 @@ cosmo.view.list.loadItems = function (o) {
     var collection = opts.collection || cosmo.app.pim.currentCollection;
     var itemLoadList = null;
     var showErr = function (e) {
-        cosmo.app.showErr(_('Main.Error.LoadEventsFailed'),
+        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),
             e);
         return false;
     };
@@ -207,7 +207,7 @@ cosmo.view.list.createNoteItem = function (s) {
         errMsg = 'New item must have a title.';
     }
     if (errMsg) {
-        cosmo.app.showErr(_('Main.Error.EventNewSaveFailed'), errMsg);
+        cosmo.app.showErr(_('Main.Error.ItemNewSaveFailed'), errMsg);
         return false;
     }
     else {

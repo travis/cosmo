@@ -112,7 +112,7 @@ cosmo.view.dialog = new function() {
             'btnsRight': [new Button('removeButtonDialog', 74, function() { doPublish('remove'); },
                 _('App.Button.Remove'), true)],
             'defaultAction': function() { doPublish('remove'); },
-            'content': _('Main.Prompt.EventRemoveConfirm')
+            'content': _('Main.Prompt.ItemRemoveConfirm')
         };
     };
 

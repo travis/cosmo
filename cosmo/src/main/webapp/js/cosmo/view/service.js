@@ -369,13 +369,13 @@ cosmo.view.service = new function () {
             act = 'saveFailed';
             // Failed update
             if (saveType != "new") {
-                errMsg = _('Main.Error.EventEditSaveFailed');
+                errMsg = _('Main.Error.ItemEditSaveFailed');
             }
             // Failed create
             else {
                 // FIXME: Should we be removing the item from
                 // the itemRegistry/itemRegistry here?
-                errMsg = _('Main.Error.EventNewSaveFailed');
+                errMsg = _('Main.Error.ItemNewSaveFailed');
             }
             cosmo.app.showErr(errMsg, getErrDetailMessage(err));
         }
@@ -572,7 +572,7 @@ cosmo.view.service = new function () {
     function handleRemoveResult(item, err, reqId, opts) {
         var removeEv = item;
         // Simple error message to go along with details from Error obj
-        var errMsg = _('Main.Error.EventRemoveFailed');
+        var errMsg = _('Main.Error.ItemRemoveFailed');
         if (err) {
             act = 'removeFailed';
             cosmo.app.showErr(errMsg, getErrDetailMessage(err));

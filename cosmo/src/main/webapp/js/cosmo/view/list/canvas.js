@@ -311,7 +311,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var addExpandedOccurrences = function (results) {
                 //check for errors!
                 if (!results[0][0] || (results[1] && !results[1][0])){
-                    cosmo.app.showErr(_$("Service.Error.ProblemGettingEvents"));
+                    cosmo.app.showErr(_$("Service.Error.ProblemGettingItems"));
                     return;
                 }
 

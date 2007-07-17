@@ -169,13 +169,13 @@ public class EventStamp extends BaseEventStamp implements
                 }
             }
                 
-            // check for inherited displayAlarm
+            // Check for inherited displayAlarm, which is represented
+            // by a valarm with no TRIGGER
             VAlarm displayAlarm = getDisplayAlarm(exceptionEvent);
             if(displayAlarm !=null && displayAlarm.getProperty(Property.TRIGGER)==null) {
-                if(masterAlarm!=null) {
-                    exceptionEvent.getAlarms().remove(displayAlarm);
+                exceptionEvent.getAlarms().remove(displayAlarm);
+                if(masterAlarm!=null)
                     exceptionEvent.getAlarms().add(masterAlarm);
-                }
             }
             
             sortedMap.put(exceptionStamp.getRecurrenceId().toString(), exceptionEvent);

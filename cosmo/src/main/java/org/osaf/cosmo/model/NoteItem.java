@@ -29,6 +29,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
@@ -133,6 +136,8 @@ public class NoteItem extends ContentItem {
     
     @OneToMany(mappedBy = "modifies", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.DELETE} )
+    @BatchSize(size=50)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<NoteItem> getModifications() {
         return modifications;
     }

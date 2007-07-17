@@ -60,7 +60,9 @@ public abstract class BaseStampGenerator extends BaseGenerator {
 
         // if stamp doesn't exist, check tombstones
         if(stamp==null) {
-            checkForTombstones(records, timestamp);
+            // only check tombstones if timestamp is present
+            if(timestamp!=-1)
+                checkForTombstones(records, timestamp);
             return records;
         }
         

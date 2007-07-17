@@ -40,6 +40,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
@@ -96,6 +97,7 @@ public abstract class Item extends AuditableObject {
     @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
     // turns out this creates a query that is unoptimized for MySQL
     //@Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size=50)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<Stamp> getStamps() {
@@ -188,6 +190,7 @@ public abstract class Item extends AuditableObject {
     @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
     // turns out this creates a query that is unoptimized for MySQL
     //@Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size=50)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Map<QName, Attribute> getAttributes() {
@@ -605,6 +608,7 @@ public abstract class Item extends AuditableObject {
 
     @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<Ticket> getTickets() {
         return tickets;
     }

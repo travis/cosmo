@@ -24,26 +24,26 @@
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Properties Test"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Properties Test"}}
 {"method": "type", "params": {"id" : "startdate", "text": "02/09/2007"}}
 {"method": "type", "params": {"id" : "enddate", "text": "02/09/2007"}}
-{"method": "type", "params": {"id" : "starttime", "text": "6:00"}}
-{"method": "type", "params": {"id" : "endtime", "text": "11:30"}}
+{"method": "type", "params": {"id" : "startTime", "text": "6:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "11:30"}}
 {"method": "click", "params": {"id" : "startap"}}
 {"method": "click", "params": {"id" : "endap"}}
-{"method": "select", "params": {"id" : "status", "option": "Tentative"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description for the properties test"}}
+{"method": "select", "params": {"id" : "eventStatus", "option": "Tentative"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description for the properties test"}}
 {"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"link" : "Settings"}}
 {"method": "click", "params": {"id" : "cosmo_TabContainer_0_tab1"}}
 {"method": "click", "params": {"id" : "showAccountBrowser"}}
 {"method": "click", "params": {"id" : "cosmo_Button_4Text"}}
-{"method": "type", "params": {"id" : "jumpto", "text": "02/11/2008"}}
-{"method": "click", "params": {"id" : "cosmo_Button_2Text"}}
+{"method": "type", "params": {"id" : "goToDateInput", "text": "02/11/2008"}}
+{"method": "click", "params": {"id" : "cosmo_Button_3Text"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
-{"method": "click", "params": {"id" : "miniCal_month1_day19"}}
+{"method": "click", "params": {"id" : "_month1_day19"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}

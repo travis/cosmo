@@ -24,40 +24,40 @@
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.getSelectedItemId()"}, "destination": {"id": "hourDiv1-900"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getFirst().id"}, "destination": {"id": "hourDiv1-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getFirst().id"}, "destination": {"id": "hourDiv1-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv3-3000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv3-3000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-800"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-800"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv4-1200"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv4-1200"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv5-1200"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv5-1200"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-1100"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-1100"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-900"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-900"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-700"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv6-700"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv4-1100"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv4-1100"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv4-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv4-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
@@ -83,40 +83,40 @@ windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destina
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.getSelectedEvent().id"}, "destination": {"id": "hourDiv1-900"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.getSelectedItemId()"}, "destination": {"id": "hourDiv1-900"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getFirst().id"}, "destination": {"id": "hourDiv1-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getFirst().id"}, "destination": {"id": "hourDiv1-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv1-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-windmill.testingApp.cosmo.view.cal.canvas.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv2-1000"} }}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 
 

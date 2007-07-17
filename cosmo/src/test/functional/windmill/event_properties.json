@@ -2,11 +2,11 @@
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Properties Test"}}
-{"method": "type", "params": {"id" : "starttime", "text": "9:00"}}
-{"method": "type", "params": {"id" : "endtime", "text": "4:00"}}
-{"method": "radio", "params": {"xpath" : "/html/body/div[2]/form/div[7]/div/div/div/div[10]/input[4]"}}
-{"method": "radio", "params": {"xpath" : "/html/body/div[2]/form/div[7]/div/div/div/div[8]/input[3]"}}
-{"method": "select", "params": {"id" : "status", "option": "Tentative"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description for the properties test"}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Properties Test"}}
+{"method": "type", "params": {"id" : "startTime", "text": "9:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "4:00"}}
+{"method": "radio", "params": {"id" : "startMeridianAM"}}
+{"method": "radio", "params": {"id" : "endMeridianPM"}}
+{"method": "select", "params": {"id" : "eventStatus", "option": "Tentative"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description for the properties test"}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}

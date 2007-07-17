@@ -4,46 +4,46 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Daily Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Daily"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of daily recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Daily Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Daily"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of daily recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-930"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Weekly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Weekly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of weekly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Weekly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Weekly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of weekly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1000"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing bi-weekly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Biweekly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of bi-weekly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing bi-weekly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Biweekly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of bi-weekly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1030"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing monthly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Monthly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of monthly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing monthly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Monthly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of monthly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1100"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing yearly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Yearly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of yearly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing yearly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Yearly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of yearly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
@@ -52,45 +52,47 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Daily Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Daily"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of daily recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Daily Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Daily"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of daily recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-930"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Weekly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Weekly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of weekly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Weekly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Weekly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of weekly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1000"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing bi-weekly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Biweekly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of bi-weekly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing bi-weekly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Biweekly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of bi-weekly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1030"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing monthly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Monthly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of monthly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing monthly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Monthly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of monthly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1100"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing yearly Recurrence"}}
-{"method": "select", "params": {"id" : "recurrence", "option": "Yearly"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of yearly recurrence."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing yearly Recurrence"}}
+{"method": "select", "params": {"id" : "recurrenceInterval", "option": "Yearly"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of yearly recurrenceInterval."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "wait", "params": {"milliseconds" : 5000}}
+{"method": "click", "params": {"link" : "Log Out"}}

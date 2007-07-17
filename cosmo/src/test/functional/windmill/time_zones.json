@@ -4,51 +4,51 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones LA"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones LA"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Los Angeles"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones LA."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones LA."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-930"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones NY"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones NY"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "New York"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones NY."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones NY."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv3-1000"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones El Salvador"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones El Salvador"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "El Salvador"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones El Salvador."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones El Salvador."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones Cancun"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones Cancun"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Cancun"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones Cancun."}}	
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Cancun."}}	
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones Boise"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones Boise"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Boise"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones Boise."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Boise."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
@@ -57,50 +57,50 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones LA"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones LA"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Los Angeles"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones LA."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones LA."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-930"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones NY"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones NY"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "New York"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones NY."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones NY."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv3-1000"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones El Salvador"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones El Salvador"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "El Salvador"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones El Salvador."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones El Salvador."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones Cancun"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones Cancun"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Cancun"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones Cancun."}}	
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Cancun."}}	
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
-{"method": "type", "params": {"id" : "eventtitle", "text": "Testing Timezones Boise"}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones Boise"}}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Boise"}}
-{"method": "type", "params": {"id" : "eventdescr", "text": "A description of my test of timezones Boise."}}
-{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Boise."}}
+{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}

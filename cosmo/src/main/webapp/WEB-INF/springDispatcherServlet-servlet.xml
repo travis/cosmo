@@ -162,7 +162,6 @@
 
 <bean id="appEntryController" class="org.osaf.cosmo.ui.ApplicationEntryController"> 
     <property name="methodNameResolver"><ref bean="appEntryMethodNameResolver"/></property>
-
     <property name="loginView" value="login" />
     <property name="securityManager"><ref bean="securityManager"/></property>
     <property name="defaultLoggedInRedirect"><value>/pim</value></property>
@@ -172,12 +171,14 @@
 
 <bean id="appEntryMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
   <property name="alwaysUseFullPath"><value>true</value></property>
-  <property name="mappings"><value>
+  <property name="mappings">
+  <value>
     /login=login
     /logout=logout
     /welcome=welcome
     /=root
-  </value></property>
+  </value>
+  </property>
 </bean>
 
 <!-- 
@@ -222,7 +223,8 @@
 
 <bean id="defaultViewResolver" 
       class="org.osaf.cosmo.spring.mvc.views.resolvers.CosmoDefaultViewResolver"> 
-
+	<property name="notFoundViewResolver"><ref bean="resourceBundleViewResolver"/></property>
+	<property name="notFoundViewName" value="error_notfound"/>
 </bean> 
 
 </beans>

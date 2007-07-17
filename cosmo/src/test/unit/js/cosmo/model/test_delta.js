@@ -223,8 +223,19 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
          occurrence.getEventStamp().getEndDate(), new cosmo.datetime.Date(2000,0,10,14,0));
        
    },
+   
+   test_addTaskStampToMaster: function(){
+       //added for bug 9985
+       var note = new cosmo.model.Note();
+       var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
+       var delta = new cosmo.model.Delta(occurrence);
+       delta.addAddedStamp("task");
+       delta.applyToMaster();
+       jum.assertTrue("Note should have task stamp", !!note.getTaskStamp());
+   },
+   
  
-  //test editing end date on master, from an occurrence delta
+  //TODO - test editing end date on master, from an occurrence delta
    
    //creates a basic event, recurs daily, starts on 1/1/2000 12pm
    getBaseNote: function(){

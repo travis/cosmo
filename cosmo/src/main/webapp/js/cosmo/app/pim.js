@@ -345,21 +345,17 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.reloadCollections = function(){
         //first get a handle on the currenct collection so we don't lose it. 
         var currentCollection = this.currentCollection;
-        dojo.debug("displayName: " + this.currentCollection.getDisplayName());
         this.loadCollections({ticketKey: this.ticketKey});
-        var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
-        collectionSelector.updateCollectionSelectorOptions(this.currentCollections);
 
-        if (this._selectCollectionByUid(currentCollection.getUid())){
-            dojo.debug("sucess");
-            collectionSelector.setSelectorByDisplayName(currentCollection.getDisplayName());
-        } else {
+        if (!this._selectCollectionByUid(currentCollection.getUid())){
             cosmo.app.showErr(_("Main.Error.CollectionRemoved", currentCollection.getDisplayName()));
             this.currentCollection = this.currentCollections[0];
-            collectionSelector.setSelectorByDisplayName(this.currentCollection.getDisplayName());
         }
+        
+        var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
+        collectionSelector.updateCollectionSelectorOptions(this.currentCollections, this.currentCollection);
+
         dojo.event.topic.publish('/calEvent', { action: 'loadCollection', opts: { loadType: 'changeCollection', collection: this.currentCollection }, data: {}})
-        collectionSelector.currentCollection = this.currentCollection;
         
     }
 }, cosmo.app.pim);

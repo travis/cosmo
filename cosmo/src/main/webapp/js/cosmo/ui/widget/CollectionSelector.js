@@ -368,10 +368,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             this._redraw();
         },
         
-        updateCollectionSelectorOptions: function(collections){
-            var options = this._createOptionsFromCollections(collections);
-            cosmo.util.html.setSelectOptions(this._getSelect(), options);
+        updateCollectionSelectorOptions: function(collections, currentCollection){
+            this.currentCollection = currentCollection;
             this.collections = collections;
+            this._redraw();
         },
         
         setSelectorByDisplayName: function(displayName){

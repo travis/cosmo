@@ -56,19 +56,19 @@ a {
     <div class="smLabel"><fmt:message 
          key="About.VersionString"/> ${PRODUCT_VERSION}
     </div>
-    <div style="margin-top:28px;"><fmt:message key="About.LicenseOpen"/><br/>
-    <a href="<fmt:message key="About.LicenseLink"/>" 
-               onclick="goURLMainWin('<fmt:message key="About.LicenseLink"/>'); 
-               return false;">
-    <fmt:message key="About.LicenseLinkText"/></a><fmt:message 
-                 key="About.LicenseClose"/>
+    <div style="margin-top:28px;">
+    <fmt:message key="About.LicenseLink" var="licenseLink"/>
+    <fmt:message key="About.License">
+         <fmt:param value="<a href=\"${licenseLink}\" onclick=\"goURLMainWin('${licenseLink}'); return false;\">"/>
+         <fmt:param value="</a>"/>
+    </fmt:message>
     </div>
-    <div style="margin-top:16px;"><fmt:message key="About.InfoOpen"/>
-    <a href="<fmt:message key="About.InfoLink"/>" 
-               onclick="goURLMainWin('<fmt:message key="About.InfoLink"/>'); 
-               return false;">
-    <fmt:message key="About.InfoLinkText"/></a> <fmt:message 
-                 key="About.InfoClose"/></div>
+    <div style="margin-top:16px;">
+    <fmt:message key="About.InfoLink" var="infoLink"/>
+    <fmt:message key="About.Info">
+         <fmt:param value="<a href=\"${infoLink}\" onclick=\"goURLMainWin('${infoLink}'); return false;\">"/>
+         <fmt:param value="</a>"/>
+    </fmt:message>
     
     <div class="notices">
         <fmt:message key="About.NoticesUrl" var="noticesUrl"/>

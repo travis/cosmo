@@ -1,0 +1,12 @@
+{"method": "click", "params": {"id" : "viewNavCenterRight"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "type", "params": {"id" : "noteTitle", "text": "Properties Test"}}
+{"method": "type", "params": {"id" : "startTime", "text": "9:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "4:00"}}
+{"method": "radio", "params": {"id" : "startMeridianAM"}}
+{"method": "radio", "params": {"id" : "endMeridianPM"}}
+{"method": "select", "params": {"id" : "eventStatus", "option": "Tentative"}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description for the properties test"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}

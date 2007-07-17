@@ -1,0 +1,79 @@
+{"method": "click", "params": {"id" : "viewNavCenterRight"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv0-900"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "type", "params": {"id" : "startTime", "text": "9:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "1:00"}}
+{"method": "radio", "params": {"id" : "startMeridianAM"}}
+{"method": "radio", "params": {"id" : "endMeridianPM"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv1-1030"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "type", "params": {"id" : "startTime", "text": "10:30"}}
+{"method": "type", "params": {"id" : "endTime", "text": "11:00"}}
+{"method": "radio", "params": {"id" : "startMeridianAM"}}
+{"method": "radio", "params": {"id" : "endMeridianAM"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv2-900"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "type", "params": {"id" : "startTime", "text": "9:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "1:00"}}
+{"method": "radio", "params": {"id" : "startMeridianPM"}}
+{"method": "radio", "params": {"id" : "endMeridianAM"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "type", "params": {"id" : "startTime", "text": "10:30"}}
+{"method": "type", "params": {"id" : "endTime", "text": "1:00"}}
+{"method": "radio", "params": {"id" : "startMeridianPM"}}
+{"method": "radio", "params": {"id" : "endMeridianAM"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "click", "params": {"id" : "hourDiv0-1030"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "click", "params": {"id" : "cosmo_Button_0"}}
+{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "click", "params": {"id" : "hourDiv1-1030"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "click", "params": {"id" : "cosmo_Button_0"}}
+{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "click", "params": {"id" : "hourDiv2-1030"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "click", "params": {"id" : "cosmo_Button_0"}}
+{"method": "click", "params": {"jsid" : "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getFirst().id"}, "destination": {"id": "hourDiv0-900"} }}
+{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
+windmill.testingApp.cosmo.view.cal.canvasInstance.eventRegistry.getNext().id"}, "destination": {"id": "hourDiv0-1030"} }}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv2-900"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "type", "params": {"id" : "startTime", "text": "9:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "1:00"}}
+{"method": "radio", "params": {"id" : "startMeridianPM"}}
+{"method": "radio", "params": {"id" : "endMeridianAM"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv3-930"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv5-930"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "doubleClick", "params": {"id" : "hourDiv6-900"}}
+{"method": "wait", "params": {"milliseconds" : 1000}}
+{"method": "type", "params": {"id" : "startTime", "text": "9:00"}}
+{"method": "type", "params": {"id" : "endTime", "text": "1:00"}}
+{"method": "radio", "params": {"id" : "startMeridianPM"}}
+{"method": "radio", "params": {"id" : "endMeridianAM"}}
+{"method": "click", "params": {"id" : "cosmo_Button_1"}}
+{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "click", "params": {"id" : "viewNavCenterRight"}}

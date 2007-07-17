@@ -79,12 +79,17 @@ cosmo.util.html.setSelectOptions = function (selectElement, options){
     while (selectElement.firstChild){
        selectElement.removeChild(selectElement.firstChild);
     }
+    
     for (var i = 0; i < options.length; i++) {
         var opt = document.createElement('option');
         opt.value = options[i].value;
         opt.appendChild(document.createTextNode(options[i].text));
         selectElement.appendChild(opt);
+        if (options[i].selected){
+            selectElement.selectedIndex = i;
+        }
     }
+    
 };
 
 cosmo.util.html.setSelect = function (sel, val) {

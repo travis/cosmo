@@ -20,7 +20,8 @@ cosmo.service.tickler.wrapService = function(service){
     ctr.prototype = service;
     var tickledService = new ctr();
     
-    this._wrapMethod(service, tickledService, "getItems")
+    this._wrapMethod(service, tickledService, "getItems");
+    this._wrapMethod(service, tickledService, "getDashboardItems");
 
     return tickledService;   
 }
@@ -50,6 +51,6 @@ cosmo.service.tickler._wrapMethod = function(service, wrappedService, methodName
         });
         
         return deferred;    
-    }    
+    }
 }
  

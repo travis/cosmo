@@ -9,4 +9,4 @@
 {"method": "radio", "params": {"id" : "endMeridianPM"}}
 {"method": "select", "params": {"id" : "eventStatus", "option": "Tentative"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description for the properties test"}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}

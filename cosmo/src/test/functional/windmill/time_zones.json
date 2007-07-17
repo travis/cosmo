@@ -8,7 +8,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Los Angeles"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones LA."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-930"}}
@@ -18,7 +18,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "New York"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones NY."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv3-1000"}}
@@ -28,7 +28,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "El Salvador"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones El Salvador."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
@@ -38,7 +38,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Cancun"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Cancun."}}	
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
@@ -48,7 +48,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Boise"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Boise."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
@@ -61,7 +61,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Los Angeles"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones LA."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-930"}}
@@ -71,7 +71,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "New York"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones NY."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv3-1000"}}
@@ -81,7 +81,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "El Salvador"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones El Salvador."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1030"}}
@@ -91,7 +91,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Cancun"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Cancun."}}	
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
@@ -101,6 +101,6 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"method": "select", "params": {"id" : "tzId", "option": "Boise"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Boise."}}
-{"method": "click", "params": {"xpath" : "/html/body/div/div[2]/div[3]/div/div[6]/div[2]/input"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}

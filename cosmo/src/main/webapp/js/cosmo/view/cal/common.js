@@ -154,7 +154,10 @@ cosmo.view.cal.loadEvents = function (o) {
     start = opts.viewStart;
     end = opts.viewEnd;
 
-    var showErr = function (e) {
+    var handleErr = function (e) {
+        if (e instanceof cosmo.service.exception.ResourceNotFoundException){
+            cosmo.app.pim.reloadCollections();
+        }
         cosmo.app.showErr(_('Main.Error.LoadItemsFailed'), e);
     };
     // Load the array of events
@@ -164,8 +167,8 @@ cosmo.view.cal.loadEvents = function (o) {
             { start: start, end: end }, { sync: true });
         var results = deferred.results;
         // Catch any error stuffed in the deferred
-        if (results[1] instanceof Error) {
-            showErr(results[1]);
+        if (results[1]) {
+            handleErr(results[1]);
             return false;
         }
         else {
@@ -173,7 +176,7 @@ cosmo.view.cal.loadEvents = function (o) {
         }
     }
     catch(e) {
-        showErr(e);
+        handleErr(e);
         return false;
     }
 

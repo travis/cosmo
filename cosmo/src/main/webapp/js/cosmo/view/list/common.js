@@ -97,9 +97,14 @@ cosmo.view.list.loadItems = function (o) {
             { sync: true });
         var results = deferred.results;
         // Catch any error stuffed in the deferred
-        if (results[1] instanceof Error) {
-            showErr(results[1]);
-            return false;
+        if (results[1]) {
+            if (results[1] instanceof cosmo.service.exception.ResourceNotFoundException){
+                cosmo.app.pim.reloadCollections()
+                return false;
+            } else {
+                showErr(results[1]);
+                return false;
+            }
         }
         else {
             itemLoadList = results[0];

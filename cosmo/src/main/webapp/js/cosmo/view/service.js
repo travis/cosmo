@@ -230,7 +230,6 @@ cosmo.view.service = new function () {
      */
      //BOBBYNOTE: Can we collapse this into "saveItemChanges" ?
     function doSaveItem(item, opts) {
-        dojo.debug("doSaveItem");
         var OPTIONS = self.recurringEventOptions;
 
         var deferred = null;
@@ -310,15 +309,14 @@ cosmo.view.service = new function () {
             deferred = cosmo.app.pim.serv.saveItem(note);
         }
 
-        var f = function () {
-            var saveType = isNew ? "new" : opts.saveType;
-            dojo.debug("callback: saveType="+ saveType)
-            handleSaveItem(item, null, deferred.id, saveType, delta);
-        };
+        var saveType = isNew ? "new" : opts.saveType;
 
-        deferred.addCallback(f);
+        deferred.addCallback(function () {
+            handleSaveItem(item, null, deferred.id, saveType, delta, newItem);
+        });
+
         deferred.addErrback(function(error){
-            handleSaveItem(item, error, deferred.id, saveType, delta);
+               handleSaveItem(item, error, deferred.id, saveType, delta, newItem);
         })
         requestId = deferred.id;
 
@@ -358,34 +356,50 @@ cosmo.view.service = new function () {
      * @param optsParam A JS Object, options for the save operation.
      */
     function handleSaveItem(item, err, reqId, saveType, delta, newItem) {
-        dojo.debug("handleSaveItem");
         var OPTIONS = self.recurringEventOptions;
         var errMsg = '';
         var act = '';
-
-        if (err) {
-            dojo.debug("handleSaveItem: err");
+         
+        if (err){
             // Failure -- display exception info
             act = 'saveFailed';
-            // Failed update
-            if (saveType != "new") {
-                errMsg = _('Main.Error.ItemEditSaveFailed');
+            
+            if (err instanceof cosmo.service.exception.ResourceNotFoundException){
+                //let's see if it was the collection that got deleted, or the item
+                //itself.
+                var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.currentCollection.getUrls().self, {sync:true});
+                if (deferred.results[1]){
+                    //reload collections will handle showing the error message, as it will try and load the 
+                    //original collection
+                    cosmo.app.pim.reloadCollections();
+                    return;
+                } else {
+                    errMsg = _('Main.Error.EventEditSaveFailed.EventRemoved');
+                    cosmo.app.showErr(errMsg);
+                    //easiest thing to do here just reload the collections, since it would be a pain to figure
+                    //out if you need to re-expand if the removed item was an occurrence, etc. 
+                    cosmo.app.pim.reloadCollections();
+                    self.processingQueue.shift();
+                    return;
+                }
+            } else {
+                //generic error handling.
+                if (saveType != "new") {
+                    errMsg = _('Main.Error.ItemEditSaveFailed');
+                } else {
+                    // Failed create
+                    // FIXME: Should we be removing the item from
+                    // the itemRegistry/itemRegistry here?
+                    errMsg = _('Main.Error.ItemNewSaveFailed');
+                }
+                cosmo.app.showErr(errMsg, getErrDetailMessage(err));
+
             }
-            // Failed create
-            else {
-                // FIXME: Should we be removing the item from
-                // the itemRegistry/itemRegistry here?
-                errMsg = _('Main.Error.ItemNewSaveFailed');
-            }
-            cosmo.app.showErr(errMsg, getErrDetailMessage(err));
-        }
-        else {
+        } else {
             // Success
             act = 'saveSuccess';
-            dojo.debug("handleSaveItem: saveSuccess");
         }
 
-        dojo.debug("handleSaveItem: publish topic for all other cases");
         // Success/failure for all other cases
         self.processingQueue.shift();
         // Broadcast message for success/failure

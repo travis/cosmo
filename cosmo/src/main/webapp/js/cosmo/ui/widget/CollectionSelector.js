@@ -229,10 +229,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
             // Logged-in view
             function renderSelector() {
-                var o = [];
-                var c = 0;
                 var imgPath = 'details';
                 var imgTitle = self.strings.imgTitleInfo;
+
                 var clickFunction = function () {
                     var _pim = cosmo.app.pim;
                     cosmo.app.showDialog(
@@ -244,13 +243,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // so we can get the info icon valigned properly
                 selectorNode.style.height = this.verticalHeight + 'px';
 
-                for (var i in col) {
-                    // Grab the currently selected collection's index
-                    if (col[i].getDisplayName() == curr.getDisplayName()) {
-                        c = i;
-                    }
-                    o.push( { value: i, text: col[i].getDisplayName()} );
-                }
+                var options = self._createOptionsFromCollections(col);
 
                 // The collection selector
                 // ---
@@ -258,11 +251,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 d.className = 'floatLeft';
                 var sel = cosmo.util.html.createSelect({ id: 'calSelectElem',
                     name: 'calSelectElem',
-                    options: o, className: 'selectElem' }, d);
+                    options: options, className: 'selectElem' }, d);
                 sel.style.width = '120px';
-                // Set the select to the current collection
-                cosmo.util.html.setSelect(sel, c);
+                
                 self.selector = sel;
+
+                // Set the select to the current collection
+                self.setSelectorByDisplayName(curr.getDisplayName());
                 dojo.event.connect(sel, "onchange", self, 'selectFunction');
                 selectorNode.appendChild(d);
 
@@ -371,8 +366,49 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 this.currentCollection = updatedSubscription;
             }
             this._redraw();
-        } ,
-
+        },
+        
+        updateCollectionSelectorOptions: function(collections){
+            var options = this._createOptionsFromCollections(collections);
+            cosmo.util.html.setSelectOptions(this._getSelect(), options);
+            this.collections = collections;
+        },
+        
+        setSelectorByDisplayName: function(displayName){
+            var index = this._getIndexByDisplayName(this.collections, displayName);
+            if (index == -1){
+                return false;
+            }
+            this.setSelectorByIndex(index);
+        },
+        
+        setSelectorByIndex: function(index){
+            cosmo.util.html.setSelect(this._getSelect(), index);    
+        }, 
+        
+        _getSelect: function(){ return this.selector;},
+        
+        _getIndexByDisplayName: function(collections, displayName){
+            for (var x = 0; x < collections.length; x++){
+                if (collections[x].getDisplayName() == displayName){
+                    return x;
+                }
+            }
+            return -1;
+        },
+        
+        _createOptionsFromCollections: function(collections, /*String?*/ displayName){
+                var options = [];
+                for (var x = 0; x < collections.length; x++) {
+                    var collection = collections[x];
+                    var selected = displayName && collection.displayName == displayName ? true : false; 
+                    options.push( { value: x, 
+                                    text: collection.getDisplayName(),
+                                    selected: selected} );
+                }
+                return options;
+        },
+        
         _redraw: function () {
             while (this.domNode.firstChild) {
                 this.domNode.removeChild(this.domNode.firstChild);
@@ -380,20 +416,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             this.fillInTemplate();
         },
 
-        _collectionWithDisplayNameExists: function (cols, displayName) {
-            for (var x = 0; x < cols.length; x++) {
-                dojo.debug("comparing: displayNames" + displayName + " and " + cols[x].getDisplayName());
-                if (cols[x].getDisplayName() == displayName) {
-                    return true;
-                }
-            }
-            return false;
+        _collectionWithDisplayNameExists: function(cols, displayName){
+            var index = _getIndexByDisplayName(cols, displayName);
+            return index != -1;
         },
-
-        _collectionWithUidExists: function (cols, uid) {
-            for (var x = 0; x < cols.length; x++) {
-                dojo.debug("comparing: uid" + uid + " and " + cols[x].getUid());
-                if (cols[x].getUid() == uid) {
+        
+        _collectionWithUidExists: function(cols, uid){
+            for (var x = 0; x < cols.length; x++){
+                if (cols[x].getUid() == uid){
                     return cols[x].declaredClass;
                 }
             }

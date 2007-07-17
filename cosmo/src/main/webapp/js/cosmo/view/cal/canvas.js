@@ -559,17 +559,16 @@ cosmo.view.cal.canvas = new function () {
      */
     this.handlePub_calEvent = function (cmd) {
         if (!cosmo.view.cal.isCurrentView()) { return false; }
-
         var act = cmd.action;
         var opts = cmd.opts;
         var data = cmd.data;
         switch (act) {
             case 'eventsLoadSuccess':
                 cosmo.view.cal.itemRegistry = data;
-                var _c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
+                var c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
                 // Update viewStart, viewEnd from passed opts
-                for (var n in opts) { _c[n] = opts[n]; }
-                _c.render();
+                for (var n in opts) { c[n] = opts[n]; }
+                c.render();
                 break;
             case 'setSelected':
                 var ev = cmd.data;
@@ -583,7 +582,7 @@ cosmo.view.cal.canvas = new function () {
                 var ev = cmd.data;
                 // If the failure was a new event, remove
                 // the placeholder lozenge
-                if (cmd.qualifier.newEvent) {
+                if (cmd.saveType == "new") {
                     removeEvent(ev);
                 }
                 // Otherwise put it back where it was and
@@ -591,11 +590,11 @@ cosmo.view.cal.canvas = new function () {
                 else {
                     var rEv = null;
                     // Recurrence, 'All events'
-                    if (opts.saveType == 'recurrenceMaster' ||
-                        opts.saveType == 'instanceAllFuture') {
+                    if (cmd.saveType == 'recurrenceMaster' ||
+                        cmd.saveType == 'instanceAllFuture') {
                         // Edit ocurring from one of the instances
                         if (opts.instanceEvent) {
-                            rEv = opts.instanceEvent
+                            rEv = cmd.instanceEvent
                         }
                         // Edit occurring from the actual master
                         else {

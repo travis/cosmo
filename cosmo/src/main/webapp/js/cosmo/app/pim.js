@@ -108,7 +108,12 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         //cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
         this.loadCollections(params);
-
+        if (params.collectionUid){
+            this._selectCollectionByUid(params.collectionUid);
+        } else {
+            this.currentCollection = this.currentCollections[0];
+        }
+        
         // Base layout
         // ===============================
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
@@ -218,9 +223,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Load/create calendar to view
         // --------------
 
-        // Uid of the first calendar to select.
-        var selectUid = params.collectionUid;
-        
+        this.currentCollections = [];
         //If we received a ticket key, use the collectionUrl in params to load a collection
         if (params.ticketKey) {
             try {
@@ -274,20 +277,20 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         };
         this.currentCollections.sort(f);
 
+    };
+    
+    this._selectCollectionByUid = function(selectUid){
         // If we received a collectionUrl, select that collection
-        if (selectUid){
-            for (var i = 0; i < this.currentCollections.length; i++){
-                if (this.currentCollections[i].getUid() == selectUid){
-                    this.currentCollection = this.currentCollections[i];
-                    break;
-                }
+        for (var i = 0; i < this.currentCollections.length; i++){
+            if (this.currentCollections[i].getUid() == selectUid){
+                this.currentCollection = this.currentCollections[i];
+                return true;
             }
         }
-        // Otherwise, use the first collection
-        else {
-            this.currentCollection = this.currentCollections[0];
-        }
+        
+        return false;
     };
+    
     this.handleCollectionUpdated = function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
         var updatedCollection = message.collection;
 
@@ -338,6 +341,27 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         }
         this.allDayArea = null;
     };
+    
+    this.reloadCollections = function(){
+        //first get a handle on the currenct collection so we don't lose it. 
+        var currentCollection = this.currentCollection;
+        dojo.debug("displayName: " + this.currentCollection.getDisplayName());
+        this.loadCollections({ticketKey: this.ticketKey});
+        var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
+        collectionSelector.updateCollectionSelectorOptions(this.currentCollections);
+
+        if (this._selectCollectionByUid(currentCollection.getUid())){
+            dojo.debug("sucess");
+            collectionSelector.setSelectorByDisplayName(currentCollection.getDisplayName());
+        } else {
+            cosmo.app.showErr(_("Main.Error.CollectionRemoved", currentCollection.getDisplayName()));
+            this.currentCollection = this.currentCollections[0];
+            collectionSelector.setSelectorByDisplayName(this.currentCollection.getDisplayName());
+        }
+        dojo.event.topic.publish('/calEvent', { action: 'loadCollection', opts: { loadType: 'changeCollection', collection: this.currentCollection }, data: {}})
+        collectionSelector.currentCollection = this.currentCollection;
+        
+    }
 }, cosmo.app.pim);
 
 Cal = cosmo.app.pim;

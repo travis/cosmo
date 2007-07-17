@@ -15,7 +15,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
 
         // Localized strings
         strings: {
-            version: _('About.Version', cosmo.env.getVersion()),
             license: [_('About.LicenseOpen'), "<a href=\"", _("About.LicenseLink"),
                       "\">", _('About.LicenseLinkText'), "</a>", _("About.LicenseClose")].join(""),
             info: [_('About.InfoOpen'), "<a href=\"", _("About.InfoLink"),
@@ -44,7 +43,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             // Version
             d = _createElem('div');
             d.style.marginTop = '-4px';
-            d.innerHTML = this.strings.version;
+            d.innerHTML = _('About.Version', cosmo.env.getVersion());
             node.appendChild(d);
             // License text
             d = _createElem('div');

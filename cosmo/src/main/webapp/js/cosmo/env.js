@@ -33,6 +33,8 @@ cosmo.env._cosmoConfig = {};
 cosmo.env._cosmoConfig["baseUrl"] = djConfig['staticBaseUrl'];
 cosmo.env._NULL = {};
 cosmo.env._FALSE_OR_ZERO = {};
+cosmo.env._version = null;
+
 cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction ){
    var _calcy = calculatorFunction;
 
@@ -163,8 +165,13 @@ cosmo.env.getAuthProc = function(){
 	return cosmo.env.getBaseUrl() + "/security_check";
 }
 
-cosmo.env.getVersion= function(){
-	return cosmo.env.version;
+cosmo.env.getVersion = function(){
+	return this._version;
+}
+
+cosmo.env.setVersion = function(version){
+    dojo.debug(version)
+    this._version = version;
 }
 
 /**

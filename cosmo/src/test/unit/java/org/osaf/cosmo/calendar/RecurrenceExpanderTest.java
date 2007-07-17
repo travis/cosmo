@@ -137,10 +137,11 @@ public class RecurrenceExpanderTest extends TestCase {
     
     public void testRecurrenceExpanderLongEvent() throws Exception {
         RecurrenceExpander expander = new RecurrenceExpander();
+        TimeZone ctz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
         EventStamp es = new EventStamp(new NoteItem());
         es.createCalendar();
-        es.setStartDate(new DateTime("20070101T100000"));
-        es.setEndDate(new DateTime("20070101T120000"));
+        es.setStartDate(new DateTime("20070101T100000", ctz));
+        es.setEndDate(new DateTime("20070101T120000", ctz));
         
         String recur1 = "FREQ=DAILY;UNTIL=20100101T120000Z";
        

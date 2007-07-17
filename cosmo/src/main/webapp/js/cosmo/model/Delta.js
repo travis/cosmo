@@ -302,7 +302,6 @@ dojo.declare("cosmo.model.Delta", null, {
             }
         }
         
-        
         //now the split has happened and we can FINALLY apply the changes.
         //note that we apply a "master" type of delta to the new note
         this._apply("master", newNote);
@@ -389,23 +388,18 @@ dojo.declare("cosmo.model.Delta", null, {
         
     },
     
-
     _apply: function(type, note){
-//        dojo.debug("delta._apply(), type: " + type);
         note = note || this._note;
         for (var stampName in this._deletedStamps){
             note.removeStamp(stampName);
         }
-        
-//        dojo.debug("delta._apply(): adding stamps.");
+
         for (var stampName in this._addedStamps){
             note.getStamp(stampName, true);
         }
         
-//        dojo.debug("delta._apply(): applying note properties.");
         this._applyProperties(note, this._propertyProps, type);
         
-//        dojo.debug("delta._apply(): applying stamp changes");
         for (var stampName in this._stampProps){
             var stampChanges = this._stampProps[stampName];
             if (stampChanges == null || this._isEmpty(stampChanges)){
@@ -413,18 +407,14 @@ dojo.declare("cosmo.model.Delta", null, {
             }
             
             //create the stamp if it doesn't exist yet
-//            dojo.debug("delta._apply():getting Stamp!");
             var stamp = note.getStamp(stampName,true);
             
             if (stampName == "event"){
-//                dojo.debug("delta._apply(): eventStamp application!");
                 this._applyPropertiesToEventStamp(stamp, stampChanges, type);
             } else {
                 this._applyProperties(stamp, stampChanges, type);
             }
         }
-        dojo.debug("delta._apply(): exit!");
-        
     },
     
    _applyProperties: function(original,changes, type){
@@ -440,6 +430,7 @@ dojo.declare("cosmo.model.Delta", null, {
         //start date must be applied first so that duration can be calculated
         //properly
         dojo.debug("_applyPropertiesToEventStamp() ");
+        changes = dojo.lang.shallowCopy(changes, false);
         if (changes["startDate"]){
            var changeValue = changes["startDate"];
            original.applyChange("startDate", changeValue, type);

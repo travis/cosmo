@@ -336,11 +336,11 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
     leftSidebar.addChild(cB);
     leftSidebar.collectionSelector = cB;
-    dojo.widget.createWidget('cosmo:CollectionSelector', {
+    var widget = dojo.widget.createWidget('cosmo:CollectionSelector', {
         'collections': cosmo.app.pim.currentCollections,
         'currentCollection': cosmo.app.pim.currentCollection,
         'ticketKey': cosmo.app.pim.ticketKey }, selectorDiv, 'last');
-
+    cB.widget = widget;
     // Minical -- subclassed ContentBox
     var miniCalDiv = _createElem('div');
     miniCalDiv.id = 'miniCal';

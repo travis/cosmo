@@ -252,74 +252,22 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     var rightSidebar = this.baseLayout.mainApp.rightSidebar;
 
     // Main logo graphic
-    var d = _createElem('div');
-    d.id = 'mainLogoContainer';
-    d = cosmo.ui.imagegrid.createImageIcon({ domNode: d,
+    var logoDiv = _createElem('div');
+    logoDiv.id = 'mainLogoContainer';
+    logoDiv = cosmo.ui.imagegrid.createImageIcon({ domNode: logoDiv,
         iconState: 'mainLogoGraphic' });
-    d.style.position = 'absolute';
-    d.style.top = '0px';
-    d.style.left = '6px';
-    menuBar.domNode.appendChild(d);
+    logoDiv.style.position = 'absolute';
+    logoDiv.style.top = '0px';
+    logoDiv.style.left = '6px';
+    menuBar.domNode.appendChild(logoDiv);
 
     // Main menu of links at the top of the UI
-    var d = _createElem('div');
-    d.id = 'menuNavItems';
-    var cB = new  cosmo.ui.menu.MainMenu({ domNode: d, id: d.id, top: 4});
+    var menuDiv = _createElem('div');
+    menuDiv.id = 'menuNavItems';
+    var cB = new  cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
     menuBar.addChild(cB);
     menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data
-
-    // List view canvas
-    var d = _createElem('div');
-    d.id = 'listViewContainer';
-    var list = new cosmo.view.list.canvas.Canvas({ domNode: d, id: d.id,
-        width: centerColumn.width - 2, // 2px for borders
-        height: centerColumn.height - CAL_TOP_NAV_HEIGHT });
-    centerColumn.addChild(list);
-    centerColumn.listCanvas = list;
-
-    // Cal view canvas -- namespace singleton and Canvas ContentBox obj
-    // are bolted together in an unpleasant way here
-    var cal = new cosmo.view.cal.canvas.Canvas({
-        viewStart: cosmo.view.cal.viewStart,
-        viewEnd: cosmo.view.cal.viewEnd,
-        currDate: cosmo.app.pim.currDate
-    });
-    centerColumn.addChild(cal);
-    centerColumn.calCanvas = cal;
-
-    // Navbar for the two views -- list and cal
-    // Pass in refs to the two view widgets
-    var d = _createElem('div');
-    d.id = 'calTopNavDiv';
-    var navBar = new cosmo.ui.navbar.Bar({ domNode: d, id: d.id,
-        width: centerColumn.width,
-        listCanvas: list,
-        calCanvas: cal });
-    centerColumn.addChild(navBar);
-    centerColumn.navBar = navBar;
-    navBar.render();
-
-    // Cal selector / single cal name -- the container is a
-    // ContentBox, and the contents is a Dojo widget
-    var d = _createElem('div');
-    d.id = 'calSelectNav';
-    var cB = new cosmo.ui.ContentBox({ domNode: d, id: d.id });
-    leftSidebar.addChild(cB);
-    leftSidebar.collectionSelector = cB;
-    dojo.widget.createWidget('cosmo:CollectionSelector', {
-        'collections': cosmo.app.pim.currentCollections,
-        'currentCollection': cosmo.app.pim.currentCollection,
-        'ticketKey': cosmo.app.pim.ticketKey }, d, 'last');
-
-    // Minical -- subclassed ContentBox
-    var d = _createElem('div');
-    d.id = 'miniCal';
-    cB = new cosmo.ui.minical.MiniCal({ domNode: d, currDate:
-        cosmo.app.pim.currDate });
-    leftSidebar.addChild(cB);
-    leftSidebar.minical = cB;
-    cB.render();
 
     // Subscription selector thinger -- show only in ticketed view
     if (cosmo.app.initParams.ticketKey) {
@@ -347,13 +295,65 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         form.appendChild(subscrSel);
         s.appendChild(cosmo.util.html.nbsp());
         // Add to the menu area in the first position
-        d.insertBefore(s, d.firstChild);
+        menuDiv.insertBefore(s, menuDiv.firstChild);
     }
 
+    // List view canvas
+    var listDiv = _createElem('div');
+    listDiv.id = 'listViewContainer';
+    var list = new cosmo.view.list.canvas.Canvas({ domNode: listDiv, id: listDiv.id,
+        width: centerColumn.width - 2, // 2px for borders
+        height: centerColumn.height - CAL_TOP_NAV_HEIGHT });
+    centerColumn.addChild(list);
+    centerColumn.listCanvas = list;
+
+    // Cal view canvas -- namespace singleton and Canvas ContentBox obj
+    // are bolted together in an unpleasant way here
+    var cal = new cosmo.view.cal.canvas.Canvas({
+        viewStart: cosmo.view.cal.viewStart,
+        viewEnd: cosmo.view.cal.viewEnd,
+        currDate: cosmo.app.pim.currDate
+    });
+    centerColumn.addChild(cal);
+    centerColumn.calCanvas = cal;
+
+    // Navbar for the two views -- list and cal
+    // Pass in refs to the two view widgets
+    var navbarDiv = _createElem('div');
+    navbarDiv.id = 'calTopNavDiv';
+    var navBar = new cosmo.ui.navbar.Bar({ domNode: navbarDiv, id: navbarDiv.id,
+        width: centerColumn.width,
+        listCanvas: list,
+        calCanvas: cal });
+    centerColumn.addChild(navBar);
+    centerColumn.navBar = navBar;
+    navBar.render();
+
+    // Cal selector / single cal name -- the container is a
+    // ContentBox, and the contents is a Dojo widget
+    var selectorDiv = _createElem('div');
+    selectorDiv.id = 'calSelectNav';
+    var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
+    leftSidebar.addChild(cB);
+    leftSidebar.collectionSelector = cB;
+    dojo.widget.createWidget('cosmo:CollectionSelector', {
+        'collections': cosmo.app.pim.currentCollections,
+        'currentCollection': cosmo.app.pim.currentCollection,
+        'ticketKey': cosmo.app.pim.ticketKey }, selectorDiv, 'last');
+
+    // Minical -- subclassed ContentBox
+    var miniCalDiv = _createElem('div');
+    miniCalDiv.id = 'miniCal';
+    cB = new cosmo.ui.minical.MiniCal({ domNode: miniCalDiv, currDate:
+        cosmo.app.pim.currDate });
+    leftSidebar.addChild(cB);
+    leftSidebar.minical = cB;
+    cB.render();
+
     // Detail-view form
-    var d = _createElem('div');
-    d.id = 'detailViewForm';
-    var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: d, id: d.id, top: 0 });
+    var detailDiv = _createElem('div');
+    detailDiv.id = 'detailViewForm';
+    var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: detailDiv, id: detailDiv.id, top: 0 });
     rightSidebar.addChild(cB);
     rightSidebar.detailViewForm = cB;
     rightSidebar.render();

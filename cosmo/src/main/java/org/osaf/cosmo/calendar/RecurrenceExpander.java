@@ -19,7 +19,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -331,9 +330,7 @@ public class RecurrenceExpander {
         if(instances.size()==0)
             return null;
         
-        TreeMap<String, Instance> sortedInstances = new TreeMap<String, Instance>();
-        sortedInstances.putAll(instances);
-        return sortedInstances.get(sortedInstances.lastKey());
+        return (Instance) instances.get(instances.lastKey());
     }
     
     
@@ -353,9 +350,7 @@ public class RecurrenceExpander {
         if(instances.size()==0)
             return null;
         
-        TreeMap<String, Instance> sortedInstances = new TreeMap<String, Instance>();
-        sortedInstances.putAll(instances);
-        return sortedInstances.get(sortedInstances.firstKey());
+        return (Instance) instances.get(instances.firstKey());
     }
     
     /**

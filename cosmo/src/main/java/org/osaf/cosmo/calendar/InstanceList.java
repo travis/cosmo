@@ -17,8 +17,8 @@ package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.fortuna.ical4j.model.Component;
@@ -53,7 +53,7 @@ import net.fortuna.ical4j.util.Dates;
  * added first.
  */
 
-public class InstanceList extends HashMap {
+public class InstanceList extends TreeMap {
 
     private static final long serialVersionUID = 1838360990532590681L;
     private boolean isUTC = false;

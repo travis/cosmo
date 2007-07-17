@@ -48,8 +48,8 @@ a {
   <div style="margin-top:28px;">
 
     <div>
-    <a href="http://cosmo.osafoundation.org/"
-               onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
+    <a href="<fmt:message key="About.LogoLink"/>"
+               onclick="goURLMainWin('<fmt:message key="About.LogoLink"/>'); 
                return false;"><img src="${staticBaseUrl}/templates/${templateName}/images/${logoUri}" alt="<fmt:message 
                key="About.LogoAltText"/>" style="border: 0px"/></a>    
     </div>
@@ -65,7 +65,7 @@ a {
     </div>
     <div style="margin-top:16px;"><fmt:message key="About.InfoOpen"/>
     <a href="<fmt:message key="About.InfoLink"/>" 
-               onclick="goURLMainWin('http://cosmo.osafoundation.org/'); 
+               onclick="goURLMainWin('<fmt:message key="About.InfoLink"/>'); 
                return false;">
     <fmt:message key="About.InfoLinkText"/></a> <fmt:message 
                  key="About.InfoClose"/></div>

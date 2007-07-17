@@ -200,9 +200,9 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     saveItem: function(item, kwArgs){
         kwArgs = kwArgs || {};
 
-        // do topic notifications
+        item.getModifiedBy().setAction(cosmo.model.ACTION_EDITED);
         var deferred = this._transport.saveItem(item, this._translator.itemToAtomEntry(item), kwArgs);
-        var translationArgs = {};                                  
+        var translationArgs = {};
         if (item instanceof cosmo.model.NoteOccurrence) {
             translationArgs.masterItem = item.getMaster();
             translationArgs.oldObject = item;
@@ -218,6 +218,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     createItem: function(item, parentCollection, kwArgs){
         kwArgs = kwArgs || {};
 
+        item.getModifiedBy().setAction(cosmo.model.ACTION_CREATED);
         var deferred =  this._transport.createItem(item, this._translator.itemToAtomEntry(item),
                                           parentCollection, kwArgs);
         var translationArgs = {};                                  

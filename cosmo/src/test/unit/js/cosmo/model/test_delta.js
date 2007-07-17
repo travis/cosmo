@@ -225,7 +225,7 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
    },
    
    test_addTaskStampToMaster: function(){
-       //added for bug 9985
+       //added for bug 9885
        var note = new cosmo.model.Note();
        var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
        var delta = new cosmo.model.Delta(occurrence);

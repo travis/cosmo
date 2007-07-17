@@ -390,13 +390,8 @@ dojo.declare("cosmo.model.Delta", null, {
     
     _apply: function(type, note){
         note = note || this._note;
-        for (var stampName in this._deletedStamps){
-            note.removeStamp(stampName);
-        }
-
-        for (var stampName in this._addedStamps){
-            note.getStamp(stampName, true);
-        }
+        
+        this._applyStampAdditionsAndDeletions(type, note);
         
         this._applyProperties(note, this._propertyProps, type);
         
@@ -414,6 +409,17 @@ dojo.declare("cosmo.model.Delta", null, {
             } else {
                 this._applyProperties(stamp, stampChanges, type);
             }
+        }
+    },
+    
+    _applyStampAdditionsAndDeletions: function(type, note){
+        note = type == "master" ? note.getMaster() : note;
+        for (var stampName in this._deletedStamps){
+            note.removeStamp(stampName);
+        }
+
+        for (var stampName in this._addedStamps){
+            note.getStamp(stampName, true);
         }
     },
     

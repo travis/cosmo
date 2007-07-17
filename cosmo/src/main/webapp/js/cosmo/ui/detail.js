@@ -646,6 +646,8 @@ cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {
         // Don't pass click event along to the expando
         // when enabled/expanded states already match
         if (this.hasBody && (this.enabled != this.expanded)) { this.toggleExpando(); }
+        // Don't need to set this.enablerSwitch.checked --
+        // this code was called by checking/unchecking the box
         opts.setUpDefaults = true;
         opts.disableStampFormElem = !this.enabled;
     }

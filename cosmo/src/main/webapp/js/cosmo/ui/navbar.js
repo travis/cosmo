@@ -155,12 +155,17 @@ cosmo.ui.navbar.Bar = function (p) {
                     self.displayView(cosmo.app.pim.views.CAL); }
                 })
         ];
+
+        // Clean up if previously rendered
+        if (this.viewToggle) { this.viewToggle.destroy(); }
+
         var t = _createElem('div');
         t.id = 'viewToggle';
         t.className = 'floatLeft';
-        this.viewToggle = t;
+        this.viewToggleNode = t;
         var vT =  dojo.widget.createWidget("cosmo:GraphicRadioButtonSet", {
             selectedButtonIndex: selButtonIndex, height: 35, buttons: btns }, t, 'last');
+        this.viewToggle = vT;
         d.appendChild(t);
     };
     this._addCalViewNav = function () {

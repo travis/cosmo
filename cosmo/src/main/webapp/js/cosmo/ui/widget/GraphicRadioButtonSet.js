@@ -15,8 +15,10 @@
 */
 
 /**
- * @fileoverview GraphicRadioButtonSet.js -- panel of buttons allowing three
- *      clusters of buttons: left, center, right.
+ * @fileoverview GraphicRadioButtonSet.js -- set of graphical toggles
+ *    that act like radio buttons -- clickable elements are DOM nodes
+ *    that have graphical backgrounds, allowing loading of one large
+ *    master image to pull the various button state images from
  * @author Matthew Eernisse mde@osafoundation.org
  * @license Apache License 2.0
  */

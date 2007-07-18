@@ -65,6 +65,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var opts = cmd.opts;
         var delta = cmd.delta;
         switch (act) {
+            case 'eventsLoadSuccess':
+                this.initListProps();
+                this.render();
+                break;
             case 'saveSuccess':
                 this._saveSuccess(cmd)
                 break;

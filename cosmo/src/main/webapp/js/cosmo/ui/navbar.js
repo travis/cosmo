@@ -19,6 +19,7 @@ dojo.provide('cosmo.ui.navbar');
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.util.html");
@@ -43,6 +44,7 @@ cosmo.ui.navbar.Bar = function (p) {
     this.monthHeader = null;
     this.listViewPager = null;
     this.listViewPageNum = null;
+    this.defaultViewHasBeenInitialized = false;
 
     for (var n in params) { this[n] = params[n]; }
 
@@ -57,7 +59,7 @@ cosmo.ui.navbar.Bar = function (p) {
         var act = cmd.action;
         var opts = cmd.opts;
         switch (act) {
-            case 'loadCollection':
+            case 'eventsLoadSuccess':
             case 'navigateLoadedCollection':
             case 'saveSuccess':
                 self.renderSelf();
@@ -90,41 +92,49 @@ cosmo.ui.navbar.Bar = function (p) {
     this.displayView = function (v) {
         var _pim = cosmo.app.pim;
         var _view = cosmo.view[v];
+        var _loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
         _pim.currentView = v;
         if (!_view.hasBeenInitialized) {
             _view.init();
         }
-        if (v == _pim.views.LIST) {
-            // Only switch views if the data for the view loads successfully
-            if (_view.loadItems()) {
-                // If the cal canvas is currently showing, save the scroll
-                // offset of the timed canvas
-                if (self.calCanvas.domNode.style.display == 'block') {
-                    cosmo.view.cal.canvas.saveTimedCanvasScrollOffset();
+        if (this.defaultViewHasBeenInitialized) {
+            _loading.show();
+        }
+        // This has been called now as part of the app init
+        // process -- now we need to show the 'loading'
+        // status message on subsequent calls
+        this.defaultViewHasBeenInitialized = true;
+        var doDisplay = function () {
+            if (v == _pim.views.LIST) {
+                // Only switch views if the data for the view loads successfully
+                if (_view.loadItems()) {
+                    // If the cal canvas is currently showing, save the scroll
+                    // offset of the timed canvas
+                    if (self.calCanvas.domNode.style.display == 'block') {
+                        cosmo.view.cal.canvas.saveTimedCanvasScrollOffset();
+                    }
+                    self.calCanvas.domNode.style.display = 'none';
+                    self.listCanvas.domNode.style.display = 'block';
                 }
-                self.calCanvas.domNode.style.display = 'none';
-                self.listCanvas.domNode.style.display = 'block';
+            }
+            else if (v == _pim.views.CAL) {
+                // Set up topic subscriptions in the canvas -- published
+                // message "data has loaded" tells the canvas to render
+                if (!_view.canvas.hasBeenInitialized) {
+                    _view.canvas.init();
+                }
+                // Only switch views if the data for the view loads successfully
+                if (_view.loadEvents()) {
+                    self.listCanvas.domNode.style.display = 'none';
+                    self.calCanvas.domNode.style.display = 'block';
+                    cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
+                }
+            }
+            else {
+                throw(v + ' is not a valid view.');
             }
         }
-        else if (v == _pim.views.CAL) {
-            // Set up topic subscriptions in the canvas -- published
-            // message "data has loaded" tells the canvas to render
-            if (!_view.canvas.hasBeenRendered) {
-                _view.canvas.init();
-            }
-            // Only switch views if the data for the view loads successfully
-            if (_view.loadEvents()) {
-                self.listCanvas.domNode.style.display = 'none';
-                self.calCanvas.domNode.style.display = 'block';
-                cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
-            }
-        }
-        else {
-            throw(v + ' is not a valid view.');
-        }
-        // Changing views also needs to re-render the nav bar
-        // to show the view-specific widgets in it
-        self.renderSelf();
+        setTimeout(doDisplay, 0);
     };
 
     // Private methods
@@ -198,17 +208,31 @@ cosmo.ui.navbar.Bar = function (p) {
         var td = _createElem('td');
         td.id = 'viewNavButtons';
         self.viewNavButtons = td;
-        var back = function back() {
+        // It would be nicer to do this in a decentralized way
+        // with topics, but we need the feedback box to show
+        // instantly -- so, call the 'loading' box's show method
+        // directly, then publish the message to the topic on
+        // a set timeout
+        var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+        var publish = function (dir) {
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection',
-                opts: { loadType: 'changeTimespan', goTo: 'back' },
+                opts: { loadType: 'changeTimespan', goTo: dir },
                     data: {} });
+        };
+        var back = function back() {
+            var backFunc = function () {
+                publish('back');
+            };
+            loading.show();
+            setTimeout(backFunc, 0);
         }
         var next = function next() {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection',
-                opts: { loadType: 'changeTimespan', goTo: 'next' },
-                    data: {} });
+            var nextFunc = function () {
+                publish('next');
+            };
+            loading.show();
+            setTimeout(nextFunc, 0);
         }
         var navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
         self.viewNavButtons.appendChild(navButtons.domNode);

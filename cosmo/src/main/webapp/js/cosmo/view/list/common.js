@@ -115,13 +115,11 @@ cosmo.view.list.loadItems = function (o) {
         return false;
     }
     // Create a hash from the array
-    cosmo.view.list.itemRegistry =
-        cosmo.view.list.createItemRegistry(itemLoadList);
+    var itemRegistry = cosmo.view.list.createItemRegistry(itemLoadList);
+    cosmo.view.list.itemRegistry = itemRegistry;
 
-    // This could be done with topics to avoid the explicit dependency
-    listCanvas = cosmo.app.pim.baseLayout.mainApp.centerColumn.listCanvas;
-    listCanvas.initListProps();
-    listCanvas.render();
+    dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
+        data: itemRegistry, opts: opts });
     return true;
 };
 

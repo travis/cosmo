@@ -29,6 +29,7 @@ dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
 // --
 
+dojo.require('cosmo.view.loading');
 dojo.require('cosmo.view.cal.common');
 dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.list.canvas');
@@ -316,6 +317,14 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     });
     centerColumn.addChild(cal);
     centerColumn.calCanvas = cal;
+
+    var loadingDiv = _createElem('div');
+    loadingDiv.id = 'viewLoading';
+    var loading = new cosmo.view.loading.StatusMessage({ domNode: loadingDiv,
+        id: loadingDiv.id });
+    centerColumn.addChild(loading);
+    centerColumn.loading  = loading;
+    loading.render();
 
     // Navbar for the two views -- list and cal
     // Pass in refs to the two view widgets

@@ -19,6 +19,7 @@ dojo.require("dojo.widget.*");
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
@@ -55,10 +56,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // Publish this through a setTimeout call so that the
             // select box doesn't just sit open while waiting for
             // the collection data to load and the UI to render
+            var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
             var f = function () { dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection', opts: { loadType: 'changeCollection',
                 collection: c }, data: {}
             }); };
+            loading.show();
             setTimeout(f, 0);
         },
 

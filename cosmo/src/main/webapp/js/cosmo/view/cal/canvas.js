@@ -77,14 +77,19 @@ cosmo.view.cal.canvas = new function () {
     this.timedCanvas = null;
     // The scroll offset -- needed to preserve scroll position
     this.timedCanvasScrollTop = parseInt(HOUR_UNIT_HEIGHT*8);
+    // Init flag -- NavBar's displayView uses this to know
+    // when to call the canvas init function
+    this.hasBeenInitialized = false;
 
     // Public methods
     // ****************
     this.init = function () {
+        dojo.debug('init on cal canvas');
         // Subscribe to the '/calEvent' channel
         dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
         // Subscribe to the '/app' channel
         dojo.event.topic.subscribe('/app', self, 'handlePub_app');
+        this.hasBeenInitialized = true;
     };
     /**
      * Main rendering function for the calendar canvas called

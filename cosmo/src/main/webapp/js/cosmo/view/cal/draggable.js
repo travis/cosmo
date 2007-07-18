@@ -303,7 +303,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
  * height of div
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeBottom = function (y) {
-   // The selected event
+    // The selected event
     var selEv = this.ev; 
     // Where the bottom edge of the lozenge should go -- this is a
     // relative measurement based on pos on the scrollable area

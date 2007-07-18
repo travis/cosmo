@@ -454,12 +454,10 @@ cosmo.view.cal.canvas = new function () {
         // Has to be looked up every time, as value may change
         // either when user scrolls or resizes all-day event area
         var top = this.timedCanvas.scrollTop;
-        // FIXME -- viewOffset is the vertical offset of the UI
-        // with the top menubar added in. This should be a property
-        // of render context that the canvas can look up
-        top -= cosmo.app.pim.viewOffset;
-        // Subtract change in resized all-day event area
-        top -= (allDayArea.dragSize - allDayArea.origSize);
+        // Subtract change, if any, in resized all-day event area
+        var offset = cosmo.ui.resize_area.dragSize ? 
+            (cosmo.ui.resize_area.dragSize - ALL_DAY_RESIZE_AREA_HEIGHT) : 0;
+        top -= offset;
         // Subtract height of navbar -- this lives outside the cal view
         top -=  CAL_TOP_NAV_HEIGHT;
         return top;

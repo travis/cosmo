@@ -22,11 +22,6 @@
     <packaging>pom</packaging>
     <name>OSAF Server</name>
     <url>http://cosmo.osafoundation.org</url>
-    <scm>
-        <connection>scm:svn:http://svn.osafoundation.org/server/cosmo/trunk</connection>
-        <developerConnection>scm:svn:svn+ssh://svn.osafoundation.org/svn/server/cosmo/trunk</developerConnection>
-        <url>http://viewcvs.osafoundation.org/</url>
-    </scm>
     <modules>
         <module>cosmo</module>
         <module>snarf</module>
@@ -101,11 +96,6 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>tlc</id>
-            <name>TLC Repository</name>
-            <url>http://commons.ucalgary.ca/pub/m2</url>
         </pluginRepository>
     </pluginRepositories>
     <distributionManagement>

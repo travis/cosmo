@@ -170,7 +170,6 @@ cosmo.env.getVersion = function(){
 }
 
 cosmo.env.setVersion = function(version){
-    dojo.debug(version)
     this._version = version;
 }
 

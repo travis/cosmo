@@ -60,7 +60,7 @@ function bootstrap(){
     dojo.require("cosmo.ui.conf");
 
     cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
-    cosmo.env.version = "${PRODUCT_VERSION}";
+    cosmo.env.setVersion("${PRODUCT_VERSION}");
     <%-- 
       Note: It is possible to set this value to negative numbers --
       Setting the canonical client-side value with a function ensures

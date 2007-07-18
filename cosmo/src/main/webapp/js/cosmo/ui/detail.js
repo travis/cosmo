@@ -36,6 +36,7 @@ dojo.require("cosmo.ui.DetailFormConverter");
 
 cosmo.ui.detail = new function () {
     this.item = null;
+    this.processingExpando = false;
 
     this.createFormElementsForStamp = function (stampType) {
         return new cosmo.ui.detail[stampType + 'FormElements']();
@@ -335,7 +336,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
                 if (eventStamp){
                     var startDate = eventStamp.getStartDate();
                     var endDate = eventStamp.getEndDate();
-    
+
                     if (startDate.tzId) {
                         body = body.concat([
                          _("Sidebar.Email.Timezone"), startDate.tzId , "%0d%0a"]);
@@ -346,7 +347,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
                     if (eventStamp.getAllDay()) {
                         body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
                     }
-    
+
                     if (eventStamp.getRrule()) {
                         var rrule = eventStamp.getRrule();
                         body = body.concat([_("Sidebar.Email.Recurs") ,
@@ -595,6 +596,25 @@ cosmo.ui.detail.StampSection.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
+    // Dojo bug http://trac.dojotoolkit.org/ticket/1776
+    // Set processing lock: Don't trigger again until
+    // animation completes -- Dojo doesn't allow an explicit
+    // target height to be passed to the wipeIn; it guesses
+    // based on the height of the node when the animation
+    // begins. If the wipeIn is initiated when the wipeOut
+    // is in progress, it mistakes the truncated height as the
+    // desired target height. Setting a lock prevents this
+    // from happening -- NOTE, the lock has to be removed as
+    // a callback from the animation, otherwise it gets removed
+    // before the animation has really completed.
+    if (cosmo.ui.detail.processingExpando) {
+        return false;
+    }
+    // Add the animation processing lock
+    cosmo.ui.detail.processingExpando = true;
+    // Callback to remove the lock
+    var f = function () { cosmo.ui.detail.processingExpando = false; }
+
     // Allow to be passed in explicitly, or just trigger toggle
     var doShow = typeof p == 'boolean' ? p : !this.expanded;
     var display = '';
@@ -611,12 +631,12 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
             }
         }
         this.expanded = true;
-        dojo.lfx.wipeIn(this.bodyNode, 500).play();
+        dojo.lfx.wipeIn(this.bodyNode, 500, null, f).play();
         display = '[hide]';
     }
     else {
         this.expanded = false;
-        dojo.lfx.wipeOut(this.bodyNode, 500).play();
+        dojo.lfx.wipeOut(this.bodyNode, 500, null, f).play();
         display = '[show]';
     }
     if (dojo.render.html.ie || dojo.render.html.safari) {

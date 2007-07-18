@@ -194,7 +194,9 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     setVals('startDate', sr, fm);
     // Triage
     var tr = data.getTriageStatus();
-    var fm = _('Dashboard.ListEntry.Triage' + this.triageStatusCodeMappings[tr]);
+
+    var fm = tr ? _('Dashboard.ListEntry.Triage' +
+        this.triageStatusCodeMappings[tr]) : '(NONE)';
     setVals('triage', tr, fm);
 
     // Use two separate keyword/val objs since

@@ -23,10 +23,10 @@ dojo.require("cosmo.env");
 dj_global.TEMPLATE_DIRECTORY = "/" + (djConfig.templateName || 'default'); // Template directory to use
 dj_global.DISPLAY_WIDTH_PERCENT = 1.0; // Percent of window width to draw entire display
 dj_global.DISPLAY_HEIGHT_PERCENT = 1.0; // Percent of window height to draw entire display
-dj_global.TOP_MENU_HEIGHT = 48; // Height for top navigation area -- Month name and nav arrows
+dj_global.TOP_MENU_HEIGHT = 48; // Height for top menubar 
 dj_global.LEFT_SIDEBAR_WIDTH = 172; // Width of lefthand sidebar
 dj_global.RIGHT_SIDEBAR_WIDTH = 256; // Width of righthand sidebar
-dj_global.CAL_TOP_NAV_HEIGHT = 36; // Height for top navigation area -- Month name and nav arrows
+dj_global.CAL_TOP_NAV_HEIGHT = 36; // Height for top navigation area -- Month name and nav arrows, list view pager
 dj_global.DAY_LIST_DIV_HEIGHT = 16; // Height for list of days/dates for each day col
 dj_global.ALL_DAY_RESIZE_HANDLE_HEIGHT = 8; // Height for resizer handle under area for 'no time' events
 dj_global.ALL_DAY_RESIZE_AREA_HEIGHT = 60-ALL_DAY_RESIZE_HANDLE_HEIGHT;

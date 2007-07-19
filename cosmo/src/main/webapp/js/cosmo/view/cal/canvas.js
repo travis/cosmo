@@ -1496,7 +1496,8 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         allDayResize.setSize(self.width - 1, ALL_DAY_RESIZE_HANDLE_HEIGHT);
         allDayResize.setPosition(0, vOffset);
         var allDayContent = self.allDayContentDiv;
-        allDayContent.setSize((self.width - SCROLLBAR_SPACER_WIDTH - HOUR_LISTING_WIDTH), '100%');
+        allDayContent.setSize((self.width - SCROLLBAR_SPACER_WIDTH -
+            HOUR_LISTING_WIDTH - 4), '100%');
         allDayContent.setPosition((HOUR_LISTING_WIDTH + 1), 0);
         var allDaySpacer = self.allDayHourSpacerDiv
         allDaySpacer.setSize((HOUR_LISTING_WIDTH - 1), '100%');

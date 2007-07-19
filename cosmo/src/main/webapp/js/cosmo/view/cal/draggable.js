@@ -105,7 +105,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
             this.clickOffsetLozengeTop = this.getLocalMouseYPos(yPos) - node.offsetTop;
             this.clickOffsetLozengeBottom = this.getLocalMouseYPos(yPos) - offsetBottom;
         }
-
+        this.setLozengTitleNode(true);
     };
     this.doDrag = function () {
         // Hand off to Draggable methods based on dragMode
@@ -192,11 +192,11 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * changes to the event to the backend
      */
     this.doUpdate = function () {
-        var selEv = this.ev; 
+        var selEv = this.ev;
         // Make backup snapshot of event data in case save/remove
         // operation fails
         selEv.makeSnapshot();
-        // Get the delta for 
+        // Get the delta for
         var delta = selEv.lozenge.getDelta(selEv, this.dragMode);
         if (delta.hasChanges()) {
             // Check against the backup to make sure the event has
@@ -205,20 +205,21 @@ cosmo.view.cal.draggable.Draggable = function (id) {
             // Save the changes
             // ==========================
             dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':selEv});
-        } else {
+        }
+        else {
             // If no real edit, then just reposition the lozenge
             // With conflict calculations and snap-to
             selEv.lozenge.updateFromEvent(selEv);
             selEv.lozenge.updateElements();
         }
     };
-    
+
     /**
      * Abort if the Draggable object does not point to an actual div
      * or doesn't have a valid dragMode
      */
     this.paranoia = function () {
-        var ev = this.ev; 
+        var ev = this.ev;
         if (!ev || !cosmo.app.dragItem.dragMode ||
             ev.lozenge.getInputDisabled()) {
             return false;
@@ -230,6 +231,14 @@ cosmo.view.cal.draggable.Draggable = function (id) {
     this.doDragEffect = function (dragState) {
         var o = dragState == 'on' ? 60 : 100;
         this.ev.lozenge.setOpacity(o);
+    };
+
+    this.setLozengTitleNode = function (forceToLeft) {
+        var lozenge = this.ev.lozenge;
+        if (lozenge instanceof cosmo.view.cal.lozenge.NoTimeLozenge &&
+            lozenge.left < 0) {
+            lozenge.setTitleNodePos(forceToLeft);
+        }
     };
 }
 
@@ -283,7 +292,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resize = function () {
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
     // The selected event
-    var selEv = this.ev; 
+    var selEv = this.ev;
     // Where the top edge of the lozenge should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
@@ -304,7 +313,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeBottom = function (y) {
     // The selected event
-    var selEv = this.ev; 
+    var selEv = this.ev;
     // Where the bottom edge of the lozenge should go -- this is a
     // relative measurement based on pos on the scrollable area
     var b = (y - this.absTop) + this.scrollOffset;
@@ -330,7 +339,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
         return false;
     }
 
-    var selEv = this.ev; 
+    var selEv = this.ev;
     var unit = HOUR_UNIT_HEIGHT/4; // 15-min. increments
     var top = 0;
     var size = 0;
@@ -438,6 +447,8 @@ cosmo.view.cal.draggable.NoTimeDraggable.prototype =
  * visual update
  */
 cosmo.view.cal.draggable.NoTimeDraggable.prototype.drop = function () {
+
+    this.setLozengTitleNode(false);
 
     if (!this.dragged || !this.paranoia()) {
         return false;

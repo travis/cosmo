@@ -82,6 +82,11 @@ cosmo.view.cal.lozenge.Lozenge = function () {
     this.domNode = null;
     // DOM elem ref for inner div of the Lozenge
     this.contentNode = null;
+    // For timed events, contains the time of day for the event
+    // Null for untimed events
+    this.timeNode = null;
+    // Contains the title text for the event
+    this.titleNode = null;
     // The separator plus ID -- convenience to avoid
     // concatenating the same thing over and over
     this.idPrefix = '';
@@ -700,6 +705,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setUpDomAndAppend = function (id
     d.id = this.domNodeId + 'Start' + this.idPrefix;
     d.className = 'eventTime';
     d.style.width = '100%'; // Needed for IE, which sucks
+    this.timeNode = d;
     lozengeDivSub.appendChild(d);
 
     // Title
@@ -707,6 +713,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setUpDomAndAppend = function (id
     d.id = this.domNodeId + 'Title' + this.idPrefix
     d.className = 'eventTitle';
     d.style.width = '100%'; // Needed for IE, which sucks
+    this.titleNode = d;
     lozengeDivSub.appendChild(d);
 
     lozengeDiv.appendChild(lozengeDivSub);
@@ -995,7 +1002,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.showProcessing = function () {
 cosmo.view.cal.lozenge.NoTimeLozenge.prototype.hideProcessing = function () {
     this._setLozengeState(false);
     this._mainAreaCursorChange(false);
-}
+};
 
 /**
  * Update the lozenge properties from an event
@@ -1011,9 +1018,18 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateFromEvent = function (ev, t
     this.left = this.getPlatonicLeft();
     this.width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-3;
     if (!temp) {
-        this.top = ev.allDayRow*19;
+        var rowHeight = 19; // px
+        this.top = ev.allDayRow * rowHeight;
     }
-}
+    this.setTitleNodePos();
+};
+
+cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setTitleNodePos = function (forceToLeft) {
+    var margin = (this.left < 0 && !forceToLeft) ? -this.left : 0;
+    margin += BLOCK_RESIZE_LIP_HEIGHT;
+    this.titleNode.style.marginLeft = margin + 'px';
+    console.log(margin);
+};
 
 /**
  * Returns the Delta based on changes to the lozenge -- usually called
@@ -1040,7 +1056,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getDelta = function (ev, dragMode
     delta.deltafy();
 
     return delta;
-}
+};
 
 /**
  * Calculate the width of an all-day event lozenge -- for events that
@@ -1103,7 +1119,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setUpDomAndAppend = function (id,
     d = _createElem('div');
     d.id = this.domNodeId + 'Title' + this.idPrefix;
     d.className = 'eventTitle';
-    d.style.marginLeft = BLOCK_RESIZE_LIP_HEIGHT + 'px';
+    this.titleNode = d;
     lozengeDivSub.appendChild(d);
 
     lozengeDiv.appendChild(lozengeDivSub);

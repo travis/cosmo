@@ -53,8 +53,8 @@
          /cmp/user/**/service=ROLE_ROOT,ROLE_USER
          /cmp/signup=ROLE_ANONYMOUS
          /cmp/activate/*=ROLE_ROOT
-	 /cmp/account/password/reset/*=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
-	 /cmp/account/password/recover=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
+         /cmp/account/password/reset/*=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
+         /cmp/account/password/recover=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
          /cmp/account=ROLE_USER
          /**=ROLE_ROOT
        </value>

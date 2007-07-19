@@ -88,9 +88,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var col = this.collections;
             var curr = this.currentCollection;
             var passedKey = this.ticketKey; // Indicates we're in ticket view
-            var _collectionWithUidExists = this._collectionWithUidExists;
-            var _collectionWithDisplayNameExists = this._collectionWithDisplayNameExists;
-            var _validateDisplayName = this._validateDisplayName;
+
             // Collection selector / label and 'add'/'info' icons
             var selectorNode = _createElem('div');
             selectorNode.id = 'collectionSelectorOrLabel';
@@ -103,7 +101,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // if auth succeeds
                 var subscribeFunction = function () {
                         var collections = cosmo.app.pim.serv.getCollections({sync:true}).results[0];
-                        var alreadySubscribed = _collectionWithUidExists(collections, curr.getUid());
+                        var alreadySubscribed = self._collectionWithUidExists(collections, curr.getUid());
                         if (alreadySubscribed) {
                             var message = alreadySubscribed == "cosmo.model.Collection"
                                 ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
@@ -116,12 +114,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
                         var displayName = "";
 
-                        while (!_validateDisplayName(displayName)) {
+                        while (!self._validateDisplayName(displayName)) {
                             displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
                         }
 
-                        while (_collectionWithDisplayNameExists(collections, displayName) || !_validateDisplayName(displayName)) {
-                            displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt",displayName));
+                        while (self._collectionWithDisplayNameExists(collections, displayName) || !self._validateDisplayName(displayName)) {
+                            displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt", displayName));
                         }
 
                         if (displayName == null) {
@@ -145,24 +143,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     // Action to take after successful auth -- try to add the
                     // collection subscription
                     attemptFunc: function () {
-                        dojo.debug("attemptFunc");
                         var deferred = subscribeFunction();
-                        dojo.debug("after subbie.");
                         if (deferred != null) {
-                            dojo.debug("deferred != null");
                             deferred.addCallback(dojo.lang.hitch(this, function (x,y,z) {
-                                dojo.debug(x)
-                                dojo.debug(y)
-                                dojo.debug(z)
                                 // Log the user into Cosmo and display the current collection
                                 this._showPrompt(this.authAction.successPrompt);
                                 location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
 
                             }));
                             deferred.addErrback(dojo.lang.hitch(this, function (err, y, z) {
-                                dojo.debug(err)
-                                dojo.debug(y)
-                                dojo.debug(z)
                                 cosmo.app.hideDialog();
                                 cosmo.app.showErr(self.strings.collectionAddError, err);
                                 return false;
@@ -420,7 +409,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         },
 
         _collectionWithDisplayNameExists: function(cols, displayName){
-            var index = _getIndexByDisplayName(cols, displayName);
+            var index = this._getIndexByDisplayName(cols, displayName);
             return index != -1;
         },
         

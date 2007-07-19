@@ -369,3 +369,37 @@ cosmo.util.html.getElementTextContent = function (element){
     return content;
 }
 
+cosmo.util.html.getFormValue =  function(form, fieldName){
+        //summary: given a form and a field name returns the value of that field. 
+        //         note: doesn't work with multi-selects (yet). 
+        //         Checkboxes return the string "1" for checked and the string "0" for unchecked.
+        var element = form[fieldName];
+        var type = null;
+        if (element.type){
+            type = element.type
+        } else if (element.length){
+            type = element[0].type;
+        }
+        switch(type){
+            case "text":
+                return element.value;
+                break;
+            case "textarea":
+                return element.value;
+                break;
+            case "radio":
+                return cosmo.util.html.getRadioButtonSetValue(element);
+                break;
+            case "select-one":
+                return cosmo.util.html.getSelectValue(element);
+                break;
+            case "checkbox":
+                return element.checked ? "1" : "0";
+                break;
+            default: 
+                alert(type);
+                return "";
+                break;
+        }
+}
+

@@ -36,7 +36,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             errorMessage += this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }
 
-        if (this._isStampEnabled("event")){
+        if (cosmo.ui.detail.isStampEnabled("event")){
             errorMessage += this._populateAnyTimeAtTime(delta);
         }
         
@@ -49,23 +49,12 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         return [delta, errorMessage];  
     },
     
-    getStampForm: function(stampName){
-        //summary: returns the form object for the given stamp name
-        stampName = stampName.toLowerCase();
-        return cosmo.app.pim.baseLayout.mainApp.rightSidebar
-                   .detailViewForm[stampName +"Section"].formSection.formNode;
-    },
-    
-    getMainForm: function(){
-        return cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.mainSection.formNode;
-    },
-    
     _populateDelta: function(delta, stampName, hasFields){
         var map =  this._stampPropertiesMaps[stampName];
         var errors = "";
         
         if (stampName != "note"){
-            var enabled = this._isStampEnabled(stampName);
+            var enabled = cosmo.ui.detail.isStampEnabled(stampName);
             if (!enabled){
                 delta.addDeletedStamp(stampName);
                 return errors;
@@ -78,7 +67,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             return errors;
         }
 
-        var form = stampName == "note" ? this.getMainForm() : this.getStampForm(stampName);
+        var form = stampName == "note" ? cosmo.ui.detail.getMainForm() 
+                                       : cosmo.ui.detail.getStampForm(stampName);
         
         for (var propertyName in map){
             var propertyInfo = map[propertyName];
@@ -111,47 +101,11 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             delta.addProperty("autoTriage", false);
         }
      },
+     
+     _getFormValue: cosmo.util.html.getFormValue, 
+
     
-    _isStampEnabled: function(stampName){
-        var checkBox = $("section"+ this._upperFirstChar(stampName) +"EnableToggle");
-        return checkBox.checked;
-    },
-            
-    _getFormValue:  function(form, fieldName){
-        var element = form[fieldName];
-        var type = null;
-        if (element.type){
-            type = element.type
-        } else if (element.length){
-            type = element[0].type;
-        }
-        switch(type){
-            case "text":
-                return element.value;
-                break;
-            case "textarea":
-                return element.value;
-                break;
-            case "radio":
-                return cosmo.util.html.getRadioButtonSetValue(element);
-                break;
-            case "select-one":
-                return cosmo.util.html.getSelectValue(element);
-                break;
-            case "checkbox":
-                return element.checked ? "1" : "0";
-                break;
-            default: 
-                alert(type);
-                return "";
-                break;
-        }
-    },
-    
-    _upperFirstChar: function(str){
-        return str.charAt(0).toUpperCase() + str.substr(1,str.length -1 );
-    },
-    
+
     _stampPropertiesMaps: {
         note: {
             body: {type: "string",
@@ -357,12 +311,13 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                return "";
         }
         
-        var form = this.getStampForm("event");
+        var form = cosmo.ui.detail.getStampForm("event");
         var startTimeFieldValue = this._getFormValue(form, "startTime");
         var endTimeFieldValue = this._getFormValue(form, "endTime");
         if (!startTimeFieldValue) {
            if (!endTimeFieldValue){
                delta.addStampProperty("event", "anyTime", true)
+               delta.addStampProperty("event", "eventStatus", null);
            } else {
                return _("App.Error.NoEndTimeWithoutStartTime");
            }
@@ -372,11 +327,11 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                delta.removeStampProperty("event", "endDate");
                delta.addStampProperty("event", "duration", null);
                delta.addStampProperty("event", "anyTime", false) //just in case.
+               delta.addStampProperty("event", "eventStatus", null);
            } else {
                delta.addStampProperty("event", "anyTime", false) //just in case.
            }
         }
         return "";
     }
-    
 });

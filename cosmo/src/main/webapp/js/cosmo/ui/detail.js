@@ -81,7 +81,30 @@ cosmo.ui.detail = new function () {
         d.appendChild(elem);
         return d;
     };
-
+    
+    //some convienient methods for getting at the various forms and form values. 
+    
+    this.getStampForm = function(stampName){
+        //summary: returns the form object for the given stamp name
+        stampName = stampName.toLowerCase();
+        return cosmo.app.pim.baseLayout.mainApp.rightSidebar
+                   .detailViewForm[stampName +"Section"].formSection.formNode;
+    }
+    
+    this.getMainForm = function(){
+        return cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.mainSection.formNode;
+    }
+        
+    this.isStampEnabled = function(stampName){
+        //summary: returns whether or not a particular stamp section is enabled
+        var checkBox = $("section"+ this._upperFirstChar(stampName) +"EnableToggle");
+        return checkBox.checked;
+    }
+            
+    this._upperFirstChar = function(str){
+        return str.charAt(0).toUpperCase() + str.substr(1,str.length -1 );
+    }
+    
 };
 
 cosmo.ui.detail.StampFormElemState = function (p) {
@@ -1183,7 +1206,7 @@ cosmo.ui.detail.EventFormElements= function () {
         };
         // All-day event / normal event toggling
         dojo.event.connect(f.eventAllDay, 'onclick', func);
-
+      
         // Recurrence -- disable 'ending' text box if event
         // does not recur
         var elem = f.recurrenceInterval;
@@ -1218,6 +1241,8 @@ cosmo.ui.detail.EventFormElements= function () {
             _html.setSelectOptions(f.tzId, options);
         };
         dojo.event.connect(f.tzRegion, 'onchange', func);
+        dojo.event.connect(f.eventAllDay, 'onchange', self.hideOrShowEventStatus);
+        dojo.event.connect(f.endTime, 'onblur', self.hideOrShowEventStatus);
     }
 
     // Interface methods
@@ -1307,10 +1332,32 @@ cosmo.ui.detail.EventFormElements= function () {
             _html.setSelect(f.recurrenceInterval, '');
             _html.clearAndDisableFormElem(recurEnd, 'text');
         }
+        
+        this.hideOrShowEventStatus();
     };
+
 };
+
 cosmo.ui.detail.EventFormElements.prototype =
     new cosmo.ui.detail.StampFormElements();
+
+cosmo.ui.detail.EventFormElements.prototype.hideOrShowEventStatus = function(){
+        //summary: hides the event status if item is anytime or attime,
+        //         shows it otherwise.
+        var html = cosmo.util.html;
+        var detail = cosmo.ui.detail;
+        var form = detail.getStampForm("event");
+        var show = true;
+        var endTime = html.getFormValue(form, "endTime");
+        if (html.getFormValue(form, "eventAllDay") == "0"){
+            if (!endTime || endTime == "hh:mm" ){
+                show = false;
+            }
+        }
+        
+        form["eventStatus"].disabled = !show;
+}
+
 
 cosmo.ui.detail.ButtonSection = function () {
     var self = this;

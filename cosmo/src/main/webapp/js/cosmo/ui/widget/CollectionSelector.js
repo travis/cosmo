@@ -244,7 +244,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
                 // Logged-in view uses a select box -- set vertical height
                 // so we can get the info icon valigned properly
-                selectorNode.style.height = this.verticalHeight + 'px';
+                selectorNode.style.height = self.verticalHeight + 'px';
 
                 var options = self._createOptionsFromCollections(col);
 

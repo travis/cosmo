@@ -1028,7 +1028,6 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.setTitleNodePos = function (force
     var margin = (this.left < 0 && !forceToLeft) ? -this.left : 0;
     margin += BLOCK_RESIZE_LIP_HEIGHT;
     this.titleNode.style.marginLeft = margin + 'px';
-    console.log(margin);
 };
 
 /**

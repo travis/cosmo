@@ -18,6 +18,7 @@ package org.osaf.cosmo.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.persistence.DiscriminatorValue;
@@ -205,6 +206,25 @@ public class EventStamp extends BaseEventStamp implements
         setEventCalendar(calendar);
     }
     
+    
+    /**
+     * Returns a list of exception components for a recurring event.
+     * If the event is not recurring, the list will be empty.
+     */
+    @Transient
+    public List<Component> getExceptions() {
+        ArrayList<Component> exceptions = new ArrayList<Component>();
+        
+        // add all exception events
+        NoteItem note = (NoteItem) getItem();
+        for(NoteItem exception : note.getModifications()) {
+            EventExceptionStamp exceptionStamp = EventExceptionStamp.getStamp(exception);
+            if(exceptionStamp!=null)
+                exceptions.add(exceptionStamp.getEvent());
+        }
+        
+        return exceptions;
+    }
     
     /**
      * Returns the master event extracted from the underlying

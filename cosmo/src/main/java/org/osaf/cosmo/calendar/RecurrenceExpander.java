@@ -333,6 +333,26 @@ public class RecurrenceExpander {
         return (Instance) instances.get(instances.lastKey());
     }
     
+    /**
+     * Calculate and return the latest ocurring instance for the 
+     * specified master and exception calendar components and date range.
+     * @param master master recurring calendar component
+     * @param modifications list of exception components
+     * @param rangeStart period start
+     * @param rangeEnd period end
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
+     * @return the latest ocurring instance, else null if no instance
+     *         occurs within the specified time range
+     */
+    public Instance getLatestInstance(Component master, List<Component> modifications, Date rangeStart, Date rangeEnd, TimeZone timezone) {
+        InstanceList instances = getOcurrences(master, modifications, rangeStart, rangeEnd, timezone );
+        if(instances.size()==0)
+            return null;
+        
+        return (Instance) instances.get(instances.lastKey());
+    }
+    
     
     /**
      * Calculate and return the first ocurring instance for the 
@@ -347,6 +367,29 @@ public class RecurrenceExpander {
      */
     public Instance getFirstInstance(Calendar calendar, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd, timezone );
+        
+        if(instances.size()==0)
+            return null;
+        
+        return (Instance) instances.get(instances.firstKey());
+    }
+    
+    /**
+     * Calculate and return the first ocurring instance for the 
+     * specified master and exception components and date range.
+     * @param master master component
+     * @param modifications list of exception components
+     * @param rangeStart period start
+     * @param rangeEnd period end
+     * @param timezone Optional timezone to use for floating dates.  If null, the
+     *        system default is used.
+     * @return the first ocurring instance, else null if no instance
+     *         occurs within the specified time range
+     */
+    public Instance getFirstInstance(Component master, List<Component> modifications, Date rangeStart, Date rangeEnd, TimeZone timezone) {
+        
+        InstanceList instances = getOcurrences(master, modifications, rangeStart, rangeEnd, timezone );
+        
         if(instances.size()==0)
             return null;
         

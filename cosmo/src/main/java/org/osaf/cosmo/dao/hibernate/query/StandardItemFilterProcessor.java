@@ -365,9 +365,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         // Otherwise, expand the recurring item to determine if it actually
         // occurs in the time range specified
         RecurrenceExpander expander = new RecurrenceExpander();
-        InstanceList instances = expander.getOcurrences(eventStamp
-                .getCalendar(), filter.getPeriod().getStart(), filter
-                .getPeriod().getEnd(), filter.getTimezone());
+        InstanceList instances = expander.getOcurrences(eventStamp.getEvent(),
+                eventStamp.getExceptions(), filter.getPeriod().getStart(),
+                filter.getPeriod().getEnd(), filter.getTimezone());
 
         // If recurring event occurs in range, add master unless the filter
         // is configured to not return the master

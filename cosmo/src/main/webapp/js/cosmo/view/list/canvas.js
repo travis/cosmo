@@ -68,6 +68,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             case 'eventsLoadSuccess':
                 this.initListProps();
                 this.render();
+                this._doSortAndDisplay();
                 break;
             case 'saveSuccess':
                 this._saveSuccess(cmd)
@@ -82,23 +83,24 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     this.renderSelf = function () {
-
         // Rendering can be messages published to calEvent
         // or by window resizing
         if (!cosmo.view.list.isCurrentView()) { return false; }
 
-        var reg = this.view.itemRegistry;
+        //var reg = this.view.itemRegistry;
         this._updateSize();
         this.setPosition(0, CAL_TOP_NAV_HEIGHT);
         this.setSize();
 
+        /*
         cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
-        this.displayTable();
+        this.displayListViewTable();
         var sel = this.getSelectedItem();
         if (sel) {
             cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.updateFromItem(
                 sel);
         }
+        */
 
     }
     this.handleMouseOver = function (e) {
@@ -166,7 +168,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     };
     // innerHTML will be much faster for table display with
     // lots of rows
-    this.displayTable = function () {
+    this.displayListViewTable = function () {
         var _list = cosmo.view.list;
         var _tMap = cosmo.view.list.triageStatusCodeMappings;
         var hash = _list.itemRegistry;
@@ -249,7 +251,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
         dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
             opts: null });
-    }; this.initListProps = function () {
+    };
+    this.initListProps = function () {
         var items = cosmo.view.list.itemRegistry.length;
         var pages = parseInt(items/this.itemsPerPage);
         if (items % this.itemsPerPage > 0) {
@@ -261,11 +264,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
     };
     this.goNextPage = function () {
         self.currPageNum++;
-        self.render();
+        self.displayListViewTable();
     };
     this.goPrevPage = function () {
         self.currPageNum--;
-        self.render();
+        self.displayListViewTable();
     };
 
 
@@ -424,7 +427,15 @@ cosmo.view.list.canvas.Canvas = function (p) {
             this.currSortCol = s;
         }
         if (cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir)) {
-            this.displayTable();
+            this.displayListViewTable();
+            if (cosmo.view.list.itemRegistry.length) {
+                dojo.event.topic.publish('/calEvent', { 'action':
+                    'eventsDisplaySuccess', 'data': self.getSelectedItem() });
+
+            }
+            else {
+                dojo.event.topic.publish('/calEvent', { 'action': 'noItems' });
+            }
         }
         else {
             throw('Could not sort item registry.');

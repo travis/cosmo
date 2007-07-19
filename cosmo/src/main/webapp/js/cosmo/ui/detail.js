@@ -203,10 +203,8 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         var act = cmd.action;
         var item = cmd.data;
         switch (act) {
-            case 'eventsLoadPrepare':
-                //self.clear();
-                break;
             case 'eventsDisplaySuccess':
+            case 'noItems':
             case 'setSelected':
                 // An item has been clicked on, selected
                 if (item) {

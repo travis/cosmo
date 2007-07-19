@@ -338,7 +338,7 @@ cosmo.ui.navbar.Bar = function (p) {
                 n = n > list.pageCount ? list.pageCount : n;
                 n = n < 1 ? 1 : n;
                 list.currPageNum = n;
-                list.render();
+                list.displayListViewTable();
             }
         };
         var d = this.domNode;

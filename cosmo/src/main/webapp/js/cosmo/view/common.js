@@ -162,13 +162,27 @@ cosmo.view.canvasBase = new function () {
     this.getSelectedItem = function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         var id = this.selectedItemIdRegistry[key];
-        var reg = this.view.itemRegistry;
-        return reg ? reg.getItem(id) : null;
+        return this.view.itemRegistry.getItem(id) || null;
+    };
+    this.getSelectedItemCacheCopy = function () {
+        var key = cosmo.app.pim.currentCollection.getUid();
+        var id = this.selectedItemIdRegistry[key];
+        return this.selectedItemCache[id] || null;
     };
     this.setSelectedItem = function (p) {
         var key = cosmo.app.pim.currentCollection.getUid();
-        var id = typeof p == 'string' ? p : p.id
+        var id = '';
+        var item = null;
+        if (typeof p == 'string') {
+            id = p;
+            item = this.view.itemRegistry.getItem(id);
+        }
+        else {
+            id = p.id;
+            item = p;
+        }
         this.selectedItemIdRegistry[key] = id;
+        this.selectedItemCache[id] = item;
         return true;
     };
     this.clearSelectedItem = function () {

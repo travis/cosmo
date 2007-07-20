@@ -231,7 +231,14 @@ cosmo.ui.detail.DetailViewForm = function (p) {
             case 'setSelected':
                 // An item has been clicked on, selected
                 if (item) {
-                    self.updateFromItem(item);
+                    // Only update the values in the form if
+                    // the item has actually changed -- note that
+                    // in the cal, when navigating off the week
+                    // where the selected item is displayed, the
+                    // selected item will in the selectedItemCache
+                    if (item != cosmo.ui.detail.item) {
+                        self.updateFromItem(item);
+                    }
                 }
                 // No-item means 'nothing selected'
                 else {

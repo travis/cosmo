@@ -71,6 +71,12 @@ cosmo.view.cal.canvas = new function () {
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
     this.selectedItemIdRegistry = {};
+    // Stash references to the selected object here
+    // The current itemRegistry won't always have the
+    // selected item loaded. If it's not in the
+    // itemRegistry, pull it from here to persist the
+    // collection's selected object in the detail view
+    this.selectedItemCache = {};
     // Available lozenge colors
     this.colors = {};
     // The scrolling div for timed events
@@ -455,7 +461,7 @@ cosmo.view.cal.canvas = new function () {
         // either when user scrolls or resizes all-day event area
         var top = this.timedCanvas.scrollTop;
         // Subtract change, if any, in resized all-day event area
-        var offset = cosmo.ui.resize_area.dragSize ? 
+        var offset = cosmo.ui.resize_area.dragSize ?
             (cosmo.ui.resize_area.dragSize - ALL_DAY_RESIZE_AREA_HEIGHT) : 0;
         top -= offset;
         // Subtract height of navbar -- this lives outside the cal view
@@ -772,14 +778,11 @@ cosmo.view.cal.canvas = new function () {
         if (cosmo.view.cal.itemRegistry.length) {
             if (cosmo.view.cal.conflict.calc(cosmo.view.cal.itemRegistry) &&
                 positionLozenges()) {
-                // If no currently selected event, put selection on
-                // the final one loaded
-                //if (!self.getSelectedItem()) {
-                //    dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                //        'data': cosmo.view.cal.itemRegistry.getLast() });
-                //}
+                // If the selected item is not in the on-canvas itemRegistry,
+                // pull the copy from the selectedItemCache
+                var sel = self.getSelectedItem() || self.getSelectedItemCacheCopy();
                 dojo.event.topic.publish('/calEvent', { 'action':
-                    'eventsDisplaySuccess', 'data': self.getSelectedItem() });
+                    'eventsDisplaySuccess', 'data': sel });
             }
         }
         // No items displayed in the current collection

@@ -44,6 +44,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
     // UIDs for selected events keyed by the uid of
     // the currently displayed collection
     this.selectedItemIdRegistry = {};
+    // Stash references to the selected object here
+    // The current itemRegistry won't always have the
+    // selected item loaded. If it's not in the 
+    // itemRegistry, pull it from here to persist the 
+    // collection's selected object in the detail view
+    this.selectedItemCache = {};
     this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';
     this.itemsPerPage = 20;
@@ -429,8 +435,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir)) {
             this.displayListViewTable();
             if (cosmo.view.list.itemRegistry.length) {
+                var sel = self.getSelectedItem() || self.getSelectedItemCacheCopy();
                 dojo.event.topic.publish('/calEvent', { 'action':
-                    'eventsDisplaySuccess', 'data': self.getSelectedItem() });
+                    'eventsDisplaySuccess', 'data': sel });
 
             }
             else {

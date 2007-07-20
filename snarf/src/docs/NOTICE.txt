@@ -1,5 +1,7 @@
-This product includes software developed by the Open Source Applications
-Foundation (http://www.osafoundation.org/), the Apache Software Foundation 
-(http://www.apache.org/) and MySQL AB (http://www.mysql.com) (under the 
-FOSS License exception http://www.mysql.com/company/legal/licensing/
-foss-exception.html)
+This product includes software developed by:
+
+    Open Source Applications Foundation (http://www.osafoundation.org/)
+    Apache Software Foundation (http://www.apache.org/)
+    MySQL AB (http://www.mysql.com) - under the FOSS License exception
+        http://www.mysql.com/company/legal/licensing/foss-exception.html
+

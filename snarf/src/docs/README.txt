@@ -5,19 +5,18 @@ OSAF Server Bundle
 WHAT IS THE SERVER BUNDLE?
 ==========================
 
-The OSAF Sever Bundle integrates the Cosmo and Scooby calendar
-application and server with the Tomcat servlet container and the
-Derby embedded database to provide an integrated, easy-to-run
-calendar server.  The server bundle also includes configuration
-options and the MySQL Connector/J JDBC driver to run Cosmo
-against a MySQL 5 database server.
+The OSAF Sever Bundle integrates the Chandler Server (Cosmo)
+with the Tomcat servlet container and the Derby embedded database
+to provide an integrated, easy-to-run calendar server.  The server
+bundle also includes configuration options and the MySQL Connector/J
+JDBC driver to run Cosmo against a MySQL 5 database server.
 
 
 MORE INFO
 =========
 
-Instructions for installing and running the srever bundle are found at
-<http://wiki.osafoundation.org/bin/view/Documentation/ServerBundleAdministrator>.
+Instructions for installing and running the OSAF Server Bundle are found at
+<http://chandlerproject.org/Projects/ServerBundleDevelopmentHome>.
 
 Legal information is found in LICENSE.txt and NOTICE.txt.
 
@@ -29,9 +28,7 @@ server to cosmo@osafoundation.org. Sign up at
 IRC at irc.osafoundation.org in the #cosmo channel.
 
 
-
-
-Copyright 2006 Open Source Applications Foundation
+Copyright 2007 Open Source Applications Foundation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

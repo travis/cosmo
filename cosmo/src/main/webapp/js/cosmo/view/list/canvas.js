@@ -46,8 +46,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.selectedItemIdRegistry = {};
     // Stash references to the selected object here
     // The current itemRegistry won't always have the
-    // selected item loaded. If it's not in the 
-    // itemRegistry, pull it from here to persist the 
+    // selected item loaded. If it's not in the
+    // itemRegistry, pull it from here to persist the
     // collection's selected object in the detail view
     this.selectedItemCache = {};
     this.currSortCol = 'Triage';
@@ -56,6 +56,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.itemCount = 0;
     this.pageCount = 0;
     this.currPageNum = 1;
+    this.processingRow = null;
 
     for (var n in params) { this[n] = params[n]; }
 
@@ -71,6 +72,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var opts = cmd.opts;
         var delta = cmd.delta;
         switch (act) {
+            case 'save':
+            case 'remove':
+                if (cmd.saveType != "new") {
+                    this._showRowProcessing();
+                }
+                break;
             case 'eventsLoadSuccess':
                 this.initListProps();
                 this.render();
@@ -97,17 +104,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this._updateSize();
         this.setPosition(0, CAL_TOP_NAV_HEIGHT);
         this.setSize();
-
-        /*
-        cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir);
-        this.displayListViewTable();
-        var sel = this.getSelectedItem();
-        if (sel) {
-            cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.updateFromItem(
-                sel);
-        }
-        */
-
     }
     this.handleMouseOver = function (e) {
         if (e && e.target) {
@@ -186,29 +182,44 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var taskIconStyle = taskIcon.style;
         var t = '';
         var r = '';
+        var cols = [
+            { name: 'Task', width: 16, display: '' },
+            { name: 'Title', width: null, display: 'Title' },
+            { name: 'Who', width: null, display: 'UpdatedBy' },
+            { name: 'Start', width: null, display: 'StartsOn' },
+            { name: 'Triage', width: null, display: 'Triage' }
+        ];
+        var colCount = 0; // Used to generated the 'processing' row
 
         t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
         // Header row
         r += '<tr>';
-        r += '<td id="listViewTaskHeader" class="listViewHeaderCell"' +
-            ' style="width: 16px;">&nbsp;</td>';
-        r += '<td id="listViewTitleHeader" class="listViewHeaderCell">' +
-            _('Dashboard.ColHeaders.Title') + '</td>';
-        r += '<td id="listViewWhoHeader" class="listViewHeaderCell">' +
-            _('Dashboard.ColHeaders.UpdatedBy') + '</td>';
-        r += '<td id="listViewStartDateHeader" class="listViewHeaderCell">' +
-            _('Dashboard.ColHeaders.StartsOn') + '</td>';
-        r += '<td id="listViewTriageHeader" class="listViewHeaderCell"' +
-            ' style="border-right: 0px;">' + _('Dashboard.ColHeaders.Triage') + '</td>';
+        for (var i = 0; i < cols.length; i++) {
+            var col = cols[i];
+            r += '<td id="listView' + col.name +
+                'Header" class="listViewHeaderCell"';
+            if (col.width) {
+                r += ' style="width: 16px;"';
+            }
+            r += '>';
+            if (col.display) {
+                r += _('Dashboard.ColHeaders.' + col.display);
+            }
+            else {
+                r += '&nbsp;';
+            }
+            r += '</td>';
+            colCount++;
+        }
         r += '</tr>\n';
         t += r;
 
-        var fillCell = function (s) { 
+        var fillCell = function (s) {
             var cell = s;
             if (s) s = dojo.string.escapeXml(s);
             return  s || '&nbsp;';
         };
-        var getRow = function (key, val) {
+        var createContentRow = function (key, val) {
             var item = val;
             var display = item.display;
             var sort = item.sort;
@@ -236,10 +247,26 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         var size = this.itemsPerPage;
         var st = (this.currPageNum * size) - size;
-        hash.each(getRow, { start: st, items: size });
+        hash.each(createContentRow, { start: st, items: size });
 
         t += '</table>';
+        // ============
+        // Create the table
+        // ============
         this.domNode.innerHTML = t;
+
+        // Create the 'processing' row
+        var row = _createElem('tr');
+        var cell = _createElem('td');
+        cell.colSpan = colCount - 1;
+        cell.className = 'listViewDataCell listViewSelectedCell';
+        cell.style.textAlign = 'center';
+        cell.style.whiteSpace = 'nowrap';
+        cell.innerHTML = 'Processing ...';
+        row.appendChild(cell);
+        var cell = _createElem('td');
+        row.appendChild(cell);
+        this.processingRow = row;
 
         // Attach event listeners -- event will be delagated by row
         dojo.event.connect($('listViewTable'), 'onmouseover',
@@ -257,6 +284,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
         dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
             opts: null });
+
     };
     this.initListProps = function () {
         var items = cosmo.view.list.itemRegistry.length;
@@ -384,7 +412,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 }
             }
             else {
-                dojo.debug("how many left in queue: " + cosmo.view.service.processingQueue.length);
+                dojo.debug("how many left in queue: " +
+                    cosmo.view.service.processingQueue.length);
             }
         }
 
@@ -435,7 +464,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir)) {
             this.displayListViewTable();
             if (cosmo.view.list.itemRegistry.length) {
-                var sel = self.getSelectedItem() || self.getSelectedItemCacheCopy();
+                // List view has all items loaded at once
+                // in the itemRegistry -- no need for selectedItemCache
+                var sel = self.getSelectedItem();
                 dojo.event.topic.publish('/calEvent', { 'action':
                     'eventsDisplaySuccess', 'data': sel });
 
@@ -446,6 +477,18 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         else {
             throw('Could not sort item registry.');
+        }
+    };
+    this._showRowProcessing = function () {
+        var id = 'listView_item' + self.getSelectedItemId();
+        var sel = $(id);
+        if (sel) {
+            selLast = sel.lastChild;
+            procLast = this.processingRow.lastChild;
+            sel.style.display = 'none';
+            procLast.className = selLast.className;
+            procLast.innerHTML = selLast.innerHTML;
+            sel.parentNode.insertBefore(this.processingRow, sel);
         }
     };
 };

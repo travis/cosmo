@@ -64,7 +64,7 @@ cosmo.ui.detail = new function () {
 
     this.removeItem = function () {
         dojo.event.topic.publish('/calEvent',
-            { 'action': 'removeConfirm', 'data':this.item });
+            { action: 'removeConfirm', data: this.item });
     };
 
     // Utility functions

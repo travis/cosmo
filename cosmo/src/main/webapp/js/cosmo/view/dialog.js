@@ -143,7 +143,7 @@ cosmo.view.dialog = new function() {
 
     // Publish via topics
     function doPublish(act, qual) {
-        var selEv = cosmo.view.cal.canvas.getSelectedItem();
+        var selEv = this.item;
         dojo.event.topic.publish('/calEvent', { 
             action: act, qualifier: qual, data: self.item });
         closeSelf();
@@ -207,7 +207,7 @@ cosmo.view.dialog = new function() {
             }
         }
         else if (key == 'removeRecurConfirm') {
-           var item = cosmo.view.cal.canvas.getSelectedItem();
+           var item = this.item;
             p.btnsRight = [];
             p.btnsRight.push(buttons.removeAllEvents());
             if (!item.data.isFirstOccurrence()) {

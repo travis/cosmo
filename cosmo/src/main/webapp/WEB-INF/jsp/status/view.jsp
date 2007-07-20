@@ -20,7 +20,7 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<cosmo:standardLayout prefix="Status.">
+<cosmo:standardLayout prefix="Status." contentWrapperClass="fullPageWidthContent">
 <cosmo:cnfmsg/>
 
 <!-- simple memory stats -->

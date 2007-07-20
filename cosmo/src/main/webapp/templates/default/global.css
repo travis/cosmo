@@ -1,3 +1,19 @@
+/*
+ * Copyright 2007 Open Source Applications Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 /* Styles that will likely be needed app-wide (pim, admin, etc..) */
 /* Fake popup for modal dialog box
  * --------------------- */
@@ -140,8 +156,11 @@
 }
 
 .aboutChandlerServer {
+	position: relative;
 	width: 100%;
+	top: 70%;
 	text-align: center;
+	padding: 5px 0px;
 }
 
 .notices{
@@ -255,32 +274,6 @@ Link styles
     * Mousedown link color: #0066cc
     * Visited link color: #57beff */
 
-/*
- * A style for the center box of the kind of page layout found here:
- * http://chandlerproject.org/Journal/CosmoSignUpWorkflow
- */
-.mainInfoBox{
-	border-left:1px solid lightgrey;
-	border-right:1px solid lightgrey;
-	border-bottom:0px;
-	border-top:0px;
-	height: 100%;
-	margin-right: 20%;
-	margin-left: 20%;
-	padding-top: 20px;
-	text-align: center;
-}
-
-#contentDiv{
-	height: 50em;
-	width: 100%;	
-
-}
-
-hr {
-	color: lightgrey;	
-}
-
 /* Buttons
  * --------------------- */
 .btnElemBase {
@@ -385,3 +378,42 @@ hr {
 div.authBoxRecoverPassword {
 	margin-top: 2em;
 }
+
+/* Top menubar
+ * --------------------- */
+/* Menubar main */
+#menuBar {
+    position: absolute;
+    background: #fff;
+    border-bottom: 1px solid #dddddd;
+    visibility: visible;
+}
+#menuNavItems {
+position: absolute;
+    width: 100%;
+    color: #333333;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: right;
+}
+/* Menu links should look clickable whether
+ * they have an href prop or not */
+#menuNavItems a.menuBarLink {
+    cursor: pointer;
+}
+/* The pipe character between links */
+#menuNavItems span.menuBarDivider {
+    font-weight: normal;
+    color: #999;
+}
+/* Cosmo logo up on menubar */
+#smallLogoDiv {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 129px;
+    height: 28px;
+    background-repeat: no-repeat;
+}
+
+

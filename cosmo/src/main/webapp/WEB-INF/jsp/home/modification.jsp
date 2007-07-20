@@ -25,14 +25,14 @@
 <c:set var="taskstamp" value="${Item.stampMap['task']}" />
 <c:set var="messagestamp" value="${Item.stampMap['message']}" />
 
-<cosmo:standardLayout prefix="HomeDirectory.Item.">
+<cosmo:standardLayout prefix="HomeDirectory.Item." contentWrapperClass="fullPageWidthContent" stylesheets="account_browser">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Item.Title">
-      <fmt:param value="${Item.modifies.displayName} Modification"/>
+      <fmt:param><c:out value="${Item.modifies.displayName} Modification"/></fmt:param>
     </fmt:message>
   </span>
-  - <span class="md">${Path}</span>
+  - <span class="md"><c:out value="${Path}"/></span>
 </div>
 
 <div class="hd" style="margin-top: 12px;">
@@ -46,7 +46,7 @@
         UUID
       </td>
       <td class="mdData">
-        ${Item.uid}
+        <c:out value="${Item.uid}"/>
       </td>
     </tr>
     <tr>
@@ -94,7 +94,7 @@
         Last Modified By:
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.lastModifiedBy != null}">${Item.lastModifiedBy}</c:when><c:otherwise><span class="disabled">(anonymous)</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Item.lastModifiedBy != null}"><c:out value="${Item.lastModifiedBy}"/></c:when><c:otherwise><span class="disabled">(anonymous)</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -152,7 +152,7 @@
         UID
       </td>
       <td class="mdData">
-        ${eventstamp.icalUid}
+        <c:out value="${eventstamp.icalUid}"/>
       </td>
     </tr>
     <tr>
@@ -160,7 +160,7 @@
         Summary
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${eventstamp.summary != null}">${eventstamp.summary}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${eventstamp.summary != null}"><c:out value="${eventstamp.summary}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -168,7 +168,7 @@
         Description
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${eventstamp.description != null}">${eventstamp.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${eventstamp.description != null}"><c:out value="${eventstamp.description}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -200,7 +200,7 @@
         Location
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${not empty eventstamp.location}">${eventstamp.location}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${not empty eventstamp.location}"><c:out value="${eventstamp.location}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -208,7 +208,7 @@
         Status
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${not empty eventstamp.status}">${eventstamp.status}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${not empty eventstamp.status}"><c:out value="${eventstamp.status}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
   </table>
@@ -269,7 +269,7 @@
 
 <pre>
 
-${eventstamp.eventCalendar}
+<c:out value="${eventstamp.eventCalendar}"/>
 </pre>
 
 <jsp:include page="inc-indexes.jsp" />

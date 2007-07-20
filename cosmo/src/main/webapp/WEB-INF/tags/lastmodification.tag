@@ -27,7 +27,7 @@
       <c:when test="${value == 300}">SENT</c:when>
       <c:when test="${value == 400}">UPDATED</c:when>
       <c:when test="${value == 500}">CREATED</c:when>
-      <c:otherwise>${value}</c:otherwise>
+      <c:otherwise><c:out value="${value}"/></c:otherwise>
     </c:choose>
   </c:when>
   <c:otherwise>

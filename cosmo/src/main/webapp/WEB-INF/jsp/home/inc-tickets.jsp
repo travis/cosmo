@@ -84,7 +84,7 @@ dojo.addOnLoad(function(){
         </a>
       </td>
       <td class="smTableData">
-        ${ticket.key}
+        <c:out value="${ticket.key}"/>
       </td>
       <td class="smTableData" style="text-align:center;">
         <a href='<c:url value="${davPath}?ticket=${ticket.key}" />'>[dav]</a>
@@ -94,14 +94,14 @@ dojo.addOnLoad(function(){
         </c:if>
       </td>
       <td class="smTableData" style="text-align:center;">
-        ${ticket.owner.username}
+        <c:out value="${ticket.owner.username}"/>
       </td>
       <td class="smTableData" style="text-align:center;">
-        ${ticket.timeout}
+        <c:out value="${ticket.timeout}"/>
       </td>
       <td class="smTableData" style="text-align:center;">
         <c:forEach var="privilege" items="${ticket.privileges}">
-          ${privilege}
+          <c:out value="${privilege}"/>
         </c:forEach>
       </td>
       <td class="smTableData" style="text-align:center;">

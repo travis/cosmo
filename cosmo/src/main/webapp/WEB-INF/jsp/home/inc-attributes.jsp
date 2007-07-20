@@ -46,13 +46,13 @@
       <c:if test="${! fn:startsWith(attr.key.namespace, 'org.osaf.cosmo')}">
     <tr>
       <td class="smTableData" width="50%">
-        ${attr.key.namespace}
+        <c:out value="${attr.key.namespace}"/>
       </td>
       <td class="smTableData" width="50%">
-        ${attr.key.localName}
+        <c:out value="${attr.key.localName}"/>
       </td>
       <td class="smTableData" width="50%">
-        ${attr.value.value}
+        <c:out value="${attr.value.value}"/>
       </td>
     </tr>
       </c:if>

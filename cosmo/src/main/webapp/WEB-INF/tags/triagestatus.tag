@@ -25,7 +25,7 @@
   <c:when test="${property eq 'code'}">
     <c:choose>
       <c:when test="${value.code != null}">
-        ${cosmoui:triageStatusLabel(value.code)}
+        <c:out value="${cosmoui:triageStatusLabel(value.code)}"/>
       </c:when>
       <c:otherwise>
         -
@@ -35,7 +35,7 @@
   <c:when test="${property eq 'rank'}">
     <c:choose>
       <c:when test="${value.code != null}">
-        ${value.rank}
+        <c:out value="${value.rank}"/>
       </c:when>
       <c:otherwise>
         -

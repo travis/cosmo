@@ -53,7 +53,7 @@
   <c:when test="${isUser}">
 <p>
   <fmt:message key="Error.Forbidden.NotWhileLoggedIn">
-    <fmt:param value="${username}"/>
+    <fmt:param><c:out value="${username}"/></fmt:param>
   </fmt:message>
 </p>
 <p>

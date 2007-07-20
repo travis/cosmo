@@ -1,8 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" %>
-
-<%--
 /*
- * Copyright 2005-2007 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
---%>
+*/
 
-<%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
-<%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<cosmoui:user var="user" />
-<cosmo:standardLayout prefix="Account.View.">
-
-
-<div style="width:500px;">
-
-<p>
-  <fmt:message key="Account.View.Welcome">
-    <fmt:param><c:out value="${pageContext.request.serverName}"/></fmt:param>
-  </fmt:message>
-</p>
-
-</div>
-</cosmo:standardLayout>
+div.loggedInMessage {
+	margin: 1em;
+}

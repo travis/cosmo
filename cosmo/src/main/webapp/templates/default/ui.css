@@ -83,28 +83,6 @@ a:active {
     display: none;
 }
 
-/*************************************************
- * Admin UI Styles                               *
- *                                               *
- * Until the Pim and Admin UI layouts are united *
- * we need separate styles for the admin ui.     *
- *************************************************
- */
-
-
-body.adminPage {
-    font-size: 12px;
-    background: #fff;
-    color: #222222;
-    padding-left: 1%;
-    padding-right: 1%;
-    padding-top: 1%;
-    height: 99%;
-    width: 98%;
-
-}
-
-
 /* Main styles, classes
  * ==================================== */
 /* Login
@@ -467,43 +445,6 @@ td.dataDisplayLabel {
 
 /* Cal-specific, specific elements by id
  * ==================================== */
-/* Top menubar
- * --------------------- */
-/* Menubar main */
-#menuBar {
-    position: absolute;
-    background: #fff;
-    border-bottom: 1px solid #dddddd;
-    visibility: visible;
-}
-#menuNavItems {
-    position: absolute;
-    width: 100%;
-    color: #333333;
-    font-size: 11px;
-    font-weight: bold;
-    text-align: right;
-}
-/* Menu links should look clickable whether
- * they have an href prop or not */
-#menuNavItems a.menuBarLink {
-    cursor: pointer;
-}
-/* The pipe character between links */
-#menuNavItems span.menuBarDivider {
-    font-weight: normal;
-    color: #999;
-}
-/* Cosmo logo up on menubar */
-#smallLogoDiv {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    width: 129px;
-    height: 28px;
-    background-repeat: no-repeat;
-}
-
 /* Main content area under menubar -- contains both
  * sidebars and the central column for main content
  * --------------------- */

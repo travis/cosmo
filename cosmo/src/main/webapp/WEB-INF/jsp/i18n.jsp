@@ -25,5 +25,5 @@
 <%-- This jsp generates json used by cosmo.util.i18n. 
      Please see /src/main/webapp/cosmo/util/i18n.js for more details. --%>
 
-[{<c:forEach var="key" items="${messages}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>"${key}": "<fmt:message key="${key}"/>"</c:forEach>},
-{<c:forEach var="item" items="${configProperties}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>"${item.key}": "${item.value}"</c:forEach>}]
+[{<c:forEach var="key" items="${messages}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>"<c:out value="${key}"/>": "<fmt:message key="${key}"/>"</c:forEach>},
+{<c:forEach var="item" items="${configProperties}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>"<c:out value="${item.key}"/>": "<c:out value="${item.value}"/>"</c:forEach>}]

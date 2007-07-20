@@ -30,14 +30,14 @@
 </c:if>
 <c:url var="downloadUrl" value="/browse/download${Path}" />
 
-<cosmo:standardLayout prefix="HomeDirectory.Item.">
+<cosmo:standardLayout prefix="HomeDirectory.Item." contentWrapperClass="fullPageWidthContent" stylesheets="account_browser">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Item.Title">
-      <fmt:param value="${Item.displayName}"/>
+      <fmt:param><c:out value="${Item.displayName}"/></fmt:param>
     </fmt:message>
   </span>
-  - <span class="md">${Path}</span>
+  - <span class="md"><c:out value="${Path}"/></span>
 </div>
 
 <c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem' || eventstamp!=null}">
@@ -64,7 +64,7 @@
         UUID
       </td>
       <td class="mdData">
-        ${Item.uid}
+        <c:out value="${Item.uid}"/>
       </td>
     </tr>
     <tr>
@@ -112,7 +112,7 @@
         Last Modified By:
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.lastModifiedBy != null}">${Item.lastModifiedBy}</c:when><c:otherwise><span class="disabled">(anonymous)</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Item.lastModifiedBy != null}"><c:out value="${Item.lastModifiedBy}"/></c:when><c:otherwise><span class="disabled">(anonymous)</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -194,7 +194,7 @@
         Media Type
       </td>
       <td class="mdData">
-        ${Item.contentType}
+        <c:out value="${Item.contentType}"/>
       </td>
     </tr>
     <tr>
@@ -202,7 +202,7 @@
         Encoding
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.contentEncoding != null}">${Item.contentEncoding}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Item.contentEncoding != null}"><c:out value="${Item.contentEncoding}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -210,7 +210,7 @@
         Language
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${Item.contentLanguage != null}">${Item.contentLanguage}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${Item.contentLanguage != null}"><c:out value="${Item.contentLanguage}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
   </table>
@@ -229,7 +229,7 @@
         UID
       </td>
       <td class="mdData">
-        ${eventstamp.icalUid}
+        <c:out value="${eventstamp.icalUid}"/>
       </td>
     </tr>
     <tr>
@@ -237,7 +237,7 @@
         Summary
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${eventstamp.summary != null}">${eventstamp.summary}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${eventstamp.summary != null}"><c:out value="${eventstamp.summary}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -245,7 +245,7 @@
         Description
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${eventstamp.description != null}">${eventstamp.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${eventstamp.description != null}"><c:out value="${eventstamp.description}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -277,7 +277,7 @@
         Location
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${not empty eventstamp.location}">${eventstamp.location}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${not empty eventstamp.location}"><c:out value="${eventstamp.location}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -285,7 +285,7 @@
         Status
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${not empty eventstamp.status}">${eventstamp.status}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${not empty eventstamp.status}"><c:out value="${eventstamp.status}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
   </table>
@@ -451,7 +451,7 @@
 
 <pre>
 
-${eventstamp.calendar}
+<c:out value="${eventstamp.calendar}"/>
 </pre>
 
 <jsp:include page="inc-indexes.jsp" />

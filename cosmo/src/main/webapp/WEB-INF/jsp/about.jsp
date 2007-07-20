@@ -54,20 +54,20 @@ a {
                key="About.LogoAltText"/>" style="border: 0px"/></a>    
     </div>
     <div class="smLabel"><fmt:message 
-         key="About.VersionString"/> ${PRODUCT_VERSION}
+         key="About.VersionString"/> <c:out value="${PRODUCT_VERSION}"/>
     </div>
     <div style="margin-top:28px;">
     <fmt:message key="About.LicenseLink" var="licenseLink"/>
     <fmt:message key="About.License">
-         <fmt:param value="<a href=\"${licenseLink}\" onclick=\"goURLMainWin('${licenseLink}'); return false;\">"/>
-         <fmt:param value="</a>"/>
+         <fmt:param><a href='${licenseLink}' onclick="goURLMainWin('${licenseLink}'); return false;"></fmt:param>
+         <fmt:param></a></fmt:param>
     </fmt:message>
     </div>
     <div style="margin-top:16px;">
     <fmt:message key="About.InfoLink" var="infoLink"/>
     <fmt:message key="About.Info">
-         <fmt:param value="<a href=\"${infoLink}\" onclick=\"goURLMainWin('${infoLink}'); return false;\">"/>
-         <fmt:param value="</a>"/>
+         <fmt:param><a href='${infoLink}' onclick="goURLMainWin('${infoLink}'); return false;"></fmt:param>
+         <fmt:param></a></fmt:param>
     </fmt:message>
     
     <div class="notices">

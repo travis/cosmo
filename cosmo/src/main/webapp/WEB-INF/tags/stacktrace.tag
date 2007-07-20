@@ -21,13 +21,13 @@
 
 <c:if test="${not empty exception}">
   <div class="pre">
-${exception}<c:forEach var="element" items="${exception.stackTrace}">
-    at ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})</c:forEach>
+<c:out value="${exception}"/><c:forEach var="element" items="${exception.stackTrace}">
+    <c:out value="at ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"/></c:forEach>
 </div>
   <c:if test="${not empty exception.cause}">
     <div class="pre">
-${exception.cause}<c:forEach var="element" items="${exception.cause.stackTrace}">
-    at ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})</c:forEach>
+<c:out value="${exception.cause}"/><c:forEach var="element" items="${exception.cause.stackTrace}">
+    <c:out value="at ${element.className}.${element.methodName}(${element.fileName}:${element.lineNumber})"/></c:forEach>
   </div>
   </c:if>
 </c:if>

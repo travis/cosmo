@@ -31,7 +31,7 @@
     <title>
       <fmt:message key="Login.HeadTitle">
         <c:forEach var="p" items="${TitleParam}">
-          <fmt:param value="${p}"/>
+          <fmt:param><c:out value="${p}"/></fmt:param>
         </c:forEach>
       </fmt:message>
       

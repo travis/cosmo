@@ -34,11 +34,6 @@ margin-right: auto;
 }
 </style>
 
-<div class="mainInfoBox">
-
 <div dojoType="cosmo:PasswordResetter" displayDefaultInfo="true" recoveryKey="${param.key}" widgetId="passwordResetter"/>
-
-</div>
-
 
 </cosmo:standardLayout>

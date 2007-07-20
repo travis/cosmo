@@ -27,14 +27,27 @@
 
 <cosmoui:user var="user"/>
 <cosmo:baseurl var="baseUrl"/>
-
-<cosmo:standardLayout prefix="Error.LoggedIn." showNav="false">
-<div class="mainInfoBox">
-	<p class="mainInfoBoxText">
-	You are already logged in as ${user.username}. Go to your <a href="${baseUrl}/pim"> Calendar</a>.<br/>
-	Not ${user.username}? <a href="${baseUrl}/logout">Log out</a>.<br/>
-	Don't have an account? <a href="${baseUrl}/logout?signup=true">Sign up</a>.
-	</p>
+<fmt:setBundle basename="PimMessageResources"/>
+<cosmo:standardLayout prefix="Error.LoggedIn." showNav="false" stylesheets="error">
+	<div class="loggedInMessage">
+	<fmt:message key="Error.LoggedIn">
+		<fmt:param><c:out value="${user.username}"/></fmt:param>
+		<fmt:param><a href='${baseUrl}/pim'></fmt:param>
+		<fmt:param></a></fmt:param>
+	</fmt:message>
+	</div>
+	<div class="loggedInMessage">
+	<fmt:message key="Error.LoggedIn.LogOut">
+		<fmt:param><c:out value="${user.username}"/></fmt:param>
+		<fmt:param><a href='${baseUrl}/logout'></fmt:param>
+		<fmt:param></a></fmt:param>
+	</fmt:message>
+	</div>
+	<div class="loggedInMessage">
+	<fmt:message key="Error.LoggedIn.SignUp">
+		<fmt:param><a href='${baseUrl}/logout?signup=true'></fmt:param>
+		<fmt:param></a></fmt:param>
+	</fmt:message>
+	</div>
 	<hr/>
-</div>
 </cosmo:standardLayout>

@@ -18,5 +18,6 @@
 <%@ include   file="/WEB-INF/jsp/taglibs.jsp"            %>
 <%@ attribute name="value"              required="true"
               type="java.lang.Boolean"                   %>
+<<fmt:setBundle basename="PimMessageResources"/>
 
-<c:choose><c:when test="${value}">Yes</c:when><c:otherwise>No</c:otherwise></c:choose>
+<c:choose><c:when test="${value}"><fmt:message key="Yes"/></c:when><c:otherwise><fmt:message key="No"/></c:otherwise></c:choose>

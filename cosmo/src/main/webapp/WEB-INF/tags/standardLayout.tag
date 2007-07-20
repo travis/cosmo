@@ -20,10 +20,15 @@
 
 <%@ attribute name="prefix" 		%>
 <%@ attribute name="showNav"        %>
+<%@ attribute name="contentWrapperClass"     %>
 <%@ attribute name="selfLink"        %>
 <%@ attribute name="stylesheets"     %>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+
+<c:if test="${empty contentWrapperClass}">
+  <c:set var="contentWrapperClass" value="mainInfoBox"/>
+</c:if>
 
 <c:if test="${empty showNav}">
   <c:set var="showNav" value="true"/>
@@ -51,6 +56,15 @@
     </title>
     
     <!-- Stylesheets -->
+    <c:choose>
+    <c:when  test="${not empty stylesheets}">
+    	<c:set var="stylesheets" value="admin,${stylesheets}"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="stylesheets" value="admin"/>
+	</c:otherwise>
+    </c:choose>
+
     <cosmo:stylesheets stylesheets="${stylesheets}"/>
     
     
@@ -65,20 +79,16 @@
 
   </head>
   <body class="adminPage">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr>
-        <td align="left" valign="top">
-          <div class="lg">
+    <div id="menuBar">
+          <div id="mainLogoContainer">
             <a href="<c:url value="/account/view"/>">
-              <img src="${staticBaseUrl}/templates/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
+              <img id="logo" src="${staticBaseUrl}/templates/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
               	   alt="<fmt:message key="App.Name"  bundle="${uiBundle}"/>"/>
             </a>
           </div>
-        </td>
         <c:if test="${showNav}">
-          <td align="right" valign="top">
             <!-- main navbar -->
-            <div class="mdData">
+            <div id="menuNavItems">
               <fmt:message key="Layout.Nav.Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
               <authz:authorize ifAnyGranted="ROLE_USER">
                 |
@@ -88,43 +98,44 @@
                 <c:url var="calendarUrl" value="/pim"/>
                 <a href="${calendarUrl}"><fmt:message key="Layout.Nav.Main.Calendar"/></a>
               </authz:authorize>
+        <authz:authorize ifAllGranted="ROLE_ROOT">
+          <!-- admin console navbar -->
+            |
+            <c:choose>
+            <c:when test="${fn:endsWith(body, '/user/list')}">
+            	<strong><fmt:message key="Layout.Nav.Console.Users"/></strong>
+            </c:when>
+            <c:otherwise>
+	            <a href="<c:url value="/admin/users"/>">
+	            <fmt:message key="Layout.Nav.Console.Users"/></a>
+		    </c:otherwise>
+		    </c:choose>
+		    |
+            <c:choose><c:when test="${fn:endsWith(body, '/status/view')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><a href="<c:url value="/admin/status"/>"><fmt:message key="Layout.Nav.Console.ServerStatus"/></a></c:otherwise></c:choose>
+            <!-- end admin console navbar -->
+        </authz:authorize>
               |
               <a href="<c:url value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>"><fmt:message key="Layout.Nav.Main.Help"/></a>
               |
               <a href="<c:url value="/logout"/>">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>
               </a>
-            </div>
             <!-- end main navbar -->
-          </td>
+
+
+            </div>
         </c:if>
-      </tr>
-    </table>
-    <hr/>
-    <c:choose>
-      <c:when test="${showNav}">
-        <authz:authorize ifAllGranted="ROLE_ROOT">
-          <!-- admin console navbar -->
-          <div class="md">
-            <fmt:message key="Layout.Nav.Console.Label"/>
-            <c:choose><c:when test="${fn:endsWith(body, '/user/list.jsp')}"><strong><fmt:message key="Layout.Nav.Console.Users"/></strong></c:when><c:otherwise><a href="<c:url value="/admin/users"/>"><fmt:message key="Layout.Nav.Console.Users"/></a></c:otherwise></c:choose>
-            |
-            <c:choose><c:when test="${fn:endsWith(body, '/status/view.jsp')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><a href="<c:url value="/admin/status"/>"><fmt:message key="Layout.Nav.Console.ServerStatus"/></a></c:otherwise></c:choose>
-            <!-- end admin console navbar -->
-          </div>
-          <hr/>
-        </authz:authorize>
-      </c:when>
-      <c:otherwise>
-      </c:otherwise>
-    </c:choose>
+	</div>
     <div class="md" id="contentDiv">
-      <!-- page body -->
+    	<div id="contentWrapper" class="${contentWrapperClass}">
+
+        <!-- page body -->
         <jsp:doBody/>
-      <!-- end page body -->
+        <!-- end page body -->
+      	<div class="aboutChandlerServer"><cosmo:aboutPopupLink/></div>
+		</div>
     </div>
     <div id="debug"></div>
-    <div class="aboutChandlerServer"><cosmo:aboutPopupLink/></span>
   </body>
 </html>
 

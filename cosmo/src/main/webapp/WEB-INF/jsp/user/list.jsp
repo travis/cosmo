@@ -23,9 +23,7 @@
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
-<cosmo:standardLayout prefix="User.List.">
-
-<link rel="stylesheet" href="${staticBaseUrl}/templates/default/admin.css"/>
+<cosmo:standardLayout prefix="User.List." contentWrapperClass="fullPageWidthContent">
 
 <script type="text/javascript">
 

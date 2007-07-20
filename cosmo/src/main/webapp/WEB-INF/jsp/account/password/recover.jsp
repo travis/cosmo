@@ -35,13 +35,8 @@ dojo.require("cosmo.ui.widget.PasswordRecoverer");
 }
 </style>
 
-<div class="mainInfoBox">
-
 <div dojoType="cosmo:PasswordRecoverer" widgetId="passwordRecoverer" displayDefaultInfo="true">
 
 </div>
-
-</div>
-
 
 </cosmo:standardLayout>

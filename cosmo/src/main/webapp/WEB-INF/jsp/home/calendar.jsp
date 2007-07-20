@@ -21,14 +21,14 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<cosmo:standardLayout prefix="HomeDirectory.Collection.">
+<cosmo:standardLayout prefix="HomeDirectory.Collection." contentWrapperClass="fullPageWidthContent" stylesheets="account_browser">
 <div>
   <span class="hd" style="margin-top: 12px;">
     <fmt:message key="HomeDirectory.Calendar.Title">
-      <fmt:param value="${Calendar.item.displayName}"/>
+      <fmt:param><c:out value="${Calendar.item.displayName}"/></fmt:param>
     </fmt:message>
   </span>
-  - <span class="md">${Path}</span>
+  - <span class="md"><c:out value="${Path}"/></span>
 </div>
 
 <div style="margin-top:12px;">
@@ -61,10 +61,10 @@
         </a>
       </td>
       <td class="smTableData">
-        <c:choose><c:when test="${not empty event.summary}"><span class="summary">${event.summary}</span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${not empty event.summary}"><span class="summary"><c:out value="${event.summary}"/></span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${not empty event.location}"><span class="location">${event.location}</span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose> 
+        <c:choose><c:when test="${not empty event.location}"><span class="location"><c:out value="${event.location}"/></span></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose> 
       </td>
       <td class="smTableData" style="text-align:center;">         
         <c:choose>

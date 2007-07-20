@@ -25,14 +25,13 @@
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <link rel="stylesheet" href="${staticBaseUrl}/templates/<fmt:message key="App.TemplateName"/>/activated.css"/>
-<div class="mainInfoBox">
 
 <span id="congratulations"><fmt:message key="Account.Activate.Congrats"/></span>
 <span id="activatedMessage"><fmt:message key="Account.Activate.ActivatedMessage"/></span>
 <table id="user">
 <tbody>
-<tr><td class="label"><fmt:message key="Account.Activate.Username"/></td><td>${user.username}</td></tr>
-<tr><td class="label"><fmt:message key="Account.Activate.Email"/></td><td>${user.email}</td></tr>
+<tr><td class="label"><fmt:message key="Account.Activate.Username"/></td><td><c:out value="${user.username}"/></td></tr>
+<tr><td class="label"><fmt:message key="Account.Activate.Email"/></td><td><c:out value="${user.email}"/></td></tr>
 </tbody>
 </table>
 <a id="login" href="${staticBaseUrl}/login">
@@ -41,7 +40,5 @@
 <hr class="seperator"/>
 
 <span class="publishInstructions"><fmt:message key="Help.PublishInstructions"/></span>
-
-</div>
 
 </cosmo:standardLayout>

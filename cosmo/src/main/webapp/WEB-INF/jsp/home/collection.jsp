@@ -28,15 +28,15 @@
 </c:if>
 <c:url var="feedUrl" value="/atom/collection/${Collection.uid}" />
 
-<cosmo:standardLayout prefix="HomeDirectory.Collection.">
+<cosmo:standardLayout prefix="HomeDirectory.Collection." contentWrapperClass="fullPageWidthContent" stylesheets="account_browser">
 
 <div>
   <span class="hd" style="margin-top: 12px;">
   <fmt:message key="HomeDirectory.Collection.Title">
-      <fmt:param value="${Collection.displayName}"/>
+      <fmt:param><c:out value="${Collection.displayName}"/></fmt:param>
   </fmt:message>
   </span>
-  <span class="md">${Path}</span>
+  <span class="md"><c:out value="${Path}"/></span>
 </div>
 
 <div style="margin-top:12px;">
@@ -58,7 +58,7 @@
         UID
       </td>
       <td class="mdData">
-        ${Collection.uid}
+        <c:out value="${Collection.uid}"/>
       </td>
     </tr>
     <tr>
@@ -92,7 +92,7 @@
         Description
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${ccstamp.description != null}">${ccstamp.description}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${ccstamp.description != null}"><c:out value="${ccstamp.description}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -100,7 +100,7 @@
         Language
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${ccstamp.language != null}">${ccstamp.language}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${ccstamp.language != null}"><c:out value="${ccstamp.language}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -108,7 +108,7 @@
         Timezone
       </td>
       <td class="mdData">
-        <c:choose><c:when test="${ccstamp.timezoneName != null}">${ccstamp.timezoneName}</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${ccstamp.timezoneName != null}"><c:out value="${ccstamp.timezoneName}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>
@@ -161,7 +161,7 @@
         <c:if test="${item.parent != null}"><a href='<c:url value="/browse/remove${Path}/${item.name}" />'>[remove]</a></c:if>
       </td>
       <td class="smTableData">
-        ${item.displayName}
+        <c:out value="${item.displayName}"/>
       </td>
       <td class="smTableData" style="text-align:center;">
         <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.stampMap['calendar'] != null}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.stampMap['event'] != null}">Event</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.FileItem'}">File</c:when><c:otherwise>Item</c:otherwise></c:choose>
@@ -225,19 +225,19 @@
         </a>
       </td>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        ${subscription.displayName}
+        <c:out value="${subscription.displayName}"/>
       </td>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        ${subscription.collectionUid}
+        <c:out value="${subscription.collectionUid}"/>
       </td>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        ${subscription.ticketKey}
+        <c:out value="${subscription.ticketKey}"/>
       </td>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        ${subscription.creationDate}
+        <fmt:formatDate value="${subscription.creationDate}" type="both"/>
       </td>
       <td class="smTableData" style="text-align:center; white-space:nowrap;">
-        ${subscription.modifiedDate}
+        <fmt:formatDate value="${subscription.modifiedDate}" type="both"/>
       </td>
     </tr>
   </c:forEach>

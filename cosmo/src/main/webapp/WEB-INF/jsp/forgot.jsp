@@ -29,7 +29,7 @@
 
 <logic:messagesPresent message="true">
   <p>
-    <span class="confirm"><html:messages message="true" id="msg">${msg}<br/></html:messages></span>
+    <span class="confirm"><html:messages message="true" id="msg"><c:out value="${msg}"/><br/></html:messages></span>
   </p>
     <input type="submit" name="ok" value="${closeButton}" class="md"
            onClick="window.close()"/>

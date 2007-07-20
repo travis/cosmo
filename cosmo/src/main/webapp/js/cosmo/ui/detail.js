@@ -210,7 +210,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                     var st = stamps[i];
                     var sec = self[st.stampType.toLowerCase() + 'Section'];
                     if (sec.hasBody) {
-                        sec.toggleExpando(false);
+                        sec.toggleExpando(false, true);
                     }
                 }
             }
@@ -623,7 +623,7 @@ cosmo.ui.detail.StampSection = function (p) {
 cosmo.ui.detail.StampSection.prototype =
     new cosmo.ui.ContentBox();
 
-cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
+cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
     // Dojo bug http://trac.dojotoolkit.org/ticket/1776
     // Set processing lock: Don't trigger again until
     // animation completes -- Dojo doesn't allow an explicit
@@ -635,13 +635,28 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
     // from happening -- NOTE, the lock has to be removed as
     // a callback from the animation, otherwise it gets removed
     // before the animation has really completed.
-    if (cosmo.ui.detail.processingExpando) {
-        return false;
+    // -------------------------
+    // If this is being called from accordion mode, bypass
+    // the animation lock -- multiple sections need to collapse
+    // at the same time, and since this is not user-invoked,
+    // there are no issues with the Dojo bug above
+    if (accordion) {
+        // Dummy var for anim callback
+        var f = null;
     }
-    // Add the animation processing lock
-    cosmo.ui.detail.processingExpando = true;
-    // Callback to remove the lock
-    var f = function () { cosmo.ui.detail.processingExpando = false; }
+    // This is normal, user-mode -- go through the locking
+    // mechanism
+    else {
+        if (cosmo.ui.detail.processingExpando) {
+            return false;
+        }
+        else {
+            // Add the animation processing lock
+            cosmo.ui.detail.processingExpando = true;
+            // Callback to remove the lock
+            var f = function () { cosmo.ui.detail.processingExpando = false; }
+        }
+    }
 
     // Allow to be passed in explicitly, or just trigger toggle
     var doShow = typeof p == 'boolean' ? p : !this.expanded;
@@ -654,7 +669,7 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p) {
                 var st = stamps[i];
                 var sec = dvForm[st.stampType.toLowerCase() + 'Section'];
                 if (sec != this && sec.hasBody) {
-                    sec.toggleExpando(false);
+                    sec.toggleExpando(false, true);
                 }
             }
         }

@@ -129,8 +129,9 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                     deletedSubscriptions[x].getDisplayName()));
             }
         }
-        
-        cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
+        if (this.authAccess){
+            cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
+        }
     };
 
     // ==========================

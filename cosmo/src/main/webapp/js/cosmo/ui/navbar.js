@@ -302,6 +302,7 @@ cosmo.ui.navbar.Bar = function (p) {
             value: ''
         };
         var text = cosmo.util.html.createInput(o);
+        text.style.width = '220px';
         var func = cosmo.util.html.handleTextInputFocus;
         cosmo.util.html.setTextInput(text, _('Main.NavBar.QuickItemEntryHint'), true);
         dojo.event.connect(text, 'onfocus', func);

@@ -859,6 +859,7 @@ cosmo.ui.detail.MainSection = function () {
         maxlength: 100,
         value: '',
         className: 'inputText' });
+    elem.style.width = '220px';
     var t =  cosmo.ui.detail.createFormElemDiv(elem);
     f.appendChild(t);
     var t = cosmo.ui.detail.createLabelDiv(_(
@@ -1095,6 +1096,7 @@ cosmo.ui.detail.EventFormElements= function () {
             maxlength: 100,
             value: '',
             className: 'inputText' });
+        elem.style.width = '220px';
         var t =  cosmo.ui.detail.createFormElemDiv(elem);
         f.appendChild(t);
         // All-day checkbox

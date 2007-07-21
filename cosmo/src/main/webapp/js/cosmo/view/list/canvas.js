@@ -343,9 +343,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
 
             //now we have to expand out the item for the viewing range
-            var deferredArray = [self.view.loadItems({ item: data.getMaster() })];
+            var deferredArray = [cosmo.app.pim.serv.getDashboardItems(data.getMaster(),
+                { sync: true })];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
-              deferredArray.push(self.view.loadItems({ item: newItemNote }));
+              deferredArray.push(cosmo.app.pim.serv.getDashboardItems(newItemNote,
+                  { sync: true }));
             }
             deferred = new dojo.DeferredList(deferredArray);
 
@@ -361,11 +363,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     var otherOccurrences = results[1][1]
                     occurrences = occurrences.concat(otherOccurrences);
                 }
-                var newHash = cosmo.view.cal.createEventRegistry(occurrences);
+                var newHash = cosmo.view.list.createItemRegistry(occurrences);
                 newRegistry.append(newHash);
 
                 self.view.itemRegistry = newRegistry;
-                self.view.itemRegistry.eachValue(self.view.setSortAndDisplay);
             };
             deferred.addCallback(addExpandedOccurrences);
         }

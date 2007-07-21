@@ -191,13 +191,11 @@ cosmo.util.hash.Hash = function () {
         }
         return true;
     };
-    this.eachKey = function (func, o) {
-        o.keyOnly = true;
-        this.each(func, o);
+    this.eachKey = function (func) {
+        this.each(func, { keyOnly: true });
     };
-    this.eachValue = function (func, o) {
-        o.valueOnly = true;
-        this.each(func, o);
+    this.eachValue = function (func) {
+        this.each(func, { valueOnly: true });
     };
     this.clone = function () {
         var h = new Hash();

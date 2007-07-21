@@ -550,7 +550,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '<content type="xhtml">',
           '<div xmlns="http://www.w3.org/1999/xhtml">',
             '<div class="collection">',
-              '<span class="name">', escape(collection.getDisplayName()), '</span>', 
+              '<span class="name">', collection.getDisplayName(), '</span>', 
             '</div>',
           '</div>',
          '</content>',
@@ -759,8 +759,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     noteToNoteRecord: function(note){
         var props = {}
+        var uid = this.getUid(note);
         props.body = note.getBody();
-        props.uuid = this.getUid(note);
+        props.icalUid = uid;
+        props.uuid = uid;
         return this.propsToNoteRecord(props);
     },
     

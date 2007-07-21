@@ -703,6 +703,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         props.rank = note.getRank();
         props.triageStatus = note.getTriageStatus();
         props.autoTriage = note.getAutoTriage();
+        props.creationDate = note.getCreationDate();
         props.uuid = this.getUid(note);
         return this.propsToItemRecord(props);
     },
@@ -715,6 +716,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var missingFields = [];
         if (record.fields.title == undefined) missingFields.push("title");
         if (record.fields.triage == undefined) missingFields.push("triage");
+        if (record.fields.createdOn == undefined) missingFields.push("createdOn");
         record.missingFields = missingFields;
         return record;
     },
@@ -735,6 +737,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         with (cosmo.service.eim.constants){
         
             if (props.displayName != undefined) fields.title = [type.TEXT, props.displayName];
+            if (props.creationDate != undefined) fields.createdOn = [type.DECIMAL, props.creationDate/1000];
             if (props.triageStatus || props.triageRank || props.autoTriage)
                 fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.rank), props.autoTriage? 1 : 0].join(" ")];
             
@@ -970,7 +973,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                     userid: [type.TEXT, note.getModifiedBy().getUserId() || 
                                         cosmo.util.auth.getUsername()],
                     action: [type.INTEGER, note.getModifiedBy().getAction()],
-                    timestamp: [type.DECIMAL, new Date().getTime()]
+                    timestamp: [type.DECIMAL, new Date().getTime()/1000]
                 }
             }
         }
@@ -1030,7 +1033,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var props = {};
         if (record.fields){
             if (record.fields.title) props.displayName = record.fields.title[1];
-            if (record.fields.createdOn) props.creationDate = record.fields.createdOn[1];
+            if (record.fields.createdOn) props.creationDate = record.fields.createdOn[1]*1000;
             if (record.fields.triage) this.addTriageStringToItemProps(record.fields.triage[1], props);
         }
         return props;

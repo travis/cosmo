@@ -286,14 +286,14 @@ cosmo.ui.navbar.Bar = function (p) {
         headerDiv.appendChild(document.createTextNode(str));
     };
     this._showQuickItemEntry = function () {
-        var f = null;
+        var form = null;
         var d = this.domNode;
         var t = _createElem('div');
         t.className = 'floatLeft';
         t.style.paddingLeft = '12px';
-        f = _createElem('form');
-        f.onsubmit = function () { return false; };
-        t.appendChild(f);
+        form = _createElem('form');
+        form.onsubmit = function () { return false; };
+        t.appendChild(form);
         var o = { type: 'text',
             id: 'listViewQuickItemEntry',
             name: 'listViewQuickItemEntry',
@@ -304,12 +304,16 @@ cosmo.ui.navbar.Bar = function (p) {
         var text = cosmo.util.html.createInput(o);
         text.style.width = '220px';
         var func = cosmo.util.html.handleTextInputFocus;
-        cosmo.util.html.setTextInput(text, _('Main.NavBar.QuickItemEntryHint'), true);
+        cosmo.util.html.setTextInput(text,
+            _('Main.NavBar.QuickItemEntryHint'), true);
         dojo.event.connect(text, 'onfocus', func);
-        f.appendChild(text);
-        f.appendChild(cosmo.util.html.nbsp());
+        form.appendChild(text);
+        form.appendChild(cosmo.util.html.nbsp());
         var func = function () {
-            var title = f.listViewQuickItemEntry.value;
+            var title = form.listViewQuickItemEntry.value;
+            form.listViewQuickItemEntry.value = _('App.Status.Processing');
+            dojo.html.addClass(form.listViewQuickItemEntry,
+                'listViewSelectedCell');
             cosmo.view.list.createNoteItem(title);
         };
         dojo.event.connect(text, 'onkeyup', function (e) {
@@ -324,7 +328,7 @@ cosmo.ui.navbar.Bar = function (p) {
             small: true,
             width: 52,
             enabled: true },
-            f, 'last');
+            form, 'last');
         d.appendChild(t);
 
     }

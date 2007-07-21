@@ -242,11 +242,7 @@ cosmo.ui.resize.Viewports = new function () {
             }
             return rtnArr
         }
-        Ev.listen(window,"load", self.initialize)
 }
-
-
-
 
 /**
  *  the viewport forms the basic resize unit. A viewport is a block element

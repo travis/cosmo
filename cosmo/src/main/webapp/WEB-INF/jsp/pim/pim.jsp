@@ -41,9 +41,7 @@
 <head>
 
 <title><fmt:message key="App.Welcome"/></title>
-
-<link rel="stylesheet" href="${staticBaseUrl}/templates/default/global.css"/>
-<link rel="stylesheet" href="${staticBaseUrl}/templates/default/ui.css"/>
+<cosmo:stylesheets stylesheets="pim"/>
 
 <!--[if IE]>
 <style type="text/css">

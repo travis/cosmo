@@ -48,6 +48,7 @@ dojo.require("cosmo.ui.imagegrid");
 cosmo.app.pim.layout = new function () {
     this.baseLayout = null;
     this.initBaseLayout = function (node) {
+        cosmo.ui.resize.Viewports.initialize();
         this.baseLayout = new cosmo.app.pim.layout.BaseLayout(node);
         this.baseLayout.render();
         this.populateBaseLayout();

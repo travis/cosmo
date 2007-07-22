@@ -26,6 +26,7 @@ dojo.provide("cosmo.ui.detail");
 dojo.require("dojo.event.*");
 dojo.require("dojo.lfx.*");
 dojo.require("dojo.html.style");
+dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
@@ -33,6 +34,8 @@ dojo.require('cosmo.datetime.timezone');
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.ui.DetailFormConverter");
+dojo.require("cosmo.view.list.common");
+dojo.require("cosmo.view.cal.common");
 
 cosmo.ui.detail = new function () {
     this.item = null;
@@ -229,6 +232,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
             case 'eventsDisplaySuccess':
             case 'noItems':
             case 'setSelected':
+            case 'clearSelected':
                 // An item has been clicked on, selected
                 if (item) {
                     // Only update the values in the form if
@@ -240,8 +244,15 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                         self.updateFromItem(item);
                     }
                 }
-                // No-item means 'nothing selected'
-                else {
+                // No-item means 'clear the selection'
+                // FIXMe: We need better sematics for this --
+                // an empty collection/week-view will also pass nothing here
+                // On the other hand, the itemRegistry could now be empty
+                // because the user just removed the last item, in which
+                // case we need to clear out the form after all. We ought to
+                // have a specific 'clear the selection' flag
+                else if (act == 'clearSelected' ||
+                    cosmo.view[cosmo.app.pim.currentView].itemRegistry.length) {
                     cosmo.ui.detail.item = null;
                     self.clear(true);
                     self.buttonSection.setButtons(false);

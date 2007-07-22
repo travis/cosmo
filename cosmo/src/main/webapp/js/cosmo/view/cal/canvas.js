@@ -908,12 +908,25 @@ cosmo.view.cal.canvas = new function () {
         else {
             // Saved event is still in view
             var inRange = !item.isOutOfViewRange();
+            // Lozenge is in the current week, update it
             if (inRange) {
                 item.lozenge.setInputDisabled(false);
                 item.lozenge.updateDisplayMain();
             }
-            else if (cmd.qualifier.offCanvas) {
+            // Lozenge was in view, event was explicitly edited
+            // to a date that moves the lozenge off-canvas
+            else if (cmd.qualifier && cmd.qualifier.offCanvas) {
                 removeEvent(item);
+            }
+            // User has navigated off the week displaying the currently
+            // selected item -- the item is not in the itemRegistry,
+            // it's being pulled from the selectedItemCache, so it does
+            // not have a lozenge on the canvas to update -- the only
+            // drawback here is that the user now gets no feedback that
+            // the item has been successfully updated, because there's
+            // no lozenge to see
+            else if (item.lozenge.isOrphaned()) {
+                // Do nothing
             }
         }
 
@@ -976,6 +989,18 @@ cosmo.view.cal.canvas = new function () {
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var removeType = opts.removeType;
         dojo.debug("removeSuccess, removeType: " + removeType);
+
+        // If the user has navigated off the week displaying the
+        // current selected item, it's not in the itemRegistry,
+        // it's being pulled from selectedItemCache, so its Lozenge
+        // object has been 'orphaned' -- the DOM node is not on
+        // the currently displayed canvas
+        // just send the 'clear selected' message
+        if (ev.lozenge.isOrphaned()) {
+            dojo.event.topic.publish('/calEvent', { 'action':
+                'clearSelected', 'data': null });
+            return;
+        }
 
         switch(removeType){
             case 'singleEvent':
@@ -1157,6 +1182,14 @@ cosmo.view.cal.canvas = new function () {
         var allDay = eventStamp.getAllDay();
         var anyTime = eventStamp.getAnyTime();
         var rrule = eventStamp.getRrule();
+
+        // If the user has navigated off the week displaying the
+        // current selected item, it's not in the itemRegistry,
+        // it's being pulled from selectedItemCache, so its Lozenge
+        // object has been 'orphaned' -- the DOM node is not on
+        // the currently displayed canvas
+        if (ev.lozenge.isOrphaned()) { return false; }
+
         if (ev.dataOrig){
             var origEventStamp = ev.dataOrig.getEventStamp();
             var origStartDate = origEventStamp.getStartDate();

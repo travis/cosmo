@@ -247,6 +247,9 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                     self.buttonSection.setButtons(false);
                 }
                 break;
+            case 'saveSuccess':
+                this.markupBar.render();
+                break;
             case 'saveFailed':
                 //self.setButtons(true, true);
                 break;

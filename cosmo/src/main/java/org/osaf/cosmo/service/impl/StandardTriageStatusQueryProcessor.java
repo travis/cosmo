@@ -112,7 +112,7 @@ public class StandardTriageStatusQueryProcessor implements
         NoteItemFilter noTriageStatusFilter = getTriageStatusFilter(collection, -1);
         
         // recurring event filter
-        NoteItemFilter eventFilter = getRecurringEventFilter(collection);
+        NoteItemFilter eventFilter = getRecurringEventFilter(collection, pointInTime, pointInTime, timezone);
         
         // store results here
         ArrayList<NoteItem> results = new ArrayList<NoteItem>();
@@ -139,6 +139,8 @@ public class StandardTriageStatusQueryProcessor implements
         // current instant in time
         for(Item item: contentDao.findItems(eventFilter)) {
             NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                continue;
             Set<NoteItem> occurrences = getNowFromRecurringNote(note, pointInTime, timezone);
             if(occurrences.size()>0) {
                 results.addAll(occurrences);
@@ -223,7 +225,7 @@ public class StandardTriageStatusQueryProcessor implements
        NoteItemFilter laterFilter = getTriageStatusFilter(collection, TriageStatus.CODE_LATER);
        
        // recurring event filter
-       NoteItemFilter eventFilter = getRecurringEventFilter(collection);
+       NoteItemFilter eventFilter = getRecurringEventFilter(collection, pointInTime, laterDur.getTime(pointInTime), timezone);
        
        // store results here
        ArrayList<NoteItem> results = new ArrayList<NoteItem>();
@@ -246,6 +248,9 @@ public class StandardTriageStatusQueryProcessor implements
        // Now process recurring events
        for(Item item: contentDao.findItems(eventFilter)) {
            NoteItem note = (NoteItem) item;
+           if(note.getModifies()!=null)
+               continue;
+           
            NoteItem laterItem = getLaterFromRecurringNote(note, pointInTime, timezone);
            
            // add laterItem and master if present
@@ -324,7 +329,7 @@ public class StandardTriageStatusQueryProcessor implements
         NoteItemFilter doneFilter = getTriageStatusFilter(collection, TriageStatus.CODE_DONE);
         
         // filter for recurring events
-        NoteItemFilter eventFilter = getRecurringEventFilter(collection);
+        NoteItemFilter eventFilter = getRecurringEventFilter(collection, doneDur.getTime(pointInTime), pointInTime, timezone);
         
         List<NoteItem> results = new ArrayList<NoteItem>();
         
@@ -342,6 +347,9 @@ public class StandardTriageStatusQueryProcessor implements
         // Now process recurring events
         for(Item item: contentDao.findItems(eventFilter)) {
             NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                continue;
+            
             NoteItem doneItem = getDoneFromRecurringNote(note, pointInTime, timezone);
             // add doneItem and master if present
             if(doneItem!=null) {
@@ -464,10 +472,13 @@ public class StandardTriageStatusQueryProcessor implements
      * Create NoteItemFilter that matches all recurring event NoteItems that belong
      * to a specified parent collection.
      */
-    private NoteItemFilter getRecurringEventFilter(CollectionItem collection) {
+    private NoteItemFilter getRecurringEventFilter(CollectionItem collection, Date start, Date end, TimeZone timezone) {
         NoteItemFilter eventNoteFilter = new NoteItemFilter();
+        eventNoteFilter.setFilterProperty(EventStampFilter.PROPERTY_DO_TIMERANGE_SECOND_PASS, "false");
         EventStampFilter eventFilter = new EventStampFilter();
         eventFilter.setIsRecurring(true);
+        eventFilter.setTimeRange(new DateTime(start), new DateTime(end));
+        eventFilter.setTimezone(timezone);
         eventNoteFilter.setParent(collection);
         eventNoteFilter.getStampFilters().add(eventFilter);
         return eventNoteFilter;

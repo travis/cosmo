@@ -202,9 +202,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         // handle recurring event filter
         if(filter.getIsRecurring()!=null) {
             if(filter.getIsRecurring().booleanValue()==true)
-                appendWhere(whereBuf, "es.timeRangeIndex.isRecurring=true");
+                appendWhere(whereBuf, "(es.timeRangeIndex.isRecurring=true or i.modifies is not null)");
             else
-                appendWhere(whereBuf, "es.timeRangeIndex.isRecurring=false");
+                appendWhere(whereBuf, "(es.timeRangeIndex.isRecurring=false and i.modifies is null)");
         }
         
         // handle time range
@@ -299,6 +299,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     private HashSet<Item> processResults(List<Item> results, ItemFilter itemFilter) {
         boolean hasTimeRangeFilter = false;
         boolean includeMasterInResults = true;
+        boolean doTimeRangeSecondPass = true;
         
         HashSet<Item> processedResults = new HashSet<Item>();
         EventStampFilter eventFilter = (EventStampFilter) itemFilter.getStampFilter(EventStampFilter.class);
@@ -314,6 +315,13 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         if(hasTimeRangeFilter && "false".equalsIgnoreCase(itemFilter
                 .getFilterProperty(EventStampFilter.PROPERTY_INCLUDE_MASTER_ITEMS)))
             includeMasterInResults = false;
+        
+        // Should we do a second pass to expand recurring events to determine
+        // if a recurring event actually occurs in the time-range specified,
+        // or should we just return the recurring event without double-checking.
+        if (hasTimeRangeFilter && "false".equalsIgnoreCase(itemFilter
+                 .getFilterProperty(EventStampFilter.PROPERTY_DO_TIMERANGE_SECOND_PASS)))
+            doTimeRangeSecondPass = false;
         
         for(Item item: results) {
             
@@ -336,7 +344,8 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             else if(!hasTimeRangeFilter)
                 processedResults.add(note);
             else {
-                processedResults.addAll(processMasterNote(note, eventFilter, includeMasterInResults));
+                processedResults.addAll(processMasterNote(note, eventFilter,
+                        includeMasterInResults, doTimeRangeSecondPass));
             }
         }
         
@@ -344,16 +353,15 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     }
     
     private Collection<ContentItem> processMasterNote(NoteItem note,
-            EventStampFilter filter, boolean includeMasterInResults) {
+            EventStampFilter filter, boolean includeMasterInResults,
+            boolean doTimeRangeSecondPass) {
         EventStamp eventStamp = EventStamp.getStamp(note);
         ArrayList<ContentItem> results = new ArrayList<ContentItem>();
 
-        // If the event is not recurring, then return the
-        // master note unless filter is configured to not return the master item,
-        // in which case we are done.
-        if (!eventStamp.isRecurring()) {
-            if(includeMasterInResults)
-                results.add(note);
+        // If the event is not recurring or the filter is configured
+        // to not do a second pass then just return the note
+        if (!eventStamp.isRecurring() || !doTimeRangeSecondPass) {
+            results.add(note);
             return results;
         }
 

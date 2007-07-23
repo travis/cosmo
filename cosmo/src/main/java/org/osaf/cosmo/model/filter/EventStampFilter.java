@@ -40,6 +40,8 @@ public class EventStampFilter extends StampFilter {
     
     public static final String PROPERTY_INCLUDE_MASTER_ITEMS = 
         "cosmo.filter.eventStamp.timeRange.includeMasterItems";
+    public static final String PROPERTY_DO_TIMERANGE_SECOND_PASS = 
+        "cosmo.filter.eventStamp.timeRange.doSecondPass";
     
     private Period period = null;
     private Boolean isRecurring = null;

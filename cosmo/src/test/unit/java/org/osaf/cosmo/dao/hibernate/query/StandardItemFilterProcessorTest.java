@@ -144,7 +144,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
     
         eventFilter.setIsRecurring(true);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and es.item=i and es.timeRangeIndex.isRecurring=true and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:icaluid", query.getQueryString());
     }
     
     public void testEventStampTimeRangeQuery() throws Exception {

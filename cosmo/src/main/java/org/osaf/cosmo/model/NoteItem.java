@@ -34,6 +34,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Index;
 
 /**
  * Extends {@link ContentItem} to represent a Note item.
@@ -120,6 +121,7 @@ public class NoteItem extends ContentItem {
     }
 
     @Column(name="icaluid", length=255)
+    //@Index(name="idx_icaluid")
     public String getIcalUid() {
         return icalUid;
     }
@@ -137,7 +139,7 @@ public class NoteItem extends ContentItem {
     @OneToMany(mappedBy = "modifies", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.DELETE} )
     @BatchSize(size=50)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<NoteItem> getModifications() {
         return modifications;
     }

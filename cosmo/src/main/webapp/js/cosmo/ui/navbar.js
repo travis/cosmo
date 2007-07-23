@@ -311,14 +311,47 @@ cosmo.ui.navbar.CalViewNav = function (p) {
 cosmo.ui.navbar.CalViewNav.prototype = new cosmo.ui.ContentBox();
 
 cosmo.ui.navbar.QuickItemEntry = function (p) {
+    var self = this;
     var params = p || {};
+    // Processing lock to avoid duplicate items created
+    var isProcessing = false;
+
     this.parent = params.parent;
     this.domNode = _createElem('div');
+    this.formNode = null;
     this.createTextBox = null;
     this.createButton = null;
 
     this.renderSelf = function () {
-        var form = null;
+        // Resest processing lock on render
+        isProcessing = false;
+
+        var disableButton = function () {
+          self.formNode.removeChild(self.createButton.domNode);
+          self.createButton.destroy();
+          dis = dojo.widget.createWidget("cosmo:Button", {
+              text: _('App.Button.Create'),
+              handleOnClick: null,
+              small: true,
+              width: 52,
+              enabled: false },
+              self.formNode, 'last');
+          self.createButton = dis;
+        };
+        var createItem = function () {
+            // Only create one item at a time
+            if (isProcessing) { return false; }
+            isProcessing = true;
+            var form = self.formNode;
+            console.log(form);
+            var title = form.listViewQuickItemEntry.value;
+            disableButton();
+            form.listViewQuickItemEntry.value = _('App.Status.Processing');
+            dojo.html.addClass(form.listViewQuickItemEntry,
+                'listViewSelectedCell');
+            cosmo.view.list.createNoteItem(title);
+        };
+
         var t = this.domNode;
         t.className = 'floatLeft';
         t.style.paddingLeft = '12px';
@@ -327,7 +360,8 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         this.clearAll();
         if (this.createButton) { this.createButton.destroy() };
 
-        form = _createElem('form');
+        this.formNode = _createElem('form');
+        var form = this.formNode;
         form.onsubmit = function () { return false; };
         t.appendChild(form);
         var o = { type: 'text',
@@ -346,22 +380,16 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         dojo.event.connect(text, 'onfocus', func);
         form.appendChild(text);
         form.appendChild(cosmo.util.html.nbsp());
-        var func = function () {
-            var title = form.listViewQuickItemEntry.value;
-            form.listViewQuickItemEntry.value = _('App.Status.Processing');
-            dojo.html.addClass(form.listViewQuickItemEntry,
-                'listViewSelectedCell');
-            cosmo.view.list.createNoteItem(title);
-        };
+
         dojo.event.connect(text, 'onkeyup', function (e) {
             if (e.keyCode == 13) {
-                func();
+                createItem();
                 e.stopPropagation();
             }
         });
         button = dojo.widget.createWidget("cosmo:Button", {
             text: _('App.Button.Create'),
-            handleOnClick: func,
+            handleOnClick: createItem,
             small: true,
             width: 52,
             enabled: true },

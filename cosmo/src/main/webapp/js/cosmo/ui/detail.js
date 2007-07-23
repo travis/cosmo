@@ -288,10 +288,6 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     var stamps = this.stamps;
     var stamp = null;
 
-    // Clear out previous values -- don't bother disabling elements;
-    // we'll just be filling them in anyway
-    this.clear(false);
-
     //save the item
     cosmo.ui.detail.item = item;
 
@@ -303,8 +299,14 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();
+        // Stamped -- wipe/Enable and fill in values
         if (stamp) {
             this[st.stampType.toLowerCase() + 'Section'].updateFromStamp(stamp);
+        }
+        // Unstamped -- wipe and disable
+        else {
+            this[st.stampType.toLowerCase() + 'Section'].toggleEnabled(false, {
+                doCompleteDisable: false, disableStampFormElem: true });
         }
     }
     this.buttonSection.setButtons(true);
@@ -313,8 +315,14 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
 cosmo.ui.detail.DetailViewForm.prototype.clear =
     function (doCompleteDisable) {
     var opts = {};
-    opts.doCompleteDisable = doCompleteDisable;
-    opts.disableStampFormElem = doCompleteDisable;
+    if (doCompleteDisable) {
+        opts.doCompleteDisable = true;
+        opts.disableStampFormElem = true;
+    }
+    else {
+        opts.doCompleteDisable = false;
+        opts.disableStampFormElem = false;
+    }
     this.markupBar.render();
     this.mainSection.toggleEnabled(false, opts);
     var stamps = this.stamps;

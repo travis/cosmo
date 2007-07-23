@@ -61,7 +61,11 @@ cosmo.ui.conf.timeoutDialogAutoLogout = 30
 cosmo.ui.conf.httpSupported="false";
 
 // Are terms of service required?
-cosmo.ui.conf.tosRequired=false;
+cosmo.ui.conf.tosRequired = "false";
+
+// Should we take extra steps to prevent data caching?
+// Once we fix bug 9715, this should not be true.
+cosmo.ui.conf.preventDataCaching = "true";
 
 //****************** End Overidable Defaults. *********************************
 

@@ -122,7 +122,7 @@ cosmo.account.getFieldList = function (accountInfo) {
 
     // If this is a new account creation attempt
     // and Terms of Service are required
-    if (!accountInfo && cosmo.ui.conf.tosRequired){
+    if (!accountInfo && cosmo.ui.conf.getBooleanValue("tosRequired")){
         f = { label: _('Signup.Form.TOS'),
             elemName: 'tos',
             elemType: 'checkbox'

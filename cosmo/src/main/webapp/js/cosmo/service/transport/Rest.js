@@ -69,7 +69,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             request.headers["Cache-Control"] = "no-cache";
             request.headers["Pragma"] = "no-cache";
             // Fight the dark powers of IE's evil caching mechanism
-            if (dojo.render.html.ie) {
+            if (dojo.render.html.ie || cosmo.ui.conf.getBooleanValue("preventDataCaching")) {
                 request.preventCache = request.preventCache || true;
             }
             if (request.method){

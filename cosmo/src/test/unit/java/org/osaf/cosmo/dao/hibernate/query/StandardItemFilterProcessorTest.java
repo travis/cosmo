@@ -158,7 +158,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setParent(parent);
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and es.item=i and ( (es.timeRangeIndex.isFloating=true and ((es.timeRangeIndex.dateStart < '20070101T040000' and es.timeRangeIndex.dateEnd > '20070101T040000') or (es.timeRangeIndex.dateStart >= '20070101T040000' and es.timeRangeIndex.dateStart < '20070201T040000'))) or (es.timeRangeIndex.isFloating=false and ((es.timeRangeIndex.dateStart < '20070101T100000Z' and es.timeRangeIndex.dateEnd > '20070101T100000Z') or (es.timeRangeIndex.dateStart >= '20070101T100000Z' and es.timeRangeIndex.dateStart < '20070201T100000Z'))))", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and es.item=i and ( (es.timeRangeIndex.isFloating=true and es.timeRangeIndex.dateStart < '20070201T040000' and es.timeRangeIndex.dateEnd > '20070101T040000') or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.dateStart < '20070201T100000Z' and es.timeRangeIndex.dateEnd > '20070101T100000Z'))", query.getQueryString());
     }
     
     public void testBasicStampQuery() throws Exception {

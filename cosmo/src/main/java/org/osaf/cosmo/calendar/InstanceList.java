@@ -77,7 +77,7 @@ public class InstanceList extends TreeMap {
         if (comp.getProperties().getProperty(Property.RECURRENCE_ID) == null) {
             addMaster(comp, rangeStart, rangeEnd);
         } else {
-            addOverride(comp);
+            addOverride(comp, rangeStart, rangeEnd);
         }
     }
     
@@ -271,10 +271,12 @@ public class InstanceList extends TreeMap {
      * Add an override component if it falls within the specified time range.
      * 
      * @param comp
+     * @param rangeStart
+     * @param rangeEnd
      * @return true if the override component modifies instance list and false
      *         if the override component has no effect on instance list
      */
-    public boolean addOverride(Component comp) {
+    public boolean addOverride(Component comp, Date rangeStart, Date rangeEnd) {
 
         boolean modified = false;
 
@@ -343,9 +345,15 @@ public class InstanceList extends TreeMap {
                 future);
         String key = instance.getRid().toString();
 
-        // Replace the master instance by adding this one
-        // only if it exists.
+        // Replace the master instance if it exists
         if(containsKey(key)) {
+            remove(key);
+            modified = true;
+        }
+        
+        // Add modification instance if its in the range
+        if (dtstart.before(rangeEnd)
+                && dtend.after(rangeStart)) {
             put(key, instance);
             modified = true;
         }

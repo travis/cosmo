@@ -60,7 +60,7 @@ public class InstanceListTest extends TestCase {
             }
             else {
                 Assert.assertTrue(addedMaster);
-                instances.addOverride(event);
+                instances.addOverride(event, start, end);
             }
         }
         
@@ -134,7 +134,7 @@ public class InstanceListTest extends TestCase {
             }
             else {
                 Assert.assertTrue(addedMaster);
-                instances.addOverride(event);
+                instances.addOverride(event, start, end);
             }
         }
         
@@ -203,7 +203,7 @@ public class InstanceListTest extends TestCase {
             }
             else {
                 Assert.assertTrue(addedMaster);
-                instances.addOverride(event);
+                instances.addOverride(event, start, end);
             }
         }
         
@@ -219,22 +219,22 @@ public class InstanceListTest extends TestCase {
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20070509T081500Z", key);
-        Assert.assertEquals("20070509T081500Z", instance.getStart().toString());
-        Assert.assertEquals("20070509T091500Z", instance.getEnd().toString());
+        Assert.assertEquals("20070509T031500", instance.getStart().toString());
+        Assert.assertEquals("20070509T041500", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20070510T081500Z", key);
-        Assert.assertEquals("20070510T081500Z", instance.getStart().toString());
-        Assert.assertEquals("20070510T091500Z", instance.getEnd().toString());
+        Assert.assertEquals("20070510T031500", instance.getStart().toString());
+        Assert.assertEquals("20070510T041500", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20070511T081500Z", key);
-        Assert.assertEquals("20070511T081500Z", instance.getStart().toString());
-        Assert.assertEquals("20070511T091500Z", instance.getEnd().toString());
+        Assert.assertEquals("20070511T031500", instance.getStart().toString());
+        Assert.assertEquals("20070511T041500", instance.getEnd().toString());
     }
     
     public void testFloatingWithSwitchingTimezoneInstanceList() throws Exception {
@@ -260,7 +260,7 @@ public class InstanceListTest extends TestCase {
             }
             else {
                 Assert.assertTrue(addedMaster);
-                instances.addOverride(event);
+                instances.addOverride(event, start, end);
             }
         }
         
@@ -276,36 +276,36 @@ public class InstanceListTest extends TestCase {
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20060102T220000Z", key);
-        Assert.assertEquals("20060102T220000Z", instance.getStart().toString());
-        Assert.assertEquals("20060102T230000Z", instance.getEnd().toString());
+        Assert.assertEquals("20060102T140000", instance.getStart().toString());
+        Assert.assertEquals("20060102T150000", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20060103T220000Z", key);
-        Assert.assertEquals("20060103T220000Z", instance.getStart().toString());
-        Assert.assertEquals("20060103T230000Z", instance.getEnd().toString());
+        Assert.assertEquals("20060103T140000", instance.getStart().toString());
+        Assert.assertEquals("20060103T150000", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20060104T220000Z", key);
-        Assert.assertEquals("20060105T000000Z", instance.getStart().toString());
-        Assert.assertEquals("20060105T010000Z", instance.getEnd().toString());
+        Assert.assertEquals("20060104T160000", instance.getStart().toString());
+        Assert.assertEquals("20060104T170000", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20060105T220000Z", key);
-        Assert.assertEquals("20060106T000000Z", instance.getStart().toString());
-        Assert.assertEquals("20060106T010000Z", instance.getEnd().toString());
+        Assert.assertEquals("20060105T160000", instance.getStart().toString());
+        Assert.assertEquals("20060105T170000", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
         Assert.assertEquals("20060106T220000Z", key);
-        Assert.assertEquals("20060106T220000Z", instance.getStart().toString());
-        Assert.assertEquals("20060106T230000Z", instance.getEnd().toString());
+        Assert.assertEquals("20060106T140000", instance.getStart().toString());
+        Assert.assertEquals("20060106T150000", instance.getEnd().toString());
     }
     
 }

@@ -30,20 +30,18 @@ import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.component.VJournal;
 import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.parameter.Range;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ExRule;
-import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
-import net.fortuna.ical4j.util.Dates;
+import net.fortuna.ical4j.model.property.RecurrenceId;
 
 import org.osaf.cosmo.calendar.Instance;
 import org.osaf.cosmo.calendar.InstanceList;
@@ -138,7 +136,8 @@ public class OutputFilter {
         // Add override components to InstanceList.
         // Only add override if it changes anything about the InstanceList.
         for (Component comp : (List<Component>) overrides) {
-            if (instances.addOverride(comp))
+            if (instances.addOverride(comp, period.getStart(),
+                    period.getEnd()))
                 newCal.getComponents().add(comp);
         }
         
@@ -183,7 +182,8 @@ public class OutputFilter {
         }
 
         for (Component comp : (List<Component>) overrides)
-            instances.addComponent(comp, null, null);
+            instances.addComponent(comp, getExpand().getStart(),
+                    getExpand().getEnd());
 
         // Create a copy of the master with recurrence properties removed
         boolean isRecurring = false;

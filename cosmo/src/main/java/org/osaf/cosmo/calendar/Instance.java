@@ -15,23 +15,9 @@
  */
 package org.osaf.cosmo.calendar;
 
-import java.util.Iterator;
-
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Dur;
-import net.fortuna.ical4j.model.Parameter;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VAlarm;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.parameter.Related;
-import net.fortuna.ical4j.model.property.Duration;
-import net.fortuna.ical4j.model.property.Repeat;
-import net.fortuna.ical4j.model.property.Trigger;
 
 /**
  * @author cyrusdaboo
@@ -70,8 +56,8 @@ public class Instance {
                     boolean overridden,
                     boolean future) {
         this.comp = comp;
-        this.start = copyNormalisedDate(start);
-        this.end = copyNormalisedDate(end);
+        this.start = start;
+        this.end = end;
         this.rid = copyNormalisedDate(rid);
         this.overridden = overridden;
         this.future = future;
@@ -119,92 +105,7 @@ public class Instance {
         return future;
     }
 
-    /**
-     * Return the set of trigger times for this instance if it has an alarm. The
-     * times are returned in UTC, and repeating alarms are expanded.
-     * 
-     * @return a list of trigger date-times.
-     */
-    public DateList getAlarmTriggers() {
-
-        DateList result = null;
-
-        // Look for VALARMs
-        ComponentList alarms = null;
-        if (comp instanceof VEvent) {
-            alarms = ((VEvent) comp).getAlarms();
-        } else if (comp instanceof VToDo) {
-            alarms = ((VToDo) comp).getAlarms();
-        }
-
-        if (alarms != null) {
-            for (Iterator iter = alarms.iterator(); iter.hasNext();) {
-                VAlarm valarm = (VAlarm) iter.next();
-                if (result == null)
-                    result = new DateList();
-                result.addAll(getTriggers(valarm));
-            }
-        }
-
-        // Make sure we use UTC
-        if (result != null)
-            result.setUtc(true);
-
-        return result;
-    }
-
-    /**
-     * Return the list of trigger times for the VALARM.
-     * 
-     * @param comp
-     *            the VALARM component
-     * @return
-     */
-    private DateList getTriggers(Component comp) {
-
-        DateList result = new DateList();
-
-        Trigger propT = (Trigger) comp.getProperties().getProperty(
-                Property.TRIGGER);
-        Repeat propR = (Repeat) comp.getProperties().getProperty(
-                Property.REPEAT);
-        Duration propD = (Duration) comp.getProperties().getProperty(
-                Property.DURATION);
-
-        boolean relativeToStart = true;
-        Parameter related = propT.getParameters().getParameter(
-                Parameter.RELATED);
-        if (related != null)
-            relativeToStart = Related.START.equals(related);
-
-        // Find the first trigger for the alarm
-        Date triggerStart = null;
-        if (propT.getDateTime() != null) {
-            triggerStart = copyNormalisedDate(propT.getDateTime());
-        } else if (propT.getDuration() != null) {
-            triggerStart = copyNormalisedDate(org.osaf.cosmo.calendar.util.Dates.getInstance(propT
-                    .getDuration().getTime(
-                            relativeToStart ? getStart() : getEnd()),
-                    relativeToStart ? getStart() : getEnd()));
-        }
-
-        result.add(triggerStart);
-
-        // Now apply repeats
-        if ((propR != null) && (propD != null)) {
-            int repeats = propR.getCount();
-            Dur duration = propD.getDuration();
-
-            for (int i = 0; i < repeats; i++) {
-                triggerStart = copyNormalisedDate(org.osaf.cosmo.calendar.util.Dates.getInstance(duration
-                        .getTime(triggerStart), triggerStart));
-                result.add(triggerStart);
-            }
-        }
-
-        return result;
-    }
-
+   
     /**
      * Copy a Date/DateTime and normalise to UTC if its not floating.
      * 

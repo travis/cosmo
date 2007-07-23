@@ -309,7 +309,7 @@ public class RecurrenceExpander {
         instances.setTimezone(timezone);
         instances.addMaster(component, rangeStart, rangeEnd);
         for(Component mod: modifications)
-            instances.addOverride(mod);
+            instances.addOverride(mod, rangeStart, rangeEnd);
         
         return instances;
     }

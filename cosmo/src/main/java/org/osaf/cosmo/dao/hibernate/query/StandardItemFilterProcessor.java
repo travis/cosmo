@@ -210,16 +210,11 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         // handle time range
         if(filter.getPeriod()!=null) {
            whereBuf.append(" and ( ");
-           whereBuf.append("(es.timeRangeIndex.isFloating=true and ((es.timeRangeIndex.dateStart < '" + filter.getFloatStart() + "'");
-           
+           whereBuf.append("(es.timeRangeIndex.isFloating=true and es.timeRangeIndex.dateStart < '" + filter.getFloatEnd() + "'");
            whereBuf.append(" and es.timeRangeIndex.dateEnd > '" + filter.getFloatStart() + "')");
-           whereBuf.append(" or (es.timeRangeIndex.dateStart >= '" + filter.getFloatStart() + "'");
-           whereBuf.append(" and es.timeRangeIndex.dateStart < '" + filter.getFloatEnd() + "')))");
            
-           whereBuf.append(" or (es.timeRangeIndex.isFloating=false and ((es.timeRangeIndex.dateStart < '" + filter.getUTCStart() + "'");
+           whereBuf.append(" or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.dateStart < '" + filter.getUTCEnd() + "'");
            whereBuf.append(" and es.timeRangeIndex.dateEnd > '" + filter.getUTCStart() + "')");
-           whereBuf.append(" or (es.timeRangeIndex.dateStart >= '" + filter.getUTCStart() + "'");
-           whereBuf.append(" and es.timeRangeIndex.dateStart < '" + filter.getUTCEnd() + "')))");
            
            whereBuf.append(")");
         }

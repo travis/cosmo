@@ -291,7 +291,7 @@ public class CalendarFilterEvaluater {
         
         // Add overides after master has been added
         for(Component mod : mods)
-            instances.addOverride(mod);
+            instances.addOverride(mod, filter.getPeriod().getStart(), filter.getPeriod().getEnd());
         
         if(instances.size()>0)
             return true;

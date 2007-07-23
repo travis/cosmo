@@ -92,6 +92,7 @@ cosmo.ui.minical.MiniCal = function (p) {
     this.miniCalNode = null;
     this.goToDateNode = null;
     this.goToDateForm = null;
+    this.goToDateButton = null;
     this.currDate = null;
     this.id = '';
     // Current height -- determines how many month tiles to display
@@ -250,6 +251,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             td = _createElem('td');
             var buttonGoTo = new Button('goToDateButton', 36, self.doGoToDate,
                 _('App.Button.Go'), true);
+            self.goToButton = buttonGoTo;
             td.appendChild(buttonGoTo.domNode);
             tr.appendChild(td);
 

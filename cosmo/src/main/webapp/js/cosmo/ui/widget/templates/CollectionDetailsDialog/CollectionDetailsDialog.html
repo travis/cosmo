@@ -22,9 +22,10 @@
              <input class="inputText" dojoAttachPoint="collectionNameInput"
                 type="text"
                 value="${this.displayName}"/>&nbsp;
-               <input type="button" class="btnElemBaseSm" 
-               style="width: 86px;" value="${this.strings.changeNameButton}"
-               dojoAttachEvent="onClick: _handleSave;"/>
+               <input  dojoAttachPoint="collectionNameChangeButton" 
+                type="button" class="btnElemBaseSm" 
+                style="width: 86px;" value="${this.strings.changeNameButton}"
+                dojoAttachEvent="onClick: _handleSave;"/>
           </span>
         </div>
         <div class="floatLeft">

@@ -70,6 +70,8 @@ Button = cosmo.ui.button.Button;
 cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
 
     var self = this;
+    this.leftButtonNode = null;
+    this.rightButtonNode = null;
 
     // Private method to create the button-set table
     var doButtonTable = function() {
@@ -85,7 +87,8 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         nbTable.appendChild(nbTBody);
         nbTBody.appendChild(nbRow);
         // Left arrow
-        nbRow.appendChild(doButtonSetCenter('Left', leftHandler));
+        self.leftButtonNode = doButtonSetCenter('Left', leftHandler);
+        nbRow.appendChild(self.leftButtonNode);
         // Divider cell
         nbDivider = document.createElement('td');
         nbDivider.id = id + 'ButtonDivider';
@@ -95,7 +98,8 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         nbDivider.className = 'btnSetDividerBase';
         nbRow.appendChild(nbDivider);
         // Right arrow
-        nbRow.appendChild(doButtonSetCenter('Right', rightHandler));
+        self.rightButtonNode = doButtonSetCenter('Right', rightHandler);
+        nbRow.appendChild(self.rightButtonNode);
         return nbTable;
     }
     // Private method to make the center arrow cells

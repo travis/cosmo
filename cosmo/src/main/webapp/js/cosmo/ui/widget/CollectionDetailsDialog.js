@@ -57,6 +57,7 @@ dojo.widget.HtmlWidget, function(){
         collectionNameText: null, //Label with the collection name
         collectionNameInputSpan: null, //span with textbox with the collection name
         collectionNameInput: null, //Textbox with the collection name
+        collectionNameChangeButton: null, // Button for changing the collection name
         linkSpan: null, //where to put the link image
         chandlerPlug: null, //span with info about downloading chandler
 

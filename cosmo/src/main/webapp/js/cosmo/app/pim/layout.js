@@ -337,7 +337,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         calCanvas: cal });
     centerColumn.addChild(navBar);
     centerColumn.navBar = navBar;
-    navBar.render();
+    //navBar.render();
 
     // Cal selector / single cal name -- the container is a
     // ContentBox, and the contents is a Dojo widget

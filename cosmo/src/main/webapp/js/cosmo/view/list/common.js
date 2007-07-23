@@ -182,7 +182,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     setVals('title', t, t);
     // Who
     var m = data.getModifiedBy().userId;
-    m = m ? m : cosmo.app.currentUsername;
+    m = m ? m : ''; 
     setVals('who', m, m);
     // Start
     var st = data.getEventStamp();

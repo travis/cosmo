@@ -343,7 +343,6 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             if (isProcessing) { return false; }
             isProcessing = true;
             var form = self.formNode;
-            console.log(form);
             var title = form.listViewQuickItemEntry.value;
             disableButton();
             form.listViewQuickItemEntry.value = _('App.Status.Processing');

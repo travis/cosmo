@@ -113,7 +113,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         } else {
             this.currentCollection = this.currentCollections[0];
         }
-        
+
         // Base layout
         // ===============================
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
@@ -279,7 +279,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         this.currentCollections.sort(f);
 
     };
-    
+
     this._selectCollectionByUid = function(selectUid){
         // If we received a collectionUrl, select that collection
         for (var i = 0; i < this.currentCollections.length; i++){
@@ -288,10 +288,10 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                 return true;
             }
         }
-        
+
         return false;
     };
-    
+
     this.handleCollectionUpdated = function(/*cosmo.topics.CollectionUpdatedMessage*/ message){
         var updatedCollection = message.collection;
 
@@ -342,9 +342,9 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         }
         this.allDayArea = null;
     };
-    
+
     this.reloadCollections = function(){
-        //first get a handle on the currenct collection so we don't lose it. 
+        //first get a handle on the currenct collection so we don't lose it.
         var currentCollection = this.currentCollection;
         this.loadCollections({ticketKey: this.ticketKey});
 
@@ -352,12 +352,12 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             cosmo.app.showErr(_("Main.Error.CollectionRemoved", currentCollection.getDisplayName()));
             this.currentCollection = this.currentCollections[0];
         }
-        
+
         var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
         collectionSelector.updateCollectionSelectorOptions(this.currentCollections, this.currentCollection);
 
         dojo.event.topic.publish('/calEvent', { action: 'loadCollection', opts: { loadType: 'changeCollection', collection: this.currentCollection }, data: {}})
-        
+
     }
 }, cosmo.app.pim);
 

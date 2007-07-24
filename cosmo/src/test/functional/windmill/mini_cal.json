@@ -23,22 +23,22 @@
 {"method": "click", "params": {"id" : "_month2_day28"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "05/08/2002"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "03/10/2008"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "01/07/2018"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "07/17/2027"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}
@@ -67,22 +67,22 @@
 {"method": "click", "params": {"id" : "_month2_day28"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "05/08/2002"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "03/10/2008"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "01/07/2018"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "07/17/2027"}}
-{"method": "click", "params": {"id" : "cosmo_Button_3"}}
+{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "verify", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}

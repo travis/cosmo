@@ -15,10 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import net.fortuna.ical4j.model.TimeZone;
-
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -26,25 +24,23 @@ import javax.activation.MimeTypeParseException;
 
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.util.Dates;
 
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
-import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
+import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
 import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.atom.processor.ContentProcessor;
@@ -52,10 +48,11 @@ import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
-import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
@@ -522,9 +519,10 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     removals.add(mod);
 
                     NoteItem copy = (NoteItem) mod.copy();
-
+                    
                     EventExceptionStamp ees =
                         EventExceptionStamp.getStamp(copy);
+                    
                     DateTime oldRid = (DateTime) ees.getRecurrenceId();
                     java.util.Date newRidTime =
                         new java.util.Date(oldRid.getTime() + delta);
@@ -534,10 +532,17 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                         newRid.setUtc(true);
                     else
                         newRid.setTimeZone(oldRid.getTimeZone());
-                        
+                    
                     copy.setUid(new ModificationUid(item, newRid).toString());
                     ees.setRecurrenceId(newRid);
 
+                    // If the modification's dtstart is missing, then
+                    // we have to adjust dtstart to be equal to the
+                    // recurrenceId.
+                    if(isDtStartMissing(BaseEventStamp.getStamp(mod))) {
+                        ees.setStartDate(ees.getRecurrenceId());
+                    }
+                    
                     copies.add(copy);
                 }
 
@@ -581,4 +586,28 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             throw new ValidationException("Error parsing XHTML content", e);
         }
     }
+    
+    /**
+     * Determine if startDate is missing.  The startDate is missing
+     * if the startDate is equal to the reucurreceId and the anyTime
+     * parameter is inherited.
+     * @param stamp BaseEventStamp to test
+     * @return
+     */
+    private boolean isDtStartMissing(BaseEventStamp stamp) {
+       
+        if(stamp.getStartDate()==null || stamp.getRecurrenceId()==null)
+            return false;
+        
+        // "missing" startDate is represented as startDate==recurrenceId
+        if(!stamp.getStartDate().equals(stamp.getRecurrenceId()))
+            return false;
+        
+        // "missing" anyTime is represented as null
+        if(stamp.isAnyTime()!=null)
+            return false;
+        
+        return true;
+    }
+    
 }

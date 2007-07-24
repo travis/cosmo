@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.fortuna.ical4j.model.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
@@ -27,6 +29,7 @@ import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 import org.osaf.cosmo.model.BaseEventStamp;
+import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.Item;
 
 /**
@@ -87,8 +90,14 @@ public class EventGenerator extends BaseStampGenerator
         if(isDtStartMissing(stamp)) {
             record.addField(generateMissingField(new TextField(FIELD_DTSTART, null)));
         } else {
-            value = EimValueConverter.fromICalDate(stamp.getStartDate(),
-                                                   stamp.isAnyTime());
+            Date startDate = stamp.getStartDate();
+            Boolean isAnyTime = stamp.isAnyTime();
+            
+            // Shouldn't happen, but prevent NPE if it does
+            if(isAnyTime==null)
+                isAnyTime = ((EventExceptionStamp) stamp).getMasterStamp().isAnyTime();
+            
+            value = EimValueConverter.fromICalDate(startDate, isAnyTime);
             record.addField(new TextField(FIELD_DTSTART, value));
         }
          

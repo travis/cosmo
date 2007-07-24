@@ -42,6 +42,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         collections: [],
         currentCollection: {},
         ticketKey: '',
+        MAX_DISPLAY_NAME_LENGTH: 13,
 
         // Function for onchange of collection selector
         // sets local currentCollection and passes the selected
@@ -191,13 +192,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
                 // Collection name label
                 // ---
-                var displayName = curr.getDisplayName();
+                var displayName = curr? "" : curr.getDisplayName();
                 var d = _createElem("div");
                 d.id = 'collectionLabelName';
                 d.className = 'labelTextHoriz';
-                if (displayName.length > 13) {
-                    var textNode = _createText(displayName.substr(0, 12) + '\u2026');
-                    d.title = curr.displayName;
+                if (displayName.length > self.MAX_DISPLAY_NAME_LENGTH) {
+                    var textNode = _createText(displayName.substr(0, self.MAX_DISPLAY_NAME_LENGTH - 1) + '\u2026');
+                    d.title = curr.getDisplayName();
                 }
                 else {
                     var textNode = _createText(displayName);
@@ -249,7 +250,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 self.selector = sel;
 
                 // Set the select to the current collection
-                self.setSelectorByDisplayName(curr.getDisplayName());
+                if (curr) self.setSelectorByDisplayName(curr.getDisplayName());
                 dojo.event.connect(sel, "onchange", self, 'selectFunction');
                 selectorNode.appendChild(d);
 

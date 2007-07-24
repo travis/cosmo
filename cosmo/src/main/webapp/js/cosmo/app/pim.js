@@ -118,19 +118,24 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // ===============================
         // FIXME: Safari -- Need to valign-middle the whole-screen mask
         this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
-        // Display the default view
-        this.baseLayout.mainApp.centerColumn.navBar.displayView(startView);
-
-        // Show errors for deleted subscriptions -- deletedSubscriptions
-        // is a private var populated in the loadCollections method
-        if (deletedSubscriptions && deletedSubscriptions.length > 0){
-            for (var x = 0; x < deletedSubscriptions.length; x++){
-                cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",
-                    deletedSubscriptions[x].getDisplayName()));
+        
+        if (!cosmo.app.pim.currentCollection) {
+            cosmo.app.showErr(_("Error.NoCollections"));
+        } else {
+            // Display the default view
+            this.baseLayout.mainApp.centerColumn.navBar.displayView(startView);
+    
+            // Show errors for deleted subscriptions -- deletedSubscriptions
+            // is a private var populated in the loadCollections method
+            if (deletedSubscriptions && deletedSubscriptions.length > 0){
+                for (var x = 0; x < deletedSubscriptions.length; x++){
+                    cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",
+                        deletedSubscriptions[x].getDisplayName()));
+                }
             }
-        }
-        if (this.authAccess){
-            cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
+            if (this.authAccess){
+                cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
+            }
         }
     };
 
@@ -246,11 +251,6 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                 this.currentCollections.push(collection);
             }
 
-            // No collections for this user
-            if (this.currentCollections.length == 0){
-                 //XINT
-                 throw new Error("No collections!")
-            }
             var subscriptions = this.serv.getSubscriptions({sync:true}).results[0];
 
             var result = this.filterOutDeletedSubscriptions(subscriptions);
@@ -347,17 +347,18 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         //first get a handle on the currenct collection so we don't lose it.
         var currentCollection = this.currentCollection;
         this.loadCollections({ticketKey: this.ticketKey});
-
-        if (!this._selectCollectionByUid(currentCollection.getUid())){
-            cosmo.app.showErr(_("Main.Error.CollectionRemoved", currentCollection.getDisplayName()));
-            this.currentCollection = this.currentCollections[0];
+        
+        if (this.currentCollection) {
+            if (!this._selectCollectionByUid(currentCollection.getUid())){
+                cosmo.app.showErr(_("Main.Error.CollectionRemoved", currentCollection.getDisplayName()));
+                this.currentCollection = this.currentCollections[0];
+            }
+    
+            var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
+            collectionSelector.updateCollectionSelectorOptions(this.currentCollections, this.currentCollection);
+    
+            dojo.event.topic.publish('/calEvent', { action: 'loadCollection', opts: { loadType: 'changeCollection', collection: this.currentCollection }, data: {}})
         }
-
-        var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
-        collectionSelector.updateCollectionSelectorOptions(this.currentCollections, this.currentCollection);
-
-        dojo.event.topic.publish('/calEvent', { action: 'loadCollection', opts: { loadType: 'changeCollection', collection: this.currentCollection }, data: {}})
-
     }
 }, cosmo.app.pim);
 

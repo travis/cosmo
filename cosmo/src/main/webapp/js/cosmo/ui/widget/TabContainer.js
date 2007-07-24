@@ -165,6 +165,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         tabMain.appendChild(tabContent);
         this.domNode.appendChild(tabMain);
         tabMain.style.visibility = 'visible';
+        this.showTab(0);
     },
     // Clean up any sub-widgets in any of the tabs
     destroyChildren: function () {

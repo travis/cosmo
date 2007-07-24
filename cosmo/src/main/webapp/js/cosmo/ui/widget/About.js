@@ -30,6 +30,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             node.style.textAlign = 'center';
             node.style.margin = 'auto';
             node.style.width = '100%';
+            node.style.height = "230px";
+            node.style.overflowY = 'scroll';
 
             // Image
             d = _createElem('div');

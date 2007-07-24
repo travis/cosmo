@@ -39,6 +39,6 @@ OptionParser.new do |opts|
     
 end.parse!
 
-serverObject = CosmoUserStats.new
+serverObject = Cosmo::CosmoUserStats.new
 DRb.start_service("druby://#{server}:#{port}", serverObject)
 DRb.thread.join

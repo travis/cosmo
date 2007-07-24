@@ -104,7 +104,7 @@ if(statsServer.nil?)
   stats = CosmoUserStats.new
 else
   DRb.start_service()
-  drbAddress = "druby://#{statsServer}:9000"
+  drbAddress = "druby://#{statsServer}"
   puts drbAddress
   stats = DRbObject.new(nil, drbAddress)
 end

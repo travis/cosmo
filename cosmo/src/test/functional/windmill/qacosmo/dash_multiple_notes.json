@@ -1,3 +1,5 @@
+{"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number one", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
@@ -24,11 +26,11 @@
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number seven", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
-{"params": {"id": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number eight", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
-{"params": {"id": "cosmo_Button_375"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number nine", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
@@ -36,7 +38,7 @@
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number ten", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
-{"params": {"id": "cosmo_Button_391"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number eleven", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
@@ -54,7 +56,7 @@
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number sixteen", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
-{"params": {"id": "cosmo_Button_437"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"text": "Testing lots of notes, this is number seventeen", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}

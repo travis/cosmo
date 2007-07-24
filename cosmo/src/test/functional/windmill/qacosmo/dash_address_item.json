@@ -1,9 +1,11 @@
+{"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"text": "Testing Adress this item", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "noteDescription"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Addressing this item description field, I wonder how long I can make it... Addressing this item description field, I wonder how long I can make it...", "id": "noteDescription"}, "version": "0.1", "method": "type"}
-{"params": {"id": "sectionMailEnableToggle"}, "version": "0.1", "method": "check"}
+{"params": {"id": "sectionMailEnableToggle"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "mailFrom"}, "version": "0.1", "method": "click"}
 {"params": {"text": "adam@osafoundation.org", "id": "mailFrom"}, "version": "0.1", "method": "type"}

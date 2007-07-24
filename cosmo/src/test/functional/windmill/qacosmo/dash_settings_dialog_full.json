@@ -1,11 +1,15 @@
+{"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"link": "Settings"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "firstName"}, "version": "0.1", "method": "click"}
 {"params": {"text": "bob", "id": "firstName"}, "version": "0.1", "method": "type"}
 {"params": {"text": "jones", "id": "lastName"}, "version": "0.1", "method": "type"}
 {"params": {"text": "bob@osafoundation.org", "id": "email"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[1].id"}, "version": "0.1", "method": "click"}
-{"params": {"id": "showAccountBrowser"}, "version": "0.1", "method": "check"}
+{"params": {"id": "showAccountBrowser"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[2].id"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[1].id"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[0].id"}, "version": "0.1", "method": "click"}

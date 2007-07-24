@@ -1,3 +1,5 @@
+{"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "another test", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
@@ -6,5 +8,5 @@
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "triageButtonDone"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
-{"params": {"id": "sectionTaskEnableToggle"}, "version": "0.1", "method": "check"}
+{"params": {"id": "sectionTaskEnableToggle"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}

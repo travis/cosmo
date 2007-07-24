@@ -84,8 +84,7 @@ cosmo.view.list.loadItems = function (o) {
     if (!cosmo.app.pim.currentCollection) return;
     var itemLoadList = null;
     var showErr = function (e) {
-        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),
-            e);
+        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"",e);
         return false;
     };
 

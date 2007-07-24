@@ -352,11 +352,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
             deferred = new dojo.DeferredList(deferredArray);
 
             var addExpandedOccurrences = function (results) {
+                var error = cosmo.util.deferred.getFirstError(results);
+
                 //check for errors!
-                if (!results[0][0] || (results[1] && !results[1][0])){
-                    cosmo.app.showErr(_$("Service.Error.ProblemGettingItems"));
+                if (error){
+                    cosmo.app.showErr(_$("Service.Error.ProblemGettingItems"), "", error);
                     return;
-                }
+                }   
 
                 var occurrences = results[0][1];
                 if (results[1]){

@@ -162,7 +162,7 @@ cosmo.view.cal.loadEvents = function (o) {
         if (e instanceof cosmo.service.exception.ResourceNotFoundException){
             cosmo.app.pim.reloadCollections();
         }
-        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'), e);
+        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
     };
     // Load the array of events
     // ======================

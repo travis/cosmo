@@ -589,7 +589,7 @@ cosmo.view.service = new function () {
         var errMsg = _('Main.Error.ItemRemoveFailed');
         if (err) {
             act = 'removeFailed';
-            cosmo.app.showErr(errMsg, getErrDetailMessage(err));
+            cosmo.app.showErr(errMsg, getErrDetailMessage(err), err);
             item.restoreEvent();
         }
         else {

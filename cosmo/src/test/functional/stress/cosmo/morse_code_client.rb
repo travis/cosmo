@@ -43,10 +43,10 @@ module Cosmo
   class MorseCodeClient < BaseHttpClient
     @@log = Logger.new 'MorseCodeClient'
     
-    COL_PATH = "/cosmo/mc/collection/"
+    COL_PATH = "/mc/collection/"
     
-    def initialize(server, port, user, pass)
-      super(server, port, user, pass)
+    def initialize(server, port, context, user, pass)
+      super(server, port, context, user, pass)
     end
     
     attr_accessor :sync_token
@@ -54,7 +54,7 @@ module Cosmo
     def subscribe(collection)
       @@log.debug "subscribe #{collection} begin"
       @http.start do |http|
-        req = Net::HTTP::Get.new("#{COL_PATH}#{collection}")
+        req = Net::HTTP::Get.new("#{@context}#{COL_PATH}#{collection}")
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password
@@ -71,7 +71,7 @@ module Cosmo
     def sync(collection)
       @@log.debug "sync #{collection} begin"
       @http.start do |http|
-        req = Net::HTTP::Get.new("#{COL_PATH}#{collection}")
+        req = Net::HTTP::Get.new("#{@context}#{COL_PATH}#{collection}")
         http.read_timeout=600
         @@log.debug "using synctoken: #{@sync_token}"
   
@@ -91,7 +91,7 @@ module Cosmo
     def publish(collection, eimml)
       @@log.debug "publish #{collection} begin"
       @http.start do |http|
-        req = Net::HTTP::Put.new("#{COL_PATH}#{collection}")
+        req = Net::HTTP::Put.new("#{@context}#{COL_PATH}#{collection}")
         http.read_timeout=600
         
         # we make an HTTP basic auth by passing the
@@ -110,7 +110,7 @@ module Cosmo
     def update(collection, eimml)
       @@log.debug "update #{collection} begin"
       @http.start do |http|
-        req = Net::HTTP::Post.new("#{COL_PATH}#{collection}")
+        req = Net::HTTP::Post.new("#{@context}#{COL_PATH}#{collection}")
         http.read_timeout=600
         
         # we make an HTTP basic auth by passing the
@@ -130,7 +130,7 @@ module Cosmo
     def delete(collection)
       @@log.debug "delete #{collection} begin"
       @http.start do |http|
-        req = Net::HTTP::Delete.new("#{COL_PATH}#{collection}")
+        req = Net::HTTP::Delete.new("#{@context}#{COL_PATH}#{collection}")
         http.read_timeout=600
         
         # we make an HTTP basic auth by passing the

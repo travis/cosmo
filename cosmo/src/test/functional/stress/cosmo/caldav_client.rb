@@ -43,16 +43,16 @@ module Cosmo
   class CalDAVClient < BaseHttpClient
     @@log = Logger.new 'CalDAVClient'
     
-    DAV_PATH = "/cosmo/dav/"
+    DAV_PATH = "/dav/"
     
-    def initialize(server, port, user, pass)
-      super(server,port,user,pass)
+    def initialize(server, port, context, user, pass)
+      super(server,port,context,user,pass)
     end
     
     def get(path)
       @@log.debug "get #{path} begin"
       @http.start do |http|
-        req = Net::HTTP::Get.new("#{DAV_PATH}#{path}")
+        req = Net::HTTP::Get.new("#{@context}#{DAV_PATH}#{path}")
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password
@@ -67,7 +67,7 @@ module Cosmo
     def put(path, data)
       @@log.debug "put #{path} begin"
       @http.start do |http|
-        req = Net::HTTP::Put.new("#{DAV_PATH}#{path}")
+        req = Net::HTTP::Put.new("#{@context}#{DAV_PATH}#{path}")
         http.read_timeout=600
         
         # we make an HTTP basic auth by passing the
@@ -85,7 +85,7 @@ module Cosmo
     def delete(path)
       @@log.debug "delete #{path} begin"
       @http.start do |http|
-        req = Net::HTTP::Delete.new("#{DAV_PATH}#{path}")
+        req = Net::HTTP::Delete.new("#{@context}#{DAV_PATH}#{path}")
         http.read_timeout=600
         
         # we make an HTTP basic auth by passing the
@@ -101,7 +101,7 @@ module Cosmo
     def report(path, reportBody, depth="1")
       @@log.debug "report #{path} begin"
       @http.start do |http|
-        req = Net::HTTP::Report.new("#{DAV_PATH}#{path}")
+        req = Net::HTTP::Report.new("#{@context}#{DAV_PATH}#{path}")
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password
@@ -118,7 +118,7 @@ module Cosmo
      def makeCalendar(path, calendarBody)
       @@log.debug "mkcalendar #{path} begin"
       @http.start do |http|
-        req = Net::HTTP::MakeCalendar.new("#{DAV_PATH}#{path}")
+        req = Net::HTTP::MakeCalendar.new("#{@context}#{DAV_PATH}#{path}")
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password

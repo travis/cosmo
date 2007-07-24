@@ -185,10 +185,10 @@ module Cosmo
     # iterations - number of iterations to run, or number of seconds to run
     # timBased - if true, iterations represents number of seconds to run
     # stats - CosmoUserStats object to report stats to
-    def initialize(server, port, user, pass, iterations=1, timeBased=false, stats=nil)
+    def initialize(server, port, context, user, pass, iterations=1, timeBased=false, stats=nil)
       
       # create new user
-      @cmpClient = CMPClient.new(server, port, user, pass)
+      @cmpClient = CMPClient.new(server, port, context, user, pass)
       @user = "user" + random_string(10)
       @pass = "password"
       @cmpClient.createUser(@user, @pass, random_string(15), random_string(15), random_string(15) + "@osafoundation.org")
@@ -274,10 +274,11 @@ module Cosmo
   # Base HTTP Client that initializes a Net::HTTP object
   class BaseHttpClient
     
-    def initialize(server, port, user, pass)
+    def initialize(server, port, context, user, pass)
       @http = Net::HTTP.new(server, port)
       @user = user
       @pass = pass
+      @context = context
     end
     
     # Time the execution of a block of code

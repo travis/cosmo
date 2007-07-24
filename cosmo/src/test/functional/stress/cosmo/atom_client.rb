@@ -28,10 +28,10 @@ module Cosmo
   class AtomClient < BaseHttpClient
     @@log = Logger.new 'AtomClient'
     
-    COL_PATH = "/cosmo/atom/"
+    COL_PATH = "/atom/"
     
-    def initialize(server, port, user, pass)
-      super(server,port,user,pass)
+    def initialize(server, port, context, user, pass)
+      super(server,port,context,user,pass)
     end
     
     def getFullFeed(collection, format=nil, startRange=nil, endRange=nil)
@@ -39,9 +39,9 @@ module Cosmo
       @http.start do |http|
         
         if(format.nil?)
-          strRequest = "#{COL_PATH}collection/#{collection}/full"
+          strRequest = "#{@context}#{COL_PATH}collection/#{collection}/full"
         else
-          strRequest = "#{COL_PATH}collection/#{collection}/full/#{format}"
+          strRequest = "#{@context}#{COL_PATH}collection/#{collection}/full/#{format}"
         end
         
         strRequest << "?start=#{startRange}&end=#{endRange}" if !startRange.nil?
@@ -62,9 +62,9 @@ module Cosmo
       @http.start do |http|
         
         if(format.nil?)
-          strRequest = "#{COL_PATH}collection/#{collection}/#{triage_status}"
+          strRequest = "#{@context}#{COL_PATH}collection/#{collection}/#{triage_status}"
         else
-          strRequest = "#{COL_PATH}collection/#{collection}/#{triage_status}/#{format}"
+          strRequest = "#{@context}#{COL_PATH}collection/#{collection}/#{triage_status}/#{format}"
         end
         
         req = Net::HTTP::Get.new(strRequest)
@@ -83,7 +83,7 @@ module Cosmo
       @@log.debug "post #{collection} begin"
       @http.start do |http|
       
-        strRequest = "#{COL_PATH}collection/#{collection}"
+        strRequest = "#{@context}#{COL_PATH}collection/#{collection}"
        
         req = Net::HTTP::Post.new(strRequest)
         http.read_timeout=600
@@ -102,7 +102,7 @@ module Cosmo
         @@log.debug "put #{item} begin"
         @http.start do |http|
       
-        strRequest = "#{COL_PATH}item/#{item}"
+        strRequest = "#{@context}#{COL_PATH}item/#{item}"
        
         req = Net::HTTP::Put.new(strRequest)
         http.read_timeout=600

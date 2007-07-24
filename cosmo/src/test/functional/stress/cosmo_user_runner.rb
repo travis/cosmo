@@ -23,6 +23,7 @@ require 'drb'
 
 server = "localhost"
 port = "8080"
+context = "/chandler"
 username = "root"
 password = "cosmo"
 threadMix = [1,0,0]
@@ -37,6 +38,10 @@ OptionParser.new do |opts|
 
     opts.on("-s", "--server [SERVER]", "server address (default localhost)") do |s|
       server = s
+    end
+    
+    opts.on("-c", "--context [CONTEXT]", "application context (default chandler)") do |c|
+      context = c
     end
     
     opts.on("-p", "--port [PORT]", "server port (default 8080)") do |p|
@@ -109,21 +114,21 @@ for i in 1..numRounds
   users = []
 
   for i in 1..threadMix[0].to_i
-    user = MorseCodeUser.new(server, port, username, password, iterations, timed, stats)
+    user = MorseCodeUser.new(server, port, context, username, password, iterations, timed, stats)
     users << user
     thread = Thread.new { user.run }
     threads << thread
   end
 
   for i in 1..threadMix[1].to_i
-    user = AtomUser.new(server, port, username, password, iterations, timed, stats)
+    user = AtomUser.new(server, port, context, username, password, iterations, timed, stats)
     users << user
     thread = Thread.new { user.run }
     threads << thread
   end
 
   for i in 1..threadMix[2].to_i
-    user = CalDAVUser.new(server, port, username, password, iterations, timed, stats)
+    user = CalDAVUser.new(server, port, context, username, password, iterations, timed, stats)
     users << user
     thread = Thread.new { user.run }
     threads << thread

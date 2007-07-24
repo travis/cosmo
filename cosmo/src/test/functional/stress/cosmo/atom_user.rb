@@ -47,10 +47,10 @@ module Cosmo
     end 
     
     
-    def initialize(server, port, user, pass, iterations=1, timeBased=false, stats=nil)
-      super(server,port,user,pass,iterations,timeBased,stats)
-      @mcClient = MorseCodeClient.new(server, port, @user, @pass)
-      @atomClient = AtomClient.new(server,port, @user, @pass)
+    def initialize(server, port, context, user, pass, iterations=1, timeBased=false, stats=nil)
+      super(server,port,context,user,pass,iterations,timeBased,stats)
+      @mcClient = MorseCodeClient.new(server, port,context, @user, @pass)
+      @atomClient = AtomClient.new(server,port,context, @user, @pass)
     end
     
     def registerStats

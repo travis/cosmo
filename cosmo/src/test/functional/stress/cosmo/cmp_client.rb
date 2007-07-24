@@ -28,16 +28,16 @@ module Cosmo
   class CMPClient < BaseHttpClient
     @@log = Logger.new 'CMPClient'
     
-    CMP_PATH = "/cosmo/cmp/"
+    CMP_PATH = "/cmp/"
    
-    def initialize(server, port, adminUser, adminPass)
-      super(server,port, adminUser, adminPass)
+    def initialize(server, port,context, adminUser, adminPass)
+      super(server,port,context, adminUser, adminPass)
     end
     
     def createUser(user, pass, first, last, email)
       @@log.debug "create #{user} begin"
       @http.start do |http|
-        req = Net::HTTP::Put.new("#{CMP_PATH}user/#{user}")
+        req = Net::HTTP::Put.new("#{@context}#{CMP_PATH}user/#{user}")
         req['Content-Type'] = 'text/xml'
         xml = getNewUserXml(user, pass, first, last, email)
         # we make an HTTP basic auth by passing the

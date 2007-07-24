@@ -738,7 +738,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
             if (props.displayName != undefined) fields.title = [type.TEXT, props.displayName];
             if (props.creationDate != undefined) fields.createdOn = [type.DECIMAL, props.creationDate/1000];
-            if (props.triageStatus || props.triageRank || props.autoTriage)
+            if (props.triageStatus)
                 fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.rank), props.autoTriage? 1 : 0].join(" ")];
             
             return {

@@ -83,14 +83,14 @@ dojo.declare("cosmo.service.transport.Rest", null,
         },
 
         errorCallback: function(/* dojo.Deferred */ deferredRequestHandler){
-    		// summary
-    		// create callback that calls the Deferreds errback method
-    		return function(type, e, xhr){
+            // summary
+            // create callback that calls the Deferreds errback method
+            return function(type, e, xhr){
                 // Workaround to not choke on 204s
-    		    if ((dojo.render.safari &&
+                if ((dojo.render.safari &&
                     !xhr.status) || (dojo.render.html.ie &&
                          xhr.status == 1223)){
-    		        xhr = {};
+                    xhr = {};
                     xhr.status = 204;
                     xhr.statusText = "No Content";
                     xhr.responseText = "";
@@ -109,41 +109,41 @@ dojo.declare("cosmo.service.transport.Rest", null,
                     if (!(dojo.render.html.ie && xhr.status == 404 && !xhr.send)){
                         var err = new Error(e.message);
                         err.xhr = xhr;
-            			deferredRequestHandler.errback(err);
+                        deferredRequestHandler.errback(err);
                     }
                 }
-    		}
-    	},
-    	
-    	resultCallback: function(/* dojo.Deferred */ deferredRequestHandler){
-    		// summary
-    		// create callback that calls the Deferred's callback method
-    		var tf = dojo.lang.hitch(this,
-    			function(type, obj, xhr){
-    				if (obj && obj["error"] != null) {
-    					var err = new Error(obj.error);
-    					err.id = obj.id;
-    					err.xhr = xhr;
-    					deferredRequestHandler.errback(err);
-    				} else {
-    				    obj = xhr.responseXML || obj;
-    				    if (dojo.render.html.ie) {
-    				        var response = xhr.responseText;
-    				        response = response.replace(/xmlns:xml.*=".*"/, "");
-    				        obj = new ActiveXObject("Microsoft.XMLDOM");
+            }
+        },
+        
+        resultCallback: function(/* dojo.Deferred */ deferredRequestHandler){
+            // summary
+            // create callback that calls the Deferred's callback method
+            var tf = dojo.lang.hitch(this,
+                function(type, obj, xhr){
+                    if (obj && obj["error"] != null) {
+                        var err = new Error(obj.error);
+                        err.id = obj.id;
+                        err.xhr = xhr;
+                        deferredRequestHandler.errback(err);
+                    } else {
+                        obj = xhr.responseXML || obj;
+                        if (dojo.render.html.ie) {
+                            var response = xhr.responseText;
+                            response = response.replace(/xmlns:xml.*=".*"/, "");
+                            obj = new ActiveXObject("Microsoft.XMLDOM");
                             if (!obj.loadXML(response)){
-    		                   dojo.debug(obj.parseError.reason)
+                               dojo.debug(obj.parseError.reason)
                             }
-    				    }
-    					deferredRequestHandler.callback(obj, xhr);
-    				}
-    			}
-    		);
-    		return tf;
-    	},
-    	
-    	putText: function (text, url, kwArgs){
-    	    var deferred = new dojo.Deferred();
+                        }
+                        deferredRequestHandler.callback(obj, xhr);
+                    }
+                }
+            );
+            return tf;
+        },
+        
+        putText: function (text, url, kwArgs){
+            var deferred = new dojo.Deferred();
             var r = this.getDefaultRequest(deferred, kwArgs);
 
             r.contentType = "application/atom+xml";
@@ -155,11 +155,11 @@ dojo.declare("cosmo.service.transport.Rest", null,
     
             dojo.io.bind(r);
             return deferred;
-    	    
-    	},
-    	
-    	postText: function (text, url, kwArgs){
-    	    var deferred = new dojo.Deferred();
+            
+        },
+        
+        postText: function (text, url, kwArgs){
+            var deferred = new dojo.Deferred();
             var r = this.getDefaultRequest(deferred, kwArgs);
 
             r.contentType = "application/atom+xml";
@@ -170,47 +170,55 @@ dojo.declare("cosmo.service.transport.Rest", null,
     
             dojo.io.bind(r);
             return deferred;
-    	    
-    	},
-    	
-    	queryHashToString: function(/*Object*/ queryHash){
-    	    var queryList = [];
-    	    for (var key in queryHash){
+            
+        },
+        
+        queryHashToString: function(/*Object*/ queryHash){
+            var queryList = [];
+            for (var key in queryHash){
                 queryList.push(key + "=" + queryHash[key]);
-    	    }
-    	    if (queryList.length > 0){
-    	        return "?" + queryList.join("&");
-    	    }
-    	    else return "";
-    	},
-    	
-    	bind: function (r, kwArgs) {
+            }
+            if (queryList.length > 0){
+                return "?" + queryList.join("&");
+            }
+            else return "";
+        },
+        
+        bind: function (r, kwArgs) {
             kwArgs = kwArgs || {};
             var deferred = new dojo.Deferred();
             var request = this.getDefaultRequest(deferred, r, kwArgs);
             dojo.lang.mixin(request, r);
-            this.add404Handling(deferred, request.url);
+            this.addStandardErrorHandling(deferred, request.url);
             dojo.io.bind(request);
             return deferred;
         },
         
         addErrorCodeToExceptionErrback: function(deferred, responseCode, exception){
             deferred.addErrback(function (err){
-                if (err.xhr && err.xhr.status == responseCode){
+                if (err.statusCode == responseCode){
                     err = new exception(err);
                 }
                 return err;
             });
         },
 
-        add404Handling: function (deferred, id){
+        addStandardErrorHandling: function (deferred, url){
             deferred.addErrback(function (err) {
-
-            if (err.xhr.status == 404){
-                return new cosmo.service.exception.ResourceNotFoundException(id);
-            }
-        });
-    }  
+                if (err.xhr.status == 404){
+                    return new cosmo.service.exception.ResourceNotFoundException(url);
+                }
+                
+                if (err.xhr.status >= 400 &&  err.xhr.status <= 599){
+                    return new cosmo.service.exception.ServerSideError({
+                        url: url, 
+                        statusCode: err.xhr.status,
+                        responseContent: err.xhr.responseText
+                    });
+                }
+                return err;
+            });
+        }
         
     }
 );

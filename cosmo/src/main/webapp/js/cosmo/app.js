@@ -70,34 +70,27 @@ cosmo.app = new function () {
      * If new errors get spawned while this is processing, it queues the
      * messages for display after users dismisses the faux modal disalog box
      */
-    this.showErr = function (pri, sec) {
+    this.showErr = function (primaryMessage, secondaryMessage, error) {
         var msg = '';
         var secondaryMessage = null; // Secondary message, if any
-        var trace = null; // Stack trace, if any
-
-        // Secondary message passed
-        if (sec) {
-            if (typeof sec == 'string') {
-                secondaryMessage = sec;
-            }
-            else if (sec instanceof Error && sec.message) {
-                secondaryMessage = sec.message;
-            }
+        
+        var verboseInfo = null; 
+        if (error && error.toStringVerbose){
+            verboseInfo = error.toStringVerbose();
         }
 
         // If the error dialog is already showing, add this message to the error queue
         if (this.modalDialog.isDisplayed) {
-            this.errorList.push(pri);
-        }
-        // Otherwise display the error dialog
-        else {
+            this.errorList.push(primaryMessage);
+        }  // Otherwise display the error dialog
+        else {  
             // If there are errors waiting in the queue, prepend them to the error msg
             if (this.errorList.length) {
                 var currErr = '';
                 while (currErr = this.errorList.shift()) {
                     msg += '<div class="errText">' + currErr + '</div>';
                 }
-                msg += pri;
+                msg += primaryMessage;
             }
             // Otherwise just display the current message
             else {
@@ -105,42 +98,41 @@ cosmo.app = new function () {
                 // Primary error message -- simple message
                 var d = _createElem('div');
                 d.className = 'errText';
-                d.innerHTML = pri;
-                pri = d;
-                msg.appendChild(pri);
+                d.innerHTML = primaryMessage;
+                primaryMessage = d;
+                msg.appendChild(primaryMessage);
+
                 // Secondary message -- some details or string from the server
-                if (secondaryMessage) {
+                d = _createElem('div');
+                d.innerHTML = secondaryMessage || "";
+                secondaryMessage = d;
+                msg.appendChild(secondaryMessage);
+
+                // If we have a verbose info, give the user the option of seeing it
+                // in a pop-up window
+                if (verboseInfo) {
                     d = _createElem('div');
-                    d.innerHTML = secondaryMessage;
-                    secondaryMessage = d;
-                    msg.appendChild(secondaryMessage);
-                    // If we have a trace, give the user the option of seeing it
-                    // in a pop-up window
-                    if (trace) {
-                        d = _createElem('div');
-                        d.innerHTML = '<pre>' + trace + '</pre>';
-                        trace = d;
-                        var full = _createElem('div');
-                        // Use a clone of the secondary message node
-                        full.appendChild(secondaryMessage.cloneNode(true));
-                        full.appendChild(trace);
-                        var f = function () {
-                            cosmo.util.popup.openFullSize(full);
-                        }
-                        d = _createElem('div');
-                        d.style.marginTop = '8px';
-                        var a = document.createElement('a');
-                        // Avoid use of the ugly hack of '#' href prop 
-                        // Give the anchor some help to act like a real link
-                        a.className = 'jsLink'; 
-                        dojo.event.connect(a, 'onclick', f);
-                        a.appendChild(_createText('Click here for details ...'));
-                        d.appendChild(a);
-                        msg.appendChild(d);
+                    d.innerHTML = '<pre>' + verboseInfo + '</pre>';
+                    verboseInfo = d;
+                    var full = _createElem('div');
+                    // Use a clone of the secondary message node
+                    full.appendChild(secondaryMessage.cloneNode(true));
+                    full.appendChild(verboseInfo);
+                    var f = function () {
+                        cosmo.util.popup.openFullSize(full);
                     }
+                    d = _createElem('div');
+                    d.style.marginTop = '8px';
+                    var a = document.createElement('a');
+                    // Avoid use of the ugly hack of '#' href prop 
+                    // Give the anchor some help to act like a real link
+                    a.className = 'jsLink'; 
+                    dojo.event.connect(a, 'onclick', f);
+                    a.appendChild(_createText('Click here for details ...'));
+                    d.appendChild(a);
+                    msg.appendChild(d);
                 }
             }
-        dojo.debug("s3");
             this.modalDialog.type = this.modalDialog.ERROR;
             var but = new Button('okButton', 64, self.hideDialog,
                 _('App.Button.OK'), true);
@@ -148,7 +140,6 @@ cosmo.app = new function () {
             this.modalDialog.defaultAction = self.hideDialog;
             this.modalDialog.content = msg;
             this.showDialog();
-        dojo.debug("s4");
         }
     };
     /**

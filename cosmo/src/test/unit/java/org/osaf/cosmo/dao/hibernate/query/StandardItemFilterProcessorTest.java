@@ -91,6 +91,11 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setTriageStatus(-1);
         query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code is null", query.getQueryString());
+        
+        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        filter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK, ItemFilter.ORDER_ASC);
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:triageStatus order by i.triageStatus.rank", query.getQueryString());
     }
     
     public void testNoteItemQuery() throws Exception {

@@ -18,6 +18,7 @@ package org.osaf.cosmo.model.filter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.QName;
@@ -34,13 +35,18 @@ import org.osaf.cosmo.model.QName;
  */
 public class ItemFilter {
     
+    public static final String ORDER_ASC = "asc";
+    public static final String ORDER_DESC = "desc";
+    
     String displayName = null;
     CollectionItem parent = null;
     String uid = null;
+    Integer maxResults = null;
     
     List<AttributeFilter> attributeFilters = new ArrayList<AttributeFilter>();
     List<StampFilter> stampFilters = new ArrayList<StampFilter>();
     HashMap<String, String> filterProperties = new HashMap<String, String>(); 
+    HashMap<String, String> orderByMap = new HashMap<String, String>();
     
     public ItemFilter() {
     }
@@ -151,4 +157,33 @@ public class ItemFilter {
     public String getFilterProperty(String key) {
         return filterProperties.get(key);
     }
+    
+    /**
+     * Add a property to order results by.  For now, this is only 
+     * really useful when used with setMaxResults(), where you
+     * only want to return the top X items, where the items are
+     * in a certain order before the top X are chosen.
+     * @param property property to order (ex. ContentItem.triageStatus.rank)
+     * @param order either "asc" or "desc"
+     */
+    public void addOrderBy(String property, String order) {
+        orderByMap.put(property, order);
+    }
+    
+    public Map<String, String> getOrderByMap() {
+        return orderByMap;
+    }
+
+    public Integer getMaxResults() {
+        return maxResults;
+    }
+
+    /**
+     * Limit the number of results returned
+     * @param maxResults
+     */
+    public void setMaxResults(Integer maxResults) {
+        this.maxResults = maxResults;
+    }
+    
 }

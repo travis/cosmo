@@ -44,6 +44,7 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteItemTriageStatusComparator;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
@@ -322,11 +323,21 @@ public class StandardTriageStatusQueryProcessor implements
      *   - For each recurring item, either the most recently occurring 
      *     modification with triage status DONE or the most recent occurrence,
      *     whichever occurred most recently 
+     *   - Limit to maxDone results
      */
     private SortedSet<NoteItem> getDone(CollectionItem collection, Date pointInTime, TimeZone timezone) {
         
         // filter for DONE triage status
         NoteItemFilter doneFilter = getTriageStatusFilter(collection, TriageStatus.CODE_DONE);
+        
+        // Limit the number of items with DONE status so we don't load
+        // tons of items on the server before merging with the recurring
+        // item occurrences and sorting.  Anything over this number will
+        // be thrown away during the limit/sorting phase so no need to pull
+        // more than maxDone items as long as they are sorted by rank.
+        doneFilter.setMaxResults(maxDone);
+        doneFilter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK,
+                ItemFilter.ORDER_ASC);
         
         // filter for recurring events
         NoteItemFilter eventFilter = getRecurringEventFilter(collection, doneDur.getTime(pointInTime), pointInTime, timezone);

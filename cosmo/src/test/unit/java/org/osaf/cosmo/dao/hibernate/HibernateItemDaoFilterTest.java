@@ -174,6 +174,11 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter.setTriageStatus(-1);
         results = contentDao.findItems(filter);
         Assert.assertEquals(8, results.size());
+        
+        // limit results
+        filter.setMaxResults(5);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(5, results.size());
     }
     
     public void testFilterByParent() throws Exception {

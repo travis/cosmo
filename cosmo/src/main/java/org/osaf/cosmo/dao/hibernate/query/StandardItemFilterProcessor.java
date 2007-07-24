@@ -79,16 +79,19 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     public Query buildQuery(Session session, ItemFilter filter) {
         StringBuffer selectBuf = new StringBuffer();
         StringBuffer whereBuf = new StringBuffer();
+        StringBuffer orderBuf = new StringBuffer();
+        
         HashMap<String, Object> params = new HashMap<String, Object>();
         
         if(filter instanceof NoteItemFilter)
-            handleNoteItemFilter(selectBuf, whereBuf, params, (NoteItemFilter) filter);
+            handleNoteItemFilter(selectBuf, whereBuf, orderBuf, params, (NoteItemFilter) filter);
         else if(filter instanceof ContentItemFilter)
-            handleContentItemFilter(selectBuf, whereBuf, params, (ContentItemFilter) filter);
+            handleContentItemFilter(selectBuf, whereBuf, orderBuf, params, (ContentItemFilter) filter);
         else    
             handleItemFilter(selectBuf, whereBuf, params, filter);
         
         selectBuf.append(whereBuf);
+        selectBuf.append(orderBuf);
         
         if(log.isDebugEnabled()) {
             log.debug(selectBuf.toString());
@@ -98,6 +101,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         
         for(Entry<String, Object> param: params.entrySet())
             hqlQuery.setParameter(param.getKey(), param.getValue());
+        
+        if(filter.getMaxResults()!=null)
+            hqlQuery.setMaxResults(filter.getMaxResults());
         
         return hqlQuery;
     }
@@ -221,11 +227,11 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     }
     
     private void handleNoteItemFilter(StringBuffer selectBuf,
-            StringBuffer whereBuf, HashMap<String, Object> params,
+            StringBuffer whereBuf, StringBuffer orderBuf,  HashMap<String, Object> params,
             NoteItemFilter filter) {
         selectBuf.append("select i from NoteItem i");
         handleItemFilter(selectBuf, whereBuf, params, filter);
-        handleContentItemFilter(selectBuf, whereBuf, params, filter);
+        handleContentItemFilter(selectBuf, whereBuf, orderBuf, params, filter);
         
         // filter by icaluid
         if(filter.getIcalUid()!=null) {
@@ -256,7 +262,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     }
     
     private void handleContentItemFilter(StringBuffer selectBuf,
-            StringBuffer whereBuf, HashMap<String, Object> params,
+            StringBuffer whereBuf, StringBuffer orderBuf, HashMap<String, Object> params,
             ContentItemFilter filter) {
         
         if("".equals(selectBuf.toString())) {
@@ -274,6 +280,16 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
                 params.put("triageStatus", filter.getTriageStatus());
             }
         }
+        
+        // look for triageStatusRank order
+        String order = filter.getOrderByMap().get(
+                ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK);
+        if (order != null) {
+            if (ItemFilter.ORDER_ASC.equals(order))
+                appendOrder(orderBuf, "i.triageStatus.rank");
+            else
+                appendOrder(orderBuf, "i.triageStatus.rank desc");
+        }
     }
     
     
@@ -282,6 +298,13 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             whereBuf.append(" where " + toAppend);
         else
             whereBuf.append(" and " + toAppend);
+    }
+    
+    private void appendOrder(StringBuffer orderBuf, String toAppend) {
+        if("".equals(orderBuf.toString()))
+            orderBuf.append(" order by " + toAppend);
+        else
+            orderBuf.append(", " + toAppend);
     }
     
     private String formatForLike(String toFormat) {

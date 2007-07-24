@@ -21,6 +21,9 @@ package org.osaf.cosmo.model.filter;
  * Matches only ContentItem instances.
  */
 public class ContentItemFilter extends ItemFilter {
+   
+    public static final String ORDER_BY_TRIAGE_STATUS_RANK = "ContentItem.triageStatus.rank";
+    
     private Integer triageStatus = null;
     
     public ContentItemFilter() {}
@@ -36,6 +39,8 @@ public class ContentItemFilter extends ItemFilter {
      *  <code> TriageStatus.CODE_DONE<br/>
      *  TriageStatus.CODE_NOW<br/>
      *  TriageStatus.CODE_LATER</code>
+     *  <p>
+     *  A value of -1 means match items with no triageStatus.
      * @param triageStatus
      */
     public void setTriageStatus(Integer triageStatus) {

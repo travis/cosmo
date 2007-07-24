@@ -1,4 +1,5 @@
 {"method": "wait", "params": {"milliseconds" : 5000}}
+{"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[1].id"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "wait", "params": {"milliseconds" : 5000}}

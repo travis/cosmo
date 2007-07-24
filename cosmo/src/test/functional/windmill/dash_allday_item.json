@@ -1,0 +1,9 @@
+{"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
+{"params": {"text": "Testing All Day", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"id": "noteDescription"}, "version": "0.1", "method": "click"}
+{"params": {"text": "My All day test of event details in the dashboard.", "id": "noteDescription"}, "version": "0.1", "method": "type"}
+{"params": {"id": "sectionEventEnableToggle"}, "version": "0.1", "method": "check"}
+{"params": {"id": "eventAllDay"}, "version": "0.1", "method": "check"}
+{"params": {"text": "8\/06\/2007", "id": "startDate"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}

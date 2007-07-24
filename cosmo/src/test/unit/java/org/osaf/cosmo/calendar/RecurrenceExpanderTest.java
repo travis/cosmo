@@ -206,7 +206,7 @@ public class RecurrenceExpanderTest extends TestCase {
         List recurs = EimValueConverter.toICalRecurs(recur1);
         es.setRecurrenceRules(recurs);
         
-        Instance instance = expander.getFirstInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T100000"), null);
+        Instance instance = expander.getFirstInstance(es.getCalendar(), new DateTime("20080101T090000"), new DateTime("20080105T100000"), null);
         
         Assert.assertEquals("20080101T100000", instance.getRid().toString());
     }
@@ -223,7 +223,7 @@ public class RecurrenceExpanderTest extends TestCase {
         List recurs = EimValueConverter.toICalRecurs(recur1);
         es.setRecurrenceRules(recurs);
         
-        Instance instance = expander.getLatestInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T110000"), null);
+        Instance instance = expander.getLatestInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T140000"), null);
         
         Assert.assertEquals("20080105T100000", instance.getRid().toString());
     }

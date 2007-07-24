@@ -316,7 +316,8 @@ public class RecurrenceExpander {
     
     /**
      * Calculate and return the latest ocurring instance for the 
-     * specified recurring calendar compnent and date range.
+     * specified recurring calendar compnent and date range.  The instance
+     * must end before the end of the range.
      * @param calendar recurring calendar component
      * @param rangeStart period start
      * @param rangeEnd period end
@@ -327,15 +328,22 @@ public class RecurrenceExpander {
      */
     public Instance getLatestInstance(Calendar calendar, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd, timezone );
-        if(instances.size()==0)
-            return null;
+       
+        // Find the latest occurrence that ends before the end of the range
+        while(instances.size()>0) {
+            String lastKey = (String) instances.lastKey();
+            Instance instance = (Instance) instances.remove(lastKey);
+            if(instance.getEnd().before(rangeEnd))
+                return instance;
+        }
         
-        return (Instance) instances.get(instances.lastKey());
+        return null;
     }
     
     /**
      * Calculate and return the latest ocurring instance for the 
      * specified master and exception calendar components and date range.
+     * The instance must end before the end of the range.
      * @param master master recurring calendar component
      * @param modifications list of exception components
      * @param rangeStart period start
@@ -347,16 +355,23 @@ public class RecurrenceExpander {
      */
     public Instance getLatestInstance(Component master, List<Component> modifications, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         InstanceList instances = getOcurrences(master, modifications, rangeStart, rangeEnd, timezone );
-        if(instances.size()==0)
-            return null;
         
-        return (Instance) instances.get(instances.lastKey());
+        // Find the latest occurrence that ends before the end of the range
+        while(instances.size()>0) {
+            String lastKey = (String) instances.lastKey();
+            Instance instance = (Instance) instances.remove(lastKey);
+            if(instance.getEnd().before(rangeEnd))
+                return instance;
+        }
+        
+        return null;
     }
     
     
     /**
      * Calculate and return the first ocurring instance for the 
      * specified recurring calendar compnent and date range.
+     * The instance must begin after the start of the range.
      * @param calendar recurring calendar component
      * @param rangeStart period start
      * @param rangeEnd period end
@@ -368,15 +383,22 @@ public class RecurrenceExpander {
     public Instance getFirstInstance(Calendar calendar, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         InstanceList instances = getOcurrences(calendar, rangeStart, rangeEnd, timezone );
         
-        if(instances.size()==0)
-            return null;
+       
+        // Find the first occurrence that begins after the start range
+        while(instances.size()>0) {
+            String firstKey = (String) instances.firstKey();
+            Instance instance = (Instance) instances.remove(firstKey);
+            if(instance.getStart().after(rangeStart))
+                return instance;
+        }
         
-        return (Instance) instances.get(instances.firstKey());
+        return null;
     }
     
     /**
      * Calculate and return the first ocurring instance for the 
      * specified master and exception components and date range.
+     * The instance must begin after the start of the range
      * @param master master component
      * @param modifications list of exception components
      * @param rangeStart period start
@@ -389,11 +411,16 @@ public class RecurrenceExpander {
     public Instance getFirstInstance(Component master, List<Component> modifications, Date rangeStart, Date rangeEnd, TimeZone timezone) {
         
         InstanceList instances = getOcurrences(master, modifications, rangeStart, rangeEnd, timezone );
+     
+        // Find the first occurrence that begins after the start range
+        while(instances.size()>0) {
+            String firstKey = (String) instances.firstKey();
+            Instance instance = (Instance) instances.remove(firstKey);
+            if(instance.getStart().after(rangeStart))
+                return instance;
+        }
         
-        if(instances.size()==0)
-            return null;
-        
-        return (Instance) instances.get(instances.firstKey());
+        return null;
     }
     
     /**

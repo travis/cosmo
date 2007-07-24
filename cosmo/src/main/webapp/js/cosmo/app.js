@@ -112,7 +112,7 @@ cosmo.app = new function () {
                 // in a pop-up window
                 if (verboseInfo) {
                     d = _createElem('div');
-                    d.innerHTML = '<pre>' + verboseInfo + '</pre>';
+                    d.innerHTML = "<textarea rows=30 cols=70>" + verboseInfo + "</textarea>"
                     verboseInfo = d;
                     var full = _createElem('div');
                     // Use a clone of the secondary message node

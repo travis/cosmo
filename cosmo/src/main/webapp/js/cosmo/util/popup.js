@@ -37,10 +37,11 @@ cosmo.util.popup = new function () {
             self.win.document.location = url;
         }
     };
+
     this.openFullSize = function (c) {
         // Create new window and display error
         try {
-            var fullWin = window.open('', 'fullWin');
+            var fullWin = window.open("", 'fullWin', 'height=480,width=640,resizeable=1');
             if (typeof c == 'string') {
                 fullWin.document.body.innerHTML = c;
             }

@@ -26,13 +26,15 @@ dojo.declare("cosmo.service.exception.ServerSideError", cosmo.service.exception.
     initializer: function(kwArgs){
         this.url = kwArgs.url;
         this.statusCode = kwArgs.statusCode;
+        this.postContent = kwArgs.postContent;
         this.responseContent = kwArgs.responseContent;
     },
     
     toStringVerbose: function(){
-        return "URL: " + this.url + "\n" 
-             + "Status Code: " + this.statusCode + "\n"
-             + "responseContent: " + this.responseContent;
+        return "URL: \n" + this.url + "\n\n" 
+             + "Status Code: \n" + this.statusCode + "\n\n"
+             + "Post Content: \n" + this.postContent + "\n\n"
+             + "Response Content: \n" + this.responseContent;
     }
 });
 

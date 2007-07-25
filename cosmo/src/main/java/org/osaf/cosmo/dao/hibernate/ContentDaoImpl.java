@@ -106,6 +106,15 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 }
                 // delete item
                 else if(item.getIsActive()==false) {
+                    // If item is a note modification, only remove the item
+                    // if its parent is not also being removed.  This is because
+                    // when a master item is removed, all its modifications are
+                    // removed.
+                    if(item instanceof NoteItem) {
+                        NoteItem note = (NoteItem) item;
+                        if(note.getModifies()!=null && note.getModifies().getIsActive()==false)
+                            continue;
+                    }
                     removeItemFromCollectionInternal(item, collection);
                 }
                 // update item

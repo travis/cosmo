@@ -102,6 +102,8 @@ public class StandardTriageStatusQueryProcessor implements
      *   - Non-recurring with triage status NOW<br/>
      *   - Modifications with triage status NOW<br/>
      *   - Occurrences whose period overlaps the current point in time 
+     *   - Modifications with triage status null and whose period
+     *     overlaps the current point in time.
      */
     private SortedSet<NoteItem> getNow(CollectionItem collection, Date pointInTime, TimeZone timezone) {
         
@@ -160,6 +162,8 @@ public class StandardTriageStatusQueryProcessor implements
      * NOW Query for a specific master NoteItem:<br/>
      *   - Modifications with triage status NOW<br/>
      *   - Occurrences whose period overlaps the current point in time 
+     *   - Modifications with triage status null and whose period
+     *     overlaps the current point in time.
      */
     private SortedSet<NoteItem> getNow(NoteItem master, Date pointInTime, TimeZone timezone) {
         
@@ -208,6 +212,12 @@ public class StandardTriageStatusQueryProcessor implements
             if(!instance.isOverridden()) {
                 // add occurrence
                 results.add(new NoteOccurrence(instance.getRid(), note));
+            } else {
+                // return modification if it has no triage-status
+                ModificationUid modUid = new ModificationUid(note, instance.getRid());
+                NoteItem mod = (NoteItem) contentDao.findItemByUid(modUid.toString());
+                if(mod.getTriageStatus()==null || mod.getTriageStatus().getCode()==null)
+                    results.add(mod);
             }
         }
         

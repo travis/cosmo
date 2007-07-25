@@ -104,8 +104,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
      
      _getFormValue: cosmo.util.html.getFormValue, 
 
-    
-
     _stampPropertiesMaps: {
         note: {
             body: {type: "string",
@@ -193,6 +191,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         var propertyDisplayName = _("Main.DetailForm." + propertyName);
         var dateFieldValue = this._getFormValue(form, info.dateField);
         var timeFieldValue = this._getFormValue(form, info.timeField);
+        timeFieldValue = timeFieldValue == "hh:mm" ? null : timeFieldValue;
         var meridianFieldValue = this._getFormValue(form, info.meridianField);
         var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
         var allDayFieldValue = this._getFormValue(form, info.allDayField) == "1";
@@ -228,7 +227,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         } 
         
         var date = new cosmo.datetime.Date();
-        if (tzIdFieldValue && !allDayFieldValue){
+        if (tzIdFieldValue && timeFieldValue){
             date.tzId = tzIdFieldValue;
             date.utc = false;
             date.updateFromLocalDate(jsDate);
@@ -305,6 +304,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         
         return errMsg;
     }, 
+    
     _populateAnyTimeAtTime: function(delta){
         if (delta.getStampProperty("event", "allDay")){
                delta.addStampProperty("event", "anyTime", false) 
@@ -317,7 +317,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         if (!startTimeFieldValue) {
            if (!endTimeFieldValue){
                delta.addStampProperty("event", "anyTime", true)
-               delta.addStampProperty("event", "eventStatus", null);
+               delta.addStampProperty("event", "status", null);
            } else {
                return _("App.Error.NoEndTimeWithoutStartTime");
            }
@@ -327,11 +327,12 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                delta.removeStampProperty("event", "endDate");
                delta.addStampProperty("event", "duration", null);
                delta.addStampProperty("event", "anyTime", false) //just in case.
-               delta.addStampProperty("event", "eventStatus", null);
+               delta.addStampProperty("event", "status", null);
            } else {
                delta.addStampProperty("event", "anyTime", false) //just in case.
            }
         }
         return "";
+        
     }
 });

@@ -72,7 +72,6 @@ cosmo.app = new function () {
      */
     this.showErr = function (primaryMessage, secondaryMessage, error) {
         var msg = '';
-        var secondaryMessage = null; // Secondary message, if any
         
         var verboseInfo = null; 
         if (error && error.toStringVerbose){

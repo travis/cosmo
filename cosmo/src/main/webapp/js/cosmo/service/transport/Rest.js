@@ -179,7 +179,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
         queryHashToString: function(/*Object*/ queryHash){
             var queryList = [];
             for (var key in queryHash){
-                queryList.push(key + "=" + queryHash[key]);
+                queryList.push(key + "=" + encodeURIComponent(queryHash[key]));
             }
             if (queryList.length > 0){
                 return "?" + queryList.join("&");

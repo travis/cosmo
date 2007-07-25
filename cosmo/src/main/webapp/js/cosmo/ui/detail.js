@@ -245,7 +245,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                     }
                 }
                 // No-item means 'clear the selection'
-                // FIXMe: We need better sematics for this --
+                // FIXME: We need better sematics for this --
                 // an empty collection/week-view will also pass nothing here
                 // On the other hand, the itemRegistry could now be empty
                 // because the user just removed the last item, in which
@@ -259,7 +259,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 }
                 break;
             case 'saveSuccess':
-                this.markupBar.render();
+                self.updateFromItem(item);
                 break;
             case 'saveFailed':
                 //self.setButtons(true, true);

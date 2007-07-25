@@ -454,14 +454,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             super.removeItem(item);
     }
     
-    @Override
-    public void removeItemFromCollection(Item item, CollectionItem collection) {
-        if(item instanceof NoteItem)
-            removeNoteItemFromCollection((NoteItem) item, collection);
-        else
-            super.removeItemFromCollection(item, collection);
-    }
-
+    
     @Override
     public void removeItemByPath(String path) {
         Item item = this.findItemByPath(path);
@@ -510,6 +503,13 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             getSession().update(parent);
         }
         
+        // Remove modifications
+        if(content instanceof NoteItem) {
+            NoteItem note = (NoteItem) content;
+            for(NoteItem mod: note.getModifications())
+                removeContentRecursive(mod);
+        }
+            
         getSession().delete(content);
     }
     

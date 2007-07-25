@@ -23,6 +23,7 @@ dojo.require("dojo.string");
 dojo.require("dojo.Deferred")
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
+dojo.require("cosmo.ui.conf");
 
 dojo.declare("cosmo.service.transport.Rest", null,
     {

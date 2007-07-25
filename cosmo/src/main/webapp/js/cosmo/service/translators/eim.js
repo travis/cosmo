@@ -989,8 +989,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 if (dateParams.anyTime !== undefined) properties.anyTime = dateParams.anyTime;
                 if (dateParams.allDay !== undefined) properties.allDay = dateParams.allDay;
             }
-    
-            if (record.fields.duration) properties.duration=
+            if (record.fields.duration) properties.duration =
                     new cosmo.model.Duration(record.fields.duration[1]);
             if (record.fields.location) properties.location = record.fields.location[1];
             if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1], properties.startDate);

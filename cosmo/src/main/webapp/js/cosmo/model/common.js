@@ -78,7 +78,7 @@ cosmo.model.declare("cosmo.model.Duration", null,
             
         },
         toIso8601: function (){
-            return ["P",
+            var durationString = ["P",
                     this._year? this._year + "Y" : "",
                     this._month? this._month + "M" : "",
                     this._day? this._day + "D" : "",
@@ -86,6 +86,8 @@ cosmo.model.declare("cosmo.model.Duration", null,
                     this._hour? this._hour + "H" : "",
                     this._minute? this._minute + "M" : "",
                     this._second? this._second + "S" : ""].join("");
+            if (durationString == "P") return null;
+            else return durationString;
                     
         }
     }, 

@@ -40,7 +40,7 @@ dojo.require("cosmo.ui.widget.TicketWidget");
   Tickets
 </div>
 
-<div dojoType="cosmo:TicketWidget" widgetId = "newTicketWidget"  itemId="${Path}"></div>
+<div dojoType="cosmo:TicketWidget" id="newTicketWidget" widgetId = "newTicketWidget"  itemId="${Path}"></div>
 <script type="text/javascript">
 dojo.addOnLoad(function(){
 	dojo.event.connect(dojo.widget.byId("newTicketWidget"), "createSuccess", 

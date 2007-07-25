@@ -20,6 +20,8 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <%@ attribute name="timezones"        %>
+<%@ attribute name="parseWidgets"        %>
+<%@ attribute name="searchIds"        %>
 
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
@@ -33,16 +35,24 @@
   <c:set var="timezones" value="false"/>
 </c:if>
 
+<c:if test="${empty parseWidgets}">
+  <c:set var="parseWidgets" value="true"/>
+</c:if>
+
 <script type="text/javascript">
 
     // Set isDebug to true to get nice dojo debugging messages.
 
+    var searchIds = [<c:forEach var="searchId" items="${searchIds}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>
+                     "${searchId}"</c:forEach>];
 
     var djConfig = {isDebug: false,
                     staticBaseUrl: "${staticBaseUrl}",
                     i18nLocation: "${staticBaseUrl}/i18n.js",
                     confLocation: "${staticBaseUrl}/webui.conf",
-                    templateName: "${templateName}"};
+                    templateName: "${templateName}",
+                    parseWidgets: ${parseWidgets},
+                    searchIds: searchIds}
 
 </script>
 

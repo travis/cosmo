@@ -23,6 +23,8 @@
 <%@ attribute name="contentWrapperClass"     %>
 <%@ attribute name="selfLink"        %>
 <%@ attribute name="stylesheets"     %>
+<%@ attribute name="parseWidgets"    %>
+<%@ attribute name="searchIds"       %>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
@@ -72,7 +74,7 @@
     <link rel="self" type="text/html" href="${selfLink }"/>
     </c:if>
 
-    <cosmo:dojoBoilerplate/>
+    <cosmo:dojoBoilerplate parseWidgets="${parseWidgets}" searchIds="${searchIds}"/>
     <script type="text/javascript">
     dojo.require("cosmo.ui.global_css");
     </script>

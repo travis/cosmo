@@ -28,7 +28,9 @@
 </c:if>
 <c:url var="feedUrl" value="/atom/collection/${Collection.uid}" />
 
-<cosmo:standardLayout prefix="HomeDirectory.Collection." contentWrapperClass="fullPageWidthContent" stylesheets="account_browser">
+<cosmo:standardLayout prefix="HomeDirectory.Collection." 
+				      contentWrapperClass="fullPageWidthContent" stylesheets="account_browser"
+				      parseWidgets="false" searchIds="newTicketWidget">
 
 <div>
   <span class="hd" style="margin-top: 12px;">

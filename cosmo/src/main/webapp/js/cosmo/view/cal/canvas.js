@@ -21,6 +21,7 @@ dojo.require("dojo.gfx.color.hsv");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("dojo.DeferredList");
+dojo.require("cosmo.app");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.datetime.Date");
@@ -578,6 +579,7 @@ cosmo.view.cal.canvas = new function () {
                 // Update viewStart, viewEnd from passed opts
                 for (var n in opts) { c[n] = opts[n]; }
                 c.render();
+                cosmo.app.hideMask();
                 break;
             case 'setSelected':
                 var ev = cmd.data;

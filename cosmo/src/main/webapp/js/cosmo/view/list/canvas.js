@@ -19,6 +19,7 @@ dojo.provide('cosmo.view.list.canvas');
 dojo.require('dojo.event.*');
 dojo.require('dojo.html.common');
 dojo.require('dojo.string');
+dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.view.common");
@@ -81,7 +82,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
             case 'eventsLoadSuccess':
                 this.initListProps();
                 this.render();
-                this._doSortAndDisplay();
+                if (this._doSortAndDisplay()) {
+                    cosmo.app.hideMask();
+                }
                 break;
             case 'saveSuccess':
                 this._saveSuccess(cmd)
@@ -285,6 +288,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
             opts: null });
 
+        return true;
     };
     this.initListProps = function () {
         var items = cosmo.view.list.itemRegistry.length;
@@ -465,7 +469,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
             this.currSortCol = s;
         }
         if (cosmo.view.list.sort.doSort(reg, this.currSortCol, this.currSortDir)) {
-            this.displayListViewTable();
+            // Wait for the result to ensure all the DOM operations
+            // are done before moving on
+            var waitForIt = this.displayListViewTable();
             if (cosmo.view.list.itemRegistry.length) {
                 // List view has all items loaded at once
                 // in the itemRegistry -- no need for selectedItemCache
@@ -481,6 +487,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         else {
             throw('Could not sort item registry.');
         }
+        return true;
     };
     this._showRowProcessing = function () {
         var id = 'listView_item' + self.getSelectedItemId();

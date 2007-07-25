@@ -59,8 +59,7 @@ cosmo.app = new function () {
         if (typeof self.initObj.init == 'function') { 
             self.initObj.init(self.initParams);
         };
-        self.hideMask();
-    }
+    };
 
     // ==========================
     // Modal dialog boxes

@@ -736,8 +736,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var fields = {};
         with (cosmo.service.eim.constants){
         
-            if (props.displayName != undefined) fields.title = [type.TEXT, props.displayName];
-            if (props.creationDate != undefined) fields.createdOn = [type.DECIMAL, props.creationDate/1000];
+            if (props.displayName !== undefined) fields.title = [type.TEXT, props.displayName];
+            if (props.creationDate !== undefined) fields.createdOn = [type.DECIMAL, props.creationDate/1000];
             if (props.triageStatus)
                 fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.rank), props.autoTriage? 1 : 0].join(" ")];
             
@@ -796,7 +796,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     propsToNoteRecord: function (props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (props.body != undefined) fields.body = [type.CLOB, props.body];
+            if (props.body !== undefined) fields.body = [type.CLOB, props.body];
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
@@ -850,16 +850,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         with (cosmo.service.eim.constants){
             var fields = {};
             var missingFields = [];
-            if (props.messageId != undefined) fields.messageId = [type.TEXT, props.messageId];
-            if (props.headers != undefined) fields.headers = [type.CLOB, props.headers];
-            if (props.fromAddress != undefined) fields.fromAddress = [type.TEXT, props.fromAddress];
-            if (props.toAddress != undefined) fields.toAddress = [type.TEXT, props.toAddress];
-            if (props.ccAddress != undefined) fields.ccAddress = [type.TEXT, props.ccAddress];
-            if (props.bccAddress != undefined) fields.bccAddress = [type.TEXT, props.bccAddress];
-            if (props.originators != undefined) fields.originators = [type.TEXT, props.originators];
-            if (props.dateSent != undefined) fields.dateSent = [type.TEXT, props.dateSent];
-            if (props.inReplyTo != undefined) fields.inReplyTo = [type.TEXT, props.inReplyTo];
-            if (props.references != undefined) fields.references = [type.CLOB, props.references];
+            if (props.messageId !== undefined) fields.messageId = [type.TEXT, props.messageId];
+            if (props.headers !== undefined) fields.headers = [type.CLOB, props.headers];
+            if (props.fromAddress !== undefined) fields.fromAddress = [type.TEXT, props.fromAddress];
+            if (props.toAddress !== undefined) fields.toAddress = [type.TEXT, props.toAddress];
+            if (props.ccAddress !== undefined) fields.ccAddress = [type.TEXT, props.ccAddress];
+            if (props.bccAddress !== undefined) fields.bccAddress = [type.TEXT, props.bccAddress];
+            if (props.originators !== undefined) fields.originators = [type.TEXT, props.originators];
+            if (props.dateSent !== undefined) fields.dateSent = [type.TEXT, props.dateSent];
+            if (props.inReplyTo !== undefined) fields.inReplyTo = [type.TEXT, props.inReplyTo];
+            if (props.references !== undefined) fields.references = [type.CLOB, props.references];
             
             return record = {
                 prefix: prefix.MAIL,
@@ -906,12 +906,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     propsToEventRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (props.startDate != undefined) fields.dtstart = 
+            if (props.startDate !== undefined) fields.dtstart = 
                 [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
-            if (props.status != undefined) fields.status = [type.TEXT, props.status];
-            if (props.location != undefined) fields.location = [type.TEXT, props.location];
-            if (props.duration != undefined) fields.duration = [type.TEXT, props.duration.toIso8601()];
-            if (props.rrule != undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
+            if (props.status !== undefined) fields.status = [type.TEXT, props.status];
+            if (props.location !== undefined) fields.location = [type.TEXT, props.location];
+            if (props.duration !== undefined) fields.duration = [type.TEXT, props.duration == null? null : props.duration.toIso8601()];
+            if (props.rrule !== undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
             if (props.exdates && props.exdates.length != 0) fields.exdate = [type.TEXT, this.exdatesToEim(props.exdates)];
             
             return record = {
@@ -986,8 +986,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (record.fields.dtstart){
                 properties.startDate = this.fromEimDate(record.fields.dtstart[1]);
                 var dateParams = this.dateParamsFromEimDate(record.fields.dtstart[1]);
-                if (dateParams.anyTime != undefined) properties.anyTime = dateParams.anyTime;
-                if (dateParams.allDay != undefined) properties.allDay = dateParams.allDay;
+                if (dateParams.anyTime !== undefined) properties.anyTime = dateParams.anyTime;
+                if (dateParams.allDay !== undefined) properties.allDay = dateParams.allDay;
             }
     
             if (record.fields.duration) properties.duration=
@@ -1116,6 +1116,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     rruleToICal: function (rrule){
+        if (rrule === null) return rrule;
         if (rrule.isSupported()){
             var recurrenceRuleList = [
                ";FREQ=",

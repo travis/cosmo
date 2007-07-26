@@ -218,16 +218,6 @@ public class ICalDate implements ICalendarConstants {
         if (tz == null)
             throw new UnknownTimeZoneException(str);
         
-        // FIXME: ical4j does not like TZID=GMT or TZID=Etc/UTC because
-        // its converts the entire datetime into UTC.  See bug 8962. 
-        // So until ical4j supports these, reject these two timezones 
-        // and suggest an alternative to prevent an ical4j validation 
-        // error from being thrown.
-        if("Etc/UTC".equals(tz.getID()))
-            throw new UnknownTimeZoneException("Etc/UTC is currently not supported, use UTC instead");
-        if("GMT".equals(tz.getID()))
-            throw new UnknownTimeZoneException("GMT is currently not supported, use Greenwich or GMT0 instead");
-            
         // If the timezone ids don't match, give an indication of the
         // correct timezone
         if(!tz.getID().equals(str))

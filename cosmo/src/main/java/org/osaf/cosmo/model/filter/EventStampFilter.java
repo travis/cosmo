@@ -150,6 +150,7 @@ public class EventStampFilter extends StampFilter {
             Value v = dstart instanceof DateTime ?
                 Value.DATE_TIME : Value.DATE;
             fstart = (DateTime) Dates.getInstance(dstart, v);
+            fstart.setUtc(false);
             // if the timezone is null then default system timezone is used
             fstart.setTimeZone((timezone != null) ? timezone : null);
         }
@@ -157,6 +158,7 @@ public class EventStampFilter extends StampFilter {
             Value v = dend instanceof DateTime ?
                 Value.DATE_TIME : Value.DATE;
             fend = (DateTime) Dates.getInstance(dend, v);
+            fend.setUtc(false);
             // if the timezone is null then default system timezone is used
             fend.setTimeZone((timezone != null) ? timezone : null);
         }

@@ -17,17 +17,14 @@ package org.osaf.cosmo.calendar.query;
 
 import java.text.ParseException;
 
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.component.VTimeZone;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.w3c.dom.Element;
-
-import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.util.Dates;
 
 /**
  * Represents the CALDAV:time-range element. From sec 9.8:
@@ -53,7 +50,7 @@ public class TimeRangeFilter implements CaldavConstants {
 
     private VTimeZone timezone = null;
 
-    private DateTime dstart, dend, fstart, fend;
+    private DateTime dstart, dend;
 
     public TimeRangeFilter(Period period) {
         setPeriod(period);
@@ -130,9 +127,6 @@ public class TimeRangeFilter implements CaldavConstants {
         // Get fixed start/end time
         dstart = period.getStart();
         dend = period.getEnd();
-        
-        // set timezone on floating times
-        updateFloatingTimes();
     }
 
     public String getUTCStart() {
@@ -143,22 +137,12 @@ public class TimeRangeFilter implements CaldavConstants {
         return dend.toString();
     }
 
-    public String getFloatStart() {
-        return fstart.toString();
-    }
-
-    public String getFloatEnd() {
-        return fend.toString();
-    }
-
     public VTimeZone getTimezone() {
         return timezone;
     }
 
     public void setTimezone(VTimeZone timezone) {
         this.timezone = timezone;
-        // update timezone on floating times
-        updateFloatingTimes();
     }
 
     /** */
@@ -166,25 +150,6 @@ public class TimeRangeFilter implements CaldavConstants {
         return new ToStringBuilder(this).
             append("dstart", dstart).
             append("dend", dend).
-            append("fstart", fstart).
-            append("fend", fend).
             toString();
-    }
-    
-    private void updateFloatingTimes() {
-        if(dstart!=null) {
-            Value v = dstart instanceof DateTime ?
-                Value.DATE_TIME : Value.DATE;
-            fstart = (DateTime) Dates.getInstance(dstart, v);
-            // if the timezone is null then default system timezone is used
-            fstart.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
-        }
-        if(dend!=null) {
-            Value v = dend instanceof DateTime ?
-                Value.DATE_TIME : Value.DATE;
-            fend = (DateTime) Dates.getInstance(dend, v);
-            // if the timezone is null then default system timezone is used
-            fend.setTimeZone((timezone != null) ? new TimeZone(timezone) : null);
-        }
     }
 }

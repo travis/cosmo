@@ -709,6 +709,8 @@ cosmo.ui.minical.MiniCal = function (p) {
      * initial load of the calendar
      */
     this.goToday = function () {
+        cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
+            cosmo.view.names.CAL, true)        
         dojo.event.topic.publish('/calEvent', {
             action: 'loadCollection',
             opts: { loadType: 'changeTimespan', goTo: self.currDate },
@@ -730,6 +732,8 @@ cosmo.ui.minical.MiniCal = function (p) {
         // Convert to int because FF saves attributes as strings
         dt = new Date(parseInt(dt));
 
+        cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
+            cosmo.view.names.CAL, true)        
         dojo.event.topic.publish('/calEvent', {
             action: 'loadCollection',
             opts: { loadType: 'changeTimespan', goTo: dt,
@@ -757,6 +761,8 @@ cosmo.ui.minical.MiniCal = function (p) {
         // All okey-dokey -- submit
         else {
             var d = new Date(val);
+            cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
+                cosmo.view.names.CAL, true)        
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: d },

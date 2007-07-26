@@ -97,11 +97,16 @@ cosmo.ui.navbar.Bar = function (p) {
         self.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
         self.setPosition(0, 0);
     };
-    this.displayView = function (v) {
+    
+    /*
+     * Switch to viewName. If noLoad is true, do not refresh
+	 * data before doing so.
+     */
+    this.displayView = function (viewName, /*boolean*/noLoad) {
         var _pim = cosmo.app.pim;
-        var _view = cosmo.view[v];
+        var _view = cosmo.view[viewName];
         var _loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
-        _pim.currentView = v;
+        _pim.currentView = viewName;
         if (!_view.hasBeenInitialized) {
             _view.init();
         }
@@ -113,7 +118,7 @@ cosmo.ui.navbar.Bar = function (p) {
         // status message on subsequent calls
         this.defaultViewHasBeenInitialized = true;
         var doDisplay = function () {
-            if (v == _pim.views.LIST) {
+            if (viewName == _pim.views.LIST) {
                 // Only switch views if the data for the view loads successfully
                 if (_view.loadItems()) {
                     // If the cal canvas is currently showing, save the scroll
@@ -125,21 +130,21 @@ cosmo.ui.navbar.Bar = function (p) {
                     self.listCanvas.domNode.style.display = 'block';
                 }
             }
-            else if (v == _pim.views.CAL) {
+            else if (viewName == _pim.views.CAL) {
                 // Set up topic subscriptions in the canvas -- published
                 // message "data has loaded" tells the canvas to render
                 if (!_view.canvas.hasBeenInitialized) {
                     _view.canvas.init();
                 }
                 // Only switch views if the data for the view loads successfully
-                if (_view.loadEvents()) {
+                if (noLoad || _view.loadEvents()) {
                     self.listCanvas.domNode.style.display = 'none';
                     self.calCanvas.domNode.style.display = 'block';
                     cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
                 }
             }
             else {
-                throw(v + ' is not a valid view.');
+                throw(viewName + ' is not a valid view.');
             }
         }
         setTimeout(doDisplay, 0);

@@ -95,8 +95,10 @@ public class EventApplicator extends BaseStampApplicator
                     // isn't, then update the modification's timezone to be the same
                     // as the master.  Although its technically legal to specify date
                     // properties in different timezones, some clients don't like this.
-                    if(modDt.isUtc() && !masterDt.isUtc())
+                    if(modDt.isUtc() && !masterDt.isUtc()) {
+                        modDt.setUtc(false);
                         modDt.setTimeZone(masterDt.getTimeZone());
+                    }
                 }
             }
             eventStamp.setRecurrenceId(modUid.getRecurrenceId());

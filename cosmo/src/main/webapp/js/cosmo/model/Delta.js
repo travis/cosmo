@@ -125,9 +125,20 @@ dojo.declare("cosmo.model.Delta", null, {
             var eventStamp = this._stampProps["event"];
             if (eventStamp["startDate"] && eventStamp["endDate"]){
                 var duration = null;
-                if ( (this._note.getEventStamp() && (this._note.getEventStamp().getAllDay() 
-                    || this._note.getEventStamp().getAnyTime())) 
-                    || eventStamp["allDay"] || eventStamp["anyTime"]){
+                var noteEStamp = this._note.getEventStamp();
+                var doAddOneDayToDuration = false;
+                if (noteEStamp){
+                    var currentStateAllDay = noteEStamp.getAllDay();
+                    var currentStateAnyTime = noteEStamp.getAnyTime();
+                    var deltaAllDay = eventStamp["allDay"];
+                    var deltaAnyTime = eventStamp["anyTime"];
+                    var resultantAllDay = deltaAllDay 
+                                        || (currentStateAllDay && deltaAllDay != false);
+                    var resultantAnyTime = deltaAnyTime 
+                                        || (currentStateAnyTime && deltaAnyTime != false);
+                    doAddOneDayToDuration = resultantAllDay || resultantAnyTime;                              
+                }
+                if (doAddOneDayToDuration){
                     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
                         eventStamp["startDate"], eventStamp["endDate"]) + 1;
                     duration = new cosmo.model.Duration({day:diff} );

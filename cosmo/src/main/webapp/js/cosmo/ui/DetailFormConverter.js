@@ -122,7 +122,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 timeField: "startTime",
                 meridianField: "startMeridian",
                 tzIdField: "tzId",
-                allDayField: "eventAllDay"                
+                allDayField: "eventAllDay",
+                validation: [["required"]]               
             },
 
             endDate: {
@@ -131,7 +132,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 timeField: "endTime",
                 meridianField: "endMeridian",
                 tzIdField: "tzId",
-                allDayField: "eventAllDay"             
+                allDayField: "eventAllDay",
+                validation: [["required"]]               
             },
             
             "location": {
@@ -190,6 +192,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         //this code adapted from mde's original cal_form code.
         var propertyDisplayName = _("Main.DetailForm." + propertyName);
         var dateFieldValue = this._getFormValue(form, info.dateField);
+        dateFieldValue = dateFieldValue == "mm/dd/yyyy" ? null : dateFieldValue;
         var timeFieldValue = this._getFormValue(form, info.timeField);
         timeFieldValue = timeFieldValue == "hh:mm" ? null : timeFieldValue;
         var meridianFieldValue = this._getFormValue(form, info.meridianField);
@@ -197,6 +200,10 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         var allDayFieldValue = this._getFormValue(form, info.allDayField) == "1";
         
         var errMsg = ""
+
+        if (!dateFieldValue){
+            return [null,null];
+        }
         
         if (timeFieldValue){
             var err = cosmo.util.validate.timeFormat(timeFieldValue);
@@ -204,9 +211,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 errMsg += '"'+propertyDisplayName+'" time field: ' + err;
                 errMsg += '\n';
             }
-        }
-
-        if(!allDayFieldValue){  
+ 
             var err = cosmo.util.validate.required(meridianFieldValue);
             if (err){
                 errMsg += '"'+propertyDisplayName+'" AM/PM field: ' + err;
@@ -313,7 +318,9 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         
         var form = cosmo.ui.detail.getStampForm("event");
         var startTimeFieldValue = this._getFormValue(form, "startTime");
+        startTimeFieldValue = startTimeFieldValue == "hh:mm" ? null : startTimeFieldValue;
         var endTimeFieldValue = this._getFormValue(form, "endTime");
+        endTimeFieldValue = endTimeFieldValue == "hh:mm" ? null : endTimeFieldValue;
         if (!startTimeFieldValue) {
            if (!endTimeFieldValue){
                delta.addStampProperty("event", "anyTime", true)

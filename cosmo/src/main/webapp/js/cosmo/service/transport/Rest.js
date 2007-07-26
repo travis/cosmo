@@ -192,7 +192,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             var deferred = new dojo.Deferred();
             var request = this.getDefaultRequest(deferred, r, kwArgs);
             dojo.lang.mixin(request, r);
-            this.addStandardErrorHandling(deferred, request.url, request.postContent);
+            this.addStandardErrorHandling(deferred, request.url, request.postContent, request.method);
             dojo.io.bind(request);
             return deferred;
         },
@@ -206,7 +206,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             });
         },
 
-        addStandardErrorHandling: function (deferred, url, postContent){
+        addStandardErrorHandling: function (deferred, url, postContent, method){
             deferred.addErrback(function (err) {
                 if (err.xhr.status == 404){
                     return new cosmo.service.exception.ResourceNotFoundException(url);
@@ -217,7 +217,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
                         url: url, 
                         statusCode: err.xhr.status,
                         responseContent: err.xhr.responseText,
-                        postContent: postContent
+                        postContent: postContent,
+                        method: method
                     });
                 }
                 return err;

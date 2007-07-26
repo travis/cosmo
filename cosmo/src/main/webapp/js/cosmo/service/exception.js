@@ -28,10 +28,12 @@ dojo.declare("cosmo.service.exception.ServerSideError", cosmo.service.exception.
         this.statusCode = kwArgs.statusCode;
         this.postContent = kwArgs.postContent;
         this.responseContent = kwArgs.responseContent;
+        this.method = kwArgs.method;
     },
     
     toStringVerbose: function(){
-        return "URL: \n" + this.url + "\n\n" 
+        return "Method: \n" + this.method + "\n\n" 
+             + "URL: \n" + this.url + "\n\n" 
              + "Status Code: \n" + this.statusCode + "\n\n"
              + "Post Content: \n" + this.postContent + "\n\n"
              + "Response Content: \n" + this.responseContent;

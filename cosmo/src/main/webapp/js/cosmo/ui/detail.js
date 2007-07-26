@@ -36,6 +36,7 @@ dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.ui.DetailFormConverter");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.view.cal.common");
+dojo.require("cosmo.model.Item");
 
 cosmo.ui.detail = new function () {
     this.item = null;
@@ -187,6 +188,12 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         this.domNode.appendChild(c.domNode);
         this[st.stampType.toLowerCase() + 'Section'] = c;
     }
+
+    var c = new cosmo.ui.detail.Byline();
+    this.children.push(c);
+    this.domNode.appendChild(c.domNode);
+    this.byline = c;
+
     var c = new cosmo.ui.detail.ButtonSection();
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
@@ -309,6 +316,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
                 doCompleteDisable: false, disableStampFormElem: true });
         }
     }
+    this.byline.updateFromItem(data);
     this.buttonSection.setButtons(true);
 };
 
@@ -606,7 +614,7 @@ cosmo.ui.detail.StampSection = function (p) {
             var a = _createElem('a');
             a.id = id + 'showHideToggle';
             self.showHideSwitch = a;
-            a.appendChild(_createText('[hide]'));
+            a.appendChild(_createText(_('Main.DetailForm.Hide')));
             d.appendChild(a);
             fg.appendChild(d);
         }
@@ -1403,6 +1411,50 @@ cosmo.ui.detail.EventFormElements.prototype.hideOrShowEventStatus = function(){
 
         form["eventStatus"].disabled = !show;
 }
+
+dojo.declare("cosmo.ui.detail.Byline", null, {
+    domNode: null,
+    
+    initializer: function (){
+        this.domNode = _createElem("div");
+        this.domNode.className = "byline";
+    },
+    
+    actionToText: new function(){
+        this[cosmo.model.ACTION_EDITED] = _("Main.DetailForm.Byline.Edited");
+        this[cosmo.model.ACTION_QUEUED] = _("Main.DetailForm.Byline.Queued");
+        this[cosmo.model.ACTION_SENT] = _("Main.DetailForm.Byline.Sent");
+        this[cosmo.model.ACTION_UPDATED] = _("Main.DetailForm.Byline.Update");
+        this[cosmo.model.ACTION_CREATED] = _("Main.DetailForm.Byline.Created");
+    },
+    
+    updateFromItem: function(item){
+        
+        var modby = item.getModifiedBy();
+        var date = new cosmo.datetime.Date();
+        date.updateFromUTC(modby.getTimeStamp());
+        dojo.debug(modby.getTimeStamp())
+        var userId = modby.getUserId();
+
+        this.domNode.innerHTML = 
+            [
+            '<span class="bylineAction">', 
+            dojo.string.escapeXml(this.actionToText[modby.getAction()] || ""), '</span>',
+            userId? (_("Main.DetailForm.Byline.By") + '<span class="bylineWho">' +
+             dojo.string.escapeXml(userId) + ' </span>') : "",
+            _("Main.DetailForm.Byline.On"), '<span class="bylineDate">',
+            dojo.string.escapeXml(date.strftime(_("Main.DetailForm.Byline.DateFormat"))), '</span>',
+            _("Main.DetailForm.Byline.At"), '<span class="bylineTime">', 
+            dojo.string.escapeXml(date.strftime(_("Main.DetailForm.Byline.TimeFormat"))), '</span>'
+            
+            ].join('');
+        
+        var x = modby;
+        var y = this.domNode;
+
+    }  
+}
+);
 
 cosmo.ui.detail.ButtonSection = function () {
     var self = this;

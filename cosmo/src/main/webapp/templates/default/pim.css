@@ -458,6 +458,12 @@
     background-color: #fbfbfb; 
     border-bottom: 1px solid #ccc;
 }
+.byline {
+	font-weight: bold;
+	font-size: smaller;
+	padding: 5px 10px;
+    color: #808080;
+}
 
 /* Minical styles
  * --------------------- */

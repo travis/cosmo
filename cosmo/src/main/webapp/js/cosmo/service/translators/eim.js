@@ -1048,10 +1048,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     modbyRecordToModbyProps: function(record){
         var props = {};
-        if (record.fields){
-            if (record.fields.userid) props.userId = record.fields.userid[1];
-            if (record.fields.timestamp) props.timeStamp = record.fields.timestamp[1];
-            if (record.fields.action) props.action = record.fields.action[1];
+        if (record.key){
+            if (record.key.userid) props.userId = record.key.userid[1];
+            if (record.key.timestamp) props.timeStamp = record.key.timestamp[1] * 1000;
+            if (record.key.action) props.action = record.key.action[1];
         }
         return props;
     },

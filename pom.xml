@@ -20,8 +20,99 @@
     <artifactId>osaf-server</artifactId>
     <version>0.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>OSAF Server</name>
-    <url>http://cosmo.osafoundation.org</url>
+    <name>Chandler Server</name>
+    <url>http://chandlerproject.org</url>
+    <description>
+        The Chandler Server team is working on both the Chandler Server (CalDAV server), the Chandler Server Administrator
+        web interface and the end-user shared information management web application. Chandler Server is the software that
+        powers the Chandler Hub Sharing Service. The Chandler Server code is also available for download as a standalone
+        server.
+    </description>
+    <issueManagement>
+        <system>Bugzilla</system>
+        <url>https://bugzilla.osafoundation.org</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Tinderbox2</system>
+        <url>http://builds.osafoundation.org/tinderbox/Cosmo/status.html</url>
+    </ciManagement>
+    <developers>
+        <developer>
+            <id>sprout</id>
+            <name>Ted Leung</name>
+            <email>twleung@osafoundation.org</email>
+            <roles>
+                <role>Project Manager</role>
+            </roles>
+            <organization>OSAF</organization>
+            <timezone>-5</timezone>
+        </developer>
+        <developer>
+            <id>bcm</id>
+            <name>Brian Moseley</name>
+                <roles>
+                    <role>Server</role>
+                    <role>Architect</role>
+                    <role>Components</role>
+                </roles>
+            <organization>OSAF</organization>
+            <timezone>-5</timezone>
+        </developer>
+        <developer>
+            <id>rletness</id>
+            <name>Randy Letness</name>
+                <roles>
+                    <role>Server</role>
+                    <role>Storage Layer</role>
+                </roles>
+            <organization>OSAF</organization>
+            <timezone>-4</timezone>
+        </developer>
+        <developer>
+            <id>mde</id>
+            <name>Matthew Eernisse</name>
+                <roles>
+                    <role>Client</role>
+                    <role>Hub Front-end</role>
+                </roles>
+            <organization>OSAF</organization>
+            <timezone>-4</timezone>
+        </developer>
+        <developer>
+            <id>br</id>
+            <name>Bobby Rullo</name>
+                <roles>
+                    <role>Server</role>
+                    <role>Components</role>
+                </roles>
+            <organization>OSAF</organization>
+            <timezone>-5</timezone>
+        </developer>
+        <developer>
+            <id>tvachon</id>
+            <name>Travis Vachon</name>
+                <roles>
+                    <role>Server</role>
+                    <role>Admin Front-end</role>
+                </roles>
+            <organization>OSAF</organization>
+            <timezone>-5</timezone>
+        </developer>
+    </developers>
+    <mailingLists>
+        <mailingList>
+            <name>Cosmo Developers mailing list</name>
+            <subscribe>cosmo-dev-subscribe@lists.osafoundation.org</subscribe>
+            <unsubscribe>cosmo-dev-unsubscribe@lists.osafoundation.org</unsubscribe>
+            <post>cosmo-dev@lists.osafoundation.org</post>
+            <archive>http://lists.osafoundation.org/pipermail/cosmo-dev/</archive>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <connection>scm:svn:http://svn.osafoundation.org/server/cosmo/</connection>
+        <developerConnection>scm:svn:svn+ssh://svn.osafoundation.org/svn/server/cosmo/</developerConnection>
+        <url>http://svn.osafoundation.org/server/cosmo/</url>
+    </scm>
     <modules>
         <module>cosmo</module>
         <module>snarf</module>
@@ -109,6 +200,10 @@
             <name>OSAF M2 Repository</name>
             <url>scpexe://paniolo.osafoundation.org/www/maven2</url>
         </snapshotRepository>
+        <site>
+            <id>osaf-site</id>
+            <url>scpexe://downloads.osafoundation.org/www/cosmo.osafoundation.org/docs</url>
+        </site>
     </distributionManagement>
     <dependencyManagement>
         <dependencies>

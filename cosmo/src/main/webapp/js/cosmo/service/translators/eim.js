@@ -928,9 +928,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     exdatesToEim: function(exdates){
-        return ";VALUE=DATE-TIME:" + dojo.lang.map(
+        return ";VALUE=DATE-TIME:" + 
+            dojo.lang.map(
                 exdates,
-                function(date){return date.strftime("%Y%m%dT%H%M%S");}
+                function(date){
+                    return date.createDateForTimezone("utc").strftime("%Y%m%dT%H%M%SZ");
+                }
             ).join(",");
     },
     

@@ -912,7 +912,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (props.location !== undefined) fields.location = [type.TEXT, props.location];
             if (props.duration !== undefined) fields.duration = [type.TEXT, props.duration == null? null : props.duration.toIso8601()];
             if (props.rrule !== undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
-            if (props.exdates && props.exdates.length != 0) fields.exdate = [type.TEXT, this.exdatesToEim(props.exdates)];
+            if (props.exdates && props.exdates.length != 0) fields.exdate = 
+                [type.TEXT, this.exdatesToEim(props.exdates, props.startDate)];
             
             return record = {
                 prefix: prefix.EVENT,
@@ -927,8 +928,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
     },
 
-    exdatesToEim: function(exdates){
-        return ";VALUE=DATE-TIME:" + 
+    exdatesToEim: function(exdates, start){
+        return ";VALUE=DATE-TIME" + 
+            (start.tzId? ";TZID=" + start.tzId : "") + 
+            ":" +
             dojo.lang.map(
                 exdates,
                 function(date){

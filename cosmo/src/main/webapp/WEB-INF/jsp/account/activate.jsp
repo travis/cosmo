@@ -21,10 +21,8 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <fmt:setBundle basename="PimMessageResources"/>
-<cosmo:standardLayout prefix="Account.Activate." showNav="false">
+<cosmo:standardLayout prefix="Account.Activate." showNav="false" stylesheets="activation">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
-
-<link rel="stylesheet" href="${staticBaseUrl}/templates/<fmt:message key="App.TemplateName"/>/activated.css"/>
 
 <span id="congratulations"><fmt:message key="Account.Activate.Congrats"/></span>
 <span id="activatedMessage"><fmt:message key="Account.Activate.ActivatedMessage"/></span>

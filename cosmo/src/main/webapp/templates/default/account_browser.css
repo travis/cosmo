@@ -17,6 +17,24 @@
  *
  */
 
+/* Home Dir Browser styles
+ * -------------------*/
+
+.smTableColHead {
+    font-size: 11px;
+    color: #666666;
+    font-weight: bold;
+    text-align: center;
+    background: #eeeeee;
+    border: 1px solid #ccc;
+    white-space: nowrap;
+}
+
+.smTableData {
+    font-size: 11px;
+    border: 1px solid #ccc;
+}
+
 .aboutChandlerServer {
 	position: static;	
 }

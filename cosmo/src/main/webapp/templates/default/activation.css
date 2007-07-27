@@ -13,6 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+/* Account Activation
+ * --------------------- */
+
+#accountActivator{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2em;
+    text-align: left;
+    padding: 24px;
+}
+
+#accountActivateButton{
+    margin: 10px;
+}
+
 /* Post account activation page
  * ------------------- */
 

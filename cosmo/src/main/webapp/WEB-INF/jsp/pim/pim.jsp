@@ -41,7 +41,7 @@
 <head>
 
 <title><fmt:message key="App.Welcome"/></title>
-<cosmo:stylesheets stylesheets="ui,pim"/>
+<cosmo:stylesheets stylesheets="pim"/>
 
 <!--[if IE]>
 <style type="text/css">

@@ -194,39 +194,6 @@ public class RecurrenceExpanderTest extends TestCase {
         Assert.assertEquals(1, instances.size());
     }
     
-    public void testRecurrenceExpanderFirstOccurrence() throws Exception {
-        RecurrenceExpander expander = new RecurrenceExpander();
-        EventStamp es = new EventStamp(new NoteItem());
-        es.createCalendar();
-        es.setStartDate(new DateTime("20070101T100000"));
-        es.setEndDate(new DateTime("20070101T120000"));
-        
-        String recur1 = "FREQ=DAILY;UNTIL=20100101T120000Z";
-       
-        List recurs = EimValueConverter.toICalRecurs(recur1);
-        es.setRecurrenceRules(recurs);
-        
-        Instance instance = expander.getFirstInstance(es.getCalendar(), new DateTime("20080101T090000"), new DateTime("20080105T100000"), null);
-        
-        Assert.assertEquals("20080101T100000", instance.getRid().toString());
-    }
-    
-    public void testRecurrenceExpanderLatestOccurrence() throws Exception {
-        RecurrenceExpander expander = new RecurrenceExpander();
-        EventStamp es = new EventStamp(new NoteItem());
-        es.createCalendar();
-        es.setStartDate(new DateTime("20070101T100000"));
-        es.setEndDate(new DateTime("20070101T120000"));
-        
-        String recur1 = "FREQ=DAILY;UNTIL=20100101T120000Z";
-       
-        List recurs = EimValueConverter.toICalRecurs(recur1);
-        es.setRecurrenceRules(recurs);
-        
-        Instance instance = expander.getLatestInstance(es.getCalendar(), new DateTime("20080101T100000"), new DateTime("20080105T140000"), null);
-        
-        Assert.assertEquals("20080105T100000", instance.getRid().toString());
-    }
     
     public void testIsOccurrence() throws Exception {
         RecurrenceExpander expander = new RecurrenceExpander();

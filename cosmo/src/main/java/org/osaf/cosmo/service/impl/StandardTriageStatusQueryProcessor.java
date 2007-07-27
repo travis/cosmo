@@ -109,7 +109,6 @@ public class StandardTriageStatusQueryProcessor implements
         
         // filter for NOW triage notes
         NoteItemFilter nowFilter = getTriageStatusFilter(collection, TriageStatus.CODE_NOW);
-        nowFilter.setIsModification(null);
         
         // filter for no (null) triage status
         NoteItemFilter noTriageStatusFilter = getTriageStatusFilter(collection, -1);
@@ -167,25 +166,17 @@ public class StandardTriageStatusQueryProcessor implements
      */
     private SortedSet<NoteItem> getNow(NoteItem master, Date pointInTime, TimeZone timezone) {
         
-        // filter for NOW modifications
-        NoteItemFilter nowFilter = getTriageStatusFilter(master, TriageStatus.CODE_NOW);
-        
         // store all results here
         ArrayList<NoteItem> results = new ArrayList<NoteItem>();
-        
-        // Add all modifications triaged as NOW
-        for(Item item : contentDao.findItems(nowFilter)) {
-            NoteItem note = (NoteItem) item;
-            if(note.getModifies()!=null)
-                results.add(note);
-        }
+        results.addAll(getModificationsByTriageStatus(master, TriageStatus.CODE_NOW));
         
         // add all occurrences that occur NOW
         Set<NoteItem> occurrences = getNowFromRecurringNote(master, pointInTime, timezone);
         results.addAll(occurrences);
         
         // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, -1); 
+        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, -1);
+        
         // add master if necessary
         if(sortedResults.size()>0)
             sortedResults.add(master);
@@ -269,11 +260,6 @@ public class StandardTriageStatusQueryProcessor implements
                results.add(laterItem);
                masters.add(note);
            }
-           
-           // add all modifications with trigaeStatus LATER
-           if(results.addAll(getModificationsByTriageStatus(note, TriageStatus.CODE_LATER)))
-               results.add(note);
-           
        }
        
        // sort results before returning
@@ -371,10 +357,6 @@ public class StandardTriageStatusQueryProcessor implements
             if(doneItem!=null) {
                 results.add(doneItem);
             }
-            
-            // add all modifications with trigaeStatus DONE
-            if(results.addAll(getModificationsByTriageStatus(note, TriageStatus.CODE_DONE)))
-                results.add(note);
         }
         
         // sort results before returning
@@ -549,19 +531,6 @@ public class StandardTriageStatusQueryProcessor implements
     private NoteItemFilter getTriageStatusFilter(CollectionItem collection, int code) {
         NoteItemFilter triageStatusFilter = new NoteItemFilter();
         triageStatusFilter.setParent(collection);
-        triageStatusFilter.setIsModification(Boolean.FALSE);
-        triageStatusFilter.setTriageStatus(code);
-        return triageStatusFilter;
-    }
-    
-    /**
-     * Create NoteItemFilter that matches modifications for a master item with
-     * a specific triageStatus
-     */
-    private NoteItemFilter getTriageStatusFilter(NoteItem master, int code) {
-        NoteItemFilter triageStatusFilter = new NoteItemFilter();
-        triageStatusFilter.setMasterNoteItem(master);
-        triageStatusFilter.setIsModification(Boolean.TRUE);
         triageStatusFilter.setTriageStatus(code);
         return triageStatusFilter;
     }

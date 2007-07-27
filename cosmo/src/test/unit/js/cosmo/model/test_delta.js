@@ -150,12 +150,22 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
        delta.applyToMaster();
        jum.assertEquals("Applying a master change to a master object.", "newBody",  note.getBody() );     
        jum.assertEquals("Applying a master change to a master object.", "loco",  note.getEventStamp().getLocation() );     
-       
-       
    },
    
    //test adding stamp to master (from a occurrence delta)
+
    //test adding stamp to occurrence
+   test_addStampToOccurrence: function(){
+       var getBaseNote = cosmotest.model.test_delta.getBaseNote;
+       var note = getBaseNote();
+       var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date(2000,0,10,12,0));
+       
+       var delta = new cosmo.model.Delta(occurrence);
+       delta.addAddedStamp("task");
+       delta.deltafy();
+       delta.applyToOccurrence();
+       jum.assertTrue(occurrence.getTaskStamp());
+   },
    
    //test editing start date on master, from an occurrence delta
    test_applyStartDateToMasterFromOccurrence: function(){

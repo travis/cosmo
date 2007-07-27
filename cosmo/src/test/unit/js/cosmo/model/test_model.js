@@ -95,6 +95,16 @@ test_noteOccurrence : function(){
     
 },
 
+test_noteOccurrenceStamping: function(){
+  var note = new cosmo.model.Note();
+  jum.assertFalse("Master note should not have a task stamp", note.getTaskStamp());
+  var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
+  var taskStamp = occurrence.getTaskStamp(true);
+  jum.assertTrue("Task stamp should have been returned", taskStamp);
+  jum.assertTrue("Task belongs to occurrence", occurrence.getTaskStamp());
+  jum.assertFalse("Master note should still not have a task stamp", note.getTaskStamp());
+},
+
 test_equals : function(){    
     var equals = cosmo.model.util.equals;
     jum.assertTrue(equals(1,1));

@@ -415,14 +415,34 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
            var ctr = cosmo.model._stampRegistry[stampName]["occurrenceConstructor"];
            var deleted = modification && modification.getDeletedStamps()[stampName];
            
-           //does the parent have the stamp?
+           //Has this stamp been deleted for the modification for this occurrence?
+           //if not...
            if (!deleted){
+               //does the master already have this stamp?
                if (this.getMaster().getStamp(stampName)){
                    return new ctr(this);
                } else {
-                  if (modification && modification.getModifiedStamps[stampName]){
+                  //the master doesn't have this stamp, but maybe this occurrence 
+                  //already does?
+                  if (modification && modification.getModifiedStamps()[stampName]){
                       return new ctr(this);
-                  }                               
+                  
+                  //ok, the master doesn't have the stamp, the occurrence doesn't either
+                  //but the create flag was passed 
+                  } else if (createIfDoesntExist){
+                      //if there is not yet a modification make one
+                      if (!modification){
+                          modification = new cosmo.model.Modification({
+                              recurrenceId: this.recurrenceId
+                          });
+                          this.getMaster().addModification(modification);
+                      }
+                      //add the new modified "stamp" to the modification 
+                      modification.getModifiedStamps()[stampName] = {};
+                      return new ctr(this);
+                  } else {
+                      return null;
+                  }
                } 
            } else {
                if (createIfDoesntExist){

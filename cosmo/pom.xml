@@ -541,34 +541,6 @@
                     </webResources>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clover-plugin</artifactId>
-                <configuration>
-                    <jdk>1.5</jdk>
-                    <excludes>
-                        <exclude>**/*Test/java</exclude>
-                    </excludes>
-                    <targetPercentage>45%</targetPercentage>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>instrument</goal>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>site</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>instrument</goal>
-                            <goal>aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -650,6 +622,34 @@
                            </configuration>
                          </execution>
                        </executions>
+                     </plugin>
+                     <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-clover-plugin</artifactId>
+                         <configuration>
+                             <jdk>1.5</jdk>
+                             <excludes>
+                                 <exclude>**/*Test/java</exclude>
+                             </excludes>
+                             <targetPercentage>45%</targetPercentage>
+                         </configuration>
+                         <executions>
+                             <execution>
+                                 <phase>verify</phase>
+                                 <goals>
+                                     <goal>instrument</goal>
+                                     <goal>check</goal>
+                                 </goals>
+                             </execution>
+                             <execution>
+                                 <id>site</id>
+                                 <phase>pre-site</phase>
+                                 <goals>
+                                     <goal>instrument</goal>
+                                     <goal>aggregate</goal>
+                                 </goals>
+                             </execution>
+                         </executions>
                      </plugin>
                 </plugins>
             </build>

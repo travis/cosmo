@@ -230,21 +230,15 @@ public class ICalDate implements ICalendarConstants {
 
     private void parseDates(String str)
         throws ParseException {
-        String[] strs = str.split(",");
-        if (strs.length == 1) {
+        
+        if (str.indexOf(',')==-1) {
             date = isDate() ? new Date(str) : new DateTime(str, tz);
             if(isDate() && tz != null)
                 throw new ParseException("DATE cannot have timezone",0);
         }
 
         dates = isDate() ?
-            new DateList(Value.DATE) :
-            new DateList(Value.DATE_TIME, tz);
-        for (String s : strs) {
-            if (isDate())
-                dates.add(new Date(s));
-            else
-                dates.add(new DateTime(s, tz));
-        }
+            new DateList(str, Value.DATE, tz) :
+            new DateList(str, Value.DATE_TIME, tz);
     }
 }

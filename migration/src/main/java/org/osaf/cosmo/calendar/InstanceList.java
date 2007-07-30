@@ -17,8 +17,8 @@ package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.fortuna.ical4j.model.Component;
@@ -53,7 +53,7 @@ import net.fortuna.ical4j.util.Dates;
  * added first.
  */
 
-public class InstanceList extends HashMap {
+public class InstanceList extends TreeMap {
 
     private static final long serialVersionUID = 1838360990532590681L;
     private boolean isUTC = false;
@@ -77,7 +77,7 @@ public class InstanceList extends HashMap {
         if (comp.getProperties().getProperty(Property.RECURRENCE_ID) == null) {
             addMaster(comp, rangeStart, rangeEnd);
         } else {
-            addOverride(comp);
+            addOverride(comp, rangeStart, rangeEnd);
         }
     }
     
@@ -130,9 +130,13 @@ public class InstanceList extends HashMap {
             return;
         }
         
-        // Convert to UTC if needed
-        if(start instanceof DateTime)
+        
+        if(start instanceof DateTime) {
+            // convert to UTC if configured
             start = convertToUTCIfNecessary((DateTime) start);
+            // adjust floating time if timezone is present
+            start = adjustFloatingDateIfNecessary(start);
+        }
         
         
         Dur duration = null;
@@ -147,9 +151,11 @@ public class InstanceList extends HashMap {
             }
             end = org.osaf.cosmo.calendar.util.Dates.getInstance(duration.getTime(start), start);
         } else {
-            // Convert to UTC if needed
             if(end instanceof DateTime) {
+                // Convert to UTC if needed
                 end = convertToUTCIfNecessary((DateTime) end);
+                // Adjust floating end time if timezone present
+                end = adjustFloatingDateIfNecessary(end);
                 // Handle case where dtend is before dtstart, in which the duration
                 // will be 0, since it is a timed event
                 if(end.before(start)) {
@@ -189,16 +195,18 @@ public class InstanceList extends HashMap {
                     Parameter.VALUE))) {
                 for (Iterator j = rdate.getPeriods().iterator(); j.hasNext();) {
                     Period period = (Period) j.next();
-                    if (period.getStart().before(rangeEnd)
-                            && period.getEnd().after(rangeStart)) {
-                        Instance instance = new Instance(comp, period
-                                .getStart(), period.getEnd());
+                    Date periodStart = adjustFloatingDateIfNecessary(period.getStart());
+                    Date periodEnd = adjustFloatingDateIfNecessary(period.getEnd());
+                    if (periodStart.before(rangeEnd)
+                            && periodEnd.after(rangeStart)) {
+                        Instance instance = new Instance(comp, periodStart, periodEnd);
                         put(instance.getRid().toString(), instance);
                     }
                 }
             } else {
                 for (Iterator j = rdate.getDates().iterator(); j.hasNext();) {
                     Date startDate = (Date) j.next();
+                    startDate = adjustFloatingDateIfNecessary(startDate);
                     Date endDate = org.osaf.cosmo.calendar.util.Dates.getInstance(duration
                             .getTime(startDate), startDate);
                     Instance instance = new Instance(comp, startDate, endDate);
@@ -233,9 +241,9 @@ public class InstanceList extends HashMap {
             ExDate exDate = (ExDate) i.next();
             for (Iterator j = exDate.getDates().iterator(); j.hasNext();) {
                 Date sd = (Date) j.next();
-                Date startDate = org.osaf.cosmo.calendar.util.Dates.getInstance(sd, start);
-                Instance instance = new Instance(comp, startDate, startDate);
-                remove(instance.getStart().toString());
+                sd = adjustFloatingDateIfNecessary(sd);
+                Instance instance = new Instance(comp, sd, sd);
+                remove(instance.getRid().toString());
             }
         }
         // exception rules..
@@ -251,9 +259,8 @@ public class InstanceList extends HashMap {
                     (start instanceof DateTime) ? Value.DATE_TIME : Value.DATE);
             for (Iterator j = startDates.iterator(); j.hasNext();) {
                 Date sd = (Date) j.next();
-                Date startDate = org.osaf.cosmo.calendar.util.Dates.getInstance(sd, start);
-                Instance instance = new Instance(comp, startDate, startDate);
-                remove(instance.getStart().toString());
+                Instance instance = new Instance(comp, sd, sd);
+                remove(instance.getRid().toString());
             }
         }
     }
@@ -262,10 +269,12 @@ public class InstanceList extends HashMap {
      * Add an override component if it falls within the specified time range.
      * 
      * @param comp
+     * @param rangeStart
+     * @param rangeEnd
      * @return true if the override component modifies instance list and false
      *         if the override component has no effect on instance list
      */
-    public boolean addOverride(Component comp) {
+    public boolean addOverride(Component comp, Date rangeStart, Date rangeEnd) {
 
         boolean modified = false;
 
@@ -280,9 +289,12 @@ public class InstanceList extends HashMap {
         if (dtstart == null)
             return false;
 
-       // Convert to UTC if needed
-        if(dtstart instanceof DateTime)
+        if(dtstart instanceof DateTime) {
+            // convert to UTC if configured
             dtstart = convertToUTCIfNecessary((DateTime) dtstart);
+            // adjust floating time if timezone is present
+            dtstart = adjustFloatingDateIfNecessary(dtstart);
+        }
         
         // We need either DTEND or DURATION.
         Date dtend = getEndDate(comp);
@@ -300,6 +312,8 @@ public class InstanceList extends HashMap {
             // Convert to UTC if needed
             if(dtend instanceof DateTime) {
                 dtend = convertToUTCIfNecessary((DateTime) dtend);
+                // Adjust floating end time if timezone present
+                dtend = adjustFloatingDateIfNecessary(dtend);
                 // Handle case where dtend is before dtstart, in which the duration
                 // will be 0, since it is a timed event
                 if(dtend.before(dtstart)) {
@@ -318,8 +332,10 @@ public class InstanceList extends HashMap {
 
         // Now create the map entry
         Date riddt = getRecurrenceId(comp);
-        if(riddt instanceof DateTime)
+        if(riddt instanceof DateTime) {
             riddt = convertToUTCIfNecessary((DateTime) riddt);
+            riddt = adjustFloatingDateIfNecessary(riddt);
+        }
         
         boolean future = getRange(comp);
 
@@ -327,9 +343,15 @@ public class InstanceList extends HashMap {
                 future);
         String key = instance.getRid().toString();
 
-        // Replace the master instance by adding this one
-        // only if it exists.
+        // Replace the master instance if it exists
         if(containsKey(key)) {
+            remove(key);
+            modified = true;
+        }
+        
+        // Add modification instance if its in the range
+        if (dtstart.before(rangeEnd)
+                && dtend.after(rangeStart)) {
             put(key, instance);
             modified = true;
         }
@@ -467,6 +489,10 @@ public class InstanceList extends HashMap {
         return (range != null) && "THISANDFUTURE".equals(range.getValue());
     }
     
+    /**
+     * If the InstanceList is configured to convert all date/times to UTC,
+     * then convert the given DateTime instance into a UTC DateTime.
+     */
     private DateTime convertToUTCIfNecessary(DateTime date) {
         // If date is not UTC and InstanceList is configured
         // to convert to UTC, then convert time to UTC
@@ -532,5 +558,36 @@ public class InstanceList extends HashMap {
             return org.osaf.cosmo.calendar.util.Dates.getInstance(cal.getTime(), startRange);
         
         return startRange;
+    }
+    
+    /**
+     * Adjust a floating time if a timezone is present.  A floating time
+     * is initially created with the default system timezone.  If a timezone
+     * if present, we need to adjust the floating time to be in specified
+     * timezone.  This allows a server in the US to return floating times for
+     * a query made by someone whos timezone is in Australia.  If no timezone is
+     * set for the InstanceList, then the system default timezone will be
+     * used in floating time calculations.
+     * 
+     * What happens is a floating time will get converted into a 
+     * date/time with a timezone.  This is ok for comparison and recurrence
+     * generation purposes.  Note that Instances will get indexed as a UTC
+     * date/time and for floating DateTimes, the the recurrenceId associated 
+     * with the Instance loses its "floating" property.
+     */
+    private Date adjustFloatingDateIfNecessary(Date date) {
+        if(timezone==null || ! (date instanceof DateTime))
+            return date;
+        
+        DateTime dtDate = (DateTime) date;
+        if(dtDate.isUtc() || dtDate.getTimeZone()!=null)
+            return date;
+        
+        try {
+            return new DateTime(dtDate.toString(), timezone);
+        } catch (ParseException e) {
+            throw new RuntimeException("error parsing date");
+        }
+        
     }
 }

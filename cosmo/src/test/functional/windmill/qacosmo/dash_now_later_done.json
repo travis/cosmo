@@ -8,5 +8,5 @@
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "triageButtonDone"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
-{"params": {"id": "sectionTaskEnableToggle"}, "version": "0.1", "method": "click"}
+{"params": {"id": "sectionTaskEnableToggle"}, "version": "0.1", "method": "check"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}

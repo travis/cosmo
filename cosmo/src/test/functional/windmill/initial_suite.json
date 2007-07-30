@@ -10,7 +10,7 @@
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}
-{"method": "verify", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
+{"method": "assertText", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester240"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}

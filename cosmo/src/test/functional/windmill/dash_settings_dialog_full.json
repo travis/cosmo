@@ -9,7 +9,7 @@
 {"params": {"text": "jones", "id": "lastName"}, "version": "0.1", "method": "type"}
 {"params": {"text": "bob@osafoundation.org", "id": "email"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[1].id"}, "version": "0.1", "method": "click"}
-{"params": {"id": "showAccountBrowser"}, "version": "0.1", "method": "click"}
+{"params": {"id": "showAccountBrowser"}, "version": "0.1", "method": "check"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[2].id"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[1].id"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[0].id"}, "version": "0.1", "method": "click"}

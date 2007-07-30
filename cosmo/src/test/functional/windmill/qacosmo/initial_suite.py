@@ -17,7 +17,7 @@ def test():
     client.type(text=u'tester', id=u'confirm')
     client.click(jsid=u'windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id')
     client.wait(milliseconds=3000)
-    client.verify(validator=u'You have successfully created your Cosmo account.', id=u'modalDialogPrompt')
+    client.assertText(validator=u'You have successfully created your Cosmo account.', id=u'modalDialogPrompt')
     client.click(jsid=u'windmill.testingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id')
     client.type(text=u'tester240', id=u'loginDialogUsernameInput')
     client.type(text=u'tester', id=u'loginDialogPasswordInput')

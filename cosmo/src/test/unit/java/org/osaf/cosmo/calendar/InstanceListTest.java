@@ -444,4 +444,133 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070605T061500", instance.getEnd().toString());
     }
     
+    public void DISABLEDtestRdateWithTimezone() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_rdates.ics");
+        Calendar calendar = cb.build(fis);
+        
+        InstanceList instances = new InstanceList();
+        
+        DateTime start = new DateTime("20070509T090000Z");
+        DateTime end = new DateTime("20070609T090000Z");
+        
+        ComponentList comps = calendar.getComponents();
+        Iterator<VEvent> it = comps.getComponents("VEVENT").iterator();
+        boolean addedMaster = false;
+        while(it.hasNext()) {
+            VEvent event = it.next();
+            if(event.getRecurrenceId()==null) {
+                addedMaster = true;
+                instances.addComponent(event, start, end);
+            }
+            else {
+                Assert.assertTrue(addedMaster);
+                instances.addOverride(event, start, end);
+            }
+        }
+        
+        Assert.assertEquals(7, instances.size() );
+        
+        Iterator<String> keys = instances.keySet().iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070515T101500Z", key);
+        Assert.assertEquals("20070515T051500", instance.getStart().toString());
+        Assert.assertEquals("20070515T061500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070516T101500Z", key);
+        Assert.assertEquals("20070516T051500", instance.getStart().toString());
+        Assert.assertEquals("20070516T061500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070517T101500Z", key);
+        Assert.assertEquals("20070517T101500Z", instance.getStart().toString());
+        Assert.assertEquals("20070517T131500Z", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070522T101500Z", key);
+        Assert.assertEquals("20070522T051500", instance.getStart().toString());
+        Assert.assertEquals("20070522T061500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070523T101500Z", key);
+        Assert.assertEquals("20070523T051500", instance.getStart().toString());
+        Assert.assertEquals("20070523T061500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070529T101500Z", key);
+        Assert.assertEquals("20070529T051500", instance.getStart().toString());
+        Assert.assertEquals("20070529T061500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070605T101500Z", key);
+        Assert.assertEquals("20070605T051500", instance.getStart().toString());
+        Assert.assertEquals("20070605T061500", instance.getEnd().toString());
+    }
+    
+    public void testExruleWithTimezone() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_exrule.ics");
+        Calendar calendar = cb.build(fis);
+        
+        InstanceList instances = new InstanceList();
+        
+        DateTime start = new DateTime("20070509T090000Z");
+        DateTime end = new DateTime("20070609T090000Z");
+        
+        ComponentList comps = calendar.getComponents();
+        Iterator<VEvent> it = comps.getComponents("VEVENT").iterator();
+        boolean addedMaster = false;
+        while(it.hasNext()) {
+            VEvent event = it.next();
+            if(event.getRecurrenceId()==null) {
+                addedMaster = true;
+                instances.addComponent(event, start, end);
+            }
+            else {
+                Assert.assertTrue(addedMaster);
+                instances.addOverride(event, start, end);
+            }
+        }
+        
+        Assert.assertEquals(2, instances.size() );
+        
+        Iterator<String> keys = instances.keySet().iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070515T101500Z", key);
+        Assert.assertEquals("20070515T051500", instance.getStart().toString());
+        Assert.assertEquals("20070515T061500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070529T101500Z", key);
+        Assert.assertEquals("20070529T051500", instance.getStart().toString());
+        Assert.assertEquals("20070529T061500", instance.getEnd().toString());
+    }
+    
 }

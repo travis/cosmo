@@ -24,9 +24,9 @@ cosmo.view.dialog = new function() {
 
     var self = this;
     var props = {}; // Props for each modal dialog
-    var allEventsMsg = 'All Events';
-    var AllFutureMsg = 'All Future Events';
-    var OnlyThisMsg = 'Only This Event';
+    var allEventsMsg = _('Main.Prompt.RecurButtonAll');
+    var AllFutureMsg = _('Main.Prompt.RecurButtonFuture');
+    var OnlyThisMsg = _('Main.Prompt.RecurButtonOnly');
     var btnWideWidth = 84;
     var btnWiderWidth = 120;
     

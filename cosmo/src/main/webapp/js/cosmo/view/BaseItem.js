@@ -40,7 +40,7 @@ cosmo.view.BaseItem.prototype.makeSnapshot = function () {
         this.dataOrig = this.data.clone();
         this.occurrence = false;
     } else {
-        this.dataOrig = this.data.getMaster();
+        this.dataOrig = this.data.getMaster().clone();
         this.occurrence = true;
         this.recurrenceId = this.data.recurrenceId
     }

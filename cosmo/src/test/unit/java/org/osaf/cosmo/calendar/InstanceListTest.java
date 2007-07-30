@@ -444,7 +444,7 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070605T061500", instance.getEnd().toString());
     }
     
-    public void DISABLEDtestRdateWithTimezone() throws Exception {
+    public void testRdateWithTimezone() throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
         FileInputStream fis = new FileInputStream(baseDir + "recurring_with_rdates.ics");
         Calendar calendar = cb.build(fis);

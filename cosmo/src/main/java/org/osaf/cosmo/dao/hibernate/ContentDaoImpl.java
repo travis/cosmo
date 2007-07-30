@@ -162,70 +162,14 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
     }
     
-    public ContentItem createContent(ContentItem content) {
-
-        if (content == null)
-            throw new IllegalArgumentException("content cannot be null");
-
-        if (content.getId()!=-1)
-            throw new IllegalArgumentException("invalid content id (expected -1)");
-        
-        if (content.getOwner() == null)
-            throw new IllegalArgumentException("content must have owner");
-        
-        try {
-            // verify uid not in use
-            checkForDuplicateUid(content);
-            
-            setBaseItemProps(content);
-            
-            applyStampHandlerCreate(content);
-            
-            getSession().save(content);
-            getSession().flush();
-            return content;
-        } catch (HibernateException e) {
-            throw convertHibernateAccessException(e);
-        } catch (InvalidStateException ise) {
-            logInvalidStateException(ise);
-            throw ise;
-        }
-    }
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.ContentDao#createContent(java.util.Set, org.osaf.cosmo.model.ContentItem)
      */
     public ContentItem createContent(Set<CollectionItem> parents, ContentItem content) {
 
-        if(parents==null)
-            throw new IllegalArgumentException("parent cannot be null");
-        
-        if (content == null)
-            throw new IllegalArgumentException("content cannot be null");
-
-        if (content.getId()!=-1)
-            throw new IllegalArgumentException("invalid content id (expected -1)");
-        
-        if (content.getOwner() == null)
-            throw new IllegalArgumentException("content must have owner");
-        
         try {
-            if(parents.size()==0)
-                throw new IllegalArgumentException("content must have at least one parent");
-            
-            // verify uid not in use
-            checkForDuplicateUid(content);
-            
-            setBaseItemProps(content);
-            for(CollectionItem parent: parents) {
-                content.getParents().add(parent);
-                if(parent.removeTombstone(content)==true)
-                    getSession().update(parent);
-            }
-            
-            applyStampHandlerCreate(content);
-            
-            getSession().save(content);
+            createContentInternal(parents, content);
             getSession().flush();
             return content;
         } catch (HibernateException e) {
@@ -539,7 +483,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public void removeNoteItemFromCollection(NoteItem note, CollectionItem collection) {
         try {
-            removeNoteItemFromCollectionInternal(note, collection);
+            if(note.getModifies()!=null)
+                removeContentRecursive(note);
+            else
+                removeNoteItemFromCollectionInternal(note, collection);
             getSession().flush();
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
@@ -617,13 +564,59 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // add parent to new content
         content.getParents().add(parent);
         
-        // remove tomstone (if it exists) from parent
+        // When a note modification is added, it must be added to all
+        // collections that the parent note is in, because a note modification's
+        // parents are tied to the parent note.
+        if(isNoteModification(content)) {
+            NoteItem note = (NoteItem) content;
+           
+            if(!note.getModifies().getParents().contains(parent))
+                throw new IllegalArgumentException("note modification cannot be added to collection that parent note is not in");
+            
+            note.getParents().addAll(note.getModifies().getParents());
+        }
+        
+        // remove tombstone (if it exists) from parent
         if(parent.removeTombstone(content)==true)
             getSession().update(parent);
         
         applyStampHandlerCreate(content);
         
         getSession().save(content);    
+    }
+    
+    public void createContentInternal(Set<CollectionItem> parents, ContentItem content) {
+
+        if(parents==null)
+            throw new IllegalArgumentException("parent cannot be null");
+        
+        if (content == null)
+            throw new IllegalArgumentException("content cannot be null");
+
+        if (content.getId()!=-1)
+            throw new IllegalArgumentException("invalid content id (expected -1)");
+        
+        if (content.getOwner() == null)
+            throw new IllegalArgumentException("content must have owner");
+        
+        
+        if(parents.size()==0)
+            throw new IllegalArgumentException("content must have at least one parent");
+        
+        // verify uid not in use
+        checkForDuplicateUid(content);
+        
+        setBaseItemProps(content);
+        
+        for(CollectionItem parent: parents) {
+            content.getParents().add(parent);
+            if(parent.removeTombstone(content)==true)
+                getSession().update(parent);
+        }
+        
+        applyStampHandlerCreate(content);
+        
+        getSession().save(content);
     }
     
     protected void updateContentInternal(ContentItem content) {
@@ -655,10 +648,26 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     
     @Override
     protected void removeItemFromCollectionInternal(Item item, CollectionItem collection) {
-        if(item instanceof NoteItem)
-            removeNoteItemFromCollectionInternal((NoteItem) item, collection);
+        if(item instanceof NoteItem) {
+            // When a note modification is removed, it is really removed from
+            // all collections because a modification can't live in one collection
+            // and not another.  It is tied to the collections that the master
+            // note is in.  Therefore you can't just remove a modification from
+            // a single collection when the master note is in multiple collections.
+            NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                removeContentRecursive((ContentItem) item);
+            else
+                removeNoteItemFromCollectionInternal((NoteItem) item, collection);
+        }
         else
             super.removeItemFromCollectionInternal(item, collection);
     }
     
+    private boolean isNoteModification(Item item) {
+        if(!(item instanceof NoteItem))
+            return false;
+        
+        return (((NoteItem) item).getModifies()!=null);
+    }
 }

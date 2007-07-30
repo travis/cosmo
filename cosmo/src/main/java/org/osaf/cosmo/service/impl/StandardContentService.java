@@ -1052,6 +1052,14 @@ public class StandardContentService implements ContentService {
                 throw new CollectionLockedException("unable to obtain collection lock");
             locks.add(parent);
         }
+        
+        // Acquire locks on master item's parents, as an addition/deletion
+        // of a modifications item affects all the parents of the master item.
+        if(item instanceof NoteItem) {
+            NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                acquireLocks(locks, note.getModifies());
+        }
     }
     
     private void releaseLocks(Set<CollectionItem> locks) {

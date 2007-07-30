@@ -96,16 +96,6 @@ public interface ContentDao extends ItemDao {
     
     
     /**
-     * Create new content item. A content item represents a piece of content or
-     * file.
-     *
-     * @param content
-     *            content to create
-     * @return newly created content
-     */
-    public ContentItem createContent(ContentItem content);
-    
-    /**
      * Create new content item and associate with multiple parent collections.
      * 
      * @param parents

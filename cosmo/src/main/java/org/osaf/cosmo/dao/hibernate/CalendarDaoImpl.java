@@ -34,12 +34,9 @@ import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**

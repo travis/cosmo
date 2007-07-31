@@ -913,7 +913,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (props.duration !== undefined) fields.duration = [type.TEXT, props.duration == null? null : props.duration.toIso8601()];
             if (props.rrule !== undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
             if (props.exdates && props.exdates.length != 0) fields.exdate = 
-                [type.TEXT, this.exdatesToEim(props.exdates, props.startDate)];
+                [type.TEXT, this.exdatesToEim(props.exdates, props.startDate, props.allDay, props.anyTime)];
             
             return record = {
                 prefix: prefix.EVENT,
@@ -928,8 +928,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         
     },
 
-    exdatesToEim: function(exdates, start){
-        return ";VALUE=DATE-TIME" + 
+    exdatesToEim: function(exdates, start, allDay, anyTime){
+        return this.datesToEim(exdates, start, allDay, anyTime);
+        /*";VALUE=DATE-TIME" + 
             (start.tzId? ";TZID=" + start.tzId : "") + 
             ":" +
             dojo.lang.map(
@@ -937,20 +938,38 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 function(date){
                     return date.strftime("%Y%m%dT%H%M%S");
                 }
-            ).join(",");
+            ).join(",");*/
     },
     
     dateToEimDtstart: function (start, allDay, anyTime){
-        return [(anyTime? ";X-OSAF-ANYTIME=TRUE" : ""),
-                (start.tzId? ";TZID=" + start.tzId : ""),
+        return (anyTime? ";X-OSAF-ANYTIME=TRUE" : "") +
+               this.datesToEim([start], start, allDay, anyTime);
+/*                (start.tzId? ";TZID=" + start.tzId : ""),
                 ";VALUE=",
                 ((allDay || anyTime)? "DATE" : "DATE-TIME"),
                 ":",
                 ((allDay || anyTime)?
                     start.strftime("%Y%m%d"):
                     start.strftime("%Y%m%dT%H%M%S"))
-                ].join("");
+                ].join("");*/
         
+    },
+    
+    datesToEim: function (dates, start, allDay, anyTime){
+          var date = [(start.tzId? ";TZID=" + start.tzId : ""),
+                ";VALUE=",
+                ((allDay || anyTime)? "DATE" : "DATE-TIME"),
+                ":"].join("");
+          var formatString = ((allDay || anyTime)?
+                    start.strftime("%Y%m%d"):
+                    start.strftime("%Y%m%dT%H%M%S"));
+          date += dojo.lang.map(
+                  dates,
+                  function(date){
+                      return date.strftime(formatString);
+                  }
+              ).join(",");
+          return date;
     },
 
     noteToTaskRecord: function (note){

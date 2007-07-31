@@ -197,10 +197,16 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return deferred;
     },
 
+    setModbyUser: function (item){
+        item.getModifiedBy().setUserId(cosmo.util.auth.getUsername() || "");
+    },
+
     saveItem: function(item, kwArgs){
         kwArgs = kwArgs || {};
 
         item.getModifiedBy().setAction(cosmo.model.ACTION_EDITED);
+        this.setModbyUser(item);
+
         var deferred = this._transport.saveItem(item, this._translator.itemToAtomEntry(item), kwArgs);
         var translationArgs = {};
         if (item instanceof cosmo.model.NoteOccurrence) {
@@ -219,6 +225,8 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         kwArgs = kwArgs || {};
 
         item.getModifiedBy().setAction(cosmo.model.ACTION_CREATED);
+        this.setModbyUser(item);
+
         var deferred =  this._transport.createItem(item, this._translator.itemToAtomEntry(item),
                                           parentCollection, kwArgs);
         var translationArgs = {};                                  

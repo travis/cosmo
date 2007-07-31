@@ -960,9 +960,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 ";VALUE=",
                 ((allDay || anyTime)? "DATE" : "DATE-TIME"),
                 ":"].join("");
-          var formatString = ((allDay || anyTime)?
-                    start.strftime("%Y%m%d"):
-                    start.strftime("%Y%m%dT%H%M%S"));
+          var formatString = (allDay || anyTime)?
+                    "%Y%m%d":
+                    "%Y%m%dT%H%M%S";
           date += dojo.lang.map(
                   dates,
                   function(date){

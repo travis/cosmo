@@ -403,13 +403,19 @@ cosmo.view.service = new function () {
         // Success/failure for all other cases
         self.processingQueue.shift();
         // Broadcast message for success/failure
-        dojo.event.topic.publish('/calEvent', {
-             'action': act,
-             'data': item,
-             'saveType': saveType,
-             'delta':delta,
-             'newItemNote':newItem
-        });
+        // Do it in window scope to avoid trapping all the
+        // subsequent UI code errors in the addErrBack for
+        // the service Deferred
+        var f = function () {
+            dojo.event.topic.publish('/calEvent', {
+                 'action': act,
+                 'data': item,
+                 'saveType': saveType,
+                 'delta':delta,
+                 'newItemNote':newItem
+            });
+        }
+        setTimeout(f, 0);
     }
 
     // Remove

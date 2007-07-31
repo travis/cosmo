@@ -27,14 +27,15 @@ cosmo.account.preferences = new function () {
     };
 
     this.setPreference = function(key, val){
-		cosmo.app.pim.serv.setPreference(key, val);
+		var deferred = cosmo.app.pim.serv.setPreference(key, val);
 		var preferences = {};
 		preferences[key] = val;
         cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [preferences])
+        return deferred;
     };
 
     this.deletePreference = function(key){
-		cosmo.app.pim.serv.deletePreferences(key);
+		return cosmo.app.pim.serv.deletePreferences(key);
     };
     
     this.getPreferences = function(){

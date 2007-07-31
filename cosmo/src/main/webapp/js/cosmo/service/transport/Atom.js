@@ -245,21 +245,13 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     },
 
-    _prefExists: function (key){
+    checkIfPrefExists: function (key){
         var exists = false;
-        dojo.io.bind(this.getDefaultRequest(null, {
+        return this.bind({
           url: cosmo.env.getBaseUrl() +
-               "/atom/user/" + cosmo.util.auth.getUsername() + "/preference" + "/"+ key,
-          method: "HEAD",
-          sync: true,
-          handle: function (result, error, xhr){
-             if (xhr.status == 200) exists = true;
-          }
-        }
-        ));
-        
-        return exists;
-        
+               "/atom/user/" + cosmo.util.auth.getUsername() + "/preference/"+ key,
+          method: "HEAD"
+        });
     },
     
     // This is not the right way to do this. We shouldn't be guessing urls,
@@ -270,27 +262,29 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     // Once this layer is redesigned, we should redo this. If we get a chance, this might be something
     // to improve before preview.
     setPreference: function (key, val, postContent, kwArgs){
-        var method;
-        var url;
-
-        if (this._prefExists(key)) {
-            method = "PUT"
-            url = cosmo.env.getBaseUrl() +
-                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preference/" + key;
-        } else {
-            method = "POST";
-            url = cosmo.env.getBaseUrl() +
-                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preferences";
-            
-        }
-        return this.bind(
-            {
+        var request = {
                 contentType: "application/atom+xml",
-                url: url,
-                postContent: postContent,
-                method: method
-            },
-            kwArgs);
+                postContent: postContent
+            }
+        var existsDeferred = this.checkIfPrefExists(key);
+        
+        // If exists returned a 200
+        existsDeferred.addCallback(dojo.lang.hitch(this, function (){
+            request.method = "PUT"
+            request.url = cosmo.env.getBaseUrl() +
+                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preference/" + key;
+            return this.bind(request, kwArgs);
+        }));
+        
+        // If exists returned a 404
+        existsDeferred.addErrback(dojo.lang.hitch(this, function (){
+            request.method = "POST";
+            request.url = cosmo.env.getBaseUrl() +
+                     "/atom/user/" + cosmo.util.auth.getUsername() + "/preferences";
+
+            return this.bind(request, kwArgs);
+        }));
+       return existsDeferred;
     },
 
     getPreferences: function (kwArgs){

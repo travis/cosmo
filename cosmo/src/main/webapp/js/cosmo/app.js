@@ -73,8 +73,8 @@ cosmo.app = new function () {
         var msg = '';
         
         var verboseInfo = null; 
-        if (error && error.toStringVerbose){
-            verboseInfo = error.toStringVerbose();
+        if (error){
+            verboseInfo = this._extractVerboseErrorInfo(error);
         }
 
         // If the error dialog is already showing, add this message to the error queue
@@ -140,6 +140,23 @@ cosmo.app = new function () {
             this.showDialog();
         }
     };
+    
+    this._extractVerboseErrorInfo = function(error){
+        if (error.toStringVerbose){
+            return error.toStringVerbose();
+        }
+        
+        if (error instanceof Error){
+            return "message: \n " + error.message + "\n\n"
+                  +"name: \n" + error.name + "\n\n"
+                  +"filename: \n" + error.fileName + "\n\n"
+                  +"lineNumber: \n" + error.lineNumber + "\n\n"
+                  +"stack: \n" + error.stack + "\n\n";
+        }
+        
+        return null;
+    };
+    
     /**
      * Displays the mask that covers the entire browser window
      * until the UI is completely rendered

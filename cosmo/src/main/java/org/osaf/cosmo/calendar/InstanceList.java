@@ -549,14 +549,6 @@ public class InstanceList extends TreeMap {
        
         Calendar cal = Dates.getCalendarInstance(startRange);
         cal.setTime(negatedDur.getTime(startRange));
-       
-        // Add a second or day so that adjusted range is just short of the 
-        // event duration.  Otherwise we could match an instance that starts and
-        // ends before the orignal startRange.
-        if(start instanceof DateTime)
-            cal.add(Calendar.SECOND, 1);
-        else
-            cal.add(Calendar.DAY_OF_WEEK, 1);
         
         // Return new startRange only if it is before the original startRange 
         if(cal.getTime().before(startRange))

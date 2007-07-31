@@ -40,6 +40,7 @@ import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Action;
@@ -323,8 +324,7 @@ public abstract class BaseEventStamp extends Stamp
     }
     
     @Transient
-    protected void setDateListPropertyValue(DateListProperty prop,
-                                        Date date) {
+    protected void setDateListPropertyValue(DateListProperty prop) {
         if (prop == null)
             return;
         Value value = (Value)
@@ -332,8 +332,18 @@ public abstract class BaseEventStamp extends Stamp
         if (value != null)
             prop.getParameters().remove(value);
         
-        value = date instanceof DateTime ? Value.DATE_TIME : Value.DATE;
+        value = prop.getDates().getType();
         prop.getParameters().add(value);
+        
+        // update timezone for now because ical4j DateList doesn't
+        Parameter param = (Parameter) prop.getParameters().getParameter(
+                Parameter.TZID);
+        if (param != null)
+            prop.getParameters().remove(param);
+        
+        if(prop.getDates().getTimeZone()!=null)
+            prop.getParameters().add(new TzId(prop.getDates().getTimeZone().getID()));
+        
         setDirty(true);
     }
 
@@ -553,7 +563,7 @@ public abstract class BaseEventStamp extends Stamp
             return;
         
         RDate rDate = new RDate(dates);
-        setDateListPropertyValue(rDate, (Date) dates.get(0));
+        setDateListPropertyValue(rDate);
         pl.add(rDate);   
     }
 
@@ -817,7 +827,7 @@ public abstract class BaseEventStamp extends Stamp
             return;
         
         ExDate exDate = new ExDate(dates);
-        setDateListPropertyValue(exDate, (Date) dates.get(0));
+        setDateListPropertyValue(exDate);
         pl.add(exDate);
     }
 

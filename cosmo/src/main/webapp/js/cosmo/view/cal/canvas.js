@@ -480,6 +480,8 @@ cosmo.view.cal.canvas = new function () {
         // it's on the page, to pick a color -- otherwise just use blue
         var sel = $('calSelectElem');
         var index = sel ? sel.selectedIndex : 0;
+        // Start over at zero when we run out of colors
+        index = index % hues.length;
         var hue = hues[index];
 
         var o = {
@@ -889,12 +891,12 @@ cosmo.view.cal.canvas = new function () {
             var addExpandedOccurrences = function (results) {
                 //check for errors!
                 var error = cosmo.util.deferred.getFirstError(results);
-                
+
                 if (error){
                     cosmo.app.showErr(_$("Service.Error.ProblemGettingItems"), "", error);
                     return;
-                }   
-                
+                }
+
                 var occurrences = results[0][1];
                 if (results[1]){
                     var otherOccurrences = results[1][1];

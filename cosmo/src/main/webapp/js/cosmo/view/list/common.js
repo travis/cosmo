@@ -183,13 +183,13 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     setVals('title', t, t);
     // Who
     var m = data.getModifiedBy().userId;
-    m = m ? m : ''; 
+    m = m ? m : '';
     setVals('who', m, m);
     // Start
     var st = data.getEventStamp();
     var dt = st ? st.getStartDate() : null;
     var sr = dt ? dt.getTime() : 0;
-    var fm = dt ? dt.strftime('%b %d, %Y %I:%M%p') : '';
+    var fm = dt ? dt.strftime('%b %d, %Y %I:%M %p') : '';
     setVals('startDate', sr, fm);
     // Triage
     var tr = data.getTriageStatus();

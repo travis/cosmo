@@ -240,7 +240,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.title) + '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.who) + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.startDate) + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '" style="white-space: nowrap;">' + fillCell(display.startDate) + '</td>';
             r += '<td class="listViewDataCell' +
                 ' listViewTriageCell listViewTriage' +
                 _tMap[item.data.getTriageStatus()] + selCss + '">' +

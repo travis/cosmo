@@ -320,6 +320,8 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
     var params = p || {};
     // Processing lock to avoid duplicate items created
     var isProcessing = false;
+    // If the collection isn't writeable, disable everything
+    var writeable = cosmo.app.pim.currentCollection.getWriteable();
 
     this.parent = params.parent;
     this.domNode = _createElem('div');
@@ -334,14 +336,8 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         var disableButton = function () {
           self.formNode.removeChild(self.createButton.domNode);
           self.createButton.destroy();
-          dis = dojo.widget.createWidget("cosmo:Button", {
-              text: _('App.Button.Create'),
-              handleOnClick: null,
-              small: true,
-              width: 52,
-              enabled: false },
-              self.formNode, 'last');
-          self.createButton = dis;
+          self.createButton = disabled;
+          self.formNode.appendChild(self.createButton.domNode);
         };
         var createItem = function () {
             // Only create one item at a time
@@ -386,19 +382,31 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         form.appendChild(cosmo.util.html.nbsp());
 
         dojo.event.connect(text, 'onkeyup', function (e) {
-            if (e.keyCode == 13) {
+            if (writeable && e.keyCode == 13) {
                 createItem();
                 e.stopPropagation();
             }
         });
-        button = dojo.widget.createWidget("cosmo:Button", {
+        var dummy = _createElem('span');
+        var enabled = dojo.widget.createWidget("cosmo:Button", {
             text: _('App.Button.Create'),
             handleOnClick: createItem,
             small: true,
             width: 52,
             enabled: true },
-            form, 'last');
-        this.createButton = button;
+            dummy, 'last');
+        dummy.removeChild(dummy.firstChild);
+        var dummy = _createElem('span');
+        var disabled = dojo.widget.createWidget("cosmo:Button", {
+            text: _('App.Button.Create'),
+            handleOnClick: null,
+            small: true,
+            width: 52,
+            enabled: false },
+            dummy, 'last');
+        dummy.removeChild(dummy.firstChild);
+        this.createButton = writeable ? enabled : disabled;
+        this.formNode.appendChild(this.createButton.domNode);
     };
 };
 

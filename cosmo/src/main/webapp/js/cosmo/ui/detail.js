@@ -326,7 +326,8 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
         }
     }
     this.byline.updateFromItem(data);
-    this.buttonSection.setButtons(true);
+    var writeable = cosmo.app.pim.currentCollection.getWriteable();
+    this.buttonSection.setButtons(writeable);
 };
 
 cosmo.ui.detail.DetailViewForm.prototype.clear =

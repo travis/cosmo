@@ -221,10 +221,8 @@ cosmo.view.cal.createEventRegistry = function(arrParam) {
 
     for (var i = 0; i < arr.length; i++) {
         var note = arr[i];
-        var eventStamp = note.getEventStamp();
         var id = note.getItemUid();
-        var ev = new cosmo.view.cal.CalItem(id, null);
-        ev.data = note;
+        var ev = new cosmo.view.cal.CalItem(id, null, note);
         h.setItem(id, ev);
     }
     return h;

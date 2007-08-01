@@ -32,15 +32,15 @@ dojo.require('cosmo.view.cal.lozenge');
  * @object CalItem -- an event on the Calendar, links to the event's
  * Lozenge and CalItemDate objects
  */
-cosmo.view.cal.CalItem = function(id, lozenge) {
+cosmo.view.cal.CalItem = function(id, lozenge, data) {
     // Same as the UID for the stamped Note, used as the
     // key for the itemRegistry Hash
     // Lozenge div elements also get their id suffixes from this
     this.id = id;
     // Points to this event's Lozenge obj
-    this.lozenge = lozenge;
+    this.lozenge = lozenge || null;
     // Points to this event's stamped Note obj
-    this.data = null;
+    this.data = data || null;
     // A backup copy (clone) of the .data property made
     // before trying to edit
     this.dataOrig = null;

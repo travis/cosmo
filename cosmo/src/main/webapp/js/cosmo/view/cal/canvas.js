@@ -865,6 +865,8 @@ cosmo.view.cal.canvas = new function () {
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
+        var recurrenceRemoved = !!(item.dataOrig &&
+            !item.data.hasRecurrence() && item.dataOrig.hasRecurrence());
 
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
@@ -913,27 +915,57 @@ cosmo.view.cal.canvas = new function () {
         }
         // Non-recurring / "only this item'
         else {
-            // Saved event is still in view
-            var inRange = !item.isOutOfViewRange();
-            // Lozenge is in the current week, update it
-            if (inRange) {
-                item.lozenge.setInputDisabled(false);
-                item.lozenge.updateDisplayMain();
+            // The item just had its recurrence removed.
+            // The only item that should remain is the first
+            // occurrence -- put that item on the canvas, if it's
+            // actually in the current view-span
+            if (recurrenceRemoved) {
+                // Remove all the recurrence items from the list
+                var newRegistry = self.view.filterOutRecurrenceGroup(
+                    cosmo.view.cal.itemRegistry.clone(), [item.data.getUid()],
+                    null);
+                // Wipe existing list of items off the canvas
+                removeAllEventsFromDisplay();
+                // Update the list
+                self.view.itemRegistry = newRegistry;
+                // Create a new item based on the updated version of
+                // the edited ocurrence's master
+                var note = item.data.getMaster();
+                var id = note.getItemUid();
+                var newItem = new cosmo.view.cal.CalItem(id, null, note);
+                // If the first item in the removed recurrence series
+                // is in the current view span, add it to the list
+                if (!newItem.isOutOfViewRange()) {
+                    self.view.itemRegistry.setItem(id, newItem);
+                }
+                // Repaint the updated list
+                self.view.itemRegistry.each(appendLozenge);
+                updateEventsDisplay();
+                return;
             }
-            // Lozenge was in view, event was explicitly edited
-            // to a date that moves the lozenge off-canvas
-            else if (cmd.qualifier && cmd.qualifier.offCanvas) {
-                removeEvent(item);
-            }
-            // User has navigated off the week displaying the currently
-            // selected item -- the item is not in the itemRegistry,
-            // it's being pulled from the selectedItemCache, so it does
-            // not have a lozenge on the canvas to update -- the only
-            // drawback here is that the user now gets no feedback that
-            // the item has been successfully updated, because there's
-            // no lozenge to see
-            else if (item.lozenge.isOrphaned()) {
-                // Do nothing
+            else {
+                // Saved event is still in view
+                var inRange = !item.isOutOfViewRange();
+                // Lozenge is in the current week, update it
+                if (inRange) {
+                    item.lozenge.setInputDisabled(false);
+                    item.lozenge.updateDisplayMain();
+                }
+                // Lozenge was in view, event was explicitly edited
+                // to a date that moves the lozenge off-canvas
+                else if (cmd.qualifier && cmd.qualifier.offCanvas) {
+                    removeEvent(item);
+                }
+                // User has navigated off the week displaying the currently
+                // selected item -- the item is not in the itemRegistry,
+                // it's being pulled from the selectedItemCache, so it does
+                // not have a lozenge on the canvas to update -- the only
+                // drawback here is that the user now gets no feedback that
+                // the item has been successfully updated, because there's
+                // no lozenge to see
+                else if (item.lozenge.isOrphaned()) {
+                    // Do nothing
+                }
             }
         }
 

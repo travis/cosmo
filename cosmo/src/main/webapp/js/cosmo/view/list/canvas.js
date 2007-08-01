@@ -448,6 +448,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
             case recurOpts.ONLY_THIS_EVENT:
             case 'singleEvent':
                 self.view.itemRegistry.removeItem(item.id);
+                // If we just removed the last item, clear the form
+                if (self.view.itemRegistry.length == 0) {
+                    dojo.event.topic.publish('/calEvent', { 'action':
+                        'clearSelected', 'data': null });
+                }
                 self._doSortAndDisplay();
                 break;
         }

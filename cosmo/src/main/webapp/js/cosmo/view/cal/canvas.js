@@ -1034,6 +1034,11 @@ cosmo.view.cal.canvas = new function () {
                 removeEvent(ev);
                 break;
         }
+        // If we just removed the last item, clear the form
+        if (self.view.itemRegistry.length == 0) {
+            dojo.event.topic.publish('/calEvent', { 'action':
+                'clearSelected', 'data': null });
+        }
         updateEventsDisplay();
     }
 

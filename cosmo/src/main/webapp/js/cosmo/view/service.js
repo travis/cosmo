@@ -517,10 +517,10 @@ cosmo.view.service = new function () {
 
 
         if (opts.removeType == "singleEvent"){
-            deferred = cosmo.app.pim.serv.deleteItem(item.data);
+            deferred = cosmo.app.pim.serv.removeItem(item.data, cosmo.app.pim.currentCollection);
             reqId = deferred.id;
         } else if (opts.removeType == OPTIONS.ALL_EVENTS){
-            deferred = cosmo.app.pim.serv.deleteItem(item.data.getMaster());
+            deferred = cosmo.app.pim.serv.removeItem(item.data.getMaster(), cosmo.app.pim.currentCollection);
             reqId = deferred.id;
         } else if (opts.removeType == OPTIONS.ALL_FUTURE_EVENTS){
             var data = item.data;

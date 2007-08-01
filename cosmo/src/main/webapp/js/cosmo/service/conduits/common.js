@@ -247,6 +247,12 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return this._transport.deleteItem(item, kwArgs);
     },
     
+    removeItem: function(item, collection, kwArgs){
+        kwArgs = kwArgs || {};
+
+        return this._transport.removeItem(item, collection, kwArgs);
+    },
+    
     createSubscription: function(subscription, kwArgs){
         kwArgs = kwArgs || {};
         

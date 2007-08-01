@@ -39,6 +39,12 @@ dojo.declare("cosmo.service.transport.Rest", null,
             'head': true
         },
         
+        METHOD_GET: "GET",
+        METHOD_PUT: "PUT",
+        METHOD_POST: "POST",
+        METHOD_DELETE: "DELETE",
+        METHOD_HEAD: "HEAD",
+        
         /**
          * summary: Return request populated with attributes common to all CMP calls.
          */

@@ -144,7 +144,7 @@ public class RecurrenceExpanderTest extends TestCase {
         
         // test DATETIME with timezone
         calendar = getCalendar("tz_recurring3.ics");
-        TimeZone ctz = TIMEZONE_REGISTRY.getTimeZone("Americal/Chicago");
+        TimeZone ctz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
         
         Assert.assertTrue(expander.isOccurrence(calendar, new DateTime("20070102T100000", ctz)));
         Assert.assertFalse(expander.isOccurrence(calendar, new DateTime("20070102T110000", ctz)));

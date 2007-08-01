@@ -234,9 +234,13 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         var act = cmd.action;
         var item = cmd.data;
         switch (act) {
+            // Successfully displaying all the loaded items on the canvas
             case 'eventsDisplaySuccess':
+            // Collections with nothing in them
             case 'noItems':
+            // Items clicked to select, newly saved items
             case 'setSelected':
+            // Nothing has the selection -- clear out the form
             case 'clearSelected':
                 // An item has been clicked on, selected
                 if (item) {
@@ -263,8 +267,15 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                     self.buttonSection.setButtons(false);
                 }
                 break;
+            // Edited items, newly saved items (don't update newly saved
+            // items; that happens when they get the selection)
             case 'saveSuccess':
-                self.updateFromItem(item);
+                // Don't update here for newly saved items -- it wil
+                // update again when the new item gets the selection,
+                // resulting in weird flashing from the multiple updates
+                if (cmd.saveType != 'new') {
+                    self.updateFromItem(item);
+                }
                 break;
             case 'saveFailed':
                 //self.setButtons(true, true);
@@ -838,13 +849,11 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
 
     // Disable/enable form elements
     // ----------
-    var f = this.formNode;
-    var elems = cosmo.util.html.getFormElemNames(f);
-    var d = this.elementDefaultStates;
+    var elems = cosmo.util.html.getFormElemNames(this.formNode);
     if (this.enabled) {
         for (var i in elems) {
-            var elem = f[i];
-            var state = d[i];
+            var elem = this.formNode[i];
+            var state = this.elementDefaultStates[i];
             var elemType = elems[i];
             cosmo.util.html.enableFormElem(elem, elemType);
             if (opts.setUpDefaults != false) {
@@ -857,7 +866,7 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
     }
     else {
         for (var i in elems) {
-            var elem = f[i];
+            var elem = this.formNode[i];
             var elemType = elems[i];
             if (opts.disableStampFormElem) {
                 cosmo.util.html.clearAndDisableFormElem(elem, elemType);
@@ -1250,6 +1259,9 @@ cosmo.ui.detail.EventFormElements= function () {
             dojo.event.connect(f[txtIn[el]], 'onfocus', func);
         }
 
+        // Clear out time inputs if All-day checkbox is checked
+        // Unchecking does nothing -- this would create an anytime
+        // event, adding a start/end time would create a timed event item
         var func = function (e) {
             var allDay = e.target.checked;
             if (allDay) {
@@ -1257,14 +1269,6 @@ cosmo.ui.detail.EventFormElements= function () {
                 cosmo.util.html.clearFormElem(f.endTime, 'text');
                 cosmo.util.html.clearFormElem(f.startMeridian, 'radio');
                 cosmo.util.html.clearFormElem(f.endMeridian, 'radio');
-            }
-            else {
-                self.setElemDefaultState(f.startTime, 'text',
-                    self.elementDefaultStates['startTime']);
-                self.setElemDefaultState(f.endTime, 'text',
-                    self.elementDefaultStates['endTime']);
-                self.setElemDefaultState(f.startMeridian, 'radio');
-                self.setElemDefaultState(f.endMeridian, 'radio');
             }
         };
         // All-day event / normal event toggling
@@ -1311,26 +1315,26 @@ cosmo.ui.detail.EventFormElements= function () {
     // Interface methods
     // -------
     this.updateFromStamp = function (stamp) {
-        var setTimeElem = function (form, name, time) {
+        var setTimeElem = function (form, name, dt, untimed) {
             var timeElem = null;
             var meridianElem = null;
-            var strtime = '';
+            var str = '';
 
             timeElem = form[name + 'Time'];
             meridianElem = form[name + 'Meridian'];
-            if (time) {
-                strtime = time.strftime('%I:%M');
+            if (dt && !untimed) {
+                str = dt.strftime('%I:%M');
                 // Trim leading zero if need be
-                strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
+                str = str.indexOf('0') == 0 ? str.substr(1) : str;
                 meridianElem[1].checked = false;
                 meridianElem[0].checked = false;
-                if (time.getHours() > 11) {
+                if (dt.getHours() > 11) {
                     meridianElem[1].checked = true;
                 }
                 else {
                     meridianElem[0].checked = true;
                 }
-                _html.setTextInput(timeElem, strtime);
+                _html.setTextInput(timeElem, str);
             }
             else {
                 meridianElem[1].checked = false;
@@ -1340,18 +1344,15 @@ cosmo.ui.detail.EventFormElements= function () {
         };
         var allDay = stamp.getAllDay();
         var anyTime = stamp.getAnyTime();
+        var untimed = allDay || anyTime;
         f.eventAllDay.checked = allDay;
         _html.setTextInput(f.eventLocation, stamp.getLocation());
         var start = stamp.getStartDate();
         _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
-        if (!(allDay || anyTime)) {
-            setTimeElem(f, 'start', start);
-        }
+        setTimeElem(f, 'start', start, untimed);
         var end = stamp.getEndDate();
         _html.setTextInput(f.endDate, end.strftime('%m/%d/%Y'));
-        if (!(allDay || anyTime)) {
-            setTimeElem(f, 'end', end);
-        }
+        setTimeElem(f, 'end', end, untimed);
         if (start.tzId){
             var tz = cosmo.datetime.timezone.getTimezone(start.tzId);
             if (!tz){

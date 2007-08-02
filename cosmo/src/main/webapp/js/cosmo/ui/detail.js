@@ -310,8 +310,10 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     this.markupBar.render();
     this.mainSection.toggleEnabled(true);
     f = this.mainSection.formNode;
-    f.noteTitle.value = data.getDisplayName();
-    f.noteDescription.value = data.getBody();
+    // Values may be null -- IE coerces to string
+    // "null" if we don't convert to empty string first
+    f.noteTitle.value = data.getDisplayName() || '';
+    f.noteDescription.value = data.getBody() || '';
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();
@@ -1008,10 +1010,12 @@ cosmo.ui.detail.MailFormElements = function () {
             }
         }
         var f = this.formNode;
-        f.mailFrom.value = stamp.getFromAddress();
-        f.mailTo.value = stamp.getToAddress();
-        f.mailCc.value = stamp.getCcAddress();
-        f.mailBcc.value = stamp.getBccAddress();
+        // Values may be null -- IE coerces to string
+        // "null" if we don't convert to empty string first
+        f.mailFrom.value = stamp.getFromAddress() || '';
+        f.mailTo.value = stamp.getToAddress() || '';
+        f.mailCc.value = stamp.getCcAddress() || '';
+        f.mailBcc.value = stamp.getBccAddress() || '';
     }
 };
 cosmo.ui.detail.MailFormElements.prototype =
@@ -1123,7 +1127,9 @@ cosmo.ui.detail.EventFormElements= function () {
             else {
                 opt.text = dojo.string.capitalize(i.toLowerCase());
             }
-            opt.value = str;
+            // Make sure null values convert to empty
+            // string, not the string "null"
+            opt.value = str || '';
             statusOpt.push(opt);
         }
         return statusOpt;
@@ -1348,7 +1354,7 @@ cosmo.ui.detail.EventFormElements= function () {
         var anyTime = stamp.getAnyTime();
         var untimed = allDay || anyTime;
         f.eventAllDay.checked = allDay;
-        _html.setTextInput(f.eventLocation, stamp.getLocation());
+        _html.setTextInput(f.eventLocation, stamp.getLocation() || '');
         var start = stamp.getStartDate();
         _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
         setTimeElem(f, 'start', start, untimed);

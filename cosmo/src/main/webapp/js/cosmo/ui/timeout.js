@@ -19,8 +19,10 @@ dojo.require("cosmo.env");
 dojo.require("dojo.lang.common");
 
 cosmo.ui.timeout.updateLastActionTime = function (){
-    dojo.lang.clearTimeout(this.timeoutObject);
-    this.setTimeout();    
+    if (this.timeoutObject){
+        clearTimeout(this.timeoutObject);
+        this.setTimeout();    
+    }
 }
 
 cosmo.ui.timeout.timeoutObject = null;
@@ -29,5 +31,5 @@ cosmo.ui.timeout.timeoutFunction = null;
 cosmo.ui.timeout.setTimeout = function (func, timeout){
    if (func) this.timeoutFunction = func;
    timeout = timeout || cosmo.env.getTimeoutSeconds() * 1000;
-   this.timeoutObject = dojo.lang.setTimeout(this.timeoutFunction, timeout);
+   this.timeoutObject = setTimeout(dojo.lang.hitch(this, "timeoutFunction"), timeout);
 }

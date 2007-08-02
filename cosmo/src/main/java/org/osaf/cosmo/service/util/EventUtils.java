@@ -29,6 +29,8 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtStamp;
 
+import org.apache.commons.id.IdentifierGenerator;
+import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -49,6 +51,8 @@ import org.osaf.cosmo.service.ContentService;
  */
 public class EventUtils {
     
+    private static IdentifierGenerator UID_GENERATOR = new VersionFourGenerator();
+    
     /**
      * Create a new event based on an ical4j Calendar.  This will 
      * create the master NoteItem and any modification NoteItem's 
@@ -67,6 +71,10 @@ public class EventUtils {
             eventStamp = new EventStamp(note);
             note.addStamp(eventStamp);
         }
+        
+        // Need to set uid to be able to set modification uid because
+        // modification uids require the master uid to be known
+        note.setUid(UID_GENERATOR.nextIdentifier().toString());
         
         updateEventInternal(note, calendar);
         

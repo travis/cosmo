@@ -585,7 +585,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         getSession().save(content);    
     }
     
-    public void createContentInternal(Set<CollectionItem> parents, ContentItem content) {
+    protected void createContentInternal(Set<CollectionItem> parents, ContentItem content) {
 
         if(parents==null)
             throw new IllegalArgumentException("parent cannot be null");

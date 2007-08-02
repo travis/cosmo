@@ -15,6 +15,8 @@ alter table event_stamp add column startdate varchar(16);
 alter table event_stamp add column enddate varchar(16);
 alter table event_stamp add index idx_startdt (startdate);
 alter table event_stamp add index idx_enddt (enddate);
+alter table event_stamp add index idx_floating (isfloating);
+alter table event_stamp add index idx_recurring (isrecurring);
 
 # user_preferences
 alter table user_preferences rename to x_user_preferences;

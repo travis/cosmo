@@ -19,7 +19,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -87,7 +90,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         
         log.debug("starting migrateData()");
         migrateTimeRangeIndexes(conn);
-       
+        migrateModifications(conn);
     }
     
     
@@ -172,6 +175,106 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         log.debug("processed " + count + " event stamps");
     }
     
+    /**
+     * Fix modification items that are out of sync with the parent item.
+     */
+    private void migrateModifications(Connection conn) throws Exception {
+        
+        PreparedStatement stmt = null;
+        PreparedStatement updateItemStmt = null;
+        PreparedStatement insertCollectionItemStmt = null;
+        PreparedStatement parentsStmt = null;
+        
+        ResultSet rs = null;
+        
+        long count = 0;
+        
+        log.debug("starting migrateModifications()");
+        
+        try {
+            // get all stamp/item data to migrate
+            stmt = conn.prepareStatement("select id, modifiesitemid from item where modifiesitemid is not null");
+            // update timestamp
+            updateItemStmt = conn.prepareStatement("update item set modifydate=?, version=version+1 where id=?");
+            insertCollectionItemStmt = conn.prepareStatement("insert into collection_item(collectionid, itemid) values (?,?)");
+            parentsStmt = conn.prepareStatement("select collectionid from collection_item where itemid=?");
+            
+            rs = stmt.executeQuery();
+            
+            HashMap<Long, Set<Long>> parentMap = new HashMap<Long, Set<Long>>();
+            
+            // examine each modification and fix if necessary
+            while(rs.next()) {
+                long itemId = rs.getLong(1);
+                long modifiesItemId = rs.getLong(2);
+                
+                Set<Long> modParents = getParents(parentsStmt, itemId);
+                Set<Long> masterParents = parentMap.get(modifiesItemId);
+                
+                // cache the set of parents as it doesn't change
+                if(masterParents==null) {
+                    masterParents = getParents(parentsStmt, modifiesItemId);
+                    parentMap.put(modifiesItemId, masterParents);
+                }
+                
+                // If both sets of parents are equal, we are good
+                if(modParents.equals(masterParents))
+                    continue;
+                
+                // otherwise add modification to each parent that
+                // master is in
+                for(Long parent: masterParents) {
+                    
+                    // Only care about collections that item is not in
+                    if(modParents.contains(parent))
+                        continue;
+                    
+                    // insert into parent
+                    insertCollectionItemStmt.setLong(1, parent);
+                    insertCollectionItemStmt.setLong(2, itemId);
+                    if(insertCollectionItemStmt.executeUpdate()!=1)
+                        throw new RuntimeException("insert into collection_item failed");
+                    
+                    // update parent and item version/timestamps
+                    updateItemStmt.setLong(1, System.currentTimeMillis());
+                    updateItemStmt.setLong(2, itemId);
+                    if(updateItemStmt.executeUpdate()!=1)
+                        throw new RuntimeException("update of item failed");
+                    
+                    updateItemStmt.setLong(1, System.currentTimeMillis());
+                    updateItemStmt.setLong(2, parent);
+                    if(updateItemStmt.executeUpdate()!=1)
+                        throw new RuntimeException("update of item failed");   
+                }
+                
+                
+                count++;
+            }
+            
+            
+        } finally {
+            close(stmt);
+            close(updateItemStmt);
+            close(insertCollectionItemStmt);
+            close(parentsStmt);
+            close(rs);
+        }
+        
+        log.debug("processed " + count + " out of sync item modifications");
+    }
+    
+    private Set<Long> getParents(PreparedStatement ps, long itemId)
+            throws Exception {
+        HashSet<Long> parents = new HashSet<Long>();
+        ps.setLong(1, itemId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next())
+            parents.add(rs.getLong(1));
+
+        rs.close();
+
+        return parents;
+    }
     
     /**
      * Calculate time-range index from Calendar.

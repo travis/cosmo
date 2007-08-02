@@ -130,8 +130,15 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             // is a private var populated in the loadCollections method
             if (deletedSubscriptions && deletedSubscriptions.length > 0){
                 for (var x = 0; x < deletedSubscriptions.length; x++){
-                    cosmo.app.showErr(_("Main.Error.SubscribedCollectionDeleted",
-                        deletedSubscriptions[x].getDisplayName()));
+                    var errorMessage;
+                    var deletedSubscription = deletedSubscriptions[x];
+                    if (deletedSubscription.getCollectionDeleted()){
+                        errorMessage = "Main.Error.SubscribedCollectionDeleted";
+                    } else if (deletedSubscription.getTicketDeleted()){
+                        errorMessage = "Main.Error.SubscribedTicketDeleted";
+                    }
+                    cosmo.app.showErr(_(errorMessage,
+                        deletedSubscription.getDisplayName()));
                 }
             }
             if (this.authAccess){
@@ -320,7 +327,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         var deletedSubscriptions = [];
         var filteredSubscriptions = dojo.lang.filter(subscriptions,
             function(sub){
-               if (sub.getCollectionDeleted()){
+               if (sub.getCollectionDeleted() || sub.getTicketDeleted()){
                    self.serv.deleteItem(sub);
                    deletedSubscriptions.push(sub);
                    return false;

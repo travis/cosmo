@@ -194,10 +194,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var ticketEl = this.getChildrenByClassName(subscriptionDiv, "ticket", "div")[0];
             var ticketKeyEl = this.getChildrenByClassName(ticketEl, "key", "span")[0];
             var ticket = ticketKeyEl.firstChild.nodeValue;
+            var ticketExistsEl = this.getChildrenByClassName(ticketEl, "exists", "span")[0];
+            var ticketDeleted = (ticketExistsEl.firstChild.nodeValue == "false");
             var collectionEl = this.getChildrenByClassName(subscriptionDiv, "collection", "div")[0];
             var collectionUidEl = this.getChildrenByClassName(collectionEl, "uuid", "span")[0];
-            var collectionExistsEl = this.getChildrenByClassName(collectionEl, "exists", "span")[0];
             var uid = collectionUidEl.firstChild.nodeValue;
+            var collectionExistsEl = this.getChildrenByClassName(collectionEl, "exists", "span")[0];
             var collectionDeleted = (collectionExistsEl.firstChild.nodeValue == "false");
             var collection = new cosmo.model.Collection({
                 uid: uid
@@ -209,7 +211,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 ticketKey: ticket,
                 uid: uid,
                 collection: collection,
-                collectionDeleted: collectionDeleted
+                collectionDeleted: collectionDeleted,
+                ticketDeleted: ticketDeleted
             })
 
             subscription.setUrls(this.getUrls(entry));

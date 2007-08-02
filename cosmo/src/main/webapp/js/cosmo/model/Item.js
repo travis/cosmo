@@ -595,7 +595,8 @@ cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
     [["ticketKey", {"default": null}],
      ["writeable", {"default": false}],
      ["collection", {"default": null}],
-     ["collectionDeleted", {"default": false}]
+     ["collectionDeleted", {"default": false}],
+     ["ticketDeleted", {"default": false}]
      ],
     {
          isWriteable: function(){

@@ -74,19 +74,26 @@ public class CalendarFilterEvaluater {
     }
     
     private boolean evaluate(ComponentList comps, ComponentFilter filter) {
+        // Evaluate component filter against a set of components.
+        // If any component matches, then evaluation succeeds.
+        // This is basically a big OR
         for(Iterator<Component> it=comps.iterator();it.hasNext();) {
-            if(evaluateComps(getSubComponents(it.next()),filter)==false)
-                return false;
+            if(evaluateComps(getSubComponents(it.next()),filter)==true)
+                return true;
         }
-        return true;
+        return false;
     }
     
     private boolean evaluate(ComponentList comps, PropertyFilter filter) {
+        
+        // Evaluate property filter against a set of components.
+        // If any component matches, then evaluation succeeds.
+        // This is basically a big OR
         for(Iterator<Component> it=comps.iterator();it.hasNext();) {
-            if(evaluate(it.next(),filter)==false)
-                return false;
+            if(evaluate(it.next(),filter)==true)
+                return true;
         }
-        return true;
+        return false;
     }
     
     private boolean evaluateComps(ComponentList components, ComponentFilter filter) {
@@ -189,11 +196,14 @@ public class CalendarFilterEvaluater {
     }
     
     private boolean evaluate(PropertyList props, ParamFilter filter) {
+        // Evaluate param filter against a set of properties.
+        // If any property matches, then evaluation succeeds.
+        // This is basically a big OR
         for(Iterator<Property> it=props.iterator();it.hasNext();) {
-            if(evaulate(it.next(),filter)==false)
-                return false;
+            if(evaulate(it.next(),filter)==true)
+                return true;
         }
-        return true;
+        return false;
     }
     
     private boolean evaulate(Property property, ParamFilter filter) {
@@ -238,13 +248,15 @@ public class CalendarFilterEvaluater {
     }
     
     private boolean evaluate(ParameterList params, TextMatchFilter filter) {
-       
+        // Evaluate textmatch filter against a set of parameters.
+        // If any param matches, then evaluation succeeds.
+        // This is basically a big OR
         for(Iterator<Parameter> it = params.iterator(); it.hasNext();) {
             Parameter param = it.next();
-            if(evaluate(param,filter)==false)
-                return false;
+            if(evaluate(param,filter)==true)
+                return true;
         }
-        return true;
+        return false;
     }
     
     private boolean evaluate(Property property, TextMatchFilter filter) {
@@ -300,11 +312,14 @@ public class CalendarFilterEvaluater {
     }
     
     private boolean evaluate(PropertyList props, TimeRangeFilter filter) {
+        // Evaluate timerange filter against a set of properties.
+        // If any property matches, then evaluation succeeds.
+        // This is basically a big OR
         for(Iterator<Property> it = props.iterator(); it.hasNext();) {
-            if(evaluate(it.next(),filter)==false)
-                return false;
+            if(evaluate(it.next(),filter)==true)
+                return true;
         }
-        return true;
+        return false;
     }
     
     private boolean evaluate(Property property, TimeRangeFilter filter) {

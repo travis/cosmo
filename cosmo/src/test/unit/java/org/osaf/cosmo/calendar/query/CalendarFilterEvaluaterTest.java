@@ -268,4 +268,21 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         alarmFilter.setIsNotDefinedFilter(new IsNotDefinedFilter());
         Assert.assertFalse(evaluater.evaluate(calendar, filter));
     }
+    
+    public void testEvaluateFilterPropFilterAgainstException() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "event_with_exception.ics");
+        CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+        Calendar calendar = cb.build(fis);
+        
+        CalendarFilter filter = new CalendarFilter();
+        ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
+        ComponentFilter eventFilter = new ComponentFilter("VEVENT");
+        filter.setFilter(compFilter);
+        compFilter.getComponentFilters().add(eventFilter);
+        PropertyFilter propFilter = new PropertyFilter("DESCRIPTION");
+        eventFilter.getPropFilters().add(propFilter);
+        
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
+    }
 }

@@ -977,6 +977,7 @@ cosmo.ui.detail.MailFormElements = function () {
                 maxlength: 100,
                 value: '',
                 className: 'inputText' });
+            elem.style.width = '182px';
             td.appendChild(elem);
             tr.appendChild(td);
             return tr;

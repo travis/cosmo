@@ -20,6 +20,8 @@ dojo.declare("cosmo.service.exception.ServiceException", Error,
     // summary: The root of all service exceptions. If your error is not an instance
 function(){}, {           });
 
+dojo.declare("cosmo.service.exception.ClientSideError", cosmo.service.exception.ServiceException, {});
+
 dojo.declare("cosmo.service.exception.ServerSideError", cosmo.service.exception.ServiceException,
     // summary: General errors that result from 5xx or 4xx Http Errors 
 {

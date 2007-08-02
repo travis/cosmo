@@ -42,6 +42,17 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     
     CONTENT_TYPE_ATOM: "application/atom+xml",
     
+    getAndCheckEditLink: function(item){
+        var editLink = item.getUrls()[this.EDIT_LINK];
+        if (!editLink) {
+            throw new cosmo.service.exception.ClientSideError(
+                "Could not find edit link for item with uuid " + 
+                item.getUid() + ": " + item.toString()
+            )
+        }
+        return editLink;
+    },
+    
     getAtomBase: function () {
         return cosmo.env.getBaseUrl() + "/atom";
     },
@@ -105,7 +116,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         }
 
         var query = this._generateSearchQuery(searchCrit);
-        var editLink = collection.getUrls()[this.EDIT_LINK];
+        var editLink = this.getAndCheckEditLink(collection);
         
         var projection = (this.getItemsProjections[searchCrit.triage] || "full") + "/eim-json";
         var r = {};
@@ -118,7 +129,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     saveItem: function (item, postContent, kwArgs){
         kwArgs = kwArgs || {};
         
-        var editLink = item.getUrls()[this.EDIT_LINK];
+        var editLink = this.getAndCheckEditLink(item);
 
         var r = {};
         r.url = this.generateUri(this.getAtomBase() + "/" + 
@@ -177,7 +188,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
             collection = collection.getCollection();
         }
         
-        var editLink = collection.getUrls()[this.EDIT_LINK];
+        var editLink = this.getAndCheckEditLink(collection);
 
         var r = {};
         r.url = this.generateUri(this.getAtomBase() + "/" + 
@@ -212,7 +223,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
 
         var r = {};
-        r.url = this.getAtomBase() + "/" + subscription.getUrls()[this.EDIT_LINK];
+        r.url = this.getAtomBase() + "/" + this.getAndCheckEditLink(subscription);
         r.contentType = this.CONTENT_TYPE_ATOM;
         r.postContent = postContent;
         r.method = this.METHOD_PUT;
@@ -224,7 +235,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
 
         var r = {};
-        r.url = this.getAtomBase() + "/" + collection.getUrls()[this.EDIT_LINK];
+        r.url = this.getAtomBase() + "/" + this.getAndCheckEditLink(collection);
         r.contentType = "application/xhtml+xml";
         r.postContent = postContent;
         r.method = this.METHOD_PUT;
@@ -233,7 +244,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     deleteItem: function(item, kwArgs){
         kwArgs = kwArgs || {};
-        var editLink = item.getUrls()[this.EDIT_LINK];
+        var editLink = this.getAndCheckEditLink(item);
         var r = {};
         r.url = this.getAtomBase() + "/" + editLink;
         r.method = this.METHOD_DELETE;
@@ -245,7 +256,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     removeItem: function(item, collection, kwArgs){
         kwArgs = kwArgs || {};
-        var editLink = item.getUrls()[this.EDIT_LINK];
+        var editLink = this.getAndCheckEditLink(item);
         var r = {};
         var query = {uuid: collection.getUid()};
 
@@ -258,7 +269,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     checkIfPrefExists: function (key, kwArgs){
-        var exists = false;
+        kwArgs = dojo.lang.shallowCopy(kwArgs);
+        kwArgs.noErr = true;
         return this.bind({
           url: this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preference/"+ key,
           method: this.METHOD_HEAD

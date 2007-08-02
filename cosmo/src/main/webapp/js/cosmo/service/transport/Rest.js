@@ -62,10 +62,11 @@ dojo.declare("cosmo.service.transport.Rest", null,
             var request = cosmo.util.auth.getAuthorizedRequest(r, kwArgs);
             
             if (deferred){
-                deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
-                                              dojo.debug(e);
-                                              return e;});
-            
+                if (!kwArgs.noErr){
+                    deferred.addErrback(function(e) { dojo.debug("Transport Error: "); 
+                                                      dojo.debug(e);
+                                                      return e;});
+                }
                 request.load = request.load || this.resultCallback(deferred);
                 request.error = request.error || this.errorCallback(deferred);
             }

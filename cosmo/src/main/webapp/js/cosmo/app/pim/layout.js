@@ -271,35 +271,6 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data
 
-    // Subscription selector thinger -- show only in ticketed view
-    if (cosmo.app.initParams.ticketKey) {
-        var s = _createElem('span');
-        s.id = 'subscribeSelector';
-        var form = _createElem('form');
-        s.appendChild(form);
-        var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
-        clientOpts.unshift({ text: 'Subscribe with ...', value: '' });
-        var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
-           options: clientOpts, className: 'selectElem' };
-        var subscrSel = cosmo.util.html.createSelect(selOpts);
-        var f = function (e) {
-            // Show the subcription dialog if the empty "Subscribe with ..."
-            // option is not the one selected
-            var sel = e.target;
-            if (sel.selectedIndex != 0) {
-            cosmo.app.showDialog(
-                cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                    cosmo.app.pim.currentCollection,
-                    sel.options[sel.selectedIndex].value));
-            }
-        };
-        dojo.event.connect(subscrSel, 'onchange', f);
-        form.appendChild(subscrSel);
-        s.appendChild(cosmo.util.html.nbsp());
-        // Add to the menu area in the first position
-        menuDiv.insertBefore(s, menuDiv.firstChild);
-    }
-
     // List view canvas
     var listDiv = _createElem('div');
     listDiv.id = 'listViewContainer';

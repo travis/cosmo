@@ -1451,7 +1451,6 @@ dojo.declare("cosmo.ui.detail.Byline", null, {
         var modby = item.getModifiedBy();
         var date = new cosmo.datetime.Date();
         date.updateFromUTC(modby.getTimeStamp());
-        dojo.debug(modby.getTimeStamp())
         var userId = modby.getUserId();
 
         this.domNode.innerHTML = 

@@ -42,7 +42,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         collections: [],
         currentCollection: {},
         ticketKey: '',
-        MAX_DISPLAY_NAME_LENGTH: 13,
+        MAX_DISPLAY_NAME_LENGTH: 18,
 
         // Function for onchange of collection selector
         // sets local currentCollection and passes the selected
@@ -187,12 +187,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     }
                 };
 
-                var addCollectionPromptNode = _createElem('div');
-                addCollectionPromptNode.id = 'addCollectionPrompt';
 
                 // Collection name label
                 // ---
-                var displayName = curr? "" : curr.getDisplayName();
+                var displayName = curr? curr.getDisplayName() : "";
                 var d = _createElem("div");
                 d.id = 'collectionLabelName';
                 d.className = 'labelTextHoriz';
@@ -209,6 +207,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
 
                 // Set up addCollectionPromptNode
                 // -----
+                var addCollectionPromptNode = _createElem('div');
+                addCollectionPromptNode.id = 'addCollectionPrompt';
                 var anchor = _createElem('a');
                 anchor.title = self.strings.collectionAddTooltip;
                 dojo.event.connect(anchor, 'onclick', clickFunction);

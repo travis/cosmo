@@ -123,6 +123,35 @@ cosmo.ui.menu.urls = {
 // make it easy to rearrange order, or leave items out
 // based on display mode, user permissions, and user prefs
 cosmo.ui.menu.allItems = [
+    { id: 'subscribeWithMenuItem',
+      createFunc: function(){
+        var s = _createElem('span');
+        s.id = 'subscribeSelector';
+        var form = _createElem('form');
+        s.appendChild(form);
+        var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
+        clientOpts.unshift({ text: _('Main.SubscribeWith'), value: '' });
+        var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
+           options: clientOpts, className: 'selectElem' };
+        var subscrSel = cosmo.util.html.createSelect(selOpts);
+        var f = function (e) {
+            // Show the subcription dialog if the empty "Subscribe with ..."
+            // option is not the one selected
+            var sel = e.target;
+            if (sel.selectedIndex != 0) {
+            cosmo.app.showDialog(
+                cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
+                    cosmo.app.pim.currentCollection,
+                    sel.options[sel.selectedIndex].value));
+            }
+        };
+        dojo.event.connect(subscrSel, 'onchange', f);
+        form.appendChild(subscrSel)
+        return s;
+      },
+      displayMode: cosmo.ui.menu.displayModes.ANON,
+      requiredRoles: []
+    },
     { id: 'welcomeMenuItem',
         displayText: _('Main.Welcome', [cosmo.app.currentUsername]),
         displayMode: cosmo.ui.menu.displayModes.AUTH,
@@ -192,6 +221,7 @@ cosmo.ui.menu.MenuItem = function (p) {
     this.requiredPref = null;
     this.subscribeTo = {};
     this.span = null;
+    this.createFunc = null;
     // Note that yes, there are sometimes that you want
     // *both* an onclickFunc and a urlString -- example
     // is opening something in a new window where you
@@ -216,24 +246,28 @@ cosmo.ui.menu.MainMenu = function (p) {
     this.hasBeenRendered = false;
     this.currentlyDisplayedItems = [];
     this.createItem = function (item, lastItem) {
-        var s = _createElem('span');
-        s.id = item.id;
-        if (item.onclickFunc || item.urlString) {
-            var a = _createElem('a');
-            a.className = 'menuBarLink';
-            a.innerHTML = item.displayText;
-            if (item.onclickFunc && typeof item.onclickFunc == 'function') {
-                dojo.event.connect(a, 'onclick', item.onclickFunc);
+        if (item.createFunc) {
+            return item.createFunc();
+        } else {
+            var s = _createElem('span');
+            s.id = item.id;
+            if (item.onclickFunc || item.urlString) {
+                var a = _createElem('a');
+                a.className = 'menuBarLink';
+                a.innerHTML = item.displayText;
+                if (item.onclickFunc && typeof item.onclickFunc == 'function') {
+                    dojo.event.connect(a, 'onclick', item.onclickFunc);
+                }
+                if (item.urlString && typeof item.urlString == 'string') {
+                    a.href = item.urlString;
+                }
+                s.appendChild(a);
             }
-            if (item.urlString && typeof item.urlString == 'string') {
-                a.href = item.urlString;
+            else {
+                s.innerHTML = item.displayText;
             }
-            s.appendChild(a);
+            return s;
         }
-        else {
-            s.innerHTML = item.displayText;
-        }
-        return s;
     };
     this.appendItem = function (item, lastItem) {
         var s = this.createItem(item, lastItem);

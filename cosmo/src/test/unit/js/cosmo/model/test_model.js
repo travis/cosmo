@@ -172,6 +172,20 @@ test_hasRecurrence: function(){
 
 test_stampMetaData: function(){
     assertEquals("event", cosmo.model.getStampMetaData("event").stampName);
+},
+
+test_addressRecurring: function(){
+    var note = new cosmo.model.Note({
+        body: "body",
+        uid: "123",
+        displayName: "display"
+    });
+    var stamp = note.getEventStamp(true);
+    stamp.setRrule(new cosmo.model.RecurrenceRule({frequency:cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY}));
+    var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
+    var stamp = occurrence.getMailStamp(true);
+    stamp.setFromAddress("from");
+    assertTrue(stamp.getFromAddress() == "from");
 }
 
 });

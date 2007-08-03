@@ -957,11 +957,8 @@ cosmo.view.cal.canvas = new function () {
                         self.view.itemRegistry.each(appendLozenge);
                         updateEventsDisplay();
                     } else {
-                        dojo.debug("ss inview")
-                        dojo.debug("lozzie?" +item.lozenge);
                         item.lozenge.setInputDisabled(false);
                         item.lozenge.updateDisplayMain();
-                        dojo.debug("ss after updateDisplayMain")
                     }
                 }
                 // Lozenge was in view, event was explicitly edited

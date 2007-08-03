@@ -382,6 +382,11 @@ cosmo.view.service = new function () {
                     self.processingQueue.shift();
                     return;
                 }
+            } else if (err instanceof ccosmo.service.exception.CollectionLockedException){
+                    errMsg = _('Main.Error.EventEditSaveFailed.CollectionLocked');
+                    cosmo.app.showErr(errMsg);
+                    self.processingQueue.shift();
+                    return;
             } else {
                 //generic error handling.
                 if (saveType != "new") {

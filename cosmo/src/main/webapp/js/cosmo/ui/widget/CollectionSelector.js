@@ -101,39 +101,51 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // Set up callback for deferred -- this is the action to take
                 // if auth succeeds
                 var subscribeFunction = function () {
-                        var collections = cosmo.app.pim.serv.getCollections({sync:true}).results[0];
-                        var alreadySubscribed = self._collectionWithUidExists(collections, curr.getUid());
-                        if (alreadySubscribed) {
-                            var message = alreadySubscribed == "cosmo.model.Collection"
-                                ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
-                                : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
-                                var doContinue = confirm(message);
-                                if (!doContinue) {
-                                    return null;
-                                }
-                        }
-
-                        var displayName = "";
-
-                        while (!self._validateDisplayName(displayName)) {
-                            displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
-                        }
-
-                        while (self._collectionWithDisplayNameExists(collections, displayName) || !self._validateDisplayName(displayName)) {
-                            displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt", displayName));
-                        }
-
-                        if (displayName == null) {
-                            return null;
-                        }
-
-                        var subscription = new cosmo.model.Subscription({
-                            displayName: displayName,
-                            uid: curr.getUid(),
-                            ticketKey: passedKey
+                        var collectionsDeferred = cosmo.app.pim.serv.getCollections();
+                        var subscriptionsDeferred = cosmo.app.pim.serv.getSubscriptions();
+                        var dList = new dojo.DeferredList(
+                            [collectionsDeferred, subscriptionsDeferred]
+                            );
+                        dList.addCallback(function (results) {
+                            var collections = results[0][1];
+                            collections = collections.concat(results[1][1]);
+                            return collections;
                         })
-
-                        return cosmo.app.pim.serv.createSubscription(subscription);
+                        dList.addCallback(function (collections){
+                            var alreadySubscribed = self._collectionWithUidExists(collections, curr.getUid());
+                            if (alreadySubscribed) {
+                                var message = alreadySubscribed == "cosmo.model.Collection"
+                                    ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
+                                    : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
+                                    var doContinue = confirm(message);
+                                    if (!doContinue) {
+                                        return null;
+                                    }
+                            }
+    
+                            var displayName = "";
+    
+                            while (!self._validateDisplayName(displayName)) {
+                                displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
+                            }
+    
+                            while (self._collectionWithDisplayNameExists(collections, displayName) || !self._validateDisplayName(displayName)) {
+                                displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt", displayName));
+                            }
+    
+                            if (displayName == null) {
+                                return null;
+                            }
+    
+                            var subscription = new cosmo.model.Subscription({
+                                displayName: displayName,
+                                uid: curr.getUid(),
+                                ticketKey: passedKey
+                            })
+    
+                            return cosmo.app.pim.serv.createSubscription(subscription);
+                        });
+                        return dList;
                 };
                 // Set up the authAction obj for the AuthBox
                 // Passed to cosmo.ui.widget.AuthBox.getInitProperties
@@ -146,13 +158,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     attemptFunc: function () {
                         var deferred = subscribeFunction();
                         if (deferred != null) {
-                            deferred.addCallback(dojo.lang.hitch(this, function (x,y,z) {
+                            deferred.addCallback(dojo.lang.hitch(this, function () {
                                 // Log the user into Cosmo and display the current collection
                                 this._showPrompt(this.authAction.successPrompt);
                                 location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
 
                             }));
-                            deferred.addErrback(dojo.lang.hitch(this, function (err, y, z) {
+                            deferred.addErrback(dojo.lang.hitch(this, function (err) {
                                 cosmo.app.hideDialog();
                                 cosmo.app.showErr(self.strings.collectionAddError, err);
                                 return false;

@@ -777,7 +777,6 @@ cosmo.view.cal.canvas = new function () {
      * @ return Boolean, true
      */
     function updateEventsDisplay() {
-        dojo.debug("update events display");
         // Current collection has items
         if (cosmo.view.cal.itemRegistry.length) {
             if (cosmo.view.cal.conflict.calc(cosmo.view.cal.itemRegistry) &&
@@ -948,8 +947,22 @@ cosmo.view.cal.canvas = new function () {
                 var inRange = !item.isOutOfViewRange();
                 // Lozenge is in the current week, update it
                 if (inRange) {
-                    item.lozenge.setInputDisabled(false);
-                    item.lozenge.updateDisplayMain();
+                    if (item.lozenge.isOrphaned()){
+                        var id = item.data.getItemUid();
+                        var newItem = new cosmo.view.cal.CalItem(id, null, item.data);
+                        // If the first item in the removed recurrence series
+                        // is in the current view span, add it to the list
+                        self.view.itemRegistry.setItem(id, newItem);
+                        // Repaint the updated list
+                        self.view.itemRegistry.each(appendLozenge);
+                        updateEventsDisplay();
+                    } else {
+                        dojo.debug("ss inview")
+                        dojo.debug("lozzie?" +item.lozenge);
+                        item.lozenge.setInputDisabled(false);
+                        item.lozenge.updateDisplayMain();
+                        dojo.debug("ss after updateDisplayMain")
+                    }
                 }
                 // Lozenge was in view, event was explicitly edited
                 // to a date that moves the lozenge off-canvas

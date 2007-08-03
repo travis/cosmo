@@ -1065,7 +1065,7 @@ cosmo.view.cal.canvas = new function () {
                 break;
             case recurOpts.ALL_FUTURE_EVENTS:
                 var eventRegistry = cosmo.view.cal.itemRegistry.clone();
-                eventRegistry = self.viw.filterOutRecurrenceGroup(
+                eventRegistry = self.view.filterOutRecurrenceGroup(
                     eventRegistry, [ev.data.getUid()],
                     ev.data.getEventStamp().getRrule().getEndDate());
                 removeAllEventsFromDisplay();

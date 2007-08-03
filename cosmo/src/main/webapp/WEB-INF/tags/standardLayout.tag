@@ -114,7 +114,7 @@
             <!-- end admin console navbar -->
         </authz:authorize>
               |
-              <a href="<c:url value="http://wiki.osafoundation.org/bin/view/Projects/CosmoHelpPortal"/>"><fmt:message key="Layout.Nav.Main.Help"/></a>
+              <a href="<fmt:message key="Main.CollectionDetails.HelpLink" bundle="${uiBundle}"/>"><fmt:message key="Layout.Nav.Main.Help"/></a>
               |
               <a href="<c:url value="/logout"/>">
                 <fmt:message key="Layout.Nav.Main.LogOut"/>

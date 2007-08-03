@@ -91,7 +91,11 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, at
             if (this._masterPropertyGetters && this._masterPropertyGetters[propertyName]){
                 return this._masterPropertyGetters[propertyName].apply(this);
             }
-            return this._master._stamps[stampName].__getProperty(propertyName);
+            var masterStamp = this._master._stamps[stampName];
+            if (!masterStamp){
+                return undefined;
+            }
+            return masterStamp.__getProperty(propertyName);
         },
     
         _getModifiedProperty: function (propertyName){

@@ -1,0 +1,11 @@
+{"params": {"text": "7\/29\/2007", "id": "goToDateInput"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"}, "version": "0.1", "method": "click"}
+{"method": "wait", "params": {"milliseconds" : 5000}}
+{"params": {"id": "hourDiv1-1100"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"id": "viewNavCenterRight"}, "version": "0.1", "method": "click"}
+{"method": "wait", "params": {"milliseconds" : 5000}}
+{"params": {"id": "startDate"}, "version": "0.1", "method": "click"}
+{"params": {"text": "8\/5\/2007", "id": "startDate"}, "version": "0.1", "method": "type"}
+{"params": {"text": "8\/5\/2007", "id": "endDate"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "version": "0.1", "method": "click"}
+{"method": "wait", "params": {"milliseconds" : 5000}}

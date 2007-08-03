@@ -228,11 +228,11 @@ cosmo.view.cal.conflict = new function() {
             var eventStamp = ev.data.getEventStamp();
             var allDay = eventStamp.getAllDay();
             var anyTime = eventStamp.getAnyTime();
-            
+
             // Only look at untimed events
             if (allDay || anyTime) {
                 var startDate = eventStamp.getStartDate();
-                var endDate = eventStamp.getStartDate();
+                var endDate = eventStamp.getEndDate();
                 // Calc start column and column width
                 if (ev.startsBeforeViewRange()) {
                     startCol = 0;

@@ -724,12 +724,12 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
             }
         }
         this.expanded = true;
-        display = '[hide]';
+        display = _('Main.DetailForm.Hide');
         animKey = 'wipeIn';
     }
     else {
         this.expanded = false;
-        display = '[show]';
+        display = _('Main.DetailForm.Show');
         animKey = 'wipeOut';
     }
     // Toggle the switch text

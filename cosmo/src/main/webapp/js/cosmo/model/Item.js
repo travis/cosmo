@@ -605,6 +605,9 @@ cosmo.model.declare("cosmo.model.Subscription", cosmo.model.Item,
     {
          isWriteable: function(){
              return this.getCollection().getWriteable();
+         },
+         getWriteable: function(){
+             return this.isWriteable();
          }
     }
 );

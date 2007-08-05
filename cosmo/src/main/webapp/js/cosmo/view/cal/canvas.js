@@ -864,8 +864,7 @@ cosmo.view.cal.canvas = new function () {
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
-        var recurrenceRemoved = !!(item.dataOrig &&
-            !item.data.hasRecurrence() && item.dataOrig.hasRecurrence());
+        var recurrenceRemoved = item.recurrenceRemoved();
 
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
@@ -915,13 +914,13 @@ cosmo.view.cal.canvas = new function () {
         // Non-recurring / "only this item'
         else {
             // The item just had its recurrence removed.
-            // The only item that should remain is the first
-            // occurrence -- put that item on the canvas, if it's
+            // The only item that should remain is the item that was the
+            // first occurrence -- put that item on the canvas, if it's
             // actually in the current view-span
             if (recurrenceRemoved) {
                 // Remove all the recurrence items from the list
                 var newRegistry = self.view.filterOutRecurrenceGroup(
-                    cosmo.view.cal.itemRegistry.clone(), [item.data.getUid()],
+                    self.view.itemRegistry.clone(), [item.data.getUid()],
                     null);
                 // Wipe existing list of items off the canvas
                 removeAllEventsFromDisplay();
@@ -947,11 +946,12 @@ cosmo.view.cal.canvas = new function () {
                 var inRange = !item.isOutOfViewRange();
                 // Lozenge is in the current week, update it
                 if (inRange) {
+                    // Item is being edited was off-canvas
                     if (item.lozenge.isOrphaned()){
                         var id = item.data.getItemUid();
+                        // Create a new CalItem from the stamped Note on the item
+                        // so we can give it a new on-canvas lozenge
                         var newItem = new cosmo.view.cal.CalItem(id, null, item.data);
-                        // If the first item in the removed recurrence series
-                        // is in the current view span, add it to the list
                         self.view.itemRegistry.setItem(id, newItem);
                         // Repaint the updated list
                         self.view.itemRegistry.each(appendLozenge);

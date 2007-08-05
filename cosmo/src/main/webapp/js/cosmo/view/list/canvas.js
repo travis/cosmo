@@ -332,6 +332,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
+        var recurrenceRemoved = item.recurrenceRemoved();
 
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
@@ -362,7 +363,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 if (error){
                     cosmo.app.showErr(_$("Service.Error.ProblemGettingItems"), "", error);
                     return;
-                }   
+                }
 
                 var occurrences = results[0][1];
                 if (results[1]){
@@ -378,6 +379,27 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         // Non-recurring / "only this item'
         else {
+            // The item just had its recurrence removed.
+            // The only item that should remain is the item that was the
+            // first occurrence
+            if (recurrenceRemoved) {
+                // Remove all the recurrence items from the list
+                var newRegistry = self.view.filterOutRecurrenceGroup(
+                    self.view.itemRegistry.clone(), [item.data.getUid()],
+                    null);
+                // Update the list
+                self.view.itemRegistry = newRegistry;
+                // Create a new item based on the updated version of
+                // the edited ocurrence's master
+                var note = item.data.getMaster();
+                var id = note.getItemUid();
+                var newItem = new cosmo.view.cal.CalItem(id, null, note);
+                self.view.itemRegistry.setItem(id, newItem);
+                // Use the updated item from here forward -- set its precalc'd
+                // sort/display props, and point the selection at it in
+                // updateEventsCallback -- recurOpts.ALL_EVENTS case
+                item = newItem;
+            }
             self.view.setSortAndDisplay(item);
         }
 
@@ -430,7 +452,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
         else {
             updateEventsCallback();
         }
-
         self._doSortAndDisplay();
     };
     this._removeSuccess = function (cmd) {

@@ -65,4 +65,11 @@ cosmo.view.BaseItem.prototype.restoreFromSnapshot = function () {
     }
     return true;
 };
+/**
+ * 
+ */
+cosmo.view.BaseItem.prototype.recurrenceRemoved = function () {
+    return !!(this.dataOrig &&
+        !this.data.hasRecurrence() && this.dataOrig.hasRecurrence());
+};
 

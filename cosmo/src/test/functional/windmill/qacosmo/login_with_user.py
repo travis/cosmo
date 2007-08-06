@@ -2,7 +2,6 @@
 from windmill.authoring import WindmillTestClient
 
 def test():
-
     client = WindmillTestClient(__name__)
 
     client.type(text=u'%random%', id=u'loginDialogUsernameInput')

@@ -2,7 +2,6 @@
 from windmill.authoring import WindmillTestClient
 
 def test():
-
     client = WindmillTestClient(__name__)
 
     client.open(url=u'http://qacosmo.osafoundation.org/cosmo/browse/%random%')

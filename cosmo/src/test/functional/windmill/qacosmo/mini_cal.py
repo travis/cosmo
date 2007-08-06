@@ -2,7 +2,6 @@
 from windmill.authoring import WindmillTestClient
 
 def test():
-
     client = WindmillTestClient(__name__)
 
     client.click(id=u'_month0_day3')

@@ -2,7 +2,6 @@
 from windmill.authoring import WindmillTestClient
 
 def test():
-
     client = WindmillTestClient(__name__)
 
     client.doubleClick(id=u'hourDiv1-1200')

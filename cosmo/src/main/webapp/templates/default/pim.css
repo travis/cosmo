@@ -458,11 +458,13 @@
     background-color: #fbfbfb; 
     border-bottom: 1px solid #ccc;
 }
-.byline {
+#detailViewByline {
+    height: 24px;
+    padding: 4px 10px 0px 10px;
     border-top: 1px solid #ccc;
-	font-weight: bold;
-	font-size: smaller;
-	padding: 5px 10px;
+	  font-weight: bold;
+	  font-size: 10px;
+    line-height: 12px;
     color: #808080;
 }
 

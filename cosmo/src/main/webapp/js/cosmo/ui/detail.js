@@ -1432,12 +1432,12 @@ cosmo.ui.detail.EventFormElements.prototype.hideOrShowEventStatus = function(){
 
 dojo.declare("cosmo.ui.detail.Byline", null, {
     domNode: null,
-    
+
     initializer: function (){
         this.domNode = _createElem("div");
         this.domNode.className = "byline";
     },
-    
+
     actionToText: new function(){
         this[cosmo.model.ACTION_EDITED] = _("Main.DetailForm.Byline.Edited");
         this[cosmo.model.ACTION_QUEUED] = _("Main.DetailForm.Byline.Queued");
@@ -1445,31 +1445,31 @@ dojo.declare("cosmo.ui.detail.Byline", null, {
         this[cosmo.model.ACTION_UPDATED] = _("Main.DetailForm.Byline.Update");
         this[cosmo.model.ACTION_CREATED] = _("Main.DetailForm.Byline.Created");
     },
-    
+
     updateFromItem: function(item){
-        
+
         var modby = item.getModifiedBy();
         var date = new cosmo.datetime.Date();
         date.updateFromUTC(modby.getTimeStamp());
         var userId = modby.getUserId();
 
-        this.domNode.innerHTML = 
+        this.domNode.innerHTML =
             [
-            '<span class="bylineAction">', 
+            '<span class="bylineAction">',
             dojo.string.escapeXml(this.actionToText[modby.getAction()] || ""), '</span>',
             userId? (_("Main.DetailForm.Byline.By") + '<span class="bylineWho">' +
              dojo.string.escapeXml(userId) + ' </span>') : "",
             _("Main.DetailForm.Byline.On"), '<span class="bylineDate">',
             dojo.string.escapeXml(date.strftime(_("Main.DetailForm.Byline.DateFormat"))), '</span>',
-            _("Main.DetailForm.Byline.At"), '<span class="bylineTime">', 
+            _("Main.DetailForm.Byline.At"), '<span class="bylineTime">',
             dojo.string.escapeXml(date.strftime(_("Main.DetailForm.Byline.TimeFormat"))), '</span>'
-            
+
             ].join('');
-        
+
         var x = modby;
         var y = this.domNode;
 
-    }  
+    }
 }
 );
 

@@ -58,6 +58,42 @@ public class MessageApplicatorTest extends BaseApplicatorTestCase
         Assert.assertEquals(messageStamp.getReferences(), "blah2");
     }
     
+    public void testApplyMissingFields() throws Exception {
+        NoteItem masterNote = new NoteItem();
+        NoteItem modItem = new NoteItem();
+        MessageStamp messageStamp = new MessageStamp(masterNote);
+        messageStamp.setMessageId("test");
+        messageStamp.setHeaders("test");
+        messageStamp.setFrom("test");
+        messageStamp.setCc("test");
+        messageStamp.setBcc("test");
+        messageStamp.setOriginators("test");
+        messageStamp.setDateSent("test");
+        messageStamp.setInReplyTo("test");
+        messageStamp.setReferences("test");
+        masterNote.addStamp(messageStamp);
+
+        modItem.setModifies(masterNote);
+        
+        EimRecord record = makeTestMissingRecord();
+
+        MessageApplicator applicator =
+            new MessageApplicator(modItem);
+        applicator.applyRecord(record);
+
+        MessageStamp modStamp = MessageStamp.getStamp(modItem);
+        
+        Assert.assertNull(modStamp.getMessageId());
+        Assert.assertNull(modStamp.getHeaders());
+        Assert.assertNull(modStamp.getFrom());
+        Assert.assertNull(modStamp.getCc());
+        Assert.assertNull(modStamp.getBcc());
+        Assert.assertNull(modStamp.getOriginators());
+        Assert.assertNull(modStamp.getDateSent());
+        Assert.assertNull(modStamp.getInReplyTo());
+        Assert.assertNull(modStamp.getReferences());
+    }
+    
     private EimRecord makeTestRecord() {
         EimRecord record = new EimRecord(PREFIX_MESSAGE, NS_MESSAGE);
 
@@ -71,6 +107,23 @@ public class MessageApplicatorTest extends BaseApplicatorTestCase
         record.addField(new TextField(FIELD_DATE_SENT, "dateSent"));
         record.addField(new TextField(FIELD_IN_REPLY_TO, "inReplyTo"));
         record.addField(new ClobField(FIELD_REFERENCES, new StringReader("blah2")));
+
+        return record;
+    }
+    
+    private EimRecord makeTestMissingRecord() {
+        EimRecord record = new EimRecord(PREFIX_MESSAGE, NS_MESSAGE);
+
+        addMissingTextField(FIELD_MESSAGE_ID, record);
+        addMissingClobField(FIELD_HEADERS, record);
+        addMissingTextField(FIELD_FROM, record);
+        addMissingTextField(FIELD_TO, record);
+        addMissingTextField(FIELD_CC, record);
+        addMissingTextField(FIELD_BCC, record);
+        addMissingTextField(FIELD_ORIGINATORS, record);
+        addMissingTextField(FIELD_DATE_SENT, record);
+        addMissingTextField(FIELD_IN_REPLY_TO, record);
+        addMissingClobField(FIELD_REFERENCES, record);
 
         return record;
     }

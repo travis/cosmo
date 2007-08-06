@@ -134,7 +134,7 @@ public class MessageApplicator extends BaseStampApplicator
             }
         } else if (field.getName().equals(FIELD_IN_REPLY_TO)) {
             if(field.isMissing()) {
-                handleMissingAttribute("inReplyto");
+                handleMissingAttribute("inReplyTo");
             }
             else {
                 String value = EimFieldValidator.validateText(field, MAXLEN_IN_REPLY_TO);

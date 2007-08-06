@@ -24,6 +24,7 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordField;
@@ -93,6 +94,12 @@ public class BaseApplicatorTestCase extends TestCase
         TextField tf = new TextField(fieldName, null);
         tf.setMissing(true);
         record.addField(tf);
+    }
+    
+    protected void addMissingClobField(String fieldName, EimRecord record) {
+        ClobField cf = new ClobField(fieldName, null);
+        cf.setMissing(true);
+        record.addField(cf);
     }
     
     protected void addMissingIntegerField(String fieldName, EimRecord record) {

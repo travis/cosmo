@@ -142,7 +142,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
                             response = response.replace(/xmlns:xml.*=".*"/, "");
                             obj = new ActiveXObject("Microsoft.XMLDOM");
                             if (!obj.loadXML(response)){
-                               dojo.debug(obj.parseError.reason)
+                               dojo.debug(obj.parseError.reason + " on line " + obj.parseError.line+ " at char " + obj.parseError.linepos)
                             }
                         }
                         deferredRequestHandler.callback(obj, xhr);

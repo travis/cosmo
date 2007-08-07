@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +46,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.lock.LockManager;
+import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 import org.osaf.cosmo.service.triage.TriageStatusQueryProcessor;
 
 /**
@@ -766,33 +766,27 @@ public class StandardContentService implements ContentService {
     /**
      * Find note items by triage status that belong to a collection.
      * @param collection collection
-     * @param statusLabel triage status to find
-     * @param pointInTime point in time to triage
-     * @param timezone Optional timezone to use for floating dates.  If null, the
-     *        system default is used.
+     * @param context the query context
      * @return set of notes that match the specified triage status label and
      *         belong to the specified collection
      */
     public SortedSet<NoteItem> findNotesByTriageStatus(CollectionItem collection,
-            String statusLabel, Date pointInTime, TimeZone timezone) {
+            TriageStatusQueryContext context) {
         return triageStatusQueryProcessor.processTriageStatusQuery(collection,
-                statusLabel, pointInTime, timezone);
+                context);
     }
     
     /**
      * Find note items by triage status that belong to a recurring note series.
      * @param note recurring note
-     * @param statusLabel triage status to find
-     * @param pointInTime point in time to triage
-     * @param timezone Optional timezone to use for floating dates.  If null, the
-     *        system default is used.
+     * @param context the query context
      * @return set of notes that match the specified triage status label and belong
      *         to the specified recurring note series
      */
     public SortedSet<NoteItem> findNotesByTriageStatus(NoteItem note,
-            String statusLabel, Date pointInTime, TimeZone timezone) {
+            TriageStatusQueryContext context) {
         return triageStatusQueryProcessor.processTriageStatusQuery(note,
-                statusLabel, pointInTime, timezone);
+                context);
     }
 
     /**

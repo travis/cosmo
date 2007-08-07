@@ -48,6 +48,7 @@ import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 import org.osaf.cosmo.service.triage.TriageStatusQueryProcessor;
 
 /**
@@ -72,30 +73,58 @@ public class StandardTriageStatusQueryProcessor implements
     /* (non-Javadoc)
      * @see org.osaf.cosmo.service.triage.TriageStatusQueryProcessor#processTriageStatusQuery(org.osaf.cosmo.model.CollectionItem, java.lang.String, java.util.Date, net.fortuna.ical4j.model.TimeZone)
      */
-    public SortedSet<NoteItem> processTriageStatusQuery(CollectionItem collection,
-            String triageStatusLabel, Date pointInTime, TimeZone timezone) {
-        if(TriageStatus.LABEL_DONE.equalsIgnoreCase(triageStatusLabel))
-            return getDone(collection, pointInTime, timezone);
-        else if(TriageStatus.LABEL_NOW.equalsIgnoreCase(triageStatusLabel))
-            return getNow(collection, pointInTime, timezone);
-        else if(TriageStatus.LABEL_LATER.equalsIgnoreCase(triageStatusLabel))
-            return getLater(collection, pointInTime, timezone);
+    public SortedSet<NoteItem>
+        processTriageStatusQuery(CollectionItem collection,
+                                 TriageStatusQueryContext context) {
+        if (context.isAll())
+            return getAll(collection, context).merge();
+        if (context.isDone())
+            return getDone(collection, context).merge();
+        else if (context.isNow())
+            return getNow(collection, context).merge();
+        else if (context.isLater())
+            return getLater(collection, context).merge();
         else
-            throw new IllegalArgumentException("invalid status: " + triageStatusLabel);
+            throw new IllegalArgumentException("invalid status: " + context.getTriageStatus());
     }
     
-    public SortedSet<NoteItem> processTriageStatusQuery(NoteItem note,
-            String triageStatusLabel, Date pointInTime, TimeZone timezone) {
-        if(TriageStatus.LABEL_DONE.equalsIgnoreCase(triageStatusLabel))
-            return getDone(note, pointInTime, timezone);
-        else if(TriageStatus.LABEL_NOW.equalsIgnoreCase(triageStatusLabel))
-            return getNow(note, pointInTime, timezone);
-        else if(TriageStatus.LABEL_LATER.equalsIgnoreCase(triageStatusLabel))
-            return getLater(note, pointInTime, timezone);
+    public SortedSet<NoteItem>
+        processTriageStatusQuery(NoteItem note,
+                                 TriageStatusQueryContext context) {
+        if (context.isAll())
+            return getAll(note, context).merge();
+        if (context.isDone())
+            return getDone(note, context).merge();
+        else if (context.isNow())
+            return getNow(note, context).merge();
+        else if (context.isLater())
+            return getLater(note, context).merge();
         else
-            throw new IllegalArgumentException("invalid status: " + triageStatusLabel);
+            throw new IllegalArgumentException("invalid status: " + context.getTriageStatus());
     }
-    
+
+    private QueryResult getAll(CollectionItem collection,
+                               TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult();
+
+        qr.add(getNow(collection, context));
+        qr.add(getDone(collection, context));
+        qr.add(getLater(collection, context));
+
+        return qr;
+    }
+
+    private QueryResult getAll(NoteItem note,
+                               TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult();
+
+        qr.add(getNow(note, context));
+        qr.add(getDone(note, context));
+        qr.add(getLater(note, context));
+
+        return qr;
+    }
+
     /**
      * NOW Query:<br/>
      *   - Non-recurring with no or null triage status<br/>
@@ -105,35 +134,39 @@ public class StandardTriageStatusQueryProcessor implements
      *   - Modifications with triage status null and whose period
      *     overlaps the current point in time.
      */
-    private SortedSet<NoteItem> getNow(CollectionItem collection, Date pointInTime, TimeZone timezone) {
-        
+    private QueryResult getNow(CollectionItem collection,
+                               TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult();
+
         // filter for NOW triage notes
-        NoteItemFilter nowFilter = getTriageStatusFilter(collection, TriageStatus.CODE_NOW);
+        NoteItemFilter nowFilter =
+            getTriageStatusFilter(collection, TriageStatus.CODE_NOW);
         
         // filter for no (null) triage status
-        NoteItemFilter noTriageStatusFilter = getTriageStatusFilter(collection, -1);
+        NoteItemFilter noTriageStatusFilter =
+            getTriageStatusFilter(collection, -1);
         
         // recurring event filter
-        NoteItemFilter eventFilter = getRecurringEventFilter(collection, pointInTime, pointInTime, timezone);
-        
-        // store results here
-        ArrayList<NoteItem> results = new ArrayList<NoteItem>();
-        
-        // keep track of masters as we have to include them in the result set
-        HashSet<NoteItem> masters = new HashSet<NoteItem>();
+        NoteItemFilter eventFilter =
+            getRecurringEventFilter(collection, context.getPointInTime(),
+                                    context.getPointInTime(),
+                                    context.getTimeZone());
         
         // Add all non-recurring items that are have an explicit NOW triage,
         // modifications with NOW triage, or no triage (null triage)
-        for(Item item : contentDao.findItems(new ItemFilter[] { nowFilter, noTriageStatusFilter })) {
+        ItemFilter[] filters = new ItemFilter[] {
+            nowFilter, noTriageStatusFilter
+        };
+        for(Item item : contentDao.findItems(filters)) {
             NoteItem note = (NoteItem) item;
             EventStamp eventStamp = EventStamp.getStamp(note);
             
             // Don't add recurring events
             if(eventStamp==null || eventStamp.isRecurring()==false) {
-                results.add(note);
+                qr.getResults().add(note);
                 // keep track of master
                 if(note.getModifies()!=null)
-                    masters.add(note.getModifies());
+                    qr.getMasters().add(note.getModifies());
             }
         }
         
@@ -143,18 +176,15 @@ public class StandardTriageStatusQueryProcessor implements
             NoteItem note = (NoteItem) item;
             if(note.getModifies()!=null)
                 continue;
-            Set<NoteItem> occurrences = getNowFromRecurringNote(note, pointInTime, timezone);
+            Set<NoteItem> occurrences =
+                getNowFromRecurringNote(note, context);
             if(occurrences.size()>0) {
-                results.addAll(occurrences);
-                masters.add(note);
+                qr.getResults().addAll(occurrences);
+                qr.getMasters().add(note);
             }
         }
-        
-        // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, -1); 
-        // add masters
-        sortedResults.addAll(masters);
-        return sortedResults;
+
+        return qr;
     }
     
     /**
@@ -164,39 +194,40 @@ public class StandardTriageStatusQueryProcessor implements
      *   - Modifications with triage status null and whose period
      *     overlaps the current point in time.
      */
-    private SortedSet<NoteItem> getNow(NoteItem master, Date pointInTime, TimeZone timezone) {
-        
-        // store all results here
-        ArrayList<NoteItem> results = new ArrayList<NoteItem>();
-        results.addAll(getModificationsByTriageStatus(master, TriageStatus.CODE_NOW));
+    private QueryResult getNow(NoteItem master,
+                               TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult();
+        Set<NoteItem> mods = null;
+
+        mods = getModificationsByTriageStatus(master, TriageStatus.CODE_NOW);
+        qr.getResults().addAll(mods);
         
         // add all occurrences that occur NOW
-        Set<NoteItem> occurrences = getNowFromRecurringNote(master, pointInTime, timezone);
-        results.addAll(occurrences);
-        
-        // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, -1);
-        
+        mods = getNowFromRecurringNote(master, context);
+        qr.getResults().addAll(mods);
+
         // add master if necessary
-        if(sortedResults.size()>0)
-            sortedResults.add(master);
-            
-        return sortedResults; 
+        if (! qr.getResults().isEmpty())
+            qr.getMasters().add(master);
+
+        return qr;
     }
     
     /**
      * Get all instances that are occuring during a given point in time
      */
-    private Set<NoteItem> getNowFromRecurringNote(NoteItem note, Date pointInTime, TimeZone timezone) {
+    private Set<NoteItem>
+        getNowFromRecurringNote(NoteItem note,
+                                TriageStatusQueryContext context) {
         EventStamp eventStamp = EventStamp.getStamp(note);
-        DateTime currentDate = new DateTime(pointInTime); 
+        DateTime currentDate = new DateTime(context.getPointInTime()); 
         RecurrenceExpander expander = new RecurrenceExpander();
         HashSet<NoteItem> results = new HashSet<NoteItem>();
         
         // Get all occurrences that overlap current instance in time
         InstanceList occurrences = expander.getOcurrences(
                 eventStamp.getEvent(), eventStamp.getExceptions(), currentDate,
-                currentDate, timezone);
+                currentDate, context.getTimeZone());
         
         for(Instance instance: (Collection<Instance>) occurrences.values()) {
             // Not interested in modifications
@@ -221,52 +252,51 @@ public class StandardTriageStatusQueryProcessor implements
      *   - For each recurring item, either the next occurring modification 
      *     with triage status LATER or the next occurrence, whichever occurs sooner 
      */
-    private SortedSet<NoteItem> getLater(CollectionItem collection, Date pointInTime, TimeZone timezone) {
+    private QueryResult getLater(CollectionItem collection,
+                                 TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult(false, -1);
+
+        // filter for LATER triage status 
+        NoteItemFilter laterFilter =
+            getTriageStatusFilter(collection, TriageStatus.CODE_LATER);
        
-       // filter for LATER triage status 
-       NoteItemFilter laterFilter = getTriageStatusFilter(collection, TriageStatus.CODE_LATER);
-       
-       // recurring event filter
-       NoteItemFilter eventFilter = getRecurringEventFilter(collection, pointInTime, laterDur.getTime(pointInTime), timezone);
-       
-       // store results here
-       ArrayList<NoteItem> results = new ArrayList<NoteItem>();
-       HashSet<NoteItem> masters = new HashSet<NoteItem>();
-       
-       // Add all items that are have an explicit LATER triage
-       for(Item item : contentDao.findItems(laterFilter)) {
-           NoteItem note = (NoteItem) item;
-           EventStamp eventStamp = EventStamp.getStamp(note);
+        // recurring event filter
+        NoteItemFilter eventFilter =
+            getRecurringEventFilter(collection, context.getPointInTime(),
+                                    laterDur.getTime(context.getPointInTime()),
+                                    context.getTimeZone());
+
+        // Add all items that are have an explicit LATER triage
+        for(Item item : contentDao.findItems(laterFilter)) {
+            NoteItem note = (NoteItem) item;
+            EventStamp eventStamp = EventStamp.getStamp(note);
+
+            // Don't add recurring events
+            if(eventStamp==null || eventStamp.isRecurring()==false) {
+                qr.getResults().add(note);
+                // keep track of masters
+                if(note.getModifies()!=null)
+                    qr.getMasters().add(note.getModifies());
+            }
+        }
+
+        // Now process recurring events
+        for(Item item: contentDao.findItems(eventFilter)) {
+            NoteItem note = (NoteItem) item;
+            if(note.getModifies()!=null)
+                continue;
            
-           // Don't add recurring events
-           if(eventStamp==null || eventStamp.isRecurring()==false) {
-               results.add(note);
-               // keep track of masters
-               if(note.getModifies()!=null)
-                   masters.add(note.getModifies());
-           }
-       }
-       
-       // Now process recurring events
-       for(Item item: contentDao.findItems(eventFilter)) {
-           NoteItem note = (NoteItem) item;
-           if(note.getModifies()!=null)
-               continue;
+            NoteItem laterItem =
+                getLaterFromRecurringNote(note, context);
            
-           NoteItem laterItem = getLaterFromRecurringNote(note, pointInTime, timezone);
-           
-           // add laterItem and master if present
-           if(laterItem!=null) {
-               results.add(laterItem);
-               masters.add(note);
-           }
-       }
-       
-       // sort results before returning
-       SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_DESC, -1); 
-       // add masters
-       sortedResults.addAll(masters);
-       return sortedResults;
+            // add laterItem and master if present
+            if(laterItem!=null) {
+                qr.getResults().add(laterItem);
+                qr.getMasters().add(note);
+            }
+        }
+
+        return qr;
     }
     
     /**
@@ -274,37 +304,43 @@ public class StandardTriageStatusQueryProcessor implements
      *   - the next occurring modification 
      *     with triage status LATER or the next occurrence, whichever occurs sooner
      */
-    private SortedSet<NoteItem> getLater(NoteItem master, Date pointInTime, TimeZone timezone) {
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(COMPARE_DESC);
+    private QueryResult getLater(NoteItem master,
+                                 TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult(false, -1);
+
         // get the next occurring modification or occurrence
-        NoteItem result = getLaterFromRecurringNote(master, pointInTime, timezone);
+        NoteItem result = getLaterFromRecurringNote(master, context);
         
         // add result and master if present
         if(result!=null) {
-            results.add(master);
-            results.add(result);
+            qr.getMasters().add(master);
+            qr.getResults().add(result);
         }
         
         // add all modifications with trigaeStatus LATER
-        if(results.addAll(getModificationsByTriageStatus(master, TriageStatus.CODE_LATER)))
-            results.add(master);
+        Set<NoteItem> mods =
+            getModificationsByTriageStatus(master, TriageStatus.CODE_LATER);
+        if(qr.getResults().addAll(mods))
+            qr.getMasters().add(master);
         
-        return results;
+        return qr;
     }
     
     /**
      * Get the next occurrence or modification for a recurring event, whichever
      * occurrs sooner relative to a point in time.
      */
-    private NoteItem getLaterFromRecurringNote(NoteItem note, Date pointInTime, TimeZone timezone) {
+    private NoteItem
+        getLaterFromRecurringNote(NoteItem note,
+                                  TriageStatusQueryContext context) {
         EventStamp eventStamp = EventStamp.getStamp(note);
-        Date currentDate = pointInTime;
+        Date currentDate = context.getPointInTime();
         Date futureDate = laterDur.getTime(currentDate);
-        
+
         // calculate the next occurrence or LATER modification
         NoteItem first = getFirstInstanceOrModification(eventStamp,
-                currentDate, futureDate, timezone);
-    
+                currentDate, futureDate, context.getTimeZone());
+
         return first;
     }
     
@@ -316,11 +352,14 @@ public class StandardTriageStatusQueryProcessor implements
      *     whichever occurred most recently 
      *   - Limit to maxDone results
      */
-    private SortedSet<NoteItem> getDone(CollectionItem collection, Date pointInTime, TimeZone timezone) {
-        
+    private QueryResult getDone(CollectionItem collection,
+                                TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult(true, maxDone);
+
         // filter for DONE triage status
-        NoteItemFilter doneFilter = getTriageStatusFilter(collection, TriageStatus.CODE_DONE);
-        
+        NoteItemFilter doneFilter =
+            getTriageStatusFilter(collection, TriageStatus.CODE_DONE);
+
         // Limit the number of items with DONE status so we don't load
         // tons of items on the server before merging with the recurring
         // item occurrences and sorting.  Anything over this number will
@@ -328,13 +367,15 @@ public class StandardTriageStatusQueryProcessor implements
         // more than maxDone items as long as they are sorted by rank.
         doneFilter.setMaxResults(maxDone);
         doneFilter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK,
-                ItemFilter.ORDER_ASC);
-        
+                              ItemFilter.ORDER_ASC);
+
         // filter for recurring events
-        NoteItemFilter eventFilter = getRecurringEventFilter(collection, doneDur.getTime(pointInTime), pointInTime, timezone);
-        
-        List<NoteItem> results = new ArrayList<NoteItem>();
-        
+        NoteItemFilter eventFilter =
+            getRecurringEventFilter(collection,
+                                    doneDur.getTime(context.getPointInTime()),
+                                    context.getPointInTime(),
+                                    context.getTimeZone());
+
         // Add all items that are have an explicit DONE triage
         for(Item item : contentDao.findItems(doneFilter)) {
             NoteItem note = (NoteItem) item;
@@ -342,37 +383,31 @@ public class StandardTriageStatusQueryProcessor implements
             
             // Don't add recurring events
             if(eventStamp==null || eventStamp.isRecurring()==false) {
-                results.add(note);
+                qr.getResults().add(note);
             }
         }
-        
+
         // Now process recurring events
         for(Item item: contentDao.findItems(eventFilter)) {
             NoteItem note = (NoteItem) item;
             if(note.getModifies()!=null)
                 continue;
             
-            NoteItem doneItem = getDoneFromRecurringNote(note, pointInTime, timezone);
+            NoteItem doneItem = getDoneFromRecurringNote(note, context);
             // add doneItem and master if present
             if(doneItem!=null) {
-                results.add(doneItem);
+                qr.getResults().add(doneItem);
             }
         }
         
-        // sort results before returning
-        SortedSet<NoteItem> sortedResults =  sortResults(results, COMPARE_ASC, maxDone); 
-        Set<NoteItem> masters = new HashSet<NoteItem>();
-        
         // add masters for all ocurrences and modifications
-        for(NoteItem note: sortedResults)
+        for(NoteItem note: qr.getResults())
             if(note instanceof NoteOccurrence)
-                masters.add(((NoteOccurrence) note).getMasterNote());
+                qr.getMasters().add(((NoteOccurrence) note).getMasterNote());
             else if(note.getModifies()!=null)
-                masters.add(note.getModifies());
+                qr.getMasters().add(note.getModifies());
         
-        sortedResults.addAll(masters);
-        
-        return sortedResults;
+        return qr;
     }
     
     /**
@@ -381,37 +416,42 @@ public class StandardTriageStatusQueryProcessor implements
      *     with triage status DONE or the last occurrence, whichever occurred
      *     most recently
      */
-    private SortedSet<NoteItem> getDone(NoteItem master, Date pointInTime, TimeZone timezone) {
-        TreeSet<NoteItem> results = new TreeSet<NoteItem>(COMPARE_ASC);
+    private QueryResult getDone(NoteItem master,
+                                TriageStatusQueryContext context) {
+        QueryResult qr = new QueryResult();
         
         // get the most recently occurred modification or occurrence
-        NoteItem result = getDoneFromRecurringNote(master, pointInTime, timezone);
+        NoteItem result = getDoneFromRecurringNote(master, context);
         
         // add result and master if present
         if(result!=null) {
-            results.add(master);
-            results.add(result);
+            qr.getMasters().add(master);
+            qr.getResults().add(result);
         }
         
         // add all modifications with trigaeStatus DONE
-        if(results.addAll(getModificationsByTriageStatus(master, TriageStatus.CODE_DONE)))
-            results.add(master);
+        Set<NoteItem> mods =
+            getModificationsByTriageStatus(master, TriageStatus.CODE_DONE);
+        if(qr.getResults().addAll(mods))
+            qr.getMasters().add(master);
         
-        return results;
+        return qr;
     }
     
     /**
      * Get the last occurring modification or occurrence, whichever occurred
      * last.
      */
-    private NoteItem getDoneFromRecurringNote(NoteItem note, Date pointInTime, TimeZone timezone) {
+    private NoteItem
+        getDoneFromRecurringNote(NoteItem note,
+                                 TriageStatusQueryContext context) {
         EventStamp eventStamp = EventStamp.getStamp(note);
-        Date currentDate = pointInTime;
+        Date currentDate = context.getPointInTime();
         Date pastDate = doneDur.getTime(currentDate);
        
         // calculate the previous occurrence or modification
         NoteItem latest = getLatestInstanceOrModification(eventStamp, pastDate,
-                currentDate, timezone);
+                currentDate, context.getTimeZone());
     
         return latest;
     }
@@ -503,25 +543,6 @@ public class StandardTriageStatusQueryProcessor implements
         }
         
         return mods;
-    }    
-    
-    /**
-     *Sort results using rank calculated from triageStatusRank, eventStart,
-     *or lastModified date.  Limit results.
-     */
-    private SortedSet<NoteItem> sortResults(List<NoteItem> results, Comparator<NoteItem> comparator, int limit) {
-        TreeSet<NoteItem> sortedResults = new TreeSet<NoteItem>(comparator);
-        Collections.sort(results, comparator);
-        
-        int toAdd = results.size();
-        if(limit > 0 && toAdd > limit)
-            toAdd = limit;
-        
-        for(int i=0;i<toAdd;i++) {
-            sortedResults.add(results.get(i));
-        }
-        
-        return sortedResults;
     }
     
     /**
@@ -567,4 +588,50 @@ public class StandardTriageStatusQueryProcessor implements
         this.maxDone = maxDone;
     }
 
+    private class QueryResult {
+        private ArrayList<NoteItem> results = new ArrayList<NoteItem>();
+        private HashSet<NoteItem> masters = new HashSet<NoteItem>();
+        private Comparator<NoteItem> comparator;
+        private int limit;
+
+        public QueryResult() {
+            this(true, -1);
+        }
+
+        public QueryResult(boolean ascending, int limit) {
+            results = new ArrayList<NoteItem>();
+            masters = new HashSet<NoteItem>();
+            comparator = ascending ? COMPARE_ASC : COMPARE_DESC;
+            limit = limit;
+        }
+
+        public ArrayList<NoteItem> getResults() {
+            return results;
+        }
+
+        public HashSet<NoteItem> getMasters() {
+            return masters;
+        }
+
+        public void add(QueryResult qr) {
+            results.addAll(qr.getResults());
+            masters.addAll(qr.getMasters());
+        }
+
+        public SortedSet<NoteItem> merge() {
+            Collections.sort(results, comparator);
+
+            int toAdd = results.size();
+            if (limit > 0 && toAdd > limit)
+                toAdd = limit;
+
+            TreeSet<NoteItem> merged = new TreeSet<NoteItem>(comparator);
+            for (int i=0; i<toAdd; i++)
+                merged.add(results.get(i));
+
+            merged.addAll(masters);
+
+            return merged;
+        }
+    }
 }

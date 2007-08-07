@@ -66,6 +66,8 @@ public class StandardGeneratorFactory
      * <dd>{@link BasicFeedGenerator}</dd>
      * <dt>{@link AtomConstants#PROJECTION_FULL}</dt>
      * <dd>{@link FullFeedGenerator}</dd>
+     * <dd>{@link AtomConstants#PROJECTION_DASHBOARD}</dt>
+     * <dd>{@link DashboardFeedGenerator}</dd>
      * <dt>{@link AtomConstants#PROJECTION_DASHBOARD_NOW}</dt>
      * <dd>{@link DashboardFeedGenerator}</dd>
      * <dt>{@link AtomConstants#PROJECTION_DASHBOARD_LATER}</dt>
@@ -109,6 +111,8 @@ public class StandardGeneratorFactory
             return new FullFeedGenerator(this, locator, format);
         if (projection.equals(PROJECTION_DETAILS))
             return new DetailsFeedGenerator(this, locator);
+        if (projection.equals(PROJECTION_DASHBOARD))
+            return new DashboardFeedGenerator(this, locator, format);
         if (projection.equals(PROJECTION_DASHBOARD_NOW))
             return new DashboardFeedGenerator(this, locator, format,
                                               TriageStatus.CODE_NOW);

@@ -35,6 +35,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 
 /**
  * Test StandardTriageStatusQueryProcessor
@@ -91,13 +92,29 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
             event.setUid("calendar2_" + i);
             contentDao.createContent(calendar, event);
         }
-        
-        
+    }
+
+    public void testGetAllCollection() throws Exception {
+        CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(null, new DateTime("20070601T000000Z"), null);
+        Set<NoteItem> done = queryProcessor.processTriageStatusQuery(calendar, context);
+        Assert.assertEquals(10, done.size());
+        verifyItemInSet(done,NOTE_UID + "later");
+        verifyItemInSet(done,NOTE_UID + "done");
+        verifyItemInSet(done,NOTE_UID + "mod");
+        verifyItemInSet(done,"calendar2_1:20070529T101500Z");
+        verifyItemInSet(done,"calendar2_3:20070531T081500Z");
+        verifyItemInSet(done,"calendar2_1");
+        verifyItemInSet(done,"calendar2_2");
+        verifyItemInSet(done,"calendar2_3");
     }
 
     public void testGetDoneCollection() throws Exception {
         CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
-        Set<NoteItem> done = queryProcessor.processTriageStatusQuery(calendar, TriageStatus.LABEL_DONE, new DateTime("20070601T000000Z"), null);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(TriageStatus.LABEL_DONE, new DateTime("20070601T000000Z"), null);
+        Set<NoteItem> done = queryProcessor.processTriageStatusQuery(calendar, context);
         Assert.assertEquals(5, done.size());
         verifyItemInSet(done,NOTE_UID + "done");
         verifyItemInSet(done,"calendar2_1:20070529T101500Z");
@@ -108,7 +125,9 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     
     public void testGetDoneItem() throws Exception {
         NoteItem done = (NoteItem) contentDao.findItemByUid("calendar2_1");
-        Set<NoteItem> results = queryProcessor.processTriageStatusQuery(done, TriageStatus.LABEL_DONE, new DateTime("20070601T000000Z"), null);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(TriageStatus.LABEL_DONE, new DateTime("20070601T000000Z"), null);
+        Set<NoteItem> results = queryProcessor.processTriageStatusQuery(done, context);
         Assert.assertEquals(2, results.size());
         
         verifyItemInSet(results,"calendar2_1:20070529T101500Z");
@@ -117,7 +136,9 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     
     public void testGetLaterCollection() throws Exception {
         CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
-        Set<NoteItem> later = queryProcessor.processTriageStatusQuery(calendar, TriageStatus.LABEL_LATER, new DateTime("20070601T000000Z"), null);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(TriageStatus.LABEL_LATER, new DateTime("20070601T000000Z"), null);
+        Set<NoteItem> later = queryProcessor.processTriageStatusQuery(calendar, context);
         Assert.assertEquals(5, later.size());
         verifyItemInSet(later,NOTE_UID + "later");
         verifyItemInSet(later,"calendar2_1:20070605T101500Z");
@@ -128,7 +149,9 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     
     public void testGetLaterItem() throws Exception {
         NoteItem later = (NoteItem) contentDao.findItemByUid("calendar2_1");
-        Set<NoteItem> results = queryProcessor.processTriageStatusQuery(later, TriageStatus.LABEL_LATER, new DateTime("20070601T000000Z"), null);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(TriageStatus.LABEL_LATER, new DateTime("20070601T000000Z"), null);
+        Set<NoteItem> results = queryProcessor.processTriageStatusQuery(later, context);
         Assert.assertEquals(2, results.size());
         verifyItemInSet(results,"calendar2_1:20070605T101500Z");
         verifyItemInSet(results,"calendar2_1");
@@ -136,7 +159,9 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     
     public void testGetNowCollection() throws Exception {
         CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
-        Set<NoteItem> now = queryProcessor.processTriageStatusQuery(calendar, TriageStatus.LABEL_NOW, new DateTime("20070601T083000Z"), null);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(TriageStatus.LABEL_NOW, new DateTime("20070601T083000Z"), null);
+        Set<NoteItem> now = queryProcessor.processTriageStatusQuery(calendar, context);
         Assert.assertEquals(5, now.size());
         
         // should be included because triage status is NOW
@@ -153,7 +178,9 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     
     public void testGetNowItem() throws Exception {
         NoteItem now = (NoteItem) contentDao.findItemByUid("calendar2_3");
-        Set<NoteItem> results = queryProcessor.processTriageStatusQuery(now, TriageStatus.LABEL_NOW, new DateTime("20070601T083000Z"), null);
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(TriageStatus.LABEL_NOW, new DateTime("20070601T083000Z"), null);
+        Set<NoteItem> results = queryProcessor.processTriageStatusQuery(now, context);
         Assert.assertEquals(2, results.size());
         
         // should be included because occurence overlaps instant in time

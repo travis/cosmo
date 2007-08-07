@@ -40,32 +40,21 @@ public interface TriageStatusQueryProcessor {
      * Return NoteItems from a collection that fall into a 
      * given triage status category.
      * @param collection collection to search
-     * @param triageStatusLabel triage status label to match
-     * @param pointInTime time that is considered "NOW"
-     * @param timezone Optional timezone to use in interpreting
-     *                 floating times. If null, the system default
-     *                 will be used.
-     * @return the set of NoteItems that match the given parameters
+     * @param context the query context
      */
-    public SortedSet<NoteItem> processTriageStatusQuery(CollectionItem collection,
-            String triageStatusLabel,
-            Date pointInTime,
-            TimeZone timezone);
+    public SortedSet<NoteItem>
+        processTriageStatusQuery(CollectionItem collection,
+                                 TriageStatusQueryContext context);
     
     /**
      * Return modification and occurrence NoteItems 
      * from a master recurring NoteItem that fall into a 
      * given triage status category.
      * @param note master recurring note to search
-     * @param triageStatusLabel triage status label to match
-     * @param pointInTime time that is considered "NOW"
-     * @param timezone Optional timezone to use in interpreting
-     *                 floating times. If null, the system default
-     *                 will be used.
+     * @context the query context
      * @return the set of NoteItems that match the given parameters
      */
-    public SortedSet<NoteItem> processTriageStatusQuery(NoteItem note,
-            String triageStatusLabel,
-            Date pointInTime,
-            TimeZone timezone);
+    public SortedSet<NoteItem>
+        processTriageStatusQuery(NoteItem note, 
+                                 TriageStatusQueryContext context);
 }

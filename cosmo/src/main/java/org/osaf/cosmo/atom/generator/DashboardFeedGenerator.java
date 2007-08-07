@@ -31,6 +31,7 @@ import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 
 /**
  * <p>
@@ -64,8 +65,20 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
                                   int triageStatus)
         throws UnsupportedFormatException {
         super(factory, locator, format);
-        TriageStatus.label(triageStatus); // validates legitimacy
+        if (triageStatus != -1)
+            TriageStatus.label(triageStatus); // validates legitimacy
         this.triageStatus = triageStatus;
+    }
+
+    /**
+     * @throws IllegalArgumentException if the provided triage status
+     * is not known
+     */
+    public DashboardFeedGenerator(StandardGeneratorFactory factory,
+                                  ServiceLocator locator,
+                                  String format)
+        throws UnsupportedFormatException {
+        this(factory, locator, format, -1);
     }
 
     // our methods
@@ -83,7 +96,8 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      * @param collection the collection whose contents are to be listed
      */
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
-        String label = TriageStatus.label(triageStatus);
+        String label = triageStatus == -1 ?
+            null : TriageStatus.label(triageStatus);
         Date now = Calendar.getInstance().getTime();
         TimeZone tz = null;
         if (getFilter() != null) {
@@ -92,8 +106,10 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             tz = esf.getTimezone();
         }
 
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(label, now, tz);
         return getFactory().getContentService().
-            findNotesByTriageStatus(collection, label, now, tz);
+            findNotesByTriageStatus(collection, context);
     }
 
     /**
@@ -109,7 +125,8 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      * @param item the item whose contents are to be listed
      */
     protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
-        String label = TriageStatus.label(triageStatus);
+        String label = triageStatus == -1 ?
+            null : TriageStatus.label(triageStatus);
         Date now = Calendar.getInstance().getTime();
         TimeZone tz = null;
         if (getFilter() != null) {
@@ -118,8 +135,10 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             tz = esf.getTimezone();
         }
 
+        TriageStatusQueryContext context =
+            new TriageStatusQueryContext(label, now, tz);
         return getFactory().getContentService().
-            findNotesByTriageStatus(item, label, now, tz);
+            findNotesByTriageStatus(item, context);
     }
   
     /**

@@ -64,6 +64,7 @@ public interface AtomConstants {
     public static final String PROJECTION_BASIC = "basic";
     /** */
     public static final String PROJECTION_FULL = "full";
+    public static final String PROJECTION_DASHBOARD = "dashboard";
     public static final String PROJECTION_DASHBOARD_NOW = "dashboard-now";
     public static final String PROJECTION_DASHBOARD_LATER = "dashboard-later";
     public static final String PROJECTION_DASHBOARD_DONE = "dashboard-done";

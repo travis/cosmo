@@ -20,7 +20,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
 
-cosmo.view.dialog = new function() {
+cosmo.view.dialog = new function () {
 
     var self = this;
     var props = {}; // Props for each modal dialog
@@ -34,35 +34,35 @@ cosmo.view.dialog = new function() {
 
     // All available buttons for the dialog
     var buttons = {
-        'removeAllEvents': function(){
+        'removeAllEvents': function () {
            dojo.debug("create removeAllEvents button called.");
            return new Button('allButtonDialog', btnWideWidth,
-                function() { doPublish('remove',
+                function () { doPublish('remove',
                 cosmo.view.service.recurringEventOptions.ALL_EVENTS); },
                 allEventsMsg, true);
         },
 
-        'removeFutureEvents': function(){
+        'removeFutureEvents': function () {
             dojo.debug("create removeFutureEvents button called.");
             return new Button('allFutureButtonDialog', btnWiderWidth,
-                function() { doPublish('remove',
+                function () { doPublish('remove',
                 cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS); },
                 AllFutureMsg, true);
         },
 
-        'removeOnlyThisEvent': function(){
+        'removeOnlyThisEvent': function () {
             dojo.debug("create removeOnlyThisEvent button called.");
             return new Button('onlyThisButtonDialog', btnWiderWidth,
-                function() {
+                function () {
                     doPublish('remove',
                     cosmo.view.service.recurringEventOptions.ONLY_THIS_EVENT);
                 },
                 OnlyThisMsg, true);
         },
 
-        'saveAllEvents': function(saveItem, delta){
+        'saveAllEvents': function (saveItem, delta) {
             return new Button('allButtonDialog', btnWideWidth,
-                function() {
+                function () {
                     doPublishSave(
                         cosmo.view.service.recurringEventOptions.ALL_EVENTS,
                         saveItem, delta)
@@ -71,7 +71,7 @@ cosmo.view.dialog = new function() {
                 true);
         },
 
-        'saveFutureEvents': function(saveItem, delta){
+        'saveFutureEvents': function (saveItem, delta) {
             return new Button('allFutureButtonDialog', btnWiderWidth,
                 function () {
                     doPublishSave(
@@ -81,7 +81,7 @@ cosmo.view.dialog = new function() {
                 AllFutureMsg, true);
         },
 
-        'saveOnlyThisEvent': function(saveItem, delta){
+        'saveOnlyThisEvent': function (saveItem, delta) {
             return new Button('onlyThisButtonDialog', btnWiderWidth,
                 function () {
                     doPublishSave(
@@ -92,50 +92,50 @@ cosmo.view.dialog = new function() {
                 OnlyThisMsg, true);
         },
 
-        'allEventsDisabled': function(){
+        'allEventsDisabled': function () {
             return new Button('allButtonDialog', btnWideWidth,
                 null, allEventsMsg, true, true);
         },
 
-        'futureEventsDisabled': function(){
+        'futureEventsDisabled': function () {
             return new Button('allFutureButtonDialog', btnWiderWidth,
                 null, AllFutureMsg, true, true);
         }
     };
 
-    props.removeConfirm = function(){
+    props.removeConfirm = function () {
         dojo.debug("removeConfirm dialog called.");
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
                 _('App.Button.Cancel'), true)],
-            'btnsRight': [new Button('removeButtonDialog', 74, function() { doPublish('remove'); },
+            'btnsRight': [new Button('removeButtonDialog', 74, function () { doPublish('remove'); },
                 _('App.Button.Remove'), true)],
-            'defaultAction': function() { doPublish('remove'); },
+            'defaultAction': function () { doPublish('remove'); },
             'content': _('Main.Prompt.ItemRemoveConfirm')
         };
     };
 
-    props.removeRecurConfirm = function(){
+    props.removeRecurConfirm = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
-            'defaultAction': function() {},
+            'defaultAction': function () {},
             'width': 480,
             'content': _('Main.Prompt.RecurRemoveConfirm')
         };
     };
 
-    props.saveRecurConfirm = function(){
+    props.saveRecurConfirm = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new Button('cancelButtonDialog', 74,
                 doCancelSave,
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
-            'defaultAction': function() {},
+            'defaultAction': function () {},
             'width': 480,
             'content': _('Main.Prompt.RecurSaveConfirm')
         };
@@ -183,7 +183,7 @@ cosmo.view.dialog = new function() {
                 break;
         }
     }
-    this.getProps = function(key, opts) {
+    this.getProps = function (key, opts) {
         var OPTIONS = cosmo.view.service.recurringEventOptions;
         var p = props[key]();
         var opts = opts || {};
@@ -192,17 +192,17 @@ cosmo.view.dialog = new function() {
             var delta = opts.delta;
             var saveItem = opts.saveItem  // CalItem/ListItem
             p.btnsRight = [];
-            if (!changeTypes[OPTIONS.ALL_EVENTS]){
+            if (!changeTypes[OPTIONS.ALL_EVENTS]) {
                 p.btnsRight.push(buttons.allEventsDisabled());
             } else {
                 p.btnsRight.push(buttons.saveAllEvents(saveItem, delta));
             }
 
-            if (changeTypes[OPTIONS.ALL_FUTURE_EVENTS]){
+            if (changeTypes[OPTIONS.ALL_FUTURE_EVENTS]) {
                 p.btnsRight.push(buttons.saveFutureEvents(saveItem, delta));
             }
 
-            if (changeTypes[OPTIONS.ONLY_THIS_EVENT]){
+            if (changeTypes[OPTIONS.ONLY_THIS_EVENT]) {
                 p.btnsRight.push(buttons.saveOnlyThisEvent(saveItem, delta));
             }
         }

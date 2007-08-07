@@ -251,6 +251,12 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                     // selected item will in the selectedItemCache
                     if (item != cosmo.ui.detail.item) {
                         self.updateFromItem(item);
+                        // For brand-new items auto-focus the Title field
+                        // to allow people to change the placeholder
+                        // 'New Event' text quickly
+                        if (cmd.saveType == 'new') {
+                            this.mainSection.formNode.noteTitle.focus();
+                        }
                     }
                 }
                 // No-item means 'clear the selection'
@@ -314,6 +320,8 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     // "null" if we don't convert to empty string first
     f.noteTitle.value = data.getDisplayName() || '';
     f.noteDescription.value = data.getBody() || '';
+    var func = cosmo.util.html.handleTextInputFocus;
+    dojo.event.connect(f.noteTitle, 'onfocus', func);
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();
@@ -980,6 +988,8 @@ cosmo.ui.detail.MailFormElements = function () {
                 value: '',
                 className: 'inputText' });
             elem.style.width = '182px';
+            var func = cosmo.util.html.handleTextInputFocus;
+            dojo.event.connect(elem, 'onfocus', func);
             td.appendChild(elem);
             tr.appendChild(td);
             return tr;

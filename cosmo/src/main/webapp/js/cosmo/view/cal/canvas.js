@@ -1012,7 +1012,7 @@ cosmo.view.cal.canvas = new function () {
                     setSelectedCalItem(sel);
                     sel = self.getSelectedItem();
                     dojo.event.topic.publish('/calEvent', { action: 'setSelected',
-                        data: sel });
+                        saveType: saveType, data: sel });
                 }
             }
             else {

@@ -1,0 +1,27 @@
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[1].id"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "hourDiv1-1000"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "hourDiv1-1200"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "hourDiv4-1200"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"link": "Settings"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.content.tabNodes[1].id"}, "version": "0.1", "method": "click"}
+{"params": {"id": "showAccountBrowser"}, "version": "0.1", "method": "check"}
+{"params": {"jsid": " windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"url": "http:\/\/qacosmo.osafoundation.org\/browse\/{$random}"}, "version": "0.1", "method": "open"}
+{"params": {"link": "[browse]"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"link": "[browse]"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "contentWrapper"}, "version": "0.1", "method": "assertNode"}
+{"params": {"link": "Account Browser"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"link": "[browse]"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"link": "[remove]"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": ""}, "version": "0.1", "method": "wait"}
+{"params": {"link": "Log out"}, "version": "0.1", "method": "click"}

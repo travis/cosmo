@@ -4,7 +4,7 @@ from windmill.authoring import WindmillTestClient
 def test():
     client = WindmillTestClient(__name__)
 
-    client.type(text=u'%random%', id=u'loginDialogUsernameInput')
+    client.type(text=u'{$random}', id=u'loginDialogUsernameInput')
     client.type(text=u'testers', id=u'loginDialogPasswordInput')
     client.click(id=u'loginSubmitButton')
     client.wait(milliseconds=3000)

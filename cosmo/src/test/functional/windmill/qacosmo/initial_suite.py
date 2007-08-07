@@ -55,4 +55,4 @@ def test():
     client.click(xpath=u'/html/body/div[2]/form/div/div/span/div[2]/div[3]/img')
     client.select(xpath=u'/html/body/div[4]/div/div[4]/div/table/tbody/tr[3]/td[2]/div/select', option=u'Other...')
     client.click(jsid=u'windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id')
-    client.click(link=u'Log Out')
+    client.click(link=u'Log out')

@@ -49,4 +49,4 @@
 {"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}
 {"method": "select", "params": {"xpath" : "/html/body/div[4]/div/div[4]/div/table/tbody/tr[3]/td[2]/div/select","option": "Other..."}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "click", "params": {"link" : "Log Out"}}
+{"method": "click", "params": {"link" : "Log out"}}

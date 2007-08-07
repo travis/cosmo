@@ -1,9 +1,9 @@
-{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/%random%"}}
+{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/{$random}"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method":"reWriteAlert", "params":{}}
 {"method": "click", "params": {"link" : "[browse]"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
-{"method": "click", "params": {"link" : "Log Out"}}
+{"method": "click", "params": {"link" : "Log out"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "root"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "cosmo"}}
@@ -11,4 +11,4 @@
 {"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "click", "params": {"link" : "Users"}}
 {"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "click", "params": {"link" : "Log Out"}}
+{"method": "click", "params": {"link" : "Log out"}}

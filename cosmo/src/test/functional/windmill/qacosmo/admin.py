@@ -4,12 +4,12 @@ from windmill.authoring import WindmillTestClient
 def test():
     client = WindmillTestClient(__name__)
 
-    client.open(url=u'http://qacosmo.osafoundation.org/cosmo/browse/%random%')
+    client.open(url=u'http://qacosmo.osafoundation.org/cosmo/browse/{$random}')
     client.wait(milliseconds=2000)
     client.reWriteAlert()
     client.click(link=u'[browse]')
     client.wait(milliseconds=2000)
-    client.click(link=u'Log Out')
+    client.click(link=u'Log out')
     client.wait(milliseconds=2000)
     client.type(text=u'root', id=u'loginDialogUsernameInput')
     client.type(text=u'cosmo', id=u'loginDialogPasswordInput')
@@ -17,4 +17,4 @@ def test():
     client.wait(milliseconds=5000)
     client.click(link=u'Users')
     client.wait(milliseconds=5000)
-    client.click(link=u'Log Out')
+    client.click(link=u'Log out')

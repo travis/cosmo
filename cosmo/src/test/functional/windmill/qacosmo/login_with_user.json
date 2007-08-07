@@ -1,4 +1,4 @@
-{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "%random%"}}
+{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "{$random}"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "testers"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method": "wait", "params": {"milliseconds" : 3000}}

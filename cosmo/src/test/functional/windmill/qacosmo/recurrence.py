@@ -101,4 +101,4 @@ def test():
     client.wait(milliseconds=3000)
     client.wait(milliseconds=3000)
     client.wait(milliseconds=5000)
-    client.click(link=u'Log Out')
+    client.click(link=u'Log out')

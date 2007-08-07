@@ -15,6 +15,7 @@
  */
 
 dojo.provide("cosmo.util.deferred");
+dojo.require("cosmo.app");
 
 cosmo.util.deferred = {
     //FIXME: don't think we actually use this    
@@ -24,11 +25,10 @@ cosmo.util.deferred = {
         return d;
     },
     
-    //FIXME: don't think we actually use this    
-    addStdErrback: function (deferred, msg){
+    addStdErrback: function (deferred, primaryMessage, secondaryMessage){
         deferred.addErrback(function (e){
-            dojo.debug(msg || _("Error.Deferred"));
-            dojo.debug(e);
+            cosmo.app.showErr(primaryMessage || _("Error.DeferredPrimary"), 
+                              secondaryMessage || _("Error.DeferredSecondary"), e);
         });
     },
     

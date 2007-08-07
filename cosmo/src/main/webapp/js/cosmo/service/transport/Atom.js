@@ -269,6 +269,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     checkIfPrefExists: function (key, kwArgs){
+        kwArgs = kwArgs || {}
         kwArgs = dojo.lang.shallowCopy(kwArgs);
         kwArgs.noErr = true;
         return this.bind({

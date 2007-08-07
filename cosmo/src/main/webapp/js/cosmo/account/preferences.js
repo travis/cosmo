@@ -22,24 +22,24 @@ cosmo.account.preferences = new function () {
 	this.SHOW_ACCOUNT_BROWSER_LINK = 'UI.Show.AccountBrowserLink';
 	this.LOGIN_URL = 'Login.Url';
 	
-    this.getPreference = function(key){
-		return cosmo.app.pim.serv.getPreference(key);
+    this.getPreference = function(key, kwArgs){
+		return cosmo.app.pim.serv.getPreference(key, kwArgs);
     };
 
-    this.setPreference = function(key, val){
-		var deferred = cosmo.app.pim.serv.setPreference(key, val);
+    this.setPreference = function(key, val, kwArgs){
+		var deferred = cosmo.app.pim.serv.setPreference(key, val, kwArgs);
 		var preferences = {};
 		preferences[key] = val;
         cosmo.topics.publish(cosmo.topics.PreferencesUpdatedMessage, [preferences])
         return deferred;
     };
 
-    this.deletePreference = function(key){
-		return cosmo.app.pim.serv.deletePreferences(key);
+    this.deletePreference = function(key, kwArgs){
+		return cosmo.app.pim.serv.deletePreferences(key, kwArgs);
     };
     
-    this.getPreferences = function(){
-		return cosmo.app.pim.serv.getPreferences();
+    this.getPreferences = function(kwArgs){
+		return cosmo.app.pim.serv.getPreferences(kwArgs);
     };
 
 };

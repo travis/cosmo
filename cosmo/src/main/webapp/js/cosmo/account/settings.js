@@ -254,6 +254,7 @@ cosmo.account.settings = new function () {
             }
         }));
         
+        cosmo.util.deferred.addStdErrback(setPreferencesDeferred, _("Error.SaveSettings"), "");
     };
     /**
      * Handle both success and error responses from the CMP call

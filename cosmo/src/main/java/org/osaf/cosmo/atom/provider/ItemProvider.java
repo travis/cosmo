@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import javax.activation.MimeTypeParseException;
 
@@ -51,6 +52,7 @@ import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
@@ -497,8 +499,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             es.getStartDate() : null;
 
         processor.processContent(entry.getContent(), item);
-        item = (NoteItem) contentService.updateItem(item);
-
+        
         if (oldstart != null) {
             Date newstart = es.getStartDate();
             if (newstart != null && ! newstart.equals(oldstart)) {
@@ -508,6 +509,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                               "adjusting modifications by " + delta +
                               " milliseconds");
 
+                LinkedHashSet<ContentItem> updates = new LinkedHashSet<ContentItem>();
                 HashSet<NoteItem> copies = new HashSet<NoteItem>();
                 HashSet<NoteItem> removals = new HashSet<NoteItem>();
 
@@ -516,9 +518,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 Iterator<NoteItem> mi = item.getModifications().iterator();
                 while (mi.hasNext()) {
                     NoteItem mod = mi.next();
+                    mod.setIsActive(false);
                     removals.add(mod);
 
                     NoteItem copy = (NoteItem) mod.copy();
+                    copy.setModifies(item);
                     
                     EventExceptionStamp ees =
                         EventExceptionStamp.getStamp(copy);
@@ -546,26 +550,22 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     copies.add(copy);
                 }
 
-                // remove the old mods from each of their collections,
-                // leaving tombstones behind
-                for (NoteItem removal : removals) {
-                    for (CollectionItem parent : removal.getParents())
-                        contentService.removeItemFromCollection(removal,
-                                                                parent);
-                }
-
-                // add the replacement mods to each of the master's
-                // collections
-                for (NoteItem newmod : copies) {
-                    newmod.setModifies(item);
-                    item.getModifications().add(newmod);
-
-                    Iterator<CollectionItem> pi = item.getParents().iterator();
-                    contentService.createContent(pi.next(), newmod);
-                    while (pi.hasNext())
-                        contentService.addItemToCollection(newmod, pi.next());
-                }
+                // add removals first
+                updates.addAll(removals);
+                // then additions
+                updates.addAll(copies);
+                // then updates
+                updates.add(item);
+                
+                // Update everything in one atomic service call
+                contentService.updateContentItems(item.getParents(), updates);
+            } else {
+                // use simple update
+                item = (NoteItem) contentService.updateItem(item);
             }
+        } else {
+            // use simple update
+            item = (NoteItem) contentService.updateItem(item);
         }
 
         return item;

@@ -56,6 +56,8 @@ cosmo.view.cal.canvas = new function () {
     var timedCanvasContentArea = null;
     // Ref to untimed canvas content area to save DOM lookup
     var untimedCanvasContentArea = null;
+    //
+    var unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
 
     dojo.lang.mixin(this, cosmo.view.canvasBase);
 
@@ -1135,9 +1137,7 @@ cosmo.view.cal.canvas = new function () {
                         var delta = deltaAndError[0];
                         /*
                         if (error || delta.hasChanges()) {
-                            cosmo.app.showErr(_('Main.DetailForm.Error'), 'You have unsaved changes, dude.');
-                            console.log('Delta:');
-                            console.log(delta);
+                            cosmo.app.showDialog(unsavedChangesDialog.getProps());
                             return false;
                         }
                         */

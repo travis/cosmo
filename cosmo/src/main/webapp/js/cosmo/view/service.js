@@ -31,13 +31,16 @@ dojo.require("cosmo.util.debug");
 
 cosmo.view.service = new function () {
     var self = this;
-    var ranges = {
+    
+    this._ranges = {
         'daily': [dojo.date.dateParts.DAY, 1],
         'weekly': [dojo.date.dateParts.WEEK, 1],
         'biweekly': [dojo.date.dateParts.WEEK, 2],
         'monthly': [dojo.date.dateParts.MONTH, 1],
         'yearly': [dojo.date.dateParts.YEAR, 1]
-    }
+    };
+    this._recurrenceDialog = new cosmo.view.dialog.RecurrenceDialog();
+
     // Public attributes
     // ********************
     // What view we're using -- currently only week view exists
@@ -119,8 +122,9 @@ cosmo.view.service = new function () {
         if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
             dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
-        } else {
-            cosmo.app.showDialog(cosmo.view.dialog.getProps('saveRecurConfirm',
+        } 
+        else {
+            cosmo.app.showDialog(self._recurrenceDialog.getProps('saveRecurConfirm',
                 { changeTypes: changeTypes, delta: delta, saveItem: item }));
         }
     }
@@ -443,7 +447,7 @@ cosmo.view.service = new function () {
         else {
             str = 'removeConfirm';
         }
-        cosmo.app.showDialog(cosmo.view.dialog.getProps(str, opts));
+        cosmo.app.showDialog(self._recurrenceDialog.getProps(str, opts));
     }
 
     /**
@@ -533,8 +537,8 @@ cosmo.view.service = new function () {
             var master = data.getMaster();
             var masterEventStamp = master.getEventStamp();
             var oldRecurrenceRule = masterEventStamp.getRrule();
-            var unit = ranges[oldRecurrenceRule.getFrequency()][0];
-            var incr = (ranges[oldRecurrenceRule.getFrequency()][1] * -1);
+            var unit = self._ranges[oldRecurrenceRule.getFrequency()][0];
+            var incr = (self._ranges[oldRecurrenceRule.getFrequency()][1] * -1);
             // New end should be one 'recurrence span' back -- e.g.,
             // the previous day for a daily recurrence, one week back
             // for a weekly, etc.

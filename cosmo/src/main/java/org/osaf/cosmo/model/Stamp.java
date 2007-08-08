@@ -98,19 +98,10 @@ public abstract class Stamp extends AuditableObject implements
     public abstract Stamp copy(Item item);
     
     
-    @Transient
-    public boolean isDirty() {
-        return dirty;
-    }
-    
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-    }
-    
     /**
      * Update stamp's timestamp
      */
-    protected void updateTimestamp() {
+    public void updateTimestamp() {
         setModifiedDate(new Date());
     }
 }

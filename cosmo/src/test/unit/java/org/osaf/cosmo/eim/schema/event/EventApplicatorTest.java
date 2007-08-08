@@ -17,6 +17,8 @@ package org.osaf.cosmo.eim.schema.event;
 
 import junit.framework.Assert;
 
+import net.fortuna.ical4j.model.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
@@ -24,9 +26,11 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
+import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.QName;
 
 /**
  * Test Case for {@link EventApplicator}.
@@ -52,6 +56,30 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         Assert.assertEquals(eventStamp.getEndDate(), EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T084500").getDate());
         Assert.assertEquals(eventStamp.getStatus(), "CONFIRMED");
         Assert.assertEquals(eventStamp.getRecurrenceRules().get(0).toString(), "FREQ=DAILY;UNTIL=20070306T055959Z");
+    }
+    
+    public void testApplyFieldWithUnknown() throws Exception {
+        NoteItem noteItem = new NoteItem();
+        EventStamp es = new EventStamp(noteItem);
+        noteItem.addStamp(es);
+        es.createCalendar();
+        es.setStartDate(new Date("01011979"));
+        es.setModifiedDate(es.getStartDate());
+        
+        EimRecord record = makeTestRecordWithUnknown();
+
+        EventApplicator applicator =
+            new EventApplicator(noteItem);
+        applicator.applyRecord(record);
+
+        // verify unkown field got stored
+        Assert.assertEquals(1, noteItem.getAttributes().size());
+        Attribute attribute = noteItem.getAttribute(new QName(NS_EVENT, "unknown"));
+        Assert.assertNotNull(attribute);
+        Assert.assertEquals("NA", attribute.getValue());
+        
+        // verify event stamp modify date got updated
+        Assert.assertTrue(es.getModifiedDate().after(es.getStartDate()));
     }
     
     public void testApplyMissingField() throws Exception {
@@ -117,6 +145,12 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         record.addField(new TextField(FIELD_RRULE, "FREQ=DAILY;UNTIL=20070306T055959Z"));
         record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));
 
+        return record;
+    }
+    
+    private EimRecord makeTestRecordWithUnknown() {
+        EimRecord record = new EimRecord(PREFIX_EVENT, NS_EVENT);
+        record.addField(new TextField("unknown", "NA"));
         return record;
     }
     

@@ -56,6 +56,9 @@ public class TaskApplicator extends BaseStampApplicator {
      */
     protected void applyField(EimRecordField field)
         throws EimSchemaException {
+        // Update timestamp of stamp so that task record will be 
+        // serialized next sync
+        getStamp().updateTimestamp();
         applyUnknownField(field);
     }
 }

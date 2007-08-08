@@ -207,6 +207,9 @@ public class EventApplicator extends BaseStampApplicator
                 event.setStatus(value);
             }
         } else {
+            // Update timestamp of stamp so that event record will be 
+            // serialized next sync
+            getStamp().updateTimestamp();
             applyUnknownField(field);
         }
     }

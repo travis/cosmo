@@ -149,6 +149,9 @@ public class MessageApplicator extends BaseStampApplicator
                 message.setReferences(value);
             }
         } else {
+            // Update timestamp of stamp so that message record will be 
+            // serialized next sync
+            getStamp().updateTimestamp();
             applyUnknownField(field);
         }
     }

@@ -587,15 +587,19 @@ public class StandardContentService implements ContentService {
                       " in " + parent.getName());
         }
         
-        if (! lockManager.lockCollection(parent, lockTimeout))
-            throw new CollectionLockedException("unable to obtain collection lock");
+        // Obtain locks to all collections involved.
+        Set<CollectionItem> locks = acquireLocks(parent, content);
         
         try {
             content = contentDao.createContent(parent, content);
-            contentDao.updateCollectionTimestamp(parent);
+            
+            // update collections
+            for(CollectionItem col : locks)
+                contentDao.updateCollectionTimestamp(col);
+            
             return content;
         } finally {
-            lockManager.unlockCollection(parent);
+            releaseLocks(locks);
         }   
     }
     

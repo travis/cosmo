@@ -56,7 +56,8 @@ cosmo.ui.menu = new function () {
                 var item = items[i];
                 if (this.itemShownInDisplayMode(item, this.calculateDisplayMode()) &&
                     this.userHasRequiredRolesForItem(item) &&
-                    this.userHasRequiredPrefForItem(item)) {
+                    this.userHasRequiredPrefForItem(item) &&
+                    this.confForItem(item)) {
                     
                     this.items.addItem(item.id, new cosmo.ui.menu.MenuItem(item));
                 }
@@ -87,6 +88,17 @@ cosmo.ui.menu = new function () {
         }
         return true;
     };
+    this.confForItem = function (item) {
+        var conf = item.requiredConf;
+        if (conf){
+            for (var i = 0; i < conf.length; i++) {
+                if (!cosmo.ui.conf.getBooleanValue([conf[i]])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
     this.userHasRequiredPrefForItem = function (item) {
         var pref = item.requiredPref;
         if (pref) {
@@ -112,9 +124,9 @@ cosmo.ui.menu.requiredRoles = {
 
 cosmo.ui.menu.urls = {
     HELP: _("Main.CollectionDetails.HelpLink"),
-    ACCOUNT_BROWSER: cosmo.env.getBaseUrl() + '/browse/' +
+    ACCOUNT_BROWSER: cosmo.env.getFullUrl("Browse") + "/" +
         cosmo.app.currentUsername,
-    ADMIN_CONSOLE: cosmo.env.getBaseUrl() + '/admin/users'
+    ADMIN_CONSOLE: cosmo.env.getFullUrl("UserList")
 };
 
 // A slighly cleaner way to list all the menu item props
@@ -150,7 +162,8 @@ cosmo.ui.menu.allItems = [
         return s;
       },
       displayMode: cosmo.ui.menu.displayModes.ANON,
-      requiredRoles: []
+      requiredRoles: [],
+      dividerText: "\u00A0\u00A0"
     },
     { id: 'welcomeMenuItem',
         displayText: _('Main.Welcome', [cosmo.app.currentUsername]),
@@ -184,11 +197,41 @@ cosmo.ui.menu.allItems = [
         displayMode: cosmo.ui.menu.displayModes.ANON,
         requiredRoles: []
         },
+    { id: 'loginMenuItem',
+        displayText: _('Main.LogIn'),
+        onclickFunc: function(){location = cosmo.env.getLoginRedirect()},
+        displayMode: cosmo.ui.menu.displayModes.ANON,
+        requiredRoles: [],
+        dividerText: "\u00A0\u00A0"
+        },
+    { id: 'logoutMenuItem',
+        displayText: _('Main.LogOut'),
+        urlString: cosmo.env.getRedirectUrl(),
+        displayMode: cosmo.ui.menu.displayModes.AUTH,
+        requiredRoles: [cosmo.ui.menu.requiredRoles.USER],
+        dividerText: "\u00A0\u00A0"
+        },
     { id: 'aboutMenuItem',
         displayText: _('Main.About'),
-        onclickFunc: function () {cosmo.util.popup.open(cosmo.env.getBaseUrl() + '/help/about', 360, 280)},
+        onclickFunc: function () {cosmo.util.popup.open(cosmo.env.getFullUrl("About"), 360, 280)},
         displayMode: cosmo.ui.menu.displayModes.ANON,
         requiredRoles: []
+        },
+    { id: 'tosMenuItem',
+        displayText: _('Main.TermsOfService'),
+        onclickFunc: function (e) {
+            cosmo.util.popup.open(cosmo.env.getFullUrl("TermsOfService"), _("TermsOfService.Width"), _("TermsOfService.Height"), true); },
+        displayMode: cosmo.ui.menu.displayModes.ANY,
+        requiredRoles: [],
+        requiredConf: ["tosRequired"]
+        },
+    { id: 'privacyMenuItem',
+        displayText: _('Main.PrivacyPolicy'),
+        onclickFunc: function (e) {
+            cosmo.util.popup.open(cosmo.env.getFullUrl("PrivacyPolicy"), _("PrivacyPolicy.Width"), _("PrivacyPolicy.Height"), true); },
+        displayMode: cosmo.ui.menu.displayModes.ANY,
+        requiredRoles: [],
+        requiredConf: ["tosRequired"]
         },
     { id: 'helpMenuItem',
         displayText: _('Main.Help'),
@@ -197,18 +240,6 @@ cosmo.ui.menu.allItems = [
         urlString: cosmo.ui.menu.urls.HELP,
         displayMode: cosmo.ui.menu.displayModes.ANY,
         requiredRoles: []
-        },
-    { id: 'loginMenuItem',
-        displayText: _('Main.LogIn'),
-        onclickFunc: function(){location = cosmo.env.getLoginRedirect()},
-        displayMode: cosmo.ui.menu.displayModes.ANON,
-        requiredRoles: []
-        },
-    { id: 'logoutMenuItem',
-        displayText: _('Main.LogOut'),
-        urlString: cosmo.env.getRedirectUrl(),
-        displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
         }
 ];
 
@@ -219,6 +250,7 @@ cosmo.ui.menu.MenuItem = function (p) {
     this.displayMode = '';
     this.requiredRoles = [];
     this.requiredPref = null;
+    this.requiredConf = [];
     this.subscribeTo = {};
     this.span = null;
     this.createFunc = null;
@@ -277,7 +309,7 @@ cosmo.ui.menu.MainMenu = function (p) {
         s.className = 'menuBarDivider';
         s.appendChild(cosmo.util.html.nbsp());
         if (!lastItem) {
-            s.appendChild(_createText('|'));
+            s.appendChild(_createText(item.dividerText? item.dividerText : '|'));
         }
         s.appendChild(cosmo.util.html.nbsp());
         this.domNode.appendChild(s);

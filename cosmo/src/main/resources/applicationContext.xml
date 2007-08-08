@@ -761,7 +761,9 @@
          /admin/user/**=ROLE_ROOT
          /error=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
          /error/**=ROLE_ANONYMOUS,ROLE_USER,ROLE_ROOT
+         /help/privacy=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /help/about=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /help/tos=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
          /help=ROLE_ROOT,ROLE_USER
          /help/**=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT

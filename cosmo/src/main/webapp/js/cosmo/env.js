@@ -142,7 +142,12 @@ cosmo.env.urls = {
     "Logout": "/logout",
     "Redirect": "/logout",
     "Auth": "/security_check",
-    "Notices": function(){return _("About.NoticesUrl")}
+    "Notices": function(){return _("About.NoticesUrl")},
+    "Browse": "/browse",
+    "UserList": '/admin/users',
+    "TermsOfService": "/help/tos",
+    "PrivacyPolicy": "/help/privacy",
+    "About": "/help/about"
 }
 
 cosmo.env.getFullUrl = function (urlKey) {

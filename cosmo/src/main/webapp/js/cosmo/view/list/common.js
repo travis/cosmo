@@ -182,8 +182,8 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     var t = data.getDisplayName();
     setVals('title', t, t);
     // Who
-    var m = data.getModifiedBy().userId;
-    m = m ? m : '';
+    var m = data.getModifiedBy();
+    m = m ? m.getUserId() : '';
     setVals('who', m, m);
     // Start
     var st = data.getEventStamp();

@@ -102,12 +102,6 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return this.bind(r, kwArgs);
     },
     
-    getItemsProjections: {
-        now: "dashboard-now",
-        later: "dashboard-later",
-        done: "dashboard-done"  
-    },
-    
     getItems: function (collection, searchCrit, kwArgs){
         kwArgs = kwArgs || {};
 
@@ -118,7 +112,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var query = this._generateSearchQuery(searchCrit);
         var editLink = this.getAndCheckEditLink(collection);
         
-        var projection = (this.getItemsProjections[searchCrit.triage] || "full") + "/eim-json";
+        var projection = (searchCrit.projection || "full") + "/eim-json";
         var r = {};
 
         r.url = this.generateUri(this.getAtomBase() + "/" + editLink, "/" + projection, query);
@@ -162,7 +156,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
         var query = this._generateSearchQuery(searchCrit);
 
-        var projection = (this.getItemsProjections[searchCrit.triage] || "full") + "/eim-json";
+        var projection = (searchCrit.projection || "full") + "/eim-json";
         var r = {};
         
         var expandedLink = item.getUrls()['expanded'];

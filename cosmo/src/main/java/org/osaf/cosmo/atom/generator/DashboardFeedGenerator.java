@@ -151,7 +151,7 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             return PROJECTION_DASHBOARD_DONE;
         if (triageStatus == TriageStatus.CODE_LATER)
             return PROJECTION_DASHBOARD_LATER;
-        if (triageStatus == TriageStatus.CODE_LATER)
+        if (triageStatus == TriageStatus.CODE_NOW)
             return PROJECTION_DASHBOARD_NOW;
         return PROJECTION_DASHBOARD;
     }

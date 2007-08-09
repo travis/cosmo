@@ -247,18 +247,19 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
     }
     
     if (a == null){
-        type = typeof(b);
+        return b == null;
     }
     
+    if (b == null){
+        return false;
+    }
+ 
     if (type != typeof(b)){
         throw new Error("Both operands must be of the same type!\n You passed '" 
            + a + "' and '" + b +"', a " + typeof(a) + " and a "+ typeof(b));
     }
     
     if (type == "object"){
-       if (a == null){
-           return b == null;
-       }
        return a.equals(b);
     }
     

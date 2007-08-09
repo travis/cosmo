@@ -561,16 +561,16 @@ cosmo.view.cal.canvas = new function () {
         if (item.lozenge.getInputDisabled()) {
             return false;
         }
-
-        // Publish selection
+        var writeable = cosmo.app.pim.currentCollection.isWriteable();
         var c = cosmo.view.cal.canvas;
-        var sel = c.getSelectedItem();
+        var origSelection = c.getSelectedItem();
+
         // If no currently selected item, or the item clicked
         // is not the currently selected item, update the selection
-        if ((!sel) || (item.id != sel.id)) {
+        if ((item.id != origSelection.id) || (!origSelection)) {
             // Make sure the user isn't leaving unsaved edits
-            if (!unsavedChangesOverride && sel) {
-                var converter = new cosmo.ui.DetailFormConverter(sel.data);
+            if (!unsavedChangesOverride && origSelection && writeable) {
+                var converter = new cosmo.ui.DetailFormConverter(origSelection.data);
                 var deltaAndError = converter.createDelta();
                 var error = deltaAndError[1];
                 var delta = deltaAndError[0];
@@ -624,8 +624,7 @@ cosmo.view.cal.canvas = new function () {
         // dialog, as it interferes with the normal flow of setting
         // up a draggable, also naturaly no move/resize for
         // read-only collections
-        if (!unsavedChangesOverride &&
-            cosmo.app.pim.currentCollection.isWriteable()) {
+        if (!unsavedChangesOverride && writeable) {
             // Set up Draggable and save dragMode -- user may be dragging
             if (id.indexOf('AllDay') > -1) {
                 dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);

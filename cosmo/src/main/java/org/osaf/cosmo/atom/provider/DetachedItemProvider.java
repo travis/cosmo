@@ -16,28 +16,26 @@
 package org.osaf.cosmo.atom.provider;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.ResponseContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
-import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
-import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
+import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.processor.ContentProcessor;
 import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionLockedException;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.UidInUseException;
+import org.osaf.cosmo.model.util.ThisAndFutureHelper;
 import org.osaf.cosmo.server.ServiceLocator;
 
 public class DetachedItemProvider extends ItemProvider {
@@ -188,7 +186,21 @@ public class DetachedItemProvider extends ItemProvider {
     private NoteItem detachOccurrence(NoteItem master,
                                       NoteItem copy,
                                       NoteItem occurrence) {
-        // XXX
+        
+        ThisAndFutureHelper tafHelper = new ThisAndFutureHelper();
+        LinkedHashSet<ContentItem> updates = new LinkedHashSet<ContentItem>();
+        
+        // need to update master, create new master
+        updates.add(master);
+        updates.add(copy);
+        
+        // get all modifications to remove/add
+        updates.addAll(tafHelper.breakRecurringEvent(master, copy, occurrence));
+        
+        // This service call will update/remove/create items in one transaction
+        // Any new items will be added to all specified parents.
+        getContentService().updateContentItems(master.getParents(), updates);
+        
         return copy;
     }
 }

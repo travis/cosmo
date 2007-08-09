@@ -56,7 +56,6 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
        return prop;
    }
 
-
    prop = _calcy();
 
    if (!prop){
@@ -167,12 +166,17 @@ cosmo.env._getNextSuffix = function(){
  * distribute urls across various hosts.
  */
 cosmo.env.getStaticUrl = function(resourcePath){
+    var url = this.getStaticBaseUrlTemplate();
+    if (!url){
+        return this.getBaseUrl() + resourcePath;   
+    }
+    
     var cached = this._staticUrlPathCache[resourcePath];
     if (cached){
         return cached;
     }
     
-    var url = this.getStaticBaseUrlTemplate();
+    
     if (this._doesHaveRange()){
         var suffix = this._getNextSuffix();
         url = url.replace("*", suffix);

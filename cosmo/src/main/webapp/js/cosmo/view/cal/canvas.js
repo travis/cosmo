@@ -174,13 +174,6 @@ cosmo.view.cal.canvas = new function () {
                 str += '<div class="dayListDayDiv" id="dayListDiv' + i +
                     '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
                     'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
-                /*
-                if (calcDay.getTime() == currDay.getTime()) {
-                    str += ' background-image:url(' + cosmo.env.getImagesUrl() +
-                        'day_col_header_background.gif); background-repeat:' +
-                        ' repeat-x; background-position:0px 0px;'
-                }
-                */
                 str += '">';
                 str += cosmo.datetime.abbrWeekday[i] + '&nbsp;' + startdate;
                 str += '</div>\n';
@@ -369,8 +362,7 @@ cosmo.view.cal.canvas = new function () {
             if (cosmo.view.cal.viewStart.getTime() <= currDateTime &&
                 cosmo.view.cal.viewEnd.getTime() > currDateTime) {
                 currDayClass = ' currentDayDay';
-                currDayImg = 'url(' + cosmo.env.getImagesUrl() +
-                    'day_col_header_background.gif)';
+                currDayImg = 'url(' + cosmo.env.getImageUrl('day_col_header_background.gif')+')';
             }
             else {
                 currDayClass = '';

@@ -287,8 +287,6 @@ cosmo.app = new function () {
             dojo.lang.setTimeout(logoutFunction,
                 cosmo.ui.conf.timeoutDialogAutoLogout * 1000)
         
-        
-        
         var dialogHash = {};
         var cancelLogoutButton = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
             handleOnClick: function () { 

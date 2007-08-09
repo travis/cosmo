@@ -114,7 +114,7 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         nbData.style.lineHeight = '0px';
         nbData.style.textAlign = lowerCaseSide;
         nbData.className = 'btnElemBaseSm';
-        nbData.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() + 'button_bgs.png)';
+        nbData.style.backgroundImage = 'url(' + cosmo.env.getImageUrl("button_bgs.png") + ')';
         nbImg.src = BUTTON_DIR_PATH + 'nav_arrow_' +
             lowerCaseSide + '.gif';
         nbImg.style.padding = '2px 5px 0 5px';

@@ -30,8 +30,7 @@ dojo.require("cosmo.convenience");
 
 cosmo.ui.imagegrid.config = {};
 cosmo.ui.imagegrid.DISABLED_OPACITY = 0.3;
-cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImagesUrl() +
-  'image_grid.png';
+cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImageUrl( 'image_grid.png');
 
 cosmo.ui.imagegrid.readConfig = function (type, data, obj) {
     cosmo.ui.imagegrid.config = data;
@@ -39,7 +38,7 @@ cosmo.ui.imagegrid.readConfig = function (type, data, obj) {
 
 // Get the config data file that tells us
 // which images are where, and what sizes
-dojo.io.bind({ url: cosmo.env.getImagesUrl() + 'imagegrid.json',
+dojo.io.bind({ url: cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/"+ 'imagegrid.json',
     method: 'POST', // This is not RESTful, but POST avoids Prototype hijacking
     sync: true,
     mimetype: 'application/json',

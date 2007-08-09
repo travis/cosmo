@@ -40,13 +40,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
                 this.showErr(_('Login.Error.AuthFailed'));
                 this.passwordInput.value = '';
-            	
+                
             } else {
-	            var username  = this.usernameInput.value;
+                var username  = this.usernameInput.value;
                 cosmo.util.auth.setCred(this.usernameInput.value,
                     this.passwordInput.value);
 
-    			location = str;
+                location = str;
             }
         },
         doLogin: function () {
@@ -124,7 +124,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             this.submitButtonContainer.appendChild(button.domNode);
             this.submitButton = button;
 
-            logo.src = cosmo.env.getImagesUrl() + _("App.LogoUri");
+            logo.src = cosmo.env.getImageUrl(_("App.LogoUri"));
             this.logoContainer.appendChild(logo);
             dojo.event.connect(this.passwordInput, "onfocus", this, 'setFocus');
             dojo.event.connect(this.passwordInput, "onblur", this, 'setFocus');

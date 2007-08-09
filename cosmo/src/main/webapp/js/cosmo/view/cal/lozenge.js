@@ -293,7 +293,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
                 textColor = '#ffffff';
                 borderColor = '#ffffff';
                 lozengeColor = colors['darkSel'];
-                imgPath = cosmo.env.getImagesUrl() + 'block_gradient_dark.png';
+                imgPath = cosmo.env.getImageUrl('block_gradient_dark.png');
             }
             break;
         // Unselected
@@ -308,7 +308,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
                 textColor = '#ffffff';
                 borderColor = '#ffffff';
                 lozengeColor = colors['darkUnsel'];
-                imgPath = cosmo.env.getImagesUrl() + 'block_gradient_light.png';
+                imgPath = cosmo.env.getImageUrl('block_gradient_light.png');
             }
             break;
         // Processing

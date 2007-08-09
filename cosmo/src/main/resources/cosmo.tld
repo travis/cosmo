@@ -92,4 +92,24 @@
     <function-class>org.osaf.cosmo.model.TriageStatus</function-class>
     <function-signature>java.lang.String label(java.lang.Integer)</function-signature>
   </function>
+  <function>
+    <name>getStaticHostUrlTemplate</name>
+    <function-class>org.osaf.cosmo.ui.TagFunctions</function-class>
+    <function-signature>java.lang.String getStaticHostUrlTemplate()</function-signature>
+  </function>
+  <function>
+    <name>getStaticHostUrl</name>
+    <function-class>org.osaf.cosmo.ui.TagFunctions</function-class>
+    <function-signature>java.lang.String getStaticHostUrl()</function-signature>
+  </function>
+  <function>
+    <name>getStaticHostUrlRange</name>
+    <function-class>org.osaf.cosmo.ui.TagFunctions</function-class>
+    <function-signature>java.lang.String getStaticHostUrlRange()</function-signature>
+  </function>
+  <function>
+    <name>getConfigProperty</name>
+    <function-class>org.osaf.cosmo.ui.TagFunctions</function-class>
+    <function-signature>java.lang.String getConfigProperty(java.lang.String)</function-signature>
+  </function>
 </taglib>

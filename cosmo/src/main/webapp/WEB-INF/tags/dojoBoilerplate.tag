@@ -19,6 +19,8 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<cosmo:baseurl var="baseUrl"/>
+
 <%@ attribute name="timezones"        %>
 <%@ attribute name="parseWidgets"        %>
 <%@ attribute name="searchIds"        %>
@@ -46,17 +48,17 @@
     var searchIds = [<c:forEach var="searchId" items="${searchIds}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>
                      "${searchId}"</c:forEach>];
 
-    var djConfig = {isDebug: false,
+    var djConfig = {isDebug: false, 
                     staticBaseUrl: "${staticBaseUrl}",
-                    i18nLocation: "${staticBaseUrl}/i18n.js",
-                    confLocation: "${staticBaseUrl}/webui.conf",
+                    i18nLocation: "${baseUrl}/i18n.js",
+                    confLocation: "${baseUrl}/webui.conf",
                     templateName: "${templateName}",
                     parseWidgets: ${parseWidgets},
                     searchIds: searchIds}
 
 </script>
 
-<script type="text/javascript" src="${staticBaseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>
+<script type="text/javascript" src="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>
 <script type="text/javascript">
 
 function bootstrap(){
@@ -69,7 +71,9 @@ function bootstrap(){
     dojo.require("cosmo.env");
     dojo.require("cosmo.ui.conf");
 
-    cosmo.env.setBaseUrl(djConfig['staticBaseUrl']);
+    cosmo.env.setBaseUrl("${baseUrl}");
+    cosmo.env.setStaticBaseUrlTemplate("${cosmoui:getStaticHostUrlTemplate()}");
+    cosmo.env.setStaticBaseUrlRange("${cosmoui:getStaticHostUrlRange()}");
     cosmo.env.setVersion("${PRODUCT_VERSION}");
     <%-- 
       Note: It is possible to set this value to negative numbers --
@@ -77,8 +81,8 @@ function bootstrap(){
       we end up with reasonable numbers in getTimeoutSeconds and getTimeoutMinutes
     --%>
     cosmo.env.setTimeoutSeconds(
-    	cosmo.ui.conf.uiTimeout ||
-    	<%=session.getMaxInactiveInterval()%>);
+        cosmo.ui.conf.uiTimeout ||
+        <%=session.getMaxInactiveInterval()%>);
 
     dojo.require("cosmo.ui.widget.Debug");
 

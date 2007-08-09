@@ -274,7 +274,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 selectorNode.appendChild(d);
 
                 var collIcon = cosmo.util.html.createRollOverMouseDownImage(
-                    cosmo.env.getImagesUrl() + 'collection_' + imgPath + ".png");
+                    cosmo.env.getImageUrl( 'collection_' + imgPath + ".png"));
                 collIcon.style.cursor = 'pointer';
                 collIcon.alt = imgTitle;
                 collIcon.title = imgTitle;

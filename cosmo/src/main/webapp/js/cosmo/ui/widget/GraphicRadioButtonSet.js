@@ -113,8 +113,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
             var td = _createElem('td');
             td.id = this.widgetId + '_button' + i;
             td.style.width = b.width + 'px';
-            td.style.backgroundImage = 'url(' + cosmo.env.getImagesUrl() +
-                'image_grid.png)';
+            td.style.backgroundImage = 'url(' + cosmo.env.getImageUrl('image_grid.png')+')';
             var pos = i == this.selectedButtonIndex ? b.downStateImgPos : b.defaultImgPos;
             td.style.backgroundPosition = pos[0] + 'px ' + pos[1] + 'px';
             td.style.cursor = 'pointer';

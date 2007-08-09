@@ -885,5 +885,13 @@
   <bean id="httpLoggingFormat" class="java.lang.String">
     <constructor-arg type="java.lang.String"><value>${cosmo.log.HttpLoggingFilter.format}</value></constructor-arg>
   </bean>
-
+   
+  <!-- give JSP tag functions access to config properties -->
+  <bean id="jspConfigProps" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetClass"><value>org.osaf.cosmo.ui.TagFunctions</value></property>
+    <property name="targetMethod"><value>setPropertyPlaceholderConfigurer</value></property>
+    <property name="arguments">
+        <list><ref bean="propertyPlaceholderConfigurer"/></list>
+    </property>
+  </bean>
 </beans>

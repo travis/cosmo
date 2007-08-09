@@ -24,5 +24,8 @@
 
 <cosmo:baseurl var="baseurl"/>
 
-<c:set var="result"
-       value="${baseurl}"/>
+<c:choose>
+  <c:when test="${not empty cosmoui:getStaticHostUrl()}"><c:set var="result" value="${cosmoui:getStaticHostUrl()}"/></c:when>
+  <c:otherwise><c:set var="result" value="${baseurl}"/></c:otherwise>
+</c:choose>
+

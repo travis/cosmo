@@ -118,7 +118,7 @@ dojo.widget.HtmlWidget, function(){
                this.collectionNameText.style.display = "";
             }
 
-            var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImagesUrl() + "link.png");
+            var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImageUrl("link.png"));
             var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);
             linkImg.title = toolTip;
             linkImg.alt = toolTip;

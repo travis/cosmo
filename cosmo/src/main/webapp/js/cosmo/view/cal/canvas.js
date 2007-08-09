@@ -567,7 +567,10 @@ cosmo.view.cal.canvas = new function () {
 
         // If no currently selected item, or the item clicked
         // is not the currently selected item, update the selection
-        if ((item.id != origSelection.id) || (!origSelection)) {
+        // Since there may not be an existing selection, check for
+        // the non-existence first, then compare to the item if it
+        // exists
+        if ((!origSelection) || (origSelection.id != item.id)) {
             // Make sure the user isn't leaving unsaved edits
             if (!unsavedChangesOverride && origSelection && writeable) {
                 var converter = new cosmo.ui.DetailFormConverter(origSelection.data);

@@ -200,6 +200,39 @@ cosmo.app = new function () {
         cosmo.topics.publish(cosmo.topics.ModalDialogToggle, { isDisplayed: true });
         self.modalDialog.show();
     };
+    this.getValue = function (valuePrompt, defaultValue, retryConditions){
+        var valueInput = _createElem("input");
+        valueInput.value = defaultValue || "";
+        valueInput.type = "text";
+        retryConditions = retryConditions || [];
+        var deferred = new dojo.Deferred();
+        var submitFunc = dojo.lang.hitch(this, function () { 
+                                    var displayName = valueInput.value;
+                                    for (var i = 0; i < retryConditions.length; i++){
+                                        var valueErrorMessage = retryConditions[i](displayName);
+                                        if (valueErrorMessage){
+                                            this.modalDialog.setPrompt(valueErrorMessage);
+                                            return false;
+                                        }
+                                    }
+                                    deferred.callback(valueInput.value);
+                                    }) 
+        var button = new cosmo.ui.button.Button(
+                              { text:_('App.Button.Submit'), 
+                                width:74,
+                                handleOnClick: submitFunc
+                              });
+        var dialogProps = {
+            "btnsRight": [button],
+            "content": valueInput,
+            "prompt": valuePrompt,
+            "width" : 250,
+            "height" : 100,
+            "defaultAction" : submitFunc
+        };
+        self.showDialog(dialogProps);
+        return deferred;
+    };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
      * messages to display if needed

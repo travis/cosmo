@@ -101,6 +101,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 // Set up callback for deferred -- this is the action to take
                 // if auth succeeds
                 var subscribeFunction = function () {
+                        cosmo.app.showDialog({"content" : _("Main.CollectionAdd.LoadingInfo")})
                         var collectionsDeferred = cosmo.app.pim.serv.getCollections();
                         var subscriptionsDeferred = cosmo.app.pim.serv.getSubscriptions();
                         var dList = new dojo.DeferredList(
@@ -112,6 +113,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             return collections;
                         })
                         dList.addCallback(function (collections){
+                            cosmo.app.hideDialog();
                             var alreadySubscribed = self._collectionWithUidExists(collections, curr.getUid());
                             if (alreadySubscribed) {
                                 var message = alreadySubscribed == "cosmo.model.Collection"
@@ -125,25 +127,34 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
     
                             var displayName = "";
     
-                            while (!self._validateDisplayName(displayName)) {
-                                displayName = prompt(_("Main.CollectionAdd.EnterDisplayNamePrompt"), curr.getDisplayName());
-                            }
-    
-                            while (self._collectionWithDisplayNameExists(collections, displayName) || !self._validateDisplayName(displayName)) {
-                                displayName = prompt(_("Main.CollectionAdd.DisplayNameExistsPrompt", displayName));
-                            }
-    
-                            if (displayName == null) {
-                                return null;
-                            }
-    
-                            var subscription = new cosmo.model.Subscription({
-                                displayName: displayName,
-                                uid: curr.getUid(),
-                                ticketKey: passedKey
-                            })
-    
-                            return cosmo.app.pim.serv.createSubscription(subscription);
+                            var displayNameDeferred = cosmo.app.getValue(_("Main.CollectionAdd.EnterDisplayNamePrompt"), 
+                                               curr.getDisplayName(), [
+                                               function (displayName){
+                                                   if (!self._validateDisplayName(displayName)){
+                                                       return _("Main.CollectionAdd.EnterDisplayNamePrompt");
+                                                   }
+                                                },
+                                               function (displayName){
+                                                    if (self._collectionWithDisplayNameExists(collections, displayName)){
+                                                       return _("Main.CollectionAdd.DisplayNameExistsPrompt", displayName);
+                                                    }
+                                                }
+                                               ]);
+
+                            displayNameDeferred.addCallback(function(displayName){
+                                if (displayName == null) {
+                                    return null;
+                                }
+        
+                                var subscription = new cosmo.model.Subscription({
+                                    displayName: displayName,
+                                    uid: curr.getUid(),
+                                    ticketKey: passedKey
+                                })
+        
+                                return cosmo.app.pim.serv.createSubscription(subscription);
+                            });
+                            return displayNameDeferred;
                         });
                         return dList;
                 };
@@ -156,23 +167,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     // Action to take after successful auth -- try to add the
                     // collection subscription
                     attemptFunc: function () {
+                        // Hide the auth dialog, as we will be opening a new one
+                        // to get the subscription name.
+                        cosmo.app.hideDialog();
                         var deferred = subscribeFunction();
-                        if (deferred != null) {
-                            deferred.addCallback(dojo.lang.hitch(this, function () {
-                                // Log the user into Cosmo and display the current collection
-                                this._showPrompt(this.authAction.successPrompt);
-                                location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
 
-                            }));
-                            deferred.addErrback(dojo.lang.hitch(this, function (err) {
-                                cosmo.app.hideDialog();
-                                cosmo.app.showErr(self.strings.collectionAddError, err);
-                                return false;
-                            }));
-                        }
-                        else {
+                        deferred.addCallback(dojo.lang.hitch(this, function () {
+                            // Log the user into Cosmo and display the current collection
+                            this._showPrompt(this.authAction.successPrompt);
+                            location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+
+                        }));
+                        deferred.addErrback(dojo.lang.hitch(this, function (err) {
                             cosmo.app.hideDialog();
-                        }
+                            cosmo.app.showErr(self.strings.collectionAddError, err.message);
+                            return false;
+                        }));
                     },
                     attemptPrompt: self.strings.attemptPrompt,
                     successPrompt: self.strings.successPrompt

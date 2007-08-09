@@ -237,7 +237,7 @@ cosmo.account.createTosInput = function (tosField){
 
     var lab = _createElem('span');
     lab.id = "tosLinkLabel";
-    lab.appendChild(_createText(tosField.label))
+    lab.innerHTML = tosField.label;
 
     var input = cosmo.account.fieldToElement(tosField)
 

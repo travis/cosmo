@@ -1,4 +1,4 @@
-{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/%random%"}}
+{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/{$random}"}}
 {"method": "wait", "params": {"milliseconds" : 2000}}
 {"method":"reWriteAlert", "params":{}}
 {"method": "click", "params": {"link" : "[browse]"}}

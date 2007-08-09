@@ -1,0 +1,30 @@
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[1].id"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "hourDiv0-900"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "hourDiv0-1030"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "hourDiv0-1300"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getCurrent().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"option": "Mazatlan", "id": "tzId"}, "version": "0.1", "method": "select"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"jsid": " windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"option": "Barbados", "id": "tzId"}, "version": "0.1", "method": "select"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"jsid": "  windmill.testingApp.cosmo.app.modalDialog.btnsRight[1].domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"option": "Miquelon", "id": "tzId"}, "version": "0.1", "method": "select"}
+{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"jsid": "   windmill.testingApp.cosmo.app.modalDialog.btnsRight[2].domNode.id"}, "version": "0.1", "method": "click"}

@@ -2,6 +2,7 @@
 from windmill.authoring import WindmillTestClient
 
 def test():
+
     client = WindmillTestClient(__name__)
 
     client.click(id=u'viewNavCenterRight')
@@ -12,7 +13,7 @@ def test():
     client.wait(milliseconds=7000)
     client.type(text=u'Testing Daily Recurrence', id=u'noteTitle')
     client.select(id=u'recurrenceInterval', option=u'Daily')
-    client.type(text=u'A description of my test of daily recurrenceInterval.', id=u'noteDescription')
+    client.type(text=u'A description of my test of Daily recurrenceInterval.', id=u'noteDescription')
     client.click(jsid=u'windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId')
     client.wait(milliseconds=7000)
     client.wait(milliseconds=7000)
@@ -60,7 +61,7 @@ def test():
     client.wait(milliseconds=7000)
     client.type(text=u'Testing Daily Recurrence', id=u'noteTitle')
     client.select(id=u'recurrenceInterval', option=u'Daily')
-    client.type(text=u'A description of my test of daily recurrenceInterval.', id=u'noteDescription')
+    client.type(text=u'A description of my test of Daily recurrenceInterval.', id=u'noteDescription')
     client.click(jsid=u'windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId')
     client.wait(milliseconds=7000)
     client.wait(milliseconds=7000)

@@ -6,7 +6,7 @@
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "type", "params": {"id" : "noteTitle", "text": "Testing Daily Recurrence"}}
 {"method": "select", "params": {"id" : "recurrenceInterval", "option": "Daily"}}
-{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of daily recurrenceInterval."}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of Daily recurrenceInterval."}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
@@ -54,7 +54,7 @@
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "type", "params": {"id" : "noteTitle", "text": "Testing Daily Recurrence"}}
 {"method": "select", "params": {"id" : "recurrenceInterval", "option": "Daily"}}
-{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of daily recurrenceInterval."}}
+{"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of Daily recurrenceInterval."}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "wait", "params": {"milliseconds" : 7000}}

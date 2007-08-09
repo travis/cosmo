@@ -53,6 +53,9 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         },
         
         getStatus: function(){
+            if (this.getAnyTime() || this.getAtTime()){
+                return null;
+            }
             var status = this.__getProperty("status");
             return status || cosmo.model.EventStatus.CONFIRMED;
         },

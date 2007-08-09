@@ -27,22 +27,22 @@ import org.osaf.cosmo.model.NoteItem;
 public class DetachedItemTarget extends BaseItemTarget {
 
     private NoteItem master;
-    private NoteItem modification;
+    private NoteItem occurrence;
 
     public DetachedItemTarget(RequestContext request,
                               NoteItem master,
-                              NoteItem modification) {
-        this(request, master, modification, null, null);
+                              NoteItem occurrence) {
+        this(request, master, occurrence, null, null);
     }
 
     public DetachedItemTarget(RequestContext request,
                               NoteItem master,
-                              NoteItem modification,
+                              NoteItem occurrence,
                               String projection,
                               String format) {
         super(TargetType.TYPE_COLLECTION, request, projection, format);
         this.master = master;
-        this.modification = modification;
+        this.occurrence = occurrence;
     }
 
     // AuditableTarget methods
@@ -61,7 +61,7 @@ public class DetachedItemTarget extends BaseItemTarget {
         return master;
     }
 
-    public NoteItem getModification() {
-        return modification;
+    public NoteItem getOccurrence() {
+        return occurrence;
     }
 }

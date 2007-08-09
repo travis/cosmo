@@ -97,9 +97,6 @@ public class StandardRequestHandler extends DefaultRequestHandler
         if (method.equals("PUT")) {
             if (type == TargetType.TYPE_COLLECTION)
                 return ((ExtendedProvider) provider).updateCollection(request);
-        } else if (method.equals("POST")) {
-            if (type == TargetType.TYPE_COLLECTION)
-                return ((ExtendedProvider) provider).createCollection(request);
         }
 
         return super.process(provider, request);

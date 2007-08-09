@@ -233,7 +233,12 @@ cosmo.view.dialog.RecurrenceDialog.prototype =
 cosmo.view.dialog.UnsavedChangesDialog = function () {
     var self = this;
     var props = null;
-    var unsavedChangesMsg = _('Main.Prompt.RecurButtonAll');
+    var strings = {
+        unsavedChangesMsg: _('Main.Prompt.UnsavedChangesConfirm'),
+        cancelButtonText: _('App.Button.Cancel'),
+        discardButtonText: _('Main.Prompt.UnsavedChangesDiscard'),
+        saveButtonText: _('Main.Prompt.UnsavedChangesSave')
+    }
     var btnWidth = 84;
     var btnWidthWide = 120;
 
@@ -243,28 +248,28 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [
                 new Button({
-                    text: _('App.Button.Cancel'), 
+                    text: strings.cancelButtonText, 
                     width: btnWidth,
-                    handleOnClick: cosmo.app.hideDialog,
+                    handleOnClick: opts.cancelFunc, 
                     small: true,
                     enabled: true })
             ],
             'btnsRight': [
                 new cosmo.ui.button.Button({ 
-                    text: 'Ignore Changes', 
+                    text: strings.discardButtonText,
                     width: btnWidthWide,
-                    handleOnClick: opts.ignoreFunc,
+                    handleOnClick: opts.discardFunc,
                     small: true,
                     enabled: true }),
                 new cosmo.ui.button.Button({ 
-                    text: 'Save Changes', 
+                    text: strings.saveButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.saveFunc,
                     small: true,
                     enabled: true })
             ],
             'defaultAction': null,
-            'content': 'You have unsaved changes, dude. How do you want to handle that?'
+            'content': strings.unsavedChangesMsg
         };
     };
     this.getProps = function (o) {

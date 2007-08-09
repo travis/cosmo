@@ -41,10 +41,16 @@ dojo.require("cosmo.view.cal.canvas");
  */
 cosmo.view.cal.draggable.Draggable = function (id) {
 
+    // Scopeage -- set this to null here, point to
+    // 'this' over in the init function, since all
+    // these methods are here in the base prototype
+    // Draggable obj
+    var self = null;
+
     // Same as the UID of the selected CalItem
     this.id = id;
     // The selected CalItem
-    this.ev = null;
+    this.item = null;
     // Dragged/resized or not
     this.dragged = false;
     // Vertical offset of the hosting div for calc'ing Y pos
@@ -77,9 +83,14 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * to be shared between the sub-classes
      */
     this.init = function (dragMode, ev) {
+
+        // Scopeage for inner functions in doUpdate method
+        self = this;
+
         var lozenge = ev.lozenge;
         var node = lozenge.domNode;
-        this.ev = ev;
+
+        this.item = ev;
         this.vertOffset = cosmo.app.pim.baseLayout.mainApp.top +
             cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas.timedCanvas.top;
         this.dragMode = dragMode;
@@ -137,7 +148,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         // Not just a simple click
         this.dragged = true;
         // Lozenge associated with this Draggable
-        var moveLozenge = this.ev.lozenge;
+        var moveLozenge = this.item.lozenge;
         // Subtract the offset to get where the left/top
         // of the lozenge should be
         var moveX = (xPos - this.clickOffsetX);
@@ -178,7 +189,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         ret = parseInt(size);
         // Single-day events only
         // Min size is 30 minutes -- two 15-min. chunks
-        if (!this.ev.lozenge.auxDivList.length) {
+        if (!this.item.lozenge.auxDivList.length) {
             ret = ret < this.unit ? this.unit : ret;
         }
         return ret;
@@ -191,26 +202,76 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * This method also calls remoteSaveMain which save the
      * changes to the event to the backend
      */
-    this.doUpdate = function () {
-        var selEv = this.ev;
-        // Make backup snapshot of event data in case save/remove
-        // operation fails
-        selEv.makeSnapshot();
-        // Get the delta for
-        var delta = selEv.lozenge.getDelta(selEv, this.dragMode);
-        if (delta.hasChanges()) {
-            // Check against the backup to make sure the event has
-            // actually been edited
-            //selEv.setInputDisabled(true); // Disable input while processing
-            // Save the changes
-            // ==========================
-            dojo.event.topic.publish('/calEvent', { 'action': 'saveConfirm', 'delta': delta, 'data':selEv});
+    this.doUpdate = function (discardUnsavedChanges) {
+        var item = self.item;
+        // Make backup snapshot of the item -- this is used
+        // to compute the deltas
+        item.makeSnapshot();
+
+        // Check for unsaved changes pre-move/resize -- blow by this
+        // when re-called with explicit 'discard changes'
+        if (!discardUnsavedChanges) {
+            var converter = new cosmo.ui.DetailFormConverter(item.data);
+            var deltaAndError = converter.createDelta();
+            var error = deltaAndError[1];
+            var delta = deltaAndError[0];
+            if (error || delta.hasChanges()) {
+                // Cancel button -- just hide the dialog, do nothing
+                var cancel = function () {
+                    item.lozenge.restore(item);
+                    cosmo.app.hideDialog();
+                };
+                // Throw out the changes and proceed to update the
+                // item with this drop
+                var discard = function () {
+                    // Re-call with explicit discard flag
+                    // Hide the dialog first, wait for return value to
+                    // avoid contention for the use of the dialog box
+                    // (re-calling will spawn the recurrrence or error
+                    // dialog box in some cases)
+                    if (cosmo.app.hideDialog()) {
+                        self.doUpdate.apply(self, [true]);
+                    }
+                };
+                // Restore the item to its original position
+                // and save the changes
+                // FIXME: You might argue that the ideal behavior
+                // would be to apply the drag changes at the same
+                // time -- that's technically very difficult though
+                var save = function () {
+                    var f = function () {
+                        item.lozenge.restore(item);
+                        dojo.event.topic.publish('/calEvent',
+                            { 'action': 'saveFromForm' });
+                    }
+                    // Hide the dialog first, wait for return value to
+                    // avoid contention for the use of the dialog box
+                    if (cosmo.app.hideDialog()) {
+                        setTimeout(f, 0);
+                    }
+                };
+                // Show the 'unsaved changes' dialog, with the appropriate
+                // actions tied to each of the buttons
+                cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
+                    cancelFunc: cancel,
+                    discardFunc: discard,
+                    saveFunc: save }));
+                return false;
+
+            }
         }
+
+        // Delta from dragging
+        var delta = item.lozenge.getDelta(item, self.dragMode);
+        // Item has actually been edited
+        if (delta.hasChanges()) {
+            dojo.event.topic.publish('/calEvent', { action: 'saveConfirm',
+                delta: delta, data: item });
+        }
+        // If no real edit, then just reposition the lozenge
+        // With conflict calculations and snap-to
         else {
-            // If no real edit, then just reposition the lozenge
-            // With conflict calculations and snap-to
-            selEv.lozenge.updateFromEvent(selEv);
-            selEv.lozenge.updateElements();
+            item.lozenge.restore(item);
         }
     };
 
@@ -219,7 +280,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
      * or doesn't have a valid dragMode
      */
     this.paranoia = function () {
-        var ev = this.ev;
+        var ev = this.item;
         if (!ev || !cosmo.app.dragItem.dragMode ||
             ev.lozenge.getInputDisabled()) {
             return false;
@@ -230,11 +291,11 @@ cosmo.view.cal.draggable.Draggable = function (id) {
     };
     this.doDragEffect = function (dragState) {
         var o = dragState == 'on' ? 60 : 100;
-        this.ev.lozenge.setOpacity(o);
+        this.item.lozenge.setOpacity(o);
     };
 
     this.setLozengTitleNode = function (forceToLeft) {
-        var lozenge = this.ev.lozenge;
+        var lozenge = this.item.lozenge;
         if (lozenge instanceof cosmo.view.cal.lozenge.NoTimeLozenge &&
             lozenge.left < 0) {
             lozenge.setTitleNodePos(forceToLeft);
@@ -292,7 +353,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resize = function () {
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
     // The selected event
-    var selEv = this.ev;
+    var item = this.item;
     // Where the top edge of the lozenge should go, given any offset for the
     // top of the calendar, and any scrolling in the scrollable area
     // Used when resizing up
@@ -303,8 +364,8 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
     var size = this.getSize((this.absTop - yPos - this.scrollOffset)
         + this.height);
 
-    selEv.lozenge.setHeight(size, true);
-    selEv.lozenge.setTop(t);
+    item.lozenge.setHeight(size, true);
+    item.lozenge.setTop(t);
 }
 
 /**
@@ -313,14 +374,14 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeTop = function (y) {
  */
 cosmo.view.cal.draggable.HasTimeDraggable.prototype.resizeBottom = function (y) {
     // The selected event
-    var selEv = this.ev;
+    var item = this.item;
     // Where the bottom edge of the lozenge should go -- this is a
     // relative measurement based on pos on the scrollable area
     var b = (y - this.absTop) + this.scrollOffset;
     var max = ((VIEW_DIV_HEIGHT + TOP_MENU_HEIGHT) - this.absTop);
     b = b > max ? max : b;
     var size = this.getSize(b);
-    selEv.lozenge.setHeight(size);
+    item.lozenge.setHeight(size);
 
 }
 
@@ -339,7 +400,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
         return false;
     }
 
-    var selEv = this.ev;
+    var item = this.item;
     var unit = HOUR_UNIT_HEIGHT/4; // 15-min. increments
     var top = 0;
     var size = 0;
@@ -357,9 +418,9 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
 
     // Abstract away getting top and bottom -- multi-day events
     // have multiple divs, treat as a composite here
-    top = selEv.lozenge.getTop();
-    left = selEv.lozenge.getLeft();
-    size = selEv.lozenge.getBottom() - top;
+    top = item.lozenge.getTop();
+    left = item.lozenge.getLeft();
+    size = item.lozenge.getBottom() - top;
 
     // Snap-to for top position: both simple move and resize up
     if (this.dragMode == 'drag' || this.dragMode == 'resizetop') {
@@ -372,7 +433,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
         else {
             top = top-deltaY;
         }
-        selEv.lozenge.top = top;
+        item.lozenge.top = top;
     }
     // Snap-to for size: both resize up and resize down
     if (this.dragMode.indexOf('resize') > -1) {
@@ -388,7 +449,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
         else {
             size = size-deltaY;
         }
-        selEv.lozenge.height = size;
+        item.lozenge.height = size;
     }
     // 1px border -- add the 1px taken out for the 1px border
     // back to the size
@@ -406,7 +467,7 @@ cosmo.view.cal.draggable.HasTimeDraggable.prototype.drop = function () {
         else {
             left = left-deltaX;
         }
-        selEv.lozenge.left = left;
+        item.lozenge.left = left;
     }
     // Do the actual update
     // =================
@@ -457,9 +518,9 @@ cosmo.view.cal.draggable.NoTimeDraggable.prototype.drop = function () {
     var left = 0;
     var deltaX = 0;
     var deltaY = 0;
-    var selEv = this.ev;
-    top = selEv.lozenge.getTop();
-    left = selEv.lozenge.getLeft();
+    var item = this.item;
+    top = item.lozenge.getTop();
+    left = item.lozenge.getLeft();
 
     // Reset opacity to normal
     this.doDragEffect('off');
@@ -475,9 +536,9 @@ cosmo.view.cal.draggable.NoTimeDraggable.prototype.drop = function () {
         else {
             left = left-deltaX;
         }
-        selEv.lozenge.left = left;
+        item.lozenge.left = left;
     }
-    selEv.lozenge.top = top;
+    item.lozenge.top = top;
 
     // Do the actual update
     // =================

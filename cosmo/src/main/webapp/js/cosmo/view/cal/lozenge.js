@@ -453,7 +453,18 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setDeselected = function () {
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.isOrphaned = function () {
     return !(this.domNode.parentNode);
-}
+};
+
+/**
+ * Convenience function for restoring the lozenge to
+ * its original location/time -- used in fallback
+ * from failed save/remove, and when cancelling changes
+ */
+cosmo.view.cal.lozenge.Lozenge.prototype.restore = function (item) {
+    this.updateFromEvent(item);
+    this.updateElements();
+    return true;
+};
 
 /**
  * cosmo.view.cal.lozenge.HasTimeLozenge -- sub-class of Lozenge

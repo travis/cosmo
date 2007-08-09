@@ -554,10 +554,10 @@ cosmo.view.cal.canvas = new function () {
             throw(lozengeType + 'is not a valid lozenge type.');
         }
     };
-    this.handleSelectionChange = function (id, unsavedChangesOverride) {
+    this.handleSelectionChange = function (id, discardUnsavedChanges) {
         var s = getIndexEvent(id);
         var item = cosmo.view.cal.itemRegistry.getItem(s);
-        // If this object is currently in 'processing' state, ignore any input
+        // If this object is currently in 'processing' state, discard any input
         if (item.lozenge.getInputDisabled()) {
             return false;
         }
@@ -571,19 +571,31 @@ cosmo.view.cal.canvas = new function () {
         // the non-existence first, then compare to the item if it
         // exists
         if ((!origSelection) || (origSelection.id != item.id)) {
-            // Make sure the user isn't leaving unsaved edits
-            if (!unsavedChangesOverride && origSelection && writeable) {
-                var converter = new cosmo.ui.DetailFormConverter(origSelection.data);
+            // Make sure the user isn't leaving unsaved edits --
+            // blow by this when re-called with explicit 'discard changes'
+            if (!discardUnsavedChanges && origSelection && writeable) {
+                var converter = new cosmo.ui.DetailFormConverter(
+                    origSelection.data);
                 var deltaAndError = converter.createDelta();
                 var error = deltaAndError[1];
                 var delta = deltaAndError[0];
                 if (error || delta.hasChanges()) {
+                    
+                    /*
+                    var changes = delta.getApplicableChangeTypes();
+                    for (var prop in changes) {
+                        console.log(prop);
+                        console.log(changes[prop]);
+                    }
+                    */
+
                     // Cancel button -- just hide the dialog, do nothing
                     var cancel = cosmo.app.hideDialog;
                     // Throw out the changes and proceed to highlight the
                     // new item
-                    var ignore = function () {
+                    var discard = function () {
                         cosmo.app.hideDialog();
+                        // Re-call with explicit discard flag
                         self.handleSelectionChange.apply(self, [id, true]);
                     };
                     // Save the changes
@@ -604,7 +616,7 @@ cosmo.view.cal.canvas = new function () {
                     // actions tied to each of the buttons
                     cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
                         cancelFunc: cancel,
-                        ignoreFunc: ignore,
+                        discardFunc: discard,
                         saveFunc: save }));
                     return false;
                 }
@@ -627,7 +639,7 @@ cosmo.view.cal.canvas = new function () {
         // dialog, as it interferes with the normal flow of setting
         // up a draggable, also naturaly no move/resize for
         // read-only collections
-        if (!unsavedChangesOverride && writeable) {
+        if (!discardUnsavedChanges && writeable) {
             // Set up Draggable and save dragMode -- user may be dragging
             if (id.indexOf('AllDay') > -1) {
                 dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);

@@ -227,6 +227,10 @@ public class PreferencesProvider extends BaseProvider
 
     // ExtendedProvider methods
 
+    public ResponseContext createCollection(RequestContext request) {
+        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    }
+
     public ResponseContext updateCollection(RequestContext request) {
         return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
     }

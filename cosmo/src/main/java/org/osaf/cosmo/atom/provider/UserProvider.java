@@ -98,6 +98,10 @@ public class UserProvider extends BaseProvider {
 
     // ExtendedProvider methods
 
+    public ResponseContext createCollection(RequestContext request) {
+        throw new UnsupportedOperationException();
+    }
+
     public ResponseContext updateCollection(RequestContext request) {
         throw new UnsupportedOperationException();
     }

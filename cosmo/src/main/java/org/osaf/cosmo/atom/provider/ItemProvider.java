@@ -346,6 +346,10 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     }
 
     // ExtendedProvider methods
+  
+    public ResponseContext createCollection(RequestContext request) {
+        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    }
 
     public ResponseContext updateCollection(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();

@@ -24,11 +24,17 @@ public interface ExtendedProvider extends Provider {
 
     /**
      * <p>
-     * Updates the targeted collection.
+     * Creates the targeted collection.
      * </p>
      * <p>
-     * If the <code>name</code> request parameter is provided, uses
-     * its value to set the collection's name and display name.
+     * Returns <code>201 OK</code> on success.
+     * </p>
+     */
+    public ResponseContext createCollection(RequestContext request);
+
+    /**
+     * <p>
+     * Updates the targeted collection.
      * </p>
      * <p>
      * Returns <code>204 No Content</code> on success.

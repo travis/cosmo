@@ -122,6 +122,10 @@ public class MockProvider implements ExtendedProvider {
 
     // ExtendedProvider methods
 
+    public ResponseContext createCollection(RequestContext request) {
+        return null;
+    }
+
     public ResponseContext updateCollection(RequestContext request) {
         if (! (request.getTarget() instanceof CollectionTarget))
             return new EmptyResponseContext(404);

@@ -226,6 +226,7 @@ cosmo.app = new function () {
         else {
             self.setInputDisabled(false);
         }
+        return true;
     };
     this.setInputDisabled = function (isDisabled) {
         if (isDisabled) {

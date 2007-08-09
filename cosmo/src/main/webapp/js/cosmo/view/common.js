@@ -18,6 +18,10 @@ dojo.provide('cosmo.view.common');
 
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime.Date");
+dojo.require('cosmo.view.dialog');
+
+cosmo.view.recurrenceDialog = new cosmo.view.dialog.RecurrenceDialog();
+cosmo.view.unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
 
 cosmo.view.viewBase = new function () {
     this.init = function () {
@@ -196,4 +200,5 @@ cosmo.view.canvasBase = new function () {
         return id;
     }
 };
+
 

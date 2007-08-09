@@ -24,7 +24,6 @@ dojo.require("cosmo.model");
 dojo.require("cosmo.view.BaseItem");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
-dojo.require('cosmo.view.dialog');
 dojo.require("cosmo.service.exception");
 
 dojo.require("cosmo.util.debug");
@@ -39,7 +38,6 @@ cosmo.view.service = new function () {
         'monthly': [dojo.date.dateParts.MONTH, 1],
         'yearly': [dojo.date.dateParts.YEAR, 1]
     };
-    this._recurrenceDialog = new cosmo.view.dialog.RecurrenceDialog();
 
     // Public attributes
     // ********************
@@ -124,7 +122,7 @@ cosmo.view.service = new function () {
             dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
         } 
         else {
-            cosmo.app.showDialog(self._recurrenceDialog.getProps('saveRecurConfirm',
+            cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps('saveRecurConfirm',
                 { changeTypes: changeTypes, delta: delta, saveItem: item }));
         }
     }
@@ -447,7 +445,7 @@ cosmo.view.service = new function () {
         else {
             str = 'removeConfirm';
         }
-        cosmo.app.showDialog(self._recurrenceDialog.getProps(str, opts));
+        cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps(str, opts));
     }
 
     /**

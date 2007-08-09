@@ -56,8 +56,6 @@ cosmo.view.cal.canvas = new function () {
     var timedCanvasContentArea = null;
     // Ref to untimed canvas content area to save DOM lookup
     var untimedCanvasContentArea = null;
-    //
-    var unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
 
     dojo.lang.mixin(this, cosmo.view.canvasBase);
 
@@ -564,7 +562,139 @@ cosmo.view.cal.canvas = new function () {
             throw(lozengeType + 'is not a valid lozenge type.');
         }
     };
+    this.handleSelectionChange = function (id, unsavedChangesOverride) {
+        var s = getIndexEvent(id);
+        var item = cosmo.view.cal.itemRegistry.getItem(s);
+        // If this object is currently in 'processing' state, ignore any input
+        if (item.lozenge.getInputDisabled()) {
+            return false;
+        }
 
+        // Publish selection
+        var c = cosmo.view.cal.canvas;
+        var sel = c.getSelectedItem();
+        // If no currently selected item, or the item clicked
+        // is not the currently selected item, update the selection
+        if ((!sel) || (item.id != sel.id)) {
+            // Make sure the user isn't leaving unsaved edits
+            if (!unsavedChangesOverride && sel) {
+                var converter = new cosmo.ui.DetailFormConverter(sel.data);
+                var deltaAndError = converter.createDelta();
+                var error = deltaAndError[1];
+                var delta = deltaAndError[0];
+                if (error || delta.hasChanges()) {
+                    // Cancel button -- just hide the dialog, do nothing
+                    var cancel = cosmo.app.hideDialog;
+                    // Throw out the changes and proceed to highlight the
+                    // new item
+                    var ignore = function () {
+                        cosmo.app.hideDialog();
+                        self.handleSelectionChange.apply(self, [id, true]);
+                    };
+                    // Save the changes
+                    // FIXME: Should this continue on to select the new
+                    // item, or not?
+                    var save = function () {
+                        var f = function () {
+                            dojo.event.topic.publish('/calEvent',
+                                { 'action': 'saveFromForm' });
+                        }
+                        // Hide the dialog first, wait for return value to
+                        // avoid contention for the use of the dialog box
+                        if (cosmo.app.hideDialog()) {
+                            setTimeout(f, 0);
+                        }
+                    };
+                    // Show the 'unsaved changes' dialog, with the appropriate
+                    // actions tied to each of the buttons
+                    cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
+                        cancelFunc: cancel,
+                        ignoreFunc: ignore,
+                        saveFunc: save }));
+                    return false;
+                }
+            }
+            // Call setSelectedCalItem here directly, and publish the
+            // selected-item message on a setTimeout to speed up UI
+            // response for direct clicks -- publishing 'setSelected'
+            // will cause setSelectedCalItem to be called a second time
+            // as the canvas responds to this message, but it doesn't
+            // hurt to re-select the currently selected item
+            self.setSelectedCalItem(item);
+            var f = function () {
+                dojo.event.topic.publish('/calEvent', {
+                    'action': 'setSelected', 'data': item });
+            }
+            setTimeout(f, 0);
+        }
+
+        // No move/resize after displaying the unsaved changes
+        // dialog, as it interferes with the normal flow of setting
+        // up a draggable, also naturaly no move/resize for
+        // read-only collections
+        if (!unsavedChangesOverride &&
+            cosmo.app.pim.currentCollection.isWriteable()) {
+            // Set up Draggable and save dragMode -- user may be dragging
+            if (id.indexOf('AllDay') > -1) {
+                dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
+            }
+            else {
+                dragItem = new cosmo.view.cal.draggable.HasTimeDraggable(s);
+            }
+
+            switch(true) {
+                // Main content area -- drag entire event
+                case id.indexOf('Content') > -1:
+                case id.indexOf('Title') > -1:
+                case id.indexOf('Start') > -1:
+                    dragItem.init('drag', item);
+                    break;
+                // Top lip -- resize top
+                case id.indexOf('Top') > -1:
+                    dragItem.init('resizetop', item);
+                    break;
+                // Bottom lip -- resize bottom
+                case id.indexOf('Bottom') > -1:
+                    dragItem.init('resizebottom', item);
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+
+            // Set the Cal draggable to the dragged lozenge
+            cosmo.app.dragItem = dragItem;
+        }
+    };
+    /**
+     * Set the passed calendar event as the selected one on
+     * canvas
+     * @param p CalItem object or CalItem id string, the event to select
+     */
+    this.setSelectedCalItem = function (/* Can be CalItem object or String id */ p) {
+        // Deselect previously selected event if any
+        var sel = self.getSelectedItem();
+        if (sel) {
+            sel.lozenge.setDeselected();
+        }
+        // Bail out if called without a proper param passed
+        // this can happen if this method is called by blindly
+        // passing the result of a function without checking
+        // to see if it's acutally returning a value
+        if (!p){
+            return;
+        }
+        // Pass the item or id, set as the selected item
+        // for the current collection
+        self.setSelectedItem(p);
+
+        // Grab the selected item -- have to do this lookup
+        // because the passed-in param might be an id string
+        var sel = self.getSelectedItem();
+
+        // Show the associated lozenge as selected
+        sel.lozenge.setSelected();
+    };
     /**
      * Handle events published on the '/calEvent' channel, including
      * self-published events
@@ -587,7 +717,7 @@ cosmo.view.cal.canvas = new function () {
                 break;
             case 'setSelected':
                 var ev = cmd.data;
-                setSelectedCalItem(ev);
+                self.setSelectedCalItem(ev);
                 break;
             case 'save':
                 setLozengeProcessing(cmd);
@@ -677,34 +807,6 @@ cosmo.view.cal.canvas = new function () {
 
     // Private methods
     // ****************
-    /**
-     * Set the passed calendar event as the selected one on
-     * canvas
-     * @param p CalItem object or CalItem id string, the event to select
-     */
-    function setSelectedCalItem(/* Can be CalItem object or String id */ p) {
-
-        // Deselect previously selected event if any
-        var sel = self.getSelectedItem();
-        if (sel) {
-            sel.lozenge.setDeselected();
-        }
-
-        if (!p){
-            return;
-        }
-
-        // Pass the item or id, set as the selected item
-        // for the current collection
-        self.setSelectedItem(p);
-
-        // Grab the selected item -- have to do this lookup
-        // because the passed-in param might be an id string
-        var sel = self.getSelectedItem();
-
-        // Show the associated lozenge as selected
-        sel.lozenge.setSelected();
-    };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
      * (1) Actually removing an event from the calendar (this gets
@@ -1011,7 +1113,7 @@ cosmo.view.cal.canvas = new function () {
                             break;
 
                     }
-                    setSelectedCalItem(sel);
+                    self.setSelectedCalItem(sel);
                     sel = self.getSelectedItem();
                     dojo.event.topic.publish('/calEvent', { action: 'setSelected',
                         saveType: saveType, data: sel });
@@ -1115,80 +1217,7 @@ cosmo.view.cal.canvas = new function () {
             // On event lozenge -- simple select, or move/resize
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
-                s = getIndexEvent(id);
-                item = cosmo.view.cal.itemRegistry.getItem(s);
-
-                // If this object is currently in 'processing' state, ignore any input
-                if (item.lozenge.getInputDisabled()) {
-                    return false;
-                }
-
-                // Publish selection
-                var c = cosmo.view.cal.canvas;
-                var sel = c.getSelectedItem();
-                // If no currently selected item, or the item clicked
-                // is not the currently selected item, update the selection
-                if ((!sel) || (item.id != sel.id)) {
-                    // Make sure the user isn't leaving unsaved edits
-                    if (sel) {
-                        var converter = new cosmo.ui.DetailFormConverter(sel.data);
-                        var deltaAndError = converter.createDelta();
-                        var error = deltaAndError[1];
-                        var delta = deltaAndError[0];
-                        /*
-                        if (error || delta.hasChanges()) {
-                            cosmo.app.showDialog(unsavedChangesDialog.getProps());
-                            return false;
-                        }
-                        */
-                    }
-                    // Call setSelectedCalItem here directly, and publish the
-                    // selected-item message on a setTimeout to speed up UI
-                    // response for direct clicks -- publishing 'setSelected'
-                    // will cause setSelectedCalItem to be called a second time
-                    // as the canvas responds to this message, but it doesn't
-                    // hurt to re-select the currently selected item
-                    setSelectedCalItem(item);
-                    var f = function () {
-                        dojo.event.topic.publish('/calEvent', {
-                            'action': 'setSelected', 'data': item });
-                    }
-                    setTimeout(f, 0);
-                }
-
-                // No move/resize for read-only collections
-                if (cosmo.app.pim.currentCollection.isWriteable()) {
-                    // Set up Draggable and save dragMode -- user may be dragging
-                    if (id.indexOf('AllDay') > -1) {
-                        dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
-                    }
-                    else {
-                        dragItem = new cosmo.view.cal.draggable.HasTimeDraggable(s);
-                    }
-
-                    switch(true) {
-                        // Main content area -- drag entire event
-                        case id.indexOf('Content') > -1:
-                        case id.indexOf('Title') > -1:
-                        case id.indexOf('Start') > -1:
-                            dragItem.init('drag', item);
-                            break;
-                        // Top lip -- resize top
-                        case id.indexOf('Top') > -1:
-                            dragItem.init('resizetop', item);
-                            break;
-                        // Bottom lip -- resize bottom
-                        case id.indexOf('Bottom') > -1:
-                            dragItem.init('resizebottom', item);
-                            break;
-                        default:
-                            // Do nothing
-                            break;
-                    }
-
-                    // Set the Cal draggable to the dragged lozenge
-                    cosmo.app.dragItem = dragItem;
-                }
+                self.handleSelectionChange(id);
                 break;
         }
     }

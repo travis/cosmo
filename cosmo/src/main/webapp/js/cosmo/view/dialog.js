@@ -236,11 +236,8 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
     var unsavedChangesMsg = _('Main.Prompt.RecurButtonAll');
     var btnWidth = 84;
     var btnWidthWide = 120;
-            //text: displayText, 'width':width,
-            //handleOnClick: onClickHandler, small: isSmall,
-            //enabled: enabled }, dummyDom, 'last');
 
-    props = function () {
+    props = function (opts) {
         return {
             'width': 480,
             'type': cosmo.app.modalDialog.CONFIRM,
@@ -256,23 +253,23 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
                 new cosmo.ui.button.Button({ 
                     text: 'Ignore Changes', 
                     width: btnWidthWide,
-                    handleOnClick: null,
+                    handleOnClick: opts.ignoreFunc,
                     small: true,
                     enabled: true }),
                 new cosmo.ui.button.Button({ 
                     text: 'Save Changes', 
                     width: btnWidthWide,
-                    handleOnClick: null,
+                    handleOnClick: opts.saveFunc,
                     small: true,
                     enabled: true })
             ],
-            'defaultAction': function () { },
-            'content': 'You have unsaved changed, dude. How do you want to handle that?'
+            'defaultAction': null,
+            'content': 'You have unsaved changes, dude. How do you want to handle that?'
         };
     };
-    this.getProps = function (opts) {
-        var p = props();
-        var opts = opts || {};
+    this.getProps = function (o) {
+        var opts = o || {};
+        var p = props(opts);
         return p;
     };
 };

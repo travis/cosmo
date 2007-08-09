@@ -1,3 +1,4 @@
+{"method":"reWriteAlert", "params":{}}
 {"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"text": "Testing Adress this item", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}

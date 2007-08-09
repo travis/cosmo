@@ -79,19 +79,22 @@
       <div style="padding-top:24px; text-align:center">
         <fmt:message key="Login.CreateAccount"/>
         <a href="javascript:cosmo.account.create.showForm();">
-        <fmt:message key="Login.ClickHere"/>
+        <fmt:message key="Login.CreateClickHere"/>
         </a>
       </div>
 
       <div style="padding-top:4px; text-align:center;">
         <fmt:message key="Login.Forgot"/>
         <a href="${staticBaseUrl}/account/password/recover">
-        <fmt:message key="Login.ClickHere"/>
+        <fmt:message key="Login.ForgotClickHere"/>
         </a>
       </div>
       
       <div style="padding-top:36px; text-align:center;">
           <cosmo:aboutPopupLink/>
+      </div>
+      <div style="padding-top:36px; text-align:center;">
+	      <fmt:message key="Login.Extra"/>
       </div>
     </div>
   </body>

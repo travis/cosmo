@@ -47,10 +47,17 @@ public class UriTemplate {
     private static final Log log = LogFactory.getLog(UriTemplate.class);
 
     private String pattern;
+    private String base;
     private ArrayList<Segment> segments;
 
     public UriTemplate(String pattern) {
+        this(pattern, "");
+    }
+
+    public UriTemplate(String pattern,
+                       String base) {
         this.pattern = pattern;
+        this.base = base;
         this.segments = new ArrayList<Segment>();
 
         StrTokenizer tokenizer = new StrTokenizer(pattern, '/');
@@ -59,21 +66,23 @@ public class UriTemplate {
     }
 
     /**
-     * Generates a uri-path based on the template with variable
-     * segments replaced by the provided values. All literal segments,
-     * optional or no, are always included. Values are bound into
-     * the template in the order in which they are provided. If a
-     * value is not provided for an optional variable segment, the
-     * segment is not included.
+     * Generates a URI relative to the template's base (or / if no base was
+     * provided) by replacing the variable segments of the template with the
+     * provided values. All literal segments, optional or no, are always
+     * included. Values are bound into the template in the order in which they
+     * are provided. If a value is not provided for an optional variable
+     * segment, the segment is not included.
      *
      * @param values the (unescaped) values to be bound
-     * @return a uri-path with variables replaced by bound values
+     * @return a URI with variables replaced by bound values
      * @throws IllegalArgumentException if more or fewer values are
      * provided than are needed by the template or if a null value is
      * provided for a mandatory variable
      */
     public String bind(String... values) {
-        StringBuffer buf = new StringBuffer("/");
+        StringBuffer buf = new StringBuffer();
+        if (base != null)
+            buf.append(base);
 
         List<String> variables = Arrays.asList(values);
         Iterator<String> vi = variables.iterator();
@@ -96,7 +105,7 @@ public class UriTemplate {
                 buf.append(segment.getData());
             }
 
-            if (si.hasNext())
+            if (si.hasNext() && vi.hasNext())
                 buf.append("/");
         }
 
@@ -157,6 +166,14 @@ public class UriTemplate {
         }
 
         return match;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public String getBase() {
+        return base;
     }
 
     private static final String escape(String raw) {

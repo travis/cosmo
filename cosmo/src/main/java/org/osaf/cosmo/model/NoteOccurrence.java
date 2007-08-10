@@ -29,15 +29,18 @@ public class NoteOccurrence extends NoteItem {
 
     Date occurrenceDate = null;
     NoteItem masterNote = null;
+    ModificationUid modUid = null;
     
     public NoteOccurrence(Date occurrenceDate, NoteItem masterNote) {
         // uid is the same as a modification's uid
-        setUid(new ModificationUid(masterNote, occurrenceDate).toString());
+        this.modUid = new ModificationUid(masterNote, occurrenceDate);
+        setUid(modUid.toString());
         
         // set base fields from master
         setModifiedDate(masterNote.getModifiedDate());
         setCreationDate(masterNote.getCreationDate());
         setDisplayName(masterNote.getDisplayName());
+        setOwner(masterNote.getOwner());
         this.occurrenceDate = occurrenceDate;
         this.masterNote = masterNote;
     }
@@ -55,6 +58,13 @@ public class NoteOccurrence extends NoteItem {
      */
     public Date getOccurrenceDate() {
         return occurrenceDate;
+    }
+
+    /**
+    * @return the ModificationUid
+     */
+    public ModificationUid getModificationUid() {
+        return modUid;
     }
 
     @Override

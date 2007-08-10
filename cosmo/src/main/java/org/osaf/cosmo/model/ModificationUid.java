@@ -54,6 +54,11 @@ public class ModificationUid {
         this.recurrenceId = recurrenceId;
     }
 
+    public ModificationUid(Item parent, String recurrenceId)
+        throws ParseException {
+        this(parent, fromStringToDate(recurrenceId));
+    }
+
     /**
      * Construct modification uid from String.
      * @param modUid modification uid

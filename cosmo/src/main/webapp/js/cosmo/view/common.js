@@ -198,7 +198,51 @@ cosmo.view.canvasBase = new function () {
         var key = cosmo.app.pim.currentCollection.getUid();
         var id = this.selectedItemIdRegistry[key];
         return id;
-    }
+    };
+    this.handleUnsavedChanges = function (origSelection,
+        recallParam, execContext) {
+        var converter = new cosmo.ui.DetailFormConverter(
+            origSelection.data);
+        var deltaAndError = converter.createDelta();
+        var error = deltaAndError[1];
+        var delta = deltaAndError[0];
+        if (error || delta.hasChanges()) {
+            // Cancel button -- just hide the dialog, do nothing
+            var cancel = cosmo.app.hideDialog;
+            // Throw out the changes and proceed to highlight the
+            // new item
+            var discard = function () {
+                cosmo.app.hideDialog();
+                // Re-call with explicit discard flag
+                execContext.handleSelectionChange.apply(
+                    execContext, [recallParam, true]);
+            };
+            // Save the changes
+            // FIXME: Should this continue on to select the new
+            // item, or not?
+            var save = function () {
+                var f = function () {
+                    dojo.event.topic.publish('/calEvent',
+                        { 'action': 'saveFromForm' });
+                }
+                // Hide the dialog first, wait for return value to
+                // avoid contention for the use of the dialog box
+                if (cosmo.app.hideDialog()) {
+                    setTimeout(f, 0);
+                }
+            };
+            // Show the 'unsaved changes' dialog, with the appropriate
+            // actions tied to each of the buttons
+            cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
+                cancelFunc: cancel,
+                discardFunc: discard,
+                saveFunc: save }));
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
 };
 
 

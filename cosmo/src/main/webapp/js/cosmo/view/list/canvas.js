@@ -140,36 +140,65 @@ cosmo.view.list.canvas.Canvas = function (p) {
             // Normal row cell clicked
             else {
                 var p = targ.parentNode;
-                if (!p.id) { return false; }
-                // Deselect any original selection
-                var orig = $('listView_item' + self.getSelectedItemId());
-                if (orig) {
-                    ch = orig.childNodes;
-                    for (var i = 0; i < ch.length; i++) {
-                        dojo.html.removeClass(ch[i], 'listViewSelectedCell');
-                    }
+                // Paranoia check -- bail out if somehow the node
+                // has no id
+                if (p.id) {
+                    self.handleSelectionChange(p);
                 }
-                // The new selection
-                var ch = p.childNodes;
-                for (var i = 0; i < ch.length; i++) {
-                    dojo.html.addClass(ch[i], 'listViewSelectedCell');
-                }
-                var id = p.id.replace('listView_item', '');
-                var item = this.view.itemRegistry.getItem(id);
-                // Load the selected item's stuff into the detail-view form
-                if (item) {
-                    self.setSelectedItem(item);
-                    var f = function () {
-                      dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                        'data': item });
-                    };
-                    // Free up the UI thread so we don't see two items
-                    // selected at once while the message is being published
-                    // to all parts of the UI
-                    setTimeout(f, 0);
-                }
+                        
             }
         }
+    };
+    this.handleSelectionChange = function (p, discardUnsavedChanges) {
+        var writeable = cosmo.app.pim.currentCollection.isWriteable();
+        // Original selection
+        var origSelection = self.getSelectedItem();
+        // New selection
+        var id = p.id.replace('listView_item', '');
+        var item = this.view.itemRegistry.getItem(id);
+
+        if ((!origSelection) || (origSelection.id != item.id)) {
+            // Make sure the user isn't leaving unsaved edits --
+            // blow by this when re-called with explicit 'discard changes'
+            // Note: we have to spoon-feed the execution context to the
+            // callback methods for the buttons in the dialog, hence
+            // passing the 'self' param below
+            if (!discardUnsavedChanges && origSelection && writeable) {
+                if (!self.handleUnsavedChanges(origSelection, p, self)) {
+                    return false;
+                }
+            }
+            
+            // Deselect any original selection
+            if (origSelection) {
+                var origSelectionId = origSelection ? origSelection.id : '';
+                var origSelectionNode = $('listView_item' + origSelectionId);
+                ch = origSelectionNode.childNodes;
+                for (var i = 0; i < ch.length; i++) {
+                    dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+                }
+            }
+            
+            
+            // The new selection
+            var ch = p.childNodes;
+            for (var i = 0; i < ch.length; i++) {
+                dojo.html.addClass(ch[i], 'listViewSelectedCell');
+            }
+            // Load the selected item's stuff into the detail-view form
+            if (item) {
+                self.setSelectedItem(item);
+                var f = function () {
+                  dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                    'data': item });
+                };
+                // Free up the UI thread so we don't see two items
+                // selected at once while the message is being published
+                // to all parts of the UI
+                setTimeout(f, 0);
+            }
+        }
+
     };
     // innerHTML will be much faster for table display with
     // lots of rows

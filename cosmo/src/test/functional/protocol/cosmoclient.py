@@ -15,6 +15,7 @@
 import davclient
 import copy
 import xmlobjects
+import pdb
 
 from xml.etree import ElementTree
 
@@ -106,11 +107,14 @@ class CosmoClient(davclient.DAVClient):
     def get_all_dav_resources_for_user(self, user, collection='/'):
         all_items = []
         self.propfind(self._cosmo_path+'dav/'+user+collection)
-        hrefs = self.response.tree.findall('//{DAV:}href')
+        hrefs = [ response.find('{DAV:}href').text for response in self.response.tree.getchildren() if (
+                      response.find('{DAV:}href').text.find('http') is not -1) and ( not
+                      response.find('{DAV:}href').text.endswith('/') )]
+        print hrefs
         for ref in hrefs:
-            item = {'href':ref.text}
-            print ref.text.replace(self._url.geturl(), '')
-            self.get(ref.text.replace(self._url.geturl(), ''))
+            item = {'href':ref}
+            print ref.replace(self._url.geturl(), '')
+            self.get(ref.replace(self._url.geturl(), ''))
             item['body'] = copy.copy(self.response.body)
             all_items.append(item)
         return all_items

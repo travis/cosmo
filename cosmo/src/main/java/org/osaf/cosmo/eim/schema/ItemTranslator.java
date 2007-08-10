@@ -125,8 +125,8 @@ public class ItemTranslator implements EimSchemaConstants {
      */
     public void applyRecords(EimRecordSet recordset)
         throws EimSchemaException {
-        if (! recordset.getUuid().equals(item.getUid()))
-            throw new IllegalArgumentException("recordset and item uuids do not match");
+        if (item.getUid() == null)
+            item.setUid(recordset.getUuid());
 
         if (recordset.isDeleted()) {
             item.setIsActive(Boolean.FALSE);

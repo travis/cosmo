@@ -36,14 +36,18 @@ dojo.require("cosmo.service.exception");
 
 dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     {
+    initializer: function(urlCache){
+        this.urlCache = urlCache;  
+    },
         
     EDIT_LINK: "atom-edit",
+    DETACHED_LINK: "detached",
     PROJECTION_FULL_EIM_JSON: "/full/eim-json",
     
     CONTENT_TYPE_ATOM: "application/atom+xml",
     
     getAndCheckEditLink: function(item){
-        var editLink = item.getUrls()[this.EDIT_LINK];
+        var editLink = this.urlCache.getUrl(item, this.EDIT_LINK);
         if (!editLink) {
             throw new cosmo.service.exception.ClientSideError(
                 "Could not find edit link for item with uuid " + 
@@ -122,19 +126,25 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     saveItem: function (item, postContent, kwArgs){
         kwArgs = kwArgs || {};
-        
-        var editLink = this.getAndCheckEditLink(item);
+        var editLink = kwArgs.editLink || this.getAndCheckEditLink(item);
 
         var r = {};
         r.url = this.generateUri(this.getAtomBase() + "/" + 
                 editLink, this.PROJECTION_FULL_EIM_JSON);
         r.contentType = this.CONTENT_TYPE_ATOM;
         r.postContent = postContent;
-        r.method = this.METHOD_PUT;
+        r.method = kwArgs.method || this.METHOD_PUT;
         var deferred = this.bind(r, kwArgs);
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
  
         return deferred;
+    },
+    
+    saveThisAndFuture: function (oldOccurrence, postContent, kwArgs){
+        kwArgs = kwArgs || {};
+        kwArgs.editLink =  this.urlCache.getUrl(oldOccurrence, this.DETACHED_LINK);
+        kwArgs.method =  this.METHOD_POST;
+        return this.saveItem(oldOccurrence, postContent, kwArgs);
     },
     
     getItem: function(uid, kwArgs){
@@ -159,7 +169,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var projection = (searchCrit.projection || "full") + "/eim-json";
         var r = {};
         
-        var expandedLink = item.getUrls()['expanded'];
+        var expandedLink = this.urlCache.getUrl(item, 'expanded');
         
         var defaultProjection = "/full/eim-json";
         var projectionIndex = expandedLink.indexOf(defaultProjection);
@@ -344,5 +354,3 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     }
 );
-
-cosmo.service.transport.atom = new cosmo.service.transport.Atom();

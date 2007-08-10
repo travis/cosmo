@@ -318,6 +318,74 @@ cosmotest.service.conduits.test_conduits = {
         }
     },
     
+    test_ThisAndFuture: function(){
+        try {
+            var user = cosmotest.service.conduits.test_conduits.createTestAccount();
+            
+            var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
+            var collections = conduit.getCollections({sync: true}).results[0];
+            
+            var c0 = collections[0];
+            
+            var newItem = new cosmo.model.Note(
+            {
+                displayName: "Blah blah blah"
+            }
+            );
+            
+            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45);
+            startDate.setMilliseconds(0);
+
+            var duration = new cosmo.model.Duration({hour: 1});
+            var loc = "Wherever";
+            var stat = "CONFIRMED";
+            newItem.getEventStamp(true, {
+                startDate: startDate,
+                duration: duration,
+                location: loc,
+                status: stat,
+                rrule: new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY})
+            });
+
+            conduit.createItem(newItem, c0, {sync: true});
+
+            var item0Occurrences = conduit.getItems(c0, 
+               {start: new cosmo.datetime.Date(2007, 5, 10),
+                end: new cosmo.datetime.Date(2007, 5, 17)}, 
+               {sync: true}
+            ).results[0];
+            jum.assertTrue("no rrule", !!item0Occurrences[0].getMaster().getEventStamp().getRrule())            
+            jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);
+            
+            var occurrenceToBreakOn = 
+                item0Occurrences[0].getMaster().getNoteOccurrence(new cosmo.datetime.Date(2007, 5, 13, 12, 30, 45));
+            var newMaster = occurrenceToBreakOn.getMaster().clone();
+            newMaster.setDisplayName("Bop bop a lee bop");
+            newMaster.getEventStamp().setStartDate(occurrenceToBreakOn.getEventStamp().getStartDate());
+            dojo.require("cosmo.util.uuid");
+            var gen = new cosmo.util.uuid.RandomGenerator()
+            var newUid = gen.generate();
+            newMaster.setUid(newUid);
+            conduit.saveThisAndFuture(occurrenceToBreakOn, newMaster, {sync: true})
+            
+            var newMasterOccurrences = conduit.expandRecurringItem(newMaster, 
+               new cosmo.datetime.Date(2007, 5, 10),
+               new cosmo.datetime.Date(2007, 5, 17), 
+               {sync: true}).results[0];
+            jum.assertEquals("wrong number of newMaster occurrences", 4, newMasterOccurrences.length);
+            
+            var item0Occurrences = conduit.expandRecurringItem(occurrenceToBreakOn.getMaster(), 
+               new cosmo.datetime.Date(2007, 5, 10),
+               new cosmo.datetime.Date(2007, 5, 17), 
+               {sync: true}
+            ).results[0];
+            jum.assertEquals("wrong number of old item occurrences", 3, item0Occurrences.length);
+                        
+        } finally {
+           cosmotest.service.conduits.test_conduits.cleanup(user);            
+        }
+    },
+    
     test_Mail: function(){
         try {
             var user = cosmotest.service.conduits.test_conduits.createTestAccount();

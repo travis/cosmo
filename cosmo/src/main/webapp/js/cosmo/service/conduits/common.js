@@ -184,6 +184,24 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     },
     
+    saveThisAndFuture: function(oldOccurrence, newItem, kwArgs){
+        kwArgs = kwArgs || {};
+        newItem.getModifiedBy().setAction(cosmo.model.ACTION_CREATED);
+        this.setModbyUser(newItem);
+        oldOccurrence.getModifiedBy().setAction(cosmo.model.ACTION_EDITED);
+        this.setModbyUser(oldOccurrence);
+        var x = this._translator.itemToAtomEntry(newItem)
+        var deferred = this._transport.saveThisAndFuture(oldOccurrence, 
+            x, kwArgs);
+            
+        var translationArgs = {
+            "oldObject": newItem
+        };
+        this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
+        
+        return deferred;
+    },
+
     createItem: function(item, parentCollection, kwArgs){
         kwArgs = kwArgs || {};
 
@@ -265,10 +283,11 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 cosmo.service.conduits.getAtomPlusEimConduit = function (){
     dojo.require("cosmo.service.translators.eim");
     dojo.require("cosmo.service.transport.Atom");
-
+    var urlCache = new cosmo.service.UrlCache();
+    
     return new cosmo.service.conduits.Conduit(
-        new cosmo.service.transport.Atom(),
-        cosmo.service.translators.eim
+        new cosmo.service.transport.Atom(urlCache),
+        new cosmo.service.translators.Eim(urlCache)
     );
 };
 

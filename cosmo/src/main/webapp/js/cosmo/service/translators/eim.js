@@ -28,12 +28,15 @@ dojo.require("dojo.string");
 dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model.*");
 dojo.require("cosmo.service.translators.common");
+dojo.require("cosmo.service.common");
 dojo.require("cosmo.datetime.serialize");
 dojo.require("cosmo.util.html");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     
-    initializer: function (){
+    initializer: function (urlCache){
+        this.urlCache = urlCache;
+        
         with (this.rruleConstants) {
         with (cosmo.model.RRULE_FREQUENCIES){
             this.rruleFrequenciesToRruleConstants = {};
@@ -45,9 +48,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }}
     },
     
-    getDateFormatString: function (allDay, anyTime){
-        return (allDay || anyTime) ? "%Y%m%d": "%Y%m%dT%H%M%S";
-    },
+    getDateFormatString: dojo.lang.hitch(cosmo.service, cosmo.service.getDateFormatString),
     
     // a hash from link rels to useful url names
     urlNameHash: {
@@ -60,7 +61,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     getUrls: function (xml){
-            var urls = {};//item.getUrls();
+            var urls = {};
             var links = cosmo.util.html.getElementsByTagName(xml, "link");
             for (var i = 0; i < links.length; i++){
                 var link = links[i];
@@ -141,7 +142,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var collection = oldCollection || new cosmo.model.Collection();
         collection.setUid(uid);
         collection.setDisplayName(displayName);
-        collection.setUrls(this.getUrls(atomXml));
+        var urls = this.getUrls(atomXml)
+        collection.setUrls(urls);
+        this.urlCache.setUrls(collection, urls);
         
         var selfUrl = collection.getUrls()['self'];
         if (!selfUrl.match(/.*ticket=.*/)) collection.setWriteable(true);
@@ -214,8 +217,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 collectionDeleted: collectionDeleted,
                 ticketDeleted: ticketDeleted
             })
-
-            subscription.setUrls(this.getUrls(entry));
+            var urls = this.getUrls(entry)
+            subscription.setUrls(urls);
+            this.urlCache.setUrls(subscription, urls);
             this.setLazyLoader(collection, ["urls", "writeable"], kwArgs.lazyLoader);
             subscriptions.push(subscription);
         }
@@ -302,7 +306,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var recordSets = dojo.json.evalJson(content);
 
         var masterItem = this.recordSetToObject(recordSets[0]);
-        masterItem.setUrls(this.getUrls(entry));
+        var urls = this.getUrls(entry)
+        masterItem.setUrls(urls);
+        this.urlCache.setUrls(masterItem, urls);
 
         var items = [];
         // All record sets after the first are occurrences
@@ -416,9 +422,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             else {
                 item = this.recordSetToObject(dojo.json.evalJson(content), kwArgs);
             }
+            var urls = this.getUrls(entry)
             if (item.isMaster() || (item.isOccurrence() && item.hasModification())){
-                item.setUrls(this.getUrls(entry));
+                item.setUrls(urls);
             }
+            this.urlCache.setUrls(item, urls);
             return item;
     },
     
@@ -603,24 +611,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '</entry>'].join("");
     },
     
-    getUid: function (/*cosmo.model.Note*/ note){
-        if (note instanceof cosmo.model.NoteOccurrence){
-            var masterEvent = note.getMaster().getEventStamp();
-            return note.getUid() + ":" + this.getRid(note.recurrenceId, 
-                                             masterEvent.getAllDay(), masterEvent.getAnyTime());
-        } else {
-            return note.getUid();
-        }
-    },
+    getUid: dojo.lang.hitch(cosmo.service, cosmo.service.getUid),
     
-    getRid: function(/*cosmo.datetime.Date*/date, allDay, anyTime){
-        var ridFormat = this.getDateFormatString(allDay, anyTime)
-        if (date.isFloating()) {
-            return date.strftime(ridFormat);
-        } else {
-            return  date.createDateForTimezone("utc").strftime(ridFormat + "Z");
-        }
-    },
+    getRid: dojo.lang.hitch(cosmo.service, cosmo.service.getRid),
 
     objectToRecordSet: function (note){
         if (note instanceof cosmo.model.NoteOccurrence){
@@ -1357,7 +1350,3 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return uuid;
     }
 });
-
-cosmo.service.translators.eim = new cosmo.service.translators.Eim();
-
-

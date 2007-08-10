@@ -17,11 +17,15 @@
 dojo.provide("cosmotest.service.translators.test_eim");
 
 dojo.require("cosmo.service.translators.eim");
+dojo.require("cosmo.service.common");
 dojo.require("cosmo.datetime.serialize");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 
 cosmotest.service.translators.test_eim = {
+    translator: new cosmo.service.translators.Eim(
+       new cosmo.service.UrlCache()
+    ),
   
     test_parseRecordSet: function (){
         var uid = "12345";
@@ -41,7 +45,7 @@ cosmotest.service.translators.test_eim = {
               dtstart: dtstart
               
             }));
-        var objectList = cosmo.service.translators.eim.translateGetItems(a);
+        var objectList = cosmotest.service.translators.test_eim.translator.translateGetItems(a);
         var o1 = objectList[0];
         jum.assertEquals("uid does not match", uid, o1.getUid());
         jum.assertEquals("display name does not match title", title, o1.getDisplayName());
@@ -60,7 +64,7 @@ cosmotest.service.translators.test_eim = {
         var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;"
         var startDate = cosmo.datetime.fromIso8601("20000101T090000Z");
 
-        var rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
+        var rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule, startDate);
        
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY, 
@@ -72,28 +76,28 @@ cosmotest.service.translators.test_eim = {
         jum.assertTrue("wrong supported value", rrule.isSupported());
 
         rule = "FREQ=WEEKLY;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
+        rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency",
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_WEEKLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=WEEKLY;INTERVAL=2;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
+        rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_BIWEEKLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=MONTHLY;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
+        rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_MONTHLY, 
                          rrule.getFrequency());
 
         rule = "FREQ=YEARLY;UNTIL=20000131T090000Z;"
-        rrule = cosmo.service.translators.eim.parseRRule(rule, startDate);
+        rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule, startDate);
 
         jum.assertEquals("wrong frequency", 
                          cosmo.model.RRULE_FREQUENCIES.FREQUENCY_YEARLY, 
@@ -102,7 +106,7 @@ cosmotest.service.translators.test_eim = {
     
     test_parseRRuleUnsupported: function (){
         var rule = "FREQ=DAILY;UNTIL=20000131T090000Z;BYMONTH=1"
-        var rrule = cosmo.service.translators.eim.parseRRule(rule);
+        var rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule);
         
         jum.assertFalse("bymonth not supported", rrule.isSupported());
         jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
@@ -110,7 +114,7 @@ cosmotest.service.translators.test_eim = {
                          rrule.getUnsupportedRule().bymonth);
 
         rule = "FREQ=WEEKLY;COUNT=10"
-        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule);
         
         jum.assertFalse("count not supported", rrule.isSupported());
         jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
@@ -118,7 +122,7 @@ cosmotest.service.translators.test_eim = {
                          rrule.getUnsupportedRule().count);
         
         rule = "FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR"
-        rrule = cosmo.service.translators.eim.parseRRule(rule);
+        rrule = cosmotest.service.translators.test_eim.translator.parseRRule(rule);
         
         jum.assertFalse("byday not supported", rrule.isSupported());
         jum.assertTrue("unsupported rule not saved", !!rrule.getUnsupportedRule());
@@ -138,7 +142,7 @@ cosmotest.service.translators.test_eim = {
             autoTriage: true,
             rank: -12345.67
         });
-        var recordSet = cosmo.service.translators.eim.noteToRecordSet(note);
+        var recordSet = cosmotest.service.translators.test_eim.translator.noteToRecordSet(note);
         jum.assertEquals("12345", recordSet.uuid);
         jum.assertEquals("test calendar", recordSet.records.item.fields.title[1]);
         jum.assertEquals("200 -12345.67 1", recordSet.records.item.fields.triage[1]);
@@ -153,16 +157,13 @@ cosmotest.service.translators.test_eim = {
             anyTime: true,
             allDay: false,
             location: "home",
-            status: "Confirmed",
             rrule: new cosmo.model.RecurrenceRule({
                 frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY,
                 endDate: new cosmo.datetime.Date(2007, 5, 14)
             })
         });
-        
-        var recordSet = cosmo.service.translators.eim.noteToRecordSet(note);
+        var recordSet = cosmotest.service.translators.test_eim.translator.noteToRecordSet(note);
         jum.assertEquals("location", "home", recordSet.records.event.fields.location[1]);
-        jum.assertEquals("status", "Confirmed", recordSet.records.event.fields.status[1]);
         jum.assertEquals("duration", "PT2H30M45S", recordSet.records.event.fields.duration[1]);
         jum.assertEquals("dtstart", ";X-OSAF-ANYTIME=TRUE;VALUE=DATE:20070607", 
                         recordSet.records.event.fields.dtstart[1]);

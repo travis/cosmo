@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,6 +78,35 @@ public class ThisAndFutureHelperTest extends TestCase {
         assertContains("newmaster:20070808T081500", results, true);
         assertContains("newmaster:20070809T081500", results, true);
         assertContains("newmaster:20070810T081500", results, true);
+    }
+    
+    public void testBreakFloatingSeriesWithTimeShift() throws Exception {
+        Calendar cal1 = getCalendar("thisandfuturetest_floating.ics");
+        Calendar cal2 = getCalendar("thisandfuturetest_floating_changed_timeshift.ics");
+        
+        NoteItem oldSeries = createEvent("oldmaster", cal1);
+        NoteItem newSeries = createEvent("newmaster", cal2);
+        
+        Date lastRecurrenceId = new DateTime("20070808T081500");
+        
+        ThisAndFutureHelper helper = new ThisAndFutureHelper();
+        
+        Set<NoteItem> results = 
+            helper.breakRecurringEvent(oldSeries, newSeries, lastRecurrenceId);
+        
+        EventStamp eventStamp = EventStamp.getStamp(oldSeries);
+        Recur recur = eventStamp.getRecurrenceRules().get(0);
+        
+        Assert.assertEquals(new DateTime("20070808T081459"), recur.getUntil());
+        
+        Assert.assertEquals(6, results.size());
+        
+        assertContains("oldmaster:20070808T081500", results, false);
+        assertContains("oldmaster:20070809T081500", results, false);
+        assertContains("oldmaster:20070810T081500", results, false);
+        assertContains("newmaster:20070808T101500", results, true);
+        assertContains("newmaster:20070809T101500", results, true);
+        assertContains("newmaster:20070810T101500", results, true);
     }
     
     public void testBreakTimeZoneSeries() throws Exception {

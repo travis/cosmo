@@ -1,12 +1,3 @@
-package org.osaf.cosmo.model.util;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import net.fortuna.ical4j.model.Calendar;
 /*
  * Copyright 2007 Open Source Applications Foundation
  * 
@@ -22,7 +13,17 @@ import net.fortuna.ical4j.model.Calendar;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.osaf.cosmo.model.util;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 
 import org.osaf.cosmo.calendar.RecurrenceExpander;
@@ -151,18 +152,45 @@ public class ThisAndFutureHelper {
         EventStamp newEvent = EventStamp.getStamp(newSeries);
         Calendar newEventCal = newEvent.getEventCalendar();
         
+        Date newStartDate = newEvent.getStartDate();
+        long delta = 0;
+        
+        if(!newStartDate.equals(lastRecurrenceId))
+            delta = newStartDate.getTime() - lastRecurrenceId.getTime();
+           
         // Find all modifications with a recurrenceId that is in the set of
         // recurrenceIds for the new series
         for(NoteItem mod: oldSeries.getModifications()) {
             EventExceptionStamp event = EventExceptionStamp.getStamp(mod);
             Date recurrenceId = event.getRecurrenceId();
+            
+            // Account for shift in startDate by calculating a new
+            // recurrenceId based on the shift.
+            if(delta!=0) {
+                java.util.Date newRidTime =
+                    new java.util.Date(recurrenceId.getTime() + delta);
+                recurrenceId = (DateTime)
+                    Dates.getInstance(newRidTime, recurrenceId);
+            }
+            
+            // If modification matches an occurrence in the new series
+            // then add it to the list
             if(expander.isOccurrence(newEventCal, recurrenceId)) {
+                event.setRecurrenceId(recurrenceId);
+                
+                // If modification is the start of the series and there 
+                // was a time change, then match up the startDate
+                if(recurrenceId.equals(newStartDate) && delta!=0)
+                    event.setStartDate(newStartDate);
+                
                 mods.add(mod);
             } 
         }
         
         return  mods;
     }
+    
+    
     
     
 }

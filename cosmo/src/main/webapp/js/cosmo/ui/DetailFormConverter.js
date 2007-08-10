@@ -198,57 +198,64 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         var meridianFieldValue = this._getFormValue(form, info.meridianField);
         var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
         var allDayFieldValue = this._getFormValue(form, info.allDayField) == "1";
-        
-        var errMsg = ""
+        var errMsg = "";
 
         if (!dateFieldValue){
             return [null,null];
+        }
+        
+        var err = cosmo.util.validate.dateFormat(dateFieldValue);
+        if (err){
+            errMsg += '"'+propertyDisplayName+'" date field: ' + err;
+            errMsg += '<br/>';
+        }
+        else {
+            var jsDate  = new Date(dateFieldValue);
         }
         
         if (timeFieldValue){
             var err = cosmo.util.validate.timeFormat(timeFieldValue);
             if (err){
                 errMsg += '"'+propertyDisplayName+'" time field: ' + err;
-                errMsg += '\n';
+                errMsg += '<br/>';
             }
  
             var err = cosmo.util.validate.required(meridianFieldValue);
             if (err){
                 errMsg += '"'+propertyDisplayName+'" AM/PM field: ' + err;
-                errMsg += '\n';
+                errMsg += '<br/>';
             }
-        }
-        
-        var jsDate  = new Date(dateFieldValue);
-        if (timeFieldValue) {
             var t = cosmo.datetime.util.parseTimeString(timeFieldValue);
             var h = cosmo.datetime.util.hrStd2Mil(t.hours, (meridianFieldValue == "pm"));
             var m = t.minutes;
-            jsDate.setHours(h, m);
+            
+            if (!errMsg) {
+                jsDate.setHours(h, m);
+            }
         }
 
         if (errMsg){
             return [null, errMsg];
         } 
         
-        var date = new cosmo.datetime.Date();
+        var dt = new cosmo.datetime.Date();
         if (tzIdFieldValue && timeFieldValue){
-            date.tzId = tzIdFieldValue;
-            date.utc = false;
-            date.updateFromLocalDate(jsDate);
+            dt.tzId = tzIdFieldValue;
+            dt.utc = false;
+            dt.updateFromLocalDate(jsDate);
         } else {
-            date.tzId = null;
-            date.utc = false;
-            date.updateFromUTC(jsDate.getTime());            
+            dt.tzId = null;
+            dt.utc = false;
+            dt.updateFromUTC(jsDate.getTime());            
         }
-        date.utc = false;
-        return [date, null];
+        dt.utc = false;
+        return [dt, null];
     }, 
     
     requiredValidator: function(value, propertyName){
         var propertyDisplayName = _("Main.DetailForm." + propertyName);
         if (!value){
-            return '"'+propertyDisplayName+'" is a required field.\n'
+            return '"'+propertyDisplayName+'" is a required field.<br/>'
         }
         return "";
     },
@@ -270,7 +277,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var err = cosmo.util.validate.dateFormat(endDateFieldValue);
             if (err) {
                 errMsg += '"'+propertyDisplayName+'" ending date field: ' + err;
-                errMsg += '\n';
+                errMsg += '<br/>';
                 return [null, errMsg];
             } 
 
@@ -303,7 +310,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 > eventStampProperties.endDate.getTime())){
                 errMsg += '"Starts" and "Ends" time fields: ';
                 errMsg += 'Event cannot end before it starts.';
-                errMsg += '\n';                
+                errMsg += '<br/>';                
             }    
         }
         

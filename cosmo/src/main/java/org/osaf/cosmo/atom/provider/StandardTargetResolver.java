@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.text.ParseException;
+
 import org.apache.abdera.protocol.server.provider.RequestContext;
 import org.apache.abdera.protocol.server.provider.TargetResolver;
 import org.apache.abdera.protocol.server.provider.Target;
@@ -28,6 +30,7 @@ import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
@@ -84,6 +87,10 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
         match = TEMPLATE_EXPANDED.match(uri);
         if (match != null)
             return createExpandedItemTarget(context, match);
+
+        match = TEMPLATE_DETACHED.match(uri);
+        if (match != null)
+            return createDetachedItemTarget(context, match);
 
         match = TEMPLATE_SUBSCRIPTIONS.match(uri);
         if (match != null)
@@ -159,6 +166,38 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
         if (! (item instanceof NoteItem))
             return null;
         return new ExpandedItemTarget(context, (NoteItem) item,
+                                      match.get("projection"),
+                                      match.get("format"));
+    }
+
+    /**
+     * Creates a target representing a detached recurring item occurrence.
+     */
+    protected Target createDetachedItemTarget(RequestContext context,
+                                              UriTemplate.Match match) {
+        Item master = contentService.findItemByUid(match.get("uid"));
+        if (master == null)
+            return null;
+        if (! (master instanceof NoteItem))
+            return null;
+
+        ModificationUid occurrenceUid = null;
+        try {
+            occurrenceUid =
+                new ModificationUid(master, match.get("occurrence"));
+        } catch (ParseException e) {
+            log.warn("Error parsing occurrence date: " + e.getMessage());
+            return null;
+        }
+        Item occurrence =
+            contentService.findItemByUid(occurrenceUid.toString());
+        if (occurrence == null)
+            return null;
+        if (! (occurrence instanceof NoteItem))
+            return null;
+
+        return new DetachedItemTarget(context, (NoteItem) master,
+                                      (NoteItem) occurrence,
                                       match.get("projection"),
                                       match.get("format"));
     }

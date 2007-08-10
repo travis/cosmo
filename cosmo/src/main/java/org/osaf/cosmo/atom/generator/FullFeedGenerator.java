@@ -107,6 +107,9 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
         else
             entry.addLink(newEditLink(item));
 
+        if (item.getModifies() != null || item instanceof NoteOccurrence)
+            entry.addLink(newDetachedLink(item));
+
         return entry;
     }
 

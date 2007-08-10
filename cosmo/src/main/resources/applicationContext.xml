@@ -524,6 +524,10 @@
       <ref local="contentService"/>
     </property>
   </bean>
+  
+  <bean id="atomDetachedItemProvider"
+        class="org.osaf.cosmo.atom.provider.DetachedItemProvider"
+        init-method="init" parent="atomItemProvider"/>
 
   <bean id="atomExpandedItemProvider"
         class="org.osaf.cosmo.atom.provider.ExpandedItemProvider"
@@ -556,6 +560,9 @@
             init-method="init">
         <property name="itemProvider">
           <ref local="atomItemProvider"/>
+        </property>
+        <property name="detachedItemProvider">
+          <ref local="atomDetachedItemProvider"/>
         </property>
         <property name="expandedItemProvider">
           <ref local="atomExpandedItemProvider"/>

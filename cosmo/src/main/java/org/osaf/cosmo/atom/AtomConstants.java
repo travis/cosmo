@@ -57,6 +57,7 @@ public interface AtomConstants {
     public static final String REL_MODIFICATION = "modification";
     public static final String REL_EXPANDED = "expanded";
     public static final String REL_MASTER = "master";
+    public static final String REL_DETACHED = "detached";
 
     // projection constants
 
@@ -110,6 +111,8 @@ public interface AtomConstants {
         new UriTemplate("/item/{uid}/{projection}?/{format}?");
     public static final UriTemplate TEMPLATE_EXPANDED =
         new UriTemplate("/expanded/{uid}/{projection}?/{format}?");
+    public static final UriTemplate TEMPLATE_DETACHED =
+        new UriTemplate("/detached/{uid}/{occurrence}/{projection}?/{format}?");
     public static final UriTemplate TEMPLATE_SUBSCRIPTIONS =
         new UriTemplate("/user/{username}/subscriptions");
     public static final UriTemplate TEMPLATE_SUBSCRIPTION =

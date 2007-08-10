@@ -41,7 +41,7 @@ public class ItemPath {
     private static final Log log = LogFactory.getLog(ItemPath.class);
 
     private static final Pattern PATTERN_ITEM_UID =
-        Pattern.compile("^/(item|expanded)/([^/]+)(/.*)?$");
+        Pattern.compile("^/(item|expanded|detached)/([^/]+)(/.*)?$");
 
     private String urlPath;
     private String uid;

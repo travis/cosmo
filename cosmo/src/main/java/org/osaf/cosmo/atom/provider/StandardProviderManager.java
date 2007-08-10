@@ -22,6 +22,7 @@ import org.apache.abdera.protocol.server.provider.Target;
 
 public class StandardProviderManager implements ProviderManager {
 
+    private DetachedItemProvider detachedItemProvider;
     private ExpandedItemProvider expandedItemProvider;
     private ItemProvider itemProvider;
     private SubscriptionProvider subscriptionProvider;
@@ -40,6 +41,8 @@ public class StandardProviderManager implements ProviderManager {
             return null;
         if (target instanceof ExpandedItemTarget)
             return expandedItemProvider;
+        if (target instanceof DetachedItemTarget)
+            return detachedItemProvider;
         if (target instanceof BaseItemTarget)
             return itemProvider;
         if (target instanceof SubscriptionsTarget ||
@@ -56,6 +59,14 @@ public class StandardProviderManager implements ProviderManager {
     public void release(Provider provider) {}
 
     // our methods
+
+    public DetachedItemProvider getDetachedItemProvider() {
+        return detachedItemProvider;
+    }
+
+    public void setDetachedItemProvider(DetachedItemProvider provider) {
+        this.detachedItemProvider = provider;
+    }
 
     public ExpandedItemProvider getExpandedItemProvider() {
         return expandedItemProvider;

@@ -32,11 +32,13 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
+
 /**
  * A base class for feed generators that work with collectoins and items.
  *
@@ -430,7 +432,19 @@ public abstract class BaseItemFeedGenerator
      */
     protected Link newModificationLink(NoteItem item)
         throws GeneratorException {
-        return newLink(REL_MODIFICATION, MEDIA_TYPE_ATOM, selfIri(item));
+        return newLink(REL_MODIFICATION, MEDIA_TYPE_ATOM, detachedIri(item));
+    }
+
+    /**
+     * Creates a <code>Link</code> for the detached IRI of the given
+     * item.
+     *
+     * @param item the item to link
+     * @throws GeneratorException
+     */
+    protected Link newDetachedLink(NoteItem item)
+        throws GeneratorException {
+        return newLink(REL_DETACHED, MEDIA_TYPE_ATOM, detachedIri(item));
     }
 
     /**
@@ -467,6 +481,26 @@ public abstract class BaseItemFeedGenerator
     protected String expandedIri(Item item) {
         String selfIri = selfIri(item);
         return selfIri.replaceFirst("item", "expanded");
+    }
+
+    protected String detachedIri(NoteItem item) {
+        String masterUid = null;
+        String occurrenceUid = null;
+        if (item instanceof NoteOccurrence) {
+            NoteOccurrence occurrence = (NoteOccurrence) item;
+            masterUid = occurrence.getMasterNote().getUid();
+            occurrenceUid = ModificationUid.
+                fromDateToStringNoTimezone(occurrence.getOccurrenceDate());
+        } else {
+            if (item.getModifies() == null)
+                throw new IllegalArgumentException("Cannot generate detached IRI for master item");
+            masterUid = item.getModifies().getUid();
+            ModificationUid modUid = new ModificationUid(item.getUid());
+            occurrenceUid = ModificationUid.
+                fromDateToStringNoTimezone(modUid.getRecurrenceId());
+        }
+
+        return TEMPLATE_DETACHED.bind(masterUid, occurrenceUid);
     }
 
     protected void addPathInfo(StringBuffer iri,

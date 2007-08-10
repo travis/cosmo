@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -145,6 +144,7 @@ public class StandardTriageStatusQueryProcessor implements
         // filter for no (null) triage status
         NoteItemFilter noTriageStatusFilter =
             getTriageStatusFilter(collection, -1);
+        noTriageStatusFilter.setIsModification(false);
         
         // recurring event filter
         NoteItemFilter eventFilter =
@@ -556,6 +556,7 @@ public class StandardTriageStatusQueryProcessor implements
         return triageStatusFilter;
     }
     
+    
     /**
      * Create NoteItemFilter that matches all recurring event NoteItems that belong
      * to a specified parent collection.
@@ -602,33 +603,48 @@ public class StandardTriageStatusQueryProcessor implements
             results = new ArrayList<NoteItem>();
             masters = new HashSet<NoteItem>();
             comparator = ascending ? COMPARE_ASC : COMPARE_DESC;
-            limit = limit;
+            this.limit = limit;
         }
 
         public ArrayList<NoteItem> getResults() {
             return results;
         }
+        
+        public void processResults() {
+            
+            // sort
+            Collections.sort(results, comparator);
 
+            // trim based on limit
+            if(limit!=-1 && results.size() > limit) {
+                while(results.size() > limit)
+                    results.remove(results.size()-1);
+                
+                // rebuild masters list as it may have changed
+                masters.clear();
+                for(NoteItem note: results) {
+                    if(note instanceof NoteOccurrence)
+                        masters.add(((NoteOccurrence) note).getMasterNote());
+                    else if(note.getModifies()!=null)
+                        masters.add(note.getModifies());
+                }
+            }
+        }
+        
         public HashSet<NoteItem> getMasters() {
             return masters;
         }
 
         public void add(QueryResult qr) {
+            qr.processResults();
             results.addAll(qr.getResults());
             masters.addAll(qr.getMasters());
         }
 
         public SortedSet<NoteItem> merge() {
-            Collections.sort(results, comparator);
-
-            int toAdd = results.size();
-            if (limit > 0 && toAdd > limit)
-                toAdd = limit;
-
+            
             TreeSet<NoteItem> merged = new TreeSet<NoteItem>(comparator);
-            for (int i=0; i<toAdd; i++)
-                merged.add(results.get(i));
-
+            merged.addAll(results);
             merged.addAll(masters);
 
             return merged;

@@ -576,7 +576,10 @@ cosmo.view.cal.canvas = new function () {
             // Note: we have to spoon-feed the execution context to the
             // callback methods for the buttons in the dialog, hence
             // passing the 'self' param below
-            if (!discardUnsavedChanges && origSelection && writeable) {
+            if (!discardUnsavedChanges &&
+                origSelection &&
+                !origSelection.lozenge.getInputDisabled() && // Ignore if orig. item is already in 'processing' state
+                writeable) {
                 if (!self.handleUnsavedChanges(origSelection, item.id, self)) {
                     return false;
                 }

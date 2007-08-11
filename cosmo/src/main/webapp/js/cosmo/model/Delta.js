@@ -281,7 +281,7 @@ dojo.declare("cosmo.model.Delta", null, {
         newNote.setUid(cosmo.model.uuidGenerator.generate());
         
         //set the new note's start date to the old occurrence's start date.
-        newNote.getEventStamp().setStartDate(this._note.getEventStamp().getStartDate());
+        newNote.getEventStamp().setStartDate(this._note.recurrenceId);
         
         //set the old note's rrule end date to just before the break.
         var newEndDate = occurrence.getEventStamp().getStartDate().clone();

@@ -1,15 +1,13 @@
-{"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
+{"method": "click", "params": {"jsid": "{$listView}"}}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "BBQ at my house", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
-{"params": {"milliseconds": "5000"}, "version": "0.1", "method": "wait"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
-{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "{$quickCreateButton}"}, "version": "0.1", "method": "click"}
 {"params": {"id": "noteDescription"}, "version": "0.1", "method": "click"}
 {"params": {"text": "We will be eating great food.", "id": "noteDescription"}, "version": "0.1", "method": "type"}
 {"params": {"id": "sectionEventEnableToggle"}, "version": "0.1", "method": "check"}
-{"params": {"milliseconds": "5000"}, "version": "0.1", "method": "wait"}
 {"params": {"milliseconds": "5000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "eventLocation"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Adams house", "id": "eventLocation"}, "version": "0.1", "method": "type"}
@@ -17,6 +15,7 @@
 {"params": {"text": "12:00", "id": "startTime"}, "version": "0.1", "method": "type"}
 {"params": {"id": "startMeridianAM"}, "version": "0.1", "method": "radio"}
 {"params": {"milliseconds": "5000"}, "version": "0.1", "method": "wait"}
+{"params": {"text": "08\/06\/2007", "id": "endDate"}, "version": "0.1", "method": "type"}
 {"params": {"text": "5:00", "id": "endTime"}, "version": "0.1", "method": "type"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "endMeridianPM"}, "version": "0.1", "method": "radio"}
@@ -25,4 +24,4 @@
 {"params": {"option": "Tentative", "id": "eventStatus"}, "version": "0.1", "method": "select"}
 {"params": {"id": "sectionTaskEnableToggle"}, "version": "0.1", "method": "check"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
-{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}

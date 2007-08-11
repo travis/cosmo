@@ -1,8 +1,7 @@
-{"method":"reWriteAlert", "params":{}}
-{"method": "click", "params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id"}}
+{"method": "click", "params": {"jsid": "{$listView}"}}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"params": {"text": "Testing Adress this item", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
-{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.quickItemEntry.createButton.domNode.id"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "{$quickCreateButton}"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "noteDescription"}, "version": "0.1", "method": "click"}
 {"params": {"text": "Addressing this item description field, I wonder how long I can make it... Addressing this item description field, I wonder how long I can make it...", "id": "noteDescription"}, "version": "0.1", "method": "type"}
@@ -13,4 +12,4 @@
 {"params": {"text": "mikeal@osafoundation.org", "id": "mailTo"}, "version": "0.1", "method": "type"}
 {"params": {"text": "aparna@osafoundation.org", "id": "mailCc"}, "version": "0.1", "method": "type"}
 {"params": {"text": "dan@osafoundation.org", "id": "mailBcc"}, "version": "0.1", "method": "type"}
-{"params": {"jsid": "windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}

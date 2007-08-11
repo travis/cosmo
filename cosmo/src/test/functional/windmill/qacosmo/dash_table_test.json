@@ -1,0 +1,17 @@
+{"params": {"jsid": "{$listView}"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html/body/div/div/div/div/table/tbody/tr/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "noteTitle"}, "version": "0.1", "method": "click"}
+{"params": {"text": "Editing dash stuff", "id": "noteTitle"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html/body/div/div/div/div/table/tbody/tr/td[3]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "noteTitle"}, "version": "0.1", "method": "click"}
+{"params": {"text": "More dash edits", "id": "noteTitle"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html/body/div/div/div/div/table/tbody/tr/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "noteTitle"}, "version": "0.1", "method": "click"}
+{"params": {"text": "just two more", "id": "noteTitle"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html/body/div/div/div/div/table/tbody/tr/td[3]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "noteTitle"}, "version": "0.1", "method": "click"}
+{"params": {"text": "Alright im done", "id": "noteTitle"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}

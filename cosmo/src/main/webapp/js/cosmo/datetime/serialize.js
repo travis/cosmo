@@ -44,15 +44,17 @@ cosmo.datetime.fromRfc3339 = function(/*String*/rfcDate){
 
 cosmo.datetime.parseIso8601Duration = 
 function parseIso8601Duration(/*String*/duration){
-   var r = "^P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
+   var r = "^(-?)P(?:(?:([0-9\.]*)Y)?(?:([0-9\.]*)M)?(?:([0-9\.]*)D)?(?:T(?:([0-9\.]*)H)?(?:([0-9\.]*)M)?(?:([0-9\.]*)S)?)?)(?:([0-9/.]*)W)?$"
    var dateArray = duration.match(r).slice(1);
+   var multiplier = (dateArray[0] == "-")? -1 : 1;
    var dateHash = {
-     year: parseFloat(dateArray[0]) || 0,
-     month: parseFloat(dateArray[1]) || 0,
-     day: parseFloat(dateArray[2]) || 0,
-     hour: parseFloat(dateArray[3]) || 0,
-     minute: parseFloat(dateArray[4]) || 0,
-     second: parseFloat(dateArray[5]) || 0
+     multiplier: multiplier,
+     year: (parseFloat(dateArray[1]) || 0) * multiplier,
+     month: (parseFloat(dateArray[2]) || 0) * multiplier,
+     day: (parseFloat(dateArray[3]) || 0) * multiplier,
+     hour: (parseFloat(dateArray[4]) || 0) * multiplier,
+     minute: (parseFloat(dateArray[5]) || 0) * multiplier,
+     second: (parseFloat(dateArray[6]) || 0) * multiplier
    }
    return dateHash
 }
@@ -90,14 +92,23 @@ cosmo.datetime.getDuration = function getDuration(dt1, dt2){
     
     var dur = {}
     with (cosmo.datetime.durationsInSeconds){
+        var multiplier = 1;
         var secs = cosmo.datetime.Date.diff(dojo.date.dateParts.SECOND, dt1, dt2);
-        dur.day = Math.floor(secs / DAY);
-        secs = secs - (dur.day*DAY);
-        dur.hour = Math.floor(secs / HOUR)
-        secs = secs - (dur.hour*HOUR);
-        dur.minute = Math.floor(secs / MINUTE)
-        secs = secs - (dur.minute*MINUTE);
-        dur.second = secs;
+        if (secs < 0) {
+            multiplier = -1;
+            secs *= -1;
+        }
+        var day = Math.floor(secs / DAY);
+        dur.day = day * multiplier;
+        secs = secs - (day*DAY);
+        var hour = Math.floor(secs / HOUR);
+        dur.hour = hour * multiplier;
+        secs = secs - (hour*HOUR);
+        var minute = Math.floor(secs / MINUTE);
+        dur.minute = minute * multiplier;
+        secs = secs - (minute*MINUTE);
+        dur.second = secs * multiplier;
+        dur.multiplier = multiplier;
    }
    return dur;
 }

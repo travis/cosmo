@@ -57,7 +57,8 @@ cosmo.model.declare("cosmo.model.Duration", null,
      ["day",    {"default":0} ],
      ["hour",   {"default":0} ],
      ["second", {"default":0} ],
-     ["minute", {"default":0} ]
+     ["minute", {"default":0} ],
+     ["multiplier", {"default":1}]
      ],
     {
         initializer:function(){
@@ -79,14 +80,18 @@ cosmo.model.declare("cosmo.model.Duration", null,
             
         },
         toIso8601: function (){
-            var durationString = ["P",
-                    this._year? this._year + "Y" : "",
-                    this._month? this._month + "M" : "",
-                    this._day? this._day + "D" : "",
+            // This violates iso 8601, but if the desktop does it, we will for now
+            var multiplier = this._multiplier;
+            var durationString = [
+                    multiplier < 0? "-" : "", 
+                    "P",
+                    this._year? multiplier * this._year + "Y" : "",
+                    this._month? multiplier * this._month + "M" : "",
+                    this._day? multiplier * this._day + "D" : "",
                     (this._hour || this._second || this._minute)? "T" : "",
-                    this._hour? this._hour + "H" : "",
-                    this._minute? this._minute + "M" : "",
-                    this._second? this._second + "S" : ""].join("");
+                    this._hour? multiplier * this._hour + "H" : "",
+                    this._minute? multiplier * this._minute + "M" : "",
+                    this._second? multiplier * this._second + "S" : ""].join("");
             if (durationString == "P") return cosmo.model.ZERO_DURATION;
             else return durationString;
                     

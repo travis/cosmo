@@ -49,6 +49,7 @@ cosmo.model.RRULE_FREQUENCIES = {
     FREQUENCY_YEARLY: "yearly"
 };
 
+cosmo.model.ZERO_DURATION = "PT0S";
 cosmo.model.declare("cosmo.model.Duration", null, 
     [["year",   {"default":0} ],
      ["month",  {"default":0} ],
@@ -86,7 +87,7 @@ cosmo.model.declare("cosmo.model.Duration", null,
                     this._hour? this._hour + "H" : "",
                     this._minute? this._minute + "M" : "",
                     this._second? this._second + "S" : ""].join("");
-            if (durationString == "P") return null;
+            if (durationString == "P") return cosmo.model.ZERO_DURATION;
             else return durationString;
                     
         }

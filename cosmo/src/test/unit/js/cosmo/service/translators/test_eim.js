@@ -166,10 +166,13 @@ cosmotest.service.translators.test_eim = {
         jum.assertEquals("location", "home", recordSet.records.event.fields.location[1]);
         jum.assertEquals("duration", "PT2H30M45S", recordSet.records.event.fields.duration[1]);
         jum.assertEquals("dtstart", ";X-OSAF-ANYTIME=TRUE;VALUE=DATE:20070607", 
-                        recordSet.records.event.fields.dtstart[1]);
-        //jum.assertEquals("rrule", ";FREQ=DAILY;UNTIL=20070613T000000Z", 
-        //                 recordSet.records.event.fields.rrule[1]);
-                         
+                        recordSet.records.event.fields.dtstart[1]);                         
+        // Test null duration
+
+        note.getEventStamp().setDuration(null);
+        recordSet = cosmotest.service.translators.test_eim.translator.noteToRecordSet(note);
+        jum.assertEquals("duration", "PT0S", recordSet.records.event.fields.duration[1]);
+
         var occurrenceDate = new cosmo.datetime.Date(2007, 5, 8, 12, 30, 45);
         note.getNoteOccurrence(occurrenceDate);
         

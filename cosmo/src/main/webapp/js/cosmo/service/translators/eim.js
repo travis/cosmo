@@ -915,7 +915,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
             if (props.status !== undefined) fields.status = [type.TEXT, props.status];
             if (props.location !== undefined) fields.location = [type.TEXT, props.location];
-            if (props.duration !== undefined) fields.duration = [type.TEXT, props.duration == null? null : props.duration.toIso8601()];
+            if (props.duration !== undefined) fields.duration = [type.TEXT, props.duration == null? cosmo.model.ZERO_DURATION : props.duration.toIso8601()];
             if (props.rrule !== undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
             if (props.exdates && props.exdates.length != 0) fields.exdate = 
                 [type.TEXT, this.exdatesToEim(props.exdates, props.startDate, props.allDay, props.anyTime)];

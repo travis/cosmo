@@ -498,7 +498,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
     
     isFirstOccurrence: function(){
-        return this.getMaster().getEventStamp().getStartDate().equals(this.recurrenceId);  
+        return (this.getMaster().getEventStamp().getStartDate().toUTC() == this.recurrenceId.toUTC());  
     }, 
     
     clone: function(){

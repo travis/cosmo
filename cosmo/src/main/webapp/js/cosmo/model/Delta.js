@@ -243,6 +243,12 @@ dojo.declare("cosmo.model.Delta", null, {
             return {occurrence:true};
         }
         
+        //if this is the first occurrence
+        if (this._note.isMaster() || this._note.isFirstOccurrence()){
+            //...then we can't do thisAndFuture
+            return { master:true, occurrence:true};
+        }
+        
         return { master:true, occurrenceAndFuture:true, occurrence:true};
     },
     

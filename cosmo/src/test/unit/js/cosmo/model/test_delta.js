@@ -74,13 +74,13 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
         delta.deltafy();
         
         //first ensure that only master gets returned for non-recurring events
-        jum.assertTrue(setEquals({master:true}, delta.getApplicableChangeTypes()));
+        jum.assertTrue("master only", setEquals({master:true}, delta.getApplicableChangeTypes()));
         
         //now ensure that all types are possible for a simple delta on a recurring item
         note.getEventStamp().setRrule(new cosmo.model.RecurrenceRule({
             frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY
         }));
-        jum.assertTrue(setEquals({master:true, occurrence:true, occurrenceAndFuture:true}, 
+        jum.assertTrue("simple recurring delta", setEquals({master:true, occurrence:true}, 
             delta.getApplicableChangeTypes()));
         
         //now the case where we remove the recurrence rule

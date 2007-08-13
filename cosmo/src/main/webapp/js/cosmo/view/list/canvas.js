@@ -145,7 +145,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 if (p.id) {
                     self.handleSelectionChange(p);
                 }
-                        
+
             }
         }
     };
@@ -168,18 +168,21 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     return false;
                 }
             }
-            
+
             // Deselect any original selection
             if (origSelection) {
                 var origSelectionId = origSelection ? origSelection.id : '';
                 var origSelectionNode = $('listView_item' + origSelectionId);
-                ch = origSelectionNode.childNodes;
-                for (var i = 0; i < ch.length; i++) {
-                    dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+                if (origSelectionNode) {
+                    ch = origSelectionNode.childNodes;
+                    for (var i = 0; i < ch.length; i++) {
+                        dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+                    }
                 }
+
             }
-            
-            
+
+
             // The new selection
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {

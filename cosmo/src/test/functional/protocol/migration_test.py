@@ -38,6 +38,7 @@ class AllUserEvents(MigrationTest):
     
     def validate(self):
         total = passed = failed = 0
+        failed_urls = []
         
         print 'Starting validation for All User Events'
         for user, events in self.store['all_events'].items():
@@ -50,9 +51,13 @@ class AllUserEvents(MigrationTest):
                     passed = passed + 1
                 except AssertionError:
                     failed = failed + 1
+                    failed_urls.append(event['href'])
                     print "failure in %s" % event['href']
                     print "Pre::%s" % event['body']
                     print "Post::%s"% body
+        print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
+        if failed is not 0:
+            print 'Failed urls :: %s' % '\n'.join(failed_urls)
         
         
 class NumberOfUsers(MigrationTest):
@@ -87,6 +92,7 @@ class TestAccountResouces(MigrationTest):
         self.store['hub_test_resources'] = self.client.get_all_dav_resources_for_user('hub-test')
     def validate(self):
         total = passed = failed = 0
+        failed_urls = []
         
         print 'Starting validation for all resources for hub-test user'
         for item in self.store['hub_test_resources']:
@@ -98,10 +104,13 @@ class TestAccountResouces(MigrationTest):
                 passed = passed + 1
             except AssertionError:
                 failed = failed + 1
+                failed_urls.append(item['href'])
                 print "failure in %s" % item['href']
                 print "Pre::%s"       % item['body']
                 print "Post::%s"      % body
-        
+        print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
+        if failed is not 0:
+            print 'Failed urls :: %s' % '\n'.join(failed_urls)
             
 def main():
     from optparse import OptionParser

@@ -1,14 +1,14 @@
 {"params": {"link": "Sign up."}, "version": "0.1", "method": "click"}
-{"params": {"text": "{$random}", "id": "username"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random}", "id": "firstName"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random}", "id": "lastName"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random}@osafoundation.org", "id": "email"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random}", "id": "password"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random}", "id": "confirm"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "username"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "firstName"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "lastName"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}@osafoundation.org", "id": "email"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "password"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "confirm"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
 {"method": "click", "params": {"jsid" : "{$btnsCenter0}"}}
 {"params": {"id": "loginDialogUsernameInput"}, "version": "0.1", "method": "click"}
-{"params": {"text": "{$random}", "id": "loginDialogUsernameInput"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random}", "id": "loginDialogPasswordInput"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "loginDialogUsernameInput"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}", "id": "loginDialogPasswordInput"}, "version": "0.1", "method": "type"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"params": {"milliseconds": "4000"}, "version": "0.1", "method": "wait"}

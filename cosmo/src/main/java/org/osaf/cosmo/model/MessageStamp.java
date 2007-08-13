@@ -34,7 +34,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 public class MessageStamp extends Stamp implements
         java.io.Serializable {
 
-    public static final String FORMAT_DATE_SENT = "MM/dd/yy hh:mm aa";
+    public static final String FORMAT_DATE_SENT = "EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z";
 
     /**
      * 

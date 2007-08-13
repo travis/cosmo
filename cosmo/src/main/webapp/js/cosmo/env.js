@@ -268,7 +268,6 @@ cosmo.env.getTimeoutMinutes = function (){
 }
 
 //initialize from djConfig
-dojo.debug("HI!!!");
 cosmo.env.setBaseUrl(djConfig['baseUrl']);
 cosmo.env.setStaticBaseUrlTemplate(djConfig['staticBaseUrlTemplate']);
 cosmo.env.setStaticBaseUrlRange(djConfig['staticBaseUrlRange']);

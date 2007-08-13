@@ -8,4 +8,5 @@
 {"params": {"id": "sectionEventEnableToggle"}, "version": "0.1", "method": "check"}
 {"params": {"id": "eventAllDay"}, "version": "0.1", "method": "click"}
 {"params": {"text": "8\/06\/2007", "id": "startDate"}, "version": "0.1", "method": "type"}
+{"params": {"text": "8\/06\/2007", "id": "endDate"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}

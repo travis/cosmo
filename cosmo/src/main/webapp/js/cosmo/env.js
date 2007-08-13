@@ -30,7 +30,6 @@ cosmo.env.OVERLORD_USERNAME = "root";
 //private variable for storing environment information. Do not access directly,
 //use methods below.
 cosmo.env._cosmoConfig = {};
-cosmo.env._cosmoConfig["baseUrl"] = djConfig['staticBaseUrl'];
 cosmo.env._NULL = {};
 cosmo.env._FALSE_OR_ZERO = {};
 cosmo.env._version = null;
@@ -267,5 +266,11 @@ cosmo.env.getTimeoutMinutes = function (){
     var ret = s == -1 ? -1 : s/60;
     return ret;
 }
+
+//initialize from djConfig
+dojo.debug("HI!!!");
+cosmo.env.setBaseUrl(djConfig['baseUrl']);
+cosmo.env.setStaticBaseUrlTemplate(djConfig['staticBaseUrlTemplate']);
+cosmo.env.setStaticBaseUrlRange(djConfig['staticBaseUrlRange']);
 
 

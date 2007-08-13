@@ -49,19 +49,21 @@
                      "${searchId}"</c:forEach>];
 
     var djConfig = {isDebug: false, 
-                    staticBaseUrl: "${staticBaseUrl}",
+                    baseUrl: "${baseUrl}",
+                    staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
+                    staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
                     i18nLocation: "${baseUrl}/i18n.js",
                     confLocation: "${baseUrl}/webui.conf",
                     templateName: "${templateName}",
                     parseWidgets: ${parseWidgets},
                     searchIds: searchIds}
-
 </script>
 
 <script type="text/javascript" src="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>
 <script type="text/javascript">
 
 function bootstrap(){
+
     dojo.require("dojo.widget.*");
     dojo.require("dojo.debug.console");
 
@@ -71,10 +73,6 @@ function bootstrap(){
     dojo.require("cosmo.env");
     dojo.require("cosmo.ui.conf");
 
-    cosmo.env.setBaseUrl("${baseUrl}");
-    cosmo.env.setStaticBaseUrlTemplate("${cosmoui:getStaticHostUrlTemplate()}");
-    cosmo.env.setStaticBaseUrlRange("${cosmoui:getStaticHostUrlRange()}");
-    cosmo.env.setVersion("${PRODUCT_VERSION}");
     <%-- 
       Note: It is possible to set this value to negative numbers --
       Setting the canonical client-side value with a function ensures

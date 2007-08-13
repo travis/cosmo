@@ -30,7 +30,7 @@ dojo.require("cosmo.convenience");
 
 cosmo.ui.imagegrid.config = {};
 cosmo.ui.imagegrid.DISABLED_OPACITY = 0.3;
-cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImageUrl( 'image_grid.png');
+cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImageUrl('image_grid.png');
 
 cosmo.ui.imagegrid.readConfig = function (type, data, obj) {
     cosmo.ui.imagegrid.config = data;

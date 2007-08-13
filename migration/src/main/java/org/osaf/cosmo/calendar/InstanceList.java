@@ -197,6 +197,7 @@ public class InstanceList extends TreeMap {
                     Period period = (Period) j.next();
                     Date periodStart = adjustFloatingDateIfNecessary(period.getStart());
                     Date periodEnd = adjustFloatingDateIfNecessary(period.getEnd());
+                    // Add period if it overlaps rage
                     if (periodStart.before(rangeEnd)
                             && periodEnd.after(rangeStart)) {
                         Instance instance = new Instance(comp, periodStart, periodEnd);
@@ -209,8 +210,12 @@ public class InstanceList extends TreeMap {
                     startDate = adjustFloatingDateIfNecessary(startDate);
                     Date endDate = org.osaf.cosmo.calendar.util.Dates.getInstance(duration
                             .getTime(startDate), startDate);
-                    Instance instance = new Instance(comp, startDate, endDate);
-                    put(instance.getRid().toString(), instance);
+                    // Add RDATE if it overlaps range
+                    if (startDate.before(rangeEnd)
+                            && endDate.after(rangeStart)) {
+                        Instance instance = new Instance(comp, startDate, endDate);
+                        put(instance.getRid().toString(), instance);
+                    }
                 }
             }
         }
@@ -544,14 +549,6 @@ public class InstanceList extends TreeMap {
        
         Calendar cal = Dates.getCalendarInstance(startRange);
         cal.setTime(negatedDur.getTime(startRange));
-       
-        // Add a second or day so that adjusted range is just short of the 
-        // event duration.  Otherwise we could match an instance that starts and
-        // ends before the orignal startRange.
-        if(start instanceof DateTime)
-            cal.add(Calendar.SECOND, 1);
-        else
-            cal.add(Calendar.DAY_OF_WEEK, 1);
         
         // Return new startRange only if it is before the original startRange 
         if(cal.getTime().before(startRange))

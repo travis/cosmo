@@ -43,17 +43,17 @@
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
-            <version>0.3.0-incubating-SNAPSHOT</version>
+            <version>0.3.0-incubating-20070710.211108-8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
-            <version>0.3.0-incubating-SNAPSHOT</version>
+            <version>0.3.0-incubating-20070709.203400-7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-server</artifactId>
-            <version>0.3.0-incubating-SNAPSHOT</version>
+            <version>0.3.0-incubating-20070709.203400-10</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
@@ -155,7 +155,6 @@
             <artifactId>jackrabbit-jcr-webdav</artifactId>
             <version>1.0-osaf-20061023</version>
         </dependency>
-        <!-- dependency of acegi security -->
         <dependency>
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
@@ -198,12 +197,12 @@
             <version>2.0.5</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.resource</groupId>
                     <artifactId>connector</artifactId>
+                    <groupId>javax.resource</groupId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.mail</groupId>
                     <artifactId>mail</artifactId>
+                    <groupId>javax.mail</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -250,15 +249,14 @@
             <version>2.0.2</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Hibernate dependencies -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate</artifactId>
             <version>3.2.5.ga</version>
             <exclusions>
                 <exclusion>
-                    <groupId>ehcache</groupId>
                     <artifactId>ehcache</artifactId>
+                    <groupId>ehcache</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -333,8 +331,8 @@
             <version>1.6.1</version>
             <exclusions>
                 <exclusion>
-                    <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -348,7 +346,6 @@
             <artifactId>wstx-asl</artifactId>
             <version>3.0.2</version>
         </dependency>
-        <!-- Integration testing dependencies -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

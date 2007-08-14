@@ -47,7 +47,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     CONTENT_TYPE_ATOM: "application/atom+xml",
     
     getAndCheckEditLink: function(item){
-        var editLink = this.urlCache.getUrl(item, this.EDIT_LINK);
+        var editLink = item.getUrls()[this.EDIT_LINK];
         if (!editLink) {
             throw new cosmo.service.exception.ClientSideError(
                 "Could not find edit link for item with uuid " + 
@@ -169,7 +169,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var projection = (searchCrit.projection || "full") + "/eim-json";
         var r = {};
         
-        var expandedLink = this.urlCache.getUrl(item, 'expanded');
+        var expandedLink = item.getUrls()['expanded'];
         
         var defaultProjection = "/full/eim-json";
         var projectionIndex = expandedLink.indexOf(defaultProjection);

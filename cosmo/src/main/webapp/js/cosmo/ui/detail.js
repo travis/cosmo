@@ -1121,6 +1121,7 @@ cosmo.ui.detail.EventFormElements= function () {
     }
     function clearTimezone() {
         f.tzRegion.selectedIndex = 0;
+        f.tzId.selectedIndex = 0;
         getTimezoneIdOptions();
     }
     function getStatusOpt() {

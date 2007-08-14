@@ -79,7 +79,7 @@ public class EventEntryFormatter {
                 start = stamp.getStartDate();
                 end = stamp.getEndDate();
             }
-            summary = stamp.getSummary();
+            summary = item.getDisplayName();
             location = stamp.getLocation();
         }
     }

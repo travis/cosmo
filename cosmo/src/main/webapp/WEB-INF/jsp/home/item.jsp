@@ -234,14 +234,6 @@
     </tr>
     <tr>
       <td class="mdLabel" style="text-align:right;">
-        Summary
-      </td>
-      <td class="mdData">
-        <c:choose><c:when test="${eventstamp.summary != null}"><c:out value="${eventstamp.summary}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
         Description
       </td>
       <td class="mdData">

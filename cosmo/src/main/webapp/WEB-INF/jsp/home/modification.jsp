@@ -129,6 +129,14 @@
         <fmt:formatDate value="${Item.modifiedDate}" type="both"/>
       </td>
     </tr>
+     <tr>
+      <td class="mdLabel" style="text-align:right;">
+        Body:
+      </td>
+      <td class="mdData">
+        <cosmo:property value="${Item.body}"/>
+      </td>
+    </tr>
   </table>
 </div>
 
@@ -153,14 +161,6 @@
       </td>
       <td class="mdData">
         <c:out value="${eventstamp.icalUid}"/>
-      </td>
-    </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        Description
-      </td>
-      <td class="mdData">
-        <c:choose><c:when test="${eventstamp.description != null}"><c:out value="${eventstamp.description}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
     <tr>

@@ -147,10 +147,16 @@ public class EventUtils {
         eventStamp.setEventCalendar(masterCalendar);
         eventStamp.compactTimezones();
         
+        VEvent event = eventStamp.getEvent();
+        
         masterNote.setIcalUid(eventStamp.getIcalUid());
-        masterNote.setBody(eventStamp.getDescription());
+        
         // for now displayName is limited to 255 chars
-        masterNote.setDisplayName(StringUtils.substring(eventStamp.getSummary(),0,255));
+        if(event.getSummary()!=null)
+            masterNote.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
+       
+        if(event.getDescription()!=null)
+            masterNote.setBody(event.getDescription().getValue());
         
         // synchronize exceptions with master NoteItem modifications
         syncExceptions(exceptions, masterNote);
@@ -206,9 +212,14 @@ public class EventUtils {
                 .getDate()).toString());
         noteMod.setOwner(masterNote.getOwner());
         noteMod.setName(noteMod.getUid());
+        
         // for now displayName is limited to 255 chars
-        noteMod.setDisplayName(StringUtils.substring(exceptionStamp.getSummary(),0,255));
-        noteMod.setBody(exceptionStamp.getDescription());
+        if(event.getSummary()!=null)
+            noteMod.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
+       
+        if(event.getDescription()!=null)
+            noteMod.setBody(event.getDescription().getValue());
+        
         noteMod.setIcalUid(masterNote.getIcalUid());
         noteMod.setClientCreationDate(new Date());
         noteMod.setClientModifiedDate(noteMod.getClientCreationDate());
@@ -225,9 +236,14 @@ public class EventUtils {
         EventExceptionStamp exceptionStamp = EventExceptionStamp
                 .getStamp(noteMod);
         exceptionStamp.setExceptionEvent(event);
+        
         // for now displayName is limited to 255 chars
-        noteMod.setDisplayName(StringUtils.substring(exceptionStamp.getSummary(),0,255));
-        noteMod.setBody(exceptionStamp.getDescription());
+        if(event.getSummary()!=null)
+            noteMod.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
+       
+        if(event.getDescription()!=null)
+            noteMod.setBody(event.getDescription().getValue());
+        
         noteMod.setClientModifiedDate(new Date());
         noteMod.setLastModifiedBy(noteMod.getModifies().getLastModifiedBy());
         noteMod.setLastModification(ContentItem.Action.EDITED);

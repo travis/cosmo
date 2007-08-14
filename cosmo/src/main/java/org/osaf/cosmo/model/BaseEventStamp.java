@@ -150,19 +150,6 @@ public abstract class BaseEventStamp extends Stamp
         event.getUid().setValue(text);
     }
     
-    /**
-     * Returns a copy of the the iCalendar SUMMARY property value of
-     * the event (can be null).
-     */
-    @Transient
-    public String getSummary() {
-        Property p = getEvent().getProperties().
-            getProperty(Property.SUMMARY);
-        if (p == null)
-            return null;
-        return p.getValue();
-    }
-
     /** 
      * Sets the iCalendar SUMMARY property of the event.
      *
@@ -186,19 +173,6 @@ public abstract class BaseEventStamp extends Stamp
             event.getProperties().add(summary);
         }
         summary.setValue(text);
-    }
-    
-    /**
-     * Returns a copy of the the iCalendar DESCRIPTION property value of
-     * the event (can be null).
-     */
-    @Transient
-    public String getDescription() {
-        Property p = getEvent().getProperties().
-            getProperty(Property.DESCRIPTION);
-        if (p == null)
-            return null;
-        return p.getValue();
     }
     
     /** 

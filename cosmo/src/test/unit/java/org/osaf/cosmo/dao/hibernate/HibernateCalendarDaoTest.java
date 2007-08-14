@@ -441,8 +441,11 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         event.addStamp(evs);
         evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
         event.setIcalUid(evs.getIcalUid());
-        event.setBody(evs.getDescription());
-        event.setDisplayName(evs.getSummary());
+        if(evs.getEvent().getDescription()!=null)
+            event.setBody(evs.getEvent().getDescription().getValue());
+        
+        if(evs.getEvent().getSummary()!=null)
+            event.setDisplayName(evs.getEvent().getSummary().getValue());
         
         return event;
     }

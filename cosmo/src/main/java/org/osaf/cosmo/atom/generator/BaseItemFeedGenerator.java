@@ -40,7 +40,7 @@ import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
- * A base class for feed generators that work with collectoins and items.
+ * A base class for feed generators that work with collections and items.
  *
  * @see Feed
  * @see Entry
@@ -500,7 +500,15 @@ public abstract class BaseItemFeedGenerator
                 fromDateToStringNoTimezone(modUid.getRecurrenceId());
         }
 
-        return TEMPLATE_DETACHED.bind(masterUid, occurrenceUid);
+        String iri = TEMPLATE_DETACHED.bind(masterUid, occurrenceUid);
+
+        if (getProjection() != null) {
+            StringBuffer buf = new StringBuffer(iri);
+            addPathInfo(buf, getProjection());
+            iri = buf.toString();
+        }
+
+        return getLocator().resolveAtomUrl(iri, false);
     }
 
     protected void addPathInfo(StringBuffer iri,

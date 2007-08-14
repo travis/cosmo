@@ -149,4 +149,11 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
             addPathInfo(iri, format);
         return iri.toString();
     }
+
+    protected String detachedIri(NoteItem item) {
+        StringBuffer iri = new StringBuffer(super.detachedIri(item));
+        if (format != null)
+            addPathInfo(iri, format);
+        return iri.toString();
+    }
 }

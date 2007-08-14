@@ -148,6 +148,15 @@ public class ServiceLocator implements ServerConstants {
     }
 
     /**
+     * Resolves the given uri-path relative to the Atom base URL, adding
+     * a query string if necessary.
+     */
+    public String resolveAtomUrl(String path,
+                                 boolean absolute) {
+        return resolveUrl(path, factory.getAtomPrefix(), absolute, true);
+    }
+
+    /**
      * Returns the Atom URL of the item.
      */
     public String getAtomUrl(Item item) {
@@ -324,6 +333,18 @@ public class ServiceLocator implements ServerConstants {
                                 factory.getWebcalPrefix());
     }
 
+    public String getAppMountUrl() {
+        return appMountUrl;
+    }
+
+    public String getTicketKey() {
+        return ticketKey;
+    }
+
+    public ServiceLocatorFactory getFactory() {
+        return factory;
+    }
+
     private String calculateBaseUrl(String servicePrefix) {
         StringBuffer buf = new StringBuffer(appMountUrl);
 
@@ -385,5 +406,22 @@ public class ServiceLocator implements ServerConstants {
         buf.append(PATH_USER).append("/").append(user.getUsername());
 
         return buf.toString();
+    }
+
+    private String resolveUrl(String path,
+                              String servicePrefix,
+                              boolean absolute,
+                              boolean withTicket) {
+        StringBuffer buf = new StringBuffer();
+
+        if (absolute)
+            buf.insert(0, appMountUrl).append(servicePrefix).append("/");
+
+        buf.append(path);
+
+        if (withTicket && ticketKey != null)
+            buf.append("?").append(PARAM_TICKET).append("=").append(ticketKey);
+
+        return buf.toString();                                  
     }
 }

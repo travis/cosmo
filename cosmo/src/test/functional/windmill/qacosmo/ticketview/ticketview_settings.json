@@ -1,3 +1,4 @@
+{"params": {"milliseconds": "4000"}, "version": "0.1", "method": "wait"}
 {"params": {"jsid": "{$calView}"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "4000"}, "version": "0.1", "method": "wait"}
 {"params": {"milliseconds": "4000"}, "version": "0.1", "method": "wait"}

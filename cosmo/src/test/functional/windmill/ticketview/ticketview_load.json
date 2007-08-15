@@ -1,7 +1,8 @@
-{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/form\/span[4]\/span[3]\/button"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
-{"method": "wait", "params": {"milliseconds" : 5000}}
+{"params": {"xpath": "html/body/div/div/form/span[4]/span[3]/button"}, "version": "0.1", "method": "click"}
+{"method": "wait", "params": {"milliseconds" : 8000}}
+{"method": "wait", "params": {"milliseconds" : 8000}}
 {"params": {"link": "[Chandler]"}, "version": "0.1", "method": "storeURL"}
+{"method": "wait", "params": {"milliseconds" : 8000}}
 {"params": {"url": "{$[Chandler]}"}, "version": "0.1", "method": "open"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
 {"method": "wait", "params": {"milliseconds" : 5000}}

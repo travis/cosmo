@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.osaf.cosmo</groupId>
     <artifactId>osaf-server</artifactId>
-    <version>0.7.0-RC1</version>
+    <version>0.7.0-RC2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Chandler Server</name>
     <url>http://chandlerproject.org</url>
@@ -248,4 +248,3 @@
         </pluginManagement>
     </build>
 </project>
-

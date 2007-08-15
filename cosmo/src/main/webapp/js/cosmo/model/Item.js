@@ -294,7 +294,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         },
         
         tickle: function(){
-           if (!this.getAutoTriage() || !this.getEventStamp() ||(this.isMaster() && this.hasRecurrence())){
+           if (!this.getAutoTriage() || (this.isMaster() && this.hasRecurrence())){
                return false;
            }
            

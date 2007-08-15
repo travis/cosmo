@@ -154,7 +154,15 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
                 }
                 
                 // calculate and store time-range indexes
-                Object[] indexes = getIndexValues(calendar, masterCalendar);
+                Object[] indexes = null;
+                
+                try {
+                    indexes = getIndexValues(calendar, masterCalendar);
+                } catch (RuntimeException e) {
+                    log.error("error processing stampid " + eventId);
+                    throw e;
+                }
+                
                 updateStmt.setBoolean(1, (Boolean) indexes[2]);
                 updateStmt.setBoolean(2, (Boolean) indexes[3]);
                 updateStmt.setString(3, (String) indexes[0]);
@@ -326,7 +334,7 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         
         // must have start date
         if(startDate==null)
-            throw new RuntimeException("event must have start date");
+            throw new RuntimeException("event must have start date: " + calendar.toString());
         
         // A floating date is a DateTime with no timezone
         if(startDate instanceof DateTime) {
@@ -385,8 +393,14 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
      */
     private Date getStartDate(VEvent event) {
         DtStart dtStart = event.getStartDate();
-        if (dtStart == null)
+        
+        // Handle no start date on modifications by returning
+        // the recurrenceId
+        if (dtStart == null && event.getRecurrenceId()!=null)
+            return event.getRecurrenceId().getDate();
+        else if(dtStart == null)
             return null;
+        
         return dtStart.getDate();
     }
     

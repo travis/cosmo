@@ -45,6 +45,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             errorMessage += this._performInterPropertyValidations(delta);
         }
         
+        this._removeRecurrenceChangeIfUnsupported(delta);
         delta.deltafy(true);
         return [delta, errorMessage];  
     },
@@ -348,5 +349,13 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         }
         return "";
         
+    },
+    _removeRecurrenceChangeIfUnsupported: function(delta){
+        if (this._item.hasRecurrence() && delta.getStampProperty("event", "rrule") == null){
+            var es = this._item.getEventStamp();
+            if (!es.getRrule().isSupported()){
+                delta.removeStampProperty("event", "rrule");
+            }
+        }  
     }
 });

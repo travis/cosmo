@@ -1400,7 +1400,7 @@ cosmo.ui.detail.EventFormElements= function () {
         }
         var recur = stamp.getRrule();
         var recurEnd = f.recurrenceEnd;
-        if (recur) {
+        if (recur && recur.isSupported()) {
             _html.setSelect(f.recurrenceInterval, recur.getFrequency());
             _html.enableFormElem(recurEnd, 'text');
             if (recur.getEndDate()) {

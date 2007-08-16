@@ -147,9 +147,10 @@ dojo.widget.HtmlWidget, function(){
             for (var i = 0; i < inputs.length; i++) {
                 var inp = inputs[i];
                 if (inp.type == 'text') {
-                    inp.onfocus = cosmo.util.html.handleTextInputFocus;
+                    dojo.event.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
                 }
             }
+            
         },
 
         saveDisplayName: function(){
@@ -198,7 +199,7 @@ dojo.widget.HtmlWidget, function(){
             }
         },
 
-        // Instance methods
+        // Ins  nce methods
         _showClientInstructionsAndAddress: function(show, showLink){
             var hideshow = show ? "" : "none";
             this.clientInstructionRows.style.display = hideshow;

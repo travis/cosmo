@@ -163,14 +163,14 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     }
     this.setText(titleDiv, note.getDisplayName());
 };
-/**
- * A bit of a misnomer -- just static text at the moment
- * FIXME: Add animation -- either GIF or using CSS effects
- */
+
 cosmo.view.cal.lozenge.Lozenge.prototype._showProcessingMessage = function () {
-    var titleDiv = $(this.domNodeId + 'Title' +
-        '__' + this.id);
-    this.setText(titleDiv, 'Processing ...');
+    // Untimed event items have no listed time
+    if (this.timeNode) {
+        this.setText(this.timeNode, '');
+    }
+    // Set the title to read 'Processing'
+    this.setText(this.titleNode, 'Processing ...');
 };
 /**
  * Toggle cursor to 'default' while lozenge is in processing
@@ -322,9 +322,10 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
             // Do nothing
             break;
     }
-
-    if (ev.data.getEventStamp().getStatus() &&
-        ev.data.getEventStamp().getStatus().indexOf('TENTATIVE') > -1) {
+    
+    var eventStamp = ev.data.getEventStamp() || ev.dataOrig.getEventStamp();
+    if (eventStamp.getStatus() &&
+        eventStamp.getStatus().indexOf('TENTATIVE') > -1) {
         borderStyle = 'dashed';
     }
 
@@ -382,7 +383,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.useLightColor = function (ev) {
     var ret = false;
-    var eventStamp = ev.data.getEventStamp();
+    var eventStamp = ev.data.getEventStamp() || ev.dataOrig.getEventStamp();
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();
     var status = eventStamp.getStatus();

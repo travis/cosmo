@@ -199,7 +199,7 @@ dojo.widget.HtmlWidget, function(){
             }
         },
 
-        // Ins  nce methods
+        // Instance methods
         _showClientInstructionsAndAddress: function(show, showLink){
             var hideshow = show ? "" : "none";
             this.clientInstructionRows.style.display = hideshow;

@@ -93,7 +93,7 @@ cosmo.ui.conf.getBooleanValue = function(propertyName){
     //             are strings, not integers, booleans, etc, so this method is necessary to do
     //             the proper "casting"
     var rawValue = this[propertyName];
-    return (""+rawValue).toLowerCase()[0] == "t";
+    return (""+rawValue).toLowerCase().charAt(0) == "t";
 } 
 
 if (djConfig['i18nLocation']){

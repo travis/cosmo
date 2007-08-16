@@ -123,11 +123,16 @@ public class EventApplicator extends BaseStampApplicator
     public void applyRecord(EimRecord record) throws EimSchemaException {
         super.applyRecord(record);
         
-        // Ensure that a startDate is present
+        // Ensure that a startDate, duration are present
         if(!record.isDeleted()) {
             BaseEventStamp event = (BaseEventStamp) getStamp();
             if(event.getStartDate()==null)
                 throw new EimValidationException("field " + FIELD_DTSTART + " is required");
+            
+            if(event instanceof EventStamp) {
+                if(event.getDuration()==null)
+                    throw new EimValidationException("field " + FIELD_DURATION + " is required");
+            }
         }
     }
 
@@ -167,7 +172,13 @@ public class EventApplicator extends BaseStampApplicator
                 String value =
                     EimFieldValidator.validateText(field, MAXLEN_DURATION);
                 try {
-                    event.setDuration(DurationFormat.getInstance().parse(value));
+                    Dur dur = DurationFormat.getInstance().parse(value);
+                    
+                    // Duration must be positive
+                    if(dur!=null && dur.isNegative())
+                        throw new EimValidationException("Illegal duration " + value);
+                    
+                    event.setDuration(dur);
                 } catch (ParseException e) {
                     throw new EimValidationException("Illegal duration " + value, e);
                 }

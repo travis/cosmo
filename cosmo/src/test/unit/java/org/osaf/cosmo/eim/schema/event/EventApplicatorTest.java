@@ -58,12 +58,27 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         Assert.assertEquals(eventStamp.getRecurrenceRules().get(0).toString(), "FREQ=DAILY;UNTIL=20070306T055959Z");
     }
     
+    public void testApplyFieldNegativeDur() throws Exception {
+        NoteItem noteItem = new NoteItem();
+       
+        EimRecord record = makeTestRecordWithNegativeDur();
+
+        EventApplicator applicator =
+            new EventApplicator(noteItem);
+        try {
+            applicator.applyRecord(record);
+            Assert.fail("able to set negative dur");
+        } catch (EimValidationException e) {
+        }
+    }
+    
     public void testApplyFieldWithUnknown() throws Exception {
         NoteItem noteItem = new NoteItem();
         EventStamp es = new EventStamp(noteItem);
         noteItem.addStamp(es);
         es.createCalendar();
         es.setStartDate(new Date("01011979"));
+        es.setEndDate(new Date("01021979"));
         es.setModifiedDate(es.getStartDate());
         
         EimRecord record = makeTestRecordWithUnknown();
@@ -141,6 +156,18 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
 
         record.addField(new TextField(FIELD_DTSTART, ";VALUE=DATE-TIME:20070212T074500"));
         record.addField(new TextField(FIELD_DURATION, "PT1H"));
+        record.addField(new TextField(FIELD_LOCATION, "here"));
+        record.addField(new TextField(FIELD_RRULE, "FREQ=DAILY;UNTIL=20070306T055959Z"));
+        record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));
+
+        return record;
+    }
+    
+    private EimRecord makeTestRecordWithNegativeDur() {
+        EimRecord record = new EimRecord(PREFIX_EVENT, NS_EVENT);
+
+        record.addField(new TextField(FIELD_DTSTART, ";VALUE=DATE-TIME:20070212T074500"));
+        record.addField(new TextField(FIELD_DURATION, "-PT1H"));
         record.addField(new TextField(FIELD_LOCATION, "here"));
         record.addField(new TextField(FIELD_RRULE, "FREQ=DAILY;UNTIL=20070306T055959Z"));
         record.addField(new TextField(FIELD_STATUS, "CONFIRMED"));

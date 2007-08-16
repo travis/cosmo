@@ -296,8 +296,8 @@ cosmo.datetime.Date.prototype.getTimezoneOffsetForGivenDate = function(date){
                 return (timezone.getOffsetInMinutes(date)*-1);
             }
             else {
-                //couldn't find timezone just make it utc?
-                return 0;
+                //couldn't find timezone - treat it as floating
+                return this.getUserPrefTimezoneOffsetForGivenDate(date);
             }
         }
 
@@ -470,6 +470,8 @@ cosmo.datetime.Date.prototype.getTimezoneAbbrName = function(){
         var timezone = cosmo.datetime.timezone.getTimezone(this.tzId);
         if (timezone){
             return timezone.getAbbreviatedName(this);
+        } else {
+            return this.tzId;
         }
     }
 

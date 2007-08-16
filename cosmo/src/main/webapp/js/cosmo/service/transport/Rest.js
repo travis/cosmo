@@ -116,7 +116,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
                     // This works around this, but is very tightly coupled to the Dojo
                     // implementation. 
                     // TODO: find a better way to do this
-                    if (!(dojo.render.html.ie && xhr.status == 404 && !xhr.send)){
+                    if (deferredRequestHandler.fired == -1){
                         var err = new Error(e.message);
                         err.xhr = xhr;
                         deferredRequestHandler.errback(err);

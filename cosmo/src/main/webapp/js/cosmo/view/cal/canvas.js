@@ -690,7 +690,11 @@ cosmo.view.cal.canvas = new function () {
                 self.setSelectedCalItem(ev);
                 break;
             case 'save':
-                setLozengeProcessing(cmd);
+                if (cmd.data.data.getEventStamp()){
+                    setLozengeProcessing(cmd);
+                } else {
+                    removeEvent(cmd.data);
+                }
                 // Do nothing
                 break;
             case 'saveFailed':
@@ -725,7 +729,9 @@ cosmo.view.cal.canvas = new function () {
                 }
                 break;
             case 'saveSuccess':
-                saveSuccess(cmd);
+                if (cmd.data.data.getEventStamp()){
+                    saveSuccess(cmd);
+                }
                 break;
             case 'remove':
                 // Show 'processing' state here

@@ -137,6 +137,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <!--
         <repository>
             <id>modularity snapshots</id>
             <name>Modularity Snapshot Repository</name>
@@ -161,6 +162,7 @@
               <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
+        -->
         <repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven</name>

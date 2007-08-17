@@ -321,7 +321,7 @@
 }
 /* Contains the cols for the all-day events */
 #allDayContentDiv {
-    position: absolute;
+    position: relative;
     overflow: hidden;
     -moz-user-select: none
 }

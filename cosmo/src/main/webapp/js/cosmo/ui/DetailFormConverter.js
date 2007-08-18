@@ -16,6 +16,7 @@
 
 dojo.provide("cosmo.ui.DetailFormConverter");
 dojo.require("cosmo.model.Delta");
+dojo.require("cosmo.model.exception");
 
 dojo.declare("cosmo.ui.DetailFormConverter", null, {
    _item: null,
@@ -25,6 +26,11 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
    },
    
    createDelta: function(){
+     	if (cosmo.ui.detail.item.data.getItemUid() != this._item.getItemUid()){
+     		throw new cosmo.model.exception.DetailItemNotDeltaItemException(
+     			"Item in detail view doesn't match item in Delta.")
+     	}
+   
         var delta = new cosmo.model.Delta(this._item);
         var errorMessage = "";
         

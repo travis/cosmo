@@ -19,6 +19,7 @@ dojo.provide('cosmo.view.common');
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime.Date");
 dojo.require('cosmo.view.dialog');
+dojo.require('cosmo.model.exception');
 
 cosmo.view.recurrenceDialog = new cosmo.view.dialog.RecurrenceDialog();
 cosmo.view.unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
@@ -203,7 +204,23 @@ cosmo.view.canvasBase = new function () {
         recallParam, execContext) {
         var converter = new cosmo.ui.DetailFormConverter(
             origSelection.data);
-        var deltaAndError = converter.createDelta();
+        var deltaAndError;
+        try {
+            deltaAndError = converter.createDelta();
+        } catch (e){
+            // This will happen if there was a problem in the createDelta
+            // function
+         	if (e instanceof cosmo.model.exception.DetailItemNotDeltaItemException){
+         	   // If the detail item wasn't the delta item it means the ui 
+               // is out of sync. We really can't do anything smart in this
+               // case, so just proceed with selecting the next item.
+               return true;
+            }
+        }
+
+        // This will be populated if there
+        // was a validation error while creating
+        // the delta.
         var error = deltaAndError[1];
         var delta = deltaAndError[0];
         if (error || delta.hasChanges()) {

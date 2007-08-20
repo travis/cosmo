@@ -174,7 +174,8 @@ def main():
     connection_info = {'admin_username' : options.admin_username,
                        'admin_password' : options.admin_password,
                        'server_url'     : options.server_url,
-                       'hub_pass'  : options.hub_pass}
+                       'hub_pass'       : options.hub_pass,
+                       'pdb'            : options.pdb}
     
     if options.collect:
         store = {}
@@ -189,9 +190,23 @@ def main():
             test.setup()
             if getattr(options, name) is True:
                 if options.collect and hasattr(test, 'collect'):
-                    test.collect()
+                    if not getattr(options.pdb, None):
+                        test.collect()
+                    else:
+                        import pdb
+                        try:
+                            test.collect()
+                        except:
+                            pdb.pm()
                 if options.validate and hasattr(test, 'validate'):
-                    test.validate()
+                    if not getattr(options.pdb, None):
+                        test.collect()
+                    else:
+                        import pdb
+                        try:
+                            test.collect()
+                        except:
+                            pdb.pm()    
     
     if not options.validate and options.collect:
         if os.path.isfile(options.filename):

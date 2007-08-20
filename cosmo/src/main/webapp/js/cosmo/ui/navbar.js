@@ -97,7 +97,7 @@ cosmo.ui.navbar.Bar = function (p) {
         self.setSize(self.width - 2, CAL_TOP_NAV_HEIGHT-1);
         self.setPosition(0, 0);
     };
-    
+
     /*
      * Switch to viewName. If noLoad is true, do not refresh
 	 * data before doing so.
@@ -320,8 +320,6 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
     var params = p || {};
     // Processing lock to avoid duplicate items created
     var isProcessing = false;
-    // If the collection isn't writeable, disable everything
-    var writeable = cosmo.app.pim.currentCollection.getWriteable();
 
     this.parent = params.parent;
     this.domNode = _createElem('div');
@@ -332,6 +330,9 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
     this.renderSelf = function () {
         // Resest processing lock on render
         isProcessing = false;
+
+        // If the collection isn't writeable, disable everything
+        var writeable = cosmo.app.pim.currentCollection.getWriteable();
 
         var disableButton = function () {
           self.formNode.removeChild(self.createButton.domNode);
@@ -369,15 +370,18 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             name: 'listViewQuickItemEntry',
             size: 24,
             className: 'inputText',
-            value: ''
+            value: '',
+            disabled: writeable ? false : true
         };
         var text = cosmo.util.html.createInput(o);
         text.style.width = '220px';
         this.createTextBox = text;
-        var func = cosmo.util.html.handleTextInputFocus;
-        cosmo.util.html.setTextInput(text,
-            _('Main.NavBar.QuickItemEntryHint'), true);
-        dojo.event.connect(text, 'onfocus', func);
+        if (writeable) {
+            var func = cosmo.util.html.handleTextInputFocus;
+            cosmo.util.html.setTextInput(text,
+                _('Main.NavBar.QuickItemEntryHint'), true);
+            dojo.event.connect(text, 'onfocus', func);
+        }
         form.appendChild(text);
         form.appendChild(cosmo.util.html.nbsp());
 

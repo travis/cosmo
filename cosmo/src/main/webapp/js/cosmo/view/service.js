@@ -537,6 +537,9 @@ cosmo.view.service = new function () {
             });
             masterEventStamp.setRrule(newRecurrenceRule);
             deferred = cosmo.app.pim.serv.saveItem(master);
+            if (data.getMaster().getModification(data.recurrenceId)){
+                deferred.addCallback(function(){cosmo.app.pim.serv.deleteItem(data)});
+            }
             reqId = deferred.id;
         } else if (opts.removeType == OPTIONS.ONLY_THIS_EVENT){
             var data = item.data;
@@ -555,6 +558,9 @@ cosmo.view.service = new function () {
             }
             masterEventStamp.getExdates().push(exDate)
             deferred = cosmo.app.pim.serv.saveItem(master);
+            if (data.getMaster().getModification(data.recurrenceId)){
+                deferred.addCallback(function(){cosmo.app.pim.serv.deleteItem(data)});
+            }
             reqId = deferred.id;
         }
 

@@ -85,12 +85,11 @@ class CosmoClient(davclient.DAVClient):
                       response.find('{DAV:}href').text.endswith('.ics') )]
         events = []
         for ref in hrefs:
-            if ref.text.endswith('.ics'):
-                event = {'href':ref.text}
-                print ref.text.replace(self._url.geturl(), '')
-                self.get(ref.text.replace(self._url.geturl(), ''))
-                event['body'] = copy.copy(self.response.body)
-                events.append(event)
+            event = {'href':ref}
+            print ref.replace(self._url.geturl(), '')
+            self.get(ref.replace(self._url.geturl(), ''))
+            event['body'] = copy.copy(self.response.body)
+            events.append(event)
         return events
         
     def get_all_users_events(self):

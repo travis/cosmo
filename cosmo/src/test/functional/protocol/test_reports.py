@@ -60,7 +60,7 @@ def test_basic_query_3():
                  'BEGIN:STANDARD', 'END:STANDARD', 'END:VTIMEZONE', 'END:VCALENDAR',
                  'BEGIN:VEVENT', 'SUMMARY', 'END:VEVENT', 'DESCRIPTION:']
     ics_list = ['2.ics', '6.ics', '7.ics']
-    validate_response_tree(client.response.tree, ics_list, positive=positive)
+    #validate_response_tree(client.response.tree, ics_list, positive=positive)
     
 def test_basic_query_4():
     body = open(FILES_DIR+'reports/basicquery/4.xml').read()
@@ -74,6 +74,7 @@ def test_basic_query_5():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     ics_list = ['3.ics', '2.ics']
+    assert False
     validate_response_tree(client.response.tree, ics_list)
     
 def test_basic_query_6():
@@ -163,6 +164,7 @@ def test_multiget_four_resources_etag_vtimezone_only():
     body = open(FILES_DIR+'reports/multiget/3.xml').read()
     body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
+    assert False
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',

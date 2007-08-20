@@ -24,6 +24,7 @@ FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/
 
 def test_delete_empty_collection():
     client.mkcol('%s/collectiontodelete' % PRINCIPAL_DAV_PATH)
+    test = PRINCIPAL_DAV_PATH
     assert client.response.status == 201
     client.delete('%s/collectiontodelete' % PRINCIPAL_DAV_PATH)
     assert client.response.status == 204

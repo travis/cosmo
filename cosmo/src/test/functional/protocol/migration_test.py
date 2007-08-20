@@ -60,7 +60,7 @@ class AllUserEvents(MigrationTest):
                     print 'Failure in '+item['href']
                     print diff
         self.store['all_item_failures'] = failures
-        for key, value in failures:
+        for key, value in failures.items():
             self.end_strings.append(key+' Failed')
             self.end_strings.append(value['diff'])
         self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))
@@ -118,7 +118,7 @@ class TestAccountResouces(MigrationTest):
                 print 'Failure in '+item['href']
                 print diff
         self.store['test_account_failures'] = failures
-        for key, value in failures:
+        for key, value in failures.items():
             self.end_strings.append(key+' Failed')
             self.end_strings.append(value['diff'])
         self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))

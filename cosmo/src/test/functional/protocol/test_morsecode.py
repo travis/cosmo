@@ -65,7 +65,7 @@ def test_get_all_collections():
     assert client.response.status == 200
     
     xobj = xmlobjects.fromstring(client.response.body)
-    assert len(xobj.collection) is 3 # cosmolib creates one calendar collection so we should have 3
+    assert len(xobj.collection) is 4 # cosmolib creates one calendar collection so we should have 3
 
     
     

@@ -22,6 +22,7 @@ class MigrationTest(object):
     def __init__(self, connection_info, store):
         self.connection_info = connection_info
         self.store = store
+        self.end_strings = []
 
 class AllUserEvents(MigrationTest):
     """Verify that all events for all users match"""
@@ -53,19 +54,23 @@ class AllUserEvents(MigrationTest):
                 except AssertionError:
                     failed = failed + 1
                     failed_urls.append(item['href'])
-                    diff = '\n'.join([line.encode('ascii', 'ignore') for line in difflib.unified_diff(item['body'].split('\n'),
-                                         body.split('\n'))])
+                    diff = '\n'.join([
+                        line.encode('ascii', 'ignore') for line in difflib.unified_diff(
+                            [ line.encode('ascii', 'ignore') for line in item['body'].split('\n')], 
+                            [ line.encode('ascii', 'ignore') for line in body.split('\n')],
+                            )
+                        ])
                     failure = {'item':item, 'body':body, 'diff':diff}
                     failures[item['href'].replace(self.client._url.geturl(), '')] = failure
                     print 'Failure in '+item['href']
                     print diff
         self.store['all_item_failures'] = failures
         for key, value in failures:
-            print key+' Failed'
-            print value['diff']
-        print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
+            self.end_strings.append(key+' Failed')
+            self.end_strings.append(value['diff'])
+        self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))
         if failed is not 0:
-            print 'Failed urls :: \n%s' % '\n'.join(failed_urls)
+            self.end_strings.append('Failed urls :: \n%s' % '\n'.join(failed_urls))
         
         
 class NumberOfUsers(MigrationTest):
@@ -83,10 +88,10 @@ class NumberOfUsers(MigrationTest):
     def validate(self):
         current_count = self.client.get_user_count()
         if self.store['number_of_users'] == current_count:
-            print 'Number of users match on both instances'
+            self.end_strings.append('Number of users match on both instances')
         else:
-            print "Number of users don't match. %s is the previous number. %s is the new one" % (
-                  self.store['number_of_users'], current_count ) 
+            self.end_strings.append("Number of users don't match. %s is the previous number. %s is the new one" % (
+                  self.store['number_of_users'], current_count )) 
 
 class TestAccountResouces(MigrationTest):
     name = 'test_account_resources'
@@ -120,11 +125,11 @@ class TestAccountResouces(MigrationTest):
                 print diff
         self.store['test_account_failures'] = failures
         for key, value in failures:
-            print key+' Failed'
-            print value['diff']
-        print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
+            self.end_strings.append(key+' Failed')
+            self.end_strings.append(value['diff'])
+        self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))
         if failed is not 0:
-            print 'Failed urls :: \n%s' % '\n'.join([fail['href'] for fail in failed])
+            self.end_strings.append('Failed urls :: \n%s' % '\n'.join([fail['href'] for fail in failed]))
             
 def main():
     from optparse import OptionParser
@@ -185,6 +190,7 @@ def main():
         print 'Loading pickle'
         store = pickle.load(f)
     
+    tests = []
     for name, cls in test_classes.items():
         if getattr(options, name):
             test = cls(connection_info, store)
@@ -207,7 +213,9 @@ def main():
                         try:
                             test.validate()
                         except:
-                            pdb.post_mortem(sys.exc_info()[2])  
+                            pdb.post_mortem(sys.exc_info()[2])
+            tests.append(test)
+    print '+++++++++++++++++++++++++++++++++\n'.join( ['\n'.join(test.end_strings) for test in tests] )
     
     if not options.validate and options.collect:
         if os.path.isfile(options.filename):

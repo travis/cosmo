@@ -99,7 +99,7 @@ class CosmoClient(davclient.DAVClient):
         
         all_events = {}
         for user in self._users:
-            print 'Getting all events for user "%s"' % user
+            print u'Getting all events for user '+user
             events = self.get_all_events(user)
             all_events[user] = events
             

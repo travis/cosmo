@@ -38,7 +38,7 @@ class AllUserEvents(MigrationTest):
     
     def validate(self):
         total = passed = failed = 0
-        failed_urls = []
+        failures = {}
         
         print 'Starting validation for All User Events'
         for user, events in self.store['all_events'].items():
@@ -52,9 +52,16 @@ class AllUserEvents(MigrationTest):
                 except AssertionError:
                     failed = failed + 1
                     failed_urls.append(event['href'])
-                    print "failure in %s" % event['href']
-                    print "Pre::%s" % event['body']
-                    print "Post::%s"% body
+                    diff = '\n'.join([line for line in difflib.unified_diff(event['body'].split('\n'),
+                                         body.split('\n'))])
+                    failure = {'event':event, 'body':body, 'diff':diff}
+                    failures[event['href'].replace(self.client._url.geturl(), '')] = failure
+                    print 'Failure in '+event['href']
+                    print diff
+        self.store['all_event_failures'] = failures
+        for key, value in failures:
+            print key+' Failed'
+            print value['diff']
         print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
         if failed is not 0:
             print 'Failed urls :: \n%s' % '\n'.join(failed_urls)
@@ -104,6 +111,18 @@ class TestAccountResouces(MigrationTest):
                 passed = passed + 1
             except AssertionError:
                 failed = failed + 1
+<<<<<<< .mine
+                diff = '\n'.join([line for line in difflib.unified_diff(item['body'].split('\n'),
+                                     body.split('\n'))])
+                failure = {'item':item, 'body':body, 'diff':diff}
+                failures[item['href'].replace(self.client._url.geturl(), '')] = failure
+                print 'Failure in '+item['href']
+                print diff
+        self.store['test_account_failures'] = failures
+        for key, value in failures:
+            print key+' Failed'
+            print value['diff']
+=======
                 diff = '\n'.join([line for line in difflib.unified_diff(item.split('\n'),
                                      body.split('\n'))])
                 failure = {'item':item, 'body':body, 'diff':diff}
@@ -114,6 +133,7 @@ class TestAccountResouces(MigrationTest):
         for key, value in failures:
             print key+' Failed'
             print value['diff']
+>>>>>>> .r5447
         print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
         if failed is not 0:
             print 'Failed urls :: \n%s' % '\n'.join(failed_urls)

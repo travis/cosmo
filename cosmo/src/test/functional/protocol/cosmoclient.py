@@ -80,7 +80,9 @@ class CosmoClient(davclient.DAVClient):
     def get_all_events(self, user, collection='/'):
         """Get all the events for a given user. Returns list of dict objects with 'href' and 'body'"""
         self.propfind(self._cosmo_path+'dav/'+user+collection)
-        hrefs = self.response.tree.findall('//{DAV:}href')
+        hrefs = [ response.find('{DAV:}href').text for response in self.response.tree.getchildren() if (
+                      response.find('{DAV:}href').text.find('http') is not -1) and (
+                      response.find('{DAV:}href').text.endswith('.ics') )]
         events = []
         for ref in hrefs:
             if ref.text.endswith('.ics'):

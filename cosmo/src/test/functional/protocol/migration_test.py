@@ -52,7 +52,7 @@ class AllUserEvents(MigrationTest):
                 except AssertionError:
                     failed = failed + 1
                     failed_urls.append(event['href'])
-                    diff = u'\n'.join([line for line in difflib.unified_diff(event['body'].split('\n'),
+                    diff = '\n'.join([line.encode('ascii', 'ignore') for line in difflib.unified_diff(event['body'].split('\n'),
                                          body.split('\n'))])
                     failure = {'event':event, 'body':body, 'diff':diff}
                     failures[event['href'].replace(self.client._url.geturl(), '')] = failure
@@ -111,7 +111,7 @@ class TestAccountResouces(MigrationTest):
                 passed = passed + 1
             except AssertionError:
                 failed = failed + 1
-                diff = '\n'.join([line for line in difflib.unified_diff(item['body'].split('\n'),
+                diff = '\n'.join([line.encode('ascii', 'ignore') for line in difflib.unified_diff(item['body'].split('\n'),
                                      body.split('\n'))])
                 failure = {'item':item, 'body':body, 'diff':diff}
                 failures[item['href'].replace(self.client._url.geturl(), '')] = failure

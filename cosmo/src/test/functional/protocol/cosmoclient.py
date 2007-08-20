@@ -99,7 +99,7 @@ class CosmoClient(davclient.DAVClient):
         
         all_events = {}
         for user in self._users:
-            print u'Getting all events for user '+user
+            print 'Getting all events for user '+user.encode('ascii', 'ignore')
             events = self.get_all_events(user)
             all_events[user] = events
             
@@ -111,7 +111,7 @@ class CosmoClient(davclient.DAVClient):
         hrefs = [ response.find('{DAV:}href').text for response in self.response.tree.getchildren() if (
                       response.find('{DAV:}href').text.find('http') is not -1) and ( not
                       response.find('{DAV:}href').text.endswith('/') )]
-        print hrefs
+
         for ref in hrefs:
             item = {'href':ref}
             print ref.replace(self._url.geturl(), '')

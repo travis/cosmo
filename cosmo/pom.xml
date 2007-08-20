@@ -56,6 +56,11 @@
             <version>0.3.0-incubating-20070709.203400-10</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-protocol</artifactId>
+            <version>0.3.0-incubating-20070709.203400-7</version>
+        </dependency>
+        <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <version>1.0.2</version>

@@ -25,7 +25,7 @@ class MigrationTest(object):
 
 class AllUserEvents(MigrationTest):
     """Verify that all events for all users match"""
-    name = 'all_events'
+    name = 'all_items'
     switch = 'e'
     def setup(self):
         self.client = cosmoclient.CosmoClient(self.connection_info['server_url'])
@@ -34,31 +34,32 @@ class AllUserEvents(MigrationTest):
     
     def collect(self):
         print 'Collecting All User events'
-        store['all_events'] = self.client.get_all_users_events()
+        self.store['all_items'] = self.client.get_all_users_items()
     
     def validate(self):
         total = passed = failed = 0
         failures = {}
+        failed_urls = []
         
         print 'Starting validation for All User Events'
-        for user, events in self.store['all_events'].items():
-            for event in events:
-                print 'Verifying %s' % event['href']
-                body = self.client.get(event['href'].replace(self.client._url.geturl(), ''))
+        for user, items in self.store['all_items'].items():
+            for item in items:
+                print 'Verifying %s' % item['href']
+                body = self.client.get(item['href'].replace(self.client._url.geturl(), ''))
                 try:
                     total = total + 1
-                    assert event['body'] == body
+                    assert item['body'] == body
                     passed = passed + 1
                 except AssertionError:
                     failed = failed + 1
-                    failed_urls.append(event['href'])
-                    diff = '\n'.join([line.encode('ascii', 'ignore') for line in difflib.unified_diff(event['body'].split('\n'),
+                    failed_urls.append(item['href'])
+                    diff = '\n'.join([line.encode('ascii', 'ignore') for line in difflib.unified_diff(item['body'].split('\n'),
                                          body.split('\n'))])
-                    failure = {'event':event, 'body':body, 'diff':diff}
-                    failures[event['href'].replace(self.client._url.geturl(), '')] = failure
-                    print 'Failure in '+event['href']
+                    failure = {'item':item, 'body':body, 'diff':diff}
+                    failures[item['href'].replace(self.client._url.geturl(), '')] = failure
+                    print 'Failure in '+item['href']
                     print diff
-        self.store['all_event_failures'] = failures
+        self.store['all_item_failures'] = failures
         for key, value in failures:
             print key+' Failed'
             print value['diff']
@@ -123,7 +124,7 @@ class TestAccountResouces(MigrationTest):
             print value['diff']
         print "Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed)
         if failed is not 0:
-            print 'Failed urls :: \n%s' % '\n'.join(failed_urls)
+            print 'Failed urls :: \n%s' % '\n'.join([fail['href'] for fail in failed])
             
 def main():
     from optparse import OptionParser
@@ -170,7 +171,7 @@ def main():
     if options.collect and not options.filename and not options.validate:
         print 'You cannot specify collect and not validate without the filename option'
         sys.exit()
-     
+    
     connection_info = {'admin_username' : options.admin_username,
                        'admin_password' : options.admin_password,
                        'server_url'     : options.server_url,
@@ -190,23 +191,23 @@ def main():
             test.setup()
             if getattr(options, name) is True:
                 if options.collect and hasattr(test, 'collect'):
-                    if not getattr(options.pdb, None):
+                    if not getattr(options, 'pdb', None):
                         test.collect()
                     else:
                         import pdb
                         try:
                             test.collect()
                         except:
-                            pdb.pm()
+                            pdb.post_mortem(sys.exc_info()[2])
                 if options.validate and hasattr(test, 'validate'):
-                    if not getattr(options.pdb, None):
-                        test.collect()
+                    if not getattr(options, 'pdb', None):
+                        test.validate()
                     else:
                         import pdb
                         try:
-                            test.collect()
+                            test.validate()
                         except:
-                            pdb.pm()    
+                            pdb.post_mortem(sys.exc_info()[2])  
     
     if not options.validate and options.collect:
         if os.path.isfile(options.filename):

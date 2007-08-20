@@ -99,9 +99,14 @@ class CosmoClient(davclient.DAVClient):
         
         all_events = {}
         for user in self._users:
-            print 'Getting all events for user '+user.encode('ascii', 'ignore')
-            events = self.get_all_events(user)
-            all_events[user] = events
+            try:
+                user.encode('ascii')
+            except UnicodeEncodeError:
+                print "username can't be coerced easily to ascii, skipping"
+            else:
+                print 'Getting all events for user '+user.encode('ascii', 'ignore')
+                events = self.get_all_events(user)
+                all_events[user] = events
             
         return all_events
         

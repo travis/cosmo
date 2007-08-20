@@ -54,12 +54,7 @@ class AllUserEvents(MigrationTest):
                 except AssertionError:
                     failed = failed + 1
                     failed_urls.append(item['href'])
-                    diff = '\n'.join([
-                        line.encode('ascii', 'ignore') for line in difflib.unified_diff(
-                            [ line.encode('ascii', 'ignore') for line in item['body'].split('\n')], 
-                            [ line.encode('ascii', 'ignore') for line in body.split('\n')],
-                            )
-                        ])
+                    diff = '\n'.join([line for line in difflib.unified_diff(item['body'].split('\n'), body.split('\n'))])
                     failure = {'item':item, 'body':body, 'diff':diff}
                     failures[item['href'].replace(self.client._url.geturl(), '')] = failure
                     print 'Failure in '+item['href']
@@ -117,8 +112,7 @@ class TestAccountResouces(MigrationTest):
                 passed = passed + 1
             except AssertionError:
                 failed = failed + 1
-                diff = '\n'.join([line.encode('ascii', 'ignore') for line in difflib.unified_diff(item['body'].split('\n'),
-                                     body.split('\n'))])
+                diff = '\n'.join([line for line in difflib.unified_diff(item['body'].split('\n'), body.split('\n'))])
                 failure = {'item':item, 'body':body, 'diff':diff}
                 failures[item['href'].replace(self.client._url.geturl(), '')] = failure
                 print 'Failure in '+item['href']
@@ -217,13 +211,12 @@ def main():
             tests.append(test)
     print '+++++++++++++++++++++++++++++++++\n'.join( ['\n'.join(test.end_strings) for test in tests] )
     
-    if not options.validate and options.collect:
-        if os.path.isfile(options.filename):
-            print 'pickle store filename exists, overwritting'
-        f = open(options.filename, 'w')
-        pickle.dump(store, f, pickle.HIGHEST_PROTOCOL)
-        f.flush()
-        f.close()
+    if os.path.isfile(options.filename):
+        print 'pickle store filename exists, overwritting'
+    f = open(options.filename, 'w')
+    pickle.dump(store, f, pickle.HIGHEST_PROTOCOL)
+    f.flush()
+    f.close()
             
 if __name__ == "__main__":
     

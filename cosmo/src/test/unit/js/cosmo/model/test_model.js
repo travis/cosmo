@@ -133,6 +133,12 @@ test_equals : function(){
     }
     jum.assertTrue(caught);
     
+    // Test for handling weird line break char insertion in IE.
+    if (dojo.render.html.ie){
+       jum.assertTrue(equals("One\r\nTwo", "One\nTwo"));
+       jum.assertTrue(equals("One\nTwo", "One\r\nTwo"));
+    }
+    
 },
 
 test_stampInheritance : function(){

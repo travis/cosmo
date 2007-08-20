@@ -262,6 +262,14 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
     if (type == "object"){
        return a.equals(b);
     }
+	
+	// Work around IE sticking in Windows line breaks in for regular ones.
+	if (dojo.render.html.ie && type == "string"){
+	    var lineBreakRegex = /\r\n/g;
+	    var replacement = "\n";
+        a = a.replace(lineBreakRegex, replacement);
+        b = b.replace(lineBreakRegex, replacement);
+	}  
     
     return a == b;
 }   

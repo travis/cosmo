@@ -244,6 +244,46 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
        jum.assertTrue("Note should have task stamp", !!note.getTaskStamp());
    },
    
+   test_makeItemAllDay: function(){
+       //added for bug 10549
+       
+       //first try without the item having an EventStamp before the delta.
+       var note = new cosmo.model.Note();
+       var delta = new cosmo.model.Delta(note);
+       delta.addAddedStamp("event");
+       delta.addStampProperty("event", "allDay", true);
+       delta.addStampProperty("event", "startDate", new cosmo.datetime.Date(2007,0,1));
+       delta.addStampProperty("event", "endDate", new cosmo.datetime.Date(2007,0,1));
+       delta.deltafy();
+       var stampDuration = delta.getStampProperty("event", "duration")
+       jum.assertTrue("stamp duration is one day", stampDuration.getDay() == 1 
+           && stampDuration.getMultiplier() == 1);
+       delta.applyToMaster();
+       var noteDuration = note.getEventStamp().getDuration();
+       jum.assertTrue("note duration is one day", noteDuration.getDay() == 1 
+           && noteDuration.getMultiplier() == 1);
+       jum.assertTrue("end date is properly set", note.getEventStamp().getEndDate().equals(note.getEventStamp().getStartDate()));
+
+       var note = new cosmo.model.Note();
+       var es = note.getEventStamp(true);
+       es.setStartDate(new cosmo.datetime.Date(2007,0,1,12,0))
+       es.setEndDate(new cosmo.datetime.Date(2007,0,1,12,30))
+       var delta = new cosmo.model.Delta(note);
+       delta.addStampProperty("event", "allDay", true);
+       delta.addStampProperty("event", "startDate", new cosmo.datetime.Date(2007,0,1));
+       delta.addStampProperty("event", "endDate", new cosmo.datetime.Date(2007,0,1));
+       delta.deltafy();
+       var stampDuration = delta.getStampProperty("event", "duration")
+       jum.assertTrue("stamp duration is one day", stampDuration.getDay() == 1 
+           && stampDuration.getMultiplier() == 1);
+       delta.applyToMaster();
+       var noteDuration = note.getEventStamp().getDuration();
+       jum.assertTrue("note duration is one day", noteDuration.getDay() == 1 
+           && noteDuration.getMultiplier() == 1);
+       jum.assertTrue("end date is properly set", note.getEventStamp().getEndDate().equals(note.getEventStamp().getStartDate()));
+
+   },
+   
  
   //TODO - test editing end date on master, from an occurrence delta
    

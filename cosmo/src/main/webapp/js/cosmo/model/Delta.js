@@ -127,17 +127,27 @@ dojo.declare("cosmo.model.Delta", null, {
                 var duration = null;
                 var noteEStamp = this._note.getEventStamp();
                 var doAddOneDayToDuration = false;
+                var currentStateAllDay = null;
+                var currentStateAnyTime = null;
                 if (noteEStamp){
-                    var currentStateAllDay = noteEStamp.getAllDay();
-                    var currentStateAnyTime = noteEStamp.getAnyTime();
-                    var deltaAllDay = eventStamp["allDay"];
-                    var deltaAnyTime = eventStamp["anyTime"];
-                    var resultantAllDay = deltaAllDay 
-                                        || (currentStateAllDay && deltaAllDay != false);
-                    var resultantAnyTime = deltaAnyTime 
-                                        || (currentStateAnyTime && deltaAnyTime != false);
-                    doAddOneDayToDuration = resultantAllDay || resultantAnyTime;                              
+                    currentStateAllDay = noteEStamp.getAllDay();
+                    currentStateAnyTime = noteEStamp.getAnyTime();
+
                 }
+                var deltaAllDay = eventStamp["allDay"];
+                var deltaAnyTime = eventStamp["anyTime"];
+
+                //note: the below logic looks weird, because it seems that deltaAllXXX is false,
+                //that's the only way to get to the right-hand side of the ||, but then why do 
+                //we check inside as well? And why write "deltaAllDay != false" 
+                //as opposed to just "deltaAllDay"? The answer is because deltaAllDay could be "undefined" 
+                //in which case things are ok, and we want to eval the right hand side, and undefined != false 
+                var resultantAllDay = deltaAllDay 
+                                    || (currentStateAllDay && (deltaAllDay != false));
+                var resultantAnyTime = deltaAnyTime 
+                                    || (currentStateAnyTime && (deltaAnyTime != false));
+                doAddOneDayToDuration = resultantAllDay || resultantAnyTime;                              
+
                 if (doAddOneDayToDuration){
                     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
                         eventStamp["startDate"], eventStamp["endDate"]) + 1;

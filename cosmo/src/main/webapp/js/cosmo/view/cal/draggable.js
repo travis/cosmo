@@ -212,7 +212,18 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         // when re-called with explicit 'discard changes'
         if (!discardUnsavedChanges) {
             var converter = new cosmo.ui.DetailFormConverter(item.data);
-            var deltaAndError = converter.createDelta();
+            try {            
+                var deltaAndError = converter.createDelta();
+            } catch (e){
+                // This will happen if there was a problem in the createDelta
+                // function
+             	if (e instanceof cosmo.model.exception.DetailItemNotDeltaItemException){
+             	   // If the detail item wasn't the delta item it means the ui 
+                   // is out of sync. We really can't do anything smart in this
+                   // case, so just proceed with selecting the next item.
+                   return true;
+                }
+            }
             var error = deltaAndError[1];
             var delta = deltaAndError[0];
             if (error || delta.hasChanges()) {

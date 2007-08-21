@@ -60,6 +60,18 @@
             <artifactId>abdera-protocol</artifactId>
             <version>0.3.0-incubating-20070709.203400-7</version>
         </dependency>
+        <!-- runtime dependency of abdera -->
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <!-- runtime dependency of abdera -->
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-impl</artifactId>
+            <version>1.2.1</version>
+        </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>

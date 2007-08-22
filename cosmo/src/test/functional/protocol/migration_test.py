@@ -123,7 +123,7 @@ class TestAccountResouces(MigrationTest):
             self.end_strings.append(value['diff'])
         self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))
         if failed is not 0:
-            self.end_strings.append('Failed urls :: \n%s' % '\n'.join([fail['href'] for fail in failed]))
+            self.end_strings.append('Failed urls :: \n%s' % '\n'.join([fail['href'] for fail in failed.keys()]))
             
 def main():
     from optparse import OptionParser

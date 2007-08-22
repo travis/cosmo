@@ -709,12 +709,18 @@ cosmo.ui.minical.MiniCal = function (p) {
      * initial load of the calendar
      */
     this.goToday = function () {
+        // FIXME: This loads the calendar data twice
+        // We need to refactor this to allow date params
+        // to be passed to the initial loading of the cal view
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
-            cosmo.view.names.CAL, true)        
-        dojo.event.topic.publish('/calEvent', {
-            action: 'loadCollection',
-            opts: { loadType: 'changeTimespan', goTo: self.currDate },
-            data: {} });
+            cosmo.view.names.CAL, true)
+        var f = function () {
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection',
+                opts: { loadType: 'changeTimespan', goTo: self.currDate },
+                data: {} });
+        }
+        setTimeout(f, 0);
     }
     /**
      * Handle clicks on normal dates within minical
@@ -732,13 +738,19 @@ cosmo.ui.minical.MiniCal = function (p) {
         // Convert to int because FF saves attributes as strings
         dt = new Date(parseInt(dt));
 
+        // FIXME: This loads the calendar data twice
+        // We need to refactor this to allow date params
+        // to be passed to the initial loading of the cal view
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
-            cosmo.view.names.CAL, true)        
-        dojo.event.topic.publish('/calEvent', {
-            action: 'loadCollection',
-            opts: { loadType: 'changeTimespan', goTo: dt,
-                  source: 'minical' },
-            data: {} });
+            cosmo.view.names.CAL, true)
+        var f = function () {
+            dojo.event.topic.publish('/calEvent', {
+                action: 'loadCollection',
+                opts: { loadType: 'changeTimespan', goTo: dt,
+                      source: 'minical' },
+                data: {} });
+        }
+        setTimeout(f, 0);
     };
     this.doGoToDate = function () {
         var e = null;
@@ -761,12 +773,18 @@ cosmo.ui.minical.MiniCal = function (p) {
         // All okey-dokey -- submit
         else {
             var d = new Date(val);
+            // FIXME: This loads the calendar data twice
+            // We need to refactor this to allow date params
+            // to be passed to the initial loading of the cal view
             cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
-                cosmo.view.names.CAL, true)        
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection',
-                opts: { loadType: 'changeTimespan', goTo: d },
-                    data: {} });
+                cosmo.view.names.CAL, true)
+            var f = function () {
+                dojo.event.topic.publish('/calEvent', {
+                    action: 'loadCollection',
+                    opts: { loadType: 'changeTimespan', goTo: d },
+                        data: {} });
+            }
+            setTimeout(f, 0);
         }
     };
     this.handleKeyUp = function (e) {

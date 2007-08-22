@@ -513,7 +513,7 @@ public abstract class BaseEventStamp extends Stamp
                 if(Value.DATE.equals(rdate.getParameter(Parameter.VALUE)))
                     l = new DateList(Value.DATE);
                 else
-                    l = new DateList(Value.DATE_TIME);
+                    l = new DateList(Value.DATE_TIME, rdate.getDates().getTimeZone());
             }
             l.addAll(rdate.getDates());
         }
@@ -556,7 +556,7 @@ public abstract class BaseEventStamp extends Stamp
                 if(Value.DATE.equals(exdate.getParameter(Parameter.VALUE)))
                     l = new DateList(Value.DATE);
                 else
-                    l = new DateList(Value.DATE_TIME);
+                    l = new DateList(Value.DATE_TIME, exdate.getDates().getTimeZone());
             }
             l.addAll(exdate.getDates());
         }

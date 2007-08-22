@@ -126,5 +126,15 @@ public class ICalDateTest extends TestCase {
         String test = ";VALUE=DATE:20021010,20021011,20021012";
         String result = new ICalDate(dl).toString();
         assertEquals(test, result);
+        
+        TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles");
+        dl = new DateList(Value.DATE_TIME, tz);
+        dl.add(new DateTime("20021010T100000", tz));
+        dl.add(new DateTime("20021011T100000", tz));
+        dl.add(new DateTime("20021012T100000", tz));
+        
+        test = ";VALUE=DATE-TIME;TZID=America/Los_Angeles:20021010T100000,20021011T100000,20021012T100000";
+        result = new ICalDate(dl).toString();
+        assertEquals(test, result);
     }
 }

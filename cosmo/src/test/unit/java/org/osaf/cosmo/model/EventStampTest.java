@@ -15,8 +15,11 @@
  */
 package org.osaf.cosmo.model;
 
+import java.io.FileInputStream;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
@@ -37,6 +40,8 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
  */
 public class EventStampTest extends TestCase {
    
+    protected String baseDir = "src/test/unit/resources/testdata/";
+    
     public void testEventStampGetCalendar() throws Exception {
         TimeZoneRegistry registry =
             TimeZoneRegistryFactory.getInstance().createRegistry();
@@ -214,5 +219,25 @@ public class EventStampTest extends TestCase {
         Assert.assertEquals("TRUE", modAnyTime.getValue());
     }
     
+    public void testExDates() throws Exception {
+        NoteItem master = new NoteItem();
+        master.setDisplayName("displayName");
+        master.setBody("body");
+        EventStamp eventStamp = new EventStamp(master);
+        
+        eventStamp.setCalendar(getCalendar("recurring_with_exdates.ics"));
+        
+        DateList exdates = eventStamp.getExceptionDates();
+        
+        Assert.assertNotNull(exdates);
+        Assert.assertTrue(2==exdates.size());
+        Assert.assertNotNull(exdates.getTimeZone());
+    }
     
+    protected Calendar getCalendar(String name) throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + name);
+        Calendar calendar = cb.build(fis);
+        return calendar;
+    }
 }

@@ -93,20 +93,27 @@ cosmo.util.html.setSelectOptions = function (selectElement, options){
 };
 
 cosmo.util.html.setSelect = function (sel, val) {
-    for (var i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value == val) {
-            sel.selectedIndex = i;
+    var index = 0;
+        for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value == val) {
+                index = i;
+                break;
+            }
+        }
+        
+    while (sel.selectedIndex != index){
+        sel.selectedIndex = index;
+        try {
+            sel.options.item(index).selected = true;
+        } catch (e) {
+            
         }
     }
 };
 
 cosmo.util.html.getSelectValue = function (selectElement){
-    for (var x = 0; x < selectElement.length; x++){
-        var option = selectElement[x]; 
-        if (option.selected){ 
-            return option.value;
-        } 
-    }
+    var index = selectElement.selectedIndex;
+    return selectElement.options.item(index).value;
 }
 
 cosmo.util.html.createInput = function (type, id, name,

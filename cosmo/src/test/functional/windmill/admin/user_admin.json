@@ -1,0 +1,44 @@
+{"params": {"url": "{$baseUrl}\/admin\/users"}, "version": "0.1", "method": "open"}
+{"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
+{"params": {"link": "Create New User"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": "1000"}, "version": "0.1", "method": "wait"}
+{"params": {"id": "username"}, "version": "0.1", "method": "click"}
+{"params": {"text": "{$random1}", "id": "username"}, "version": "0.1", "method": "type"}
+{"params": {"text": "abc", "id": "firstName"}, "version": "0.1", "method": "type"}
+{"params": {"text": "123", "id": "lastName"}, "version": "0.1", "method": "type"}
+{"params": {"text": "{$random1}@example.org", "id": "email"}, "version": "0.1", "method": "type"}
+{"params": {"text": "testing", "id": "password"}, "version": "0.1", "method": "type"}
+{"params": {"text": "testing", "id": "confirm"}, "version": "0.1", "method": "type"}
+{"params": {"id": "createUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[3]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "modifySelectedUserLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "firstName"}, "version": "0.1", "method": "click"}
+{"params": {"text": "tester", "id": "firstName"}, "version": "0.1", "method": "type"}
+{"params": {"text": "mctest", "id": "lastName"}, "version": "0.1", "method": "type"}
+{"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "modifySelectedUserLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "password"}, "version": "0.1", "method": "click"}
+{"params": {"text": "newpass", "id": "password"}, "version": "0.1", "method": "type"}
+{"params": {"text": "newpass", "id": "confirm"}, "version": "0.1", "method": "type"}
+{"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "modifySelectedUserLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "admin"}, "version": "0.1", "method": "click"}
+{"params": {"id": "admin"}, "version": "0.1", "method": "check"}
+{"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "modifySelectedUserLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "admin"}, "version": "0.1", "method": "click"}
+{"params": {"id": "admin"}, "version": "0.1", "method": "check"}
+{"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "modifySelectedUserLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "locked"}, "version": "0.1", "method": "click"}
+{"params": {"id": "locked"}, "version": "0.1", "method": "check"}
+{"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[2]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "modifySelectedUserLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "locked"}, "version": "0.1", "method": "click"}
+{"params": {"id": "locked"}, "version": "0.1", "method": "check"}
+{"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}

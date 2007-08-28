@@ -12,4 +12,3 @@
 {"params": {"text": "{$random1}", "id": "loginDialogPasswordInput"}, "version": "0.1", "method": "type"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"params": {"milliseconds": "4000"}, "version": "0.1", "method": "wait"}
-{"params": {"milliseconds": "4000"}, "version": "0.1", "method": "wait"}

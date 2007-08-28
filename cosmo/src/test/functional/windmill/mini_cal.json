@@ -1,88 +1,48 @@
 {"method": "click", "params": {"id" : "_month0_day3"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month0_day12"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month0_day23"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month0_day28"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day3"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day12"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day23"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day28"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day3"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day12"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day23"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day28"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "05/08/2002"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "03/10/2008"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "01/07/2018"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "07/17/2027"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}
 {"method": "click", "params": {"id" : "_month0_day3"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month0_day12"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month0_day23"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month0_day28"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day3"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day12"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day23"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month1_day28"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day3"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day12"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day23"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "_month2_day28"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "05/08/2002"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "03/10/2008"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "01/07/2018"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "07/17/2027"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}

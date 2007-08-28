@@ -1,6 +1,4 @@
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"link" : "Sign up."}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}
 {"method": "type", "params": {"id" : "username", "text": "{$random}"}}
 {"method": "type", "params": {"id" : "firstName", "text": "tester"}}
@@ -10,7 +8,5 @@
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "{$btnsCenter0}"}}

@@ -8,7 +8,6 @@
 {"method": "select", "params": {"id" : "tzId", "option": "Los Angeles"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones LA."}}
 {"method": "click", "params": {"jsid" : "{$dvSaveButton}"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-930"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}
 {"method": "type", "params": {"id" : "noteTitle", "text": "Testing Timezones NY"}}
@@ -40,7 +39,6 @@
 {"method": "select", "params": {"id" : "tzId", "option": "Boise"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of timezones Boise."}}
 {"method": "click", "params": {"jsid" : "{$dvSaveButton}"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "wait", "params": {"milliseconds" : 7000}}

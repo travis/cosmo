@@ -1,7 +1,5 @@
 {"method": "open", "params": {"url" : "/"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"link" : "Create a new account"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "type", "params": {"id" : "username", "text": "{$random}"}}
 {"method": "type", "params": {"id" : "firstName", "text": "tester"}}
@@ -11,8 +9,5 @@
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}

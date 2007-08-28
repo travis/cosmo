@@ -1,5 +1,4 @@
 {"method": "click", "params": {"link" : "Log in to Cosmo"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "click", "params": {"link" : "Click here to create one."}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}
 {"method": "type", "params": {"id" : "username", "text": "tester240"}}
@@ -9,21 +8,17 @@
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
 {"method": "assertText", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
 {"method": "click", "params": {"jsid" : "{$btnsCenter0}"}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester240"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButtonText"}}
-{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv4-1000"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-1300"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
-{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
-{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "type", "params": {"id" : "noteTitle", "text": "Properties Test"}}
 {"method": "type", "params": {"id" : "startdate", "text": "02/09/2007"}}
 {"method": "type", "params": {"id" : "enddate", "text": "02/09/2007"}}
@@ -34,7 +29,6 @@
 {"method": "select", "params": {"id" : "eventStatus", "option": "Tentative"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description for the properties test"}}
 {"method": "click", "params": {"id" : "cosmo_Button_1Text"}}
-{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"link" : "Settings"}}
 {"method": "click", "params": {"id" : "cosmo_TabContainer_0_tab1"}}
 {"method": "click", "params": {"id" : "showAccountBrowser"}}
@@ -42,10 +36,8 @@
 {"method": "type", "params": {"id" : "goToDateInput", "text": "02/11/2008"}}
 {"method": "click", "params": {"id" : "cosmo_Button_3Text"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
-{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"id" : "_month1_day19"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv5-1100"}}
-{"method": "wait", "params": {"milliseconds" : 2000}}
 {"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}
 {"method": "select", "params": {"xpath" : "/html/body/div[4]/div/div[4]/div/table/tbody/tr[3]/td[2]/div/select","option": "Other..."}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}

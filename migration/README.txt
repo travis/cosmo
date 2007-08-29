@@ -10,13 +10,13 @@ MySQL5 databases.
 
 Instructions for Building and Running
 -------------------------------------
-1. Shutdown Cosmo 0.5 server
+1. Shutdown Cosmo server (ver 0.5 or later)
 2. Backup your database!!
 3. run mvn package
 4. copy src/main/config/migration.properties .
 5. edit migration.properties to fit your database
-6. run java -jar target/cosmo-migration-0.6-SNAPSHOT-jar-with-dependencies.jar migration.properties
+6. run java -jar target/cosmo-migration-0.7-RELEASE-jar-with-dependencies.jar migration.properties
    - or for verbose output -
-   run java -jar target/cosmo-migration-0.6-SNAPSHOT-jar-with-dependencies.jar -v migration.properties
-7. If no errors occur, you can configure Cosmo 0.6 to run against
-   the migrated 0.5 database and start up normally.
+   run java -jar target/cosmo-migration-0.7-RELEASE-jar-with-dependencies.jar -v migration.properties
+7. If no errors occur, you can configure Cosmo 0.7 to run against
+   the migrated database and start up normally.

@@ -21,14 +21,16 @@ import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Trigger;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.osaf.cosmo.hibernate.validator.Event;
 import org.osaf.cosmo.hibernate.validator.EventException;
 
 /**
@@ -44,6 +46,8 @@ public class EventExceptionStamp extends BaseEventStamp implements
      * 
      */
     private static final long serialVersionUID = 3992468809776886156L;
+    
+    public static final String PARAM_OSAF_MISSING = "X-OSAF-MISSING";
     
     /** default constructor */
     public EventExceptionStamp() {
@@ -149,6 +153,60 @@ public class EventExceptionStamp extends BaseEventStamp implements
             return null;
 
         return new Boolean(VALUE_TRUE.equals(parameter.getValue()));
+    }
+    
+    
+    /**
+     * Override to handle "missing" trigger by searching for a
+     * custom X-PARAM "X-OSAF-MISSING".  If present, then this
+     * trigger is "missing" and null should be returned, since
+     * for now we are representing "missing" values using null.
+     */
+    @Override
+    @Transient
+    public Trigger getDisplayAlarmTrigger() {
+        Trigger trigger =  super.getDisplayAlarmTrigger();
+        if(trigger!=null && isMissing(trigger))
+            return null;
+        else
+            return trigger;
+    }
+
+    /**
+     * Override to handle "missing" trigger by appending a
+     * custom X-PARAM "X-OSAF-MISSING".  If present, then this
+     * trigger is "missing".  Since a "missing" trigger is
+     * represented by a null trigger, whenever a null trigger
+     * is set, then a basic trigger property with this custom
+     * "X-OSAF-MISSING" param will be created instead.
+     */
+    @Override
+    public void setDisplayAlarmTrigger(Trigger newTrigger) {
+        if(newTrigger==null) {
+            newTrigger = new Trigger(new Dur("-PT15M"));
+            setMissing(newTrigger, true);
+        }
+        super.setDisplayAlarmTrigger(newTrigger);    
+    }
+
+    protected boolean isMissing(Property prop) {
+        Parameter parameter = 
+            prop.getParameters().getParameter(PARAM_OSAF_MISSING);
+        return (parameter!=null);
+    }
+    
+    protected void setMissing(Property prop, boolean missing) {
+        Parameter parameter = 
+            prop.getParameters().getParameter(PARAM_OSAF_MISSING);
+        
+        if (missing) {
+            if (parameter == null)
+                prop.getParameters().add(
+                        new XParameter(PARAM_OSAF_MISSING, VALUE_TRUE));
+        } else {
+            if (parameter != null)
+                prop.getParameters().remove(parameter);
+        }
     }
     
     @Transient

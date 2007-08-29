@@ -115,6 +115,8 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
             new DisplayAlarmApplicator(modNote);
         applicator.applyRecord(record);
 
+        modEvent.getEventCalendar().validate(true);
+        
         Assert.assertNull(modEvent.getDisplayAlarmDescription());
         Assert.assertNull(modEvent.getDisplayAlarmTrigger());
         Assert.assertNull(modEvent.getDisplayAlarmDuration());

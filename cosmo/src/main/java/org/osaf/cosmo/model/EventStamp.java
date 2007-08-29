@@ -173,7 +173,7 @@ public class EventStamp extends BaseEventStamp implements
             // Check for inherited displayAlarm, which is represented
             // by a valarm with no TRIGGER
             VAlarm displayAlarm = getDisplayAlarm(exceptionEvent);
-            if(displayAlarm !=null && displayAlarm.getProperty(Property.TRIGGER)==null) {
+            if(displayAlarm !=null && exceptionStamp.getDisplayAlarmTrigger()==null) {
                 exceptionEvent.getAlarms().remove(displayAlarm);
                 if(masterAlarm!=null)
                     exceptionEvent.getAlarms().add(masterAlarm);

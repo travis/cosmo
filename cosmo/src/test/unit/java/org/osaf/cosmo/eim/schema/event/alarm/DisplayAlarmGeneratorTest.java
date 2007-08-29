@@ -199,6 +199,8 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
         modEvent.setDisplayAlarmTrigger(null);
         modEvent.setDisplayAlarmRepeat(null);
 
+        modEvent.getEventCalendar().validate(true);
+        
         DisplayAlarmGenerator generator = new DisplayAlarmGenerator(modNote);
 
         List<EimRecord> records = generator.generateRecords(-1);

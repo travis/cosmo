@@ -1,5 +1,5 @@
 {"params": {"url": "{$baseUrl}\/logout"}, "version": "0.1", "method": "open"}
-{"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
+{"params": {"url": "\/chandler\/login"}, "version": "0.1", "method": "open"}
 {"params": {"id": "loginDialogUsernameInput"}, "version": "0.1", "method": "click"}
 {"params": {"text": "root", "id": "loginDialogUsernameInput"}, "version": "0.1", "method": "type"}
 {"params": {"text": "cosmo", "id": "loginDialogPasswordInput"}, "version": "0.1", "method": "type"}

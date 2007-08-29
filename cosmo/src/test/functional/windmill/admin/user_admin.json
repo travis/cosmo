@@ -1,7 +1,6 @@
 {"params": {"url": "{$baseUrl}\/admin\/users"}, "version": "0.1", "method": "open"}
 {"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
 {"params": {"link": "Create New User"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "1000"}, "version": "0.1", "method": "wait"}
 {"params": {"id": "username"}, "version": "0.1", "method": "click"}
 {"params": {"text": "{$random1}", "id": "username"}, "version": "0.1", "method": "type"}
 {"params": {"text": "abc", "id": "firstName"}, "version": "0.1", "method": "type"}
@@ -42,3 +41,48 @@
 {"params": {"id": "locked"}, "version": "0.1", "method": "click"}
 {"params": {"id": "locked"}, "version": "0.1", "method": "check"}
 {"params": {"id": "modifyUserDialogSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]", "text": "{$random1}"}, "version": "0.1", "method": "type"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[3]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]", "text": "{$random1}"}, "version": "0.1", "method": "type"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input", "text": "2"}, "version": "0.1", "method": "type"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]", "text": "{$random1}"}, "version": "0.1", "method": "type"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/tbody\/tr[@id='{$random1}Row']\/td[4]"}, "version": "0.1", "method": "click"}
+{"params": {"id": "nextPageLink"}, "version": "0.1", "method": "click"}
+{"params": {"id": "previousPageLink"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input", "text": "25"}, "version": "0.1", "method": "type"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='pageSizeChooserContainer']\/span[@id='pageSizeChooser']\/input[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]"}, "version": "0.1", "method": "doubleClick"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[1]", "text": ""}, "version": "0.1", "method": "type"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userListControls']\/tbody\/tr\/td[@id='searchBoxContainer']\/span[@id='searchBox']\/input[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[8]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[8]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[7]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[7]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[6]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[6]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[5]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[5]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[4]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[4]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[3]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[3]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th[2]"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th"}, "version": "0.1", "method": "click"}
+{"params": {"xpath": "html\/body\/div[@id='contentDiv']\/div[@id='contentWrapper']\/table[@id='userList']\/thead\/tr\/th"}, "version": "0.1", "method": "click"}

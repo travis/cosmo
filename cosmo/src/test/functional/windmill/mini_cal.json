@@ -12,16 +12,16 @@
 {"method": "click", "params": {"id" : "_month2_day28"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "05/08/2002"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "03/10/2008"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "01/07/2018"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "07/17/2027"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}
 {"method": "click", "params": {"id" : "_month0_day3"}}
 {"method": "click", "params": {"id" : "_month0_day12"}}
 {"method": "click", "params": {"id" : "_month0_day23"}}
@@ -36,13 +36,13 @@
 {"method": "click", "params": {"id" : "_month2_day28"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "05/08/2002"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2002"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "03/10/2008"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2008"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "01/07/2018"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2018"}}
 {"method": "type", "params": {"id" : "goToDateInput", "text": "07/17/2027"}}
 {"method": "click", "params": {"jsid" : "{$miniCalGotoButton}"}}
-{"method": "assertText", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}
+{"method": "asserts.text", "params": {"id" : "monthHeaderDiv", "validator" : "2027"}}

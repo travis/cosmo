@@ -23,4 +23,3 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Miquelon", "id": "tzId"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testingApp.cosmo.app.modalDialog.btnsRight[2].domNode.id"}, "version": "0.1", "method": "click"}

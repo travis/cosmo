@@ -1,5 +1,5 @@
 {"method": "click", "params": {"jsid": "{$listView}"}}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"text": "Testing Adress this item", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$quickCreateButton}"}, "version": "0.1", "method": "click"}
 {"params": {"id": "noteDescription"}, "version": "0.1", "method": "click"}

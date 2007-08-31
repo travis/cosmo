@@ -27,7 +27,7 @@
 {"method": "click", "params": {"jsid" : "{$dvSaveButton}"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
-{"method": "wait", "params": {"milliseconds" : 7000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 7000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
 {"method": "type", "params": {"id" : "noteTitle", "text": "Testing Daily Recurrence"}}
 {"method": "select", "params": {"id" : "recurrenceInterval", "option": "Daily"}}

@@ -1,10 +1,10 @@
 {"params": {"text": "testing testing", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$quickCreateButton}"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "7000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "7000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"jsid": "{$calView}"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"id": "hourDiv0-900"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"milliseconds": "2000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "2000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"id": "hourDiv0-1100"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"link": "Log out"}, "version": "0.1", "method": "click"}

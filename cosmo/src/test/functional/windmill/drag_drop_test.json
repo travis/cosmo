@@ -1,4 +1,4 @@
-{"method": "wait", "params": {"milliseconds" : 8000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 8000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testingApp.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv4-1300"}}}

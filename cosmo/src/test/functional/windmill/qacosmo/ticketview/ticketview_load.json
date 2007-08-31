@@ -1,6 +1,6 @@
 {"params": {"xpath": "html/body/div/div/form/span[4]/span[3]/button"}, "version": "0.1", "method": "click"}
-{"method": "wait", "params": {"milliseconds" : 6000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 6000}}
 {"params": {"link": "[Chandler]"}, "version": "0.1", "method": "storeURL"}
-{"method": "wait", "params": {"milliseconds" : 2000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"params": {"url": "{$[Chandler]}"}, "version": "0.1", "method": "open"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}

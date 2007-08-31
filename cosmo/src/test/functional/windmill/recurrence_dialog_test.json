@@ -1,4 +1,4 @@
-{"params": {"milliseconds": "6000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "6000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"jsid": "{$calView}"}, "version": "0.1", "method": "click"}
 {"params": {"id": "hourDiv0-900"}, "version": "0.1", "method": "doubleClick"}
 {"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}

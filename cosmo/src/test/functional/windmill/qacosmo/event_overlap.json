@@ -40,4 +40,4 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv2-830"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-830"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv2-830"}}
-{"method": "wait", "params": {"milliseconds" : 5000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 5000}}

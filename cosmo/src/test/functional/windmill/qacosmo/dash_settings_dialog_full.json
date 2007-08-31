@@ -1,7 +1,7 @@
 {"method": "click", "params": {"jsid": "{$listView}"}}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"link": "Settings"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"id": "firstName"}, "version": "0.1", "method": "click"}
 {"params": {"text": "bob", "id": "firstName"}, "version": "0.1", "method": "type"}
 {"params": {"text": "jones", "id": "lastName"}, "version": "0.1", "method": "type"}
@@ -13,7 +13,7 @@
 {"params": {"jsid": "{$dialogTab0}"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "{$btnsLeft0}"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "wait"}
+{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"link": "Settings"}, "version": "0.1", "method": "click"}
 {"params": {"id": "password"}, "version": "0.1", "method": "click"}
 {"params": {"text": "test", "id": "password"}, "version": "0.1", "method": "type"}

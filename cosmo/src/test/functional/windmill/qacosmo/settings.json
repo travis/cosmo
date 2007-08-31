@@ -18,4 +18,4 @@
 {"method": "select", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/div/table/tbody/tr[3]/td[2]/div/select", "option": "Apple iCal v2.x"}}
 {"method": "select", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/div/table/tbody/tr[3]/td[2]/div/select", "option": "Feed Reader"}}
 {"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td[3]/input"}}
-{"method": "wait", "params": {"milliseconds" : 3000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}

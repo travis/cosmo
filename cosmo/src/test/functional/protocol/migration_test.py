@@ -40,7 +40,6 @@ class AllUserEvents(MigrationTest):
     def validate(self):
         total = passed = failed = 0
         failures = {}
-        failed_urls = []
         
         print 'Starting validation for All User Events'
         for user, items in self.store['all_items'].items():
@@ -53,7 +52,6 @@ class AllUserEvents(MigrationTest):
                     passed = passed + 1
                 except AssertionError:
                     failed = failed + 1
-                    failed_urls.append(item['href'])
                     diff = '\n'.join([line for line in difflib.unified_diff(item['body'].split('\n'), body.split('\n'))])
                     failure = {'item':item, 'body':body, 'diff':diff}
                     failures[item['href'].replace(self.client._url.geturl(), '')] = failure
@@ -65,7 +63,7 @@ class AllUserEvents(MigrationTest):
             self.end_strings.append(value['diff'])
         self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))
         if failed is not 0:
-            self.end_strings.append('Failed urls :: \n%s' % '\n'.join(failed_urls))
+            self.end_strings.append('Failed urls :: \n%s' % '\n'.join(failures.keys()))
         
         
 class NumberOfUsers(MigrationTest):
@@ -123,7 +121,7 @@ class TestAccountResouces(MigrationTest):
             self.end_strings.append(value['diff'])
         self.end_strings.append("Total resources = %s, Passed = %s, Failed = %s" % (total, passed, failed))
         if failed is not 0:
-            self.end_strings.append('Failed urls :: \n%s' % '\n'.join([fail['href'] for fail in failed.keys()]))
+            self.end_strings.append('Failed urls :: \n%s' % '\n'.join(failures.keys()))
             
 def main():
     from optparse import OptionParser
@@ -175,7 +173,7 @@ def main():
                        'admin_password' : options.admin_password,
                        'server_url'     : options.server_url,
                        'hub_pass'       : options.hub_pass,
-                       'pdb'            : options.pdb}
+                       'pdb'            : getattr(options, 'pdb', False)}
     
     if options.collect:
         store = {}

@@ -74,7 +74,6 @@ def test_basic_query_5():
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
     assert client.response.status == 207
     ics_list = ['3.ics', '2.ics']
-    assert False
     validate_response_tree(client.response.tree, ics_list)
     
 def test_basic_query_6():
@@ -164,7 +163,6 @@ def test_multiget_four_resources_etag_vtimezone_only():
     body = open(FILES_DIR+'reports/multiget/3.xml').read()
     body = body.replace('/cosmo/home/USER/CALENDAR', PRINCIPAL_DAV_PATH+'/'+CALENDAR)
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Depth': '1' })
-    assert False
     assert client.response.status == 207
     
     positive = ['BEGIN:VCALENDAR', 'CALSCALE:GREGORIAN', 'PRODID', 'VERSION:2.0',

@@ -57,7 +57,6 @@ class CosmoClient(davclient.DAVClient):
             
         root = ElementTree.Element('{http://osafoundation.org/cosmo/CMP}user')
         dict_to_elem(root, user_dict, namespace='http://osafoundation.org/cosmo/CMP')
-        print unicode(ElementTree.tostring(root), 'utf-8')
         request_method(self._cmp_path+'/user/%s'%user_dict['username'], body=unicode(ElementTree.tostring(root), 'utf-8'), headers={'content-type': 'text/xml; charset=utf-8'})
         
     def mkcalendar(self, username=None):
@@ -120,7 +119,6 @@ class CosmoClient(davclient.DAVClient):
 
         for ref in hrefs:
             item = {'href':ref}
-            print ref.replace(self._url.geturl(), '')
             self.get(ref.replace(self._url.geturl(), ''))
             item['body'] = copy.copy(self.response.body)
             all_items.append(item)

@@ -301,6 +301,13 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         }
     };
     this.doDragEffect = function (dragState) {
+        // Paranoia check -- if for whatever reason there's not 
+        // a handle on a valid item or its lozenge, then bail out. 
+        // This prevents an irritating, hard-to-replicate error 
+        // condition in IE.
+        if (!(this.item && this.item.lozenge)) {
+            return false;
+        }
         var o = dragState == 'on' ? 60 : 100;
         this.item.lozenge.setOpacity(o);
     };

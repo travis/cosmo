@@ -438,8 +438,12 @@ public class StandardMorseCodeController implements MorseCodeController {
                     
                     // Handle case where item is a NoteOccurence, in which case
                     // a new modification NoteItem needs to be created
-                    if(child instanceof NoteOccurrence)
-                        child = createChildItem((NoteOccurrence) child, collection, recordset);
+                    if(child instanceof NoteOccurrence) {
+                        if(recordset.isDeleted()==false)
+                            child = createChildItem((NoteOccurrence) child, collection, recordset);
+                        else
+                            child = null;
+                    }
                     else if(child!=null && recordset.isDeleted()==false)
                         collection.getChildren().add(child);
                     

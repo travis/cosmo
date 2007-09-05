@@ -19,6 +19,7 @@ dojo.provide("cosmotest.service.translators.test_eim");
 dojo.require("cosmo.service.translators.eim");
 dojo.require("cosmo.service.common");
 dojo.require("cosmo.datetime.serialize");
+dojo.require("cosmo.util.html");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 
@@ -26,7 +27,20 @@ cosmotest.service.translators.test_eim = {
     translator: new cosmo.service.translators.Eim(
        new cosmo.service.UrlCache()
     ),
-  
+    
+    test_getTicketType: function(){
+        var t = cosmotest.service.translators.test_eim.translator;
+        var doc = cosmotest.service.translators.test_eim.toXMLDocument("<?xml version='1.0' encoding='UTF-8'?>" +
+                                                                        '<feed xmlns:cosmo="http://osafoundation.org/cosmo/Atom" ' +
+                                                                        'xmlns="http://www.w3.org/2005/Atom" xml:base="http://localhost:8080/chandler/atom/">' +
+                                                                        '  <cosmo:ticket cosmo:type="read-write">fjgsm7key0</cosmo:ticket>' +
+                                                                       '</feed>');
+        var ticketEl = cosmo.util.html.getElementsByTagName(doc, "cosmo", "ticket")[0];
+        jum.assertTrue("ticket exists", !!ticketEl);
+        jum.assertEquals("tag name", "cosmo:ticket", ticketEl.tagName);
+        jum.assertEquals("type is read-write", "read-write", t.getTicketType(ticketEl));
+    },
+    
     test_parseRecordSet: function (){
         var uid = "12345";
         var title = "o1";
@@ -152,7 +166,7 @@ cosmotest.service.translators.test_eim = {
             duration: new cosmo.model.Duration({
                 hour: 2,
                 minute: 30,
-                second: 45,
+                second: 45
             }),
             anyTime: true,
             allDay: false,

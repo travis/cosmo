@@ -33,6 +33,7 @@ dojo.require("cosmo.datetime.serialize");
 dojo.require("cosmo.util.html");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
+    COSMO_NS: "http://osafoundation.org/cosmo/Atom",
     
     initializer: function (urlCache){
         this.urlCache = urlCache;
@@ -151,12 +152,20 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         else {
             var ticketElements = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket");
             for (var i = 0; i < ticketElements.length; i++){
-                var permission = ticketElements[i].getAttribute("cosmo:type");
+                var permission = this.getTicketType(ticketElements[i]);
                 if (permission == "read-write") collection.setWriteable(true);
             }
         }
         
         return collection;
+    },
+
+    getTicketType: function (ticketEl){
+        if (!(dojo.render.html.ie  && dojo.render.ver < 7)){
+            return ticketEl.getAttributeNS(this.COSMO_NS, "type");
+        } else {
+            return ticketEl.getAttribute("cosmo:type");
+        }
     },
           
     translateGetCollections: function (atomXml, kwArgs){

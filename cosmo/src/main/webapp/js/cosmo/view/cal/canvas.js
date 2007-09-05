@@ -1495,7 +1495,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         if (!cosmo.view.cal.isCurrentView()) { return false; }
 
         this.width = this.parent.width;
-        this.height = this.parent.height;
+        this.height = (this.parent.height - CAL_TOP_NAV_HEIGHT);
         this.domNode.style.position = 'absolute';
         this.setPosition(0, CAL_TOP_NAV_HEIGHT);
         this.setSize();
@@ -1610,8 +1610,6 @@ cosmo.view.cal.canvas.Canvas = function (p) {
         // Scrollable view area
         vOffset += ALL_DAY_RESIZE_HANDLE_HEIGHT + 1;
         calcHeight = self.height - vOffset;
-        // Subtract the navbar height -- this lives outside the cal view
-        calcHeight -= CAL_TOP_NAV_HEIGHT;
         var timedMain = self.timedCanvas;
         timedMain.setSize(self.width - 2, calcHeight); // Variable height area
         timedMain.setPosition(0, vOffset);

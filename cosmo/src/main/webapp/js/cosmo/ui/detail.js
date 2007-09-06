@@ -1035,11 +1035,17 @@ cosmo.ui.detail.EventFormElements= function () {
     var self = this;
     var d = this.domNode;
     var f = this.formNode;
+    var formElements = {};
     var _html = cosmo.util.html;
 
     setUpDOM();
     setDefaultElemState();
     addBehaviors();
+
+    function addToHashAndReturn(elem){
+        formElements[elem.name] = elem;
+        return elem;
+    }
 
     // Private methods
     // -------
@@ -1048,41 +1054,45 @@ cosmo.ui.detail.EventFormElements= function () {
         var t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.' + label));
         d.appendChild(t);
-        var elem = _html.createInput({ type: 'text',
-            id: name + 'Date',
-            name: name + 'Date',
-            size: 10,
-            maxlength: 10,
-            value: '',
-            className: 'inputText' });
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'text',
+                id: name + 'Date',
+                name: name + 'Date',
+                size: 10,
+                maxlength: 10,
+                value: '',
+                className: 'inputText' }));
         var t = cosmo.ui.detail.createFormElemDiv(elem);
         t.style.whiteSpace = 'nowrap';
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
             _('Main.DetailForm.At')));
         t.appendChild(_html.nbsp());
-        var elem = _html.createInput({ type: 'text',
-            id: name + 'Time',
-            name:name + 'Time',
-            size: 5,
-            maxlength: 5,
-            value: '',
-            className: 'inputText' });
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'text',
+                id: name + 'Time',
+                name:name + 'Time',
+                size: 5,
+                maxlength: 5,
+                value: '',
+                className: 'inputText' }));
         t.appendChild(elem);
-        t.appendChild(_html.nbsp());
-        var elem = _html.createInput({ type: 'radio',
-            id: name + 'MeridianAM',
-            name: name + 'Meridian',
-            value: "am" });
+        t.appendChild(_html.nbsp());s
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'radio',
+                id: name + 'MeridianAM',
+                name: name + 'Meridian',
+                value: "am" }));
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
             _('App.AM')));
         t.appendChild(_html.nbsp());
-        var elem = _html.createInput({ type: 'radio',
-            id: name + 'MeridianPM',
-            name: name + 'Meridian',
-            value: "pm" });
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'radio',
+                id: name + 'MeridianPM',
+                name: name + 'Meridian',
+                value: "pm" }));
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
@@ -1172,21 +1182,23 @@ cosmo.ui.detail.EventFormElements= function () {
         var t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.Location'));
         f.appendChild(t);
-        var elem = _html.createInput({ type: 'text',
-            id: 'eventLocation',
-            name: 'eventLocation',
-            size: 28,
-            maxlength: 100,
-            value: '',
-            className: 'inputText' });
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'text',
+                id: 'eventLocation',
+                name: 'eventLocation',
+                size: 28,
+                maxlength: 100,
+                value: '',
+                className: 'inputText' }));
         elem.style.width = '220px';
         var t =  cosmo.ui.detail.createFormElemDiv(elem);
         f.appendChild(t);
         // All-day checkbox
-        var elem = _html.createInput({ type: 'checkbox',
-            id: 'eventAllDay',
-            name: 'eventAllDay',
-            value: 'true' });
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'checkbox',
+                id: 'eventAllDay',
+                name: 'eventAllDay',
+                value: 'true' }));
         var t =  cosmo.ui.detail.createFormElemDiv(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText('All day'));
@@ -1203,19 +1215,21 @@ cosmo.ui.detail.EventFormElements= function () {
         t.style.whiteSpace = 'nowrap';
         t.className += ' formElem';
         t.appendChild(_html.nbsp());
-        var elem = _html.createSelect({ id: 'tzRegion',
-            name: 'tzRegion',
-            multiple: false,
-            className: 'selectElem',
-            options: getTimezoneRegionOptions() });
+        var elem = addToHashAndReturn(
+            _html.createSelect({ id: 'tzRegion',
+                name: 'tzRegion',
+                multiple: false,
+                className: 'selectElem',
+                options: getTimezoneRegionOptions() }));
         t.appendChild(_html.nbsp());
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
-        var elem = _html.createSelect({ id: 'tzId',
-            name: 'tzId',
-            multiple: false,
-            className: 'selectElem',
-            options: getTimezoneIdOptions(null) });
+        var elem = addToHashAndReturn(
+            _html.createSelect({ id: 'tzId',
+                name: 'tzId',
+                multiple: false,
+                className: 'selectElem',
+                options: getTimezoneIdOptions(null) }));
         elem.style.width = '100px';
         t.appendChild(elem);
         f.appendChild(t);
@@ -1224,11 +1238,12 @@ cosmo.ui.detail.EventFormElements= function () {
             'Main.DetailForm.Status'));
         t.className += ' formElem';
         t.appendChild(_html.nbsp());
-        var elem = _html.createSelect({ id: 'eventStatus',
-            name: 'eventStatus',
-            multi: false,
-            options: getStatusOpt(),
-            className: 'selectElem' });
+        var elem = addToHashAndReturn(
+            _html.createSelect({ id: 'eventStatus',
+                name: 'eventStatus',
+                multi: false,
+                options: getStatusOpt(),
+                className: 'selectElem' }));
         t.appendChild(_html.nbsp());
         t.appendChild(elem);
         f.appendChild(t);
@@ -1237,23 +1252,25 @@ cosmo.ui.detail.EventFormElements= function () {
             'Main.DetailForm.rrule'));
         t.className += ' formElem';
         t.style.whiteSpace = 'nowrap';
-        var elem = _html.createSelect({ id: 'recurrenceInterval',
-            name: 'recurrenceInterval',
-            multi: false,
-            options: getRecurOpt(),
-            className: 'selectElem' });
+        var elem = addToHashAndReturn(
+            _html.createSelect({ id: 'recurrenceInterval',
+                name: 'recurrenceInterval',
+                multi: false,
+                options: getRecurOpt(),
+                className: 'selectElem' }));
         t.appendChild(_html.nbsp());
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(_('Main.DetailForm.Ending')));
         t.appendChild(_html.nbsp());
-        var elem = _html.createInput({ type: 'text',
-            id: 'recurrenceEnd',
-            name: 'recurrenceEnd',
-            size: 10,
-            maxlength: 10,
-            value: '',
-            className: 'inputText' });
+        var elem = addToHashAndReturn(
+            _html.createInput({ type: 'text',
+                id: 'recurrenceEnd',
+                name: 'recurrenceEnd',
+                size: 10,
+                maxlength: 10,
+                value: '',
+                className: 'inputText' }));
         t.appendChild(elem);
         f.appendChild(t);
         d.appendChild(f);
@@ -1276,7 +1293,7 @@ cosmo.ui.detail.EventFormElements= function () {
         var txtIn = ['noteTitle', 'eventLocation', 'startDate',
             'startTime', 'endDate', 'endTime', 'recurrenceEnd'];
         for (var el in txtIn) {
-            dojo.event.connect(f[txtIn[el]], 'onfocus', func);
+            dojo.event.connect(formElements[txtIn[el]], 'onfocus', func);
         }
 
         // Clear out time inputs if All-day checkbox is checked
@@ -1285,20 +1302,20 @@ cosmo.ui.detail.EventFormElements= function () {
         var func = function (e) {
             var allDay = e.target.checked;
             if (allDay) {
-                cosmo.util.html.clearFormElem(f.startTime, 'text');
-                cosmo.util.html.clearFormElem(f.endTime, 'text');
-                cosmo.util.html.clearFormElem(f.startMeridian, 'radio');
-                cosmo.util.html.clearFormElem(f.endMeridian, 'radio');
+                cosmo.util.html.clearFormElem(formElements.startTime, 'text');
+                cosmo.util.html.clearFormElem(formElements.endTime, 'text');
+                cosmo.util.html.clearFormElem(formElements.startMeridian, 'radio');
+                cosmo.util.html.clearFormElem(formElements.endMeridian, 'radio');
             }
         };
         // All-day event / normal event toggling
-        dojo.event.connect(f.eventAllDay, 'onclick', func);
+        dojo.event.connect(formElements.eventAllDay, 'onclick', func);
 
         // Recurrence -- disable 'ending' text box if event
         // does not recur
-        var elem = f.recurrenceInterval;
+        var elem = formElements.recurrenceInterval;
         var func = function () {
-            var txtElem = f.recurrenceEnd;
+            var txtElem = formElements.recurrenceEnd;
             if (elem.selectedIndex == 0) {
                 cosmo.util.html.clearAndDisableFormElem(txtElem, 'text');
             }
@@ -1325,11 +1342,11 @@ cosmo.ui.detail.EventFormElements= function () {
                         tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
                 });
             }
-            _html.setSelectOptions(f.tzId, options);
+            _html.setSelectOptions(formElements.tzId, options);
         };
-        dojo.event.connect(f.tzRegion, 'onchange', func);
-        dojo.event.connect(f.eventAllDay, 'onchange', self.enableDisableEventStatus);
-        dojo.event.connect(f.endTime, 'onblur', self.enableDisableEventStatus);
+        dojo.event.connect(formElements.tzRegion, 'onchange', func);
+        dojo.event.connect(formElements.eventAllDay, 'onchange', self.enableDisableEventStatus);
+        dojo.event.connect(formElements.endTime, 'onblur', self.enableDisableEventStatus);
     }
 
     // Interface methods

@@ -109,6 +109,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this.setSize();
     }
     this.handleMouseOver = function (e) {
+        // Avoid DOM-event/DOM-node contention problems in Safari
+        // Just forego the purty rollovers
+        if (navigator.userAgent.indexOf('Safari/41') > -1) {
+            return false;
+        }
         if (e && e.target) {
             // get the UID from the row's DOM node id
             var p = e.target.parentNode;
@@ -123,7 +128,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (e && e.target) {
             // get the UID from the row's DOM node id
             var p = e.target.parentNode;
-            if (!p.id || (p.id ==  'listView_item' + self.getSelectedItemId())) { return false; }
+            if (!p.id || (p.id ==  'listView_item' +
+                self.getSelectedItemId())) { return false; }
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
                 dojo.html.removeClass(ch[i], 'listViewSelectedCell');

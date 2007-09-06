@@ -106,7 +106,7 @@ public class StandardUserServiceTest extends TestCase {
         assertNotNull("User not stored", userDao.getUser(u1.getUsername()));
         assertFalse("Original and stored password are the same",
                     user.getPassword().equals(password));
-        assertEquals(user.getDateCreated(), user.getDateModified());
+        assertEquals(user.getCreationDate(), user.getModifiedDate());
     }
 
     /**
@@ -115,8 +115,8 @@ public class StandardUserServiceTest extends TestCase {
         User u1 = testHelper.makeDummyUser();
         u1.setPassword(service.digestPassword(u1.getPassword()));
         String digestedPassword = u1.getPassword();
-        u1.setDateCreated(new Date());
-        u1.setDateModified(u1.getDateCreated());
+        u1.setCreationDate(new Date());
+        u1.setModifiedDate(u1.getCreationDate());
         userDao.createUser(u1);
 
         // change password
@@ -132,7 +132,7 @@ public class StandardUserServiceTest extends TestCase {
         assertFalse("Original and stored password are the same",
                     user.getPassword().equals(digestedPassword));
         assertTrue("Created and modified dates are the same",
-                   ! user.getDateCreated().equals(user.getDateModified()));
+                   ! user.getCreationDate().equals(user.getModifiedDate()));
 
         // leave password
         Thread.currentThread().sleep(1000); // let modified date change
@@ -145,7 +145,7 @@ public class StandardUserServiceTest extends TestCase {
         assertTrue("Original and stored password are not the same",
                     user2.getPassword().equals(user.getPassword()));
         assertTrue("Created and modified dates are the same",
-                   ! user2.getDateCreated().equals(user2.getDateModified()));
+                   ! user2.getCreationDate().equals(user2.getModifiedDate()));
     }
 
     /**

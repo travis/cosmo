@@ -29,8 +29,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
-import org.osaf.cosmo.icalendar.ComponentTypes;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 import org.w3c.dom.Element;
 
@@ -51,7 +52,7 @@ import org.w3c.dom.Element;
  * responsibility of the business logic to enforce this. This may be changed
  * later.
  */
-public class ComponentFilter implements CaldavConstants {
+public class ComponentFilter implements CaldavConstants, ICalendarConstants {
 
     private static final Log log = LogFactory
             .getLog(ComponentFilter.class);
@@ -89,7 +90,7 @@ public class ComponentFilter implements CaldavConstants {
         }
 
         if (! (name.equals(Calendar.VCALENDAR) ||
-               ComponentTypes.isValidComponentType(name)))
+            CalendarUtils.isSupportedComponent(name)))
             throw new ParseException(name + " is not a supported iCalendar component", -1);
 
         ElementIterator i = DomUtil.getChildren(element);

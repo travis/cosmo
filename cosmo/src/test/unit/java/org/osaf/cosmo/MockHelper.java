@@ -66,8 +66,6 @@ public class MockHelper extends TestHelper {
         serviceLocatorFactory.setAtomPrefix("/atom");
         serviceLocatorFactory.setCmpPrefix("/cmp");
         serviceLocatorFactory.setDavPrefix("/dav");
-        serviceLocatorFactory.setDavPrincipalPrefix("/dav");
-        serviceLocatorFactory.setDavCalendarHomePrefix("/dav");
         serviceLocatorFactory.setMorseCodePrefix("/mc");
         serviceLocatorFactory.setPimPrefix("/pim");
         serviceLocatorFactory.setWebcalPrefix("/webcal");

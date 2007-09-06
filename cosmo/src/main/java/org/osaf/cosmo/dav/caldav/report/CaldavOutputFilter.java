@@ -29,6 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.data.OutputFilter;
+import org.osaf.cosmo.dav.BadRequestException;
+import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 
 import org.w3c.dom.Element;
@@ -45,7 +47,7 @@ public class CaldavOutputFilter
      * <code>&lt;C:calendar-data/&gt;> element.
      */
     public static OutputFilter createFromXml(Element cdata)
-        throws ParseException {
+        throws DavException {
         OutputFilter result = null;
         Period expand = null;
         Period limit = null;
@@ -82,7 +84,7 @@ public class CaldavOutputFilter
                        equals(child.getLocalName())) {
                 limitfb = parsePeriod(child, true);
             } else {
-                throw new ParseException("Invalid child element " + child.getLocalName() + " found in calendar-data element", -1);
+                log.warn("Ignoring child " + child.getTagName() + " of " + cdata.getTagName());
             }
         }
 
@@ -190,31 +192,37 @@ public class CaldavOutputFilter
     }
 
     private static Period parsePeriod(Element node)
-        throws ParseException {
+        throws DavException {
         return parsePeriod(node, false);
     }
 
     private static Period parsePeriod(Element node, boolean utc)
-        throws ParseException {
+        throws DavException {
+        DateTime trstart = null;
+        DateTime trend = null;
         String start =
             DomUtil.getAttribute(node, ATTR_CALDAV_START, null);
-        if (start == null) {
-            throw new ParseException("CALDAV:timerange start must be present", -1);
+        if (start == null)
+            throw new BadRequestException("Expected timerange attribute " + ATTR_CALDAV_START);
+        try {
+            trstart = new DateTime(start);
+        } catch (ParseException e) {
+            throw new BadRequestException("Timerange start not parseable: " + e.getMessage());
         }
-        DateTime trstart = new DateTime(start);
-        if (utc && !trstart.isUtc()) {
-            throw new ParseException("CALDAV:timerange start must be UTC", -1);
-        }
+        if (utc && !trstart.isUtc())
+            throw new BadRequestException("Timerange start must be UTC");
 
         String end =
             DomUtil.getAttribute(node, ATTR_CALDAV_END, null);
-        if (end == null) {
-            throw new ParseException("CALDAV:timerange end must be present", -1);
+        if (end == null)
+            throw new BadRequestException("Expected timerange attribute " + ATTR_CALDAV_END);
+        try {
+            trend = new DateTime(end);
+        } catch (ParseException e) {
+            throw new BadRequestException("Timerange end not parseable: " + e.getMessage());
         }
-        DateTime trend = new DateTime(end);
-        if (utc && !trend.isUtc()) {
-            throw new ParseException("CALDAV:timerange end must be UTC", -1);
-        }
+        if (utc && !trend.isUtc())
+            throw new BadRequestException("Timerange end must be UTC");
 
         return new Period(trstart, trend);
     }

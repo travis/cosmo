@@ -16,22 +16,31 @@
 package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.server.io.IOUtil;
-import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavResourceFactory;
-import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
-import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
+
+import org.osaf.cosmo.dav.BadRequestException;
+import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavResourceFactory;
+import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.ForbiddenException;
+import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.io.DavInputContext;
+import org.osaf.cosmo.dav.property.ContentLanguage;
+import org.osaf.cosmo.dav.property.ContentLength;
+import org.osaf.cosmo.dav.property.ContentType;
+import org.osaf.cosmo.dav.property.DavProperty;
+import org.osaf.cosmo.dav.property.Etag;
+import org.osaf.cosmo.dav.property.LastModified;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -51,7 +60,7 @@ import org.osaf.cosmo.model.ModelValidationException;
  * @see DavContent
  * @see FileItem
  */
-public class DavFile extends DavContent {
+public class DavFile extends DavContentBase {
     private static final Log log = LogFactory.getLog(DavFile.class);
 
     static {
@@ -63,24 +72,22 @@ public class DavFile extends DavContent {
     /** */
     public DavFile(FileItem item,
                    DavResourceLocator locator,
-                   DavResourceFactory factory,
-                   DavSession session) {
-        super(item, locator, factory, session);
+                   DavResourceFactory factory)
+        throws DavException {
+        super(item, locator, factory);
     }
 
     /** */
     public DavFile(DavResourceLocator locator,
-                   DavResourceFactory factory,
-                   DavSession session) {
-        this(new FileItem(), locator, factory, session);
+                   DavResourceFactory factory)
+        throws DavException {
+        this(new FileItem(), locator, factory);
     }
 
     // DavResource
 
-   
-    /** */
-    public void spool(OutputContext outputContext)
-        throws IOException {
+    public void writeTo(OutputContext outputContext)
+        throws DavException, IOException {
         if (! exists())
             throw new IllegalStateException("cannot spool a nonexistent resource");
 
@@ -114,84 +121,53 @@ public class DavFile extends DavContent {
         throws DavException {
         super.populateItem(inputContext);
 
-        FileItem content = (FileItem) getItem();
-
-        if (inputContext.hasStream()) {
-            
-            try {
-                // make sure content length matches what was read
-                long contentLength = inputContext.getContentLength();
-                long bufferedLength = ((DavInputContext) inputContext)
-                        .getBufferedContentLength();
-
-                if (contentLength != IOUtil.UNDEFINED_LENGTH
-                        && contentLength != bufferedLength)
-                    throw new IOException("Read only " + bufferedLength
-                            + " of " + contentLength + " bytes");
-                
-                content.setContent(inputContext.getInputStream());
-            } catch (IOException e) {
-                log.error("Cannot read resource content", e);
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Cannot read resource content: " + e.getMessage());
-            } catch (DataSizeException e) {
-                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource content: " + e.getMessage());
-            } 
-        }
+        FileItem file = (FileItem) getItem();
 
         try {
+            InputStream content = inputContext.getInputStream();
+            if (content != null)
+                file.setContent(content);
+
             if (inputContext.getContentLanguage() != null)
-                content.setContentLanguage(inputContext.getContentLanguage());
+                file.setContentLanguage(inputContext.getContentLanguage());
 
             String contentType = inputContext.getContentType();
             if (contentType != null)
-                content.setContentType(IOUtil.getMimeType(contentType));
+                file.setContentType(IOUtil.getMimeType(contentType));
             else
-                content.setContentType(IOUtil.MIME_RESOLVER.
-                                       getMimeType(content.getName()));
+                file.setContentType(IOUtil.MIME_RESOLVER.
+                                    getMimeType(file.getName()));
 
             String contentEncoding = IOUtil.getEncoding(contentType);
             if (contentEncoding != null)
-                content.setContentEncoding(contentEncoding);
+                file.setContentEncoding(contentEncoding);
+        } catch (IOException e) {
+            throw new DavException(e);
         } catch (DataSizeException e) {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot store resource attribute: " + e.getMessage());
+            throw new ForbiddenException(e.getMessage());
         }
-
     }
 
     /** */
-    protected void loadLiveProperties() {
-        super.loadLiveProperties();
+    protected void loadLiveProperties(DavPropertySet properties) {
+        super.loadLiveProperties(properties);
 
         FileItem content = (FileItem) getItem();
         if (content == null)
             return;
 
-        DavPropertySet properties = getProperties();
-
-        if (content.getContentLanguage() != null) {
-            properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE,
-                                                  content.getContentLanguage()));
-        }
-
-        properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH,
-                                              content.getContentLength()));
-
-        properties.add(new DefaultDavProperty(DavPropertyName.GETETAG,
-                                              getETag()));
-
-        String contentType =
-            IOUtil.buildContentType(content.getContentType(),
-                                    content.getContentEncoding());
-        properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE,
-                                              contentType));
-
-        long modTime = getModificationTime();
-        properties.add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED,
-                                              IOUtil.getLastModified(modTime)));
+        if (content.getContentLanguage() != null)
+            properties.add(new ContentLanguage(content.getContentLanguage()));
+        properties.add(new ContentLength(content.getContentLength()));
+        properties.add(new Etag(getETag()));
+        properties.add(new ContentType(content.getContentType(),
+                                       content.getContentEncoding()));
+        properties.add(new LastModified(content.getModifiedDate()));
     }
 
     /** */
-    protected void setLiveProperty(DavProperty property) {
+    protected void setLiveProperty(DavProperty property)
+        throws DavException {
         super.setLiveProperty(property);
 
         FileItem content = (FileItem) getItem();
@@ -199,24 +175,25 @@ public class DavFile extends DavContent {
             return;
 
         DavPropertyName name = property.getName();
-        String value = property.getValue().toString();
+        String text = property.getValueText();
 
         if (name.equals(DavPropertyName.GETCONTENTLANGUAGE)) {
-            content.setContentLanguage(value);
+            content.setContentLanguage(text);
             return;
         }
 
         if (name.equals(DavPropertyName.GETCONTENTTYPE)) {
-            String type = IOUtil.getMimeType(value);
-            if (type == null)
-                throw new ModelValidationException("null mime type for property " + name);
+            String type = IOUtil.getMimeType(text);
+            if (StringUtils.isBlank(type))
+                throw new BadRequestException("Property " + name + " requires a valid media type");
             content.setContentType(type);
-            content.setContentEncoding(IOUtil.getEncoding(value));
+            content.setContentEncoding(IOUtil.getEncoding(text));
         }
     }
 
     /** */
-    protected void removeLiveProperty(DavPropertyName name) {
+    protected void removeLiveProperty(DavPropertyName name)
+        throws DavException {
         super.removeLiveProperty(name);
 
         FileItem content = (FileItem) getItem();
@@ -229,6 +206,6 @@ public class DavFile extends DavContent {
         }
 
         if (name.equals(DavPropertyName.GETCONTENTTYPE))
-            throw new ModelValidationException("cannot remove property " + name);
+            throw new ProtectedPropertyModificationException(name);
     }
 }

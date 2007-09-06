@@ -50,7 +50,7 @@ import org.hibernate.validator.NotNull;
 @Entity
 @Table(name="users")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class User extends BaseModelObject {
+public class User extends AuditableObject {
 
     /**
      */
@@ -331,34 +331,6 @@ public class User extends BaseModelObject {
      */
     public void setActivationId(String activationId) {
         this.activationId = activationId;
-    }
-
-    /**
-     */
-    @Column(name = "createdate")
-    @Type(type="long_timestamp")
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    /**
-     */
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    /**
-     */
-    @Column(name = "modifydate")
-    @Type(type="long_timestamp")
-    public Date getDateModified() {
-        return dateModified;
-    }
-
-    /**
-     */
-    public void setDateModified(Date dateModified) {
-        this.dateModified = dateModified;
     }
 
     /**

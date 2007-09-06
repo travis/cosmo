@@ -39,8 +39,6 @@ public class ServiceLocatorFactory {
     private String atomPrefix;
     private String cmpPrefix;
     private String davPrefix;
-    private String davPrincipalPrefix;
-    private String davCalendarHomePrefix;
     private String morseCodePrefix;
     private String pimPrefix;
     private String webcalPrefix;
@@ -73,10 +71,11 @@ public class ServiceLocatorFactory {
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request,
                                                Ticket ticket) {
-        return createServiceLocator(request, ticket.getKey(), ABSOLUTE_BY_DEFAULT);
+        return createServiceLocator(request, ticket, ABSOLUTE_BY_DEFAULT);
     }
     
-    public ServiceLocator createServiceLocator(HttpServletRequest request, String ticketKey){
+    public ServiceLocator createServiceLocator(HttpServletRequest request,
+                                               String ticketKey){
         return createServiceLocator(request, ticketKey, ABSOLUTE_BY_DEFAULT);
     }
     
@@ -86,25 +85,26 @@ public class ServiceLocatorFactory {
      * information in the given request and including the given ticket
      */
     public ServiceLocator createServiceLocator(HttpServletRequest request,
-                                               String  ticketKey,
+                                               String ticketKey,
                                                Boolean absoluteUrls){
-
         String appMountUrl = calculateAppMountUrl(request, absoluteUrls);
-
-        return new ServiceLocator(appMountUrl, ticketKey, this);
+        return createServiceLocator(appMountUrl, ticketKey);
     }
 
     public ServiceLocator createServiceLocator(HttpServletRequest request,
-            Ticket ticket, Boolean absoluteUrls) {
-
-        String appMountUrl = calculateAppMountUrl(request, absoluteUrls);
-
-        return new ServiceLocator(appMountUrl, ticket == null ? null : ticket.getKey(), this);
+                                               Ticket ticket,
+                                               Boolean absoluteUrls) {
+        String ticketKey = ticket != null ? ticket.getKey() : null;
+        return createServiceLocator(request, ticketKey, absoluteUrls);
     }
 
-    /** */
-    public String getDavPrefix() {
-        return davPrefix;
+    public ServiceLocator createServiceLocator(String appMountUrl) {
+        return createServiceLocator(appMountUrl, null);
+    }
+
+    public ServiceLocator createServiceLocator(String appMountUrl,
+                                               String ticketKey) {
+        return new ServiceLocator(appMountUrl, ticketKey, this);
     }
 
     /** */
@@ -128,28 +128,13 @@ public class ServiceLocatorFactory {
     }
 
     /** */
+    public String getDavPrefix() {
+        return davPrefix;
+    }
+
+    /** */
     public void setDavPrefix(String prefix) {
         davPrefix = prefix;
-    }
-
-    /** */
-    public String getDavPrincipalPrefix() {
-        return davPrincipalPrefix;
-    }
-
-    /** */
-    public void setDavPrincipalPrefix(String prefix) {
-        davPrincipalPrefix = prefix;
-    }
-
-    /** */
-    public String getDavCalendarHomePrefix() {
-        return davCalendarHomePrefix;
-    }
-
-    /** */
-    public void setDavCalendarHomePrefix(String prefix) {
-        davCalendarHomePrefix = prefix;
     }
 
     /** */
@@ -203,10 +188,6 @@ public class ServiceLocatorFactory {
             throw new IllegalStateException("cmpPrefix must not be null");
         if (davPrefix == null)
             throw new IllegalStateException("davPrefix must not be null");
-        if (davPrincipalPrefix == null)
-            throw new IllegalStateException("davPrincipalPrefix must not be null");
-        if (davCalendarHomePrefix == null)
-            throw new IllegalStateException("davCalendarHomePrefix must not be null");
         if (morseCodePrefix == null)
             throw new IllegalStateException("morseCodePrefix must not be null");
         if (pimPrefix == null)

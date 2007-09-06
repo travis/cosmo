@@ -297,16 +297,16 @@ public interface ContentService extends Service {
     public Set<Item> findItems(ItemFilter filter);
     
     /**
-     * Find calendar events by filter.
+     * Find calendar items by filter.
      *
      * @param calendar
      *            calendar collection to search
      * @param filter
      *            filter to use in search
-     * @return set CalendarEventItem objects matching specified
+     * @return set of ContentItem objects matching specified
      *         filter.
      */
-    public Set<ContentItem> findEvents(CollectionItem calendar,
+    public Set<ContentItem> findCalendarItems(CollectionItem calendar,
                                              CalendarFilter filter);
 
     /**

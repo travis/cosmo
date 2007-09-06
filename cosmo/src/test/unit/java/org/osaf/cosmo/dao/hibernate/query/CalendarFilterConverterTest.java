@@ -64,6 +64,7 @@ public class CalendarFilterConverterTest extends TestCase {
         uidFilter.setName("UID");
         TextMatchFilter uidMatch = new TextMatchFilter();
         uidMatch.setValue("uid");
+        uidMatch.setCaseless(false);
         uidFilter.setTextMatchFilter(uidMatch);
         eventComp.getPropFilters().add(uidFilter);
         
@@ -71,6 +72,7 @@ public class CalendarFilterConverterTest extends TestCase {
         summaryFilter.setName("SUMMARY");
         TextMatchFilter summaryMatch = new TextMatchFilter();
         summaryMatch.setValue("summary");
+        summaryMatch.setCaseless(false);
         summaryFilter.setTextMatchFilter(summaryMatch);
         eventComp.getPropFilters().add(summaryFilter);
         
@@ -78,6 +80,7 @@ public class CalendarFilterConverterTest extends TestCase {
         descFilter.setName("DESCRIPTION");
         TextMatchFilter descMatch = new TextMatchFilter();
         descMatch.setValue("desc");
+        descMatch.setCaseless(false);
         descFilter.setTextMatchFilter(descMatch);
         eventComp.getPropFilters().add(descFilter);
         

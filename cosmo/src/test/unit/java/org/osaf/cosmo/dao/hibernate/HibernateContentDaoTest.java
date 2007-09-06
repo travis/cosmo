@@ -28,7 +28,14 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import net.fortuna.ical4j.model.property.ProdId;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.DOMWriter;
 import org.hibernate.validator.InvalidStateException;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AttributeTombstone;
@@ -38,10 +45,13 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.ICalendarAttribute;
+import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
@@ -50,6 +60,8 @@ import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.XmlAttribute;
+import org.osaf.cosmo.xml.DomWriter;
 import org.springframework.dao.DataIntegrityViolationException;
 
 public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
@@ -127,70 +139,25 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         }
     }
 
-   /* public void testContentDaoInvalidContentNullLength() throws Exception {
+    public void testContentDaoCreateNoteDuplicateIcalUid() throws Exception {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(user);
-        item.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
-        item.setContentLanguage("en");
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLength(null);
+        NoteItem note1 = generateTestNote("note1", "testuser");
+        note1.setIcalUid("icaluid");
+
+        contentDao.createContent(root, note1);
+        
+        NoteItem note2 = generateTestNote("note2", "testuser");
+        note2.setIcalUid("icaluid");
+         
 
         try {
-            contentDao.createContent(root, item);
-            clearSession();
-            Assert.fail("able to create invalid content.");
-        } catch (InvalidStateException e) {
-        }
-    }*/
-
-   /* public void testContentDaoInvalidContentNegativeLength() throws Exception {
-        
-        User user = getUser(userDao, "testuser");
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
-
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(user);
-        item.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
-        item.setContentLanguage("en");
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLength(new Long(-1));
-        
-        try {
-            contentDao.createContent(root, item);
-            clearSession();
-            Assert.fail("able to create invalid content.");
-        } catch (InvalidStateException e) {
-        }
-    }*/
+            contentDao.createContent(root, note2);
+            Assert.fail("able to create duplicate icaluid");
+        } catch (IcalUidInUseException e) {}
     
-   /* public void testContentDaoInvalidContentMismatchLength() throws Exception {
-        
-        User user = getUser(userDao, "testuser");
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
-
-        ContentItem item = new ContentItem();
-        item.setName("test");
-        item.setOwner(user);
-        item.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
-        item.setContentLanguage("en");
-        item.setContentEncoding("UTF8");
-        item.setContentType("text/text");
-        item.setContentLength(new Long(1));
-
-        try {
-            contentDao.createContent(root, item);
-            Assert.fail("able to create invalid content.");
-        } catch (ModelValidationException e) {
-        }
-
-    }*/
+    }
   
     public void testContentDaoInvalidContentNullName() throws Exception {
       
@@ -379,6 +346,116 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         val = (Date) queryAttr.getValue();
         Assert.assertTrue(dateVal.equals(val));
+    }
+    
+    public void testXmlAttribute() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
+        
+        org.w3c.dom.Element testElement = createTestElement();
+        org.w3c.dom.Element testElement2 = createTestElement();
+        
+        testElement2.setAttribute("foo", "bar");
+        
+        Assert.assertFalse(testElement.isEqualNode(testElement2));
+        
+        XmlAttribute xmlAttr = 
+            new XmlAttribute(new QName("xmlattribute"), testElement ); 
+        item.addAttribute(xmlAttr);
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        Attribute attr = queryItem.getAttribute(new QName("xmlattribute"));
+        Assert.assertNotNull(attr);
+        Assert.assertTrue(attr instanceof XmlAttribute);
+        
+        org.w3c.dom.Element element = (org.w3c.dom.Element) attr.getValue();
+        
+        Assert.assertEquals(DomWriter.write(testElement),DomWriter.write(element));
+
+        Date modifyDate = attr.getModifiedDate();
+        
+        // Sleep a couple millis to make sure modifyDate doesn't change
+        Thread.sleep(2);
+        
+        contentDao.updateContent(queryItem);
+
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        attr = queryItem.getAttribute(new QName("xmlattribute"));
+        
+        // Attribute shouldn't have been updated
+        Assert.assertEquals(modifyDate, attr.getModifiedDate());
+        
+        attr.setValue(testElement2);
+
+        // Sleep a couple millis to make sure modifyDate doesn't change
+        Thread.sleep(2);
+        modifyDate = attr.getModifiedDate();
+        
+        contentDao.updateContent(queryItem);
+
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        attr = queryItem.getAttribute(new QName("xmlattribute"));
+        Assert.assertNotNull(attr);
+        Assert.assertTrue(attr instanceof XmlAttribute);
+        // Attribute should have been updated
+        Assert.assertTrue(modifyDate.before(attr.getModifiedDate()));
+        
+        element = (org.w3c.dom.Element) attr.getValue();
+        
+        Assert.assertEquals(DomWriter.write(testElement2),DomWriter.write(element));
+    }
+    
+    public void testICalendarAttribute() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        ContentItem item = generateTestContent();
+       
+        ICalendarAttribute icalAttr = new ICalendarAttribute(); 
+        icalAttr.setQName(new QName("icalattribute"));
+        icalAttr.setValue(new FileInputStream(baseDir + "/vjournal.ics"));
+        item.addAttribute(icalAttr);
+        
+        ContentItem newItem = contentDao.createContent(root, item);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        Attribute attr = queryItem.getAttribute(new QName("icalattribute"));
+        Assert.assertNotNull(attr);
+        Assert.assertTrue(attr instanceof ICalendarAttribute);
+        
+        net.fortuna.ical4j.model.Calendar calendar = (net.fortuna.ical4j.model.Calendar) attr.getValue();
+        Assert.assertNotNull(calendar);
+        
+        net.fortuna.ical4j.model.Calendar expected = CalendarUtils.parseCalendar(new FileInputStream(baseDir + "/vjournal.ics"));
+        
+        Assert.assertEquals(expected.toString(),calendar.toString());
+        
+        calendar.getProperties().add(new ProdId("blah"));
+        
+        contentDao.updateContent(queryItem);
+        
+        clearSession();
+        
+        queryItem = contentDao.findContentByUid(newItem.getUid());
+        
+        ICalendarAttribute ica = (ICalendarAttribute) queryItem.getAttribute(new QName("icalattribute"));
+        Assert.assertFalse(expected.toString().equals(ica.getValue().toString()));
     }
 
     public void testCreateDuplicateRootItem() throws Exception {
@@ -1266,6 +1343,32 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         content.addAttribute(new StringAttribute(new QName("customattribute"),
                 "customattributevalue"));
         return content;
+    }
+    
+    private NoteItem generateTestNote(String name, String owner)
+            throws Exception {
+        NoteItem content = new NoteItem();
+        content.setName(name);
+        content.setDisplayName(name);
+        content.setOwner(getUser(userDao, owner));
+        return content;
+    }
+    
+    private org.w3c.dom.Element createTestElement() throws Exception {
+        Document document = DocumentHelper.createDocument();
+        Element root = document.addElement( "root" );
+
+        root.addElement( "author" )
+            .addAttribute( "name", "James" )
+            .addAttribute( "location", "UK" )
+            .addText( "James Strachan" );
+        
+        root.addElement( "author" )
+            .addAttribute( "name", "Bob" )
+            .addAttribute( "location", "US" )
+            .addText( "Bob McWhirter" );
+
+        return new DOMWriter().write(document).getDocumentElement();
     }
 
 }

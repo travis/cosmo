@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ValidationException;
 
 import org.apache.commons.logging.Log;
@@ -27,6 +28,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.TaskStamp;
 
 /**
  * A class that writes Cosmo calendar model objects to output streams
@@ -71,5 +75,25 @@ public class ICalendarOutputter {
         } catch (ValidationException e) {
             throw new IllegalStateException("unable to validate collection calendar", e);
         }
+    }
+    
+    /**
+     * Returns an icalendar representation of a NoteItem. If a NoteItem is
+     * stamped as an event, a VEVENT will be returned.  If a non-event is
+     * stamped as a task, then a VTODO will be returned.  Otherwise a 
+     * VJOURNAL will be returned.
+     * @param note 
+     * @return icalendar representation of item
+     */
+    public static Calendar getCalendar(NoteItem note) {
+        EventStamp event = EventStamp.getStamp(note);
+        if(event!=null)
+            return event.getCalendar();
+        
+        TaskStamp task = TaskStamp.getStamp(note);
+        if(task!=null)
+            return task.getCalendar();
+        
+        return note.getCalendar();
     }
 }

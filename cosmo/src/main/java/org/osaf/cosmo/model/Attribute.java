@@ -134,5 +134,15 @@ public abstract class Attribute extends AuditableObject implements java.io.Seria
      * @return copy of Attribute
      */
     public abstract Attribute copy();
+    
+    /**
+     * Return string representation
+     */
+    public String toString() {
+        Object value = getValue();
+        if(value==null)
+            return "null";
+        return value.toString();
+    }
 
 }

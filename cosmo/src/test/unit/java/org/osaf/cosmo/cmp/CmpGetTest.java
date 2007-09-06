@@ -185,14 +185,14 @@ public class CmpGetTest extends BaseCmpServletTestCase {
                      u1.getLastName());
         assertNotNull("user has no email", user.getEmail());
         assertEquals("emails don't match", user.getEmail(), u1.getEmail());
-        assertNotNull("user has no creation date", user.getDateCreated());
+        assertNotNull("user has no creation date", user.getCreationDate());
         assertEquals("creation dates don't match", 
-                     DateUtil.formatRfc3339Date(user.getDateCreated()), 
-                     DateUtil.formatRfc3339Date(u1.getDateCreated()));
-        assertNotNull("user has no modification date", user.getDateModified());
+                     DateUtil.formatRfc3339Date(user.getCreationDate()), 
+                     DateUtil.formatRfc3339Date(u1.getCreationDate()));
+        assertNotNull("user has no modification date", user.getModifiedDate());
         assertEquals("modification dates don't match", 
-                     DateUtil.formatRfc3339Date(user.getDateModified()), 
-                     DateUtil.formatRfc3339Date(u1.getDateModified()));
+                     DateUtil.formatRfc3339Date(user.getModifiedDate()), 
+                     DateUtil.formatRfc3339Date(u1.getModifiedDate()));
         assertNotNull("user has no administrator boolean", user.getAdmin());
         assertEquals("administrator booleans don't match", user.getAdmin(), u1.getAdmin());
         assertNotNull("user has no url", user.getUrl());
@@ -331,12 +331,12 @@ public class CmpGetTest extends BaseCmpServletTestCase {
                                                  UserResource.EL_HOMEDIRURL,
                                                  OutputsXml.NS_CMP));
         
-        u.setDateCreated(DateUtil.parseRfc3339Date(
+        u.setCreationDate(DateUtil.parseRfc3339Date(
                 DomUtil.getChildTextTrim(root, 
                                          UserResource.EL_CREATED, 
                                          OutputsXml.NS_CMP)));
         
-        u.setDateModified(DateUtil.parseRfc3339Date(
+        u.setModifiedDate(DateUtil.parseRfc3339Date(
                 DomUtil.getChildTextTrim(root, 
                                          UserResource.EL_MODIFIED, 
                                          OutputsXml.NS_CMP)));

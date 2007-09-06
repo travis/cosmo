@@ -65,7 +65,7 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
      * @return set CalendarEventItem objects matching specified
      *         filter.
      */
-    public Set<ContentItem> findEvents(CollectionItem calendar,
+    public Set<ContentItem> findCalendarItems(CollectionItem calendar,
                                              CalendarFilter filter) {
         lastCalendarFilter = filter;
         return new HashSet<ContentItem>();

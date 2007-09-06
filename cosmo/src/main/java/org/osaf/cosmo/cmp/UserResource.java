@@ -165,11 +165,11 @@ public class UserResource implements CmpResource, OutputsXml {
         e.appendChild(email);
 
         Element created = DomUtil.createElement(doc, EL_CREATED, NS_CMP);
-        DomUtil.setText(created, DateUtil.formatRfc3339Date(user.getDateCreated()));
+        DomUtil.setText(created, DateUtil.formatRfc3339Date(user.getCreationDate()));
         e.appendChild(created);
 
         Element modified = DomUtil.createElement(doc, EL_MODIFIED, NS_CMP);
-        DomUtil.setText(modified, DateUtil.formatRfc3339Date(user.getDateModified()));
+        DomUtil.setText(modified, DateUtil.formatRfc3339Date(user.getModifiedDate()));
         e.appendChild(modified);
 
 
@@ -211,7 +211,7 @@ public class UserResource implements CmpResource, OutputsXml {
             return "";
         }
         return "\"" + user.hashCode() + "-" +
-            user.getDateModified().getTime() + "\"";
+            user.getModifiedDate().getTime() + "\"";
     }
 
     /**

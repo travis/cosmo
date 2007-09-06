@@ -98,4 +98,10 @@ public class IfNoneMatch {
         throws ParseException {
         return new IfNoneMatch(header).allowMethod(etag);
     }
+
+    public static boolean allowMethod(String header,
+                                      String etag)
+        throws IllegalArgumentException, ParseException {
+        return allowMethod(header, etag != null ? new EntityTag(etag) : null);
+    }
 }

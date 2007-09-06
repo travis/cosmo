@@ -228,16 +228,6 @@ public class MessageStamp extends Stamp implements
     
     public Stamp copy(Item item) {
         MessageStamp stamp = new MessageStamp();
-        stamp.setMessageId(getMessageId());
-        stamp.setTo(getTo());
-        stamp.setBcc(getBcc());
-        stamp.setCc(getCc());
-        stamp.setInReplyTo(getInReplyTo());
-        stamp.setReferences(getReferences());
-        stamp.setFrom(getFrom());
-        stamp.setHeaders(getHeaders());
-        stamp.setOriginators(getOriginators());
-        stamp.setDateSent(getDateSent());
         return stamp;
     }
 }

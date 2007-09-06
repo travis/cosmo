@@ -281,7 +281,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals("description", ccs.getDescription());
         Assert.assertEquals(testCal.toString(), ccs.getTimezone().toString());
         Assert.assertEquals("en", ccs.getLanguage());
-        Assert.assertEquals(1, ccs.getSupportedComponents().size());
         
         Calendar cal = ccs.getCalendar();
         Assert.assertEquals(1, cal.getComponents().getComponents(Component.VEVENT).size());

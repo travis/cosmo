@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,18 +23,17 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.annotations.Type;
+import org.osaf.cosmo.io.BufferedContent;
 
 
 
 /**
- * Represents the data of a piece of Content.  For now the
- * data is stored in memory as a byte[].  For the next
- * release, this will be changed to store the data on
- * the disk, to prevent OutOfMemoryExceptions.
+ * Represents the data of a piece of Content. Data is stored
+ * as a BufferedContent, either in memory (small content) or
+ * on disk (large content).
  */
 @Entity
 @Table(name="content_data")
@@ -46,7 +43,7 @@ public class ContentData extends BaseModelObject {
      * 
      */
     private static final long serialVersionUID = -5014854905531456753L;
-    private byte[] content = null;
+    private BufferedContent content = null;
    
     /**
      */
@@ -66,9 +63,7 @@ public class ContentData extends BaseModelObject {
         if(content==null)
             return null;
         
-        // For now, return byte[] inputstream, later
-        // this will be a FileInputStream most likely
-        return new ByteArrayInputStream(content);
+        return content.getInputStream();
     }
     
     /**
@@ -78,10 +73,7 @@ public class ContentData extends BaseModelObject {
      * @throws IOException
      */
     public void setContentInputStream(InputStream is) throws IOException {
-        // For now use byte[], for .6 use temp File
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        IOUtils.copy(is, bos);
-        content = bos.toByteArray();
+        content = new BufferedContent(is);
     }
     
     /**
@@ -90,18 +82,18 @@ public class ContentData extends BaseModelObject {
     @Transient
     public long getSize() {
         if(content != null)
-            return content.length;
+            return content.getLength();
         else
             return -1;
     }
 
     @Column(name = "content", length=102400000)
-    @Type(type="bytearray_blob")
-    private byte[] getContent() {
+    @Type(type="bufferedcontent_blob")
+    private BufferedContent getContent() {
         return content;
     }
 
-    private void setContent(byte[] content) {
+    private void setContent(BufferedContent content) {
         this.content = content;
     }
     

@@ -20,10 +20,13 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.dav.ExtendedDavConstants;
+
 /**
  * Base class for DAV test cases.
  */
-public abstract class BaseDavTestCase extends TestCase {
+public abstract class BaseDavTestCase extends TestCase
+    implements ExtendedDavConstants {
     private static final Log log = LogFactory.getLog(BaseDavTestCase.class);
 
     protected DavTestHelper testHelper;

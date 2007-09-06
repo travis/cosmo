@@ -79,6 +79,7 @@
             <value>org.osaf.cosmo.model.EventStamp</value>
             <value>org.osaf.cosmo.model.FileItem</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
+            <value>org.osaf.cosmo.model.ICalendarAttribute</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>
             <value>org.osaf.cosmo.model.ItemTombstone</value>
@@ -97,6 +98,7 @@
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
             <value>org.osaf.cosmo.model.Tombstone</value>
             <value>org.osaf.cosmo.model.User</value>
+            <value>org.osaf.cosmo.model.XmlAttribute</value>
         </list>
     </property>
     <property name="entityInterceptor">

@@ -15,8 +15,10 @@
  */
 package org.osaf.cosmo.dav.caldav;
 
+import javax.xml.namespace.QName;
+
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
 /**
@@ -33,19 +35,28 @@ public interface CaldavConstants {
         "application/x-calendar-collection";
 
     /** The CalDAV XML namespace */
+    public static final String PRE_CALDAV = "C";
+    public static final String NS_CALDAV =
+        "urn:ietf:params:xml:ns:caldav";
     public static final Namespace NAMESPACE_CALDAV =
-        Namespace.getNamespace("C", "urn:ietf:params:xml:ns:caldav");
+        Namespace.getNamespace(PRE_CALDAV, NS_CALDAV);
 
     /** The CalDAV XML element name <CALDAV:mkcalendar> */
     public static final String ELEMENT_CALDAV_MKCALENDAR = "mkcalendar";
+    public static final String QN_MKCALENDAR = 
+        DomUtil.getQualifiedName(ELEMENT_CALDAV_MKCALENDAR, NAMESPACE_CALDAV);
     /** The CalDAV XML element name <CALDAV:calendar> */
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
     /** The CalDAV XML element name <CALDAV:comp> */
     public static final String ELEMENT_CALDAV_COMP = "comp";
     /** The CalDAV XML element name <CALDAV:calendar-data> */
     public static final String ELEMENT_CALDAV_CALENDAR_DATA = "calendar-data";
+    public static final String QN_CALDAV_CALENDAR_DATA = 
+        DomUtil.getQualifiedName(ELEMENT_CALDAV_CALENDAR_DATA, NAMESPACE_CALDAV);
     /** The CalDAV XML element name <CALDAV:timezone> */
     public static final String ELEMENT_CALDAV_TIMEZONE = "timezone";
+    public static final String QN_CALDAV_TIMEZONE = 
+        DomUtil.getQualifiedName(ELEMENT_CALDAV_TIMEZONE, NAMESPACE_CALDAV);
     /** The CalDAV XML element name <CALDAV:allcomp> */
     public static final String ELEMENT_CALDAV_ALLCOMP = "allcomp";
     /** The CalDAV XML element name <CALDAV:allprop> */
@@ -70,6 +81,8 @@ public interface CaldavConstants {
     public static final String ELEMENT_CALDAV_PARAM_FILTER = "param-filter";
     /** The CalDAV XML element name <CALDAV:time-range> */
     public static final String ELEMENT_CALDAV_TIME_RANGE = "time-range";
+    public static final String QN_CALDAV_TIME_RANGE = 
+        DomUtil.getQualifiedName(ELEMENT_CALDAV_TIME_RANGE, NAMESPACE_CALDAV);
     /** The CalDAV XML element name <CALDAV:is-not-defined> */
     public static final String ELEMENT_CALDAV_IS_NOT_DEFINED = "is-not-defined";
     /** The (old) CalDAV XML element name <CALDAV:is-defined> */
@@ -97,8 +110,8 @@ public interface CaldavConstants {
     public static final String ATTR_CALDAV_VERSION = "version";
     /** The CalDAV XML attribute name CALDAV:novalue */
     public static final String ATTR_CALDAV_NOVALUE = "novalue";
-    /** The CalDAV XML attribute name CALDAV:caseless */
-    public static final String ATTR_CALDAV_CASELESS = "caseless";
+    /** The CalDAV XML attribute name CALDAV:collation */
+    public static final String ATTR_CALDAV_COLLATION = "collation";
     /** The CalDAV XML attribute name CALDAV:negate-condition */
     public static final String ATTR_CALDAV_NEGATE_CONDITION = "negate-condition";
     /** The CalDAV XML attribute name CALDAV:start */
@@ -155,4 +168,7 @@ public interface CaldavConstants {
     public static final DavPropertyName MAXRESOURCESIZE =
         DavPropertyName.create(PROPERTY_CALDAV_MAX_RESOURCE_SIZE,
                                NAMESPACE_CALDAV);
+
+    public static final QName RESOURCE_TYPE_CALENDAR =
+        new QName(NS_CALDAV, ELEMENT_CALDAV_CALENDAR, PRE_CALDAV);
 }

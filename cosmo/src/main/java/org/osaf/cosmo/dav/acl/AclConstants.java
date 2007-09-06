@@ -15,9 +15,12 @@
  */
 package org.osaf.cosmo.dav.acl;
 
+import javax.xml.namespace.QName;
+
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
 /**
@@ -38,6 +41,22 @@ public interface AclConstants extends DavConstants {
     /** The ACL XML element name <DAV:group-membership> */
     public static final String ELEMENT_ACL_GROUP_MEMBERSHIP =
         "group-membership";
+    public static final String ELEMENT_ACL_PRINCIPAL_COLLECTION_SET =
+        "principal-collection-set";
+    public static final String ELEMENT_ACL_PRINCIPAL_MATCH =
+        "principal-match";
+    public static final String ELEMENT_ACL_SELF = "self";
+    public static final String QN_ACL_SELF =
+        DomUtil.getQualifiedName(ELEMENT_ACL_SELF, NAMESPACE);
+    public static final String ELEMENT_ACL_PRINCIPAL_PROPERTY =
+        "principal-property";
+    public static final String QN_ACL_PRINCIPAL_PROPERTY =
+        DomUtil.getQualifiedName(ELEMENT_ACL_PRINCIPAL_PROPERTY, NAMESPACE);
+    public static final String ELEMENT_ACL_PRINCIPAL_PROPERTY_SEARCH =
+        "principal-property-search";
+    public static final String QN_ACL_PRINCIPAL_PROPERTY_SEARCH =
+        DomUtil.getQualifiedName(ELEMENT_ACL_PRINCIPAL_PROPERTY_SEARCH,
+                                 NAMESPACE);
 
     /** The ACL property name DAV:alternate-URI-set */
     public static final String PROPERTY_ACL_ALTERNATE_URI_SET =
@@ -48,6 +67,8 @@ public interface AclConstants extends DavConstants {
     /** The ACL property name DAV:group-membership */
     public static final String PROPERTY_ACL_GROUP_MEMBERSHIP =
         "group-membership";
+    public static final String PROPERTY_ACL_PRINCIPAL_COLLECTION_SET =
+        "principal-collection-set";
 
     /** The ACL property DAV:alternate-URI-set */
     public static final DavPropertyName ALTERNATEURISET =
@@ -58,4 +79,11 @@ public interface AclConstants extends DavConstants {
     /** The ACL property DAV:group-membership */
     public static final DavPropertyName GROUPMEMBERSHIP =
         DavPropertyName.create(PROPERTY_ACL_GROUP_MEMBERSHIP, NAMESPACE);
+    public static final DavPropertyName PRINCIPALCOLLECTIONSET =
+        DavPropertyName.create(PROPERTY_ACL_PRINCIPAL_COLLECTION_SET,
+                               NAMESPACE);
+
+    public static final QName RESOURCE_TYPE_PRINCIPAL =
+        new QName(NAMESPACE.getURI(), ELEMENT_ACL_PRINCIPAL,
+                  NAMESPACE.getPrefix());
 }

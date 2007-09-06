@@ -115,6 +115,7 @@
             <value>org.osaf.cosmo.model.EventStamp</value>
             <value>org.osaf.cosmo.model.FileItem</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
+            <value>org.osaf.cosmo.model.ICalendarAttribute</value>
             <value>org.osaf.cosmo.model.IntegerAttribute</value>
             <value>org.osaf.cosmo.model.Item</value>
             <value>org.osaf.cosmo.model.ItemTombstone</value>
@@ -133,6 +134,7 @@
             <value>org.osaf.cosmo.model.TimestampAttribute</value>
             <value>org.osaf.cosmo.model.Tombstone</value>
             <value>org.osaf.cosmo.model.User</value>
+            <value>org.osaf.cosmo.model.XmlAttribute</value>
         </list>
     </property>
     <property name="entityInterceptor">
@@ -443,8 +445,6 @@
     <property name="atomPrefix"><value>/atom</value></property>
     <property name="cmpPrefix"><value>/cmp</value></property>
     <property name="davPrefix"><value>/dav</value></property>
-    <property name="davPrincipalPrefix"><value>/dav</value></property>
-    <property name="davCalendarHomePrefix"><value>/dav</value></property>
     <property name="morseCodePrefix"><value>/mc</value></property>
     <property name="pimPrefix"><value>/pim</value></property>
     <property name="webcalPrefix"><value>/webcal</value></property>
@@ -455,37 +455,27 @@
 
   <!-- dav protocol resources -->
 
-  <bean id="davLockManager"
-        class="org.apache.jackrabbit.webdav.lock.SimpleLockManager"/>
-
   <bean id="davResourceFactory"
-        class="org.osaf.cosmo.dav.impl.StandardDavResourceFactory">
-    <property name="contentService">
-      <ref local="contentService"/>
-    </property>
-    <property name="securityManager">
-      <ref local="securityManager"/>
-    </property>
+        class="org.osaf.cosmo.dav.StandardResourceFactory">
+    <constructor-arg><ref local="contentService"/></constructor-arg>    
+    <constructor-arg><ref local="userService"/></constructor-arg>
+    <constructor-arg><ref local="securityManager"/></constructor-arg>
   </bean>
 
-  <bean id="davLocatorFactory"
-        class="org.osaf.cosmo.dav.impl.StandardLocatorFactory">
-    <constructor-arg>
-      <value>/dav</value>
-    </constructor-arg>
-    <constructor-arg>
-      <value>/atom</value>
-    </constructor-arg>
-    <constructor-arg>
-      <value>/cmp</value>
-    </constructor-arg>
-    <constructor-arg>
-      <value>/browse</value>
-    </constructor-arg>
+  <bean id="davResourceLocatorFactory"
+        class="org.osaf.cosmo.dav.StandardResourceLocatorFactory">
+    <constructor-arg><ref bean="serviceLocatorFactory"/></constructor-arg>
   </bean>
 
-  <bean id="davSessionProvider"
-        class="org.osaf.cosmo.dav.impl.NoOpDavSessionProvider"/>
+  <bean id="dav"
+        class="org.osaf.cosmo.dav.servlet.StandardRequestHandler">
+    <property name="resourceLocatorFactory">
+      <ref bean="davResourceLocatorFactory"/>
+    </property>
+    <property name="resourceFactory">
+      <ref bean="davResourceFactory"/>
+    </property>
+  </bean>
 
   <!-- atom protocol resources -->
 

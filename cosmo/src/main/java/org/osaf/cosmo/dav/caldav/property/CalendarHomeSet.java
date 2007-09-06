@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,67 +15,46 @@
  */
 package org.osaf.cosmo.dav.caldav.property;
 
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.Namespace;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
-import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
-import org.osaf.cosmo.dav.impl.DavHomeCollection;
+import org.osaf.cosmo.model.User;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 
 /**
- * Represents the CalDAV:calendar-home-set property.
+ * Represents the CALDAV:calendar-home-set property.
  *
  * The property is protected. The value is a single DAV:href element
- * containing the URL of the home collection.
+ * containing the URI of the home collection.
  */
-public class CalendarHomeSet extends AbstractDavProperty
+public class CalendarHomeSet extends StandardDavProperty
     implements CaldavConstants {
 
-    private DavHomeCollection home;
-
-    /**
-     */
-    public CalendarHomeSet(DavHomeCollection home) {
-        super(CALENDARHOMESET, true);
-        this.home = home;
+    public CalendarHomeSet(DavResourceLocator locator,
+                           User user) {
+        super(CALENDARHOMESET, href(locator, user), true);
     }
 
-    /**
-     * Returns a
-     * <code>CalendarHomeSet.SupportedCalendarDataInfo</code>
-     * for this property.
-     */
-    public Object getValue() {
-        return new CalendarHomeSetInfo();
+    public String getHref() {
+        return (String) getValue();
     }
 
-    /**
-     */
-    public class CalendarHomeSetInfo implements XmlSerializable {
-  
-        /**
-         */
-        public Element toXml(Document document) {
-            Element href =
-                DomUtil.createElement(document, XML_HREF, NAMESPACE);
-            DomUtil.setText(href, home.getLocator().getHref(true));
+    public Element toXml(Document document) {
+        Element name = getName().toXml(document);
 
-            Element homeset =
-                DomUtil.createElement(document,
-                                      ELEMENT_CALDAV_CALENDAR_HOME_SET,
-                                      NAMESPACE_CALDAV);
-            homeset.appendChild(href);
+        Element e = DomUtil.createElement(document, XML_HREF, NAMESPACE);
+        DomUtil.setText(e, getHref());
+        name.appendChild(e);
 
-            return homeset;
-        }
+        return name;
+    }
+
+    private static String href(DavResourceLocator locator,
+                               User user) {
+        return locator.getServiceLocator().getDavCalendarHomeUrl(user);
     }
 }

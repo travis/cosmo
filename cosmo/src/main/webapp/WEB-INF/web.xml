@@ -265,7 +265,9 @@
   </filter-mapping>
   <servlet>
     <servlet-name>dav</servlet-name>
-    <servlet-class>org.osaf.cosmo.dav.DavServlet</servlet-class>
+    <servlet-class>
+      org.springframework.web.context.support.HttpRequestHandlerServlet
+    </servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>

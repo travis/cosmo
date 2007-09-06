@@ -17,6 +17,8 @@ package org.osaf.cosmo.dav.caldav;
 
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
+import org.osaf.cosmo.dav.DavException;
+
 /**
  * Provides request functionality required by CalDAV.
  */
@@ -24,8 +26,10 @@ public interface CaldavRequest {
 
     /**
      * Return the list of 'set' entries in the MKCALENDAR request
-     * body. The list is empty if the request body could not be parsed
-     * or if the request body did not contain any 'set' elements.
+     * body.
+     *
+     * @throws DavExceptino if the request body could not be parsed
      */
-    public DavPropertySet getMkCalendarSetProperties();
+    public DavPropertySet getMkCalendarSetProperties()
+        throws DavException;
 }

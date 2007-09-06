@@ -17,8 +17,6 @@ package org.osaf.cosmo.calendar.query;
 
 import java.text.ParseException;
 
-import net.fortuna.ical4j.model.component.VTimeZone;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
@@ -38,16 +36,19 @@ import org.w3c.dom.Element;
  * 
  * <!ELEMENT text-match (#PCDATA)> PCDATA value: string
  * 
- * <!ATTLIST text-match caseless (yes | no) #IMPLIED 
- * negate-condition (yes | no) "no">
+ *  <!ATTLIST text-match collation        CDATA "i;ascii-casemap"
+ *                             negate-condition (yes | no) "no">
  */
 public class TextMatchFilter implements DavConstants, CaldavConstants {
     private boolean isNegateCondition = false;
 
-    private boolean isCaseless = false;
+    private String collation = null;
 
     private String value = null;
 
+    public static final String COLLATION_IASCII = "i;ascii-casemap";
+    public static final String COLLATION_OCTET = "i;octet";
+    
     public TextMatchFilter(String value) {
         this.value = value;
     }
@@ -62,17 +63,12 @@ public class TextMatchFilter implements DavConstants, CaldavConstants {
         // TODO: do we need to do this replacing??
         value = DomUtil.getTextTrim(element).replaceAll("'", "''");
         
-        // Check attribute for caseless
-        String caseless =
-            DomUtil.getAttribute(element, ATTR_CALDAV_CASELESS,null);
+        // Check attribute for collation
+        collation =
+            DomUtil.getAttribute(element, ATTR_CALDAV_COLLATION,null);
                     
         String negateCondition = 
             DomUtil.getAttribute(element, ATTR_CALDAV_NEGATE_CONDITION,null);
-                            
-        if ((caseless == null) || ! VALUE_YES.equals(caseless))
-            isCaseless = false;
-        else
-            isCaseless = true;
         
         if((negateCondition == null) || !VALUE_YES.equals(negateCondition))
             isNegateCondition = false;
@@ -83,12 +79,13 @@ public class TextMatchFilter implements DavConstants, CaldavConstants {
     public TextMatchFilter() {
     }
 
-    public boolean isCaseless() {
-        return isCaseless;
+    
+    public String getCollation() {
+        return collation;
     }
 
-    public void setCaseless(boolean isCaseless) {
-        this.isCaseless = isCaseless;
+    public void setCollation(String collation) {
+        this.collation = collation;
     }
 
     public boolean isNegateCondition() {
@@ -107,11 +104,34 @@ public class TextMatchFilter implements DavConstants, CaldavConstants {
         this.value = value;
     }
 
+    /**
+     * Returns true if the collation is a caseless collation, meaning
+     * case should be ingored when matching text.  The default collation
+     * is 'i;ascii-casemap', which is considered a caseless collation.
+     * On the other hand, 'i;octet' is not caseless.
+     * @return true if the collation is a caseless collation
+     */
+    public boolean isCaseless() {
+        return (collation == null || COLLATION_IASCII.equals(collation));
+    }
+    
+    /**
+     * Sets the collation to be caseless ('i;ascii-casemap') or
+     * not ('i;octet').
+     * @param caseless
+     */
+    public void setCaseless(boolean caseless) {
+        if(caseless)
+            collation = null;
+        else
+            collation = COLLATION_OCTET;
+    }
+    
     /** */
     public String toString() {
         return new ToStringBuilder(this).
             append("value", value).
-            append("isCaseless", isCaseless).
+            append("collation", collation).
             append("isNegateCondition", isNegateCondition).
             toString();
     }

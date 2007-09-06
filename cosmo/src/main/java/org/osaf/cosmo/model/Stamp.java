@@ -34,8 +34,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Index;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 
 /**
  * Represents an abstract Stamp on an Item. A Stamp is a set of related
@@ -83,6 +81,33 @@ public abstract class Stamp extends AuditableObject implements
         this.item = item;
     }
 
+    
+    /**
+     * Convenience method for retrieving an attribute on the underlying
+     * item.
+     * @param qname QName of attribute
+     * @return attribute value
+     */
+    protected Attribute getAttribute(QName qname) {
+        return getItem().getAttribute(qname);
+    }
+    
+    /**
+     * Convenience method for adding an attribute to the underlying item
+     * @param attribute attribute to add
+     */
+    protected void addAttribute(Attribute attribute) {
+        getItem().addAttribute(attribute);
+    }
+    
+    /**
+     * Convenience method for removing an attribute to the underlying item
+     * @param qname QName of attribute to remove
+     */
+    protected void removeAttribute(QName qname) {
+        getItem().removeAttribute(qname);
+    }
+    
     /**
      * @return Stamp type
      */

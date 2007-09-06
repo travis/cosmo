@@ -67,8 +67,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             if (findUserByEmailIgnoreCase(user.getEmail()) != null)
                 throw new DuplicateEmailException(user.getEmail());
 
-            user.setDateCreated(new Date());
-            user.setDateModified(new Date());
+            user.setCreationDate(new Date());
+            user.setModifiedDate(new Date());
 
             if (user.getUid() == null || "".equals(user.getUid()))
                 user.setUid(getIdGenerator().nextIdentifier().toString());
@@ -191,7 +191,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                     throw new DuplicateUsernameException(user.getUsername());
             }
 
-            user.setDateModified(new Date());
+            user.setModifiedDate(new Date());
             getSession().update(user);
             getSession().flush();
 
@@ -354,9 +354,9 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             else if (sort.equals(User.SortType.EMAIL))
                 orders.add(createOrder(pageCriteria, "email"));
             else if (sort.equals(User.SortType.CREATED))
-                orders.add(createOrder(pageCriteria, "dateCreated"));
+                orders.add(createOrder(pageCriteria, "CreatedDate"));
             else if (sort.equals(User.SortType.LAST_MODIFIED))
-                orders.add(createOrder(pageCriteria, "dateModified"));
+                orders.add(createOrder(pageCriteria, "ModifiedDate"));
             else if (sort.equals(User.SortType.ACTIVATED))
                 orders.add(createOrder(pageCriteria, "activationId"));
             else

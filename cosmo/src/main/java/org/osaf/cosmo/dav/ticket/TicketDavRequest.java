@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dav.ticket;
 
+import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.model.Ticket;
 
 /**
@@ -27,16 +28,19 @@ public interface TicketDavRequest {
      * Return a {@link Ticket} representing the information about a
      * ticket to be created by a <code>MKTICKET</code> request.
      *
-     * @throws IllegalArgumentException if there is no ticket
-     * information in the request or if the ticket information exists
-     * but is invalid
+     * @throws DavException if there is no ticket information in the request
+     * or if the ticket information exists but is invalid
      */
-    public Ticket getTicketInfo();
+    public Ticket getTicketInfo()
+        throws DavException;
 
     /**
-     * Return the ticket id included in this request, if any. If
-     * different ticket ids are included in the headers and URL, the
+     * Return the ticket key included in this request, if any. If
+     * different ticket keys are included in the headers and URL, the
      * one from the URL is used.
+     *
+     * @throws DavException if there is no ticket key in the request.
      */
-    public String getTicketId();
+    public String getTicketKey()
+        throws DavException;
 }

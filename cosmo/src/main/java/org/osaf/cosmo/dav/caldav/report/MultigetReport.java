@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,32 +21,33 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
+
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.osaf.cosmo.dav.impl.DavEvent;
+
+import org.osaf.cosmo.dav.BadRequestException;
+import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavCollection;
+import org.osaf.cosmo.dav.DavContent;
+import org.osaf.cosmo.dav.DavResource;
+import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
+
 import org.w3c.dom.Element;
 
 /**
+ * <p>
  * Represents the <code>CALDAV:calendar-multiget</code> report that
  * provides a mechanism for retrieving in one request the properties
  * and filtered calendar data from the resources identifed by the
- * supplied <code>DAV:href</code> elements. It should
- * be supported by all CalDAV resources. <p/> CalDAV specifies the
- * following required format for the request body:
- *
- * <pre>
- *                       &lt;!ELEMENT calendar-multiget (DAV:allprop | DAV:propname | DAV:prop)?
- *                                      DAV:href+&gt;
- * </pre>
+ * supplied <code>DAV:href</code> elements.
+ * </p>
  */
 public class MultigetReport extends CaldavMultiStatusReport {
     private static final Log log = LogFactory.getLog(MultigetReport.class);
-
-    /** */
     public static final ReportType REPORT_TYPE_CALDAV_MULTIGET =
         ReportType.register(ELEMENT_CALDAV_CALENDAR_MULTIGET,
                             NAMESPACE_CALDAV, MultigetReport.class);
@@ -55,23 +56,19 @@ public class MultigetReport extends CaldavMultiStatusReport {
 
     // Report methods
 
-    /** */
     public ReportType getType() {
         return REPORT_TYPE_CALDAV_MULTIGET;
     }
 
-    // CaldavReport methods
+    // ReportBase methods
 
     /**
-     * Parse property and href information from the given report
-     * info. Set output filter if the
-     * <code>CALDAV:calendar-data</code> property is included.
+     * Parses the report info, extracting the properties and output filter.
      */
     protected void parseReport(ReportInfo info)
         throws DavException {
-        if (! getType().isRequestedReportType(info)) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "report not of type " + getType());
-        }
+        if (! getType().isRequestedReportType(info))
+            throw new DavException("Report not of type " + getType());
 
         setPropFindProps(info.getPropertyNameSet());
         if (info.containsContentElement(XML_ALLPROP, NAMESPACE)) {
@@ -85,11 +82,10 @@ public class MultigetReport extends CaldavMultiStatusReport {
 
         List<Element> hrefElements =
             info.getContentElements(XML_HREF, NAMESPACE);
-        if (hrefElements.size() == 0) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "multiget report must contain at least one href element");
-        }
-        if (! getResource().isCollection() && hrefElements.size() > 1)
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "multiget report against a calendar object resource may only contain one href");
+        if (hrefElements.size() == 0) 
+            throw new BadRequestException("Expected at least one " + QN_HREF);
+        if (getResource() instanceof DavContent && hrefElements.size() > 1)
+            throw new BadRequestException("Expected at most one " + QN_HREF);
 
         String parentHref = getResource().getHref();
         String host = parentHref.substring(0, parentHref.indexOf("/", 8));
@@ -106,37 +102,57 @@ public class MultigetReport extends CaldavMultiStatusReport {
 
             // Check if the href represents the requested resource or
             // a child of it
-            if (getResource().isCollection()) {
-                if (! isDescendentOrEqual(parentHref, href)) {
-                    throw new DavException(DavServletResponse.SC_BAD_REQUEST, "href " + href + " does no refer to a child of the requested collection or the collection itself");
-                } 
+            if (getResource() instanceof DavCollection) {
+                if (! isDescendentOrEqual(parentHref, href))
+                    throw new BadRequestException("Href " + href + " does not refer to a descendent of the requested collection or the collection itself");
             } else {
-                if (! href.equals(parentHref)) {
-                    throw new DavException(DavServletResponse.SC_BAD_REQUEST, "href " + href + " does not refer to the requested calendar object resource");
-                }
+                if (! href.equals(parentHref))
+                    throw new BadRequestException("Href " + href + " does not refer to the requested resource ");
             }
 
             hrefs.add(href);
         }
     }
 
+    protected void doQuerySelf(DavResource resource)
+        throws DavException {}
+
+    protected void doQueryChildren(DavCollection collection)
+        throws DavException {}
+
     /**
      * Resolves the hrefs provided in the report info to resources.
      */
     protected void runQuery()
         throws DavException {
-        for (String href : hrefs) {
-            DavEvent target = (DavEvent)
-                getResource().findMember(href);
-            if (target != null)
-                getMultiStatus().addResponse(buildMultiStatusResponse(target));
-            else
-                getMultiStatus().addResponse(new MultiStatusResponse(href, DavServletResponse.SC_NOT_FOUND));
+        DavPropertyNameSet propspec = createResultPropSpec();
+
+        if (getResource() instanceof DavCollection) {
+            DavCollection collection = (DavCollection) getResource();
+            for (String href : hrefs) {
+                DavResource target = collection.findMember(href);
+                if (target != null)
+                    getMultiStatus().
+                        addResponse(buildMultiStatusResponse(target, propspec));
+                else
+                    getMultiStatus().
+                        addResponse(new MultiStatusResponse(href,404));
+            }
+            return;
         }
+
+        if (getResource() instanceof DavCalendarResource) {
+            getMultiStatus().
+                addResponse(buildMultiStatusResponse(getResource(), propspec));
+            return;
+        }
+
+        throw new UnprocessableEntityException(getType() + " report not supported for non-calendar resources");
     }
 
 
-    private boolean isDescendentOrEqual(String path, String descendant) {
+    private static boolean isDescendentOrEqual(String path,
+                                               String descendant) {
         if (path.equals(descendant)) {
             return true;
         } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
-import org.osaf.cosmo.icalendar.ComponentTypes;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,23 +37,22 @@ import org.w3c.dom.Document;
  * {@link ComponentTypes}.
  */
 public class SupportedCalendarComponentSet extends AbstractDavProperty
-    implements CaldavConstants {
+    implements CaldavConstants, ICalendarConstants {
 
-    private Set<String> componentTypes;
+    private String[] componentTypes;
 
-    /**
-     */
     public SupportedCalendarComponentSet() {
-        this(ComponentTypes.getAllSupportedComponentTypes());
+        this(SUPPORTED_COMPONENT_TYPES);
     }
 
-    /**
-     */
-    public SupportedCalendarComponentSet(Set<String> componentTypes) {
+	public SupportedCalendarComponentSet(Set<String> componentTypes) {
+		this((String[]) componentTypes.toArray(new String[0]));
+	}
+
+    public SupportedCalendarComponentSet(String[] componentTypes) {
         super(SUPPORTEDCALENDARCOMPONENTSET, true);
-        for (Iterator<String> i=componentTypes.iterator(); i.hasNext();) {
-            String type = i.next();
-            if (! ComponentTypes.isValidComponentType(type)) {
+        for (String type :componentTypes) {
+            if (! CalendarUtils.isSupportedComponent(type)) {
                 throw new IllegalArgumentException("Invalid component type '" +
                                                    type + "'.");
             }
@@ -67,16 +67,15 @@ public class SupportedCalendarComponentSet extends AbstractDavProperty
      */
     public Object getValue() {
         Set infos = new HashSet();
-        for (Iterator<String> i=componentTypes.iterator(); i.hasNext();) {
-            infos.add(new CalendarComponentInfo(i.next()));
-        }
+		for (String type : componentTypes)
+            infos.add(new CalendarComponentInfo(type));
         return infos;
     }
 
     /**
      * Returns the component types for this property.
      */
-    public Set<String> getComponentTypes() {
+    public String[] getComponentTypes() {
         return componentTypes;
     }
 

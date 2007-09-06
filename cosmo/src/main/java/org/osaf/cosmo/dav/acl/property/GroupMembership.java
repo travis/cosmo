@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.osaf.cosmo.dav.acl.property;
 
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.Namespace;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.osaf.cosmo.CosmoConstants;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+
 import org.osaf.cosmo.dav.acl.AclConstants;
-import org.osaf.cosmo.dav.impl.DavHomeCollection;
+import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
+import org.osaf.cosmo.model.User;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -34,37 +35,35 @@ import org.w3c.dom.Document;
  * the groups in which the principal is directly a member. The list
  * will always contain 0 elements since groups are not yet supported.
  */
-public class GroupMembership extends AbstractDavProperty
+public class GroupMembership extends StandardDavProperty
     implements AclConstants {
 
-    /**
-     */
-    public GroupMembership() {
-        super(GROUPMEMBERSHIP, true);
+    public GroupMembership(DavResourceLocator locator,
+                           User user) {
+        super(GROUPMEMBERSHIP, hrefs(locator, user), true);
     }
 
-    /**
-     * Returns a
-     * <code>GroupMembership.GroupMembershipInfo</code>
-     * for this property.
-     */
-    public Object getValue() {
-        return new GroupMembershipInfo();
+    public Set<String> getHrefs() {
+        return (Set<String>) getValue();
     }
 
-    /**
-     */
-    public class GroupMembershipInfo implements XmlSerializable {
-  
-        /**
-         */
-        public Element toXml(Document document) {
-            Element groups =
-                DomUtil.createElement(document,
-                                      ELEMENT_ACL_GROUP_MEMBERSHIP,
-                                      NAMESPACE);
+    public Element toXml(Document document) {
+        Element name = getName().toXml(document);
 
-            return groups;
+        for (String href : getHrefs()) {
+            Element e = DomUtil.createElement(document, XML_HREF, NAMESPACE);
+            DomUtil.setText(e, href);
+            name.appendChild(e);
         }
+
+        return name;
+    }
+
+    private static HashSet<String> hrefs(DavResourceLocator locator,
+                                         User user) {
+        HashSet<String> hrefs = new HashSet<String>();
+        // XXX: when we add groups, use the service locator to find the
+        // principal url for each of the user's groups
+        return hrefs;
     }
 }

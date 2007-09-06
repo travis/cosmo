@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
@@ -114,8 +115,15 @@ public class OwnerVoter implements AccessDecisionVoter {
             if (cp.getPathInfo() != null) {
                 if (indirectlyAddressable) {
                     // find indirectly addressed item
-                    item = contentService.
-                        findItemByPath(cp.getPathInfo(), cp.getUid());
+                    try {
+                        item = contentService.
+                            findItemByPath(cp.getPathInfo(), cp.getUid());
+                    } catch (ItemNotFoundException e) {
+                        // parent does not exist - case 5
+                        if (log.isDebugEnabled())
+                            log.debug("Indirectly addressed item at " + path + " not found and parent not found; abstaining");
+                        return ACCESS_ABSTAIN;
+                    }
                     if (item == null) {
                         // find indirectly addressed item's parent
                         String parentPath =

@@ -24,7 +24,7 @@ import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
-import org.osaf.cosmo.dav.ExtendedDavResource;
+import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.Ticket;
 
@@ -38,11 +38,11 @@ import org.w3c.dom.Document;
 public class TicketDiscovery extends AbstractDavProperty
     implements TicketConstants {
 
-    private ExtendedDavResource resource;
+    private DavItemResource resource;
 
     /**
      */
-    public TicketDiscovery(ExtendedDavResource resource) {
+    public TicketDiscovery(DavItemResource resource) {
         super(TICKETDISCOVERY, true);
         this.resource = resource;
     }
@@ -80,12 +80,8 @@ public class TicketDiscovery extends AbstractDavProperty
                 DomUtil.createElement(document, XML_OWNER, NAMESPACE);
             Element href =
                 DomUtil.createElement(document, XML_HREF, NAMESPACE);
-            String url =
-                resource.getLocator().getFactory().
-                createResourceLocator(resource.getLocator().getPrefix(),
-                                      resource.getLocator().getWorkspacePath(),
-                                      "/" + ticket.getOwner().getUsername()).
-                getHref(true);
+            String url = resource.getResourceLocator().getServiceLocator().
+                getDavPrincipalUrl(ticket.getOwner());
             DomUtil.setText(href, url);
             owner.appendChild(href);
             ticketInfo.appendChild(owner);

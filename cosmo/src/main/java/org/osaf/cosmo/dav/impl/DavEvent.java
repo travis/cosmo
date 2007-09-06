@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@ import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.webdav.DavResourceFactory;
-import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavSession;
+
+import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavResourceFactory;
+import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -37,24 +38,22 @@ import org.osaf.cosmo.model.NoteItem;
 public class DavEvent extends DavCalendarResource {
     private static final Log log = LogFactory.getLog(DavEvent.class);
 
-   
     /** */
     public DavEvent(DavResourceLocator locator,
-                    DavResourceFactory factory,
-                    DavSession session) {
-        this(new NoteItem(), locator, factory, session);
+                    DavResourceFactory factory)
+        throws DavException {
+        this(new NoteItem(), locator, factory);
         getItem().addStamp(new EventStamp());
     }
     
     /** */
     public DavEvent(NoteItem item,
                     DavResourceLocator locator,
-                    DavResourceFactory factory,
-                    DavSession session) {
-        super(item, locator, factory, session);
+                    DavResourceFactory factory)
+        throws DavException {
+        super(item, locator, factory);
     }
 
-    
     // our methods
 
     /**
@@ -68,7 +67,8 @@ public class DavEvent extends DavCalendarResource {
         return EventStamp.getStamp(getItem());
     }
 
-    protected void setCalendar(Calendar calendar) {
+    protected void setCalendar(Calendar calendar)
+        throws DavException {
         getEventStamp().setCalendar(calendar);
     }    
 }

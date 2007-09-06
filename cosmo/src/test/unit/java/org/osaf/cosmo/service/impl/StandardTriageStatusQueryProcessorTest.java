@@ -203,10 +203,6 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
         
         ccs.setDescription("test description");
         ccs.setLanguage("en");
-
-        HashSet<String> supportedComponents = new HashSet<String>();
-        supportedComponents.add("VEVENT");
-        ccs.setSupportedComponents(supportedComponents);
         
         return calendar;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,19 @@
  */
 package org.osaf.cosmo.dav.acl.property;
 
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.Namespace;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.osaf.cosmo.CosmoConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+
+import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.acl.AclConstants;
-import org.osaf.cosmo.dav.impl.DavHomeCollection;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
+import org.osaf.cosmo.model.User;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
@@ -31,57 +36,40 @@ import org.w3c.dom.Document;
  * Represents the DAV:alternate-URI-set property.
  *
  * This property is protected. The value contains three DAV:href
- * elements specifying the Atom, CMP and web URLs for the principal.
+ * elements specifying the Atom, CMP, dav and web URLs for the principal.
  */
-public class AlternateUriSet extends AbstractDavProperty
+public class AlternateUriSet extends StandardDavProperty
     implements AclConstants {
+    private static final Log log = LogFactory.getLog(AlternateUriSet.class);
 
-    private DavHomeCollection home;
-
-    /**
-     */
-    public AlternateUriSet(DavHomeCollection home) {
-        super(ALTERNATEURISET, true);
-        this.home = home;
+    public AlternateUriSet(DavResourceLocator locator,
+                           User user) {
+        super(ALTERNATEURISET, hrefs(locator, user), true);
     }
 
-    /**
-     * Returns a
-     * <code>AlternateUriSet.AlternateUriSetInfo</code>
-     * for this property.
-     */
-    public Object getValue() {
-        return new AlternateUriSetInfo();
+    public Set<String> getHrefs() {
+        return (Set<String>) getValue();
     }
 
-    /**
-     */
-    public class AlternateUriSetInfo implements XmlSerializable {
-  
-        /**
-         */
-        public Element toXml(Document document) {
-            Element atom =
-                DomUtil.createElement(document, XML_HREF, NAMESPACE);
-            DomUtil.setText(atom, home.getAtomLocator().getHref(false));
+    public Element toXml(Document document) {
+        Element name = getName().toXml(document);
 
-            Element cmp =
-                DomUtil.createElement(document, XML_HREF, NAMESPACE);
-            DomUtil.setText(cmp, home.getCmpLocator().getHref(false));
-
-            Element web =
-                DomUtil.createElement(document, XML_HREF, NAMESPACE);
-            DomUtil.setText(web, home.getWebLocator().getHref(false));
-
-            Element set =
-                DomUtil.createElement(document,
-                                      ELEMENT_ACL_ALTERNATE_URI_SET,
-                                      NAMESPACE);
-            set.appendChild(atom);
-            set.appendChild(cmp);
-            set.appendChild(web);
-
-            return set;
+        for (String href : getHrefs()) {
+            Element e = DomUtil.createElement(document, XML_HREF, NAMESPACE);
+            DomUtil.setText(e, href);
+            name.appendChild(e);
         }
+
+        return name;
+    }
+
+    private static HashSet<String> hrefs(DavResourceLocator locator,
+                                         User user) {
+        HashSet<String> hrefs = new HashSet<String>();
+        Collection<String> uris =
+            locator.getServiceLocator().getUserUrls(user).values();
+        for (String uri : uris)
+            hrefs.add(uri);
+        return hrefs;
     }
 }

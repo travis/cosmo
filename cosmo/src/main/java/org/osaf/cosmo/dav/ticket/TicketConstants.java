@@ -15,8 +15,10 @@
  */
 package org.osaf.cosmo.dav.ticket;
 
+import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.Namespace;
 
 /**
@@ -24,7 +26,7 @@ import org.apache.jackrabbit.webdav.xml.Namespace;
  * namespaces, elements and values, DAV properties and resource types
  * defined by the WebDAV ticket spec.
  */
-public interface TicketConstants {
+public interface TicketConstants extends DavConstants {
 
     /** The HTTP header name <code>Ticket</code> */
     public static final String HEADER_TICKET = "Ticket";
@@ -38,10 +40,16 @@ public interface TicketConstants {
 
     /** The ticket XML element name <ticket:ticketinfo  */
     public static final String ELEMENT_TICKET_TICKETINFO = "ticketinfo";
+    public static final String QN_TICKET_TICKETINFO =
+        DomUtil.getQualifiedName(ELEMENT_TICKET_TICKETINFO, NAMESPACE_TICKET);
     /** The ticket XML element name <ticket:id  */
     public static final String ELEMENT_TICKET_ID = "id";
+    public static final String QN_TICKET_ID =
+        DomUtil.getQualifiedName(ELEMENT_TICKET_ID, NAMESPACE_TICKET);
     /** The ticket XML element name <ticket:timeout  */
     public static final String ELEMENT_TICKET_TIMEOUT = "timeout";
+    public static final String QN_TICKET_TIMEOUT =
+        DomUtil.getQualifiedName(ELEMENT_TICKET_TIMEOUT, NAMESPACE_TICKET);
     /** The ticket XML element name <ticket:visits  */
     public static final String ELEMENT_TICKET_VISITS = "visits";
     /** The ticket XML element name <ticket:freebusy  */

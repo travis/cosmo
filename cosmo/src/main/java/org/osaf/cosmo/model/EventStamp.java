@@ -39,6 +39,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Event;
 
 
@@ -314,7 +315,7 @@ public class EventStamp extends BaseEventStamp implements
     private void mergeCalendarProperties(VEvent event, NoteItem note) {
         //summary = displayName
         //description = body
-        setSummary(note.getDisplayName(), event);
-        setDescription(note.getBody(), event);
+        ICalendarUtils.setSummary(note.getDisplayName(), event);
+        ICalendarUtils.setDescription(note.getBody(), event);
     }
 }

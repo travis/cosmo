@@ -136,7 +136,6 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             if(item instanceof HomeCollectionItem)
                 throw new IllegalArgumentException("cannot remove root item");
 
-            getSession().refresh(item);
             getSession().delete(item);
             getSession().flush();
             

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.osaf.cosmo.icalendar;
+
+import net.fortuna.ical4j.model.Component;
 
 /**
  * Provides constants for values specified by iCalendar that are not
@@ -52,4 +54,11 @@ public interface ICalendarConstants {
     public static final String VALUE_TRUE = "TRUE";
     
     public static final String VALUE_FALSE = "FALSE";
+
+    /**
+     * The iCalendar component types to which the Cosmo data model maps.
+     */
+    public static String[] SUPPORTED_COMPONENT_TYPES = {
+        Component.VEVENT, Component.VTODO, Component.VJOURNAL
+    };
 }

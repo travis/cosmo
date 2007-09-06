@@ -44,7 +44,6 @@ import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Action;
-import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.DateListProperty;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.Description;
@@ -54,20 +53,16 @@ import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.ExRule;
 import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Trigger;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
-import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 
@@ -143,7 +138,7 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public void setIcalUid(String uid) {
-        setIcalUid(uid, getEvent());
+        ICalendarUtils.setUid(uid, getEvent());
     }
 
     protected void setIcalUid(String text, VEvent event) {
@@ -157,22 +152,7 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public void setSummary(String text) {
-        setSummary(text, getEvent());
-    }
-    
-    protected void setSummary(String text, VEvent event) {
-        Summary summary = (Summary)
-        event.getProperties().getProperty(Property.SUMMARY);
-        if (text == null) {
-            if (summary != null)
-                event.getProperties().remove(summary);
-            return;
-        }                
-        if (summary == null) {
-            summary = new Summary();
-            event.getProperties().add(summary);
-        }
-        summary.setValue(text);
+        ICalendarUtils.setSummary(text, getEvent());
     }
     
     /** 
@@ -182,23 +162,7 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public void setDescription(String text) {
-        setDescription(text, getEvent());
-    }
-    
-    protected void setDescription(String text, VEvent event) {
-        Description description = (Description)
-        event.getProperties().getProperty(Property.DESCRIPTION);
-   
-        if (text == null) {
-            if (description != null)
-                event.getProperties().remove(description);
-            return;
-        }                
-        if (description == null) {
-            description = new Description();
-            event.getProperties().add(description);
-        }
-        description.setValue(text);
+        ICalendarUtils.setDescription(text, getEvent());
     }
 
     /**
@@ -933,50 +897,29 @@ public abstract class BaseEventStamp extends Stamp
     /**
      * Initializes the Calendar with a default master event.
      * Initializes the master event using the underlying item's
-     * icalUid (if NoteItem) or uid, and if the item is a NoteItem,
-     * initializes SUMMARY and DESCRIPTION with the NoteItem's 
-     * displayName and body.
+     * icalUid (if NoteItem) or uid.
      */
     public void createCalendar() {
-        Calendar cal = new Calendar();
-        cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        cal.getProperties().add(Version.VERSION_2_0);
-        cal.getProperties().add(CalScale.GREGORIAN);
         
-        VEvent vevent = new VEvent();
-        Uid uid = new Uid();
-        NoteItem note = null;
-        if(getItem()!=null && getItem() instanceof NoteItem)
-            note = (NoteItem) getItem();
-        
-        // VEVENT UID is the NoteItem's icalUid
-        // if it exists, or just the Item's uid
-        if(note.getIcalUid()!=null)
-            uid.setValue(note.getIcalUid());
-        else {
+        NoteItem note = (NoteItem) getItem();
+       
+        String icalUid = note.getIcalUid();
+        if(icalUid==null) {
             // A modifications UID will be the parent's icaluid
             // or uid
             if(note.getModifies()!=null) {
                 if(note.getModifies().getIcalUid()!=null)
-                    uid.setValue(note.getModifies().getIcalUid());
+                    icalUid = note.getModifies().getIcalUid();
                 else
-                    uid.setValue(note.getModifies().getUid());
+                    icalUid = note.getModifies().getUid();
             } else {
-                uid.setValue(note.getUid());
+                icalUid = note.getUid();
             }
         }
-     
-        vevent.getProperties().add(uid);
-       
-        cal.getComponents().add(vevent);
-        setCalendar(cal);
+
+        Calendar cal = ICalendarUtils.createBaseCalendar(new VEvent(), icalUid);
         
-        // SUMMARY is NoteItem.displayName and
-        // DESCRIPTION is NoteItem.body
-        if(note!=null) {
-            setSummary(note.getDisplayName());
-            setDescription(note.getBody());
-        }
+        setCalendar(cal);
     }
     
     /**

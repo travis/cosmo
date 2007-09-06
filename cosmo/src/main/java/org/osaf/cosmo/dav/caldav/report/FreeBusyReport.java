@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeSet;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -51,90 +52,74 @@ import net.fortuna.ical4j.util.Dates;
 import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavResource;
-import org.apache.jackrabbit.webdav.DavServletResponse;
+
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
+
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.Instance;
 import org.osaf.cosmo.calendar.InstanceList;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
+import org.osaf.cosmo.dav.BadRequestException;
+import org.osaf.cosmo.dav.DavCollection;
+import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavResource;
+import org.osaf.cosmo.dav.ForbiddenException;
+import org.osaf.cosmo.dav.MethodNotAllowedException;
+import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavItemCollection;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
-import org.osaf.cosmo.dav.impl.DavCollection;
+import org.osaf.cosmo.dav.report.SimpleReport;
 import org.osaf.cosmo.model.ModelConversionException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
+ * <p>
  * Represents the <code>CALDAV:free-busy-query</code> report that
- * provides a mechanism for finding free-busy information. It should
- * be supported by all CalDAV resources. <p/> CalDAV specifies the
- * following required format for the request body:
- *
- * <pre>
- *                         &lt;!ELEMENT free-busy-query (time-range)&gt;
- * </pre>
+ * provides a mechanism for finding free-busy information. 
+ * </p>
  */
-public class FreeBusyReport extends CaldavSingleResourceReport {
+public class FreeBusyReport extends SimpleReport implements CaldavConstants {
     private static final Log log = LogFactory.getLog(FreeBusyReport.class);
     private static final VersionFourGenerator uuidGenerator =
         new VersionFourGenerator();
 
     private VTimeZone tz = null;
-    
-    Period freeBusyRange;
+    private Period freeBusyRange;
+    private CalendarFilter queryFilter;
 
-    /** */
     public static final ReportType REPORT_TYPE_CALDAV_FREEBUSY =
         ReportType.register(ELEMENT_CALDAV_CALENDAR_FREEBUSY,
                             NAMESPACE_CALDAV, FreeBusyReport.class);
 
     // Report methods
 
-    /** */
     public ReportType getType() {
         return REPORT_TYPE_CALDAV_FREEBUSY;
     }
 
-    // CaldavReport methods
+    // ReportBase methods
 
     /**
-     * Parse information from the given report info needed to execute
-     * the report. Sets a query filter based on the included time
-     * range information.
+     * Parses the report info, extracting the time range and query filter.
      */
     protected void parseReport(ReportInfo info)
         throws DavException {
-        if (! getType().isRequestedReportType(info)) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "report not of type " + getType());
-        }
+        if (! getType().isRequestedReportType(info))
+            throw new DavException("Report not of type " + getType());
 
-        Element tre =
-            info.getContentElement(ELEMENT_CALDAV_TIME_RANGE,
-                                   NAMESPACE_CALDAV);
-        if (tre == null) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "CALDAV:free-busy-query must contain one time-range element");
-        }
-
-        String start = DomUtil.getAttribute(tre, ATTR_CALDAV_START, null);
-        String end = DomUtil.getAttribute(tre, ATTR_CALDAV_END, null);
-        try {
-            DateTime sdt = new DateTime(start);
-            DateTime edt = new DateTime(end);
-            setQueryFilter(createQueryFilter(tre.getOwnerDocument(), sdt, edt));
-            freeBusyRange = new Period(sdt, edt);
-        } catch (ParseException e) {
-            log.error("cannot parse CALDAV:time-range", e);
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, "cannot parse CALDAV:time-range: " + e.getMessage());
-        }
+        freeBusyRange = findFreeBusyRange(info);
+        queryFilter =
+            createQueryFilter(info.getReportElement().getOwnerDocument(),
+                              freeBusyRange);
     }
-
-    // CaldavSingleResourceReport
 
     /**
      * Runs the query, extracts the set of periods for busy time for
@@ -144,111 +129,92 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
      */
     protected void runQuery()
         throws DavException {
+        if (! (getResource() instanceof DavItemCollection))
+            throw new UnprocessableEntityException(getType() + " report not supported for non-collection resources");
+
         // if the collection or any of its parent is excluded from
         // free busy rollups, deny the query
-        DavCollection dc = (DavCollection) getResource();
+        DavItemCollection dc = (DavItemCollection) getResource();
         while (dc != null) {
             if (dc.isExcludedFromFreeBusyRollups())
-                throw new DavException(DavServletResponse.SC_FORBIDDEN, "Targeted collection does not participate in freebusy rollups");
-            dc = (DavCollection) dc.getCollection();
+                throw new ForbiddenException("Targeted collection does not participate in freebusy rollups");
+            dc = (DavItemCollection) dc.getCollection();
         }
 
         super.runQuery();
 
-        PeriodList busyPeriods = new PeriodList();
-        PeriodList busyTentativePeriods = new PeriodList();
-        PeriodList busyUnavailablePeriods = new PeriodList();
-
-        // Create recurrence instances within the time-range
-        for (DavCalendarResource child : getResults()) {
-            try {
-                Calendar calendar = child.getCalendar();
-
-                // Add busy details from the calendar data
-                addBusyPeriods(calendar, tz, busyPeriods, busyTentativePeriods,
-                               busyUnavailablePeriods);
-            } catch (ModelConversionException e) {
-                log.error("cannot parse calendar for resource " + child.getResourcePath(), e);
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,  "cannot parse calendar data: " + e.getMessage());
-            }
-        }
-
-        // Merge periods
-        busyPeriods = busyPeriods.normalise();
-        busyTentativePeriods = busyTentativePeriods.normalise();
-        busyUnavailablePeriods = busyUnavailablePeriods.normalise();
-
-        // Now create a VFREEBUSY in a calendar
-        Calendar calendar = new Calendar();
-        calendar.getProperties().add(Version.VERSION_2_0);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-
-        VFreeBusy vfb =
-            new VFreeBusy(freeBusyRange.getStart(), freeBusyRange.getEnd());
-        String uid = uuidGenerator.nextIdentifier().toString();
-        vfb.getProperties().add(new Uid(uid));
-        calendar.getComponents().add(vfb);
-
-        // Add all periods to the VFREEBUSY
-        if (busyPeriods.size() != 0) {
-            FreeBusy fb = new FreeBusy(busyPeriods);
-            vfb.getProperties().add(fb);
-        }
-        if (busyTentativePeriods.size() != 0) {
-            FreeBusy fb = new FreeBusy(busyTentativePeriods);
-            fb.getParameters().add(FbType.BUSY_TENTATIVE);
-            vfb.getProperties().add(fb);
-        }
-        if (busyUnavailablePeriods.size() != 0) {
-            FreeBusy fb = new FreeBusy(busyUnavailablePeriods);
-            fb.getParameters().add(FbType.BUSY_UNAVAILABLE);
-            vfb.getProperties().add(fb);
-        }
-
-        // Write the calendar object out
-        StringWriter out = new StringWriter();
-        String output = null;
-        try {
-            CalendarOutputter outputter = new CalendarOutputter();
-            outputter.output(calendar, out);
-            output = out.toString();
-            out.close();
-        } catch (IOException e) {
-            log.error("cannot generate freebusy", e);
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "cannot generate freebusy: " + e.getMessage());
-        } catch (ValidationException e) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "invalid freebusy generated: " + e.getMessage());
-        }
-
-        // NB ical4j's outputter generates \r\n line ends but we
-        // need only \n, so remove all \r's from the string
-        output = output.replaceAll("\r", "");
+        Calendar calendar = buildFreeBusy(getResults(), tz, freeBusyRange);
+        String output = writeCalendar(calendar);
 
         setContentType("text/calendar");
         setEncoding("UTF-8"); 
         setStream(new ByteArrayInputStream(output.getBytes()));
-    }
+    }    
 
-    /**
-     * Does nothing if the targeted resource is excluded from free
-     * busy rollups.
-     */
-    protected void doQuery(DavResource resource,
-                           boolean recurse)
+    protected void doQuerySelf(DavResource resource)
         throws DavException {
-        if (((DavCollection) resource).isExcludedFromFreeBusyRollups())
-            return;
-
-        super.doQuery(resource, recurse);
+        // runQuery already enforced that this is a collection, which never
+        // matches a calendar report query
     }
 
-    // private methods
+    protected void doQueryChildren(DavCollection collection)
+        throws DavException {
+        if (isExcluded(collection))
+            return;
+        if (collection instanceof DavCalendarCollection) {
+            DavCalendarCollection dcc = (DavCalendarCollection) collection;
+            getResults().addAll(dcc.findMembers(null));
+            return;
+        }
+        // if it's a regular collection, there won't be any calendar resources
+        // within it to match the query
+    }
+
+    protected void doQueryDescendents(DavCollection collection)
+        throws DavException {
+        if (isExcluded(collection))
+            return;
+        super.doQueryDescendents(collection);
+    }
+
+    // our methods
+
+    public CalendarFilter getQueryFilter() {
+        return queryFilter;
+    }
+
+    private static Period findFreeBusyRange(ReportInfo info)
+        throws DavException {
+        Element tre =
+            info.getContentElement(ELEMENT_CALDAV_TIME_RANGE,
+                                   NAMESPACE_CALDAV);
+        if (tre == null)
+            throw new BadRequestException("Expected " + QN_CALDAV_TIME_RANGE);
+
+        DateTime sdt = null;
+        try {
+            String start = DomUtil.getAttribute(tre, ATTR_CALDAV_START, null);
+            sdt = new DateTime(start);
+        } catch (ParseException e) {
+            throw new BadRequestException("Attribute " + ATTR_CALDAV_START + " not parseable: " + e.getMessage());
+        }
+
+        DateTime edt = null;
+        try {
+            String end = DomUtil.getAttribute(tre, ATTR_CALDAV_END, null);
+            edt = new DateTime(end);
+        } catch (ParseException e) {
+            throw new BadRequestException("Attribute " + ATTR_CALDAV_END + " not parseable: " + e.getMessage());
+        }
+
+        return new Period(sdt, edt);
+    }
 
     CalendarFilter createQueryFilter(Document doc,
-                                     DateTime start,
-                                     DateTime end)
-        throws DavException {
+                                     Period period) {
+        DateTime start = period.getStart();
+        DateTime end = period.getEnd();
+
         // Create a fake calendar-filter element designed to match
         // VEVENTs/VFREEBUSYs within the specified time range.
         //
@@ -291,11 +257,74 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
         return filter;
     }
 
-    private void addBusyPeriods(Calendar calendar,
-                                VTimeZone timezone,
-                                PeriodList busyPeriods,
-                                PeriodList busyTentativePeriods,
-                                PeriodList busyUnavailablePeriods) {
+    private static boolean isExcluded(DavCollection collection) {
+        DavItemCollection dic = (DavItemCollection) collection;
+        return dic.isExcludedFromFreeBusyRollups();
+    }
+
+    private static Calendar buildFreeBusy(Set<DavResource> resources,
+                                          VTimeZone tz,
+                                          Period freeBusyRange)
+        throws DavException {
+        PeriodList busyPeriods = new PeriodList();
+        PeriodList busyTentativePeriods = new PeriodList();
+        PeriodList busyUnavailablePeriods = new PeriodList();
+
+        // Create recurrence instances within the time-range
+        for (DavResource resource : resources) {
+            try {
+                Calendar calendar = ((DavCalendarResource)resource).getCalendar();
+
+                // Add busy details from the calendar data
+                addBusyPeriods(calendar, tz, freeBusyRange, busyPeriods,
+                               busyTentativePeriods, busyUnavailablePeriods);
+            } catch (ModelConversionException e) {
+                throw new DavException(e);
+            }
+        }
+
+        // Merge periods
+        busyPeriods = busyPeriods.normalise();
+        busyTentativePeriods = busyTentativePeriods.normalise();
+        busyUnavailablePeriods = busyUnavailablePeriods.normalise();
+
+        // Now create a VFREEBUSY in a calendar
+        Calendar calendar = new Calendar();
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+
+        VFreeBusy vfb =
+            new VFreeBusy(freeBusyRange.getStart(), freeBusyRange.getEnd());
+        String uid = uuidGenerator.nextIdentifier().toString();
+        vfb.getProperties().add(new Uid(uid));
+        calendar.getComponents().add(vfb);
+
+        // Add all periods to the VFREEBUSY
+        if (busyPeriods.size() != 0) {
+            FreeBusy fb = new FreeBusy(busyPeriods);
+            vfb.getProperties().add(fb);
+        }
+        if (busyTentativePeriods.size() != 0) {
+            FreeBusy fb = new FreeBusy(busyTentativePeriods);
+            fb.getParameters().add(FbType.BUSY_TENTATIVE);
+            vfb.getProperties().add(fb);
+        }
+        if (busyUnavailablePeriods.size() != 0) {
+            FreeBusy fb = new FreeBusy(busyUnavailablePeriods);
+            fb.getParameters().add(FbType.BUSY_UNAVAILABLE);
+            vfb.getProperties().add(fb);
+        }
+
+        return calendar;
+    }
+
+    private static void addBusyPeriods(Calendar calendar,
+                                       VTimeZone timezone,
+                                       Period freeBusyRange,
+                                       PeriodList busyPeriods,
+                                       PeriodList busyTentativePeriods,
+                                       PeriodList busyUnavailablePeriods) {
         // Create list of instances within the specified time-range
         InstanceList instances = new InstanceList();
         instances.setUTC(true);
@@ -389,6 +418,25 @@ public class FreeBusyReport extends CaldavSingleResourceReport {
                     busyPeriods.add(new Period(start, end));
                 }
             }
+        }
+    }
+
+    private static String writeCalendar(Calendar calendar)
+        throws DavException {
+        try {
+            StringWriter out = new StringWriter();
+            CalendarOutputter outputter = new CalendarOutputter();
+            outputter.output(calendar, out);
+            String output = out.toString();
+            out.close();
+
+            // NB ical4j's outputter generates \r\n line ends but we
+            // need only \n, so remove all \r's from the string
+            output = output.replaceAll("\r", "");
+
+            return output;
+        } catch (Exception e) {
+            throw new DavException(e);
         }
     }
 }

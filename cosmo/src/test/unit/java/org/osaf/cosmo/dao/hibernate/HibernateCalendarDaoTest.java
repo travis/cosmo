@@ -17,7 +17,6 @@ package org.osaf.cosmo.dao.hibernate;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -74,16 +73,11 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals("test", queryItem.getName());
         Assert.assertEquals("en", ccs.getLanguage());
         Assert.assertEquals("test description", ccs.getDescription());
-        Assert.assertEquals("VEVENT", (String) ccs
-                .getSupportedComponents().iterator().next());
 
         // test update
         queryItem.setName("test2");
         ccs.setLanguage("es");
         ccs.setDescription("test description2");
-        HashSet<String> supportedComponents = new HashSet<String>();
-        supportedComponents.add("VTODO");
-        ccs.setSupportedComponents(supportedComponents);
 
         contentDao.updateCollection(queryItem);
         Assert.assertNotNull(queryItem);
@@ -96,8 +90,6 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals("test2", queryItem.getName());
         Assert.assertEquals("es", ccs.getLanguage());
         Assert.assertEquals("test description2", ccs.getDescription());
-        Assert.assertEquals("VTODO", (String) ccs
-                .getSupportedComponents().iterator().next());
 
         // test add event
         ContentItem event = generateEvent("test.ics", "cal1.ics",
@@ -166,32 +158,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertEquals(getCalendar(event).toString(), getCalendar(queryEvent).toString());
     }
 
-    /*public void testDuplicateEventUid() throws Exception {
-        CollectionItem calendar = generateCalendar("test", "testuser");
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
-        
-        CollectionItem newItem = contentDao.createCollection(root, calendar);
-
-        ContentItem event = generateEvent("test.ics", "cal1.ics",
-                "testuser");
-
-        event = contentDao.createContent(calendar, event);
-        calendarDao.indexEvent(EventStamp.getStamp(event));
-
-        ContentItem event2 = generateEvent("testduplicate.ics",
-                "cal1.ics", "testuser");
-        calendarDao.indexEvent(EventStamp.getStamp(event));
-
-        clearSession();
-
-        calendar = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
-
-        try {
-            event2 = contentDao.createContent(calendar, event2);
-            Assert.fail("able to create event with duplicate uid");
-        } catch (DuplicateEventUidException e) {
-        }
-    }*/
+    
 
     public void testFindByEventIcalUid() throws Exception {
         CollectionItem calendar = generateCalendar("test", "testuser");
@@ -242,7 +209,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         calendar = contentDao.findCollectionByUid(calendar.getUid());
 
         // Should match ics.1
-        Set<ContentItem> queryEvents = calendarDao.findEvents(calendar,
+        Set<ContentItem> queryEvents = calendarDao.findCalendarItems(calendar,
                 filter);
         Assert.assertEquals(1, queryEvents.size());
         ContentItem nextItem = queryEvents.iterator().next();
@@ -250,28 +217,27 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
 
         // Should match all
         eventFilter.setPropFilters(new ArrayList());
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(5, queryEvents.size());
 
         // should match three
-        eventFilter.getPropFilters().add(propFilter);
         PropertyFilter propFilter2 = new PropertyFilter("SUMMARY");
         propFilter2.setTextMatchFilter(new TextMatchFilter("Physical"));
         eventFilter.getPropFilters().add(propFilter2);
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(3, queryEvents.size());
 
         // should match everything except #1...so that means 4
         eventFilter.getPropFilters().remove(propFilter2);
+        eventFilter.getPropFilters().add(propFilter);
         propFilter.getTextMatchFilter().setNegateCondition(true);
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(4, queryEvents.size());
 
         // should match ics.1 again
         propFilter.getTextMatchFilter().setNegateCondition(false);
-        propFilter.getTextMatchFilter().setCaseless(true);
         propFilter.getTextMatchFilter().setValue("vISiBlE");
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(1, queryEvents.size());
         nextItem = (ContentItem) queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
@@ -280,7 +246,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         propFilter.setTextMatchFilter(null);
         propFilter.setName("RRULE");
         propFilter.setIsNotDefinedFilter(new IsNotDefinedFilter());
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(5, queryEvents.size());
 
         // time range test
@@ -295,7 +261,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         eventFilter.setTimeRangeFilter(timeRange);
 
         // should match ics.1
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(1, queryEvents.size());
         nextItem = (ContentItem) queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
@@ -307,7 +273,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         timeRange.setPeriod(period);
 
         // should match all now
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(5, queryEvents.size());
 
         propFilter = new PropertyFilter("SUMMARY");
@@ -315,7 +281,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         eventFilter.getPropFilters().add(propFilter);
 
         // should match ics.1
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(1, queryEvents.size());
         nextItem = (ContentItem) queryEvents.iterator().next();
         Assert.assertEquals("test1.ics", nextItem.getName());
@@ -327,7 +293,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         timeRange.setPeriod(period);
 
         // should match none
-        queryEvents = calendarDao.findEvents(calendar, filter);
+        queryEvents = calendarDao.findCalendarItems(calendar, filter);
         Assert.assertEquals(0, queryEvents.size());
     }
     
@@ -423,10 +389,6 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         
         ccs.setDescription("test description");
         ccs.setLanguage("en");
-
-        HashSet<String> supportedComponents = new HashSet<String>();
-        supportedComponents.add("VEVENT");
-        ccs.setSupportedComponents(supportedComponents);
         
         return calendar;
     }
@@ -460,7 +422,6 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         EventExceptionStamp evs = new EventExceptionStamp();
         event.addStamp(evs);
         evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
-        event.setIcalUid(evs.getIcalUid());
         
         return event;
     }

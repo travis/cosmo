@@ -45,7 +45,7 @@ public interface CalendarDao {
     
 
     /**
-     * Find calendar events by filter.
+     * Find calendar items by filter.
      *
      * @param collection
      *            collection to search
@@ -54,7 +54,7 @@ public interface CalendarDao {
      * @return set ContentItem objects that contain EventStamps matching specified
      *         filter.
      */
-    public Set<ContentItem> findEvents(CollectionItem collection,
+    public Set<ContentItem> findCalendarItems(CollectionItem collection,
                                              CalendarFilter filter);
     
     /**

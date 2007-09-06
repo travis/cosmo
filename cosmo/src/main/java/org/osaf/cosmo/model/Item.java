@@ -50,6 +50,8 @@ import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
+import org.w3c.dom.Element;
+
 /**
  * Abstract base class for an item on server.  All
  * content in cosmo extends from Item.
@@ -403,6 +405,24 @@ public abstract class Item extends AuditableObject {
     public void addDictionaryAttribute(QName qname, Map<String, String> value) {
         addAttribute(new DictionaryAttribute(qname, value));
     }
+
+    /**
+     * Add new XmlAttribute in default namespace
+     * @param name local name of attribute to add
+     * @param value Element value of attribute to add
+     */
+    public void addXmlAttribute(String name, Element value) {
+        addXmlAttribute(new QName(name), value);
+    }
+
+    /**
+     * Add new XmlAttribute
+     * @param qname qualified name of attribute to add
+     * @param value Element value of attribute to add
+     */
+    public void addXmlAttribute(QName qname, Element value) {
+        addAttribute(new XmlAttribute(qname, value));
+    }
     
     /**
      * Set attribute value of attribute with local name in default
@@ -422,7 +442,7 @@ public abstract class Item extends AuditableObject {
     @SuppressWarnings("unchecked")
     public void setAttribute(QName key, Object value) {
         Attribute attr = (Attribute) attributes.get(key);
-        
+    
         if(attr==null)
         {
             if(value instanceof String)
@@ -439,6 +459,8 @@ public abstract class Item extends AuditableObject {
                 attr = new MultiValueStringAttribute(key, (Set) value);
             else if(value instanceof Map)
                 attr = new DictionaryAttribute(key, (Map) value);
+            else if(value instanceof Element)
+                attr = new XmlAttribute(key, (Element) value);
             else
                 attr = new StringAttribute(key, value.toString());
             addAttribute(attr);

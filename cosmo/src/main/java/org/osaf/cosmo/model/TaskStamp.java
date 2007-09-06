@@ -19,8 +19,14 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VToDo;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.osaf.cosmo.calendar.ICalendarUtils;
+import org.osaf.cosmo.hibernate.validator.Task;
 
 
 /**
@@ -32,12 +38,14 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 public class TaskStamp extends Stamp implements
         java.io.Serializable {
 
-
     /**
      * 
      */
     private static final long serialVersionUID = -6197756070431706553L;
 
+    public static final QName ATTR_ICALENDAR = new QName(
+            TaskStamp.class, "icalendar");
+    
     /** default constructor */
     public TaskStamp() {
     }
@@ -45,6 +53,63 @@ public class TaskStamp extends Stamp implements
     @Transient
     public String getType() {
         return "task";
+    }
+    
+    /**
+     * Return the Calendar object containing a VTODO component.
+     * @return calendar
+     */
+    @Transient
+    @Task
+    public Calendar getTaskCalendar() {
+        // calendar stored as ICalendarAttribute on Item
+        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
+        if (calAttr != null)
+            return calAttr.getValue();
+        else
+            return null;
+    }
+    
+    /**
+     * Set the Calendar object containing a VOTODO component.
+     * This allows non-standard icalendar properties to be stored 
+     * with the task.
+     * @param calendar
+     */
+    public void setTaskCalendar(Calendar calendar) {
+        // calendar stored as ICalendarAttribute on Item
+        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
+        if(calAttr==null && calendar!=null) {
+            calAttr = new ICalendarAttribute(ATTR_ICALENDAR, calendar);
+            addAttribute(calAttr);
+        }
+        
+        if(calendar==null)
+            removeAttribute(ATTR_ICALENDAR);
+        else
+            calAttr.setValue(calendar);
+    }
+    
+    /**
+     * Return icalendar representation of task.  A task is serialized
+     * as a VOTODO.
+     * @return Calendar representation of task
+     */
+    @Transient
+    public Calendar getCalendar() {
+        // Start with existing calendar if present
+        Calendar calendar = getTaskCalendar();
+        
+        // otherwise, start with new calendar
+        if (calendar == null)
+            calendar = ICalendarUtils.createBaseCalendar(new VToDo(),
+                    ((NoteItem) getItem()).getIcalUid());
+        
+        // merge in displayName,body
+        VToDo task = (VToDo) calendar.getComponent(Component.VTODO);
+        mergeCalendarProperties(task);
+        
+        return calendar;
     }
     
     /**
@@ -59,5 +124,18 @@ public class TaskStamp extends Stamp implements
     public Stamp copy(Item item) {
         TaskStamp stamp = new TaskStamp();
         return stamp;
+    }
+    
+    private void mergeCalendarProperties(VToDo task) {
+        //uid = icaluid or uid
+        //summary = displayName
+        //description = body
+        String icalUid = ((NoteItem)getItem()).getIcalUid();
+        if(icalUid==null)
+            icalUid = getItem().getUid();
+        
+        ICalendarUtils.setUid(icalUid, task);
+        ICalendarUtils.setSummary(getItem().getDisplayName(), task);
+        ICalendarUtils.setDescription(((NoteItem)getItem()).getBody(), task);
     }
 }

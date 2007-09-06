@@ -113,16 +113,6 @@
         <c:choose><c:when test="${ccstamp.timezoneName != null}"><c:out value="${ccstamp.timezoneName}"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
-    <tr>
-      <td class="mdLabel" style="text-align:right;">
-        <fmt:message key="HomeDirectory.Collection.Attributes.SupportedCalendarItems"/>
-      </td>
-      <td class="mdData">
-        <c:forEach var="type" items="${ccstamp.supportedComponents}">
-          <fmt:message key="HomeDirectory.Collection.Attributes.SupportedCalendarItem.${type}"/>
-        </c:forEach>
-      </td>
-    </tr>
   </table>
 </div>
 </c:if>

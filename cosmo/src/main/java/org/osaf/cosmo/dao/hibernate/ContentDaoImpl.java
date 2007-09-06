@@ -32,6 +32,7 @@ import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.NoteItem;
@@ -559,6 +560,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // verify uid not in use
         checkForDuplicateUid(content);
         
+        // verify icaluid not in use for collection
+        if (content instanceof NoteItem)
+            checkForDuplicateICalUid((NoteItem) content, parent);
+        
         setBaseItemProps(content);
         
         // add parent to new content
@@ -584,7 +589,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         
         getSession().save(content);    
     }
-    
+
     protected void createContentInternal(Set<CollectionItem> parents, ContentItem content) {
 
         if(parents==null)
@@ -606,6 +611,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // verify uid not in use
         checkForDuplicateUid(content);
         
+        // verify icaluid not in use for collections
+        if (content instanceof NoteItem)
+            checkForDuplicateICalUid((NoteItem) content, content.getParents());
+        
         setBaseItemProps(content);
         
         for(CollectionItem parent: parents) {
@@ -618,7 +627,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         
         getSession().save(content);
     }
-    
+
     protected void updateContentInternal(ContentItem content) {
         
         if (content == null)
@@ -646,6 +655,20 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         collection.setModifiedDate(new Date());
     }
     
+    /**
+     * Override so we can handle NoteItems. Adding a note to a collection
+     * requires verifying that the icaluid is unique within the collection.
+     */
+    @Override
+    protected void addItemToCollectionInternal(Item item,
+            CollectionItem collection) {
+        if (item instanceof NoteItem)
+            // verify icaluid is unique within collection
+            checkForDuplicateICalUid((NoteItem) item, collection);
+
+        super.addItemToCollectionInternal(item, collection);
+    }
+    
     @Override
     protected void removeItemFromCollectionInternal(Item item, CollectionItem collection) {
         if(item instanceof NoteItem) {
@@ -662,6 +685,47 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
         else
             super.removeItemFromCollectionInternal(item, collection);
+    }
+
+    protected void checkForDuplicateICalUid(NoteItem note, CollectionItem parent) {
+
+        // TODO: should icalUid be required?  Currrently its not and all
+        // items created by the webui dont' have it.
+        if (note.getIcalUid() == null || note.getModifies()!=null)
+            return;
+
+        // Lookup item by parent/icaluid
+        Query hibQuery = getSession().getNamedQuery(
+                "noteItemId.by.parent.icaluid").setParameter("parentid",
+                parent.getId()).setParameter("icaluid", note.getIcalUid());
+        hibQuery.setFlushMode(FlushMode.MANUAL);
+
+        Long itemId = (Long) hibQuery.uniqueResult();
+
+        // if icaluid is in use throw exception
+        if (itemId != null) {
+            // If the note is new, then its a duplicate icaluid
+            if (note.getId() == -1) {
+                throw new IcalUidInUseException("icalUid" + note.getIcalUid()
+                        + " already in use for collection " + parent.getUid());
+            }
+            // If the note exists and there is another note with the same
+            // icaluid, then its a duplicate icaluid
+            if (note.getId().equals(itemId)) {
+                throw new IcalUidInUseException("icalUid" + note.getIcalUid()
+                        + " already in use for collection " + parent.getUid());
+            }
+        }
+    }
+
+    protected void checkForDuplicateICalUid(NoteItem note,
+            Set<CollectionItem> parents) {
+
+        if (note.getIcalUid() == null || note.getModifies()!=null)
+            return;
+
+        for (CollectionItem parent : parents)
+            checkForDuplicateICalUid(note, parent);
     }
     
     private boolean isNoteModification(Item item) {

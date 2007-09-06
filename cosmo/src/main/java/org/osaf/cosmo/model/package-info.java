@@ -23,10 +23,20 @@
         name="bytearray_blob",
         typeClass = org.springframework.orm.hibernate3.support.BlobByteArrayType.class
     ),
+    
+    @TypeDef(
+            name="bufferedcontent_blob",
+            typeClass = org.osaf.cosmo.hibernate.BufferedContentBlob.class
+        ),
 
     @TypeDef(
             name="calendar_clob",
             typeClass = org.osaf.cosmo.hibernate.CalendarClobType.class
+    ),
+
+    @TypeDef(
+            name="xml_clob",
+            typeClass = org.osaf.cosmo.hibernate.XmlClobType.class
     ),
     
     @TypeDef(
@@ -64,6 +74,7 @@
     @NamedQuery(name="item.by.ownerId.and.nullParent", query="select i from Item i where i.owner.id=:ownerid and size(i.parents)=0"),
     @NamedQuery(name="contentItem.by.parent.timestamp", query="select item from ContentItem item left join fetch item.stamps left join fetch item.attributes left join fetch item.tombstones join item.parents parent where parent=:parent and item.modifiedDate>:timestamp"),
     @NamedQuery(name="contentItem.by.parent", query="select item from ContentItem item left join fetch item.stamps left join fetch item.attributes left join fetch item.tombstones join item.parents parent where parent=:parent"),
+    @NamedQuery(name="noteItemId.by.parent.icaluid", query="select item.id from NoteItem item join item.parents parent where parent.id=:parentid and item.icalUid=:icaluid and item.modifies is null"),
     
     // User Queries
     @NamedQuery(name="user.byUsername", query="from User where username=:username"),
@@ -80,7 +91,7 @@
     @NamedQuery(name="passwordRecovery.delete.byUser", query="delete from PasswordRecovery where user=:user"),
     
     // Event Queries
-    @NamedQuery(name="event.by.calendar.icaluid", query="select i from NoteItem i join i.parents parent where parent=:calendar and i.icalUid=:uid")
+    @NamedQuery(name="event.by.calendar.icaluid", query="select i from NoteItem i join i.parents parent join i.stamps stamp where parent=:calendar and stamp.class=EventStamp and i.icalUid=:uid")
     
 })
 package org.osaf.cosmo.model;

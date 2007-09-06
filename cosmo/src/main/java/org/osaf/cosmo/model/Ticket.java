@@ -222,6 +222,24 @@ public class Ticket extends BaseModelObject {
         return false;
     }
 
+    @Transient
+    public boolean isReadOnly() {
+        Type type = getType();
+        return type != null && type.equals(Type.READ_ONLY);
+    }
+
+    @Transient
+    public boolean isReadWrite() {
+        Type type = getType();
+        return type != null && type.equals(Type.READ_WRITE);
+    }
+
+    @Transient
+    public boolean isFreeBusy() {
+        Type type = getType();
+        return type != null && type.equals(Type.FREE_BUSY);
+    }
+
     /**
      */
     public boolean equals(Object o) {

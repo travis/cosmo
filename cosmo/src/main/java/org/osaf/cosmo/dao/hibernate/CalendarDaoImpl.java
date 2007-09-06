@@ -30,17 +30,18 @@ import org.osaf.cosmo.calendar.query.CalendarFilterEvaluater;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.hibernate.query.CalendarFilterConverter;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
-import org.osaf.cosmo.model.CalendarCollectionStamp;
+import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * Implemtation of CalendarDao using Hibernate persistence objects.
+ * Implementation of CalendarDao using Hibernate persistence objects.
  */
 public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao {
 
@@ -48,10 +49,11 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
 
     private ItemFilterProcessor itemFilterProcessor = null;
   
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.CalendarDao#findEvents(org.osaf.cosmo.model.CollectionItem, org.osaf.cosmo.calendar.query.CalendarFilter)
+     * @see org.osaf.cosmo.dao.CalendarDao#findCalendarItems(org.osaf.cosmo.model.CollectionItem, org.osaf.cosmo.calendar.query.CalendarFilter)
      */
-    public Set<ContentItem> findEvents(CollectionItem collection,
+    public Set<ContentItem> findCalendarItems(CollectionItem collection,
                                              CalendarFilter filter) {
 
         try {
@@ -68,12 +70,19 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             // to an ItemFilter (slower but at least gets the job done).
             HashSet<ContentItem> results = new HashSet<ContentItem>();
             CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-            CalendarCollectionStamp calendar = CalendarCollectionStamp.getStamp(collection);
             
-            // Evaluate filter against all events
-            for(EventStamp event: calendar.getEventStamps()) {
-               if(evaluater.evaluate(event.getCalendar(),filter)==true)
-                   results.add((ContentItem) event.getItem()); 
+            // Evaluate filter against all calendar items
+            for (Item child : collection.getChildren()) {
+                // only care about notes
+                if (child instanceof NoteItem) {
+                    NoteItem note = (NoteItem) child;
+                    // only care about master items
+                    if (note.getModifies() != null)
+                        continue;
+                    if (evaluater.evaluate(
+                            ICalendarOutputter.getCalendar(note), filter) == true)
+                        results.add(note);
+                }
             }
             
             return results;

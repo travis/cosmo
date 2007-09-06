@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,110 +15,118 @@
  */
 package org.osaf.cosmo.dav.caldav.report;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.MultiStatus;
+
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+
+import org.osaf.cosmo.calendar.data.OutputFilter;
+import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavResource;
+import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.property.CalendarData;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
+import org.osaf.cosmo.dav.report.MultiStatusReport;
+
+import org.w3c.dom.Element;
 
 /**
- * Base class for CalDAV reports that return multistatus
- * responses.
- *
- * Based on code originally written by Cyrus Daboo.
+ * <p>
+ * Extends <code>MultiStatusReport</code> to handle CalDAV report features.
+ * </p>
+ * <p>
+ * A report request may contain the pseudo-property
+ * <code>CALDAV:calendar-data</code>. If so, the calendar data for the resource
+ * is to be returned in the response as the value of a property of the same
+ * name. The value for the request property may specify
+ * an <em>output filter</em> that restricts the components, properties and
+ * parameters included in the calendar data in the response. Subclasses are
+ * responsible for setting the output filter when parsing the report info.
+ * </p>
  */
-public abstract class CaldavMultiStatusReport extends CaldavReport {
+public abstract class CaldavMultiStatusReport extends MultiStatusReport
+    implements CaldavConstants {
     private static final Log log =
         LogFactory.getLog(CaldavMultiStatusReport.class);
 
-    private MultiStatus multistatus = new MultiStatus();
-    private int propfindType = PROPFIND_ALL_PROP;
-    private DavPropertyNameSet propfindProps;
+    private OutputFilter outputFilter;
 
-    // Report methods
+    // ReportBase methods
+
+
+    // MultiStatusReport methods
 
     /**
-     * Returns true.
+     * Removes <code>CALDAV:calendar-data</code> from the property spec
+     * since it doesn't represent a real property.
      */
-    public boolean isMultiStatusReport() {
-        return true;
+    protected DavPropertyNameSet createResultPropSpec() {
+        DavPropertyNameSet spec = super.createResultPropSpec();
+        spec.remove(CALENDARDATA);
+        return spec;
+    }
+
+    /**
+     * Includes the resource's calendar data in the response as the
+     * <code>CALDAV:calendar-data</code> property if it was requested. The
+     * calendar data is filtered if a filter was included in the request.
+     */
+    protected MultiStatusResponse
+        buildMultiStatusResponse(DavResource resource,
+                                 DavPropertyNameSet props)
+        throws DavException {
+        MultiStatusResponse msr =
+            super.buildMultiStatusResponse(resource, props);
+
+        DavCalendarResource dcr = (DavCalendarResource) resource;
+        if (getPropFindProps().contains(CALENDARDATA))
+            msr.add(new CalendarData(readCalendarData(dcr)));
+
+        return msr;
     }
 
     // our methods
 
-    /**
-     * Runs the query and builds a multistatus response.
-     */
-    protected void runQuery()
-        throws DavException {
-        super.runQuery();
-
-        for (DavCalendarResource member : getResults()) {
-            multistatus.addResponse(buildMultiStatusResponse(member));
-        }
+    public OutputFilter getOutputFilter() {
+        return outputFilter;
     }
 
-    /** */
-    protected MultiStatus getMultiStatus() {
-        return multistatus;
+    public void setOutputFilter(OutputFilter outputFilter) {
+        this.outputFilter = outputFilter;
     }
 
     /**
-     * Write output to the response.
+     * Parses an output filter out of the given report info.
      */
-    protected void output(DavServletResponse response)
-        throws IOException {
-        response.sendXmlResponse(multistatus,
-                                 DavServletResponse.SC_MULTI_STATUS);
-    }
-
-    /** */
-    public int getPropFindType() {
-        return propfindType;
-    }
-
-    /** */
-    public void setPropFindType(int type) {
-        this.propfindType = type;
-    }
-
-    /** */
-    public DavPropertyNameSet getPropFindProps() {
-        return propfindProps;
-    }
-
-    /** */
-    public void setPropFindProps(DavPropertyNameSet props) {
-        this.propfindProps = props;
-    }
-
-    /** */
-    protected MultiStatusResponse
-        buildMultiStatusResponse(DavCalendarResource resource)
+    protected static OutputFilter findOutputFilter(ReportInfo info)
         throws DavException {
-        // clone the incoming property name set and remove
-        // calendar-data since we generate it manually
-        DavPropertyNameSet resourceProps =
-            new DavPropertyNameSet(propfindProps);
-        resourceProps.remove(CALENDARDATA);
+        Element propdata =
+            DomUtil.getChildElement(info.getReportElement(),
+                                    XML_PROP, NAMESPACE);
+        if (propdata == null)
+            return null;
 
-        MultiStatusResponse response =
-            new MultiStatusResponse(resource, resourceProps, propfindType);
+        Element cdata =
+            DomUtil.getChildElement(propdata, ELEMENT_CALDAV_CALENDAR_DATA,
+                                    NAMESPACE_CALDAV);
+        if (cdata == null)
+            return null;
 
-        if (propfindProps.contains(CALENDARDATA)) {
-            String calendarData = null;
-            if (resource.exists()) {
-                calendarData = readCalendarData(resource);
-            }
-            response.add(new CalendarData(calendarData));
-        }
+        return CaldavOutputFilter.createFromXml(cdata);
+    }
 
-        return response;
+    private String readCalendarData(DavCalendarResource resource)
+        throws DavException {
+        if (! resource.exists())
+            return null;
+        StringBuffer buffer = new StringBuffer();
+        if (outputFilter != null)
+            outputFilter.filter(resource.getCalendar(), buffer);
+        else
+            buffer.append(resource.getCalendar().toString());
+        return buffer.toString();
     }
 }

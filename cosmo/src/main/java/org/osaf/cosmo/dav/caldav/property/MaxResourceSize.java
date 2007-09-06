@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 
 /**
- * Represents the CalDAV calendar-description property.
+ * Represents the CalDAV max-resource-size property.
  */
 public class MaxResourceSize extends AbstractDavProperty
     implements CaldavConstants {

@@ -15,25 +15,28 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.webdav.DavConstants;
-import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
-import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.WebdavResponseImpl;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
-import org.osaf.cosmo.dav.ExtendedDavResource;
+import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavResponse;
+import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
-import org.osaf.cosmo.dav.ticket.TicketDavResponse;
 import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
 import org.osaf.cosmo.model.Ticket;
 
@@ -45,18 +48,19 @@ import org.w3c.dom.Element;
  * implements methods for the DAV ticket extension.
  */
 public class StandardDavResponse extends WebdavResponseImpl
-    implements TicketDavResponse, DavConstants, TicketConstants {
+    implements DavResponse, DavConstants, TicketConstants {
     private static final Log log =
         LogFactory.getLog(StandardDavResponse.class);
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY =
+        XMLOutputFactory.newInstance();
 
     /**
      */
-    public StandardDavResponse(HttpServletResponse response,
-                               boolean noCache) {
-        super(response, noCache);
+    public StandardDavResponse(HttpServletResponse response) {
+        super(response);
     }
 
-    // TicketDavResponse methods
+    // DavResponse methods
 
     /**
      * Send the <code>ticketdiscovery</code> response to a
@@ -65,7 +69,7 @@ public class StandardDavResponse extends WebdavResponseImpl
      * @param resource the resource on which the ticket was created
      * @param ticketId the id of the newly created ticket
      */
-    public void sendMkTicketResponse(ExtendedDavResource resource,
+    public void sendMkTicketResponse(DavItemResource resource,
                                      String ticketId)
         throws DavException, IOException {
         setHeader(HEADER_TICKET, ticketId);
@@ -92,15 +96,37 @@ public class StandardDavResponse extends WebdavResponseImpl
         }
     }
 
-    /**
-     * Send the response to a <code>DELTICKET</code> request.
-     *
-     * @param resource the resource on which the ticket was deleted
-     * @param ticketId the id of the deleted ticket
-     */
-    public void sendDelTicketResponse(ExtendedDavResource resource,
-                                      String ticketId)
-        throws DavException, IOException {
-        setStatus(SC_NO_CONTENT);
+    public void sendDavError(DavException e)
+        throws IOException {
+        setStatus(e.getErrorCode());
+        if (! e.hasContent())
+            return;
+
+        XMLStreamWriter writer = null;
+
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(out);
+            writer.writeStartDocument();
+            e.writeTo(writer);
+            writer.writeEndDocument();
+
+            setContentType("text/xml; charset=UTF-8");
+            byte[] bytes = out.toByteArray();
+            setContentLength(bytes.length);
+            getOutputStream().write(bytes);
+        } catch (Throwable e2) {
+            log.error("Error writing XML", e2);
+            log.error("Original exception", e);
+            setStatus(500);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (XMLStreamException e2) {
+                    log.warn("Unable to close XML writer", e2);
+                }
+            }
+        }
     }
 }

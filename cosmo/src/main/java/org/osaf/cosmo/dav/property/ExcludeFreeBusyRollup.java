@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,42 +15,12 @@
  */
 package org.osaf.cosmo.dav.property;
 
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.Namespace;
-
-import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.dav.ExtendedDavConstants;
-import org.osaf.cosmo.dav.caldav.CaldavConstants;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
 /**
- * Represents the Cosmo extended DAV cosmo:exclude-free-busy-rollup
- * property.
+ * Represents the cosmo:exclude-free-busy-rollup property.
  */
-public class ExcludeFreeBusyRollup extends AbstractDavProperty
-    implements ExtendedDavConstants {
+public class ExcludeFreeBusyRollup extends StandardDavProperty {
 
-    private boolean flag;
-
-    /**
-     */
     public ExcludeFreeBusyRollup(boolean flag) {
-        super(EXCLUDEFREEBUSYROLLUP, false);
-        this.flag = flag;
-    }
-
-    /**
-     * Returns a <code>Boolean</code> representing the property's
-     * flag.
-     */
-    public Object getValue() {
-        return Boolean.valueOf(flag);
+        super(EXCLUDEFREEBUSYROLLUP, new Boolean(flag), true);
     }
 }

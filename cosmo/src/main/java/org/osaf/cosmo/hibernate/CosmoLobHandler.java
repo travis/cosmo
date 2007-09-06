@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.hibernate;
 
+import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,6 +40,13 @@ public class CosmoLobHandler extends DefaultLobHandler {
     }
 
     @Override
+    public InputStream getBlobAsBinaryStream(ResultSet rs, int columnIndex)
+            throws SQLException {
+        Blob blob = rs.getBlob(columnIndex);
+        return blob.getBinaryStream();
+    }
+
+    @Override
     public LobCreator getLobCreator() {
         return new CosmoLobCreator();
     }
@@ -47,12 +55,17 @@ public class CosmoLobHandler extends DefaultLobHandler {
 
         public void setBlobAsBytes(PreparedStatement ps, int paramIndex, byte[] content)
                 throws SQLException {
-
             ps.setBlob(paramIndex, Hibernate.createBlob(content));
-            //            if (logger.isDebugEnabled()) {
-            //                logger.debug(content != null ? "Set bytes for BLOB with length " + content.length : "Set BLOB to null");
-            //            }
         }
+
+        @Override
+        public void setBlobAsBinaryStream(PreparedStatement ps, int paramIndex,
+                InputStream binaryStream, int contentLength)
+                throws SQLException {
+            ps.setBlob(paramIndex, Hibernate.createBlob(binaryStream, contentLength));
+        }
+        
+        
     }
 
 }

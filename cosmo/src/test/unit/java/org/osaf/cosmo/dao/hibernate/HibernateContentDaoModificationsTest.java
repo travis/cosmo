@@ -115,7 +115,7 @@ public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTe
         content.setName(name);
         content.setDisplayName(name);
         content.setOwner(getUser(userDao, owner));
-        content.setIcalUid("icaluid");
+        content.setIcalUid("icaluid:" + name);
         content.setBody("this is a body");
         return content;
     }

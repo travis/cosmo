@@ -219,8 +219,7 @@ public class EventUtils {
        
         if(event.getDescription()!=null)
             noteMod.setBody(event.getDescription().getValue());
-        
-        noteMod.setIcalUid(masterNote.getIcalUid());
+
         noteMod.setClientCreationDate(new Date());
         noteMod.setClientModifiedDate(noteMod.getClientCreationDate());
         noteMod.setTriageStatus(TriageStatus.createInitialized());

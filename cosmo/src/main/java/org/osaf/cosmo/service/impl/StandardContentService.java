@@ -731,22 +731,22 @@ public class StandardContentService implements ContentService {
 
     
     /**
-     * Find calendar events by filter.
+     * Find calendar items by filter.
      *
      * @param calendar
      *            calendar collection to search
      * @param filter
      *            filter to use in search
-     * @return set CalendarEventItem objects matching specified
+     * @return set of ContentItem objects matching specified
      *         filter.
      */
-    public Set<ContentItem> findEvents(CollectionItem calendar,
+    public Set<ContentItem> findCalendarItems(CollectionItem calendar,
                                        CalendarFilter filter) {
         if (log.isDebugEnabled()) {
             log.debug("finding events in calendar " + calendar.getUid() +
                       " by filter " + filter);
         }
-        return calendarDao.findEvents(calendar, filter);
+        return calendarDao.findCalendarItems(calendar, filter);
     }
     
     

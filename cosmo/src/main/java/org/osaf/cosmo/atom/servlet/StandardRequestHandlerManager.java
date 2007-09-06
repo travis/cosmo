@@ -15,20 +15,22 @@
  */
 package org.osaf.cosmo.atom.servlet;
 
-import org.apache.abdera.protocol.server.servlet.RequestHandler;
-import org.apache.abdera.protocol.server.servlet.RequestHandlerManager;
+import org.apache.abdera.protocol.ItemManager;
+import org.apache.abdera.protocol.Request;
+import org.apache.abdera.protocol.server.RequestHandler;
 
-public class StandardRequestHandlerManager implements RequestHandlerManager {
+public class StandardRequestHandlerManager
+    implements ItemManager<RequestHandler> {
 
     private RequestHandler requestHandler;
 
-    // RequestHandlerManager methods
+    // ItemManager methods
 
-    public RequestHandler getRequestHandler() {
+    public RequestHandler get(Request request) {
         return requestHandler;
     }
 
-    public void release(RequestHandler requestHandler) {}
+    public void release(RequestHandler item) {}
 
     // our methods
 

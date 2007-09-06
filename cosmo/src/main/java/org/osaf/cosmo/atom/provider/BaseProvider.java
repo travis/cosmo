@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.activation.MimeTypeParseException;
+import javax.activation.MimeType;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.Abdera;
@@ -31,13 +31,14 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.protocol.server.provider.AbstractProvider;
-import org.apache.abdera.protocol.server.provider.AbstractResponseContext;
-import org.apache.abdera.protocol.server.provider.BaseResponseContext;
-import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
-import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
+import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.AbstractProvider;
+import org.apache.abdera.protocol.server.impl.AbstractResponseContext;
+import org.apache.abdera.protocol.server.impl.BaseResponseContext;
+import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
+import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
 import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
 import org.apache.abdera.util.MimeTypeHelper;
@@ -46,14 +47,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.model.AuditableObject;
+import org.osaf.cosmo.server.ServerConstants;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.util.DateUtil;
 
 public abstract class BaseProvider extends AbstractProvider
-    implements ExtendedProvider {
+    implements ExtendedProvider, AtomConstants, ServerConstants {
     private static final Log log = LogFactory.getLog(BaseProvider.class);
     private static final TimeZoneRegistry TIMEZONE_REGISTRY =
         TimeZoneRegistryFactory.getInstance().createRegistry();
@@ -67,6 +70,45 @@ public abstract class BaseProvider extends AbstractProvider
     protected int getDefaultPageSize() {
         // XXX
         return 25;
+    }
+
+    
+    /**
+     * <p>
+     * Extends the superclass method to implement the following APP
+     * extensions:
+     * </p>
+     * <ul>
+     * <li> When <code>PUT</code>ing to a collection, the request is
+     * interpreted as an update of the collection itself.
+     * </ul>
+     */
+    public ResponseContext request(RequestContext request) {
+        String method = request.getMethod();
+        TargetType type = request.getTarget().getType();
+
+        try {
+            if (method.equals("PUT")) {
+                if (type == TargetType.TYPE_COLLECTION)
+                    return updateCollection(request);
+            }
+
+            return super.request(request);
+        } catch (RuntimeException e) {
+            // the request handler swallows the exception when it sends its
+            // 500 response, so stuff the exception into a request attribute
+            // to let the servlet and filters examine the exception if they
+            // wish
+            request.setAttribute(RequestContext.Scope.REQUEST,
+                                 ATTR_SERVICE_EXCEPTION, e);
+            throw e;
+        }
+    }
+
+    public String[] getAllowedMethods(TargetType type) {
+        if (type != null && type == TargetType.TYPE_COLLECTION)
+            return new String[] { "GET", "POST", "PUT", "HEAD", "OPTIONS" };
+        return super.getAllowedMethods(type);
     }
 
     // our methods
@@ -152,30 +194,28 @@ public abstract class BaseProvider extends AbstractProvider
 
     protected ResponseContext
         checkCollectionWritePreconditions(RequestContext request) {
-        if (request.getContentLength() <= 0)
-            return lengthrequired(getAbdera(), request, "Length Required");
+        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(getAbdera(), request);
 
-        try {
-            if (! MimeTypeHelper.isXhtml(request.getContentType()))
-                return notsupported(getAbdera(), request, "Content-Type must be " + Constants.XHTML_MEDIA_TYPE);
-        } catch (MimeTypeParseException e) {
-            return notsupported(getAbdera(), request, "Unable to parse content-type: " + e.getMessage());
-        }
+        MimeType ct = request.getContentType();
+        if (ct == null ||
+            ! MimeTypeHelper.isMatch(MEDIA_TYPE_XHTML, ct.toString()))
+            return notsupported(getAbdera(), request, "Content-Type must be " + MEDIA_TYPE_XHTML);
 
         return null;
     }
 
     protected ResponseContext
         checkEntryWritePreconditions(RequestContext request) {
-        if (request.getContentLength() <= 0)
-            return lengthrequired(getAbdera(), request, "Length Required");
+        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(getAbdera(), request);
 
-        try {
-            if (! MimeTypeHelper.isAtom(request.getContentType()))
-                return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
-        } catch (MimeTypeParseException e) {
-            return notsupported(getAbdera(), request, "Unable to parse content-type: " + e.getMessage());
-        }
+        MimeType ct = request.getContentType();
+        if (ct == null ||
+            ! MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, ct.toString()))
+            return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
 
         try {
             if (! (request.getDocument().getRoot() instanceof Entry))
@@ -191,8 +231,9 @@ public abstract class BaseProvider extends AbstractProvider
 
     protected ResponseContext
         checkMediaWritePreconditions(RequestContext request) {
-        if (request.getContentLength() <= 0)
-            return lengthrequired(getAbdera(), request, "Length Required");
+        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(getAbdera(), request);
 
         return null;
     }
@@ -314,6 +355,13 @@ public abstract class BaseProvider extends AbstractProvider
                                                  String reason) {
         return returnBase(createErrorDocument(abdera, 412, reason, null),
                           412, null);
+    }
+
+    protected ResponseContext lengthrequired(Abdera abdera,
+                                             RequestContext request) {
+        return returnBase(createErrorDocument(abdera, 411, "Length Required",
+                                              null),
+                          411, null);
     }
 
     protected ResponseContext locked(Abdera abdera,

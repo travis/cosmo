@@ -20,11 +20,13 @@ import java.util.LinkedHashSet;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.parser.ParseException;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.processor.ContentProcessor;

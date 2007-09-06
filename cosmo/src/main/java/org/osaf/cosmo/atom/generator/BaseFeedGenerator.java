@@ -18,8 +18,6 @@ package org.osaf.cosmo.atom.generator;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import javax.activation.MimeTypeParseException;
-
 import org.apache.abdera.i18n.iri.IRISyntaxException;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
@@ -178,8 +176,6 @@ public abstract class BaseFeedGenerator implements AtomConstants {
             link.setMimeType(mimeType);
             link.setHref(href);
             return link;
-        } catch (MimeTypeParseException e) {
-            throw new GeneratorException("Attempted to set invalid link mime type " + mimeType, e);
         } catch (IRISyntaxException e) {
             throw new GeneratorException("Attempted to set invalid link href " + href, e);
         }

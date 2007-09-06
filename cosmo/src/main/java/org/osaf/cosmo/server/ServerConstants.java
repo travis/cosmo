@@ -27,6 +27,8 @@ public interface ServerConstants {
     /** The request header containing a ticket key */
     public static final String HEADER_TICKET = "Ticket";
 
+    public static final String ATTR_SERVICE_EXCEPTION = "server.exception";
+
     /**
      * The service id for Atom
      */

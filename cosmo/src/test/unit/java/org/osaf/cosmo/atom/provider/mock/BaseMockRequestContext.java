@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.abdera.model.Entry;
-import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
 import org.apache.abdera.protocol.server.ServiceContext;
+import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
 import org.apache.abdera.util.Constants;
 
 import org.apache.commons.logging.Log;

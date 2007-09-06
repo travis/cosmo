@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import org.apache.abdera.protocol.server.provider.Provider;
-import org.apache.abdera.protocol.server.util.AbstractSingletonProviderManager;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.impl.AbstractSingletonProviderManager;
 
 public class MockProviderManager extends AbstractSingletonProviderManager {
 

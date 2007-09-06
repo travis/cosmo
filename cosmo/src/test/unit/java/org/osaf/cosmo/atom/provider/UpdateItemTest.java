@@ -21,8 +21,8 @@ import net.fortuna.ical4j.model.Recur;
 
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

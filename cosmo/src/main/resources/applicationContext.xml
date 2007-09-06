@@ -578,7 +578,7 @@
         </property>
       </bean>
     </property>
-    <property name="requestHandlerManager">
+    <property name="handlerManager">
       <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager"
             init-method="init">
         <property name="requestHandler">

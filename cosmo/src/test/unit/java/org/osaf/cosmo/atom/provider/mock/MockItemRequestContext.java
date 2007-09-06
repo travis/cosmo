@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.provider.TargetType;
+import org.apache.abdera.protocol.server.TargetType;
 import org.apache.abdera.util.Constants;
 
 import org.apache.commons.logging.Log;

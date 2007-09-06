@@ -21,9 +21,9 @@ import java.util.Date;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.provider.Provider;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,7 +72,7 @@ public class AtomHelper extends MockHelper {
         serviceContext.setAbdera(abdera);
         serviceContext.setProviderManager(new MockProviderManager());
         // XXX mock these up
-        serviceContext.setRequestHandlerManager(new StandardRequestHandlerManager());
+        serviceContext.setHandlerManager(new StandardRequestHandlerManager());
         serviceContext.setTargetResolver(new StandardTargetResolver());
         serviceContext.init();
     }
@@ -95,7 +95,7 @@ public class AtomHelper extends MockHelper {
 
     public MockProvider getProvider(RequestContext request) {
         return (MockProvider)
-            serviceContext.getProviderManager().getProvider(request);
+            serviceContext.getProviderManager().get(request);
     }
 
     public void setIfMatch(RequestContext context,

@@ -17,7 +17,7 @@ package org.osaf.cosmo.atom.provider;
 
 import java.util.Date;
 
-import org.apache.abdera.protocol.server.provider.Target;
+import org.apache.abdera.protocol.server.Target;
 import org.apache.abdera.util.EntityTag;
 
 /**

@@ -17,8 +17,8 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

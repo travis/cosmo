@@ -15,60 +15,22 @@
  */
 package org.osaf.cosmo.atom;
 
+import javax.security.auth.Subject;
+
 import org.apache.abdera.Abdera;
-import org.apache.abdera.protocol.server.AbstractServiceContext;
-import org.apache.abdera.protocol.server.auth.SubjectResolver;
-import org.apache.abdera.protocol.server.provider.ProviderManager;
-import org.apache.abdera.protocol.server.provider.TargetResolver;
-import org.apache.abdera.protocol.server.servlet.RequestHandlerManager;
+import org.apache.abdera.protocol.ItemManager;
+import org.apache.abdera.protocol.Resolver;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestHandler;
+import org.apache.abdera.protocol.server.Target;
+import org.apache.abdera.protocol.server.impl.AbstractServiceContext;
 
 public class StandardServiceContext extends AbstractServiceContext {
 
+    // ServiceContext methods
+
     public Abdera getAbdera() {
         return abdera;
-    }
-
-    public void setAbdera(Abdera abdera) {
-        this.abdera = abdera;
-    }
-
-    public ProviderManager getProviderManager() {
-        return providerManager;
-    }
-
-    public void setProviderManager(ProviderManager manager) {
-        this.providerManager = manager;
-    }
-
-    public RequestHandlerManager getRequestHandlerManager() {
-        return handlerManager;
-    }
-
-    public void setRequestHandlerManager(RequestHandlerManager manager) {
-        this.handlerManager = manager;
-    }
-
-    public SubjectResolver getSubjectResolver() {
-        return subjectResolver;
-    }
-
-    public void setSubjectResolver(SubjectResolver resolver) {
-        this.subjectResolver = resolver;
-    }
-
-    /**
-     * A single target resolver is used regardless of context path.
-     */
-    public TargetResolver getTargetResolver(String contextPath) {
-        return getTargetResolver();
-    }
-
-    public TargetResolver getTargetResolver() {
-        return targetResolver;
-    }
-
-    public void setTargetResolver(TargetResolver resolver) {
-        this.targetResolver = resolver;
     }
 
     public void init() {
@@ -80,5 +42,34 @@ public class StandardServiceContext extends AbstractServiceContext {
             throw new IllegalStateException("requestHandlerManager is required");
         if (targetResolver == null)
             throw new IllegalStateException("targetResolver is required");
+    }
+
+    public ItemManager<RequestHandler> getRequestHandlerManager() {
+        return handlerManager;
+    }
+
+    public ItemManager<Provider> getProviderManager() {
+        return providerManager;
+    }
+
+    public Resolver<Subject> getSubjectResolver() {
+        return subjectResolver;
+    }
+
+    /**
+     * A single target resolver is used regardless of context path.
+     */
+    public Resolver<Target> getTargetResolver(String contextPath) {
+        return getTargetResolver();
+    }
+
+    // our methods
+
+    public void setAbdera(Abdera abdera) {
+        this.abdera = abdera;
+    }
+
+    public Resolver<Target> getTargetResolver() {
+        return targetResolver;
     }
 }

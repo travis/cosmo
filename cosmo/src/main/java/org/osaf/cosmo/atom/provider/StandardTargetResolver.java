@@ -17,11 +17,12 @@ package org.osaf.cosmo.atom.provider;
 
 import java.text.ParseException;
 
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.TargetResolver;
-import org.apache.abdera.protocol.server.provider.Target;
-import org.apache.abdera.protocol.server.provider.TargetType;
-import org.apache.abdera.protocol.server.servlet.HttpServletRequestContext;
+import org.apache.abdera.protocol.Request;
+import org.apache.abdera.protocol.Resolver;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.Target;
+import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,14 +45,15 @@ import org.osaf.cosmo.util.UriTemplate;
 /**
  * Resolves the request to a resource target.
  */
-public class StandardTargetResolver implements TargetResolver, AtomConstants {
+public class StandardTargetResolver
+    implements Resolver<Target>, AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardTargetResolver.class);
 
     private ContentService contentService;
     private UserService userService;
 
-    // TargetResolver methods
+    // Resolver methods
 
     /**
      * <p>
@@ -65,12 +67,13 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
      * target is returned.
      * </p>
      *
-     * @param context the request context
+     * @param request the request
      * @return the target of the request, or <code>null</code>
      */
-    public Target resolve(RequestContext context) {
-        String uri =
-            ((HttpServletRequestContext) context).getRequest().getPathInfo();
+    public Target resolve(Request request) {
+        HttpServletRequestContext context =
+            (HttpServletRequestContext) request;
+        String uri = context.getRequest().getPathInfo();
         if (log.isDebugEnabled())
             log.debug("resolving URI " + uri);
 
@@ -113,14 +116,6 @@ public class StandardTargetResolver implements TargetResolver, AtomConstants {
             return createServiceTarget(context, match);
 
         return null;
-    }
-
-    /**
-     * Not actually used for anything.
-     * @throws UnsupportedOperationException
-     */
-    public void setContextPath(String contextPath) {
-        throw new UnsupportedOperationException();
     }
 
     // our methods

@@ -16,9 +16,9 @@
 package org.osaf.cosmo.atom.provider;
 
 
-import org.apache.abdera.protocol.server.provider.Provider;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
 
 public interface ExtendedProvider extends Provider {
 

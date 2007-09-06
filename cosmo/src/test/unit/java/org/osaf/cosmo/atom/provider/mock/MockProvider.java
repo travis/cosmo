@@ -18,9 +18,10 @@ package org.osaf.cosmo.atom.provider.mock;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
+import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,6 +119,14 @@ public class MockProvider implements ExtendedProvider {
   
     public ResponseContext mediaPost(RequestContext request) {
         return null;
+    }
+
+    public ResponseContext request(RequestContext request) {
+        return null;
+    }
+
+    public String[] getAllowedMethods(TargetType type) {
+        return new String[] { "GET", "PUT" };
     }
 
     // ExtendedProvider methods

@@ -16,91 +16,35 @@
 package org.osaf.cosmo.atom.servlet;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.abdera.protocol.ItemManager;
+import org.apache.abdera.protocol.server.HttpResponse;
 import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.provider.EmptyResponseContext;
-import org.apache.abdera.protocol.server.provider.Provider;
-import org.apache.abdera.protocol.server.provider.ProviderManager;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
-import org.apache.abdera.protocol.server.provider.TargetType;
-import org.apache.abdera.protocol.server.servlet.DefaultRequestHandler;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
+import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
+import org.apache.abdera.protocol.server.impl.AbstractRequestHandler;
+import org.apache.abdera.util.EntityTag;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.AuditableTarget;
 import org.osaf.cosmo.atom.provider.ExtendedProvider;
-import org.osaf.cosmo.http.IfMatch;
-import org.osaf.cosmo.http.IfNoneMatch;
 
 /**
  * Extends {@link DefaultRequestHandler} to provide Cosmo-specific
  * behaviors.
  */
-public class StandardRequestHandler extends DefaultRequestHandler
+public class StandardRequestHandler extends AbstractRequestHandler
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardRequestHandler.class);
-
-    /**
-     * Override to not swallow RuntimeExceptions 
-     */
-    @Override
-    public void process(ServiceContext context, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-
-        ProviderManager manager = context.getProviderManager();
-        RequestContext requestContext = getRequestContext(context, request);
-        Provider provider = manager.getProvider(requestContext);
-
-        try {
-            if (preconditions(provider, requestContext, response)) {
-                try {
-                    output(request, response, process(provider, requestContext));
-                } catch (RuntimeException e) {
-                    throw e;
-                } catch (Throwable t) {
-                    log.error("Error producing output", t);
-                    try {
-                        output(request, response, new EmptyResponseContext(500));
-                    } catch (Exception ex) {
-                        log.error("Error outputting error", ex);
-                        response.sendError(500);
-                    }
-                }
-            }
-        } finally {
-            manager.release(provider);
-        }
-    }
-    
-    /**
-     * <p>
-     * Extends the superclass method to implement the following APP
-     * extensions:
-     * </p>
-     * <ul>
-     * <li> When <code>PUT</code>ing to a collection, the request is
-     * interpreted as an update of the collection itself.
-     * </ul>
-     */
-    protected ResponseContext process(Provider provider,
-                                      RequestContext request) {
-        String method = request.getMethod();
-        TargetType type = request.getTarget().getType();
-
-        if (method.equals("PUT")) {
-            if (type == TargetType.TYPE_COLLECTION)
-                return ((ExtendedProvider) provider).updateCollection(request);
-        }
-
-        return super.process(provider, request);
-    }
 
     /**
      * Extends the superclass method to implement conditional request
@@ -109,7 +53,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
      */
     protected boolean preconditions(Provider provider, 
                                     RequestContext request, 
-                                    HttpServletResponse response)
+                                    HttpResponse response)
         throws IOException {
         if (! super.preconditions(provider, request, response))
             return false;
@@ -136,44 +80,40 @@ public class StandardRequestHandler extends DefaultRequestHandler
         return true;
     }
 
-    protected String[] getAllowedMethods(TargetType type) {
-        if (type != null && type == TargetType.TYPE_COLLECTION)
-            return new String[] { "GET", "POST", "PUT", "HEAD", "OPTIONS" };
-        return super.getAllowedMethods(type);
+    protected void noprovider(RequestContext request,
+                              HttpResponse response)
+        throws IOException {
+        notfound(request, response);
     }
 
-    private boolean ifMatch(String header,
+    private boolean ifMatch(EntityTag[] etags,
                             AuditableTarget target,
                             RequestContext request,
-                            HttpServletResponse response)
+                            HttpResponse response)
         throws IOException {
-        try {
-            if (IfMatch.allowMethod(header, target.getEntityTag()))
-                return true;
-        } catch (ParseException e) {
-            response.sendError(400, e.getMessage());
-            return false;
-        }
+        if (etags.length == 0)
+            return true;
+
+        if (EntityTag.matchesAny(target.getEntityTag(), etags))
+            return true;
 
         response.sendError(412, "If-Match disallows conditional request");
         if (target.getEntityTag() != null)
-            response.addHeader("ETag", target.getEntityTag().toString());
+            response.setHeader("ETag", target.getEntityTag().toString());
 
         return false;
     }
 
-    private boolean ifNoneMatch(String header,
+    private boolean ifNoneMatch(EntityTag[] etags,
                                 AuditableTarget target,
                                 RequestContext request,
-                                HttpServletResponse response)
+                                HttpResponse response)
         throws IOException {
-        try {
-            if (IfNoneMatch.allowMethod(header, target.getEntityTag()))
-                return true;
-        } catch (ParseException e) {
-            response.sendError(400, e.getMessage());
-            return false;
-        }
+        if (etags.length == 0)
+            return true;
+
+        if (! EntityTag.matchesAny(target.getEntityTag(), etags))
+            return true;
 
         if (deservesNotModified(request))
             response.sendError(304, "Not Modified");
@@ -181,7 +121,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
             response.sendError(412, "If-None-Match disallows conditional request");
 
         if (target.getEntityTag() != null)
-            response.addHeader("ETag", target.getEntityTag().toString());
+            response.setHeader("ETag", target.getEntityTag().toString());
 
         return false;
     }
@@ -189,7 +129,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
     private boolean ifModifiedSince(Date date,
                                     AuditableTarget target,
                                     RequestContext request,
-                                    HttpServletResponse response)
+                                    HttpResponse response)
         throws IOException {
         if (date == null)
             return true;
@@ -202,7 +142,7 @@ public class StandardRequestHandler extends DefaultRequestHandler
     private boolean ifUnmodifiedSince(Date date,
                                       AuditableTarget target,
                                       RequestContext request,
-                                      HttpServletResponse response)
+                                      HttpResponse response)
         throws IOException {
         if (date == null)
             return true;

@@ -15,12 +15,14 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.server.provider.Provider;
-import org.apache.abdera.protocol.server.provider.ProviderManager;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.Target;
+import org.apache.abdera.protocol.ItemManager;
+import org.apache.abdera.protocol.Request;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.Target;
 
-public class StandardProviderManager implements ProviderManager {
+public class StandardProviderManager
+    implements ItemManager<Provider> {
 
     private DetachedItemProvider detachedItemProvider;
     private ExpandedItemProvider expandedItemProvider;
@@ -29,14 +31,11 @@ public class StandardProviderManager implements ProviderManager {
     private PreferencesProvider preferencesProvider;
     private UserProvider userProvider;
 
-    // ProviderManager methods
+    // Manager methods
 
-    public Provider getProvider() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Provider getProvider(RequestContext request) {
-        Target target = request.getTarget();
+    public Provider get(Request request) {
+        RequestContext context = (RequestContext) request;
+        Target target = context.getTarget();
         if (target == null)
             return null;
         if (target instanceof ExpandedItemTarget)
@@ -111,6 +110,8 @@ public class StandardProviderManager implements ProviderManager {
     public void init() {
         if (expandedItemProvider == null)
             throw new IllegalStateException("expandedItemProvider is required");
+        if (detachedItemProvider == null)
+            throw new IllegalStateException("detachedItemProvider is required");
         if (itemProvider == null)
             throw new IllegalStateException("itemProvider is required");
         if (subscriptionProvider == null)

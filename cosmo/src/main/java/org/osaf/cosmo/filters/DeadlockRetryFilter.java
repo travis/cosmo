@@ -26,9 +26,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.abdera.protocol.server.servlet.RequestHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.osaf.cosmo.server.ServerConstants;
+
 import org.springframework.dao.ConcurrencyFailureException;
 
 /**
@@ -41,7 +43,7 @@ import org.springframework.dao.ConcurrencyFailureException;
  * types and be applied to other methods using filter init
  * parameters.
  */
-public class DeadlockRetryFilter implements Filter {
+public class DeadlockRetryFilter implements Filter, ServerConstants {
     
     private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
     private int maxRetries = 10;
@@ -151,7 +153,7 @@ public class DeadlockRetryFilter implements Filter {
 
     private Exception findFilterException(HttpServletRequest request) {
         Exception e = (Exception)
-            request.getAttribute(RequestHandler.ATTR_EXCEPTION);
+            request.getAttribute(ATTR_SERVICE_EXCEPTION);
         if (e == null)
             return null;
         if(isFilterException(e))

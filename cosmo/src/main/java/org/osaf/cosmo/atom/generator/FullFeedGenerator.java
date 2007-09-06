@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import javax.activation.MimeTypeParseException;
-
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 
@@ -120,14 +118,9 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
     protected void setEntryContent(Entry entry,
                                    NoteItem item)
         throws GeneratorException {
-        ContentBean content = null;
-        try {
-            content = getFactory().getContentFactory().
-                createContent(format, item);
-            entry.setContent(content.getValue(), content.getMediaType());
-        } catch (MimeTypeParseException e) {
-            throw new GeneratorException("Attempted to set invalid media type " + content.getMediaType(), e);
-        }
+        ContentBean content =
+            getFactory().getContentFactory().createContent(format, item);
+        entry.setContent(content.getValue(), content.getMediaType());
     }
 
     /**

@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import javax.activation.MimeTypeParseException;
-
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
@@ -33,8 +31,8 @@ import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
-import org.apache.abdera.protocol.server.provider.RequestContext;
-import org.apache.abdera.protocol.server.provider.ResponseContext;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -251,8 +249,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
-        } catch (MimeTypeParseException e) {
-            return notsupported(getAbdera(), request, "Unparseable content type");
         } catch (UnsupportedContentTypeException e) {
             return notsupported(getAbdera(), request, "Unsupported media type " + e.getContentType());
         } catch (ValidationException e) {

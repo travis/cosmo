@@ -119,10 +119,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                 var message = alreadySubscribed == "cosmo.model.Collection"
                                     ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
                                     : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
-                                    var doContinue = confirm(message);
-                                    if (!doContinue) {
-                                        return null;
-                                    }
+                                return cosmo.app.showAndWait(message, null);
                             }
     
                             var displayName = "";
@@ -158,6 +155,20 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         });
                         return dList;
                 };
+                var redirectFunction = function () {
+                    // Make sure the modal dialog is hidden
+                    try {
+                        cosmo.app.hideDialog()
+                    } catch (e){
+                        // don't do anything on error
+                    }
+                    cosmo.app.showDialog(
+                        {"prompt":_("Main.CollectionAdd.RedirectPrompt")}
+                    );
+                    // Log the user into Cosmo and display the current collection
+                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
+                }
+
                 // Set up the authAction obj for the AuthBox
                 // Passed to cosmo.ui.widget.AuthBox.getInitProperties
                 var authAction = {
@@ -172,12 +183,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         cosmo.app.hideDialog();
                         var deferred = subscribeFunction();
 
-                        deferred.addCallback(dojo.lang.hitch(this, function () {
-                            // Log the user into Cosmo and display the current collection
-                            this._showPrompt(this.authAction.successPrompt);
-                            location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-
-                        }));
+                        deferred.addCallback(redirectFunction);
                         deferred.addErrback(dojo.lang.hitch(this, function (err) {
                             cosmo.app.hideDialog();
                             cosmo.app.showErr(self.strings.collectionAddError, err.message);
@@ -200,9 +206,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                         if (deferred == null) {
                             return;
                         }
-                        deferred.addCallback(function () {
-                            location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
-                        });
+                        deferred.addCallback(redirectFunction);
                         deferred.addErrback(function (err) {
                             cosmo.app.showErr(self.strings.collectionAddError, err);
                         });

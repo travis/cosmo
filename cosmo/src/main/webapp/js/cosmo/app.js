@@ -233,6 +233,27 @@ cosmo.app = new function () {
         self.showDialog(dialogProps);
         return deferred;
     };
+    this.showAndWait = function (message, returnValue){
+        var deferred = new dojo.Deferred();
+        var submitFunc = dojo.lang.hitch(this, function () { 
+            this.hideDialog();
+            deferred.callback(returnValue);
+        })
+        var button = new cosmo.ui.button.Button(
+                              { text:_('App.Button.OK'), 
+                                width:74,
+                                handleOnClick: submitFunc
+                              });
+        var dialogProps = {
+            "btnsRight": [button],
+            "prompt": message,
+            "width" : 300,
+            "height" : 100,
+            "defaultAction" : submitFunc
+        };
+        self.showDialog(dialogProps);
+        return deferred;
+    };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
      * messages to display if needed

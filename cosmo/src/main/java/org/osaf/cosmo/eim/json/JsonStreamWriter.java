@@ -129,6 +129,10 @@ public class JsonStreamWriter implements JsonConstants, XMLStreamConstants, Eimm
         }
     }
 
+    public JSONWriter getActual() {
+        return jsonWriter;
+    }
+
     private void doWriteRecordSet(EimRecordSet recordset)
         throws JsonStreamException, JSONException {
         

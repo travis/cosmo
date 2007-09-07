@@ -18,9 +18,11 @@ package org.osaf.cosmo.eim.json;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -110,6 +112,22 @@ public class JsonStreamWriterTest extends TestCase
     private ClobField makeClobField() {
         return new ClobField("body", new InputStreamReader(testHelper.getInputStream("eimml/jabberwocky.txt")));
     }
-    
 
+    public void testUnicodeClob() throws Exception {
+        String unicode = "åß∂ƒ";
+        log.error("unicode: " + unicode);
+        StringReader reader = new StringReader(unicode);
+        //log.error("reader: " + IOUtils.toString(reader));
+        //log.error("json: " + JSONObject.valueToString(IOUtils.toString(reader)));
+        ClobField field = new ClobField("unicode", reader);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JsonStreamWriter writer = new JsonStreamWriter(out);
+        writer.getActual().object();
+        writer.writeField(field);
+        writer.getActual().endObject();
+        writer.close();
+
+        log.error("UTF-8 JSON: " + new String(out.toByteArray(), "UTF-8"));
+    }
 }

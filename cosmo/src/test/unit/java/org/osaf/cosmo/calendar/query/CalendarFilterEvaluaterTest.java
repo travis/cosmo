@@ -345,20 +345,53 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
-        ComponentFilter eventFilter = new ComponentFilter("VFREEBUSY");
+        ComponentFilter vfbFilter = new ComponentFilter("VFREEBUSY");
         filter.setFilter(compFilter);
-        compFilter.getComponentFilters().add(eventFilter);
+        compFilter.getComponentFilters().add(vfbFilter);
         
         Assert.assertTrue(evaluater.evaluate(calendar, filter));
         
         PropertyFilter propFilter = new PropertyFilter("ORGANIZER");
         TextMatchFilter textFilter = new TextMatchFilter("Joe");
         propFilter.setTextMatchFilter(textFilter);
-        eventFilter.getPropFilters().add(propFilter);
+        vfbFilter.getPropFilters().add(propFilter);
         
         Assert.assertTrue(evaluater.evaluate(calendar, filter));
         
         textFilter.setValue("bogus");
         Assert.assertFalse(evaluater.evaluate(calendar, filter));
+    }
+    
+    public void testEvaluateVFreeBusyFilterFilterTimeRange() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+        Calendar calendar1 = cb.build(new FileInputStream(baseDir + "vfreebusy.ics"));
+        Calendar calendar2 = cb.build(new FileInputStream(baseDir + "vfreebusy_no_dtstart.ics"));
+        
+        CalendarFilter filter = new CalendarFilter();
+        ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
+        ComponentFilter vfbFilter = new ComponentFilter("VFREEBUSY");
+        filter.setFilter(compFilter);
+        compFilter.getComponentFilters().add(vfbFilter);
+        
+        DateTime start = new DateTime("20060102T115000Z");
+        DateTime end = new DateTime("20060109T115000Z");
+    
+        Period period = new Period(start, end);
+        TimeRangeFilter timeRangeFilter = new TimeRangeFilter(period);
+        vfbFilter.setTimeRangeFilter(timeRangeFilter);
+        
+        Assert.assertTrue(evaluater.evaluate(calendar1, filter));
+        Assert.assertTrue(evaluater.evaluate(calendar2, filter));
+        
+        start = new DateTime("20070102T115000Z");
+        end = new DateTime("20070109T115000Z");
+    
+        period = new Period(start, end);
+        timeRangeFilter.setPeriod(period);
+        
+        Assert.assertFalse(evaluater.evaluate(calendar1, filter));
+        Assert.assertFalse(evaluater.evaluate(calendar2, filter));
+        
     }
 }

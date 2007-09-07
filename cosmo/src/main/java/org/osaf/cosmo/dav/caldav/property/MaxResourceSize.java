@@ -15,34 +15,19 @@
  */
 package org.osaf.cosmo.dav.caldav.property;
 
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.Namespace;
-
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
-import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.model.FileItem;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 
 /**
  * Represents the CalDAV max-resource-size property.
  */
-public class MaxResourceSize extends AbstractDavProperty
+public class MaxResourceSize extends StandardDavProperty
     implements CaldavConstants {
 
     /**
      */
     public MaxResourceSize() {
-        super(MAXRESOURCESIZE, true);
-    }
-
-    /**
-     * Returns a <code>Long</code> representing the maximum resource
-     * size.
-     */
-    public Object getValue() {
-        return new Long(FileItem.MAX_CONTENT_SIZE);
+        super(MAXRESOURCESIZE, new Long(FileItem.MAX_CONTENT_SIZE), true);
     }
 }

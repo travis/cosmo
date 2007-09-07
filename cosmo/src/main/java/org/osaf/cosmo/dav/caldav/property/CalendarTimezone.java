@@ -15,49 +15,18 @@
  */
 package org.osaf.cosmo.dav.caldav.property;
 
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
-import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.Namespace;
-
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
 
 /**
  * Represents the CalDAV calendar-timezone property.
  */
-public class CalendarTimezone extends AbstractDavProperty
+public class CalendarTimezone extends StandardDavProperty
     implements CaldavConstants {
-
-    private String icalVTIMEZONE;
 
     /**
      */
     public CalendarTimezone(String text) {
-        super(CALENDARTIMEZONE, true);
-        this.icalVTIMEZONE = text;
-    }
-
-    /**
-     * Returns an <code>Element</code> representing this property.
-     */
-    public Element toXml(Document document) {
-        return DomUtil.
-            createElement(document, PROPERTY_CALDAV_CALENDAR_TIMEZONE,
-                          NAMESPACE_CALDAV, icalVTIMEZONE);
-    }
-
-    /**
-     * Returns a <code>String</code> representing the property's
-     * text.
-     */
-    public Object getValue() {
-        return icalVTIMEZONE;
+        super(CALENDARTIMEZONE, text, true);
     }
 }

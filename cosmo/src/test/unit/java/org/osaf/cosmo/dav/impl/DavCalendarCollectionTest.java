@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dav.impl;
 
+import java.util.Set;
+
 import junit.framework.Assert;
 
 import org.apache.commons.logging.Log;
@@ -48,9 +50,9 @@ public class DavCalendarCollectionTest extends BaseDavTestCase
         
         Assert.assertNotNull(prop);
         Assert.assertTrue(prop.isProtected());
-        String[] collations = prop.getCollations();
+        Set<String> collations = prop.getCollations();
         Assert.assertNotNull(collations);
-        Assert.assertTrue(collations.length==2);
+        Assert.assertTrue(collations.size()==2);
         for(String c: collations)
             Assert.assertTrue(CalendarUtils.isSupportedCollation(c));
     }

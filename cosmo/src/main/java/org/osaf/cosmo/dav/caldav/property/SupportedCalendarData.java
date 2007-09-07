@@ -15,56 +15,41 @@
  */
 package org.osaf.cosmo.dav.caldav.property;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
-
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Represents the CalDAV supported-calendar-data property.
  */
-public class SupportedCalendarData extends AbstractDavProperty
+public class SupportedCalendarData extends StandardDavProperty
     implements ICalendarConstants, CaldavConstants {
 
     /**
      */
     public SupportedCalendarData() {
-        super(SUPPORTEDCALENDARDATA, true);
-    }
-
-    /**
-     * (Returns a
-     * <code>SupportedCalendarData.SupportedCalendarDataInfo</code>
-     * for this property.
-     */
-    public Object getValue() {
-        return new SupportedCalendarDataInfo();
+        super(SUPPORTEDCALENDARDATA, null, true);
     }
 
     /**
      */
-    public class SupportedCalendarDataInfo implements XmlSerializable {
-  
-        /**
-         */
-        public Element toXml(Document document) {
-            Element element =
-                DomUtil.createElement(document, ELEMENT_CALDAV_CALENDAR_DATA,
-                                      NAMESPACE_CALDAV);
-            DomUtil.setAttribute(element, ATTR_CALDAV_CONTENT_TYPE,
-                                 NAMESPACE_CALDAV, ICALENDAR_MEDIA_TYPE);
-            DomUtil.setAttribute(element, ATTR_CALDAV_VERSION,
-                                 NAMESPACE_CALDAV, ICALENDAR_VERSION);
-            return element;
-        }
+    public Element toXml(Document document) {
+        Element name = getName().toXml(document);
+        
+        Element element =
+            DomUtil.createElement(document, ELEMENT_CALDAV_CALENDAR_DATA,
+                                  NAMESPACE_CALDAV);
+        DomUtil.setAttribute(element, ATTR_CALDAV_CONTENT_TYPE,
+                             NAMESPACE_CALDAV, ICALENDAR_MEDIA_TYPE);
+        DomUtil.setAttribute(element, ATTR_CALDAV_VERSION,
+                             NAMESPACE_CALDAV, ICALENDAR_VERSION);
+        
+        name.appendChild(element);
+        
+        return name;
     }
+   
 }

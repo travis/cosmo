@@ -15,94 +15,67 @@
  */
 package org.osaf.cosmo.dav.caldav.property;
 
-import java.util.Iterator;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
-
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Represents the CalDAV supported-calendar-component-set
  * property. Valid component types are defined by
  * {@link ComponentTypes}.
  */
-public class SupportedCalendarComponentSet extends AbstractDavProperty
+public class SupportedCalendarComponentSet extends StandardDavProperty
     implements CaldavConstants, ICalendarConstants {
-
-    private String[] componentTypes;
 
     public SupportedCalendarComponentSet() {
         this(SUPPORTED_COMPONENT_TYPES);
     }
 
-	public SupportedCalendarComponentSet(Set<String> componentTypes) {
-		this((String[]) componentTypes.toArray(new String[0]));
-	}
+    public SupportedCalendarComponentSet(Set<String> componentTypes) {
+        this((String[]) componentTypes.toArray(new String[0]));
+    }
 
     public SupportedCalendarComponentSet(String[] componentTypes) {
-        super(SUPPORTEDCALENDARCOMPONENTSET, true);
-        for (String type :componentTypes) {
-            if (! CalendarUtils.isSupportedComponent(type)) {
-                throw new IllegalArgumentException("Invalid component type '" +
-                                                   type + "'.");
+        super(SUPPORTEDCALENDARCOMPONENTSET, componentTypes(componentTypes),
+                true);
+        for (String type : componentTypes) {
+            if (!CalendarUtils.isSupportedComponent(type)) {
+                throw new IllegalArgumentException("Invalid component type '"
+                        + type + "'.");
             }
         }
-        this.componentTypes = componentTypes;
+    }
+    
+    private static HashSet<String> componentTypes(String[] types) {
+        HashSet<String> typesSet = new HashSet<String>();
+        
+        for (String t: types)
+            typesSet.add(t);
+        return typesSet;
     }
 
-    /**
-     * (Returns a <code>Set</code> of
-     * <code>SupportedCalendarComponentSet.CalendarComponentInfo</code>s
-     * for this property.
-     */
-    public Object getValue() {
-        Set infos = new HashSet();
-		for (String type : componentTypes)
-            infos.add(new CalendarComponentInfo(type));
-        return infos;
+    public Set<String> getComponentTypes() {
+        return (Set<String>) getValue();
     }
 
-    /**
-     * Returns the component types for this property.
-     */
-    public String[] getComponentTypes() {
-        return componentTypes;
-    }
+    public Element toXml(Document document) {
+        Element name = getName().toXml(document);
 
-    /**
-     */
-    public class CalendarComponentInfo implements XmlSerializable {
-        private String type;
-
-        /**
-         */
-        public CalendarComponentInfo(String type) {
-            this.type = type;
+        for (String type : getComponentTypes()) {
+            Element e = DomUtil.createElement(document,
+                    ELEMENT_CALDAV_COMP, NAMESPACE_CALDAV);
+            DomUtil.setAttribute(e, ATTR_CALDAV_NAME,  NAMESPACE_CALDAV,
+                    type);
+            name.appendChild(e);
         }
 
-        public String toString() {
-            return type;
-        }
-
-        /**
-         */
-        public Element toXml(Document document) {
-            Element elem =
-                DomUtil.createElement(document, ELEMENT_CALDAV_COMP,
-                                      NAMESPACE_CALDAV);
-            DomUtil.setAttribute(elem, ATTR_CALDAV_NAME,  NAMESPACE_CALDAV,
-                                 type);
-            return elem;
-        }
+        return name;
     }
 }

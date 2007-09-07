@@ -18,11 +18,10 @@ package org.osaf.cosmo.dav.caldav.property;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jackrabbit.webdav.property.AbstractDavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,10 +30,8 @@ import org.w3c.dom.Element;
  * Represents the CalDAV supported-collation-set
  * property.
  */
-public class SupportedCollationSet extends AbstractDavProperty
+public class SupportedCollationSet extends StandardDavProperty
     implements CaldavConstants, ICalendarConstants {
-
-    private String[] collations;
 
     public SupportedCollationSet() {
         this(SUPPORTED_COLLATIONS);
@@ -45,59 +42,37 @@ public class SupportedCollationSet extends AbstractDavProperty
     }
 
     public SupportedCollationSet(String[] collations) {
-        super(SUPPORTEDCOLLATIONSET, true);
+        super(SUPPORTEDCOLLATIONSET, collations(collations), true);
         for (String collation :collations) {
             if (! CalendarUtils.isSupportedCollation(collation)) {
                 throw new IllegalArgumentException("Invalid collation '" +
                                                    collation + "'.");
             }
         }
-        this.collations = collations;
     }
 
-    /**
-     * (Returns a <code>Set</code> of
-     * <code>SupportedCollationsSet.SupportedCollationInfo</code>s
-     * for this property.
-     */
-    public Object getValue() {
-        Set infos = new HashSet();
-        for (String collation : collations)
-            infos.add(new SupportedCollationInfo(collation));
-        return infos;
+    private static HashSet<String> collations(String[] collations) {
+        HashSet<String> collationSet = new HashSet<String>();
+        
+        for (String c : collations)
+            collationSet.add(c);
+        return collationSet;
     }
 
-    /**
-     * Returns the collations for this property.
-     */
-    public String[] getCollations() {
-        return collations;
+    public Set<String> getCollations() {
+        return (Set<String>) getValue();
     }
+    
+    public Element toXml(Document document) {
+        Element name = getName().toXml(document);
 
-    /**
-     */
-    public class SupportedCollationInfo implements XmlSerializable {
-        private String collation;
-
-        /**
-         */
-        public SupportedCollationInfo(String collation) {
-            this.collation = collation;
+        for (String collation : getCollations()) {
+            Element e = DomUtil.createElement(document,
+                    ELEMENT_CALDAV_SUPPORTEDCOLLATION, NAMESPACE_CALDAV);
+            DomUtil.setText(e, collation);
+            name.appendChild(e);
         }
 
-        public String toString() {
-            return collation;
-        }
-
-        /**
-         */
-        public Element toXml(Document document) {
-            Element elem =
-                DomUtil.createElement(document, ELEMENT_CALDAV_SUPPORTEDCOLLATION,
-                                      NAMESPACE_CALDAV);
-            DomUtil.setText(elem, collation);
-            
-            return elem;
-        }
+        return name;
     }
 }

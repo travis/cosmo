@@ -90,34 +90,45 @@ cosmo.view.cal.CalItem.prototype.restoreEvent = function () {
  * on one side or the other of the current view span
  */
 cosmo.view.cal.CalItem.prototype.isOutOfViewRange = function () {
-    // Note event data dates are cosmo.datetime.Date, viewStart/viewEnd are Date
+    // Event data dates are cosmo.datetime.Date, viewStart/viewEnd are Date
     // Return true only if both start and end are before view range
-    // or both are after view range
+    // or start is after view range (we can assume end is equal to or
+    // later than start)
+    // Notes:
+    // 1. If both the start and end are equal to the beginning
+    // of the range, it's an at-time event we need to keep
+    // (e.g., Start: 12 a.m. Sunday, End: 12 a.m. Sunday)
+    // 2. Throw out items that start exactly at the end time of
+    // the view range (we can assume end will be at the same
+    // time, or later)
     var ret = ((this.startsBeforeViewRange() && 
-        this.endsBeforeViewRange()) ||
-        (this.startsAfterViewRange() && 
-        this.endsAfterViewRange()));
+        this.endsBeforeViewRange(true)) ||
+        this.startsAfterViewRange(true));
     return ret;
 
 };
 cosmo.view.cal.CalItem.prototype.startsBeforeViewRange = 
-    function () {
-    return (this.data.getEventStamp().getStartDate().toUTC() < 
-        cosmo.view.cal.viewStart.getTime());
+    function (inclusive) {
+    var dtA = this.data.getEventStamp().getStartDate().getTime();
+    var dtB = cosmo.view.cal.viewStart.getTime();
+    return inclusive ? dtA <= dtB : dtA < dtB;
 };
 cosmo.view.cal.CalItem.prototype.endsBeforeViewRange = 
-    function () {
-    return (this.data.getEventStamp().getEndDate().toUTC() < 
-        cosmo.view.cal.viewStart.getTime());
+    function (inclusive) {
+    var dtA = this.data.getEventStamp().getEndDate().getTime();
+    var dtB = cosmo.view.cal.viewStart.getTime();
+    return inclusive ? dtA <= dtB : dtA < dtB;
 };
 cosmo.view.cal.CalItem.prototype.startsAfterViewRange = 
-    function () {
-    return (this.data.getEventStamp().getStartDate().toUTC() > 
-        cosmo.view.cal.viewEnd.getTime());
+    function (inclusive) {
+    var dtA = this.data.getEventStamp().getStartDate().getTime();
+    var dtB = cosmo.view.cal.viewEnd.getTime();
+    return inclusive ? dtA >= dtB : dtA > dtB;
 };
 cosmo.view.cal.CalItem.prototype.endsAfterViewRange = 
-    function () {
-    return (this.data.getEventStamp().getEndDate().toUTC() > 
-        cosmo.view.cal.viewEnd.getTime());
+    function (inclusive) {
+    var dtA = this.data.getEventStamp().getEndDate().getTime();
+    var dtB = cosmo.view.cal.viewEnd.getTime();
+    return inclusive ? dtA >= dtB : dtA > dtB;
 };
 

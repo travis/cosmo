@@ -336,4 +336,29 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         textFilter.setValue("bogus");
         Assert.assertFalse(evaluater.evaluate(calendar, filter));
     }
+    
+    public void testEvaluateVFreeBusyFilterFilter() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "vfreebusy.ics");
+        CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+        Calendar calendar = cb.build(fis);
+        
+        CalendarFilter filter = new CalendarFilter();
+        ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
+        ComponentFilter eventFilter = new ComponentFilter("VFREEBUSY");
+        filter.setFilter(compFilter);
+        compFilter.getComponentFilters().add(eventFilter);
+        
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
+        
+        PropertyFilter propFilter = new PropertyFilter("ORGANIZER");
+        TextMatchFilter textFilter = new TextMatchFilter("Joe");
+        propFilter.setTextMatchFilter(textFilter);
+        eventFilter.getPropFilters().add(propFilter);
+        
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
+        
+        textFilter.setValue("bogus");
+        Assert.assertFalse(evaluater.evaluate(calendar, filter));
+    }
 }

@@ -18,6 +18,7 @@ package org.osaf.cosmo.dao.hibernate;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 
@@ -34,7 +35,6 @@ import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
@@ -73,15 +73,17 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             
             // Evaluate filter against all calendar items
             for (Item child : collection.getChildren()) {
-                // only care about notes
-                if (child instanceof NoteItem) {
-                    NoteItem note = (NoteItem) child;
-                    // only care about master items
-                    if (note.getModifies() != null)
-                        continue;
-                    if (evaluater.evaluate(
-                            ICalendarOutputter.getCalendar(note), filter) == true)
-                        results.add(note);
+                
+                // only care about content items
+                if (child instanceof ContentItem) {
+                    
+                    ContentItem content = (ContentItem) child;
+                    Calendar calendar = ICalendarOutputter.getCalendar(content);
+                        
+                    if(calendar!=null) {
+                        if (evaluater.evaluate(calendar, filter) == true)
+                            results.add(content);
+                    }
                 }
             }
             

@@ -59,7 +59,7 @@ public interface ICalendarConstants {
      * The iCalendar component types to which the Cosmo data model maps.
      */
     public static String[] SUPPORTED_COMPONENT_TYPES = {
-        Component.VEVENT, Component.VTODO, Component.VJOURNAL
+        Component.VEVENT, Component.VTODO, Component.VJOURNAL, Component.VFREEBUSY
     };
     
     /**

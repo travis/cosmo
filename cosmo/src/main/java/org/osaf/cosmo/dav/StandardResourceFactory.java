@@ -31,6 +31,7 @@ import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavFile;
+import org.osaf.cosmo.dav.impl.DavFreeBusy;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
@@ -38,6 +39,7 @@ import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.FileItem;
+import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -183,7 +185,10 @@ public class StandardResourceFactory
                 return new DavTask((NoteItem) item, locator, this);
             else 
                 return new DavJournal((NoteItem) item, locator, this);
-        } 
+        }
+        
+        if(item instanceof FreeBusyItem)
+            return new DavFreeBusy((FreeBusyItem) item, locator, this);
 
         return new DavFile((FileItem) item, locator, this);
     }

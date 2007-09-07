@@ -34,6 +34,7 @@ import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.caldav.SupportedCalendarComponentException;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavEvent;
+import org.osaf.cosmo.dav.impl.DavFreeBusy;
 import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
 import org.osaf.cosmo.dav.io.DavInputContext;
@@ -82,6 +83,8 @@ public class CalendarResourceProvider extends FileProvider {
             return new DavTask(locator, getResourceFactory());
         if (original instanceof DavJournal)
             return new DavJournal(locator, getResourceFactory());
+        if (original instanceof DavFreeBusy)
+            return new DavFreeBusy(locator, getResourceFactory());
         return new DavEvent(locator, getResourceFactory());
     }
 
@@ -96,6 +99,8 @@ public class CalendarResourceProvider extends FileProvider {
             return new DavTask(locator, getResourceFactory());
         if (! calendar.getComponents(Component.VJOURNAL).isEmpty())
             return new DavJournal(locator, getResourceFactory());
+        if (! calendar.getComponents(Component.VFREEBUSY).isEmpty())
+            return new DavFreeBusy(locator, getResourceFactory());
         throw new SupportedCalendarComponentException();
   }
 }

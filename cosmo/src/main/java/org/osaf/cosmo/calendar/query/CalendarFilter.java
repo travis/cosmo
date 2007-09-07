@@ -87,4 +87,9 @@ public class CalendarFilter implements CaldavConstants {
             append("filter", filter).
             toString();
     }
+    
+    public void validate() {
+        if(filter!=null)
+            filter.validate();
+    }
 }

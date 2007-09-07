@@ -17,6 +17,7 @@ package org.osaf.cosmo.calendar.query;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.fortuna.ical4j.model.component.VTimeZone;
@@ -188,5 +189,13 @@ public class PropertyFilter implements DavConstants, CaldavConstants {
             append("isNotDefinedFilter", isNotDefinedFilter).
             append("paramFilters", paramFilters).
             toString();
+    }
+    
+    public void validate() {
+        if(textMatchFilter!=null)
+            textMatchFilter.validate();
+        
+        for(Iterator<ParamFilter> it= paramFilters.iterator(); it.hasNext();)
+            it.next().validate();
     }
 }

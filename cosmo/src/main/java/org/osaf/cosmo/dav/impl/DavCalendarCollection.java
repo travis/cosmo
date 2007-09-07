@@ -30,6 +30,7 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.UnsupportedCollationException;
 import org.osaf.cosmo.dav.ConflictException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavException;
@@ -42,6 +43,7 @@ import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.caldav.SupportedCollationException;
 import org.osaf.cosmo.dav.caldav.TimeZoneExtractor;
 import org.osaf.cosmo.dav.caldav.property.CalendarDescription;
 import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
@@ -149,6 +151,17 @@ public class DavCalendarCollection extends DavCollectionBase
      */
     public Set<DavCalendarResource> findMembers(CalendarFilter filter)
         throws DavException {
+        
+        try {
+            filter.validate();
+        } catch (UnsupportedCollationException e) {
+            
+            /* If the client chooses a collation not supported by the server, 
+             * the server MUST respond with a CALDAV:supported-collation 
+             * precondition error response. */
+            throw new SupportedCollationException();
+        }
+        
         Set<DavCalendarResource> members =
             new HashSet<DavCalendarResource>();
 

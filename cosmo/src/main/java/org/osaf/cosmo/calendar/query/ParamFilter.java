@@ -141,4 +141,9 @@ public class ParamFilter implements DavConstants, CaldavConstants {
             append("isNotDefinedFilter", isNotDefinedFilter).
             toString();
     }
+    
+    public void validate() {
+        if(textMatchFilter!=null)
+            textMatchFilter.validate();
+    }
 }

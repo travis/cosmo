@@ -17,6 +17,7 @@ package org.osaf.cosmo.calendar.query;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -209,5 +210,12 @@ public class ComponentFilter implements CaldavConstants, ICalendarConstants {
             append("componentFilters", componentFilters).
             append("propFilters", propFilters).
             toString();
+    }
+    
+    public void validate() {
+        for(Iterator<ComponentFilter> it= componentFilters.iterator(); it.hasNext();)
+            it.next().validate();
+        for(Iterator<PropertyFilter> it= propFilters.iterator(); it.hasNext();)
+            it.next().validate();
     }
 }

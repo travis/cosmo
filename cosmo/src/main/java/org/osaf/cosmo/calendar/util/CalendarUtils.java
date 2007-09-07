@@ -112,6 +112,12 @@ public class CalendarUtils implements ICalendarConstants {
             if (s.equalsIgnoreCase(type)) return true;
         return false;
     }
+    
+    public static boolean isSupportedCollation(String collation) {
+        for (String s : SUPPORTED_COLLATIONS)
+            if (s.equalsIgnoreCase(collation)) return true;
+        return false;
+    }
 
     public static boolean hasMultipleComponentTypes(Calendar calendar) {
         String found = null;

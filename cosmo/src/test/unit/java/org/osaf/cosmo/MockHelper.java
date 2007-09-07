@@ -151,6 +151,12 @@ public class MockHelper extends TestHelper {
         CollectionItem c = makeDummyCollection(user);
         return contentService.createCollection(parent, c);
     }
+    
+    public CollectionItem makeAndStoreDummyCalendarCollection()
+            throws Exception {
+        CollectionItem c = makeDummyCalendarCollection(user);
+        return contentService.createCollection(homeCollection, c);
+    }
 
     public void lockCollection(CollectionItem collection) {
         contentService.getLockManager().lockCollection(collection);

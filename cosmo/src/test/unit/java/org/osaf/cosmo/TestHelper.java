@@ -47,6 +47,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
@@ -344,6 +345,23 @@ public class TestHelper {
         collection.setOwner(user);
         collection.setCreationDate(java.util.Calendar.getInstance().getTime());
         collection.setModifiedDate(collection.getCreationDate());
+
+        return collection;
+    }
+    
+    /** */
+    public CollectionItem makeDummyCalendarCollection(User user) {
+        String serial = new Integer(++lseq).toString();
+        String name = "test calendar collection " + serial;
+
+        CollectionItem collection = new CollectionItem();
+        collection.setUid(serial);
+        collection.setName(name);
+        collection.setDisplayName(name);
+        collection.setOwner(user);
+        collection.setCreationDate(java.util.Calendar.getInstance().getTime());
+        collection.setModifiedDate(collection.getCreationDate());
+        collection.addStamp(new CalendarCollectionStamp(collection));
 
         return collection;
     }

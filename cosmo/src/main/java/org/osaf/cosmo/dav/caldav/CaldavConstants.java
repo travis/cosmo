@@ -49,6 +49,8 @@ public interface CaldavConstants {
     public static final String ELEMENT_CALDAV_CALENDAR = "calendar";
     /** The CalDAV XML element name <CALDAV:comp> */
     public static final String ELEMENT_CALDAV_COMP = "comp";
+    /** The CalDAV XML element name <CALDAV:supported-collation> */
+    public static final String ELEMENT_CALDAV_SUPPORTEDCOLLATION = "supported-collation";
     /** The CalDAV XML element name <CALDAV:calendar-data> */
     public static final String ELEMENT_CALDAV_CALENDAR_DATA = "calendar-data";
     public static final String QN_CALDAV_CALENDAR_DATA = 
@@ -130,6 +132,9 @@ public interface CaldavConstants {
         "calendar-timezone";
     /** The CalDAV property name CALDAV:supported-calendar-component-set */
     public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET = "supported-calendar-component-set";
+    /** The CalDAV property name CALDAV:supported-collation-set */
+    public static final String PROPERTY_CALDAV_SUPPORTED_COLLATION_SET = 
+        "supported-collation-set";
     /** The CalDAV property name CALDAV:supported-calendar-data */
     public static final String PROPERTY_CALDAV_SUPPORTED_CALENDAR_DATA =
         "supported-calendar-data";
@@ -155,6 +160,10 @@ public interface CaldavConstants {
     /** The CalDAV property CALDAV:supported-calendar-component-set */
     public static final DavPropertyName SUPPORTEDCALENDARCOMPONENTSET =
         DavPropertyName.create(PROPERTY_CALDAV_SUPPORTED_CALENDAR_COMPONENT_SET,
+                               NAMESPACE_CALDAV);
+    /** The CalDAV property CALDAV:supported-collation-component-set */
+    public static final DavPropertyName SUPPORTEDCOLLATIONSET =
+        DavPropertyName.create(PROPERTY_CALDAV_SUPPORTED_COLLATION_SET,
                                NAMESPACE_CALDAV);
     /** The CalDAV property CALDAV:supported-calendar-data */
     public static final DavPropertyName SUPPORTEDCALENDARDATA =

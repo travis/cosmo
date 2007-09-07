@@ -48,6 +48,7 @@ import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.caldav.property.MaxResourceSize;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarData;
+import org.osaf.cosmo.dav.caldav.property.SupportedCollationSet;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
@@ -212,6 +213,7 @@ public class DavCalendarCollection extends DavCollectionBase
             properties.add(new CalendarTimezone(cc.getTimezone().toString()));
 
         properties.add(new SupportedCalendarComponentSet());
+        properties.add(new SupportedCollationSet());
         properties.add(new SupportedCalendarData());
         properties.add(new MaxResourceSize());
     }

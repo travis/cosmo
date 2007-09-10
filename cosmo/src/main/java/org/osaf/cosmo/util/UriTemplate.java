@@ -150,8 +150,8 @@ public class UriTemplate {
     public Match match(String path) {
         Match match = new Match();
 
-        if (log.isDebugEnabled())
-            log.debug("matching " + path + " to " + pattern);
+        //if (log.isDebugEnabled())
+            //log.debug("matching " + path + " to " + pattern);
 
         StrTokenizer candidate = new StrTokenizer(path, '/');
         Iterator<Segment> si = segments.iterator();

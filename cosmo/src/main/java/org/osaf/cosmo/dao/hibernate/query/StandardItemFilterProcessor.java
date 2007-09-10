@@ -222,6 +222,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
            whereBuf.append(" or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.dateStart < '" + filter.getUTCEnd() + "'");
            whereBuf.append(" and es.timeRangeIndex.dateEnd > '" + filter.getUTCStart() + "')");
            
+           // edge case where start==end
+           whereBuf.append(" or (es.timeRangeIndex.dateStart=es.timeRangeIndex.dateEnd and (es.timeRangeIndex.dateStart='" + filter.getFloatStart() + "' or es.timeRangeIndex.dateStart='" + filter.getUTCStart() + "'))");
+                   
            whereBuf.append(")");
         }
     }

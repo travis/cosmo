@@ -71,7 +71,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         contentDao.createCollection(root, calendar1);
         contentDao.createCollection(root, calendar2);
 
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 6; i++) {
             NoteItem event = generateEvent("test" + i + ".ics", "cal"
                     + i + ".ics", "testuser");
             event.setUid("calendar1_" + i);
@@ -115,7 +115,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     public void testNoteFilter() throws Exception {
         NoteItemFilter filter = new NoteItemFilter();
         Set<Item> results = contentDao.findItems(filter);
-        Assert.assertEquals(10, results.size());
+        Assert.assertEquals(11, results.size());
         
         filter.setIcalUid("icaluid1");
         results = contentDao.findItems(filter);
@@ -143,7 +143,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter = new NoteItemFilter();
         filter.setIsModification(false);
         results = contentDao.findItems(filter);
-        Assert.assertEquals(9, results.size());
+        Assert.assertEquals(10, results.size());
         
         // find master items with modifications only
         filter.setIsModification(null);
@@ -173,7 +173,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter = new NoteItemFilter();
         filter.setTriageStatus(-1);
         results = contentDao.findItems(filter);
-        Assert.assertEquals(8, results.size());
+        Assert.assertEquals(9, results.size());
         
         // limit results
         filter.setMaxResults(5);
@@ -187,7 +187,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter.setParent(calendar1);
         
         Set<Item> results = contentDao.findItems(filter);
-        Assert.assertEquals(7, results.size());
+        Assert.assertEquals(8, results.size());
     }
     
     public void testFilterByNoStamp() throws Exception {
@@ -212,7 +212,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter.getStampFilters().add(eventFilter);
         
         Set<Item> results = contentDao.findItems(filter);
-        Assert.assertEquals(8, results.size());
+        Assert.assertEquals(9, results.size());
         
         // find only recurring events
         eventFilter.setIsRecurring(true);
@@ -222,12 +222,22 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         eventFilter.setIsRecurring(null);
         filter.setParent(calendar1);
         results = contentDao.findItems(filter);
-        Assert.assertEquals(5, results.size());
+        Assert.assertEquals(6, results.size());
         
         DateTime start = new DateTime("20050817T115000Z");
         DateTime end = new DateTime("20050818T115000Z");
        
         Period period = new Period(start, end);
+        
+        eventFilter.setPeriod(period);
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(1, results.size());
+        
+        
+        start = new DateTime("20070811T164500Z");
+        end = new DateTime("20070818T164500Z");
+       
+        period = new Period(start, end);
         
         eventFilter.setPeriod(period);
         results = contentDao.findItems(filter);
@@ -239,9 +249,9 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         eventFilter.setPeriod(period);
         
         results = contentDao.findItems(filter);
-        Assert.assertEquals(5, results.size());
+        Assert.assertEquals(6, results.size());
         
-        start.setTime(new GregorianCalendar(2006, 8, 6).getTimeInMillis());
+        start.setTime(new GregorianCalendar(2007, 8, 6).getTimeInMillis());
         end.setTime(System.currentTimeMillis());
         period = new Period(start, end);
         eventFilter.setPeriod(period);
@@ -317,7 +327,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         ItemFilter[] filters = new ItemFilter[] {filter1, filter2};
         
         Set<Item> results = contentDao.findItems(filters);
-        Assert.assertEquals(6, results.size());
+        Assert.assertEquals(7, results.size());
     }
     
     private User getUser(UserDao userDao, String username) {

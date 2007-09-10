@@ -207,12 +207,13 @@
 }
 /* Small box that contains 'Processing ...' message inside mask */
 #appLoadingMessage {
-    position: relative;
-    width: 120px;
-    height: 40px;
-    margin: auto;
+    position: absolute;
     top: 50%;
+    left: 50%;
+    height:40px;
+    width:120px;
     margin-top: -20px;
+    margin-left: -60px;
     color: #339;
     border: 1px solid #339;
     line-height: 38px;

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.filters;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
@@ -68,5 +70,16 @@ public class BufferedRequestWrapper extends HttpServletRequestWrapper {
             inputStream.resetToBeginning();
         }
         return inputStream;
+    }
+
+    @Override
+    public BufferedReader getReader()
+        throws IOException {
+        String encoding = getCharacterEncoding();
+        if (encoding == null)
+            encoding = "UTF-8";
+        InputStreamReader in = 
+            new InputStreamReader(getInputStream(), encoding);
+        return new BufferedReader(in);
     }
 }

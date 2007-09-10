@@ -15,10 +15,9 @@
  */
 package org.osaf.cosmo.eim.json;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.StringWriter;
 
 import junit.framework.TestCase;
 
@@ -71,17 +70,14 @@ public class JsonStreamWriterTest extends TestCase
         EimRecord noteRecord = new EimRecord(notePrefix, noteNs);
         noteRecord.addField(makeClobField());
         recordset.addRecord(noteRecord);
-        
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        JsonStreamWriter writer =
-            new JsonStreamWriter(out);
+        StringWriter out = new StringWriter();
+        JsonStreamWriter writer = new JsonStreamWriter(out);
         writer.writeRecordSet(recordset);
         writer.close();
 
         if (log.isDebugEnabled())
-            log.debug("Printing a single record set\n" +
-                      new String(out.toByteArray()));
+            log.debug("Printing a single record set\n" + out.toString());
     }
     
     public void testWriteMultipleRecordSets() throws Exception{
@@ -95,9 +91,8 @@ public class JsonStreamWriterTest extends TestCase
         
         recordset.addRecord(noteRecord);
         
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        JsonStreamWriter writer =
-            new JsonStreamWriter(out);
+        StringWriter out = new StringWriter();
+        JsonStreamWriter writer = new JsonStreamWriter(out);
         writer.writeContainer();
         writer.writeRecordSet(recordset);
         writer.writeRecordSet(recordset);
@@ -105,8 +100,7 @@ public class JsonStreamWriterTest extends TestCase
         writer.close();
 
         if (log.isDebugEnabled())
-            log.debug("Printing multiple record sets\n" +
-                      new String(out.toByteArray()));
+            log.debug("Printing multiple record sets\n" + out.toString());
     }
 
     private ClobField makeClobField() {
@@ -114,20 +108,35 @@ public class JsonStreamWriterTest extends TestCase
     }
 
     public void testUnicodeClob() throws Exception {
-        String unicode = "åß∂ƒ";
+        String unicode = "åß∂ƒ©˙∆˚¬…";
         log.error("unicode: " + unicode);
         StringReader reader = new StringReader(unicode);
         //log.error("reader: " + IOUtils.toString(reader));
         //log.error("json: " + JSONObject.valueToString(IOUtils.toString(reader)));
         ClobField field = new ClobField("unicode", reader);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        StringWriter out = new StringWriter();
         JsonStreamWriter writer = new JsonStreamWriter(out);
         writer.getActual().object();
         writer.writeField(field);
         writer.getActual().endObject();
         writer.close();
 
-        log.error("UTF-8 JSON: " + new String(out.toByteArray(), "UTF-8"));
+        log.error("UTF-8 JSON: " + out);
+        
+        String jsonString =  out.toString();
+        String preamble = "{\"unicode\":[\"clob\",\"";
+        //get rid of the json stuff, just want the clob
+        jsonString = jsonString.substring(preamble.length());
+        jsonString = jsonString.substring(0, jsonString.length() - 3);
+        
+        log.error("jsonString: " + jsonString);
+        log.error("Json String Length:" +jsonString.length());
+        log.error("Source String Length: " + unicode.length());
+        for (int x = 0; x < jsonString.length(); x++){
+            Character j = new Character(jsonString.charAt(x));   
+            Character s = new Character(unicode.charAt(x));
+            log.error("comparing char at '"+x+"' result: " +j.compareTo(s));
+        }
     }
 }

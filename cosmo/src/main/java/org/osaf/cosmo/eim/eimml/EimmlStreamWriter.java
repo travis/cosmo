@@ -17,8 +17,7 @@ package org.osaf.cosmo.eim.eimml;
 
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -56,7 +55,7 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
     /**
      * Opens the writer. No data is actually written to the stream.
      */
-    public EimmlStreamWriter(OutputStream out)
+    public EimmlStreamWriter(Writer out)
         throws IOException, EimmlStreamException {
         try {
             xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(out);

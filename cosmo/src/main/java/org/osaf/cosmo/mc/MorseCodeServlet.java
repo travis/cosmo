@@ -239,7 +239,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                    ticket.getType().toString());
 
                 EimmlStreamWriter writer =
-                    new EimmlStreamWriter(resp.getOutputStream());
+                    new EimmlStreamWriter(resp.getWriter());
 
                 writer.writeStartDocument();
                 writer.writeCollection(records.getUid(), records.getName());
@@ -327,7 +327,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             try {
                 SyncToken token = SyncToken.deserialize(tokenStr);
 
-                reader = new EimmlStreamReader(req.getInputStream());
+                reader = new EimmlStreamReader(req.getReader());
                 if (! reader.getCollectionUuid().equals(cp.getUid())) {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                    "EIMML collection uid " +
@@ -428,7 +428,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 if (! checkWritePreconditions(req, resp))
                     return;
 
-                reader = new EimmlStreamReader(req.getInputStream());
+                reader = new EimmlStreamReader(req.getReader());
                 if (! reader.getCollectionUuid().equals(cp.getUid())) {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                    "EIMML collection uid " +

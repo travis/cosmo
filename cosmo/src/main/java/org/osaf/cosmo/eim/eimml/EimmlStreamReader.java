@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -59,24 +59,6 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
     private String documentEncoding;
     private String uuid;
     private String name;
-
-    /**
-     * Reads the document header and root element, positioning the
-     * cursor just before the first recordset.
-     */
-    public EimmlStreamReader(InputStream in)
-        throws IOException, EimmlStreamException {
-        try {
-            xmlReader = XML_INPUT_FACTORY.createXMLStreamReader(in);
-            if (! xmlReader.hasNext())
-                throw new EimmlStreamException("Input stream has no data");
-
-            readEncoding();
-            readCollection();
-        } catch (XMLStreamException e) {
-            throw new EimmlStreamException("Unable to read EIM records", e);
-        }
-    }
 
     /**
      * Reads the document header and root element, positioning the

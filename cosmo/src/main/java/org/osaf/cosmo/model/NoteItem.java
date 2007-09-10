@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -36,16 +35,15 @@ import net.fortuna.ical4j.model.component.VJournal;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-
 import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Journal;
 
 /**
- * Extends {@link ContentItem} to represent a Note item.
+ * Extends {@link ICalendarItem} to represent a Note item.
  */
 @Entity
 @DiscriminatorValue("note")
-public class NoteItem extends ContentItem {
+public class NoteItem extends ICalendarItem {
 
     public static final QName ATTR_NOTE_BODY = new QName(
             NoteItem.class, "body");
@@ -53,11 +51,8 @@ public class NoteItem extends ContentItem {
     public static final QName ATTR_REMINDER_TIME = new QName(
             NoteItem.class, "reminderTime");
     
-    public static final QName ATTR_ICALENDAR = new QName(
-            NoteItem.class, "icalendar");
-    
     private static final long serialVersionUID = -6100568628972081120L;
-    private String icalUid = null;
+    
     private Set<NoteItem> modifications = new HashSet<NoteItem>(0);
     private NoteItem modifies = null;
     
@@ -120,12 +115,7 @@ public class NoteItem extends ContentItem {
     @Transient
     @Journal
     public Calendar getJournalCalendar() {
-        // calendar stored as ICalendarAttribute on Item
-        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
-        if(calAttr!=null)
-            return calAttr.getValue();
-        else
-            return null;
+        return getCalendar();
     }
     
     /**
@@ -135,26 +125,16 @@ public class NoteItem extends ContentItem {
      * @param calendar
      */
     public void setJournalCalendar(Calendar calendar) {
-        // calendar stored as ICalendarAttribute on Item
-        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
-        if(calAttr==null && calendar!=null) {
-            calAttr = new ICalendarAttribute(ATTR_ICALENDAR, calendar);
-            addAttribute(calAttr);
-        }
-        
-        if(calendar==null)
-            removeAttribute(ATTR_ICALENDAR);
-        else
-            calAttr.setValue(calendar);
+        setCalendar(calendar);
     }
     
     /**
-     * Return icalendar represntation of NoteItem.  A note is serialized
+     * Return icalendar representation of NoteItem.  A note is serialized
      * as a VJOURNAL.
      * @return Calendar representation of NoteItem
      */
     @Transient
-    public Calendar getCalendar() {
+    public Calendar getFullCalendar() {
         // Start with existing calendar if present
         Calendar calendar = getJournalCalendar();
         
@@ -183,16 +163,6 @@ public class NoteItem extends ContentItem {
         else
             bodyAttr.setValue(body);
     }
-
-    @Column(name="icaluid", length=255)
-    //@Index(name="idx_icaluid")
-    public String getIcalUid() {
-        return icalUid;
-    }
-
-    public void setIcalUid(String icalUid) {
-        this.icalUid = icalUid;
-    }
     
     public Item copy() {
         NoteItem copy = new NoteItem();
@@ -220,18 +190,6 @@ public class NoteItem extends ContentItem {
     
     public void setModifies(NoteItem modifies) {
         this.modifies = modifies;
-    }
-
-    @Override
-    protected void copyToItem(Item item) {
-        
-        if(!(item instanceof NoteItem))
-            return;
-        
-        super.copyToItem(item);
-        
-        NoteItem noteItem = (NoteItem) item;
-        noteItem.setIcalUid(getIcalUid());
     }
     
     private void mergeCalendarProperties(VJournal journal) {

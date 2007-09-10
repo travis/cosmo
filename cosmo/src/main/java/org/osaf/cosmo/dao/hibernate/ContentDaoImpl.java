@@ -32,6 +32,7 @@ import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
@@ -561,8 +562,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         checkForDuplicateUid(content);
         
         // verify icaluid not in use for collection
-        if (content instanceof NoteItem)
-            checkForDuplicateICalUid((NoteItem) content, parent);
+        if (content instanceof ICalendarItem)
+            checkForDuplicateICalUid((ICalendarItem) content, parent);
         
         setBaseItemProps(content);
         
@@ -612,8 +613,8 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         checkForDuplicateUid(content);
         
         // verify icaluid not in use for collections
-        if (content instanceof NoteItem)
-            checkForDuplicateICalUid((NoteItem) content, content.getParents());
+        if (content instanceof ICalendarItem)
+            checkForDuplicateICalUid((ICalendarItem) content, content.getParents());
         
         setBaseItemProps(content);
         
@@ -662,9 +663,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     @Override
     protected void addItemToCollectionInternal(Item item,
             CollectionItem collection) {
-        if (item instanceof NoteItem)
+        if (item instanceof ICalendarItem)
             // verify icaluid is unique within collection
-            checkForDuplicateICalUid((NoteItem) item, collection);
+            checkForDuplicateICalUid((ICalendarItem) item, collection);
 
         super.addItemToCollectionInternal(item, collection);
     }
@@ -687,17 +688,28 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             super.removeItemFromCollectionInternal(item, collection);
     }
 
-    protected void checkForDuplicateICalUid(NoteItem note, CollectionItem parent) {
+    protected void checkForDuplicateICalUid(ICalendarItem item, CollectionItem parent) {
 
         // TODO: should icalUid be required?  Currrently its not and all
         // items created by the webui dont' have it.
-        if (note.getIcalUid() == null || note.getModifies()!=null)
+        if (item.getIcalUid() == null) 
+            return;
+        
+        // ignore modifications
+        if(item instanceof NoteItem && ((NoteItem) item).getModifies()!=null)
             return;
 
         // Lookup item by parent/icaluid
-        Query hibQuery = getSession().getNamedQuery(
-                "noteItemId.by.parent.icaluid").setParameter("parentid",
-                parent.getId()).setParameter("icaluid", note.getIcalUid());
+        Query hibQuery = null;
+        if (item instanceof NoteItem)
+            hibQuery = getSession().getNamedQuery(
+                    "noteItemId.by.parent.icaluid").setParameter("parentid",
+                    parent.getId()).setParameter("icaluid", item.getIcalUid());
+        else
+            hibQuery = getSession().getNamedQuery(
+                    "icalendarItem.by.parent.icaluid").setParameter("parentid",
+                    parent.getId()).setParameter("icaluid", item.getIcalUid());
+        
         hibQuery.setFlushMode(FlushMode.MANUAL);
 
         Long itemId = (Long) hibQuery.uniqueResult();
@@ -705,27 +717,31 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // if icaluid is in use throw exception
         if (itemId != null) {
             // If the note is new, then its a duplicate icaluid
-            if (note.getId() == -1) {
-                throw new IcalUidInUseException("icalUid" + note.getIcalUid()
+            if (item.getId() == -1) {
+                throw new IcalUidInUseException("icalUid" + item.getIcalUid()
                         + " already in use for collection " + parent.getUid());
             }
             // If the note exists and there is another note with the same
             // icaluid, then its a duplicate icaluid
-            if (note.getId().equals(itemId)) {
-                throw new IcalUidInUseException("icalUid" + note.getIcalUid()
+            if (item.getId().equals(itemId)) {
+                throw new IcalUidInUseException("icalUid" + item.getIcalUid()
                         + " already in use for collection " + parent.getUid());
             }
         }
     }
 
-    protected void checkForDuplicateICalUid(NoteItem note,
+    protected void checkForDuplicateICalUid(ICalendarItem item,
             Set<CollectionItem> parents) {
 
-        if (note.getIcalUid() == null || note.getModifies()!=null)
+        if (item.getIcalUid() == null) 
+            return;
+        
+        // ignore modifications
+        if(item instanceof NoteItem && ((NoteItem) item).getModifies()!=null)
             return;
 
         for (CollectionItem parent : parents)
-            checkForDuplicateICalUid(note, parent);
+            checkForDuplicateICalUid(item, parent);
     }
     
     private boolean isNoteModification(Item item) {

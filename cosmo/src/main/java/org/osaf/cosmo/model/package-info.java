@@ -75,6 +75,8 @@
     @NamedQuery(name="contentItem.by.parent.timestamp", query="select item from ContentItem item left join fetch item.stamps left join fetch item.attributes left join fetch item.tombstones join item.parents parent where parent=:parent and item.modifiedDate>:timestamp"),
     @NamedQuery(name="contentItem.by.parent", query="select item from ContentItem item left join fetch item.stamps left join fetch item.attributes left join fetch item.tombstones join item.parents parent where parent=:parent"),
     @NamedQuery(name="noteItemId.by.parent.icaluid", query="select item.id from NoteItem item join item.parents parent where parent.id=:parentid and item.icalUid=:icaluid and item.modifies is null"),
+    @NamedQuery(name="icalendarItem.by.parent.icaluid", query="select item.id from ICalendarItem item join item.parents parent where parent.id=:parentid and item.icalUid=:icaluid"),
+    
     
     // User Queries
     @NamedQuery(name="user.byUsername", query="from User where username=:username"),

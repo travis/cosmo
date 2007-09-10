@@ -24,7 +24,7 @@ import net.fortuna.ical4j.model.Calendar;
 import org.osaf.cosmo.hibernate.validator.FreeBusy;
 
 /**
- * Extends {@link ICalendarItem} to represent a Note item.
+ * Extends {@link ICalendarItem} to represent a VFREEBUSY item.
  */
 @Entity
 @DiscriminatorValue("freebusy")
@@ -36,7 +36,9 @@ public class FreeBusyItem extends ICalendarItem {
 
     @Override
     public Item copy() {
-        return new FreeBusyItem();
+        FreeBusyItem copy = new FreeBusyItem();
+        copyToItem(copy);
+        return copy;
     }
     
     /**
@@ -46,7 +48,7 @@ public class FreeBusyItem extends ICalendarItem {
     @Transient
     @FreeBusy
     public Calendar getFreeBusyCalendar() {
-        return super.getCalendar();
+        return getCalendar();
     }
     
     /**
@@ -54,6 +56,7 @@ public class FreeBusyItem extends ICalendarItem {
      * @param calendar
      */
     public void setFreeBusyCalendar(Calendar calendar) {
-        super.setCalendar(calendar);
+        setCalendar(calendar);
     }
+    
 }

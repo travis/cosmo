@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.model;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -32,15 +33,44 @@ public abstract class ICalendarItem extends ContentItem {
     public static final QName ATTR_ICALENDAR = new QName(
             ICalendarItem.class, "icalendar");
     
+    private String icalUid = null;
+    
     public ICalendarItem() {
+    }
+    
+    @Column(name="icaluid", length=255)
+    //@Index(name="idx_icaluid")
+    public String getIcalUid() {
+        return icalUid;
+    }
+
+    /**
+     * Set the icalendar uid for this icalendar item.  The icalUid
+     * is separate from the uid.  A uid is unique across all items.
+     * The icalUid only has to be unique within a collection.
+     * @param icalUid
+     */
+    public void setIcalUid(String icalUid) {
+        this.icalUid = icalUid;
+    }
+    
+    /**
+     * Return the full icalendar representation of the item.  
+     * Subclasses can override this to manipulate the calendar
+     * object before returning.
+     */
+    @Transient
+    public Calendar getFullCalendar() {
+        return getCalendar();
     }
     
     /**
      * Return the Calendar object containing a calendar component.
+     * Used by sublcasses to store specific components.
      * @return calendar
      */
     @Transient
-    public Calendar getCalendar() {
+    protected Calendar getCalendar() {
         // calendar stored as ICalendarAttribute on Item
         ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
         if(calAttr!=null)
@@ -50,12 +80,11 @@ public abstract class ICalendarItem extends ContentItem {
     }
     
     /**
-     * Set the Calendar object containing a VJOURNAL component.  
-     * This allows non-standard icalendar properties to be stored 
-     * with the note.
+     * Set the Calendar object containing a calendar component.
+     * Used by sublcasses to store specific components.
      * @param calendar
      */
-    public void setCalendar(Calendar calendar) {
+    protected void setCalendar(Calendar calendar) {
         // calendar stored as ICalendarAttribute on Item
         ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
         if(calAttr==null && calendar!=null) {
@@ -67,6 +96,19 @@ public abstract class ICalendarItem extends ContentItem {
             removeAttribute(ATTR_ICALENDAR);
         else
             calAttr.setValue(calendar);
+    }
+    
+    @Override
+    protected void copyToItem(Item item) {
+        
+        if(!(item instanceof ICalendarItem))
+            return;
+        
+        super.copyToItem(item);
+        
+        // copy icalUid
+        ICalendarItem icalItem = (ICalendarItem) item;
+        icalItem.setIcalUid(getIcalUid());
     }
     
 }

@@ -91,13 +91,27 @@ public class ICalendarOutputter {
      */
     public static Calendar getCalendar(ContentItem item) {
         
-        if(item instanceof ICalendarItem)
-            return ((ICalendarItem) item).getCalendar();
+        if(item instanceof NoteItem)
+            return getCalendarFromNote( (NoteItem) item);
+        else if(item instanceof ICalendarItem)
+            return ((ICalendarItem) item).getFullCalendar();
         
-        if(! (item instanceof NoteItem))
+        return null;
+    }
+    
+    /**
+     * Returns an icalendar representation of a NoteItem. note is
+     * stamped as an event, a VEVENT will be returned.  If a non-event is
+     * stamped as a task, then a VTODO will be returned.  Otherwise a 
+     * VJOURNAL will be returned.
+     * @param note 
+     * @return icalendar representation of item
+     */
+    public static Calendar getCalendarFromNote(NoteItem note) {
+        
+        // must be a master note
+        if(note.getModifies()!=null)
             return null;
-        
-        NoteItem note = (NoteItem) item;
         
         EventStamp event = EventStamp.getStamp(note);
         if(event!=null)
@@ -107,6 +121,6 @@ public class ICalendarOutputter {
         if(task!=null)
             return task.getCalendar();
         
-        return note.getCalendar();
+        return note.getFullCalendar();
     }
 }

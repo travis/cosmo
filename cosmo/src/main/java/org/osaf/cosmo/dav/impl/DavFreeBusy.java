@@ -16,12 +16,16 @@
 package org.osaf.cosmo.dav.impl;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VFreeBusy;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.model.FreeBusyItem;
 
 /**
@@ -72,5 +76,16 @@ public class DavFreeBusy extends DavCalendarResource {
         FreeBusyItem freeBusy = (FreeBusyItem) getItem();
         
         freeBusy.setFreeBusyCalendar(cal);
+        
+        VFreeBusy vfb = (VFreeBusy) cal.getComponent(Component.VFREEBUSY);
+        if (vfb==null)
+            throw new UnprocessableEntityException("VCALENDAR does not contain a VFREEBUSY");
+
+        String val = null;
+        if (vfb.getUid() != null)
+            val = vfb.getUid().getValue();
+        if (StringUtils.isBlank(val))
+            throw new UnprocessableEntityException("VFREEBUSY does not contain a UID");
+        freeBusy.setIcalUid(val);
     }
 }

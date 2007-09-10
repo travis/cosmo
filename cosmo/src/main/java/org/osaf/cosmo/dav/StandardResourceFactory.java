@@ -179,12 +179,16 @@ public class StandardResourceFactory
         }
 
         if (item instanceof NoteItem) {
-            if (item.getStamp(EventStamp.class) != null)
-                return new DavEvent((NoteItem) item, locator, this);
+            NoteItem note = (NoteItem) item;
+            // don't expose modifications
+            if(note.getModifies()!=null)
+                return null;
+            else if (item.getStamp(EventStamp.class) != null)
+                return new DavEvent(note, locator, this);
             else if (item.getStamp(TaskStamp.class) != null)
-                return new DavTask((NoteItem) item, locator, this);
+                return new DavTask(note, locator, this);
             else 
-                return new DavJournal((NoteItem) item, locator, this);
+                return new DavJournal(note, locator, this);
         }
         
         if(item instanceof FreeBusyItem)

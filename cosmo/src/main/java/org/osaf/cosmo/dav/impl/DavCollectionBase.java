@@ -139,8 +139,12 @@ public class DavCollectionBase extends DavItemResourceBase
 
     public DavResourceIterator getMembers() {
         try {
-            for (Item memberItem : ((CollectionItem)getItem()).getChildren())
-                members.add(memberToResource(memberItem));
+            for (Item memberItem : ((CollectionItem)getItem()).getChildren()) {
+                DavResource resource = memberToResource(memberItem);
+                if(resource!=null)
+                    members.add(resource);
+            }
+                
             return new DavResourceIteratorImpl(members);
         } catch (DavException e) {
             throw new RuntimeException(e);

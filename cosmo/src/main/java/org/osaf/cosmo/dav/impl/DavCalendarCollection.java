@@ -167,8 +167,11 @@ public class DavCalendarCollection extends DavCollectionBase
 
         CollectionItem collection = (CollectionItem) getItem();
         for (ContentItem memberItem :
-             getContentService().findCalendarItems(collection, filter))
-            members.add((DavCalendarResource)memberToResource(memberItem));
+             getContentService().findCalendarItems(collection, filter)) {
+            DavResource resource = memberToResource(memberItem);
+            if(resource!=null)
+                members.add((DavCalendarResource) resource);
+        }
 
         return members;
     }

@@ -19,10 +19,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- * An exception indicating that a request method is forbidden on a resource
+ * An exception indicating that a request method is not allowed on a resource
  * that already exists.
  */
-public class ExistsException extends ForbiddenException {
+public class ExistsException extends MethodNotAllowedException {
     
     public ExistsException() {
         super("A resource exists at the request URI");

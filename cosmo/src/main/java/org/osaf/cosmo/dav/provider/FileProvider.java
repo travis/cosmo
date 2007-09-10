@@ -55,8 +55,9 @@ public class FileProvider extends BaseProvider {
         if (! content.getParent().exists())
             throw new ConflictException("One or more intermediate collections must be created");
 
+        int status = content.exists() ? 204 : 201;
         content.getParent().addContent(content, createInputContext(request));
-        response.setStatus(content != null ? 204 : 201);
+        response.setStatus(status);
         response.setHeader("ETag", content.getETag());
     }
 

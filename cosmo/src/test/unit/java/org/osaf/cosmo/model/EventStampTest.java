@@ -98,10 +98,15 @@ public class EventStampTest extends TestCase {
         eventStamp.creatDisplayAlarm();
         Date date = new ICalDate(";VALUE=DATE-TIME:20070212T074500").getDate();
         eventStamp.setStartDate(date);
-        eventStamp.setDisplayAlarmDescription("alarm");
         eventStamp.setDisplayAlarmTrigger(EimValueConverter.toIcalTrigger("-PT15M"));
         DateList dates = new ICalDate(";VALUE=DATE-TIME:20070212T074500,20070213T074500").getDateList();
         eventStamp.setRecurrenceDates(dates);
+        
+        eventStamp.getEventCalendar().validate(true);
+        eventStamp.setDisplayAlarmDescription(null);
+        eventStamp.getEventCalendar().validate(true);
+        
+        eventStamp.setDisplayAlarmDescription("alarm");
         
         NoteItem mod = new NoteItem();
         mod.setDisplayName("modDisplayName");
@@ -114,6 +119,7 @@ public class EventStampTest extends TestCase {
         exceptionStamp.creatDisplayAlarm();
         exceptionStamp.setStartDate(date);
         exceptionStamp.setRecurrenceId(date);
+
         
         // test inherited alarm
         Calendar cal = eventStamp.getCalendar();

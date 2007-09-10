@@ -600,10 +600,6 @@ public abstract class BaseEventStamp extends Stamp
         Description description = (Description) alarm.getProperties()
                 .getProperty(Property.DESCRIPTION);
         
-        if (newDescription == null) {
-            if (description != null)
-                alarm.getProperties().remove(description);
-        }
         if (description == null) {
             description = new Description();
             alarm.getProperties().add(description);
@@ -943,5 +939,6 @@ public abstract class BaseEventStamp extends Stamp
         VAlarm alarm = new VAlarm();
         alarm.getProperties().add(Action.DISPLAY);
         getEvent().getAlarms().add(alarm);
+        setDisplayAlarmDescription("Event Reminder");
     }
 }

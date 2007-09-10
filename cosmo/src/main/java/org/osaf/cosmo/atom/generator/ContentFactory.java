@@ -15,11 +15,9 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import java.io.StringWriter;
+import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -91,16 +89,13 @@ public class ContentFactory
 
     private ContentBean createEimJsonContent(NoteItem item) {
         try {
-            StringWriter out = new StringWriter();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             JsonStreamWriter writer = new JsonStreamWriter(out);
             writeJson(writer, item);
             writer.close();
 
-            byte[] bytes = out.toString().getBytes("UTF-8");
-            String value = new String(Base64.encodeBase64(bytes), "UTF-8");
-
             ContentBean content = new ContentBean();
-            content.setValue(value);
+            content.setValue(new String(out.toByteArray()));
             content.setMediaType(MEDIA_TYPE_EIM_JSON);
 
             return content;
@@ -119,14 +114,14 @@ public class ContentFactory
 
     private ContentBean createEimmlContent(NoteItem item) {
         try {
-            StringWriter out = new StringWriter();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             EimmlStreamWriter writer = new EimmlStreamWriter(out);
             writer.writeCollection(item.getUid(), null);
             writeEimml(writer, item);
             writer.close();
 
             ContentBean content = new ContentBean();
-            content.setValue(out.toString());
+            content.setValue(new String(out.toByteArray()));
             content.setMediaType(MEDIA_TYPE_EIMML);
 
             return content;
@@ -149,9 +144,9 @@ public class ContentFactory
 
         String value = new EventEntryFormatter(item).formatHtmlContent();
         if (value == null)
-            value = StringEscapeUtils.escapeHtml(item.getBody());
+            value = item.getBody();
         if (value == null)
-            value = StringEscapeUtils.escapeHtml(item.getDisplayName());
+            value = item.getDisplayName();
         if (value == null)
             value = "";
 

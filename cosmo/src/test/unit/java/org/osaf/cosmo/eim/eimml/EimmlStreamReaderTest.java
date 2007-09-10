@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
-import java.io.InputStreamReader;
+import java.io.InputStream;
 
 import junit.framework.TestCase;
 
@@ -40,8 +40,8 @@ public class EimmlStreamReaderTest extends TestCase
     }
 
     public void testReadChandlerUpdate() throws Exception {
-        InputStreamReader in = new InputStreamReader(testHelper.
-            getInputStream("eimml/chandler-update.xml"));
+        InputStream in =
+            testHelper.getInputStream("eimml/chandler-update.xml");
         EimmlStreamReader reader = new EimmlStreamReader(in);
 
         assertEquals("Collection uuid incorrect",

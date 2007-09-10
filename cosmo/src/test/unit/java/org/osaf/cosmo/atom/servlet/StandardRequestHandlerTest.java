@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
+import org.apache.abdera.protocol.server.HttpResponse;
 import org.apache.abdera.protocol.server.Provider;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
@@ -30,10 +31,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomHelper;
 import org.osaf.cosmo.atom.provider.mock.MockCollectionRequestContext;
+import org.osaf.cosmo.atom.provider.mock.MockHttpResponse;
 import org.osaf.cosmo.atom.provider.mock.MockProvider;
 import org.osaf.cosmo.model.CollectionItem;
-
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Test class for {@link StandardRequestHandler}.
@@ -49,7 +49,7 @@ public class StandardRequestHandlerTest extends TestCase {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
         helper.setIfMatch(req, "*");
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
@@ -60,7 +60,7 @@ public class StandardRequestHandlerTest extends TestCase {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
         helper.setIfMatch(req, collection);
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
@@ -71,43 +71,43 @@ public class StandardRequestHandlerTest extends TestCase {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
         helper.setIfMatch(req, "aeiou");
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions passed", rv);
         assertEquals("Incorrect response status", 412, res.getStatus());
-        assertNotNull("Null ETag header", res.getHeader("ETag"));
+        assertNotNull("Null ETag header", res.getEtag());
     }
 
     public void testIfNoneMatchAll() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
         helper.setIfNoneMatch(req, "*");
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions passed", rv);
         assertEquals("Incorrect response status", 304, res.getStatus());
-        assertNotNull("Null ETag header", res.getHeader("ETag"));
+        assertNotNull("Null ETag header", res.getEtag());
     }
 
     public void testIfNoneMatchNotOk() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
         helper.setIfNoneMatch(req, collection);
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions passed", rv);
         assertEquals("Incorrect response status", 304, res.getStatus());
-        assertNotNull("Null ETag header", res.getHeader("ETag"));
+        assertNotNull("Null ETag header", res.getEtag());
     }
 
     public void testIfNoneMatchOk() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
         helper.setIfNoneMatch(req, "aeiou");
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
@@ -119,7 +119,7 @@ public class StandardRequestHandlerTest extends TestCase {
         RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()-1000000);
         helper.setIfModifiedSince(req, date);
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);
@@ -131,7 +131,7 @@ public class StandardRequestHandlerTest extends TestCase {
         RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()+1000000);
         helper.setIfModifiedSince(req, date);
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions failed", rv);
@@ -143,7 +143,7 @@ public class StandardRequestHandlerTest extends TestCase {
         RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()-1000000);
         helper.setIfUnmodifiedSince(req, date);
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertFalse("Preconditions failed", rv);
@@ -155,7 +155,7 @@ public class StandardRequestHandlerTest extends TestCase {
         RequestContext req = createRequestContext(collection);
         Date date = new Date(System.currentTimeMillis()+1000000);
         helper.setIfUnmodifiedSince(req, date);
-        MockHttpServletResponse res = new MockHttpServletResponse();
+        MockHttpResponse res = new MockHttpResponse();
 
         boolean rv = handler.preconditions(helper.getProvider(req), req, res);
         assertTrue("Preconditions failed", rv);

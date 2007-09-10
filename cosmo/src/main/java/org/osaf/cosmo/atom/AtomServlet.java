@@ -22,8 +22,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.abdera.protocol.server.HttpResponse;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
+import org.apache.abdera.protocol.server.servlet.HttpResponseServletAdapter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,10 +53,11 @@ public class AtomServlet extends HttpServlet implements AtomConstants {
     protected void service(HttpServletRequest req,
                            HttpServletResponse res)
         throws ServletException, IOException {
-        HttpServletRequestContext requestContext =
+        RequestContext requestContext =
             new HttpServletRequestContext(serviceContext, req);
+        HttpResponse response = new HttpResponseServletAdapter(res);
         serviceContext.getRequestHandlerManager().get(requestContext).
-            process(serviceContext, requestContext, res);
+            process(serviceContext, requestContext, response);
     }
 
     // GenericServlet methods

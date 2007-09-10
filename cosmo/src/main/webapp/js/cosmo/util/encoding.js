@@ -23,7 +23,6 @@ cosmo.util.encoding.base64Alphabet =
     '0123456789+/='
 
 cosmo.util.encoding.toBase64 = function(string){
-    string = cosmo.util.encoding._utf8_encode(string);
     var i = 0;
     var char1, char2, char3;
     var enc1, enc2, enc3, enc4;
@@ -90,51 +89,5 @@ cosmo.util.encoding.fromBase64 = function(string){
 
     } while (i < string.length);
 
-    return cosmo.util.encoding._utf8_decode(out);
+    return out;
 }
-/* UTF-8 functions grabbed from http://www.webtoolkit.info/javascript-base64.html */
-cosmo.util.encoding._utf8_decode = function (utftext) {  
-    var string = "";  
-    var i = 0;  
-    var c = c1 = c2 = 0;  
-         while ( i < utftext.length ) {  
-             c = utftext.charCodeAt(i);  
-             if (c < 128) {  
-            string += String.fromCharCode(c);  
-            i++;  
-        }  
-        else if((c > 191) && (c < 224)) {  
-            c2 = utftext.charCodeAt(i+1);  
-            string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));  
-            i += 2;  
-        }  
-        else {  
-            c2 = utftext.charCodeAt(i+1);  
-            c3 = utftext.charCodeAt(i+2);  
-            string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));  
-            i += 3;  
-        }  
-         }  
-         return string;  
-}  
-
-cosmo.util.encoding._utf8_encode = function (string) {  
-    string = string.replace(/\r\n/g,"\n");  
-    var utftext = "";  
-         for (var n = 0; n < string.length; n++) {  
-             var c = string.charCodeAt(n);  
-             if (c < 128) {  
-            utftext += String.fromCharCode(c);  
-        }  
-        else if((c > 127) && (c < 2048)) {  
-            utftext += String.fromCharCode((c >> 6) | 192);  
-            utftext += String.fromCharCode((c & 63) | 128);  
-        }  
-        else {  
-            utftext += String.fromCharCode((c >> 12) | 224);  
-            utftext += String.fromCharCode(((c >> 6) & 63) | 128);  
-            utftext += String.fromCharCode((c & 63) | 128);  
-        }  
-         }  
-         return utftext;  
-} 

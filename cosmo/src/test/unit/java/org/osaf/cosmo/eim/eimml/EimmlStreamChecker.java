@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
-import java.io.Reader;
+import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -38,7 +38,7 @@ public class EimmlStreamChecker implements EimmlConstants {
     private XMLStreamReader reader;
 
     /** */
-    public EimmlStreamChecker(Reader in)
+    public EimmlStreamChecker(InputStream in)
         throws XMLStreamException {
         reader = XML_INPUT_FACTORY.createXMLStreamReader(in);
     }

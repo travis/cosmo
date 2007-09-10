@@ -16,7 +16,6 @@
 package org.osaf.cosmo.dav.caldav.report;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -34,7 +33,6 @@ import net.fortuna.ical4j.model.PeriodList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.component.VTimeZone;
@@ -45,18 +43,16 @@ import net.fortuna.ical4j.model.property.FreeBusy;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Transp;
-import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.Instance;
 import org.osaf.cosmo.calendar.InstanceList;
@@ -68,15 +64,13 @@ import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.ForbiddenException;
-import org.osaf.cosmo.dav.MethodNotAllowedException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
-import org.osaf.cosmo.dav.impl.DavItemCollection;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
+import org.osaf.cosmo.dav.impl.DavItemCollection;
 import org.osaf.cosmo.dav.report.SimpleReport;
 import org.osaf.cosmo.model.ModelConversionException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -93,7 +87,7 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
 
     private VTimeZone tz = null;
     private Period freeBusyRange;
-    private CalendarFilter queryFilter;
+    private CalendarFilter[] queryFilters;
 
     public static final ReportType REPORT_TYPE_CALDAV_FREEBUSY =
         ReportType.register(ELEMENT_CALDAV_CALENDAR_FREEBUSY,
@@ -116,7 +110,7 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             throw new DavException("Report not of type " + getType());
 
         freeBusyRange = findFreeBusyRange(info);
-        queryFilter =
+        queryFilters =
             createQueryFilter(info.getReportElement().getOwnerDocument(),
                               freeBusyRange);
     }
@@ -163,7 +157,8 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             return;
         if (collection instanceof DavCalendarCollection) {
             DavCalendarCollection dcc = (DavCalendarCollection) collection;
-            getResults().addAll(dcc.findMembers(null));
+            for(CalendarFilter filter: getQueryFilters())
+                getResults().addAll(dcc.findMembers(filter));
             return;
         }
         // if it's a regular collection, there won't be any calendar resources
@@ -179,8 +174,8 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
 
     // our methods
 
-    public CalendarFilter getQueryFilter() {
-        return queryFilter;
+    public CalendarFilter[] getQueryFilters() {
+        return queryFilters;
     }
 
     private static Period findFreeBusyRange(ReportInfo info)
@@ -210,12 +205,13 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
         return new Period(sdt, edt);
     }
 
-    CalendarFilter createQueryFilter(Document doc,
+    CalendarFilter[] createQueryFilter(Document doc,
                                      Period period) {
         DateTime start = period.getStart();
         DateTime end = period.getEnd();
+        CalendarFilter[] filters = new CalendarFilter[2];
 
-        // Create a fake calendar-filter element designed to match
+        // Create calendar-filter elements designed to match
         // VEVENTs/VFREEBUSYs within the specified time range.
         //
         // <C:filter>
@@ -241,20 +237,32 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
         eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
         eventFilter.getTimeRangeFilter().setTimezone(tz);
         
+        ComponentFilter calFilter =
+            new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
+        calFilter.getComponentFilters().add(eventFilter);
+        
+
+        CalendarFilter filter = new CalendarFilter();
+        filter.setFilter(calFilter);
+
+        filters[0] = filter;
+        
         ComponentFilter freebusyFilter =
             new ComponentFilter(Component.VFREEBUSY);
         freebusyFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
         freebusyFilter.getTimeRangeFilter().setTimezone(tz);
         
-        ComponentFilter calFilter =
+        calFilter =
             new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
         calFilter.getComponentFilters().add(eventFilter);
-        calFilter.getComponentFilters().add(freebusyFilter);
+        
 
-        CalendarFilter filter = new CalendarFilter();
+        filter = new CalendarFilter();
         filter.setFilter(calFilter);
-
-        return filter;
+        
+        filters[1] = filter;
+        
+        return filters;
     }
 
     private static boolean isExcluded(DavCollection collection) {
@@ -368,7 +376,8 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
 
         for (Iterator i = overrides.iterator(); i.hasNext();) {
             Component comp = (Component) i.next();
-            instances.addComponent(comp, null, null);
+            instances.addComponent(comp, freeBusyRange.getStart(),
+                    freeBusyRange.getEnd());
         }
 
         // See if there is nothing to do (should not really happen)

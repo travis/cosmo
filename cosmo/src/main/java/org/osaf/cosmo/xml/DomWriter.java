@@ -97,8 +97,10 @@ public class DomWriter {
             String prefix = e.getPrefix();
             if (prefix != null)
                 writer.writeStartElement(prefix, local, ns);
-            else
+            else {
+                writer.setDefaultNamespace(ns);
                 writer.writeStartElement(ns, local);
+            }
         } else {
             writer.writeStartElement(local);
         }
@@ -133,7 +135,9 @@ public class DomWriter {
             local = a.getNodeName();
         String ns = a.getNamespaceURI();
         String value = a.getValue();
-        if (ns != null) {
+        if (local.equals("xmlns"))
+            writer.writeAttribute(local, value);
+        else if (ns != null) {
             String prefix = a.getPrefix();
             if (prefix != null)
                 writer.writeAttribute(prefix, ns, local, value);

@@ -221,7 +221,7 @@ public class StandardDavRequest extends WebdavRequestImpl
         try {
             if (StringUtils.isBlank(getContentType())) {
                 if (requireDocument)
-                    throw new UnsupportedMediaTypeException("No Content-Type specified");
+                    throw new BadRequestException("No Content-Type specified");
                 return null;
             }
             MimeType mimeType = new MimeType(getContentType());
@@ -283,16 +283,17 @@ public class StandardDavRequest extends WebdavRequestImpl
         if (! DomUtil.matches(root, XML_PROPERTYUPDATE,NAMESPACE))
             throw new BadRequestException("Expected " + QN_PROPERTYUPDATE + " root element");
 
-        Element set = DomUtil.getChildElement(root, XML_SET, NAMESPACE);
-        Element remove = DomUtil.getChildElement(root, XML_REMOVE, NAMESPACE);
-        if (set == null && remove == null)
+        ElementIterator sets = DomUtil.getChildren(root, XML_SET, NAMESPACE);
+        ElementIterator removes = DomUtil.getChildren(root, XML_REMOVE, NAMESPACE);
+        if (! (sets.hasNext() || removes.hasNext()))
             throw new BadRequestException("Expected at least one of " + QN_REMOVE + " and " + QN_SET + " as a child of " + QN_PROPERTYUPDATE);
 
         Element prop = null;
         ElementIterator i = null;
 
         proppatchSet = new DavPropertySet();
-        if (set != null) {
+        while (sets.hasNext()) {
+            Element set = sets.nextElement();
             prop = DomUtil.getChildElement(set, XML_PROP, NAMESPACE);
             if (prop == null)
                 throw new BadRequestException("Expected " + QN_PROP + " child of " + QN_SET);
@@ -303,7 +304,8 @@ public class StandardDavRequest extends WebdavRequestImpl
         }
 
         proppatchRemove = new DavPropertyNameSet();
-        if (remove != null) {
+        while (removes.hasNext()) {
+            Element remove = removes.nextElement();
             prop = DomUtil.getChildElement(remove, XML_PROP, NAMESPACE);
             if (prop == null)
                 throw new BadRequestException("Expected " + QN_PROP + " child of " + QN_REMOVE);

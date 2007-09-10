@@ -43,6 +43,7 @@ import net.fortuna.ical4j.model.property.RDate;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.Instance;
 import org.osaf.cosmo.calendar.InstanceList;
 
@@ -414,6 +415,7 @@ public class OutputFilter {
             append("\n");
 
         filterProperties(subComponent.getProperties(), buffer);
+        filterSubComponents(ICalendarUtils.getSubComponents(subComponent), buffer);
 
         buffer.append(Component.END).
             append(':').

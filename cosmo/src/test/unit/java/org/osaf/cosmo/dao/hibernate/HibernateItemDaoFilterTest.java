@@ -233,7 +233,8 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         
-        
+        // Test that event with start==end==rangeStart (cal6.ics)
+        // is returned
         start = new DateTime("20070811T164500Z");
         end = new DateTime("20070818T164500Z");
        
@@ -242,6 +243,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         eventFilter.setPeriod(period);
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
+        verifyItemInSet(results, "calendar1_6");
         
         start.setTime(new GregorianCalendar(1996, 1, 22).getTimeInMillis());
         end.setTime(System.currentTimeMillis());

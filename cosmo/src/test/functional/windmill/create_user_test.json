@@ -1,13 +1,17 @@
 {"method": "open", "params": {"url" : "/"}}
 {"method": "click", "params": {"link" : "Create a new account"}}
-{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "type", "params": {"id" : "username", "text": "{$random}"}}
-{"method": "type", "params": {"id" : "firstName", "text": "tester"}}
-{"method": "type", "params": {"id" : "lastName", "text": "tester"}}
+{"params": {"id": "modalDialogTitle"}, "version": "0.1", "method": "asserts.assertNode"}
+{"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"params": {"text": "{$random}", "id": "username"}, "version": "0.1", "method": "type"}
+{"params": {"text": "tester", "id": "firstName"}, "version": "0.1", "method": "type"}
+{"params": {"text": "tester", "id": "lastName"}, "version": "0.1", "method": "type"}
 {"method": "type", "params": {"id" : "email", "text": "{$random}@osafoundation.org"}}
-{"method": "type", "params": {"id" : "password", "text": "testers"}}
-{"method": "type", "params": {"id" : "confirm", "text": "tester"}}
-{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "type", "params": {"id" : "password", "text": "tester"}}
-{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsRight[0].domNode.id"}}
-{"method": "click", "params": {"jsid" : "windmill.testingApp.cosmo.app.modalDialog.btnsCenter[0].domNode.id"}}
+{"params": {"text": "testers", "id": "password"}, "version": "0.1", "method": "type"}
+{"params": {"text": "tester", "id": "confirm"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"params": {"validator": "Passwords do not match.", "id": "modalDialogContent"}, "version": "0.1", "method": "asserts.assertText"}
+{"params": {"text": "tester", "id": "password"}, "version": "0.1", "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"params": {"validator": "You have successfully created your Chandler Server account.", "id": "modalDialogPrompt"}, "version": "0.1", "method": "asserts.assertText"}
+{"params": {"jsid": "{$btnsCenter0}"}, "version": "0.1", "method": "click"}
+

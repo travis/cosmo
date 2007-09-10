@@ -18,8 +18,10 @@ package org.osaf.cosmo.atom.servlet;
 import java.io.IOException;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.abdera.protocol.ItemManager;
-import org.apache.abdera.protocol.server.HttpResponse;
 import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.protocol.server.Provider;
 import org.apache.abdera.protocol.server.RequestContext;
@@ -53,7 +55,7 @@ public class StandardRequestHandler extends AbstractRequestHandler
      */
     protected boolean preconditions(Provider provider, 
                                     RequestContext request, 
-                                    HttpResponse response)
+                                    HttpServletResponse response)
         throws IOException {
         if (! super.preconditions(provider, request, response))
             return false;
@@ -80,16 +82,15 @@ public class StandardRequestHandler extends AbstractRequestHandler
         return true;
     }
 
-    protected void noprovider(RequestContext request,
-                              HttpResponse response)
+    protected void noprovider(HttpServletResponse response)
         throws IOException {
-        notfound(request, response);
+        notfound(response);
     }
 
     private boolean ifMatch(EntityTag[] etags,
                             AuditableTarget target,
                             RequestContext request,
-                            HttpResponse response)
+                            HttpServletResponse response)
         throws IOException {
         if (etags.length == 0)
             return true;
@@ -99,7 +100,7 @@ public class StandardRequestHandler extends AbstractRequestHandler
 
         response.sendError(412, "If-Match disallows conditional request");
         if (target.getEntityTag() != null)
-            response.setHeader("ETag", target.getEntityTag().toString());
+            response.addHeader("ETag", target.getEntityTag().toString());
 
         return false;
     }
@@ -107,7 +108,7 @@ public class StandardRequestHandler extends AbstractRequestHandler
     private boolean ifNoneMatch(EntityTag[] etags,
                                 AuditableTarget target,
                                 RequestContext request,
-                                HttpResponse response)
+                                HttpServletResponse response)
         throws IOException {
         if (etags.length == 0)
             return true;
@@ -121,7 +122,7 @@ public class StandardRequestHandler extends AbstractRequestHandler
             response.sendError(412, "If-None-Match disallows conditional request");
 
         if (target.getEntityTag() != null)
-            response.setHeader("ETag", target.getEntityTag().toString());
+            response.addHeader("ETag", target.getEntityTag().toString());
 
         return false;
     }
@@ -129,7 +130,7 @@ public class StandardRequestHandler extends AbstractRequestHandler
     private boolean ifModifiedSince(Date date,
                                     AuditableTarget target,
                                     RequestContext request,
-                                    HttpResponse response)
+                                    HttpServletResponse response)
         throws IOException {
         if (date == null)
             return true;
@@ -142,7 +143,7 @@ public class StandardRequestHandler extends AbstractRequestHandler
     private boolean ifUnmodifiedSince(Date date,
                                       AuditableTarget target,
                                       RequestContext request,
-                                      HttpResponse response)
+                                      HttpServletResponse response)
         throws IOException {
         if (date == null)
             return true;

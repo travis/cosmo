@@ -8,7 +8,7 @@
 {"method": "type", "params": {"id" : "password", "text": "tester"}}
 {"method": "type", "params": {"id" : "confirm", "text": "tester"}}
 {"method": "click", "params": {"jsid" : "{$btnsRight0}"}}
-{"method": "asserts.text", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
+{"method": "asserts.assertText", "params": {"id" : "modalDialogPrompt", "validator" : "You have successfully created your Cosmo account."}}
 {"method": "click", "params": {"jsid" : "{$btnsCenter0}"}}
 {"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "tester240"}}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}

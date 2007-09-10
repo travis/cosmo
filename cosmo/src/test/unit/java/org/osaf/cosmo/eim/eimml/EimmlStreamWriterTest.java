@@ -15,9 +15,9 @@
  */
 package org.osaf.cosmo.eim.eimml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 import junit.framework.TestCase;
 
@@ -71,17 +71,16 @@ public class EimmlStreamWriterTest extends TestCase
         record3.addKeyField(new TextField("cosmo", "http://cosmo.osafoundation.org/"));
         recordset.addRecord(record3);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
+        StringWriter out = new StringWriter();
         EimmlStreamWriter writer = new EimmlStreamWriter(out);
         writer.writeStartDocument();
         writer.writeCollection(collUuid, collName);
         writer.writeRecordSet(recordset);
         writer.close();
 
-        //System.out.print(new String(out.toByteArray()));
+        //System.out.print(out.toString());
 
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        StringReader in = new StringReader(out.toString());
         EimmlStreamChecker checker = new EimmlStreamChecker(in);
 
         checker.nextTag();

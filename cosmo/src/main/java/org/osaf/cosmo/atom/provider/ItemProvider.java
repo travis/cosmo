@@ -16,7 +16,7 @@
 package org.osaf.cosmo.atom.provider;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -577,7 +577,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         throws IOException, ValidationException {
         try {
             XhtmlCollectionFormat formatter = new XhtmlCollectionFormat();
-            InputStream in = request.getInputStream();
+            Reader in = request.getReader();
             if (in == null)
                 throw new ValidationException("An entity-body must be provided");
             CollectionItem collection = formatter.parse(IOUtils.toString(in));

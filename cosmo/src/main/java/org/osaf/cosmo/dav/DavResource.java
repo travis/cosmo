@@ -37,7 +37,7 @@ public interface DavResource
      */
     // see bug 5137 for why we don't include class 2
     public String COMPLIANCE_CLASS =
-        "1, access-control, calendar-access, ticket";
+        "1, 3, access-control, calendar-access, ticket";
 
     /**
      * Returns the parent collection for this resource.

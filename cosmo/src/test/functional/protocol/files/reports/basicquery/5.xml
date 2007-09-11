@@ -12,7 +12,7 @@
             <C:text-match>Paci</C:text-match>
           </C:param-filter>
           <C:param-filter name="TZID">
-            <C:text-match>Moun</C:text-match>
+            <C:text-match>US</C:text-match>
           </C:param-filter>
         </C:prop-filter>
       </C:comp-filter>

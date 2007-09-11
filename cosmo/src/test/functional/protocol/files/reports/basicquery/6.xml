@@ -12,7 +12,7 @@
         </C:prop-filter>
         <C:prop-filter name="DTSTART">
           <C:param-filter name="TZID">
-            <C:text-match>East</C:text-match>
+            <C:text-match>Mount</C:text-match>
           </C:param-filter>
         </C:prop-filter>
       </C:comp-filter>

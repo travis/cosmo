@@ -73,14 +73,14 @@ def test_basic_query_5():
     body = open(FILES_DIR+'reports/basicquery/5.xml').read()
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={  'Content-Type': 'text/xml', 'Depth': '1' })
     assert client.response.status == 207
-    ics_list = ['3.ics', '2.ics']
+    ics_list = ['3.ics']
     validate_response_tree(client.response.tree, ics_list)
     
 def test_basic_query_6():
     body = open(FILES_DIR+'reports/basicquery/6.xml').read()
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={  'Content-Type': 'text/xml', 'Depth': '1' })
     assert client.response.status == 207
-    ics_list = ['1.ics', '2.ics', '4.ics', '5.ics', '6.ics', '7.ics']
+    ics_list = ['2.ics']
     validate_response_tree(client.response.tree, ics_list)
     
 def test_freebusy():

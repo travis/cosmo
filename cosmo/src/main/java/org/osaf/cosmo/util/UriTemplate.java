@@ -209,8 +209,11 @@ public class UriTemplate {
 
     public static final String escape(String raw) {
         try {
-            // XXX: converts space to + not %20
-            return URLEncoder.encode(raw, "UTF-8");
+            // URLEncoder converts ' ' to '+', which is fine for HTML form
+            // data but not for URLs
+            String escaped = URLEncoder.encode(raw, "UTF-8");
+            escaped = escaped.replace("+", "%20");
+            return escaped;
         } catch (Exception e) {
             throw new RuntimeException("Could not escape string " + raw, e);
         }

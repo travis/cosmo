@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.apache.commons.logging.Log;
@@ -91,7 +92,9 @@ public class ComponentFilter implements CaldavConstants, ICalendarConstants {
         }
 
         if (! (name.equals(Calendar.VCALENDAR) ||
-            CalendarUtils.isSupportedComponent(name)))
+            CalendarUtils.isSupportedComponent(name) ||
+            name.equals(Component.VALARM) ||
+            name.equals(Component.VTIMEZONE)))
             throw new ParseException(name + " is not a supported iCalendar component", -1);
 
         ElementIterator i = DomUtil.getChildren(element);

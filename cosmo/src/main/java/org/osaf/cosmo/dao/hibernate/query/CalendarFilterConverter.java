@@ -17,11 +17,14 @@ package org.osaf.cosmo.dao.hibernate.query;
 
 import java.util.Iterator;
 
+import net.fortuna.ical4j.model.TimeZone;
+
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.ParamFilter;
 import org.osaf.cosmo.calendar.query.PropertyFilter;
 import org.osaf.cosmo.calendar.query.TextMatchFilter;
+import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -78,10 +81,13 @@ public class CalendarFilterConverter {
         EventStampFilter eventFilter = new EventStampFilter();
         itemFilter.getStampFilters().add(eventFilter);
         
+        TimeRangeFilter trf = compFilter.getTimeRangeFilter();
+        
         // handle time-range filter
-        if(compFilter.getTimeRangeFilter()!=null) {
-            eventFilter.setPeriod(compFilter.getTimeRangeFilter().getPeriod());
-            eventFilter.setTimezone(eventFilter.getTimezone());
+        if(trf!=null) {
+            eventFilter.setPeriod(trf.getPeriod());
+            if(trf.getTimezone()!=null)
+            eventFilter.setTimezone(new TimeZone(trf.getTimezone()));
         }
             
         for(Iterator it = compFilter.getComponentFilters().iterator(); it.hasNext();) {

@@ -1,5 +1,5 @@
+#!/usr/bin/env python
 import sys, os, shutil
-
 
 if __name__ == "__main__":
     root_dir = os.path.abspath(os.path.dirname(__file__))

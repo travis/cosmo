@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import cosmoclient
 import sys, os, pdb
 

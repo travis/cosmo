@@ -443,7 +443,6 @@ dojo.widget.HtmlWidget, {
                 this.width = null;
                 this.height = null;
                 this.uiFullMask.style.display = 'none';
-                this.domNode.style.display = 'none';
                 this.isDisplayed = false;
                 if (this.content instanceof dojo.widget.HtmlWidget) {
                     this.content.destroy();

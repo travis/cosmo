@@ -21,55 +21,55 @@
  -->
 
 <serverinfo>
-	<host>qacosmo.osafoundation.org</host>
-	<port>80</port>
+	<host>localhost</host>
+	<port>8080</port>
 	<authtype>basic</authtype>
 	<substitutions>
 		<substitution>
 			<key>$host:</key>
-			<value>http://qacosmo.osafoundation.org</value>
+			<value>http://localhost</value>
 		</substitution>
 
 		<!-- relative path to principal collection-->
 		<substitution>
 			<key>$principals:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/users</value>
 		</substitution>
 
 		<!-- relative path to group principal collection-->
 		<substitution>
 			<key>$groups:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/</value>
 		</substitution>
 
 		<!-- relative path to resource principal collection-->
 		<substitution>
 			<key>$resources:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/</value>
 		</substitution>
 
 		<!-- relative path to location principal collection-->
 		<substitution>
 			<key>$locations:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/</value>
 		</substitution>
 
 		<!-- relative path to __uids__ principal collection-->
 		<substitution>
 			<key>$uids:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/</value>
 		</substitution>
 
 		<!-- relative path to calendars collection-->
 		<substitution>
 			<key>$calendars:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/</value>
 		</substitution>
 
 		<!-- relative path to user calendars collection-->
 		<substitution>
 			<key>$usercalendars:</key>
-			<value>/dav/</value>
+			<value>/chandler/dav/</value>
 		</substitution>
 
 		<!-- inbox name-->
@@ -98,11 +98,11 @@
 		<!-- relative path to admin principal resource-->
 		<substitution>
 			<key>$principaladmin:</key>
-			<value>/dav/root/</value>
+			<value>/chandler/dav/user/root/</value>
 		</substitution>
 		<substitution>
 			<key>$principaluriadmin:</key>
-			<value>/dav/root/</value>
+			<value>/chandler/dav/user/root/</value>
 		</substitution>
 
 		<!-- user id for proxy user -->
@@ -124,30 +124,30 @@
 		<!-- password for first user -->
 		<substitution>
 			<key>$pswd1:</key>
-			<value>appleuser1</value>
+			<value>appletest</value>
 		</substitution>
 		<!-- relative path to first user principal resource-->
 		<substitution>
 			<key>$principal1:</key>
-			<value>/dav/appleuser1/</value>
+			<value>/chandler/dav/user/appleuser1/</value>
 		</substitution>
 		<substitution>
 			<key>$principaluri1:</key>
-			<value>/dav/appleuser1/</value>
+			<value>/chandler/dav/user/appleuser1/</value>
 		</substitution>
 		<substitution>
 			<key>$principalnoslash:</key>
-			<value>/dav/appleuser1</value>
+			<value>/chandler/dav/user/appleuser1</value>
 		</substitution>
 		<!-- relative path to first user calendar home-->
 		<substitution>
 			<key>$pathprefix:</key>
-			<value>/dav/appleuser1</value>
+			<value>/chandler/dav/appleuser1</value>
 		</substitution>
 		<!-- relative path to first user calendar home-->
 		<substitution>
 			<key>$calendarpath1:</key>
-			<value>/dav/appleuser1/calendar</value>
+			<value>/chandler/dav/appleuser1/calendar</value>
 		</substitution>
 		<!-- calendar user address of first user-->
 		<substitution>
@@ -156,11 +156,11 @@
 		</substitution>
 		<substitution>
 			<key>$cuaddralt1:</key>
-			<value>/dav/appleuser1/</value>
+			<value>/chandler/dav/appleuser1/</value>
 		</substitution>
 		<substitution>
 			<key>$cuaddraltnoslash1:</key>
-			<value>/dav/appleuser1</value>
+			<value>/chandler/dav/appleuser1</value>
 		</substitution>
 		
 		<!-- user id for second user -->
@@ -171,25 +171,25 @@
 		<!-- password for second user -->
 		<substitution>
 			<key>$pswd2:</key>
-			<value>appleuser2</value>
+			<value>appletest</value>
 		</substitution>
 		<!-- relative path to second user principal resource-->
 		<substitution>
 			<key>$principal2:</key>
-			<value>/dav/appleuser2/</value>
+			<value>/chandler/dav/user/appleuser2/</value>
 		</substitution>
 		<substitution>
 			<key>$principaluri2:</key>
-			<value>/dav/appleuser2/</value>
+			<value>/chandler/dav/user/appleuser2/</value>
 		</substitution>
 		<substitution>
 			<key>$principal2noslash:</key>
-			<value>/dav/appleuser2</value>
+			<value>/chandler/dav/user/appleuser2</value>
 		</substitution>
 		<!-- relative path to second user calendar home-->
 		<substitution>
 			<key>$pathprefix2:</key>
-			<value>/dav/appleuser2</value>
+			<value>/chandler/dav/appleuser2</value>
 		</substitution>
 		<!-- calendar user address of second user-->
 		<substitution>
@@ -198,11 +198,11 @@
 		</substitution>
 		<substitution>
 			<key>$cuaddralt2:</key>
-			<value>/dav/appleuser2/</value>
+			<value>/chandler/dav/appleuser2/</value>
 		</substitution>
 		<substitution>
 			<key>$cuaddraltnoslash2:</key>
-			<value>/dav/appleuser2</value>
+			<value>/chandler/dav/appleuser2</value>
 		</substitution>
 		
 		<!-- user id for third user -->
@@ -213,21 +213,21 @@
 		<!-- password for third user -->
 		<substitution>
 			<key>$pswd3:</key>
-			<value>appleuser3</value>
+			<value>appletest</value>
 		</substitution>
 		<!-- relative path to third user principal resource-->
 		<substitution>
 			<key>$principal3:</key>
-			<value>/dav/appleuser3/</value>
+			<value>/chandler/dav/user/appleuser3/</value>
 		</substitution>
 		<substitution>
 			<key>$principaluri3:</key>
-			<value>/dav/appleuser3/</value>
+			<value>/chandler/dav/user/appleuser3/</value>
 		</substitution>
 		<!-- relative path to third user calendar home-->
 		<substitution>
 			<key>$pathprefix3:</key>
-			<value>/dav/appleuser3</value>
+			<value>/chandler/dav/appleuser3</value>
 		</substitution>
 		<!-- calendar user address of third user-->
 		<substitution>
@@ -236,13 +236,13 @@
 		</substitution>
 		<substitution>
 			<key>$cuaddralt3:</key>
-			<value>/dav/appleuser3/</value>
+			<value>/chandler/dav/appleuser3/</value>
 		</substitution>
 
 		<!-- relative path to first resource calendar home-->
 		<substitution>
 			<key>$rpathprefix1:</key>
-			<value>/dav/resource01</value>
+			<value>/chandler/dav/resource01</value>
 		</substitution>
 		<!-- relative path to first resource principal resource-->
 		<substitution>
@@ -258,5 +258,5 @@
 			<value>/principals/__uids__/resource01/</value>
 		</substitution>
 	</substitutions>
-	<serverfilepath>/Users/cyrusdaboo/Documents/Development/Apple/eclipse/CalendarServer/twistedcaldav/test/data/</serverfilepath>
+	<serverfilepath>/Users/bcm/work/osaf/cosmo/cosmo/src/test/functional/apple/CalDAVTester/trunk/data/</serverfilepath>
 </serverinfo>

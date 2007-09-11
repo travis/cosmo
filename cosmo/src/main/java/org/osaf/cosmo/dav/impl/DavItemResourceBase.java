@@ -206,8 +206,13 @@ public abstract class DavItemResourceBase extends DavResourceBase
     public DavCollection getParent()
         throws DavException {
         if (parent == null) {
-            DavResourceLocator parentLocator = getResourceLocator().getParentLocator();
-            parent = (DavCollection) getResourceFactory().resolve(parentLocator);
+            DavResourceLocator parentLocator =
+                getResourceLocator().getParentLocator();
+            parent = (DavCollection)
+                getResourceFactory().resolve(parentLocator);
+            if (parent == null)
+                parent = new DavCollectionBase(parentLocator,
+                                               getResourceFactory());
         }
 
         return parent;

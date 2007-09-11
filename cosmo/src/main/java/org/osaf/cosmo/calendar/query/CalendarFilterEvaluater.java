@@ -17,6 +17,7 @@ package org.osaf.cosmo.calendar.query;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -619,17 +620,13 @@ public class CalendarFilterEvaluater {
             if(trigger==null)
                 continue;
             
-            Date triggerDate = ICalendarUtils.getTriggerDate(trigger, parent);
+            List<Date> triggerDates = ICalendarUtils.getTriggerDates(alarm, parent);
             
-            if(triggerDate==null)
-                continue;
-            
-            if(filter.getPeriod().getStart().compareTo(triggerDate)<=0 &&
-               filter.getPeriod().getEnd().after(triggerDate))
-               return true;
-            
-            // TODO: handle REPEAT...
-                
+            for(Date triggerDate: triggerDates) {
+                if(filter.getPeriod().getStart().compareTo(triggerDate)<=0 &&
+                   filter.getPeriod().getEnd().after(triggerDate))
+                   return true;
+            }
         }
         
         return false;

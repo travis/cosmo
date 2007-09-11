@@ -16,6 +16,8 @@
 package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -25,6 +27,7 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
@@ -36,6 +39,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Due;
 import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
@@ -169,6 +173,40 @@ public class ICalendarUtils {
             return ((VToDo) component).getAlarms();
         
         return new ComponentList();
+    }
+    
+    /**
+     * Return the list of dates that an alarm will trigger.
+     * @param alarm alarm component
+     * @param parent parent compoennt (VEvent,VToDo)
+     * @return dates that alarm is configured to trigger
+     */
+    public static List<Date> getTriggerDates(VAlarm alarm, Component parent) {
+        ArrayList<Date> dates = new ArrayList<Date>();
+        Trigger trigger = alarm.getTrigger();
+        if(trigger==null)
+            return dates;
+        
+        Date initialTriggerDate = getTriggerDate(trigger, parent);
+        if(initialTriggerDate==null)
+            return dates;
+        
+        dates.add(initialTriggerDate);
+        
+        Duration dur = alarm.getDuration();
+        if(dur==null)
+            return dates;
+        Repeat repeat = alarm.getRepeat(); 
+        if(repeat==null)
+            return dates;
+        
+        Date nextTriggerDate = initialTriggerDate;
+        for(int i=0;i<repeat.getCount();i++) {
+            nextTriggerDate = Dates.getInstance(dur.getDuration().getTime(nextTriggerDate), nextTriggerDate);
+            dates.add(nextTriggerDate);
+        }
+        
+        return dates;
     }
     
     /**

@@ -284,6 +284,13 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         timeRangeFilter.setPeriod(period);
         Assert.assertTrue(evaluater.evaluate(calendar, filter));
         
+        // find absolute repeating alarm
+        start = new DateTime("20051230T050000Z");
+        end = new DateTime("20051230T080000Z");
+        period = new Period(start, end);
+        timeRangeFilter.setPeriod(period);
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
+        
         // find no alarms
         start = new DateTime("20060101T020000Z");
         end = new DateTime("20060101T030000Z");

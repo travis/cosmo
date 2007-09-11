@@ -32,7 +32,7 @@ def dict_to_elem(parent, dict_vals, namespace=None):
 class CosmoClient(davclient.DAVClient):
     """Class for adding cosmo specific functionality to DAVClient"""
     
-    _cosmo_path = '/'
+    _cosmo_path = '/chandler/'
     _cmp_path = _cosmo_path+'cmp'
     _collections_store = {}
     

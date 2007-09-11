@@ -82,7 +82,7 @@ public interface ExtendedDavConstants extends DavConstants {
     public static final UriTemplate TEMPLATE_USERS =
         new UriTemplate("/users");
     public static final UriTemplate TEMPLATE_USER =
-        new UriTemplate("/user/{username}");
+        new UriTemplate("/users/{username}");
     public static final UriTemplate TEMPLATE_HOME =
-        new UriTemplate("/{username}");
+        new UriTemplate("/{username}/*");
 }

@@ -260,12 +260,38 @@ public class CalendarFilterEvaluaterTest extends TestCase {
        
         Assert.assertTrue(evaluater.evaluate(calendar, filter));
         
-        textMatch.setValue("DISPLAY");
+        textMatch.setValue("EMAIL");
         Assert.assertFalse(evaluater.evaluate(calendar, filter));
         
         alarmFilter.getPropFilters().clear();
         Assert.assertTrue(evaluater.evaluate(calendar, filter));
         
+        // time-range filter on VALARM
+        
+        // find alarm relative to start
+        DateTime start = new DateTime("20060101T220000Z");
+        DateTime end = new DateTime("20060101T230000Z");
+    
+        Period period = new Period(start, end);
+        TimeRangeFilter timeRangeFilter = new TimeRangeFilter(period);
+        alarmFilter.setTimeRangeFilter(timeRangeFilter);
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
+        
+        // find alarm relative to end
+        start = new DateTime("20060101T050000Z");
+        end = new DateTime("20060101T190000Z");
+        period = new Period(start, end);
+        timeRangeFilter.setPeriod(period);
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
+        
+        // find no alarms
+        start = new DateTime("20060101T020000Z");
+        end = new DateTime("20060101T030000Z");
+        period = new Period(start, end);
+        timeRangeFilter.setPeriod(period);
+        Assert.assertFalse(evaluater.evaluate(calendar, filter));
+        
+        alarmFilter.setTimeRangeFilter(null);
         alarmFilter.setIsNotDefinedFilter(new IsNotDefinedFilter());
         Assert.assertFalse(evaluater.evaluate(calendar, filter));
     }

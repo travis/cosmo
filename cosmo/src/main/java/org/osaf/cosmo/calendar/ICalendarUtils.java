@@ -20,20 +20,29 @@ import java.text.ParseException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.parameter.Related;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Due;
+import net.fortuna.ical4j.model.property.Duration;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.calendar.util.Dates;
 
 /**
  * Contains utility methods for creating/updating net.fortuna.ical4j
@@ -160,5 +169,62 @@ public class ICalendarUtils {
             return ((VToDo) component).getAlarms();
         
         return new ComponentList();
+    }
+    
+    /**
+     * Return the date that a trigger refers to, which can be an absolute
+     * date or a date relative to the start or end time of a parent 
+     * component (VEVENT/VTODO).
+     * @param trigger
+     * @param parent
+     * @return date of trigger
+     */
+    public static Date getTriggerDate(Trigger trigger, Component parent) {
+        
+        // if its absolute then we are done
+        if(trigger.getDateTime()!=null)
+            return trigger.getDateTime();
+        
+        // otherwise we need a start date if VEVENT
+        DtStart start = (DtStart) parent.getProperty(Property.DTSTART);
+        if(start==null && parent instanceof VEvent)
+            return null;
+        
+        // is trigger relative to start or end
+        Related related = (Related) trigger.getParameter(Parameter.RELATED);
+        if(related==null || related.equals(Related.START)) {    
+            // must have start date
+            if(start==null)
+                return null;
+            
+            // relative to start
+            return Dates.getInstance(trigger.getDuration().getTime(start.getDate()), start.getDate());
+        } else {
+            // relative to end
+            Date endDate = null;
+            
+            // need an end date or duration or due 
+            DtEnd end = (DtEnd) parent.getProperty(Property.DTEND);
+            if(end!=null)
+                endDate = end.getDate();
+           
+            if(endDate==null) {
+                Duration dur = (Duration) parent.getProperty(Property.DURATION);
+                if(dur!=null && start!=null)
+                    endDate= Dates.getInstance(dur.getDuration().getTime(start.getDate()), start.getDate());
+            }
+            
+            if(endDate==null) {
+                Due due = (Due) parent.getProperty(Property.DUE);
+                if(due!=null)
+                    endDate = due.getDate();
+            }
+            
+            // require end date
+            if(endDate==null)
+                return null;
+            
+            return Dates.getInstance(trigger.getDuration().getTime(endDate), endDate);
+        }
     }
 }

@@ -17,11 +17,13 @@ package org.osaf.cosmo.calendar.query;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Stack;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Period;
@@ -29,6 +31,7 @@ import net.fortuna.ical4j.model.PeriodList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.component.VJournal;
@@ -38,7 +41,9 @@ import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.FreeBusy;
+import net.fortuna.ical4j.model.property.Trigger;
 
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.InstanceList;
 
 
@@ -50,7 +55,10 @@ public class CalendarFilterEvaluater {
     
     private static final String COMP_VCALENDAR = "VCALENDAR";
     
+    private Stack<Component> stack = new Stack<Component>();
+    
     public CalendarFilterEvaluater() {}
+    
     
     /**
      * Evaulate CalendarFilter against a Calendar.
@@ -66,6 +74,8 @@ public class CalendarFilterEvaluater {
         // root filter must be "VCALENDAR"
         if(!COMP_VCALENDAR.equalsIgnoreCase(rootFilter.getName()))
             return false;
+        
+        stack.clear();
         
         // evaluate all component filters
         for(Iterator it = rootFilter.getComponentFilters().iterator(); it.hasNext();) {
@@ -85,8 +95,13 @@ public class CalendarFilterEvaluater {
         // If any component matches, then evaluation succeeds.
         // This is basically a big OR
         for(Iterator<Component> it=comps.iterator();it.hasNext();) {
-            if(evaluateComps(getSubComponents(it.next()),filter)==true)
+            Component parent = it.next();
+            stack.push(parent);
+            if(evaluateComps(getSubComponents(parent),filter)==true) {
+                stack.pop();
                 return true;
+            }
+            stack.pop();
         }
         return false;
     }
@@ -304,8 +319,10 @@ public class CalendarFilterEvaluater {
             return evaulateVToDoTimeRange(comps, filter);
         else if(comp instanceof VJournal)
             return evaluateVJournalTimeRange((VJournal) comp, filter);
-        // TODO: support VALARM
-        return false;
+        else if(comp instanceof VAlarm)
+            return evaluateVAlarmTimeRange(comps, filter);
+        else
+            return false;
     }
     
     private boolean evaluate(PropertyList props, TimeRangeFilter filter) {
@@ -573,6 +590,47 @@ public class CalendarFilterEvaluater {
         
         if(instances.size()>0)
             return true;
+        
+        return false;
+    }
+    
+    /*
+     * A VALARM component is said to overlap a given time range if the
+        following condition holds:
+
+           (start <= trigger-time) AND (end > trigger-time)
+
+       A VALARM component can be defined such that it triggers repeatedly.
+       Such a VALARM component is said to overlap a given time range if at
+       least one of its triggers overlaps the time range.
+     */
+            
+    private boolean evaluateVAlarmTimeRange(ComponentList comps, TimeRangeFilter filter) {
+        
+        // VALARAM must have parent VEVENT or VTODO
+        Component parent = stack.peek();
+        if(parent==null)
+            return false;
+       
+        // See if trigger-time overlaps the time range for each VALARM
+        for(Iterator<Component> it=comps.iterator();it.hasNext();) {
+            VAlarm alarm = (VAlarm) it.next();
+            Trigger trigger = alarm.getTrigger();
+            if(trigger==null)
+                continue;
+            
+            Date triggerDate = ICalendarUtils.getTriggerDate(trigger, parent);
+            
+            if(triggerDate==null)
+                continue;
+            
+            if(filter.getPeriod().getStart().compareTo(triggerDate)<=0 &&
+               filter.getPeriod().getEnd().after(triggerDate))
+               return true;
+            
+            // TODO: handle REPEAT...
+                
+        }
         
         return false;
     }

@@ -95,6 +95,21 @@ cosmo.model.declare("cosmo.model.Duration", null,
             if (durationString == "P") return cosmo.model.ZERO_DURATION;
             else return durationString;
                     
+        },
+        isZero: function(){
+            //summary: returns true if this represents a duration of no time.
+            if (this.getMultiplier() == 0){
+                return true;
+            }
+            
+            if (this.getYear() == 0 && this.getMonth() == 0 
+             && this.getWeek() == 0 && this.getDay() == 0
+             && this.getHour() == 0 && this.getMinute() == 0
+             && this.getSecond() == 0 ){
+                return true;
+            }
+            
+            return false;
         }
     }, 
     {

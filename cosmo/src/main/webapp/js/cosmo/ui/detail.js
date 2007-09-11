@@ -1456,9 +1456,14 @@ cosmo.ui.detail.EventFormElements.prototype.enableDisableEventStatus = function 
         var detail = cosmo.ui.detail;
         var form = detail.getStampForm("event");
         var show = true;
+        var startTime = html.getFormValue(form, "startTime");
         var endTime = html.getFormValue(form, "endTime");
+        var startDate = html.getFormValue(form, "startDate");
+        var endDate  = html.getFormValue(form, "endDate");
+        
         if (html.getFormValue(form, "eventAllDay") == "0"){
-            if (!endTime || endTime == "hh:mm" ){
+            if (!endTime || endTime == "hh:mm" 
+               || ( (startTime == endTime && startDate == endDate))){
                 show = false;
             }
         }

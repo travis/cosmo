@@ -113,7 +113,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         },
         
         getAtTime: function(){
-            return !this.getDuration();
+            return !this.getDuration() || this.getDuration().isZero();
         },
         
        applyChange: function(propertyName, changeValue, type){

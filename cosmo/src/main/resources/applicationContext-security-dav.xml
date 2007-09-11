@@ -22,16 +22,13 @@
 
 <beans>
 
-  <bean id="davOwnerVoter"
-        class="org.osaf.cosmo.acegisecurity.providers.owner.OwnerVoter">
+  <bean id="userVoter"
+        class="org.osaf.cosmo.dav.acegisecurity.UserVoter">
     <property name="contentService">
       <ref bean="contentService"/>
     </property>
     <property name="userService">
       <ref bean="userService"/>
-    </property>
-    <property name="indirectlyAddressable">
-      <value>true</value>
     </property>
   </bean>
 
@@ -43,7 +40,7 @@
     <property name="decisionVoters">
       <list>
         <ref bean="ticketVoter"/>
-        <ref bean="davOwnerVoter"/>
+        <ref bean="userVoter"/>
         <ref bean="roleVoter"/>
       </list>
     </property>

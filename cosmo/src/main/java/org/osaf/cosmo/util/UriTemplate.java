@@ -148,7 +148,7 @@ public class UriTemplate {
      * did not successfully match
      */
     public Match match(String path) {
-        Match match = new Match();
+        Match match = new Match(path);
 
         //if (log.isDebugEnabled())
             //log.debug("matching " + path + " to " + pattern);
@@ -283,6 +283,15 @@ public class UriTemplate {
     }
 
     public class Match extends HashMap<String, String> {
+        private String path;
+
+        public Match(String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return path;
+        }
 
         public String get(String key) {
             return super.get(key);

@@ -244,8 +244,12 @@ public class StandardDavRequest extends WebdavRequestImpl
     private void parsePropFindRequest()
         throws DavException {
         Document requestDocument = getSafeRequestDocument();
-        if (requestDocument == null)
-            throw new BadRequestException("PROPFIND requires entity body");
+        if (requestDocument == null) {
+            // treat as allprop
+            propfindType = PROPFIND_ALL_PROP;
+            propfindProps = new DavPropertyNameSet();
+            return;
+        }
 
         Element root = requestDocument.getDocumentElement();
         if (! DomUtil.matches(root, XML_PROPFIND, NAMESPACE))

@@ -31,12 +31,14 @@ import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.StandardResourceFactory;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PathUtil;
 
-public class DavTestHelper extends MockHelper {
+public class DavTestHelper extends MockHelper
+    implements ExtendedDavConstants {
     private static final Log log = LogFactory.getLog(DavTestHelper.class);
 
     private StandardResourceFactory resourceFactory;
@@ -95,7 +97,7 @@ public class DavTestHelper extends MockHelper {
     public DavUserPrincipal getPrincipal(User user)
         throws Exception {
         DavResourceLocator locator = locatorFactory.
-            createResourceLocator("", "/user/" + user.getUsername());
+            createResourceLocator("", TEMPLATE_USER.bind(user.getUsername()));
         return new DavUserPrincipal(user, locator, resourceFactory);
     }
 }

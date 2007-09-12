@@ -6,9 +6,6 @@
          <D:displayname>Lisa's Events</D:displayname>
          <C:calendar-description>Calendar restricted to events.</C:calendar-description>
          <C:bogus>Calendar restricted to events.</C:bogus>
-         <C:supported-calendar-component-set>
-           <C:comp name="VEVENT"/>
-         </C:supported-calendar-component-set>
          <C:calendar-timezone><![CDATA[BEGIN:VCALENDAR
 PRODID:-//Example Corp.//CalDAV Client//EN
 VERSION:2.0
@@ -30,8 +27,7 @@ TZOFFSETTO:-0400
 TZNAME:Eastern Daylight Time (US & Canada)
 END:DAYLIGHT
 END:VTIMEZONE
-END:VCALENDAR
-   ]]>
+END:VCALENDAR]]>
 </C:calendar-timezone>
 </D:prop>
 </D:set>

@@ -5,9 +5,6 @@
        <D:prop>
          <D:displayname>Lisa's Events</D:displayname>
          <C:calendar-description xml:lang="en">Calendar restricted to events.</C:calendar-description>
-         <C:supported-calendar-component-set>
-           <C:comp name="VEVENT"/>
-         </C:supported-calendar-component-set>
 </D:prop>
 </D:set>
 </C:mkcalendar>

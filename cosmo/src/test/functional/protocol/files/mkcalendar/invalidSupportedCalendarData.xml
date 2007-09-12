@@ -5,9 +5,6 @@
        <D:prop>
          <D:displayname>Lisa's Events</D:displayname>
          <C:calendar-description xml:lang="en">Calendar restricted to events.</C:calendar-description>
-         <C:supported-calendar-component-set>
-           <C:comp name="VEVENT"/>
-         </C:supported-calendar-component-set>
          <C:supported-calendar-data>
            <C:calendar-data content-type="text/calendar" version="2.0"/>
          </C:supported-calendar-data>
@@ -32,8 +29,7 @@ TZOFFSETTO:-0400
 TZNAME:Eastern Daylight Time (US & Canada)
 END:DAYLIGHT
 END:VTIMEZONE
-END:VCALENDAR
-   ]]>
+END:VCALENDAR]]>
 </C:calendar-timezone>
 </D:prop>
 </D:set>

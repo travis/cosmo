@@ -26,8 +26,7 @@ TZOFFSETTO:-0400
 TZNAME:Eastern Daylight Time (US & Canada)
 END:DAYLIGHT
 END:VTIMEZONE
-END:VCALENDAR
-   ]]>
+END:VCALENDAR]]>
 </C:calendar-timezone>
 </D:prop>
 </D:set>

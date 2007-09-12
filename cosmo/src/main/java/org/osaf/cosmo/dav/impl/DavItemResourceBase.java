@@ -442,7 +442,7 @@ public abstract class DavItemResourceBase extends DavResourceBase
 
             // XXX: language
             Object propValue = entry.getValue().getValue();
-            properties.add(new StandardDavProperty(propName, propValue, true));
+            properties.add(new StandardDavProperty(propName, propValue, false));
         }
     }
 

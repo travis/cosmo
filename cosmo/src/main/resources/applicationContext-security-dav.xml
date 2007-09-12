@@ -66,6 +66,18 @@
      </property>
    </bean>
 
+
+   <bean id="davExceptionTranslationFilter"
+         class="org.acegisecurity.ui.ExceptionTranslationFilter">
+     <property name="authenticationEntryPoint">
+       <ref bean="protocolAuthenticationEntryPoint"/>
+     </property>
+     <property name="accessDeniedHandler">
+       <bean class="org.osaf.cosmo.dav.acegisecurity.AccessDeniedHandler"/>
+     </property>
+     <property name="createSessionAllowed" value="false"/>
+   </bean>
+
   <!-- filter chain that kicks off request-time processing -->
 
   <bean id="davFilterChainProxy"
@@ -74,7 +86,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,davFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,davExceptionTranslationFilter,davFilterInvocationInterceptor
       </value>
     </property>
   </bean>

@@ -17,21 +17,19 @@
 package org.osaf.cosmo.dav.caldav;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.io.StringReader;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ValidationException;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.component.VTimeZone;
-
-import org.apache.jackrabbit.webdav.property.DavProperty;
 
 import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.property.DavProperty;
 
 /**
  * Helper class for extracting a <code>VTimeZone</code> from an iCalendar
@@ -62,7 +60,7 @@ public class TimeZoneExtractor {
         if (prop.getValue() == null)
             return null;
 
-        return extractInCalendar(prop.getValue().toString());
+        return extractInCalendar(prop.getValueText());
     }
 
     /**

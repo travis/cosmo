@@ -103,6 +103,7 @@ public abstract class ReportBase implements Report, ExtendedDavConstants {
     protected void runQuery()
         throws DavException {
         doQuerySelf(resource);
+
         if (info.getDepth() == DEPTH_0)
             return;
 

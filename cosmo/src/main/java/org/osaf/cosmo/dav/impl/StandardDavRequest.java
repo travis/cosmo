@@ -413,6 +413,8 @@ public class StandardDavRequest extends WebdavRequestImpl
                                   getDepth(DEPTH_0));
         } catch (org.apache.jackrabbit.webdav.DavException e) {
             throw new DavException(e);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 

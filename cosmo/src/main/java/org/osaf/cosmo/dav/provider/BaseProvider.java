@@ -93,7 +93,7 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
         if (! resource.exists())
             throw new NotFoundException();
 
-        int depth = request.getDepth(DEPTH_INFINITY);
+        int depth = getDepth(request);
         if (depth != DEPTH_0 && ! resource.isCollection())
             throw new BadRequestException("Depth must be 0 for non-collection resources");
 
@@ -131,9 +131,9 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             throw new NotFoundException();
         checkNoRequestBody(request);
 
-        int depth = request.getDepth(DEPTH_INFINITY);
+        int depth = getDepth(request);
         if (depth != DEPTH_INFINITY)
-            throw new BadRequestException("Depth for DELETE must be Infinity");
+            throw new BadRequestException("Depth for DELETE must be infinity");
 
         try {
             resource.getParent().removeMember(resource);
@@ -151,9 +151,9 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             throw new NotFoundException();
         checkNoRequestBody(request);
 
-        int depth = request.getDepth(DEPTH_INFINITY);
+        int depth = getDepth(request);
         if (! (depth == DEPTH_0 || depth == DEPTH_INFINITY))
-            throw new BadRequestException("Depth for COPY must be 0 or Infinity");
+            throw new BadRequestException("Depth for COPY must be 0 or infinity");
 
         DavResource destination =
             resolveDestination(request.getDestinationResourceLocator(),
@@ -376,6 +376,15 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
         }
         if (hasBody)
             throw new UnsupportedMediaTypeException("Body not expected for method " + request.getMethod());
+    }
+
+    protected int getDepth(DavRequest request)
+        throws DavException {
+        try {
+            return request.getDepth();
+        } catch (IllegalArgumentException e) {    
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     protected CosmoSecurityContext getSecurityContext() {

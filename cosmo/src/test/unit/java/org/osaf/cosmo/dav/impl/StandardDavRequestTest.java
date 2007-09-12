@@ -29,6 +29,35 @@ public class StandardDavRequestTest extends BaseDavTestCase {
     private static final Log log =
         LogFactory.getLog(StandardDavRequestTest.class);
 
+    public void testNoDepth() throws Exception {
+        // no depth => depth infinity
+
+        MockHttpServletRequest httpRequest =
+            new MockHttpServletRequest();
+        StandardDavRequest request =
+            new StandardDavRequest(httpRequest,
+                                   testHelper.getResourceLocatorFactory());
+
+        assertEquals("no depth not infinity", DEPTH_INFINITY,
+                     request.getDepth());
+    }
+
+    public void testBadDepth() throws Exception {
+        MockHttpServletRequest httpRequest =
+            new MockHttpServletRequest();
+        httpRequest.addHeader("Depth", "bad value");
+        StandardDavRequest request =
+            new StandardDavRequest(httpRequest,
+                                   testHelper.getResourceLocatorFactory());
+
+        try {
+            int depth = request.getDepth();
+            fail("got bad depth " + depth);
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
     public void testEmptyPropfindBody() throws Exception {
         // empty propfind body => allprop request
 

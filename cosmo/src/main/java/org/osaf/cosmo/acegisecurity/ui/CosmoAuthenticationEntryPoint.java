@@ -71,19 +71,20 @@ public class CosmoAuthenticationEntryPoint
             TicketAuthenticationToken) {
 
             if (authException instanceof TicketedItemNotFoundException) {
-                httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+                httpResponse.setStatus(404);
+                httpResponse.setContentLength(0);
             } else {
                 httpResponse.addHeader("WWW-Authenticate", "Ticket");
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                                       authException.getMessage());
+                httpResponse.setStatus(401);
+                httpResponse.setContentLength(0);
             }
         } else {
             // all other requests get basic
             httpResponse.addHeader("WWW-Authenticate",
                                    "Basic realm=\"" +
                                     CosmoConstants.PRODUCT_NAME + "\"");
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                                   authException.getMessage());
+            httpResponse.setStatus(401);
+            httpResponse.setContentLength(0);
         }
     }
 }

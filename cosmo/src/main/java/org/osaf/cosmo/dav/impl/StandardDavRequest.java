@@ -271,6 +271,18 @@ public class StandardDavRequest extends WebdavRequestImpl
         if (DomUtil.getChildElement(root, XML_ALLPROP, NAMESPACE) != null) {
             propfindType = PROPFIND_ALL_PROP;
             propfindProps = new DavPropertyNameSet();
+
+            Element include =
+                DomUtil.getChildElement(root, "include", NAMESPACE);
+            if (include != null) {
+                ElementIterator included = DomUtil.getChildren(include);
+                while (included.hasNext()) {
+                    DavPropertyName name = 
+                        DavPropertyName.createFromXml(included.nextElement());
+                    propfindProps.add(name);
+                }
+            }
+
             return;
         }
 

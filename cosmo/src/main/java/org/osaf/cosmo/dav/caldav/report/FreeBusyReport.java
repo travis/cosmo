@@ -132,7 +132,9 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
         while (dc != null) {
             if (dc.isExcludedFromFreeBusyRollups())
                 throw new ForbiddenException("Targeted collection does not participate in freebusy rollups");
-            dc = (DavItemCollection) dc.getCollection();
+            dc = (DavItemCollection) dc.getParent();
+            if (! dc.exists())
+                dc = null;
         }
 
         super.runQuery();

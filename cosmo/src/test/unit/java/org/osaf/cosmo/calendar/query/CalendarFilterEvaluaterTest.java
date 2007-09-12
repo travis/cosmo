@@ -370,6 +370,46 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         Assert.assertFalse(evaluater.evaluate(calendar, filter));
     }
     
+    public void testEvaluateVToDoTimeRangeFilter() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        Calendar calendar1 = cb.build(new FileInputStream(baseDir + "/vtodo/vtodo.ics"));
+        Calendar calendar2 = cb.build(new FileInputStream(baseDir + "/vtodo/vtodo_due_only.ics"));
+        
+        CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+       
+        CalendarFilter filter = new CalendarFilter();
+        ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
+        ComponentFilter vtodoFilter = new ComponentFilter("VTODO");
+        filter.setFilter(compFilter);
+        compFilter.getComponentFilters().add(vtodoFilter);
+        
+        // Verify VTODO that has DTSTART matches
+        DateTime start = new DateTime("19970414T133000Z");
+        DateTime end = new DateTime("19970416T133000Z");
+        Period period = new Period(start, end);
+        TimeRangeFilter timeRangeFilter = new TimeRangeFilter(period);
+        vtodoFilter.setTimeRangeFilter(timeRangeFilter);
+        
+        Assert.assertTrue(evaluater.evaluate(calendar1, filter));
+        
+        // Verify VTODO that has DTSTART doesn't match
+        start = new DateTime("19970420T133000Z");
+        end = new DateTime("19970421T133000Z");
+        period = new Period(start, end);
+        timeRangeFilter.setPeriod(period);
+        Assert.assertFalse(evaluater.evaluate(calendar1, filter));
+        
+        // Verify VTODO that has DUE doesn't match
+        Assert.assertFalse(evaluater.evaluate(calendar2, filter));
+        
+        // Verify VTODO that has DUE matches
+        start = new DateTime("20080401T133000Z");
+        end = new DateTime("20080421T133000Z");
+        period = new Period(start, end);
+        timeRangeFilter.setPeriod(period);
+        Assert.assertTrue(evaluater.evaluate(calendar2, filter));
+    }
+    
     public void testEvaluateVFreeBusyFilterFilter() throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
         FileInputStream fis = new FileInputStream(baseDir + "vfreebusy.ics");

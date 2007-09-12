@@ -24,7 +24,6 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Period;
@@ -573,11 +572,17 @@ public class CalendarFilterEvaluater {
                 master = (VToDo) comp;
         }
         
+        // If there is no DTSTART, evaluate using special rules as
+        // listed in the nice state table above
         if(mods.size()==0) {        
             if(master.getStartDate()==null)
-                return true;
+                return isVToDoInRange(master, filter.getPeriod());
         }
         
+        // Otherwise use standard InstantList, which relies on
+        // DTSTART,DURATION. 
+        // TODO: Handle case of no DURATION and instead DUE
+        // DUE is kind of like DTEND
         InstanceList instances = new InstanceList();
         if(filter.getTimezone()!=null)
             instances.setTimezone(new TimeZone(filter.getTimezone()));
@@ -593,6 +598,44 @@ public class CalendarFilterEvaluater {
             return true;
         
         return false;
+    }
+    
+    /*
+     * Determine if VTODO overlaps timerange assuming the VTODO
+     * has no DTSTART, using the state table defined in RFC-4791
+     * Sec 9.9.
+     */
+    private boolean isVToDoInRange(VToDo vtodo, Period period) {
+        
+        if(vtodo.getDue() != null) {
+            //(start  <  DUE)      AND (end >= DUE)
+            Date dueDate = vtodo.getDue().getDate();
+            return (period.getStart().compareTo(dueDate) < 0) &&
+                   (period.getEnd().compareTo(dueDate) >=0);
+        } else if(vtodo.getCreated()!=null && vtodo.getDateCompleted()!=null) {
+            //((start <= CREATED)  OR  (start <= COMPLETED))
+            //AND                                           
+            //((end   >= CREATED)  OR  (end   >= COMPLETED))
+            Date createDate = vtodo.getCreated().getDate();
+            Date completeDate = vtodo.getDateCompleted().getDate();
+            return ( (period.getStart().compareTo(createDate)<=0 ||
+                      period.getStart().compareTo(completeDate)<=0) &&
+                     (period.getEnd().compareTo(createDate)>=0 ||
+                      period.getEnd().compareTo(completeDate)>=0)
+                    );
+        } else if(vtodo.getDateCompleted()!=null) {
+            //(start  <= COMPLETED) AND (end  >= COMPLETED)
+            Date completeDate = vtodo.getDateCompleted().getDate();
+            return (period.getStart().compareTo(completeDate)<=0) &&
+                   (period.getEnd().compareTo(completeDate)>=0);
+        } else if(vtodo.getCreated()!=null) {
+            //(end    >  CREATED)   
+            Date createDate = vtodo.getCreated().getDate();
+            return period.getEnd().compareTo(createDate) > 0;
+        } else {
+            return true;
+        }
+        
     }
     
     /*

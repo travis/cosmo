@@ -124,7 +124,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             cosmo.app.showErr(_("Error.NoCollections"));
         } else {
             // Display the default view
-            this.baseLayout.mainApp.centerColumn.navBar.displayView(startView);
+            this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
 
             // Show errors for deleted subscriptions -- deletedSubscriptions
             // is a private var populated in the loadCollections method

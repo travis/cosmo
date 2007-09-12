@@ -43,16 +43,39 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         currentCollection: {},
         ticketKey: '',
         MAX_DISPLAY_NAME_LENGTH: 18,
+        _origSelectIndex : 0,
 
         // Function for onchange of collection selector
         // sets local currentCollection and passes the selected
         // collection to cosmo.app.pim.loadCollectionItems
         // --------
-        selectFunction: function (e) {
+        selectFunction: function (e, discardUnsavedChanges) {
+            var _this = this;
+            var args = Array.prototype.slice.call(arguments);
             var t = e.target;
             // Set local currentCollection var
             var c = this.collections[t.selectedIndex];
+            
+            // Check for unsaved changes in the selected item
+            // before switching collections
+            var view = cosmo.view[cosmo.app.pim.currentView];
+            var sel = view.canvasInstance.getSelectedItem();
+            if (!discardUnsavedChanges && sel) {
+                args.push(true);
+                var discardFunc = function () {
+                    _this.selectFunction.apply(_this, args);
+                }
+                var resetFunc = function () {
+                    t.selectedIndex = _this._origSelectIndex;
+                };
+                if (!cosmo.view.handleUnsavedChanges(sel,
+                    discardFunc, resetFunc, resetFunc)) {
+                    return false;
+                }
+            }
+
             this.currentCollection = c;
+            
             cosmo.app.pim.currentCollection = c;
             // Publish this through a setTimeout call so that the
             // select box doesn't just sit open while waiting for
@@ -64,6 +87,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }); };
             loading.show();
             setTimeout(f, 0);
+            this._origSelectIndex = t.selectedIndex;
         },
 
         strings: {

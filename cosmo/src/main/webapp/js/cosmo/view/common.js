@@ -200,66 +200,77 @@ cosmo.view.canvasBase = new function () {
         var id = this.selectedItemIdRegistry[key];
         return id;
     };
-    this.handleUnsavedChanges = function (origSelection,
-        recallParam, execContext) {
-        var converter = new cosmo.ui.DetailFormConverter(
-            origSelection.data);
-        var deltaAndError;
-        try {
-            deltaAndError = converter.createDelta();
-        } catch (e){
-            // This will happen if there was a problem in the createDelta
-            // function
-         	if (e instanceof cosmo.model.exception.DetailItemNotDeltaItemException){
-         	   // If the detail item wasn't the delta item it means the ui 
-               // is out of sync. We really can't do anything smart in this
-               // case, so just proceed with selecting the next item.
-               return true;
-            }
-        }
+};
 
-        // This will be populated if there
-        // was a validation error while creating
-        // the delta.
-        var error = deltaAndError[1];
-        var delta = deltaAndError[0];
-        if (error || delta.hasChanges()) {
-            // Cancel button -- just hide the dialog, do nothing
-            var cancel = cosmo.app.hideDialog;
-            // Throw out the changes and proceed to highlight the
-            // new item
-            var discard = function () {
-                cosmo.app.hideDialog();
-                // Re-call with explicit discard flag
-                execContext.handleSelectionChange.apply(
-                    execContext, [recallParam, true]);
-            };
-            // Save the changes
-            // FIXME: Should this continue on to select the new
-            // item, or not?
-            var save = function () {
-                var f = function () {
-                    dojo.event.topic.publish('/calEvent',
-                        { 'action': 'saveFromForm' });
-                }
-                // Hide the dialog first, wait for return value to
-                // avoid contention for the use of the dialog box
-                if (cosmo.app.hideDialog()) {
-                    setTimeout(f, 0);
-                }
-            };
-            // Show the 'unsaved changes' dialog, with the appropriate
-            // actions tied to each of the buttons
-            cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
-                cancelFunc: cancel,
-                discardFunc: discard,
-                saveFunc: save }));
-            return false;
-        }
-        else {
+cosmo.view.handleUnsavedChanges = function (origSelection,
+    discardFunc, cancelPreHook, savePreHook) {
+    var converter = new cosmo.ui.DetailFormConverter(
+        origSelection.data);
+    var deltaAndError;
+    try {
+        deltaAndError = converter.createDelta();
+    } catch (e){
+        // This will happen if there was a problem in the createDelta
+        // function
+        if (e instanceof cosmo.model.exception.DetailItemNotDeltaItemException) {
+            // If the detail item wasn't the delta item it means the ui
+            // is out of sync. We really can't do anything smart in this
+            // case, so just proceed with selecting the next item.
             return true;
         }
-    };
+    }
+
+    // This will be populated if there
+    // was a validation error while creating
+    // the delta.
+    var error = deltaAndError[1];
+    var delta = deltaAndError[0];
+    if (error || delta.hasChanges()) {
+        // Cancel button -- just hide the dialog, do nothing
+        var cancel = function () {
+            // Execute any pre-cancel code passed in
+            if (typeof cancelPreHook == 'function') {
+                cancelPreHook();
+            }
+            cosmo.app.hideDialog();
+        }
+        // Throw out the changes and proceed to highlight the
+        // new item
+        var discard = function () {
+            cosmo.app.hideDialog();
+            // Execute the discard function passed -- likely
+            // re-invoking the original calling method with an
+            // added 'true' flag for blowing by the unsaved-changes
+            // check
+            discardFunc();
+        };
+        // Save the changes
+        var save = function () {
+            var f = function () {
+                // Execute any pre-save code passed in
+                if (typeof savePreHook == 'function') {
+                    savePreHook();
+                }
+                dojo.event.topic.publish('/calEvent',
+                    { 'action': 'saveFromForm' });
+            }
+            // Hide the dialog first, wait for return value to
+            // avoid contention for the use of the dialog box
+            if (cosmo.app.hideDialog()) {
+                setTimeout(f, 0);
+            }
+        };
+        // Show the 'unsaved changes' dialog, with the appropriate
+        // actions tied to each of the buttons
+        cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
+            cancelFunc: cancel,
+            discardFunc: discard,
+            saveFunc: save }));
+        return false;
+    }
+    else {
+        return true;
+    }
 };
 
 

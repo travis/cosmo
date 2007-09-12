@@ -156,6 +156,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
     };
     this.handleSelectionChange = function (p, discardUnsavedChanges) {
+        var args = Array.prototype.slice.call(arguments);
         var writeable = cosmo.app.pim.currentCollection.isWriteable();
         // Original selection
         var origSelection = self.getSelectedItem();
@@ -170,7 +171,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
             // callback methods for the buttons in the dialog, hence
             // passing the 'self' param below
             if (!discardUnsavedChanges && origSelection && writeable) {
-                if (!self.handleUnsavedChanges(origSelection, p, self)) {
+                // Add the explicit ignore flag to the args
+                args.push(true);
+                // Discarding just re-invokes this call with the ignore flag
+                var discardFunc = function () {
+                    self.handleSelectionChange.apply(self, args);
+                };
+                if (!cosmo.view.handleUnsavedChanges(origSelection, discardFunc)) {
                     return false;
                 }
             }
@@ -269,11 +276,17 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + '">';
             if (display.task) {
-                r += '<div style="margin: 0px 2px; width: ' + taskIconStyle.width +
+                var backgroundStyle = (dojo.render.html.safari? 
+                                       ('background-position-x: ' + taskIconStyle.backgroundPositionX + '; background-position-y: ' +
+                                        taskIconStyle.backgroundPositionY) :
+                                       ('background-position: ' + taskIconStyle.backgroundPosition))  + ";";
+                    
+                r += '<div id="foo" style="margin: 0px 2px; width: ' + taskIconStyle.width +
                     '; height: ' + taskIconStyle.height +
                     '; font-size: 1px; background-image: ' +
-                    taskIconStyle.backgroundImage + '; background-position: ' +
-                    taskIconStyle.backgroundPosition + '">&nbsp;</div>';
+                    taskIconStyle.backgroundImage + ';' + 
+                    backgroundStyle + 
+                    '">&nbsp;</div>';
             }
             r += '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.title) + '</td>';

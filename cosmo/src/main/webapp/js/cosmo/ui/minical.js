@@ -713,7 +713,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         // We need to refactor this to allow date params
         // to be passed to the initial loading of the cal view
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
-            cosmo.view.names.CAL, true)
+            { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection',
@@ -742,7 +742,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         // We need to refactor this to allow date params
         // to be passed to the initial loading of the cal view
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
-            cosmo.view.names.CAL, true)
+            { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection',
@@ -777,7 +777,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             // We need to refactor this to allow date params
             // to be passed to the initial loading of the cal view
             cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
-                cosmo.view.names.CAL, true)
+                { viewName: cosmo.view.names.CAL, noLoad: true });
             var f = function () {
                 dojo.event.topic.publish('/calEvent', {
                     action: 'loadCollection',

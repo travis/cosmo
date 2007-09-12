@@ -211,64 +211,18 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         // Check for unsaved changes pre-move/resize -- blow by this
         // when re-called with explicit 'discard changes'
         if (!discardUnsavedChanges) {
-            var converter = new cosmo.ui.DetailFormConverter(item.data);
-            try {            
-                var deltaAndError = converter.createDelta();
-            } catch (e){
-                // This will happen if there was a problem in the createDelta
-                // function
-             	if (e instanceof cosmo.model.exception.DetailItemNotDeltaItemException){
-             	   // If the detail item wasn't the delta item it means the ui 
-                   // is out of sync. We really can't do anything smart in this
-                   // case, so just proceed with selecting the next item.
-                   return true;
-                }
-            }
-            var error = deltaAndError[1];
-            var delta = deltaAndError[0];
-            if (error || delta.hasChanges()) {
-                // Cancel button -- just hide the dialog, do nothing
-                var cancel = function () {
-                    item.lozenge.restore(item);
-                    cosmo.app.hideDialog();
-                };
-                // Throw out the changes and proceed to update the
-                // item with this drop
-                var discard = function () {
-                    // Re-call with explicit discard flag
-                    // Hide the dialog first, wait for return value to
-                    // avoid contention for the use of the dialog box
-                    // (re-calling will spawn the recurrrence or error
-                    // dialog box in some cases)
-                    if (cosmo.app.hideDialog()) {
-                        self.doUpdate.apply(self, [true]);
-                    }
-                };
-                // Restore the item to its original position
-                // and save the changes
-                // FIXME: You might argue that the ideal behavior
-                // would be to apply the drag changes at the same
-                // time -- that's technically very difficult though
-                var save = function () {
-                    var f = function () {
-                        item.lozenge.restore(item);
-                        dojo.event.topic.publish('/calEvent',
-                            { 'action': 'saveFromForm' });
-                    }
-                    // Hide the dialog first, wait for return value to
-                    // avoid contention for the use of the dialog box
-                    if (cosmo.app.hideDialog()) {
-                        setTimeout(f, 0);
-                    }
-                };
-                // Show the 'unsaved changes' dialog, with the appropriate
-                // actions tied to each of the buttons
-                cosmo.app.showDialog(cosmo.view.unsavedChangesDialog.getProps({
-                    cancelFunc: cancel,
-                    discardFunc: discard,
-                    saveFunc: save }));
+            // Discarding just re-invokes this call with the ignore flag
+            var discardFunc = function () {
+                self.doUpdate.apply(self, [true]);
+            };
+            // Restoring the dragged lozenge is a pre-save
+            // and pre-cancel hook
+            var restoreFunc = function () {
+                item.lozenge.restore(item);
+            };
+            if (!cosmo.view.handleUnsavedChanges(
+                item, discardFunc, restoreFunc, restoreFunc)) {
                 return false;
-
             }
         }
 

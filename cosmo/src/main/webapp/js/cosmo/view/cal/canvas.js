@@ -555,6 +555,7 @@ cosmo.view.cal.canvas = new function () {
         }
     };
     this.handleSelectionChange = function (id, discardUnsavedChanges) {
+        var args = Array.prototype.slice.call(arguments);
         var s = getIndexEvent(id);
         var item = cosmo.view.cal.itemRegistry.getItem(s);
         // If this object is currently in 'processing' state, discard any input
@@ -580,7 +581,13 @@ cosmo.view.cal.canvas = new function () {
                 origSelection &&
                 !origSelection.lozenge.getInputDisabled() && // Ignore if orig. item is already in 'processing' state
                 writeable) {
-                if (!self.handleUnsavedChanges(origSelection, item.id, self)) {
+                // Add the explicit ignore flag to the args
+                args.push(true);
+                // Discarding just re-invokes this call with the ignore flag
+                var discardFunc = function () {
+                    self.handleSelectionChange.apply(self, args);
+                };
+                if (!cosmo.view.handleUnsavedChanges(origSelection, discardFunc)) {
                     return false;
                 }
             }

@@ -18,6 +18,7 @@ package org.osaf.cosmo.dav.acl.resource;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
+import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
@@ -148,7 +150,11 @@ public class DavUserPrincipal extends DavResourceBase
     }
 
     public DavResourceIterator getMembers() {
-        throw new UnsupportedOperationException();
+        // while it would be ideal to throw an UnsupportedOperationException,
+        // MultiStatus tries to add a MultiStatusResponse for every member
+        // of a DavResource regardless of whether or not it's a collection,
+        // so we need to return an empty iterator.
+        return new DavResourceIteratorImpl(new ArrayList());
     }
 
     public void removeMember(org.apache.jackrabbit.webdav.DavResource member)

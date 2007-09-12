@@ -120,7 +120,11 @@ public abstract class DavContentBase extends DavItemResourceBase
     }
 
     public DavResourceIterator getMembers() {
-        throw new UnsupportedOperationException();
+        // while it would be ideal to throw an UnsupportedOperationException,
+        // MultiStatus tries to add a MultiStatusResponse for every member
+        // of a DavResource regardless of whether or not it's a collection,
+        // so we need to return an empty iterator.
+        return new DavResourceIteratorImpl(new ArrayList());
     }
 
     public void removeMember(org.apache.jackrabbit.webdav.DavResource member)

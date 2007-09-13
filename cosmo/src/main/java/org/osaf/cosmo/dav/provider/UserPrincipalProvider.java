@@ -47,13 +47,6 @@ public class UserPrincipalProvider extends BaseProvider {
     }
 
     // DavProvider methods
-    
-    public void proppatch(DavRequest request,
-                          DavResponse response,
-                          DavResource resource)
-        throws DavException, IOException {
-        throw new MethodNotAllowedException("PROPPATCH not allowed for user principal");
-    }
 
     public void put(DavRequest request,
                     DavResponse response,

@@ -45,6 +45,8 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.ForbiddenException;
+import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.acl.AclConstants;
 import org.osaf.cosmo.dav.acl.property.AlternateUriSet;
 import org.osaf.cosmo.dav.acl.property.GroupMembership;
@@ -104,7 +106,7 @@ public class DavUserPrincipal extends DavResourceBase
     // Jackrabbit DavResource
 
     public String getSupportedMethods() {
-        return "OPTIONS, GET, HEAD, TRACE, PROPFIND";
+        return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH";
     }
 
     public boolean isCollection() {
@@ -162,16 +164,6 @@ public class DavUserPrincipal extends DavResourceBase
         throw new UnsupportedOperationException();
     }
 
-    public void setProperty(org.apache.jackrabbit.webdav.property.DavProperty property)
-        throws org.apache.jackrabbit.webdav.DavException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeProperty(DavPropertyName propertyName)
-        throws org.apache.jackrabbit.webdav.DavException {
-        throw new UnsupportedOperationException();
-    }
-
     public DavResource getCollection() {
         try {
             return getParent();
@@ -203,13 +195,6 @@ public class DavUserPrincipal extends DavResourceBase
         }
 
         return parent;
-    }
-
-    public MultiStatusResponse
-        updateProperties(DavPropertySet setProperties,
-                         DavPropertyNameSet removePropertyNames)
-        throws DavException {
-        throw new UnsupportedOperationException();
     }
 
     public Report getReport(ReportInfo reportInfo)
@@ -244,12 +229,12 @@ public class DavUserPrincipal extends DavResourceBase
 
     protected void setLiveProperty(DavProperty property)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ProtectedPropertyModificationException(property.getName());
     }
 
     protected void removeLiveProperty(DavPropertyName name)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ProtectedPropertyModificationException(name);
     }
 
     protected void loadDeadProperties(DavPropertySet properties) {
@@ -257,11 +242,11 @@ public class DavUserPrincipal extends DavResourceBase
 
     protected void setDeadProperty(DavProperty property)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ForbiddenException("Dead properties are not supported on this resource");
     }
 
     protected void removeDeadProperty(DavPropertyName name)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ForbiddenException("Dead properties are not supported on this resource");
     }
 }

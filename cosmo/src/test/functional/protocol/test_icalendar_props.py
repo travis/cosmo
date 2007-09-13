@@ -53,7 +53,7 @@ ATTACHMENT:http://www.example.com/test.jpg
 END:VEVENT
 END:VCALENDAR"""
 
-    client.put('%s/%s/attachement.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
+    client.put('%s/%s/attachement.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar' })
     assert client.response.status == 201
     
 def test_vavailability():
@@ -104,7 +104,7 @@ END:AVAILABLE
 END:VAVAILABILITY
 END:VCALENDAR"""
 
-    client.put('%s/%s/vavailability.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
+    client.put('%s/%s/vavailability.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201
     
     
@@ -140,7 +140,7 @@ UID:95C0F1E7-F691-42DD-8889-4E0B800B9778-3
 END:VEVENT
 END:VCALENDAR"""
     
-    client.put('%s/%s/status1.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
+    client.put('%s/%s/status1.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201
     
     ics = """BEGIN:VCALENDAR
@@ -155,7 +155,7 @@ UID:961FBB7850529AAA6195464A--2345@Cyrus-Daboo.local
 END:VTODO
 END:VCALENDAR"""
 
-    client.put('%s/%s/status2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
+    client.put('%s/%s/status2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201
     
 def test_sunbird_allday():
@@ -194,7 +194,7 @@ END:STANDARD
 END:VTIMEZONE
 END:VCALENDAR"""
     
-    client.put('%s/%s/sunbird.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
+    client.put('%s/%s/sunbird.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201
     
 def test_sunbird_2():
@@ -235,7 +235,7 @@ END:DAYLIGHT
 END:VTIMEZONE
 END:VCALENDAR"""
 
-    client.put('%s/%s/sunbird2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics)
+    client.put('%s/%s/sunbird2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201
 
     

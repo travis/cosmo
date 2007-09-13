@@ -27,11 +27,11 @@ import org.osaf.cosmo.dav.ExistsException;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 
 /**
- * Test case for <code>CollectionProvider</code>.
+ * Test case for <code>MKCOL</code>.
  */
-public class CollectionProviderTest extends BaseDavTestCase {
+public class CreateCollectionTest extends BaseDavTestCase {
     private static final Log log =
-        LogFactory.getLog(CollectionProviderTest.class);
+        LogFactory.getLog(CreateCollectionTest.class);
 
     /**
      * <blockquote>

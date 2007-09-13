@@ -24,6 +24,7 @@ import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.DavTestContext;
 import org.osaf.cosmo.dav.ExistsException;
+import org.osaf.cosmo.dav.UnsupportedMediaTypeException;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 
 /**
@@ -68,6 +69,9 @@ public class CreateCollectionTest extends BaseDavTestCase {
 
         provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
 
+        assertEquals("response status not 201", 201,
+                     ctx.getHttpResponse().getStatus());
+
         DavCollection home = testHelper.initializeHomeResource();
         assertNotNull("member not found in parent collection",
                       testHelper.findMember(home, "add-member"));
@@ -98,6 +102,9 @@ public class CreateCollectionTest extends BaseDavTestCase {
      * When MKCOL is invoked without a request body, the newly created
      * collection SHOULD have no members.
      * </blockquote>
+     * <p>
+     * The server does not any default members to newly created collections.
+     * </p>
      */
     public void testNoBody() throws Exception {
          CollectionProvider provider = createCollectionProvider();
@@ -106,10 +113,35 @@ public class CreateCollectionTest extends BaseDavTestCase {
 
          provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
 
-         DavCollection home = testHelper.initializeHomeResource();
          assertEquals("found unexpected members in new collection", 0,
                        member.getMembers().size());
     }
+
+    /**
+     * <blockquote>
+     * A MKCOL request message may contain a message body.  The precise
+     * behavior of a MKCOL request when the body is present is undefined,
+     * but limited to creating collections, members of a collection, bodies
+     * of members, and properties on the collections or members.  If the
+     * server receives a MKCOL request entity type it does not support or
+     * understand, it MUST respond with a 415 (Unsupported Media Type)
+     * status code.
+     * </blockquote>
+     * <p>
+     * The server does not support bodies for <code>MKCOL</code> requests.
+     * </p>
+     */
+    public void testWithBody() throws Exception {
+        CollectionProvider provider = createCollectionProvider();
+        DavTestContext ctx = testHelper.createTestContext();
+        ctx.setTextRequestBody("this is the request body");
+        DavCollection member = createTestMember("with-body");
+
+        try {
+            provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
+            fail("mkcol succeeded even with request body");
+        } catch (UnsupportedMediaTypeException e) {}
+     }
 
     // working provider methods require a security context so that owner
     // info can be set on created resources, etc

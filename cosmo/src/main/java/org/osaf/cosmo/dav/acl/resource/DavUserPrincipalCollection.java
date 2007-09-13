@@ -49,6 +49,8 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.ForbiddenException;
+import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.acl.report.PrincipalMatchReport;
 import org.osaf.cosmo.dav.acl.report.PrincipalPropertySearchReport;
@@ -80,6 +82,10 @@ public class DavUserPrincipalCollection extends DavResourceBase
     private ArrayList<DavUserPrincipal> members;
 
     static {
+        registerLiveProperty(DavPropertyName.DISPLAYNAME);
+        registerLiveProperty(DavPropertyName.ISCOLLECTION);
+        registerLiveProperty(DavPropertyName.RESOURCETYPE);
+
         REPORT_TYPES.add(PrincipalMatchReport.REPORT_TYPE_PRINCIPAL_MATCH);
         REPORT_TYPES.add(PrincipalPropertySearchReport.
                          REPORT_TYPE_PRINCIPAL_PROPERTY_SEARCH);
@@ -97,7 +103,7 @@ public class DavUserPrincipalCollection extends DavResourceBase
     // Jackrabbit DavResource
 
     public String getSupportedMethods() {
-        return "OPTIONS, GET, HEAD, TRACE, PROPFIND, REPORT";
+        return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH, REPORT";
     }
 
     public boolean isCollection() {
@@ -212,12 +218,12 @@ public class DavUserPrincipalCollection extends DavResourceBase
 
     protected void setLiveProperty(DavProperty property)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ProtectedPropertyModificationException(property.getName());
     }
 
     protected void removeLiveProperty(DavPropertyName name)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ProtectedPropertyModificationException(name);
     }
 
     protected void loadDeadProperties(DavPropertySet properties) {
@@ -225,12 +231,12 @@ public class DavUserPrincipalCollection extends DavResourceBase
 
     protected void setDeadProperty(DavProperty property)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ForbiddenException("Dead properties are not supported on this collection");
     }
 
     protected void removeDeadProperty(DavPropertyName name)
         throws DavException {
-        throw new UnsupportedOperationException();
+        throw new ForbiddenException("Dead properties are not supported on this collection");
     }
 
     private DavUserPrincipal memberToResource(User user)

@@ -47,13 +47,6 @@ public class UserPrincipalCollectionProvider extends CollectionProvider {
     }
 
     // DavProvider methods
-    
-    public void proppatch(DavRequest request,
-                          DavResponse response,
-                          DavResource resource)
-        throws DavException, IOException {
-        throw new MethodNotAllowedException("PROPPATCH not allowed for user principal collection");
-    }
 
     public void put(DavRequest request,
                     DavResponse response,

@@ -314,9 +314,11 @@ public class StandardDavRequest extends WebdavRequestImpl
             if (prop == null)
                 throw new BadRequestException("Expected " + QN_PROP + " child of " + QN_SET);
             i = DomUtil.getChildren(prop);
-            while (i.hasNext())
-                proppatchSet.add(StandardDavProperty.
-                                 createFromXml(i.nextElement()));
+            while (i.hasNext()) {
+                StandardDavProperty p =
+                    StandardDavProperty.createFromXml(i.nextElement());
+                proppatchSet.add(p);
+            }
         }
 
         proppatchRemove = new DavPropertyNameSet();

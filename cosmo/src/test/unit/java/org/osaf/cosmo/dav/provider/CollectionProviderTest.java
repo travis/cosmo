@@ -19,12 +19,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.BaseDavTestCase;
+import org.osaf.cosmo.dav.ConflictException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.DavTestContext;
 import org.osaf.cosmo.dav.ExistsException;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
-import org.osaf.cosmo.model.CollectionItem;
 
 /**
  * Test case for <code>CollectionProvider</code>.
@@ -40,15 +40,12 @@ public class CollectionProviderTest extends BaseDavTestCase {
      * </blockquote>
      */
     public void testResourceExists() throws Exception {
-        DavCollectionBase home = (DavCollectionBase)
-            testHelper.initializeHomeResource();
         DavCollectionBase dummy =
-            new DavCollectionBase((CollectionItem) home.getItem(),
-                                  home.getResourceLocator(),
+            new DavCollectionBase(testHelper.getHomeCollection(),
+                                  testHelper.getHomeLocator(),
                                   testHelper.getResourceFactory());
 
-        CollectionProvider provider =
-            new CollectionProvider(testHelper.getResourceFactory());
+        CollectionProvider provider = createCollectionProvider();
         DavTestContext ctx = testHelper.createTestContext();
 
         try {
@@ -68,13 +65,12 @@ public class CollectionProviderTest extends BaseDavTestCase {
      * for <code>MKCOL</code> against an existing resource.
      * </p>
      */
-    public void testCollectionAddMember() throws Exception {
+    public void testAddMember() throws Exception {
         DavCollection home = testHelper.initializeHomeResource();
         DavCollectionBase member =
             createTestMember(home.getResourceLocator(), "member");
 
-        CollectionProvider provider =
-            new CollectionProvider(testHelper.getResourceFactory());
+        CollectionProvider provider = createCollectionProvider();
         DavTestContext ctx = testHelper.createTestContext();
         provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
 
@@ -82,11 +78,37 @@ public class CollectionProviderTest extends BaseDavTestCase {
                       testHelper.findMember(home, "member"));
     }
 
+    /**
+     * <blockquote>
+     * If no such ancestor exists, the method MUST fail.  When the MKCOL
+     * operation creates a new collection resource, all ancestors MUST
+     * already exist, or the method MUST fail with a 409 (Conflict) status
+     * code.  For example, if a request to create collection /a/b/c/d/ is
+     * made, and /a/b/c/ does not exist, the request must fail.
+     * </blockquote>
+     */
+    public void testAddMemberAtBogusLocation() throws Exception {
+        DavResourceLocator bogus = testHelper.createLocator("/a/b/c/d");
+        DavCollectionBase member = createTestMember(bogus, "member");
+
+        CollectionProvider provider = createCollectionProvider();
+        DavTestContext ctx = testHelper.createTestContext();
+
+        try {
+            provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
+            fail("mkcol succeeded when location is bogus");
+        } catch (ConflictException e) {}
+    }
+
     // working provider methods require a security context so that owner
     // info can be set on created resources, etc
     protected void setUp() throws Exception {
         super.setUp();
         testHelper.logIn();
+    }
+
+    private CollectionProvider createCollectionProvider() {
+        return new CollectionProvider(testHelper.getResourceFactory());
     }
 
     private DavCollectionBase createTestMember(DavResourceLocator locator,

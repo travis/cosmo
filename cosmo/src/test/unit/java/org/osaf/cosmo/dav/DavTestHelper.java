@@ -94,6 +94,11 @@ public class DavTestHelper extends MockHelper
         return new DavTestContext(locatorFactory);
     }
 
+    public DavResourceLocator createLocator(String path) {
+        return locatorFactory.
+            createResourceLocator(homeLocator, UriTemplate.escapePath(path));
+    }
+
     public DavResourceLocator createMemberLocator(DavResourceLocator locator,
                                                   String segment) {
         String path = locator.getPath() + "/" + UriTemplate.escape(segment);

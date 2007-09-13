@@ -310,7 +310,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             throw new cosmo.service.translators.
                ParseError("Could not find content element for entry " + (i+1));
         }
-        var content = cosmo.util.encoding.fromBase64(cosmo.util.html.getElementTextContent(contentEl));
+        var content = cosmo.util.html.getElementTextContent(contentEl);
         
         var recordSets = dojo.json.evalJson(content);
 
@@ -420,7 +420,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                    ParseError("Could not find content element for entry " + (i+1));
             }
 
-            var content = cosmo.util.encoding.fromBase64(cosmo.util.html.getElementTextContent(contentElement));
+            var content = cosmo.util.html.getElementTextContent(contentElement);
 
             var item;
             // If we have a second part to the uid, this entry is a
@@ -616,7 +616,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                  '<id>urn:uuid:', dojo.string.escapeXml(this.getUid(object)), '</id>',
                  '<updated>', dojo.string.escapeXml(dojo.date.toRfc3339(new Date())), '</updated>',
                  '<author><name>', dojo.string.escapeXml(cosmo.util.auth.getUsername()), '</name></author>',
-                 '<content type="application/eim+json">', cosmo.util.encoding.toBase64(dojo.json.serialize(this.objectToRecordSet(object))), '</content>',
+                 '<content type="text/eim+json"><![CDATA[', dojo.json.serialize(this.objectToRecordSet(object)), ']]></content>',
                  '</entry>'].join("");
     },
     

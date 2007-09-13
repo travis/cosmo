@@ -17,10 +17,7 @@ package org.osaf.cosmo.atom.processor;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,10 +46,7 @@ public class JsonProcessor extends BaseEimProcessor {
         throws ValidationException, ProcessorException {
         JsonStreamReader reader = null;
         try {
-            byte[] encoded = IOUtils.toString(content).getBytes("UTF-8");
-            String decoded = new String(Base64.decodeBase64(encoded), "UTF-8");
-
-            reader = new JsonStreamReader(new StringReader(decoded));
+            reader = new JsonStreamReader(content);
             EimRecordSet recordset = reader.nextRecordSet();
             if (recordset == null)
                 throw new ValidationException("No recordset read from stream");

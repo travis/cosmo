@@ -21,7 +21,7 @@ package org.osaf.cosmo.eim.json;
  */
 public interface JsonConstants {
 
-    public static final String MEDIA_TYPE_EIM_JSON = "application/eim+json";
+    public static final String MEDIA_TYPE_EIM_JSON = "text/eim+json";
 
     public static final String KEY_UUID = "uuid";
     public static final String KEY_DELETED = "deleted";

@@ -196,7 +196,7 @@ EOF
       <id>urn:uuid:#{uid}</id>
       <updated>2007-06-05T10:58:15-07:00</updated>
       <author><name>#{random_string}</name></author>
-      <content type="application/eim+json">{"uuid":"#{uid}",
+      <content type="text/eim+json">{"uuid":"#{uid}",
       "records":{"item":{"prefix":"item","ns":"http://osafoundation.org/eim/item/0",
       "key":{"uuid":["text","#{uid}"]},"fields":{"title":["text","#{random_string}"]}},
       "note":{"prefix":"note","ns":"http://osafoundation.org/eim/note/0",

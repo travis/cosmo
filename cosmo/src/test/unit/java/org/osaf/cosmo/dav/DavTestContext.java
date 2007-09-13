@@ -59,4 +59,15 @@ public class DavTestContext {
     public DavResponse getDavResponse() {
         return davResponse;
     }
+
+    public void setTextRequestBody(String text) {
+        try {
+            httpRequest.setContent(text.getBytes("UTF-8"));
+            httpRequest.setContentType("text/plain; charset=UTF-8");
+            httpRequest.addHeader("Content-Type",
+                                  httpRequest.getContentType());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

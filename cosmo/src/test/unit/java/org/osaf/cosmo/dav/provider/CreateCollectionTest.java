@@ -39,17 +39,13 @@ public class CreateCollectionTest extends BaseDavTestCase {
      * MUST fail.
      * </blockquote>
      */
-    public void testResourceExists() throws Exception {
-        DavCollectionBase dummy =
-            new DavCollectionBase(testHelper.getHomeCollection(),
-                                  testHelper.getHomeLocator(),
-                                  testHelper.getResourceFactory());
-
+    public void testExists() throws Exception { 
         CollectionProvider provider = createCollectionProvider();
         DavTestContext ctx = testHelper.createTestContext();
+        DavCollection member = testHelper.initializeHomeResource();
 
         try {
-            provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), dummy);
+            provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
             fail("mkcol succeeded when resource already exists");
         } catch (ExistsException e) {}
     }
@@ -66,16 +62,15 @@ public class CreateCollectionTest extends BaseDavTestCase {
      * </p>
      */
     public void testAddMember() throws Exception {
-        DavCollection home = testHelper.initializeHomeResource();
-        DavCollectionBase member =
-            createTestMember(home.getResourceLocator(), "member");
-
         CollectionProvider provider = createCollectionProvider();
         DavTestContext ctx = testHelper.createTestContext();
+        DavCollection member = createTestMember("add-member");
+
         provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
 
+        DavCollection home = testHelper.initializeHomeResource();
         assertNotNull("member not found in parent collection",
-                      testHelper.findMember(home, "member"));
+                      testHelper.findMember(home, "add-member"));
     }
 
     /**
@@ -87,17 +82,33 @@ public class CreateCollectionTest extends BaseDavTestCase {
      * made, and /a/b/c/ does not exist, the request must fail.
      * </blockquote>
      */
-    public void testAddMemberAtBogusLocation() throws Exception {
-        DavResourceLocator bogus = testHelper.createLocator("/a/b/c/d");
-        DavCollectionBase member = createTestMember(bogus, "member");
-
+    public void testAddMemberAtBogusLocation() throws Exception { 
         CollectionProvider provider = createCollectionProvider();
         DavTestContext ctx = testHelper.createTestContext();
+        DavCollection member = createTestMember("/a/b/c/d", "member");
 
         try {
             provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
             fail("mkcol succeeded when location is bogus");
         } catch (ConflictException e) {}
+    }
+
+    /**
+     * <blockquote>
+     * When MKCOL is invoked without a request body, the newly created
+     * collection SHOULD have no members.
+     * </blockquote>
+     */
+    public void testNoBody() throws Exception {
+         CollectionProvider provider = createCollectionProvider();
+         DavTestContext ctx = testHelper.createTestContext();
+         DavCollection member = createTestMember("no-body");
+
+         provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
+
+         DavCollection home = testHelper.initializeHomeResource();
+         assertEquals("found unexpected members in new collection", 0,
+                       member.getMembers().size());
     }
 
     // working provider methods require a security context so that owner
@@ -111,8 +122,19 @@ public class CreateCollectionTest extends BaseDavTestCase {
         return new CollectionProvider(testHelper.getResourceFactory());
     }
 
-    private DavCollectionBase createTestMember(DavResourceLocator locator,
-                                               String segment)
+    private DavCollection createTestMember(String segment)
+        throws Exception {
+        return createTestMember(testHelper.getHomeLocator(), segment);
+    }
+
+    private DavCollection createTestMember(String path,
+                                           String segment)
+        throws Exception {
+        return createTestMember(testHelper.createLocator(path), segment);
+    }
+
+    private DavCollection createTestMember(DavResourceLocator locator,
+                                           String segment)
         throws Exception {
         DavResourceLocator memberLocator =
             testHelper.createMemberLocator(locator, segment);

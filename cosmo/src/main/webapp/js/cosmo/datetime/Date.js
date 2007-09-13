@@ -29,6 +29,7 @@
  */
 dojo.provide("cosmo.datetime.Date");
 
+dojo.require("dojo.date.serialize");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.datetime");
@@ -339,7 +340,7 @@ cosmo.datetime.Date.prototype.getUserPrefTimezoneOffsetForGivenDate = function(d
     var offsetMin = 0;
     // For now, punt and go with the browser's offset for that date
         offsetMin = cosmo.datetime.Date.getBrowserTimezoneOffset(
-            date.getYear(), date.getMonth(), date.getDate(),
+            date.getFullYear(), date.getMonth(), date.getDate(),
             date.getHours(), date.getMinutes(), date.getSeconds());
     return offsetMin;
     
@@ -595,6 +596,37 @@ cosmo.datetime.Date.add = function(dt, interv, incr) {
         throw('dt is not a usable Date object.');
     }
 }
+
+cosmo.datetime.Date.monkeyPatchDojo = function(){
+    var origFunc = dojo.date.setIso8601Time;
+    var newFunc = function(dateObject, formattedString){
+        if (dojo.string.endsWith(formattedString, "z", true)){
+           formattedString = formattedString.substr(0, formattedString.length-1 );
+            //mostly copied from dojo.date.setIso8601Time
+            var regexp = "^([0-9]{2})(:?([0-9]{2})(:?([0-9]{2})(\.([0-9]+))?)?)?$";
+            d = formattedString.match(new RegExp(regexp));
+            if(!d){
+                dojo.debug("invalid time string: " + formattedString);
+                return null; // null
+            }
+            var hours = d[1];
+            var mins = Number((d[3]) ? d[3] : 0);
+            var secs = (d[5]) ? d[5] : 0;
+            var ms = d[7] ? (Number("0." + d[7]) * 1000) : 0;
+        
+            //changes are here:
+            dateObject.setUTCHours(hours);
+            dateObject.setUTCMinutes(mins);
+            dateObject.setUTCSeconds(secs);
+            dateObject.setUTCMilliseconds(ms);
+            return dateObject;            
+        } else {
+            return origFunc.apply(this, arguments);
+        }
+    }
+    dojo.date.setIso8601Time = newFunc;
+}
+cosmo.datetime.Date.monkeyPatchDojo();
 
 cosmo.util.debug.aliasToDeprecatedFuncion(
     cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");

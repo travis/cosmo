@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.BaseDavTestCase;
+import org.osaf.cosmo.dav.DavCollection;
+import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.DavTestContext;
 import org.osaf.cosmo.dav.ExistsException;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
@@ -32,12 +34,12 @@ public class CollectionProviderTest extends BaseDavTestCase {
         LogFactory.getLog(CollectionProviderTest.class);
 
     /**
-      * <blockquote>
+     * <blockquote>
      * If the Request-URI is already mapped to a resource, then the MKCOL
      * MUST fail.
      * </blockquote>
      */
-    public void testCollectionExists() throws Exception {
+    public void testResourceExists() throws Exception {
         DavCollectionBase home = (DavCollectionBase)
             testHelper.initializeHomeResource();
         DavCollectionBase dummy =
@@ -45,13 +47,54 @@ public class CollectionProviderTest extends BaseDavTestCase {
                                   home.getResourceLocator(),
                                   testHelper.getResourceFactory());
 
-        DavTestContext ctx = testHelper.createTestContext();
         CollectionProvider provider =
             new CollectionProvider(testHelper.getResourceFactory());
+        DavTestContext ctx = testHelper.createTestContext();
 
         try {
             provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), dummy);
-            fail("mkcol succeeded for existing collection");
+            fail("mkcol succeeded when resource already exists");
         } catch (ExistsException e) {}
+    }
+
+    /**
+     * <blockquote>
+     * During MKCOL processing, a server MUST make the Request-URI an internal
+     * member of its parent collection, unless the Request-URI is "/".
+     * </blockquote>
+     * <p>
+     * There is no need to test the final clause since root collections by
+     * definition always exist in Cosmo and are therefore covered by the test
+     * for <code>MKCOL</code> against an existing resource.
+     * </p>
+     */
+    public void testCollectionAddMember() throws Exception {
+        DavCollection home = testHelper.initializeHomeResource();
+        DavCollectionBase member =
+            createTestMember(home.getResourceLocator(), "member");
+
+        CollectionProvider provider =
+            new CollectionProvider(testHelper.getResourceFactory());
+        DavTestContext ctx = testHelper.createTestContext();
+        provider.mkcol(ctx.getDavRequest(), ctx.getDavResponse(), member);
+
+        assertNotNull("member not found in parent collection",
+                      testHelper.findMember(home, "member"));
+    }
+
+    // working provider methods require a security context so that owner
+    // info can be set on created resources, etc
+    protected void setUp() throws Exception {
+        super.setUp();
+        testHelper.logIn();
+    }
+
+    private DavCollectionBase createTestMember(DavResourceLocator locator,
+                                               String segment)
+        throws Exception {
+        DavResourceLocator memberLocator =
+            testHelper.createMemberLocator(locator, segment);
+        return new DavCollectionBase(memberLocator,
+                                     testHelper.getResourceFactory());
     }
 }

@@ -74,7 +74,7 @@ public class FreeBusyReportTest extends BaseDavTestCase
 
         DavHomeCollection home = testHelper.initializeHomeResource();
         DavCollection dc =
-            (DavCollection) testHelper.getMember(home, coll.getName());
+            (DavCollection) testHelper.findMember(home, coll.getName());
 
         FreeBusyReport report = new FreeBusyReport();
         report.init(dc, makeReportInfo("freebusy1.xml", DEPTH_1));

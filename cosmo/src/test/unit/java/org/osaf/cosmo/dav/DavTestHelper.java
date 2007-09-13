@@ -36,6 +36,7 @@ import org.osaf.cosmo.dav.StandardResourceFactory;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PathUtil;
+import org.osaf.cosmo.util.UriTemplate;
 
 public class DavTestHelper extends MockHelper
     implements ExtendedDavConstants {
@@ -82,18 +83,6 @@ public class DavTestHelper extends MockHelper
                                      resourceFactory);
     }
 
-    public DavResource getMember(DavCollection parent,
-                                 String name)
-        throws Exception {
-        for (DavResourceIterator i = parent.getMembers(); i.hasNext();) {
-            org.apache.jackrabbit.webdav.DavResource m = i.nextResource();
-            log.debug("member path: " + m.getResourcePath());
-            if (PathUtil.getBasename(m.getResourcePath()).equals(name))
-                return (DavResource) m;
-        }
-        return null;
-    }
-
     public DavUserPrincipal getPrincipal(User user)
         throws Exception {
         DavResourceLocator locator = locatorFactory.
@@ -103,5 +92,19 @@ public class DavTestHelper extends MockHelper
 
     public DavTestContext createTestContext() {
         return new DavTestContext(locatorFactory);
+    }
+
+    public DavResourceLocator createMemberLocator(DavResourceLocator locator,
+                                                  String segment) {
+        String path = locator.getPath() + "/" + UriTemplate.escape(segment);
+        return locatorFactory.createResourceLocator(locator, path);
+    }
+
+    public DavResource findMember(DavCollection collection,
+                                  String segment)
+        throws DavException {
+        String href = collection.getResourceLocator().getHref(false) + "/" +
+            UriTemplate.escape(segment);
+        return collection.findMember(href);
     }
 }

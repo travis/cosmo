@@ -43,7 +43,7 @@ public class DavCalendarCollectionTest extends BaseDavTestCase
         DavHomeCollection home = testHelper.initializeHomeResource();
 
         DavCollection dcc =
-            (DavCalendarCollection) testHelper.getMember(home, col.getName());
+            (DavCalendarCollection) testHelper.findMember(home, col.getName());
         
         SupportedCollationSet prop = 
             (SupportedCollationSet) dcc.getProperty(SUPPORTEDCOLLATIONSET);

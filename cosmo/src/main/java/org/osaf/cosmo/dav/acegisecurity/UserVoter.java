@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.acegisecurity.vote.UserResourceVoter;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
+import org.osaf.cosmo.http.Methods;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.UriTemplate;
@@ -49,23 +50,24 @@ public class UserVoter extends UserResourceVoter
 
         match = TEMPLATE_COLLECTION.match(path);
         if (match != null)
-            return voteOnCollection(match, authenticated);
+            return voteOnCollection(match, method, authenticated);
 
         match = TEMPLATE_ITEM.match(path);
         if (match != null)
-            return voteOnItemResource(match, authenticated);
+            return voteOnItemResource(match, method, authenticated);
 
         match = TEMPLATE_USERS.match(path);
         if (match != null)
-            return voteOnUserPrincipalCollection(match, authenticated);
+            return voteOnUserPrincipalCollection(match, method,
+                                                 authenticated);
 
         match = TEMPLATE_USER.match(path);
         if (match != null)
-            return voteOnUserPrincipalResource(match, authenticated);
+            return voteOnUserPrincipalResource(match, method, authenticated);
 
         match = TEMPLATE_HOME.match(path);
         if (match != null)
-            return voteOnHomeResource(match, authenticated);
+            return voteOnHomeResource(match, method, authenticated);
 
         if (log.isDebugEnabled())
             log.debug(path + " is not a dav path; allowing");
@@ -73,6 +75,7 @@ public class UserVoter extends UserResourceVoter
     }
 
     private int voteOnCollection(UriTemplate.Match match,
+                                 String method,
                                  User authenticated) {
         // the authenticated user and the user who owns the collection
         // represented by the URI need to match
@@ -90,6 +93,7 @@ public class UserVoter extends UserResourceVoter
     }
 
     private int voteOnItemResource(UriTemplate.Match match,
+                                   String method,
                                    User authenticated) {
         // the authenticated user and the user who owns the item
         // represented by the URI need to match
@@ -107,12 +111,16 @@ public class UserVoter extends UserResourceVoter
     }
 
     private int voteOnUserPrincipalCollection(UriTemplate.Match match,
+                                              String method,
                                               User authenticated) {
-        // allow anybody to access this principal collection
-        return ACCESS_GRANTED;
+        // allow anybody to read the principal collection, but abstain
+        // on write methods so that other voters have the opportunity to
+        // allow
+        return Methods.isReadMethod(method) ? ACCESS_GRANTED : ACCESS_ABSTAIN;
     }
 
     private int voteOnUserPrincipalResource(UriTemplate.Match match,
+                                            String method,
                                             User authenticated) {
         // the authenticated user and the user represented by the
         // principal URL need to match
@@ -129,6 +137,7 @@ public class UserVoter extends UserResourceVoter
     }
 
     private int voteOnHomeResource(UriTemplate.Match match,
+                                   String method,
                                    User authenticated) {
         // the authenticated user and the user who owns the home collection
         // represented by the URI need to match

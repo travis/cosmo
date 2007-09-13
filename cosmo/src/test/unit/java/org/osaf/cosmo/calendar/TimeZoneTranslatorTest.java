@@ -29,7 +29,7 @@ import net.fortuna.ical4j.model.component.VTimeZone;
  * Test TimeZoneTranslator
  */
 public class TimeZoneTranslatorTest extends TestCase {
-    protected String baseDir = "src/test/unit/resources/testdata/timezones/";
+    protected String baseDir = "src/test/unit/resources/testdata/testtimezones/";
     
     public void testTimeZoneTranslator() throws Exception {
         TimeZoneTranslator translator = TimeZoneTranslator.getInstance();
@@ -53,6 +53,15 @@ public class TimeZoneTranslatorTest extends TestCase {
         // bogus timezone should return null
         olsonTz = translator.translateToOlsonTz(tz4);
         Assert.assertNull(olsonTz);
+    }
+    
+    public void testTranslateLightningTZID() throws Exception {
+        TimeZoneTranslator translator = TimeZoneTranslator.getInstance();
+       
+        // test Lightning TZID format
+        TimeZone olsonTz = translator.translateToOlsonTz("/mozilla.org/20050126_1/America/Los_Angeles");
+        
+        Assert.assertEquals("America/Los_Angeles", olsonTz.getID());
     }
     
     private TimeZone getTimeZone(String filename) throws Exception {

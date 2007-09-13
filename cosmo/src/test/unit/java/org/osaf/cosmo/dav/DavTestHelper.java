@@ -100,4 +100,8 @@ public class DavTestHelper extends MockHelper
             createResourceLocator("", TEMPLATE_USER.bind(user.getUsername()));
         return new DavUserPrincipal(user, locator, resourceFactory);
     }
+
+    public DavTestContext createTestContext() {
+        return new DavTestContext(locatorFactory);
+    }
 }

@@ -38,6 +38,7 @@ import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
+import org.osaf.cosmo.dav.BadGatewayException;
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavRequest;
@@ -86,6 +87,7 @@ public class StandardDavRequest extends WebdavRequestImpl
     private boolean bufferRequestContent = false;
     private long bufferedContentLength = -1;
     private DavResourceLocatorFactory locatorFactory;
+    private DavResourceLocator locator;
 
     public StandardDavRequest(HttpServletRequest request,
                               DavResourceLocatorFactory factory) {
@@ -147,30 +149,60 @@ public class StandardDavRequest extends WebdavRequestImpl
     }
 
     public DavResourceLocator getResourceLocator() {
-        String path = getRequestURI();
-        String ctx = getContextPath();
-        if (path.startsWith(ctx))
-            path = path.substring(ctx.length());
-        return locatorFactory.createResourceLocator(getBaseUrl(), path);
+        if (locator == null) {
+            String path = getRequestURI();
+            String ctx = getContextPath();
+            if (path.startsWith(ctx))
+                path = path.substring(ctx.length());
+            locator = locatorFactory.
+                createResourceLocator(getBaseUrl(), path);
+        }
+        return locator;
     }
 
     public DavResourceLocator getDestinationResourceLocator()
         throws DavException {
         String destination = getHeader(HEADER_DESTINATION);
-        if (destination != null) {
-            try {
-                URI uri = new URI(destination);
-                if (uri.getAuthority() == null)
-                    throw new URISyntaxException(destination, "URI is not absolute", 0);
-                if (uri.getAuthority().equals(getHeader("Host")))
-                    destination = uri.getRawPath();
-            } catch (URISyntaxException e) {
-                throw new BadRequestException("Destination URI is not valid: " + e.getMessage());
-            }
-            String ctx = getContextPath();
-            if (destination.startsWith(ctx))
-                destination = destination.substring(ctx.length());
+        if (destination == null)
+            return null;
+
+        URI uri = null;
+        try {
+            uri = new URI(destination);
+        } catch (URISyntaxException e) {
+            throw new BadRequestException("Invalid destination URI: " + e.getMessage());
         }
+
+        // make sure that absolute URIs use the same scheme and authority
+        if (uri.getScheme() != null && ! uri.getScheme().equals(getScheme()))
+            throw new BadGatewayException("Absolute destination URI must specify same scheme as request URI");
+        if (uri.getAuthority() != null &&
+            ! uri.getAuthority().equals(getHeader("Host")))
+                throw new BadGatewayException("Absolute destination URI must specify same authority as request URI");
+
+        // make sure that uri-path is absolute
+        if (! uri.getRawPath().startsWith("/"))
+            throw new BadRequestException("Relative destination URI must be an absolute path");
+
+        // trim destination to uri-path
+        destination = uri.getRawPath();
+
+        // trim context path from destination
+        String ctx = getContextPath();
+        if (! ctx.equals("")) {
+            if (! destination.startsWith(ctx))
+                throw new BadRequestException("Destination URI-path must include context path");
+            destination = destination.substring(ctx.length());
+        }
+
+        // trim servlet path from destination
+        String srv = getServletPath();
+        if (! destination.startsWith(srv))
+            throw new BadRequestException("Destination URI-path must include servlet path");
+        destination = destination.substring(srv.length());
+
+        // trim servlet path from destination
+
         return locatorFactory.createResourceLocator(getBaseUrl(), destination);
     }
 

@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.BadRequestException;
+import org.osaf.cosmo.dav.ConflictException;
 import org.osaf.cosmo.dav.ContentLengthRequiredException;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavRequest;
@@ -166,6 +167,8 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             resource.copy(destination, depth == DEPTH_0);
             response.setStatus(destination.exists() ? 204 : 201);
         } catch (org.apache.jackrabbit.webdav.DavException e) {
+            if (e instanceof DavException)
+                throw (DavException)e;
             throw new DavException(e);
         }
     }
@@ -189,6 +192,8 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             resource.move(destination);
             response.setStatus(destination.exists() ? 204 : 201);
         } catch (org.apache.jackrabbit.webdav.DavException e) {
+            if (e instanceof DavException)
+                throw (DavException)e;
             throw new DavException(e);
         }
     }
@@ -309,6 +314,8 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
     protected DavResource resolveDestination(DavResourceLocator locator,
                                              DavResource original)
         throws DavException {
+        if (locator == null)
+            return null;
         DavResource destination = resourceFactory.resolve(locator);
         return destination != null ? destination :
             new DavFile(locator, resourceFactory);
@@ -317,13 +324,14 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
     protected void validateDestination(DavRequest request,
                                        DavResource destination)
         throws DavException {
-        String uri = request.getHeader(HEADER_DESTINATION);
-        if (StringUtils.isBlank(uri))
-            throw new BadRequestException("Destination header not provided");
+        if (destination == null)
+            throw new BadRequestException("Destination required");
         if (destination.getResourceLocator().equals(request.getResourceLocator()))
             throw new ForbiddenException("Destination URI is the same as the original resource URI");
         if (destination.exists() && ! request.isOverwrite())
-            throw new PreconditionFailedException("Overwrite header was not specified for existing destination");
+            throw new PreconditionFailedException("Overwrite header false was not specified for existing destination");
+        if (! destination.getParent().exists())
+            throw new ConflictException("One or more intermediate collections must be created");
     }
 
     protected void checkReportAccess(ReportInfo info)

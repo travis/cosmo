@@ -88,6 +88,7 @@ public class StandardDavRequest extends WebdavRequestImpl
     private long bufferedContentLength = -1;
     private DavResourceLocatorFactory locatorFactory;
     private DavResourceLocator locator;
+    private DavResourceLocator destinationLocator;
 
     public StandardDavRequest(HttpServletRequest request,
                               DavResourceLocatorFactory factory) {
@@ -162,6 +163,9 @@ public class StandardDavRequest extends WebdavRequestImpl
 
     public DavResourceLocator getDestinationResourceLocator()
         throws DavException {
+        if (destinationLocator != null)
+            return destinationLocator;
+
         String destination = getHeader(HEADER_DESTINATION);
         if (destination == null)
             return null;
@@ -203,7 +207,10 @@ public class StandardDavRequest extends WebdavRequestImpl
 
         // trim servlet path from destination
 
-        return locatorFactory.createResourceLocator(getBaseUrl(), destination);
+        destinationLocator =
+            locatorFactory.createResourceLocator(getBaseUrl(), destination);
+
+        return destinationLocator;
     }
 
     // CaldavRequest methods

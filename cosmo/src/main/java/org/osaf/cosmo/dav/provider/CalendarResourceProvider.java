@@ -79,6 +79,8 @@ public class CalendarResourceProvider extends FileProvider {
     protected DavResource resolveDestination(DavResourceLocator locator,
                                              DavResource original)
         throws DavException {
+        if (locator == null)
+            return null;
         if (original instanceof DavTask)
             return new DavTask(locator, getResourceFactory());
         if (original instanceof DavJournal)

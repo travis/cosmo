@@ -51,6 +51,7 @@ import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.impl.DavFile;
 import org.osaf.cosmo.dav.io.DavInputContext;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
@@ -161,6 +162,8 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
                                resource);
         validateDestination(request, destination);
 
+        checkCopyMoveAccess(resource, destination);
+
         try {
             if (destination.exists() && request.isOverwrite())
                 destination.getCollection().removeMember(destination);
@@ -185,6 +188,8 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             resolveDestination(request.getDestinationResourceLocator(),
                                resource);
         validateDestination(request, destination);
+
+        checkCopyMoveAccess(resource, destination);
 
         try {
             if (destination.exists() && request.isOverwrite())
@@ -332,6 +337,44 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             throw new PreconditionFailedException("Overwrite header false was not specified for existing destination");
         if (! destination.getParent().exists())
             throw new ConflictException("One or more intermediate collections must be created");
+    }
+
+    protected void checkCopyMoveAccess(DavResource source,
+                                       DavResource destination)
+        throws DavException {
+        // XXX refactor a BaseItemProvider so we don't have to do this check
+        if (! (source instanceof DavItemResource))
+            // we're operating on a principal resource which can't be moved
+            // anyway
+            return;
+
+        // because the security filter let us get this far, we know the
+        // security context has access to the source resource. we have to
+        // check that it also has access to the destination resource.
+        
+        if (getSecurityContext().isAdmin())
+            return;
+
+        Item destinationItem = destination.exists() ?
+                ((DavItemResource)destination).getItem() :
+                ((DavItemResource)destination.getParent()).getItem();
+
+        User user = getSecurityContext().getUser();
+        if (user != null) {
+            if (user.equals(destinationItem.getOwner()))
+                return;
+            throw new ForbiddenException("User privileges deny access");
+        }
+
+        Ticket ticket = getSecurityContext().getTicket();
+        if (ticket != null) {
+            if (ticket.isGranted(destinationItem) &&
+                ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE))
+                return;
+            throw new ForbiddenException("Ticket privileges deny access");
+        }
+
+        throw new ForbiddenException("Anonymous privileges deny access");
     }
 
     protected void checkReportAccess(ReportInfo info)

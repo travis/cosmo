@@ -19,6 +19,9 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.hibernate.annotations.Type;
 
 import org.w3c.dom.Element;
@@ -30,6 +33,7 @@ import org.w3c.dom.Element;
 @DiscriminatorValue("xml")
 public class XmlAttribute extends Attribute
     implements java.io.Serializable {
+    private static final Log log = LogFactory.getLog(XmlAttribute.class);
 
     private Element value;
 
@@ -51,7 +55,9 @@ public class XmlAttribute extends Attribute
     public Attribute copy() {
         XmlAttribute attr = new XmlAttribute();
         attr.setQName(getQName().copy());
-        attr.setValue(value.cloneNode(true));
+        Element clone = value != null ?
+            (Element) value.cloneNode(true) : null;
+        attr.setValue(clone);
         return attr;
     }
 

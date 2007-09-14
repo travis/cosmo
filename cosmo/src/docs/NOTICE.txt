@@ -3,6 +3,7 @@
     <li><a href="http://www.osafoundation.org/">Open Source Applications Foundation</li>
     <li><a href="http://www.apache.org/">Apache Software Foundation</a></li>
     <li><a href="http://www.hibernate.org/">Hibernate</a></li>
+    <li><a href="http://dojotoolkit.org/">Dojo Toolkit</a></li>
     <li><a href="http://www.acegisecurity.org/">Acegi Security</a></li>
     <li><a href="http://www.json.org/java/index.html">JSON</a></li>
     <li><a href="http://jsontools.berlios.de/">JSONTOOLS</a></li>

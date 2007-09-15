@@ -18,14 +18,14 @@
  * A module that provides translators from data received from a
  * JSON-RPC service to cosmo.model.Object objects.
  */
-dojo.provide("cosmo.service.translators.eim");
+dojo.provide("cosmo.service.translators.eim.common");
 
 dojo.require("dojo.date.serialize");
 dojo.require("dojo.lang.*");
 dojo.require("dojo.json");
 dojo.require("dojo.string");
 
-dojo.require("cosmo.service.eim");
+dojo.require("cosmo.service.translators.eim.constants");
 dojo.require("cosmo.model.*");
 dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.service.common");

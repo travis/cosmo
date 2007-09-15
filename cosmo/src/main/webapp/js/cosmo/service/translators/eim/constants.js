@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-dojo.provide("cosmo.service.eim");
+dojo.provide("cosmo.service.translators.eim.constants");
 
 cosmo.service.eim.constants = {
     prefix: {

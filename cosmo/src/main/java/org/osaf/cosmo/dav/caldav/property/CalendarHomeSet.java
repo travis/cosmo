@@ -55,6 +55,7 @@ public class CalendarHomeSet extends StandardDavProperty
 
     private static String href(DavResourceLocator locator,
                                User user) {
-        return locator.getServiceLocator().getDavCalendarHomeUrl(user);
+        return TEMPLATE_HOME.bindAbsolute(locator.getBaseHref(),
+                                          user.getUsername()) + "/";
     }
 }

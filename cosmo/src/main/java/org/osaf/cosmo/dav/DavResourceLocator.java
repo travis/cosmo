@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.dav;
 
-import org.osaf.cosmo.server.ServiceLocator;
+import java.net.URL;
 
 /**
  * <p>
@@ -23,32 +23,71 @@ import org.osaf.cosmo.server.ServiceLocator;
  * of a {@link DavResource}.
  * </p>
  * <p>
- * The URI of a resource is defined as <code>{URI base}{uri-path}</code>.
- * The URI base is defined as the leading portion of a URI that identifies
- * the root of the dav URI space:
- * <code>{scheme}://{authority}{root path}</code>.
+ * The URL of a resource is defined as
+ * <code>{prefix}{base path}{dav path}</code>.
+ * The prefix is the leading portion of the URL that includes the
+ * scheme and authority sections of the URL. The base path is the leading
+ * portion of the URL path that locates the root dav namespace. The dav path
+ * is the trailing portion of the URL path that locates the resource within
+ * the dav namespace.
  * </p>
  */
 public interface DavResourceLocator {
 
     /**
-     * Returns the absolute URI (escaped) of the resource that can be used
+     * Returns the absolute escaped URL of the resource that can be used
      * as the value for a <code>DAV:href</code> property. Appends a trailing
      * slash if <code>isCollection</code>.
      */
     public String getHref(boolean isCollection);
 
     /**
-     * Returns the portion of the resource's URI that identifies the root
-     * of the dav URI space.
+     * Returns the escaped URL of the resource that can be used as the value
+     * for a <code>DAV:href</code> property. The href is either absolute or
+     * absolute-path relative (i.e. including the base path but not the
+     * prefix). Appends a trailing slash if <code>isCollection</code>.
      */
-     public String getBase();
+    public String getHref(boolean absolute,
+                          boolean isCollection);
 
     /**
-     * Returns the uri-path (unescaped) of the resource specified relative to
-     * the root of the dav URI space.
+     * Returns the scheme and authority portion of the URL.
+     */
+    public String getPrefix();
+
+    /**
+     * Returns the leading portion of the path (unescaped) that identifies the
+     * root of the dav namespace.
+     */
+    public String getBasePath();
+
+    /**
+     * Returns the absolute escaped URL corresponding to the base path that
+     * can be used as the value for a <code>DAV:href</code> property.
+     */
+    public String getBaseHref();
+
+    /**
+     * Returns the escaped URL corresponding to the base path that can be
+     * used as the value for a <code>DAV:href</code> property. The href is
+     * either absolute or absolute-path relative (i.e. including the base
+     * path but not the prefix).
+     */
+    public String getBaseHref(boolean absolute);
+
+    /**
+     * Returns the trailing portion of the path that identifies the resource
+     * within the dav namespace.
      */
     public String getPath();
+
+    /**
+     * Returns a URL that provides context for resolving other locators.
+     * The context URL has the scheme and authority defined by this
+     * locator's prefix, and its path is the same as this locator's base
+     * path.
+     */
+    public URL getContext();
 
     /**
      * Returns a locator identifying the parent resource.
@@ -59,10 +98,4 @@ public interface DavResourceLocator {
      * Returns the factory that instantiated this locator.
      */
     public DavResourceLocatorFactory getFactory();
-
-    /**
-     * Returns the <code>ServiceLocator</code> used by this locator to
-     * resolve dav URIs.
-     */
-    public ServiceLocator getServiceLocator();
 }

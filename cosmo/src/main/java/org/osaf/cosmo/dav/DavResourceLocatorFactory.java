@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.dav;
 
-import org.osaf.cosmo.server.ServiceLocator;
+import java.net.URL;
 
 /**
  * <p>
@@ -27,44 +27,37 @@ public interface DavResourceLocatorFactory {
 
     /**
      * <p>
-     * Returns a locator for the resource at the given URI or uri-path as
-     * resolved against the given URI base.
+     * Returns a locator for the resource at the specified path relative
+     * to the given context URL. The context URL includes enough path
+     * information to identify the dav namespace.
      * </p>
      * <p>
-     * If the URI starts with the URI base, it is interpreted as an
-     * absolute, unescaped URI. Otherwise, it is interpreted as an escaped
-     * uri-path relative to the URI base.
-     * </p>
-     * <p>
-     * See {@link DavResourceLocator} for the definition of the URI base.
+     *
+     * @param context the URL specifying protocol, authority and unescaped
+     * base path
+     * @param path the unescaped path of the resource
      * </p>
      */
-    public DavResourceLocator createResourceLocator(String base,
-                                                    String uri);
+    public DavResourceLocator createResourceLocatorByPath(URL context,
+                                                          String path);
 
     /**
      * <p>
-     * Returns a locator for the resource at the given URI or uri-path as
-     * resolved against the given <code>ServiceLocator</code>.
+     * Returns a locator for the resource at the specified URI relative
+     * to the given context URL. The context URL includes enough path
+     * information to identify the dav namespace.
      * </p>
      * <p>
-     * Follows the same rules as
-     * {@link #createDavResourceLocator(String, String)}.
+     * If the URI is absolute, its scheme and authority must match those of
+     * the context URL. The URI path must begin with the context URL's path.
+     * </p>
+     *
+     * @param context the URL specifying protocol, authority and unescaped
+     * base path
+     * @param path the unescaped path of the resource
      * </p>
      */
-    public DavResourceLocator createResourceLocator(ServiceLocator sl,
-                                                    String uri);
-
-    /**
-     * <p>
-     * Returns a locator for the resource at the given URI or uri-path as
-     * resolved against the given <code>DavResourceLocator</code>.
-     * </p>
-     * <p>
-     * Follows the same rules as
-     * {@link #createDavResourceLocator(String, String)}.
-     * </p>
-     */
-    public DavResourceLocator createResourceLocator(DavResourceLocator rl,
-                                                    String uri);
+    public DavResourceLocator createResourceLocatorByUri(URL context,
+                                                         String uri)
+        throws DavException;
 }

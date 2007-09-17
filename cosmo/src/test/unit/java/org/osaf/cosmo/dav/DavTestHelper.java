@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.net.URL;
+
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,9 +46,9 @@ public class DavTestHelper extends MockHelper
 
     private StandardResourceFactory resourceFactory;
     private StandardResourceLocatorFactory locatorFactory;
-    private User user;
     private DavResourceLocator homeLocator;
     private DavHomeCollection homeResource;
+    private URL baseUrl;
 
     public DavTestHelper() {
         super();
@@ -55,14 +57,20 @@ public class DavTestHelper extends MockHelper
             new StandardResourceFactory(getContentService(),
                                         getUserService(),
                                         getSecurityManager());
-        locatorFactory =
-            new StandardResourceLocatorFactory(getServiceLocatorFactory());
+        locatorFactory = new StandardResourceLocatorFactory();
+        try {
+            baseUrl = new URL("http", "localhost", -1, "/dav");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setUp() throws Exception {
         super.setUp();
+
+        String path = TEMPLATE_HOME.bind(false, getUser().getUsername());
         homeLocator =
-            locatorFactory.createResourceLocator("", "/" + getUser().getUsername());
+            locatorFactory.createResourceLocatorByPath(baseUrl, path);
     }
 
     public DavResourceFactory getResourceFactory() {
@@ -85,8 +93,9 @@ public class DavTestHelper extends MockHelper
 
     public DavUserPrincipal getPrincipal(User user)
         throws Exception {
-        DavResourceLocator locator = locatorFactory.
-            createResourceLocator("", TEMPLATE_USER.bind(user.getUsername()));
+        String path = TEMPLATE_USER.bind(false, user.getUsername());
+        DavResourceLocator locator =
+            locatorFactory.createResourceLocatorByPath(baseUrl, path);
         return new DavUserPrincipal(user, locator, resourceFactory);
     }
 
@@ -96,13 +105,14 @@ public class DavTestHelper extends MockHelper
 
     public DavResourceLocator createLocator(String path) {
         return locatorFactory.
-            createResourceLocator(homeLocator, UriTemplate.escapePath(path));
+            createResourceLocatorByPath(homeLocator.getContext(), path);
     }
 
     public DavResourceLocator createMemberLocator(DavResourceLocator locator,
                                                   String segment) {
-        String path = locator.getPath() + "/" + UriTemplate.escape(segment);
-        return locatorFactory.createResourceLocator(locator, path);
+        String path = locator.getPath() + "/" + segment;
+        return locatorFactory.
+            createResourceLocatorByPath(locator.getContext(), path);
     }
 
     public DavResource findMember(DavCollection collection,

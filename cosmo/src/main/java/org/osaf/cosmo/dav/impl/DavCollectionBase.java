@@ -360,16 +360,18 @@ public class DavCollectionBase extends DavItemResourceBase
 
     protected DavResource memberToResource(Item item)
         throws DavException {
-        String uri = getResourcePath() + "/" + item.getName();
+        String path = getResourcePath() + "/" + item.getName();
         DavResourceLocator locator = getResourceLocator().getFactory().
-            createResourceLocator(getResourceLocator(), uri);
+            createResourceLocatorByPath(getResourceLocator().getContext(),
+                                        path);
         return getResourceFactory().createResource(locator, item);
     }    
 
     protected DavResource memberToResource(String uri)
         throws DavException {
         DavResourceLocator locator = getResourceLocator().getFactory().
-            createResourceLocator(getResourceLocator(), uri);
+            createResourceLocatorByUri(getResourceLocator().getContext(), 
+                                       uri);
         return getResourceFactory().resolve(locator);
     }
 

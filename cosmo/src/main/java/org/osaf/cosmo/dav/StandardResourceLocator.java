@@ -15,55 +15,97 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.net.URI;
+import java.net.URL;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.util.PathUtil;
-import org.osaf.cosmo.util.UriTemplate;
 
 /**
  * Standard implementation of {@link DavResourceLocator}.
  *
  * @see DavResourceLocator
- * @see ServiceLocator
  */
 public class StandardResourceLocator implements DavResourceLocator {
     private static final Log log =
         LogFactory.getLog(StandardResourceLocator.class);
 
-    private ServiceLocator locator;
+    private URL context;
     private String path;
-    private String href;
     private StandardResourceLocatorFactory factory;
 
-    public StandardResourceLocator(ServiceLocator locator,
+    /**
+     * @param context the URL specifying protocol, authority and unescaped
+     * base path
+     * @param path the unescaped dav-relative path of the resource
+     * @param factory the locator factory
+     */
+    public StandardResourceLocator(URL context,
                                    String path,
                                    StandardResourceLocatorFactory factory) {
-        this.locator = locator;
+        this.context = context;
         this.path = path.endsWith("/") && ! path.equals("/") ?
             path.substring(0, path.length()-1) : path;
-        this.href = locator.getDavBase() + UriTemplate.escapePath(path);
         this.factory = factory;
     }
 
     // DavResourceLocator methods
 
     public String getHref(boolean isCollection) {
-        String suffix = isCollection && ! path.equals("/") ? "/" : "";
-        return href + suffix;
+        return getHref(false, isCollection);
     }
 
-    public String getBase() {
-        return locator.getDavBase();
+    public String getHref(boolean absolute,
+                          boolean isCollection) {
+        String path = isCollection && ! this.path.equals("/") ?
+            this.path  + "/" : this.path;
+        try {
+            URL url = new URL(context, context.getPath() + path);
+            if (absolute)
+                return url.toURI().toASCIIString();
+            // relative dav URLs need to be path-absolute, so we can't just
+            // use path itself - we have to relativize it based on the context
+            return new URI(null, null, url.getPath(), null).toASCIIString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getPrefix() {
+        return context.getProtocol() + "://" + context.getAuthority();
+    }
+
+    public String getBasePath() {
+        return context.getPath();
+    }
+
+    public String getBaseHref() {
+        return getBaseHref(false);
+    }
+
+    public String getBaseHref(boolean absolute) {
+        try {
+            if (absolute)
+                return context.toURI().toASCIIString();
+            return new URI(null, null, context.getPath(), null).
+                toASCIIString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getPath() {
         return path;
     }
 
+    public URL getContext() {
+        return context;
+    }
+
     public DavResourceLocator getParentLocator() {
-        return factory.createResourceLocator(locator.getDavBase(),
+        return factory.createResourceLocatorByPath(context,
                                              PathUtil.getParentPath(path));
     }
 
@@ -71,14 +113,10 @@ public class StandardResourceLocator implements DavResourceLocator {
         return factory;
     }
 
-    public ServiceLocator getServiceLocator() {
-        return locator;
-    }
-
     // our methods
 
     public int hashCode() {
-        return href.hashCode();
+        return context.hashCode() + path.hashCode();
     }
 
     public boolean equals(Object o) {

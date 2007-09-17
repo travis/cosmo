@@ -15,12 +15,9 @@
  */
 package org.osaf.cosmo.dav.acl.property;
 
-import java.util.HashSet;
-
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.acl.AclConstants;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.model.User;
 
@@ -55,6 +52,7 @@ public class Owner extends StandardDavProperty {
                                User user) {
         if (user == null)
             return null;
-        return locator.getServiceLocator().getDavPrincipalUrl(user);
+        return TEMPLATE_USER.bindAbsolute(locator.getBaseHref(),
+                                          user.getUsername());
     }
 }

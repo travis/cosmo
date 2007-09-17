@@ -15,57 +15,66 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.net.URI;
+import java.net.URL;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.server.ServiceLocator;
-import org.osaf.cosmo.server.ServiceLocatorFactory;
-import org.osaf.cosmo.util.UriTemplate;
 
 /**
  * Standard implementation of {@link DavResourceLocatorFactory}.
  * Returns instances of {@link StandardResourceLocator}.
  *
  * @see DavResourceLocatorFactory
- * @see ServiceLocatorFactory
  */
 public class StandardResourceLocatorFactory
     implements DavResourceLocatorFactory {
     private static final Log log =
         LogFactory.getLog(StandardResourceLocatorFactory.class);
 
-    private ServiceLocatorFactory factory;
-
-    public StandardResourceLocatorFactory(ServiceLocatorFactory factory) {
-        this.factory = factory;
-    }
-
     // DavResourceLocatorFactory methods
 
-    public DavResourceLocator createResourceLocator(String base,
-                                                    String uri) {
-        return createResourceLocator(factory.createServiceLocator(base), uri);
+    public DavResourceLocator createResourceLocatorByPath(URL context,
+                                                          String path) {
+        return new StandardResourceLocator(context, path, this);
     }
 
-    public DavResourceLocator createResourceLocator(ServiceLocator sl,
-                                                    String uri) {
-        String path = uri;
-        if (path != null) {
-            if (path.startsWith(sl.getDavBase())) {
-                path = UriTemplate.
-                    unescape(path.substring(sl.getDavBase().length()));
-                if (! path.startsWith("/"))
-                    path = "/" + path;
-            } else if (path.startsWith(sl.getFactory().getDavPrefix())) {
-                path = UriTemplate.unescape(path.substring(4));
+    public DavResourceLocator createResourceLocatorByUri(URL context,
+                                                         String raw)
+        throws DavException {
+        try {
+            URI uri = new URI(raw);
+
+            URL url = null;
+            if (raw.startsWith("/")) {
+                // absolute-path relative URL
+                url = new URL(context, uri.getPath());
+            } else {
+                // absolute URL
+                url = new URL(uri.getScheme(), uri.getHost(), uri.getPort(),
+                              uri.getPath());
+
+                // make sure that absolute URLs use the same scheme and
+                // authority
+                if (url.getProtocol() != null &&
+                    ! url.getProtocol().equals(context.getProtocol()))
+                    throw new BadGatewayException(uri + " does not specify same scheme as " + context.toString());
+                if (url.getAuthority() != null &&
+                    ! url.getAuthority().equals(context.getAuthority()))
+                    throw new BadGatewayException(uri + " does not specify same authority as " + context.toString());
             }
-        } else if (path == null || path.equals(""))
-            path = "/";
-        return new StandardResourceLocator(sl, path, this);
-    }
 
-    public DavResourceLocator createResourceLocator(DavResourceLocator rl,
-                                                    String uri) {
-        return createResourceLocator(rl.getServiceLocator(), uri);
+            if (! url.getPath().startsWith(context.getPath()))
+                throw new BadRequestException(uri + " does not specify correct dav path " + context.getPath());
+
+            // trim base path
+            String path = url.getPath().substring(context.getPath().length());
+
+            return new StandardResourceLocator(context, path, this);
+        } catch (Exception e) {
+            if (e instanceof DavException)
+                throw (DavException) e;
+            throw new BadRequestException("Invalid URL: " + e.getMessage());
+        }
     }
 }

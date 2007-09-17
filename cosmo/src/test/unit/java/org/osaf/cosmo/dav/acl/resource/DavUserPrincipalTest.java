@@ -72,8 +72,8 @@ public class DavUserPrincipalTest extends BaseDavTestCase
         AlternateUriSet alternateUriSet = (AlternateUriSet)
             p.getProperty(ALTERNATEURISET);
         assertNotNull("No alternate-uri-set property", alternateUriSet);
-        assertTrue("No hrefs for alternate-uri-set",
-                   ! alternateUriSet.getHrefs().isEmpty());
+        assertTrue("Found hrefs for alternate-uri-set",
+                   alternateUriSet.getHrefs().isEmpty());
 
         // 4.2
         PrincipalUrl principalUrl = (PrincipalUrl)

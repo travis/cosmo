@@ -137,8 +137,8 @@ public class PrincipalPropertySearchReport extends MultiStatusReport
         for (String href : pcs.getHrefs()) {
             DavResourceLocator locator =
                 collection.getResourceLocator().getFactory().
-                    createResourceLocator(collection.getResourceLocator(),
-                                          href);
+                    createResourceLocatorByUri(collection.getResourceLocator().getContext(),
+                                               href);
             DavUserPrincipalCollection pc = (DavUserPrincipalCollection)
                 collection.getResourceFactory().resolve(locator);
             if (pc == null)

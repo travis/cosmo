@@ -465,9 +465,7 @@
   </bean>
 
   <bean id="davResourceLocatorFactory"
-        class="org.osaf.cosmo.dav.StandardResourceLocatorFactory">
-    <constructor-arg><ref bean="serviceLocatorFactory"/></constructor-arg>
-  </bean>
+        class="org.osaf.cosmo.dav.StandardResourceLocatorFactory"/>
 
   <bean id="dav"
         class="org.osaf.cosmo.dav.servlet.StandardRequestHandler">

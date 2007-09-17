@@ -17,7 +17,7 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashSet;
 
 import javax.activation.MimeType;
@@ -103,22 +103,6 @@ public class StandardDavRequest extends WebdavRequestImpl
         this.bufferRequestContent = bufferRequestContent;
     }
 
-    public String getBaseUrl() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getScheme());
-        buf.append("://");
-        buf.append(getServerName());
-        if ((isSecure() && getServerPort() != 443) ||
-            getServerPort() != 80) {
-            buf.append(":");
-            buf.append(getServerPort());
-        }
-        if (! getContextPath().equals("/")) {
-            buf.append(getContextPath());
-        }
-        return buf.toString();
-    }
-
     // DavRequest methods
 
     public int getPropFindType()
@@ -151,13 +135,19 @@ public class StandardDavRequest extends WebdavRequestImpl
 
     public DavResourceLocator getResourceLocator() {
         if (locator == null) {
-            String path = getRequestURI();
-            String ctx = getContextPath();
-            if (path.startsWith(ctx))
-                path = path.substring(ctx.length());
-            locator = locatorFactory.
-                createResourceLocator(getBaseUrl(), path);
+            URL context = null;
+            try {
+                String basePath = getContextPath() + getServletPath();
+                context = new URL(getScheme(), getServerName(),
+                                  getServerPort(), basePath);
+
+                locator = locatorFactory.
+                    createResourceLocatorByUri(context, getRequestURI());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
+
         return locator;
     }
 
@@ -170,45 +160,10 @@ public class StandardDavRequest extends WebdavRequestImpl
         if (destination == null)
             return null;
 
-        URI uri = null;
-        try {
-            uri = new URI(destination);
-        } catch (URISyntaxException e) {
-            throw new BadRequestException("Invalid destination URI: " + e.getMessage());
-        }
-
-        // make sure that absolute URIs use the same scheme and authority
-        if (uri.getScheme() != null && ! uri.getScheme().equals(getScheme()))
-            throw new BadGatewayException("Absolute destination URI must specify same scheme as request URI");
-        if (uri.getAuthority() != null &&
-            ! uri.getAuthority().equals(getHeader("Host")))
-                throw new BadGatewayException("Absolute destination URI must specify same authority as request URI");
-
-        // make sure that uri-path is absolute
-        if (! uri.getRawPath().startsWith("/"))
-            throw new BadRequestException("Relative destination URI must be an absolute path");
-
-        // trim destination to uri-path
-        destination = uri.getRawPath();
-
-        // trim context path from destination
-        String ctx = getContextPath();
-        if (! ctx.equals("")) {
-            if (! destination.startsWith(ctx))
-                throw new BadRequestException("Destination URI-path must include context path");
-            destination = destination.substring(ctx.length());
-        }
-
-        // trim servlet path from destination
-        String srv = getServletPath();
-        if (! destination.startsWith(srv))
-            throw new BadRequestException("Destination URI-path must include servlet path");
-        destination = destination.substring(srv.length());
-
-        // trim servlet path from destination
+        URL context = ((DavResourceLocator)getRequestLocator()).getContext();
 
         destinationLocator =
-            locatorFactory.createResourceLocator(getBaseUrl(), destination);
+            locatorFactory.createResourceLocatorByUri(context, destination);
 
         return destinationLocator;
     }

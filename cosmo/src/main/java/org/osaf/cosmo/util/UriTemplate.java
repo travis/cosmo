@@ -15,8 +15,7 @@
  */
 package org.osaf.cosmo.util;
 
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,17 +49,10 @@ public class UriTemplate {
     private static final Log log = LogFactory.getLog(UriTemplate.class);
 
     private String pattern;
-    private String base;
     private ArrayList<Segment> segments;
 
     public UriTemplate(String pattern) {
-        this(pattern, "");
-    }
-
-    public UriTemplate(String pattern,
-                       String base) {
         this.pattern = pattern;
-        this.base = base;
         this.segments = new ArrayList<Segment>();
 
         StrTokenizer tokenizer = new StrTokenizer(pattern, '/');
@@ -69,23 +61,81 @@ public class UriTemplate {
     }
 
     /**
-     * Generates a URI relative to the template's base (or / if no base was
-     * provided) by replacing the variable segments of the template with the
-     * provided values. All literal segments, optional or no, are always
-     * included. Values are bound into the template in the order in which they
-     * are provided. If a value is not provided for an optional variable
-     * segment, the segment is not included.
+     * Generates an absolute-path relative URI using the same algorithm as
+     * {@link #bindAbsolute(boolean, String, String...)}. Bound values are
+     * escaped.
      *
-     * @param values the (unescaped) values to be bound
+     * @param values the unescaped values to be bound
      * @return a URI with variables replaced by bound values
      * @throws IllegalArgumentException if more or fewer values are
      * provided than are needed by the template or if a null value is
      * provided for a mandatory variable
      */
     public String bind(String... values) {
-        StringBuffer buf = new StringBuffer();
-        if (base != null)
-            buf.append(base);
+        return bind(true, values);
+    }
+
+    /**
+     * Generates an absolute-path relative URI using the same algorithm as
+     * {@link #bindAbsolute(boolean, String, String...)}. Bound values are
+     * optionally escaped.
+     *
+     * @param escape a flag determining whether or not bound variables are to
+     * be escaped
+     * @param values the unescaped values to be bound
+     * @return a URI with variables replaced by bound values
+     * @throws IllegalArgumentException if more or fewer values are
+     * provided than are needed by the template or if a null value is
+     * provided for a mandatory variable
+     */
+    public String bind(boolean escape, String... values) {
+        return bindAbsolute(escape, "", values);
+    }
+
+    /**
+     * Generates a absolute URI relative to <code>base</code> using the same
+     * algorithm as {@link #bindAbsolute(boolean, String, String...)}. Bound 
+     * values are escaped.
+     *
+     * @param escape a flag determining whether or not bound variables are to
+     * be escaped
+     * @param base the optional escaped base to prepend to the generated
+     * path
+     * @param values the unescaped values to be bound
+     * @return a URI with variables replaced by bound values
+     * @throws IllegalArgumentException if more or fewer values are
+     * provided than are needed by the template or if a null value is
+     * provided for a mandatory variable
+     */
+    public String bindAbsolute(String base,
+                               String... values) {
+        return bindAbsolute(true, base, values);
+    }
+
+    /**
+     * Generates a absolute URI relative to <code>base</code> by replacing
+     * the variable segments of the template with the provided values. All
+     * literal segments, optional or no, are always included.
+     * Values are bound into the template in the order in which they are
+     * provided. If a value is not provided for an optional variable segment,
+     * the segment is not included. Bound values are optionally escaped.
+     *
+     * @param escape a flag determining whether or not bound variables are to
+     * be escaped
+     * @param base the optional escaped base to prepend to the generated
+     * path
+     * @param values the unescaped values to be bound
+     * @return a URI with variables replaced by bound values
+     * @throws IllegalArgumentException if more or fewer values are
+     * provided than are needed by the template or if a null value is
+     * provided for a mandatory variable
+     */
+    public String bindAbsolute(boolean escape,
+                               String base,
+                               String... values) {
+        if (base == null)
+            throw new IllegalArgumentException("Base cannot be null");
+        StringBuffer buf = new StringBuffer(base);
         buf.append("/");
 
         List<String> variables = Arrays.asList(values);
@@ -105,7 +155,7 @@ public class UriTemplate {
                         continue;
                     throw new IllegalArgumentException("Not enough values");
                 }
-                buf.append(escape(value));
+                buf.append(escape ? escape(value) : value);
             } else if (! segment.isAll()) {
                 buf.append(segment.getData());
             }
@@ -117,7 +167,7 @@ public class UriTemplate {
         if (vi.hasNext())
             if (segment.isAll()) {
                 while (vi.hasNext())
-                    buf.append(escape(vi.next()));
+                    buf.append(escape ? escape(vi.next()) : vi.next());
             } else
                 throw new IllegalArgumentException("Too many values");
 
@@ -203,36 +253,17 @@ public class UriTemplate {
         return pattern;
     }
 
-    public String getBase() {
-        return base;
-    }
-
     public static final String escape(String raw) {
         try {
-            // URLEncoder converts ' ' to '+', which is fine for HTML form
-            // data but not for URLs
-            String escaped = URLEncoder.encode(raw, "UTF-8");
-            escaped = escaped.replace("+", "%20");
-            return escaped;
+            return new URI(null, null, raw, null).toASCIIString();
         } catch (Exception e) {
             throw new RuntimeException("Could not escape string " + raw, e);
         }
     }
 
-    public static final String escapePath(String path) {
-        StringBuffer buf = new StringBuffer();
-        StrTokenizer tokenizer = new StrTokenizer(path, '/');
-        while (tokenizer.hasNext()) {
-            buf.append(escape(tokenizer.nextToken()));
-            if (tokenizer.hasNext())
-                buf.append('/');
-        }
-        return buf.toString();
-    }
-
     public static final String unescape(String escaped) {
         try {
-            return URLDecoder.decode(escaped, "UTF-8");
+            return new URI(escaped).getPath();
         } catch (Exception e) {
             throw new RuntimeException("Could not unescape string " + escaped, e);
         }

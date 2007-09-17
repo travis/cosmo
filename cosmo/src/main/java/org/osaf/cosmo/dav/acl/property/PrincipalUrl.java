@@ -45,7 +45,8 @@ public class PrincipalUrl extends StandardDavProperty
 
     private static String href(DavResourceLocator locator,
                                User user) {
-        return locator.getServiceLocator().getDavPrincipalUrl(user);
+        return TEMPLATE_USER.bindAbsolute(locator.getBaseHref(),
+                                          user.getUsername());
     }
 
     public Element toXml(Document document) {

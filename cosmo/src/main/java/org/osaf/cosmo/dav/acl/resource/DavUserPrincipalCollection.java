@@ -194,7 +194,8 @@ public class DavUserPrincipalCollection extends DavResourceBase
     public DavUserPrincipal findMember(String uri)
         throws DavException {
         DavResourceLocator locator = getResourceLocator().getFactory().
-            createResourceLocator(getResourceLocator(), uri);
+            createResourceLocatorByUri(getResourceLocator().getContext(),
+                                       uri);
         return (DavUserPrincipal) getResourceFactory().resolve(locator);
     }
 
@@ -241,10 +242,10 @@ public class DavUserPrincipalCollection extends DavResourceBase
 
     private DavUserPrincipal memberToResource(User user)
         throws DavException {
-        String uri = getResourceLocator().getServiceLocator().
-            getDavPrincipalUrl(user);
+        String path = TEMPLATE_USER.bind(false, user.getUsername());
         DavResourceLocator locator = getResourceLocator().getFactory().
-            createResourceLocator(getResourceLocator(), uri);
+            createResourceLocatorByPath(getResourceLocator().getContext(),
+                                        path);
         return new DavUserPrincipal(user, locator, getResourceFactory());
     }
 

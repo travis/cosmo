@@ -58,7 +58,8 @@ public class PrincipalCollectionSet extends StandardDavProperty
 
     private static HashSet<String> hrefs(DavResourceLocator locator) {
         HashSet<String> hrefs = new HashSet<String>();
-        hrefs.add(locator.getServiceLocator().getDavUserPrincipalUrl());
+        hrefs.add(TEMPLATE_USERS.
+                  bindAbsolute(locator.getBaseHref()) + "/");
         return hrefs;
     }
 }

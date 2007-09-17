@@ -35,8 +35,7 @@ import org.w3c.dom.Document;
 /**
  * Represents the DAV:alternate-URI-set property.
  *
- * This property is protected. The value contains three DAV:href
- * elements specifying the Atom, CMP, dav and web URLs for the principal.
+ * This property is protected. Its value is empty.
  */
 public class AlternateUriSet extends StandardDavProperty
     implements AclConstants {
@@ -66,10 +65,9 @@ public class AlternateUriSet extends StandardDavProperty
     private static HashSet<String> hrefs(DavResourceLocator locator,
                                          User user) {
         HashSet<String> hrefs = new HashSet<String>();
-        Collection<String> uris =
-            locator.getServiceLocator().getUserUrls(user).values();
-        for (String uri : uris)
-            hrefs.add(uri);
+
+        // XXX: find a way to add Atom and CMP URLs here
+
         return hrefs;
     }
 }

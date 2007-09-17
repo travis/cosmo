@@ -134,8 +134,9 @@ public class PrincipalMatchReport extends MultiStatusReport
             getSecurityContext().getUser();
         if (currentUser == null)
             throw new ForbiddenException("Authenticated principal is not a user");
-        currentUserPrincipalUrl = getResource().getResourceLocator().
-            getServiceLocator().getDavPrincipalUrl(currentUser);
+        String base = getResource().getResourceLocator().getBaseHref();
+        currentUserPrincipalUrl =
+            TEMPLATE_USER.bindAbsolute(base, currentUser.getUsername());
         if (log.isDebugEnabled())
             log.debug("Matching against current user " +
                       currentUser.getUsername() + " (" +

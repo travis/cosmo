@@ -377,7 +377,8 @@ public abstract class DavItemResourceBase extends DavResourceBase
         properties.add(new IsCollection(isCollection()));
         properties.add(new Owner(getResourceLocator(), item.getOwner()));
         properties.add(new PrincipalCollectionSet(getResourceLocator()));
-        properties.add(new TicketDiscovery(this));
+        properties.add(new TicketDiscovery(getResourceLocator(),
+                                           getTickets()));
         properties.add(new Uuid(item.getUid()));
     }
 

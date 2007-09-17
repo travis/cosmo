@@ -16,13 +16,14 @@
 package org.osaf.cosmo.service.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.component.VFreeBusy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +46,7 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.service.ContentService;
+import org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor;
 import org.osaf.cosmo.service.lock.LockManager;
 import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 import org.osaf.cosmo.service.triage.TriageStatusQueryProcessor;
@@ -63,6 +65,7 @@ public class StandardContentService implements ContentService {
     private ContentDao contentDao;
     private LockManager lockManager;
     private TriageStatusQueryProcessor triageStatusQueryProcessor;
+    private FreeBusyQueryProcessor freeBusyQueryProcessor;
     
     private long lockTimeout = 0;
 
@@ -792,6 +795,17 @@ public class StandardContentService implements ContentService {
         return triageStatusQueryProcessor.processTriageStatusQuery(note,
                 context);
     }
+    
+    /**
+     * Generate a VFREEBUSY component containing freebusy 
+     * periods for a collection.
+     * @param collection collection to query
+     * @param period time range to query freebusy information
+     * @return VFREEBUSY component containing freebusy periods
+     */
+    public VFreeBusy generateFreeBusy(CollectionItem collection, Period period) {
+        return freeBusyQueryProcessor.generateFreeBusy(collection, period);
+    }
 
     /**
      * Find items by filter.
@@ -920,6 +934,8 @@ public class StandardContentService implements ContentService {
             throw new IllegalStateException("lockManager must not be null");
         if(triageStatusQueryProcessor == null)
             throw new IllegalStateException("triageStatusQueryProcessor must not be null");
+        if(freeBusyQueryProcessor == null)
+            throw new IllegalStateException("freeBusyQueryProcessor must not be null");
     }
 
     /**
@@ -956,6 +972,11 @@ public class StandardContentService implements ContentService {
     public void setTriageStatusQueryProcessor(
             TriageStatusQueryProcessor triageStatusQueryProcessor) {
         this.triageStatusQueryProcessor = triageStatusQueryProcessor;
+    }
+    
+    public void setFreeBusyQueryProcessor(
+            FreeBusyQueryProcessor freeBusyQueryProcessor) {
+        this.freeBusyQueryProcessor = freeBusyQueryProcessor;
     }
 
     /** */

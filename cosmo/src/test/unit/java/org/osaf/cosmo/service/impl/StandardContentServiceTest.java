@@ -80,6 +80,7 @@ public class StandardContentServiceTest extends TestCase {
         service.setContentDao(contentDao);
         service.setLockManager(lockManager);
         service.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
+        service.setFreeBusyQueryProcessor(new StandardFreeBusyQueryProcessor());
         service.init();
     }
 

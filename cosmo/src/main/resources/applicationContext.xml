@@ -366,6 +366,13 @@
       <ref local="contentDao" />
     </property>
   </bean>
+  
+  <bean id="freeBusyQueryProcessor"
+      class="org.osaf.cosmo.service.impl.StandardFreeBusyQueryProcessor">
+    <property name="calendarDao">
+      <ref local="calendarDao" />
+    </property>
+  </bean>
 
   <bean id="userService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
@@ -418,6 +425,9 @@
     </property>
     <property name="triageStatusQueryProcessor">
       <ref bean="triageStatusQueryProcessor"/>
+    </property>
+    <property name="freeBusyQueryProcessor">
+      <ref bean="freeBusyQueryProcessor"/>
     </property>
   </bean>
 

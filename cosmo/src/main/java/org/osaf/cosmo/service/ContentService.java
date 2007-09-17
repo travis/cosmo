@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.component.VFreeBusy;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
@@ -413,4 +415,13 @@ public interface ContentService extends Service {
      */
     public void removeTicket(String path,
                              String key);
+    
+    /**
+     * Generate a VFREEBUSY component containing freebusy 
+     * periods for a collection.
+     * @param collection collection to query
+     * @param period time range to query freebusy information
+     * @return VFREEBUSY component containing freebusy periods
+     */
+    public VFreeBusy generateFreeBusy(CollectionItem collection, Period period);
 }

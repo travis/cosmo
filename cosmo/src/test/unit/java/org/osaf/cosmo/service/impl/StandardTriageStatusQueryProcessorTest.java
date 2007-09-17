@@ -15,11 +15,9 @@
  */
 package org.osaf.cosmo.service.impl;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;
-
 import net.fortuna.ical4j.model.DateTime;
 
 import org.osaf.cosmo.calendar.util.CalendarUtils;

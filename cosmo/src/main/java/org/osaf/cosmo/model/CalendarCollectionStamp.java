@@ -32,6 +32,8 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
@@ -120,10 +122,21 @@ public class CalendarCollectionStamp extends Stamp implements
     @Column(table="calendar_stamp", name = "timezone", length=100000)
     @Type(type="calendar_clob")
     @Timezone
-    public Calendar getTimezone() {
+    public Calendar getTimezoneCalendar() {
         return timezone;
     }
 
+    /**
+     * @return timezone if present
+     */
+    @Transient
+    public TimeZone getTimezone() {
+        if (timezone == null)
+            return null;
+        VTimeZone vtz = (VTimeZone) timezone.getComponents().getComponent(Component.VTIMEZONE);
+        return new TimeZone(vtz);
+    }
+    
     /**
      * @return name of timezone if one is set
      */
@@ -141,7 +154,7 @@ public class CalendarCollectionStamp extends Stamp implements
      * @param timezone
      *            timezone definition in ical format
      */
-    public void setTimezone(Calendar timezone) {
+    public void setTimezoneCalendar(Calendar timezone) {
         this.timezone = timezone;
     }
 

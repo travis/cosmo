@@ -31,6 +31,7 @@ import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.account.MockPasswordRecoverer;
 import org.osaf.cosmo.service.account.OutOfTheBoxHelper;
 import org.osaf.cosmo.service.impl.StandardContentService;
+import org.osaf.cosmo.service.impl.StandardFreeBusyQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
@@ -78,6 +79,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         contentService.setContentDao(contentDao);
         contentService.setLockManager(lockManager);
         contentService.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
+        contentService.setFreeBusyQueryProcessor(new StandardFreeBusyQueryProcessor());
         contentService.init();
 
         userService = new StandardUserService();

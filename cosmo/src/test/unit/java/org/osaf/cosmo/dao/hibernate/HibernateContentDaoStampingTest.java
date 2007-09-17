@@ -253,7 +253,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         CalendarCollectionStamp calendarStamp = new CalendarCollectionStamp(root);
         calendarStamp.setDescription("description");
-        calendarStamp.setTimezone(testCal);
+        calendarStamp.setTimezoneCalendar(testCal);
         calendarStamp.setLanguage("en");
         
         root.addStamp(calendarStamp);
@@ -279,7 +279,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals("calendar", stamp.getType());
         CalendarCollectionStamp ccs = (CalendarCollectionStamp) stamp;
         Assert.assertEquals("description", ccs.getDescription());
-        Assert.assertEquals(testCal.toString(), ccs.getTimezone().toString());
+        Assert.assertEquals(testCal.toString(), ccs.getTimezoneCalendar().toString());
         Assert.assertEquals("en", ccs.getLanguage());
         
         Calendar cal = ccs.getCalendar();
@@ -293,7 +293,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Calendar testCal = helper.getCalendar(baseDir + "/cal1.ics");
         
         CalendarCollectionStamp calendarStamp = new CalendarCollectionStamp(root);
-        calendarStamp.setTimezone(testCal);
+        calendarStamp.setTimezoneCalendar(testCal);
         
         root.addStamp(calendarStamp);
         

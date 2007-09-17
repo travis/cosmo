@@ -18,34 +18,24 @@ package org.osaf.cosmo.dav.caldav.report;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.PeriodList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
-import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VFreeBusy;
-import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.FbType;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.FreeBusy;
 import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
-import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
@@ -54,11 +44,6 @@ import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.osaf.cosmo.CosmoConstants;
-import org.osaf.cosmo.calendar.Instance;
-import org.osaf.cosmo.calendar.InstanceList;
-import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.calendar.query.ComponentFilter;
-import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavException;
@@ -67,11 +52,8 @@ import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
-import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavItemCollection;
 import org.osaf.cosmo.dav.report.SimpleReport;
-import org.osaf.cosmo.model.ModelConversionException;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -85,9 +67,8 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
     private static final VersionFourGenerator uuidGenerator =
         new VersionFourGenerator();
 
-    private VTimeZone tz = null;
     private Period freeBusyRange;
-    private CalendarFilter[] queryFilters;
+    private ArrayList<VFreeBusy> freeBusyResults;
 
     public static final ReportType REPORT_TYPE_CALDAV_FREEBUSY =
         ReportType.register(ELEMENT_CALDAV_CALENDAR_FREEBUSY,
@@ -110,9 +91,6 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             throw new DavException("Report not of type " + getType());
 
         freeBusyRange = findFreeBusyRange(info);
-        queryFilters =
-            createQueryFilter(info.getReportElement().getOwnerDocument(),
-                              freeBusyRange);
     }
 
     /**
@@ -136,10 +114,14 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             if (! dc.exists())
                 dc = null;
         }
-
+        
+        // Results are stored as VFREEBUSY components that
+        // get merged at the end
+        freeBusyResults = new ArrayList<VFreeBusy>();
+        
         super.runQuery();
 
-        Calendar calendar = buildFreeBusy(getResults(), tz, freeBusyRange);
+        Calendar calendar = buildFreeBusy();
         String output = writeCalendar(calendar);
 
         setContentType("text/calendar");
@@ -159,8 +141,9 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             return;
         if (collection instanceof DavCalendarCollection) {
             DavCalendarCollection dcc = (DavCalendarCollection) collection;
-            for(CalendarFilter filter: getQueryFilters())
-                getResults().addAll(dcc.findMembers(filter));
+            VFreeBusy vfb = dcc.generateFreeBusy(freeBusyRange);
+            if(vfb!=null)
+                freeBusyResults.add(vfb);
             return;
         }
         // if it's a regular collection, there won't be any calendar resources
@@ -175,10 +158,6 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
     }
 
     // our methods
-
-    public CalendarFilter[] getQueryFilters() {
-        return queryFilters;
-    }
 
     private static Period findFreeBusyRange(ReportInfo info)
         throws DavException {
@@ -207,109 +186,70 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
         return new Period(sdt, edt);
     }
 
-    CalendarFilter[] createQueryFilter(Document doc,
-                                     Period period) {
-        DateTime start = period.getStart();
-        DateTime end = period.getEnd();
-        CalendarFilter[] filters = new CalendarFilter[2];
-
-        // Create calendar-filter elements designed to match
-        // VEVENTs/VFREEBUSYs within the specified time range.
-        //
-        // <C:filter>
-        // <C:comp-filter name="VCALENDAR">
-        // <C:comp-filter name="VEVENT">
-        // <C:time-range start="20051124T000000Z"
-        // end="20051125T000000Z"/>
-        // </C:comp-filter>
-        // <C:comp-filter name="VFREEBUSY">
-        // <C:time-range start="20051124T000000Z"
-        // end="20051125T000000Z"/>
-        // </C:comp-filter>
-        // </C:comp-filter>
-        // </C:filter>
-
-        // If the calendar collection has a timezone attribute,
-        // then use that to convert floating date/times to UTC
-        if (getResource() instanceof DavCalendarCollection) {
-            tz = ((DavCalendarCollection) getResource()).getTimeZone();
-        }
-     
-        ComponentFilter eventFilter = new ComponentFilter(Component.VEVENT);
-        eventFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
-        eventFilter.getTimeRangeFilter().setTimezone(tz);
-        
-        ComponentFilter calFilter =
-            new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
-        calFilter.getComponentFilters().add(eventFilter);
-        
-
-        CalendarFilter filter = new CalendarFilter();
-        filter.setFilter(calFilter);
-
-        filters[0] = filter;
-        
-        ComponentFilter freebusyFilter =
-            new ComponentFilter(Component.VFREEBUSY);
-        freebusyFilter.setTimeRangeFilter(new TimeRangeFilter(start, end));
-        freebusyFilter.getTimeRangeFilter().setTimezone(tz);
-        
-        calFilter =
-            new ComponentFilter(net.fortuna.ical4j.model.Calendar.VCALENDAR);
-        calFilter.getComponentFilters().add(eventFilter);
-        
-
-        filter = new CalendarFilter();
-        filter.setFilter(calFilter);
-        
-        filters[1] = filter;
-        
-        return filters;
-    }
-
     private static boolean isExcluded(DavCollection collection) {
         DavItemCollection dic = (DavItemCollection) collection;
         return dic.isExcludedFromFreeBusyRollups();
     }
 
-    private static Calendar buildFreeBusy(Set<DavResource> resources,
-                                          VTimeZone tz,
-                                          Period freeBusyRange)
+    /**
+     * Build VCALENDAR with single VFREEBUSY
+     */
+    private Calendar buildFreeBusy()
         throws DavException {
-        PeriodList busyPeriods = new PeriodList();
-        PeriodList busyTentativePeriods = new PeriodList();
-        PeriodList busyUnavailablePeriods = new PeriodList();
 
-        // Create recurrence instances within the time-range
-        for (DavResource resource : resources) {
-            try {
-                Calendar calendar = ((DavCalendarResource)resource).getCalendar();
-
-                // Add busy details from the calendar data
-                addBusyPeriods(calendar, tz, freeBusyRange, busyPeriods,
-                               busyTentativePeriods, busyUnavailablePeriods);
-            } catch (ModelConversionException e) {
-                throw new DavException(e);
-            }
-        }
-
-        // Merge periods
-        busyPeriods = busyPeriods.normalise();
-        busyTentativePeriods = busyTentativePeriods.normalise();
-        busyUnavailablePeriods = busyUnavailablePeriods.normalise();
-
-        // Now create a VFREEBUSY in a calendar
+        VFreeBusy vfb = mergeFreeBusyResults();
+        
+        // Now add VFREEBUSY to a calendar
         Calendar calendar = new Calendar();
         calendar.getProperties().add(Version.VERSION_2_0);
         calendar.getProperties().add(CalScale.GREGORIAN);
         calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        calendar.getComponents().add(vfb);
 
+        return calendar;
+    }
+    
+    /**
+     * Build single VFREEBUSY
+     */
+    private VFreeBusy mergeFreeBusyResults() {
+        
+        // If there is only one result, return it
+        if(freeBusyResults.size()==1)
+            return freeBusyResults.get(0);
+        
+        // Otherwise, merge results into single VFREEBUSY
+        PeriodList busyPeriods = new PeriodList();
+        PeriodList busyTentativePeriods = new PeriodList();
+        PeriodList busyUnavailablePeriods = new PeriodList();
+        
+        for(VFreeBusy vfb: freeBusyResults) {
+            PropertyList props = vfb.getProperties(Property.FREEBUSY);
+            for(Iterator it = props.iterator();it.hasNext();) {
+                FreeBusy fb = (FreeBusy) it.next();
+                FbType fbt = (FbType)
+                    fb.getParameters().getParameter(Parameter.FBTYPE);
+                if ((fbt == null) || FbType.BUSY.equals(fbt)) {
+                    busyPeriods.add(fb.getPeriods());
+                } else if (FbType.BUSY_TENTATIVE.equals(fbt)) {
+                    busyTentativePeriods.add(fb.getPeriods());
+                } else if (FbType.BUSY_UNAVAILABLE.equals(fbt)) {
+                    busyUnavailablePeriods.add(fb.getPeriods());
+                }
+            }
+        }
+        
+        // Merge periods
+        busyPeriods = busyPeriods.normalise();
+        busyTentativePeriods = busyTentativePeriods.normalise();
+        busyUnavailablePeriods = busyUnavailablePeriods.normalise();
+        
+        // Construct new VFREEBUSY
         VFreeBusy vfb =
             new VFreeBusy(freeBusyRange.getStart(), freeBusyRange.getEnd());
         String uid = uuidGenerator.nextIdentifier().toString();
         vfb.getProperties().add(new Uid(uid));
-        calendar.getComponents().add(vfb);
-
+       
         // Add all periods to the VFREEBUSY
         if (busyPeriods.size() != 0) {
             FreeBusy fb = new FreeBusy(busyPeriods);
@@ -325,111 +265,8 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             fb.getParameters().add(FbType.BUSY_UNAVAILABLE);
             vfb.getProperties().add(fb);
         }
-
-        return calendar;
-    }
-
-    private static void addBusyPeriods(Calendar calendar,
-                                       VTimeZone timezone,
-                                       Period freeBusyRange,
-                                       PeriodList busyPeriods,
-                                       PeriodList busyTentativePeriods,
-                                       PeriodList busyUnavailablePeriods) {
-        // Create list of instances within the specified time-range
-        InstanceList instances = new InstanceList();
-        instances.setUTC(true);
         
-        if(timezone!=null)
-            instances.setTimezone(new TimeZone(timezone));
-        
-
-        // Look at each VEVENT/VFREEBUSY component only
-        ComponentList overrides = new ComponentList();
-        for (Iterator i=calendar.getComponents().iterator(); i.hasNext();) {
-            Component comp = (Component) i.next();
-            if (comp instanceof VEvent) {
-                VEvent vcomp = (VEvent) comp;
-                // See if this is the master instance
-                if (vcomp.getRecurrenceId() == null) {
-                    instances.addComponent(vcomp, freeBusyRange.getStart(),
-                                           freeBusyRange.getEnd());
-                } else {
-                    overrides.add(vcomp);
-                }
-            } else if (comp instanceof VFreeBusy) {
-                // Add all FREEBUSY BUSY/BUSY-TENTATIVE/BUSY-UNAVAILABLE to the
-                // periods
-                PropertyList fbs =
-                    comp.getProperties().getProperties(Property.FREEBUSY);
-                for (Iterator j = fbs.iterator(); j.hasNext();) {
-                    FreeBusy fb = (FreeBusy) j.next();
-                    FbType fbt = (FbType)
-                        fb.getParameters().getParameter(Parameter.FBTYPE);
-                    if ((fbt == null) || FbType.BUSY.equals(fbt)) {
-                        busyPeriods.add(fb.getPeriods());
-                    } else if (FbType.BUSY_TENTATIVE.equals(fbt)) {
-                        busyTentativePeriods.add(fb.getPeriods());
-                    } else if (FbType.BUSY_UNAVAILABLE.equals(fbt)) {
-                        busyUnavailablePeriods.add(fb.getPeriods());
-                    }
-                }
-            }
-        }
-
-        for (Iterator i = overrides.iterator(); i.hasNext();) {
-            Component comp = (Component) i.next();
-            instances.addComponent(comp, freeBusyRange.getStart(),
-                    freeBusyRange.getEnd());
-        }
-
-        // See if there is nothing to do (should not really happen)
-        if (instances.size() == 0) {
-            return;
-        }
-
-        // Add start/end period for each instance
-        TreeSet sortedKeys = new TreeSet(instances.keySet());
-        for (Iterator i = sortedKeys.iterator(); i.hasNext();) {
-            String ikey = (String) i.next();
-            Instance instance = (Instance) instances.get(ikey);
-
-            // Check that the VEVENT has the proper busy status
-            if (Transp.TRANSPARENT.equals(instance.getComp().getProperties()
-                                          .getProperty(Property.TRANSP))) {
-                continue;
-            }
-            if (Status.VEVENT_CANCELLED.equals(instance.getComp().
-                                               getProperties().
-                                               getProperty(Property.STATUS))) {
-                continue;
-            }
-
-            // Can only have DATE-TIME values in PERIODs
-            if (instance.getStart() instanceof DateTime) {
-                DateTime start = (DateTime) instance.getStart();
-                DateTime end = (DateTime) instance.getEnd();
-                Value sv = freeBusyRange.getStart() instanceof DateTime ?
-                    Value.DATE_TIME : Value.DATE;
-                Value se = freeBusyRange.getEnd() instanceof DateTime ?
-                    Value.DATE_TIME : Value.DATE;
-
-                if (start.compareTo(freeBusyRange.getStart()) < 0) {
-                    start = (DateTime)
-                        Dates.getInstance(freeBusyRange.getStart(), sv);
-                }
-                if (end.compareTo(freeBusyRange.getEnd()) > 0) {
-                    end = (DateTime)
-                        Dates.getInstance(freeBusyRange.getEnd(), se);
-                }
-                if (Status.VEVENT_TENTATIVE.equals(instance.getComp()
-                                                   .getProperties().
-                                                   getProperty(Property.STATUS))) {
-                    busyTentativePeriods.add(new Period(start, end));
-                } else {
-                    busyPeriods.add(new Period(start, end));
-                }
-            }
-        }
+        return vfb;
     }
 
     private static String writeCalendar(Calendar calendar)

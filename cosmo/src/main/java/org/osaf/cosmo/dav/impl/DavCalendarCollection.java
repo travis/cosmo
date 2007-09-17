@@ -22,6 +22,8 @@ import javax.xml.namespace.QName;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.apache.commons.logging.Log;
@@ -175,13 +177,29 @@ public class DavCalendarCollection extends DavCollectionBase
 
         return members;
     }
+    
+    /**
+     * Returns a VFREEBUSY component containing
+     * the freebusy periods for the calendar collection for the
+     * specified time range.
+     * @param period time range for freebusy information
+     * @return VFREEBUSY component containing FREEBUSY periods for
+     *         specified timerange
+     */
+    public VFreeBusy generateFreeBusy(Period period) {
+
+        VFreeBusy vfb = getContentService().generateFreeBusy(
+                (CollectionItem) getItem(), period);
+        
+        return vfb;
+    }
 
     /**
      * Returns the default timezone for this calendar collection, if
      * one has been set.
      */
     public VTimeZone getTimeZone() {
-        Calendar obj = getCalendarCollectionStamp().getTimezone();
+        Calendar obj = getCalendarCollectionStamp().getTimezoneCalendar();
         if (obj == null)
             return null;
         return (VTimeZone)
@@ -225,8 +243,8 @@ public class DavCalendarCollection extends DavCollectionBase
         if (cc.getDescription() != null)
             properties.add(new CalendarDescription(cc.getDescription(),
                                                    cc.getLanguage()));
-        if (cc.getTimezone() != null)
-            properties.add(new CalendarTimezone(cc.getTimezone().toString()));
+        if (cc.getTimezoneCalendar() != null)
+            properties.add(new CalendarTimezone(cc.getTimezoneCalendar().toString()));
 
         properties.add(new SupportedCalendarComponentSet());
         properties.add(new SupportedCollationSet());
@@ -259,7 +277,7 @@ public class DavCalendarCollection extends DavCollectionBase
         }
 
         if (name.equals(CALENDARTIMEZONE))
-            cc.setTimezone(TimeZoneExtractor.extract(property));
+            cc.setTimezoneCalendar(TimeZoneExtractor.extract(property));
     }
 
     /** */
@@ -283,7 +301,7 @@ public class DavCalendarCollection extends DavCollectionBase
         }
 
         if (name.equals(CALENDARTIMEZONE)) {
-            cc.setTimezone(null);
+            cc.setTimezoneCalendar(null);
             return;
         }
     }

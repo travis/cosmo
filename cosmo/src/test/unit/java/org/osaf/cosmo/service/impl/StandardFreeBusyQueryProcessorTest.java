@@ -37,6 +37,7 @@ import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 
@@ -79,6 +80,12 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
             event.setUid(CALENDAR_UID + i);
             contentDao.createContent(calendar, event);
         }
+        
+        FreeBusyItem fb = generateFreeBusy("test4.ics", "Vfreebusy.ics", "testuser");
+        fb.setUid(CALENDAR_UID + "4");
+        contentDao.createContent(calendar, fb);
+        
+        clearSession();
     }
 
     public void testFreeBusyQuery() throws Exception {
@@ -89,10 +96,23 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
         
         CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
         
+        // verify we get resuts from VEVENTS in collection
         VFreeBusy vfb = queryProcessor.generateFreeBusy(calendar, period);
         
         verifyPeriods(vfb, null, "20070508T081500Z/20070508T091500Z,20070509T081500Z/20070509T091500Z,20070510T081500Z/20070510T091500Z,20070511T081500Z/20070511T091500Z,20070512T081500Z/20070512T091500Z,20070513T081500Z/20070513T091500Z,20070514T081500Z/20070514T091500Z,20070515T081500Z/20070515T091500Z");
         verifyPeriods(vfb, FbType.BUSY_TENTATIVE, "20070508T101500Z/20070508T111500Z,20070515T101500Z/20070515T111500Z");
+       
+        // verify we get resuts from VFREEBUSY in collection
+        start = new DateTime("20060101T051500Z");
+        end = new DateTime("20060105T051500Z");
+        
+        period = new Period(start, end);
+        
+        vfb = queryProcessor.generateFreeBusy(calendar, period);
+        
+        verifyPeriods(vfb, null, "20060103T100000Z/20060103T120000Z,20060104T100000Z/20060104T120000Z,20060106T100000Z/20060106T120000Z");
+        verifyPeriods(vfb, FbType.BUSY_TENTATIVE, "20060102T100000Z/20060102T120000Z");
+        verifyPeriods(vfb, FbType.BUSY_UNAVAILABLE, "20060105T100000Z/20060105T120000Z");
     }
     
     
@@ -126,6 +146,17 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
         evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
        
         return event;
+    }
+    
+    private FreeBusyItem generateFreeBusy(String name, String file,
+            String owner) throws Exception {
+        FreeBusyItem fb = new FreeBusyItem();
+        fb.setName(name);
+        fb.setDisplayName(name);
+        fb.setOwner(getUser(userDao, owner));
+        fb.setFreeBusyCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        
+        return fb;
     }
     
     private void verifyPeriods(VFreeBusy vfb, FbType fbtype, String periods) {

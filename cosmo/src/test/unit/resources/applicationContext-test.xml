@@ -78,6 +78,7 @@
             <value>org.osaf.cosmo.model.EventExceptionStamp</value>
             <value>org.osaf.cosmo.model.EventStamp</value>
             <value>org.osaf.cosmo.model.FileItem</value>
+            <value>org.osaf.cosmo.model.FreeBusyItem</value>
             <value>org.osaf.cosmo.model.HomeCollectionItem</value>
             <value>org.osaf.cosmo.model.ICalendarAttribute</value>
             <value>org.osaf.cosmo.model.ICalendarItem</value>

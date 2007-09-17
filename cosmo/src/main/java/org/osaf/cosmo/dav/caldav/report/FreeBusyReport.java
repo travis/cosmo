@@ -230,11 +230,11 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
                 FbType fbt = (FbType)
                     fb.getParameters().getParameter(Parameter.FBTYPE);
                 if ((fbt == null) || FbType.BUSY.equals(fbt)) {
-                    busyPeriods.add(fb.getPeriods());
+                    busyPeriods.addAll(fb.getPeriods());
                 } else if (FbType.BUSY_TENTATIVE.equals(fbt)) {
-                    busyTentativePeriods.add(fb.getPeriods());
+                    busyTentativePeriods.addAll(fb.getPeriods());
                 } else if (FbType.BUSY_UNAVAILABLE.equals(fbt)) {
-                    busyUnavailablePeriods.add(fb.getPeriods());
+                    busyUnavailablePeriods.addAll(fb.getPeriods());
                 }
             }
         }

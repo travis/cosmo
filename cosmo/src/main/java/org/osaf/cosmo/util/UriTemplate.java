@@ -106,7 +106,7 @@ public class UriTemplate {
                     throw new IllegalArgumentException("Not enough values");
                 }
                 buf.append(escape(value));
-            } else {
+            } else if (! segment.isAll()) {
                 buf.append(segment.getData());
             }
 

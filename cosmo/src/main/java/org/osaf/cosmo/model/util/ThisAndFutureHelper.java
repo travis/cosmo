@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
@@ -33,6 +34,8 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.util.DateUtil;
+import org.osaf.cosmo.util.ICalendarUtils;
 
 /**
  * Helper class to handle breaking a recurring series to
@@ -135,10 +138,16 @@ public class ThisAndFutureHelper {
     
     private void modifyOldSeries(NoteItem oldSeries, Date lastRecurrenceId) {
         EventStamp event = EventStamp.getStamp(oldSeries);
-        // UNTIL should be just before lastRecurrence (don't include lastRecurrence)
-        Date untilDate = Dates.getInstance(new java.util.Date(lastRecurrenceId.getTime()
-                - TIME_OFFSET), lastRecurrenceId);
-        
+      
+        // We set the end date to 1 second before the begining of the next day
+        java.util.Calendar untilDateCalendar = java.util.Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        untilDateCalendar.setTime(lastRecurrenceId);
+        untilDateCalendar.add(java.util.Calendar.DAY_OF_MONTH, -1);
+        untilDateCalendar.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        untilDateCalendar.set(java.util.Calendar.MINUTE, 59);
+        untilDateCalendar.set(java.util.Calendar.SECOND, 59);
+        Date untilDate = Dates.getInstance(untilDateCalendar.getTime(), lastRecurrenceId);
+
         List<Recur> recurs = event.getRecurrenceRules();
         for (Recur recur : recurs)
             recur.setUntil(untilDate);

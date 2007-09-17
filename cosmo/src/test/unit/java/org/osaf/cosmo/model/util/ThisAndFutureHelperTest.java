@@ -68,7 +68,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         EventStamp eventStamp = EventStamp.getStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
-        Assert.assertEquals(new DateTime("20070808T081459"), recur.getUntil());
+        Assert.assertEquals(new DateTime("20070807T235959Z"), recur.getUntil());
         
         Assert.assertEquals(6, results.size());
         
@@ -97,7 +97,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         EventStamp eventStamp = EventStamp.getStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
-        Assert.assertEquals(new DateTime("20070808T081459"), recur.getUntil());
+        Assert.assertEquals(new DateTime("20070807T235959Z"), recur.getUntil());
         
         Assert.assertEquals(6, results.size());
         
@@ -128,7 +128,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         EventStamp eventStamp = EventStamp.getStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
-        Assert.assertEquals(new DateTime("20070809T084459", tz), recur.getUntil());
+        Assert.assertEquals(new DateTime("20070808T235959Z", tz), recur.getUntil());
         
         Assert.assertEquals(4, results.size());
         

@@ -287,7 +287,8 @@ public class ServiceLocator implements ServerConstants {
         StringBuffer buf = new StringBuffer();
         buf.append(appMountUrl).append(factory.getDavPrefix()).
             append(org.osaf.cosmo.dav.ExtendedDavConstants.
-                   TEMPLATE_HOME.bind(user.getUsername()));
+                   TEMPLATE_HOME.bind(user.getUsername())).
+                   append("/");
         return buf.toString();
     }
 

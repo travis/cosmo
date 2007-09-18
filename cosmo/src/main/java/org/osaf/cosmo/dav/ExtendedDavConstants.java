@@ -50,10 +50,13 @@ public interface ExtendedDavConstants extends DavConstants {
     public static final String PROPERTY_UUID = "uuid";
 
     /** The Cosmo property <code>cosmo:uuid</code> */
-    public static final DavPropertyName OWNER =
-        DavPropertyName.create(XML_OWNER, NAMESPACE);
     public static final DavPropertyName UUID =
         DavPropertyName.create(PROPERTY_UUID, NAMESPACE_COSMO);
+
+    public static final DavPropertyName OWNER =
+        DavPropertyName.create(XML_OWNER, NAMESPACE);
+    public static final DavPropertyName SUPPORTEDREPORTSET =
+        DavPropertyName.create("supported-report-set", NAMESPACE);
 
     public static final String QN_PROPFIND =
         DomUtil.getQualifiedName(XML_PROPFIND, NAMESPACE);

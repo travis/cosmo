@@ -122,8 +122,19 @@ cosmo.view.service = new function () {
             dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
         } 
         else {
-            cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps('saveRecurConfirm',
-                { changeTypes: changeTypes, delta: delta, saveItem: item }));
+            //if only the ALL_EVENTS type of change is possible because of a modification to the 
+            //recurrence rule, we display a special dialog box. 
+            if (size == 1 
+                  && changeTypes[cosmo.view.service.recurringEventOptions.ALL_EVENTS] 
+                  && delta.isStampPropertyChanged("event", "rrule")){
+                var props = cosmo.view.recurrenceDialog.getProps('saveRecurConfirmAllEventsOnly',
+                    { changeTypes: changeTypes, delta: delta, saveItem: item });
+                    dojo.debug(props.content);
+                cosmo.app.showDialog(props);
+            } else {
+                cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps('saveRecurConfirm',
+                    { changeTypes: changeTypes, delta: delta, saveItem: item }));
+            }
         }
     }
 

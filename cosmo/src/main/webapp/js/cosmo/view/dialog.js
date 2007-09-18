@@ -190,6 +190,19 @@ cosmo.view.dialog.RecurrenceDialog = function () {
         };
     };
 
+    props.saveRecurConfirmAllEventsOnly = function () {
+         return {
+            'type': cosmo.app.modalDialog.CONFIRM,
+            'btnsLeft': [new Button('cancelButtonDialog', 74,
+                function () { self.doCancelSave.apply(self) },
+                _('App.Button.Cancel'), true)],
+            'btnsRight': [],
+            'defaultAction': function () {},
+            'width': 480,
+            'content': _('Main.Prompt.RecurSaveConfirmAllEventsOnly')
+        };
+    };
+
     this.getProps = function (key, opts) {
         var OPTIONS = cosmo.view.service.recurringEventOptions;
         var p = props[key]();
@@ -212,8 +225,12 @@ cosmo.view.dialog.RecurrenceDialog = function () {
             if (changeTypes[OPTIONS.ONLY_THIS_EVENT]) {
                 p.btnsRight.push(buttons.saveOnlyThisEvent(saveItem, delta));
             }
-        }
-        else if (key == 'removeRecurConfirm') {
+        } else if (key == "saveRecurConfirmAllEventsOnly"){
+            var delta = opts.delta;
+            var saveItem = opts.saveItem  
+            p.btnsRight = [];
+            p.btnsRight.push(buttons.saveAllEvents(saveItem, delta));
+        } else if (key == 'removeRecurConfirm') {
            var item = cosmo.view.dialog.getSelectedItem();
             p.btnsRight = [];
             p.btnsRight.push(buttons.removeAllEvents());

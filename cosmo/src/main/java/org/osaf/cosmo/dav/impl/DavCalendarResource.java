@@ -162,18 +162,7 @@ public abstract class DavCalendarResource extends DavContentBase
         super.setLiveProperty(property);
 
         DavPropertyName name = property.getName();
-        if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
-            name.equals(DavPropertyName.GETCONTENTTYPE))
-            throw new ProtectedPropertyModificationException(name);
-    }
-
-    /** */
-    protected void removeLiveProperty(DavPropertyName name)
-        throws DavException {
-        super.removeLiveProperty(name);
-
-        if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
-            name.equals(DavPropertyName.GETCONTENTTYPE))
+        if (name.equals(DavPropertyName.GETCONTENTTYPE))
             throw new ProtectedPropertyModificationException(name);
     }
 }

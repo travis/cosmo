@@ -159,10 +159,8 @@ public class DavFile extends DavContentBase {
         if (content.getContentLanguage() != null)
             properties.add(new ContentLanguage(content.getContentLanguage()));
         properties.add(new ContentLength(content.getContentLength()));
-        properties.add(new Etag(getETag()));
         properties.add(new ContentType(content.getContentType(),
                                        content.getContentEncoding()));
-        properties.add(new LastModified(content.getModifiedDate()));
     }
 
     /** */
@@ -204,8 +202,5 @@ public class DavFile extends DavContentBase {
             content.setContentLanguage(null);
             return;
         }
-
-        if (name.equals(DavPropertyName.GETCONTENTTYPE))
-            throw new ProtectedPropertyModificationException(name);
     }
 }

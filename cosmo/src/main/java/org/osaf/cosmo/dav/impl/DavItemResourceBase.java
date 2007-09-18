@@ -17,6 +17,7 @@ package org.osaf.cosmo.dav.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +52,9 @@ import org.osaf.cosmo.dav.acl.property.PrincipalCollectionSet;
 import org.osaf.cosmo.dav.property.CreationDate;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.dav.property.DisplayName;
+import org.osaf.cosmo.dav.property.Etag;
 import org.osaf.cosmo.dav.property.IsCollection;
+import org.osaf.cosmo.dav.property.LastModified;
 import org.osaf.cosmo.dav.property.ResourceType;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.property.Uuid;
@@ -105,6 +108,8 @@ public abstract class DavItemResourceBase extends DavResourceBase
 
     static {
         registerLiveProperty(DavPropertyName.CREATIONDATE);
+        registerLiveProperty(DavPropertyName.GETLASTMODIFIED);
+        registerLiveProperty(DavPropertyName.GETETAG);
         registerLiveProperty(DavPropertyName.DISPLAYNAME);
         registerLiveProperty(DavPropertyName.ISCOLLECTION);
         registerLiveProperty(DavPropertyName.RESOURCETYPE);
@@ -136,6 +141,14 @@ public abstract class DavItemResourceBase extends DavResourceBase
         if (getItem() == null)
             return null;
         return "\"" + getItem().getEntityTag() + "\"";
+    }
+
+    public long getModificationTime() {
+        if (getItem() == null)
+            return -1;
+        if (getItem().getModifiedDate() == null)
+            return new Date().getTime();
+        return getItem().getModifiedDate().getTime();
     }
 
     public void setProperty(org.apache.jackrabbit.webdav.property.DavProperty property)
@@ -372,7 +385,9 @@ public abstract class DavItemResourceBase extends DavResourceBase
             return;
 
         properties.add(new CreationDate(item.getCreationDate()));
-        properties.add(new DisplayName(item.getDisplayName()));
+        properties.add(new LastModified(item.getModifiedDate()));
+        properties.add(new Etag(getETag()));
+        properties.add(new DisplayName(getDisplayName()));
         properties.add(new ResourceType(getResourceTypes()));
         properties.add(new IsCollection(isCollection()));
         properties.add(new Owner(getResourceLocator(), item.getOwner()));
@@ -392,6 +407,8 @@ public abstract class DavItemResourceBase extends DavResourceBase
             throw new UnprocessableEntityException("Property " + name + " requires a value");
 
         if (name.equals(DavPropertyName.CREATIONDATE) ||
+            name.equals(DavPropertyName.GETLASTMODIFIED) ||
+            name.equals(DavPropertyName.GETETAG) ||
             name.equals(DavPropertyName.RESOURCETYPE) ||
             name.equals(DavPropertyName.ISCOLLECTION) ||
             name.equals(OWNER) ||
@@ -410,6 +427,8 @@ public abstract class DavItemResourceBase extends DavResourceBase
             return;
 
         if (name.equals(DavPropertyName.CREATIONDATE) ||
+            name.equals(DavPropertyName.GETLASTMODIFIED) ||
+            name.equals(DavPropertyName.GETETAG) ||
             name.equals(DavPropertyName.DISPLAYNAME) ||
             name.equals(DavPropertyName.RESOURCETYPE) ||
             name.equals(DavPropertyName.ISCOLLECTION) ||

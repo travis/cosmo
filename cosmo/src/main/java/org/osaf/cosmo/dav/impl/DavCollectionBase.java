@@ -122,10 +122,6 @@ public class DavCollectionBase extends DavItemResourceBase
         return true;
     }
 
-    public long getModificationTime() {
-        return -1;
-    }
-
     public void spool(OutputContext outputContext)
         throws IOException {
         throw new UnsupportedOperationException();
@@ -382,8 +378,9 @@ public class DavCollectionBase extends DavItemResourceBase
                       getItem().getName());
 
         context.setContentType(IOUtil.buildContentType("text/html", "UTF-8"));
+        context.setModificationTime(getModificationTime());
+        context.setETag(getETag());
         // XXX content length unknown unless we write a temp file
-        // modification time and etag are undefined for a collection
 
         if (! context.hasStream()) {
             return;

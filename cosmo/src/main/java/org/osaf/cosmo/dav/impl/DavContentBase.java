@@ -17,7 +17,6 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,8 +42,6 @@ import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.property.DavProperty;
-import org.osaf.cosmo.dav.property.Etag;
-import org.osaf.cosmo.dav.property.LastModified;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.NoteItem;
@@ -74,9 +71,6 @@ public abstract class DavContentBase extends DavItemResourceBase
         new HashSet<String>();
 
     static {
-        registerLiveProperty(DavPropertyName.GETETAG);
-        registerLiveProperty(DavPropertyName.GETLASTMODIFIED);
-
         RESOURCE_TYPES = new int[] { ResourceType.DEFAULT_RESOURCE };
 
         DEAD_PROPERTY_FILTER.add(NoteItem.class.getName());
@@ -91,7 +85,6 @@ public abstract class DavContentBase extends DavItemResourceBase
         super(item, locator, factory);
     }
 
-
     // Jackrabbit DavResource
 
     /** */
@@ -102,15 +95,6 @@ public abstract class DavContentBase extends DavItemResourceBase
     /** */
     public String getSupportedMethods() {
         return "OPTIONS, GET, HEAD, POST, TRACE, PROPFIND, PROPPATCH, COPY, PUT, DELETE, MOVE, MKTICKET, DELTICKET";
-    }
-
-    /** */
-    public long getModificationTime() {
-        if (getItem() == null)
-            return -1;
-        if (getItem().getModifiedDate() == null)
-            return new Date().getTime();
-        return getItem().getModifiedDate().getTime();
     }
 
     public void addMember(org.apache.jackrabbit.webdav.DavResource member,
@@ -157,19 +141,6 @@ public abstract class DavContentBase extends DavItemResourceBase
             content.setLastModification(ContentItem.Action.EDITED);
         }
     }
-    
-    
-    /** */
-    protected void loadLiveProperties(DavPropertySet properties) {
-        super.loadLiveProperties(properties);
-
-        ContentItem content = (ContentItem) getItem();
-        if (content == null)
-            return;
-
-        properties.add(new Etag(getETag()));
-        properties.add(new LastModified(content.getModifiedDate()));
-    }
 
     /** */
     protected void setLiveProperty(DavProperty property)
@@ -181,10 +152,10 @@ public abstract class DavContentBase extends DavItemResourceBase
             return;
 
         DavPropertyName name = property.getName();
-        if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
-            name.equals(DavPropertyName.GETETAG) ||
-            name.equals(DavPropertyName.GETLASTMODIFIED))
+        if (name.equals(DavPropertyName.GETCONTENTLENGTH))
             throw new ProtectedPropertyModificationException(name);
+
+        // content type is settable by subclasses
     }
 
     /** */
@@ -197,8 +168,6 @@ public abstract class DavContentBase extends DavItemResourceBase
             return;
 
         if (name.equals(DavPropertyName.GETCONTENTLENGTH) ||
-            name.equals(DavPropertyName.GETETAG) ||
-            name.equals(DavPropertyName.GETLASTMODIFIED) ||
             name.equals(DavPropertyName.GETCONTENTTYPE))
             throw new ProtectedPropertyModificationException(name);
     }

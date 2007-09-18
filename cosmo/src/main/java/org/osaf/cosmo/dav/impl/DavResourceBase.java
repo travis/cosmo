@@ -38,11 +38,9 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-import org.apache.jackrabbit.webdav.version.DeltaVConstants;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
-import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
@@ -54,6 +52,7 @@ import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.property.DavProperty;
+import org.osaf.cosmo.dav.property.SupportedReportSet;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 
 /**
@@ -77,7 +76,7 @@ public abstract class DavResourceBase
         new HashSet<ReportType>(0);
 
     static {
-        registerLiveProperty(DeltaVConstants.SUPPORTED_REPORT_SET);
+        registerLiveProperty(SUPPORTEDREPORTSET);
     }
 
     private DavResourceLocator locator;
@@ -370,9 +369,7 @@ public abstract class DavResourceBase
         if (initialized)
             return;
 
-        ReportType[] reportTypes = (ReportType[])
-            getReportTypes().toArray(new ReportType[0]);
-        properties.add(new SupportedReportSetProperty(reportTypes));
+        properties.add(new SupportedReportSet(getReportTypes()));
 
         loadLiveProperties(properties);
         loadDeadProperties(properties);
@@ -387,7 +384,7 @@ public abstract class DavResourceBase
     protected void setResourceProperty(DavProperty property)
         throws DavException {
         DavPropertyName name = property.getName();
-        if (name.equals(DeltaVConstants.SUPPORTED_REPORT_SET))
+        if (name.equals(SUPPORTEDREPORTSET))
             throw new ProtectedPropertyModificationException(name);
 
         if (isLiveProperty(property.getName()))
@@ -404,7 +401,7 @@ public abstract class DavResourceBase
      */
     protected void removeResourceProperty(DavPropertyName name)
         throws DavException {
-        if (name.equals(DeltaVConstants.SUPPORTED_REPORT_SET))
+        if (name.equals(SUPPORTEDREPORTSET))
             throw new ProtectedPropertyModificationException(name);
 
         if (isLiveProperty(name))

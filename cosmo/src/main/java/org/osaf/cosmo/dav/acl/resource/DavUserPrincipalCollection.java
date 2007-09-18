@@ -35,13 +35,13 @@ import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
+import org.apache.jackrabbit.webdav.property.DavPropertyIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.DeltaVConstants;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
-import org.apache.jackrabbit.webdav.version.report.SupportedReportSetProperty;
 
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavContent;
@@ -61,6 +61,9 @@ import org.osaf.cosmo.dav.property.DisplayName;
 import org.osaf.cosmo.dav.property.IsCollection;
 import org.osaf.cosmo.dav.property.ResourceType;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.xml.DomWriter;
+
+import org.w3c.dom.Element;
 
 /**
  * <p>
@@ -251,7 +254,12 @@ public class DavUserPrincipalCollection extends DavResourceBase
 
     private void writeHtmlDirectoryIndex(OutputContext context)
         throws DavException, IOException {
+        if (log.isDebugEnabled())
+            log.debug("writing html directory index for  " +
+                      getDisplayName());
+
         context.setContentType(IOUtil.buildContentType("text/html", "UTF-8"));
+        // no modification time or etag
 
         if (! context.hasStream())
             return;
@@ -260,22 +268,74 @@ public class DavUserPrincipalCollection extends DavResourceBase
             new PrintWriter(new OutputStreamWriter(context.getOutputStream(),
                                                    "utf8"));
 
-        writer.write("<html><head><title>");
+        writer.write("<html>\n<head><title>");
         writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
-        writer.write("</title></head>");
-        writer.write("<body>");
+        writer.write("</title></head>\n");
+        writer.write("<body>\n");
         writer.write("<h1>");
         writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
-        writer.write("</h1>");
-        writer.write("<p>");
-        writer.write("The following reports are supported on this collection:");
-        writer.write("<ul>");
-        for (ReportType rt : getReportTypes())
-            writer.write(StringEscapeUtils.escapeHtml(rt.getReportName()));
-        writer.write("</ul>");
+        writer.write("</h1>\n");
+
+        writer.write("<h2>Members</h2>\n");
+        writer.write("<ul>\n");
+        for (DavResourceIterator i=getMembers(); i.hasNext();) {
+            DavResource child = (DavResource) i.nextResource();
+            writer.write("<li><a href=\"");
+            writer.write(child.getResourceLocator().getHref(child.isCollection()));
+            writer.write("\">");
+            writer.write(StringEscapeUtils.escapeHtml(child.getDisplayName()));
+            writer.write("</a></li>\n");
+        }
+        writer.write("</ul>\n");
+
+        writer.write("<h2>Properties</h2>\n");
+        writer.write("<dl>\n");
+        for (DavPropertyIterator i=getProperties().iterator(); i.hasNext();) {
+            DavProperty prop = (DavProperty) i.nextProperty();
+            Object value = prop.getValue();
+            String text = null;
+            if (value instanceof Element) {
+                try {
+                    text = DomWriter.write((Element)value);
+                } catch (Exception e) {
+                    log.warn("Error serializing value for property " + prop.getName());
+                }
+            }
+            if (text == null)
+                text = prop.getValueText();
+            writer.write("<dt>");
+            writer.write(StringEscapeUtils.escapeHtml(prop.getName().toString()));
+            writer.write("</dt><dd>");
+            writer.write(StringEscapeUtils.escapeHtml(text));
+            writer.write("</dd>\n");
+        }
+        writer.write("</dl>\n");
+
+        User user = getSecurityManager().getSecurityContext().getUser();
+        if (user != null) {
+            writer.write("<p>\n");
+            DavResourceLocator homeLocator =
+                getResourceLocator().getFactory().
+                createHomeLocator(getResourceLocator().getContext(), user);
+            writer.write("<a href=\"");
+            writer.write(homeLocator.getHref(true));
+            writer.write("\">");
+            writer.write("Home collection");
+            writer.write("</a><br>\n");
+
+            DavResourceLocator principalLocator = 
+                getResourceLocator().getFactory().
+                createPrincipalLocator(getResourceLocator().getContext(),
+                                       user);
+            writer.write("<a href=\"");
+            writer.write(principalLocator.getHref(false));
+            writer.write("\">");
+            writer.write("Principal resource");
+            writer.write("</a><br>\n");
+        }
+
         writer.write("</body>");
-        writer.write("</html>");
-        writer.write("\n");
+        writer.write("</html>\n");
         writer.close();
     }
 }

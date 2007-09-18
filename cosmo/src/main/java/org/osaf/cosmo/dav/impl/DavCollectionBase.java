@@ -380,30 +380,25 @@ public class DavCollectionBase extends DavItemResourceBase
         throws DavException, IOException {
         if (log.isDebugEnabled())
             log.debug("writing html directory index for  " +
-                      getItem().getName());
+                      getDisplayName());
 
         context.setContentType(IOUtil.buildContentType("text/html", "UTF-8"));
         context.setModificationTime(getModificationTime());
         context.setETag(getETag());
 
-        if (! context.hasStream()) {
+        if (! context.hasStream())
             return;
-        }
 
         PrintWriter writer =
             new PrintWriter(new OutputStreamWriter(context.getOutputStream(),
                                                    "utf8"));
 
-        String title = getItem().getDisplayName();
-        if (title == null)
-            title = getItem().getUid();
-
         writer.write("<html>\n<head><title>");
-        writer.write(StringEscapeUtils.escapeHtml(title));
+        writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
         writer.write("</title></head>\n");
         writer.write("<body>\n");
         writer.write("<h1>");
-        writer.write(StringEscapeUtils.escapeHtml(title));
+        writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
         writer.write("</h1>\n");
         
         DavResource parent = getParent();
@@ -418,7 +413,7 @@ public class DavCollectionBase extends DavItemResourceBase
         writer.write("<h2>Members</h2>\n");
         writer.write("<ul>\n");
         for (DavResourceIterator i=getMembers(); i.hasNext();) {
-            DavItemResourceBase child = (DavItemResourceBase) i.nextResource();
+            DavResource child = (DavResource) i.nextResource();
             writer.write("<li><a href=\"");
             writer.write(child.getResourceLocator().getHref(child.isCollection()));
             writer.write("\">");
@@ -442,6 +437,8 @@ public class DavCollectionBase extends DavItemResourceBase
             }
             if (text == null)
                 text = prop.getValueText();
+            if (text == null)
+                text = "-- no value --";
             writer.write("<dt>");
             writer.write(StringEscapeUtils.escapeHtml(prop.getName().toString()));
             writer.write("</dt><dd>");

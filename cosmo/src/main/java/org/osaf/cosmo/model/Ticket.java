@@ -52,7 +52,7 @@ import org.hibernate.validator.NotNull;
  */
 @Entity
 @Table(name="tickets")
-public class Ticket extends BaseModelObject {
+public class Ticket extends BaseModelObject implements Comparable<Ticket> {
 
     /**
      * 
@@ -267,12 +267,15 @@ public class Ticket extends BaseModelObject {
     /**
      */
     public String toString() {
-        return new ToStringBuilder(this).
-            append("key", key).
-            append("timeout", timeout).
-            append("privileges", privileges).
-            append("created", created).
-            toString();
+        StringBuffer buf = new StringBuffer(key);
+        Type type = getType();
+        if (type != null)
+            buf.append(" (").append(type).append(")");
+        return buf.toString();
+    }
+
+    public int compareTo(Ticket t) {
+        return key.compareTo(t.getKey());
     }
 
     @ManyToOne(fetch=FetchType.LAZY)

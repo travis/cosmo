@@ -190,7 +190,7 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
         VFreeBusy vfb = mergeFreeBusyResults();
         
         // Now add VFREEBUSY to a calendar
-        Calendar calendar = ICalendarUtils.createBaseCalendar(vfb, null);
+        Calendar calendar = ICalendarUtils.createBaseCalendar(vfb);
 
         return calendar;
     }

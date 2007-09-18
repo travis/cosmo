@@ -62,15 +62,21 @@ public class ICalendarUtils {
      * @return base Calendar
      */
     public static Calendar createBaseCalendar(Component comp, String icalUid) {
+        Uid uid = new Uid(icalUid);
+        comp.getProperties().add(uid);
+        return createBaseCalendar(comp);
+    }
+    
+    /**
+     * Create a base Calendar containing a single component.
+     * @param comp Component to add to the base Calendar
+     * @return base Calendar
+     */
+    public static Calendar createBaseCalendar(Component comp) {
         Calendar cal = new Calendar();
         cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
         cal.getProperties().add(Version.VERSION_2_0);
         cal.getProperties().add(CalScale.GREGORIAN);
-        
-        if(icalUid!=null) {
-            Uid uid = new Uid(icalUid);
-            comp.getProperties().add(uid);
-        }
         
         cal.getComponents().add(comp);
         return cal;

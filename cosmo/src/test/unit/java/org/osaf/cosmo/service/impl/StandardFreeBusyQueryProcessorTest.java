@@ -110,9 +110,9 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
         
         vfb = queryProcessor.generateFreeBusy(calendar, period);
         
-        verifyPeriods(vfb, null, "20060103T100000Z/20060103T120000Z,20060104T100000Z/20060104T120000Z,20060106T100000Z/20060106T120000Z");
+        verifyPeriods(vfb, null, "20060103T100000Z/20060103T120000Z,20060104T100000Z/20060104T120000Z");
         verifyPeriods(vfb, FbType.BUSY_TENTATIVE, "20060102T100000Z/20060102T120000Z");
-        verifyPeriods(vfb, FbType.BUSY_UNAVAILABLE, "20060105T100000Z/20060105T120000Z");
+        verifyPeriods(vfb, FbType.BUSY_UNAVAILABLE, "20060105T010000Z/20060105T020000Z");
     }
     
     

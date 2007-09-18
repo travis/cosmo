@@ -164,11 +164,14 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
                     FbType fbt = (FbType) fb.getParameters().getParameter(
                             Parameter.FBTYPE);
                     if ((fbt == null) || FbType.BUSY.equals(fbt)) {
-                        busyPeriods.addAll(fb.getPeriods());
+                        addRelevantPeriods(busyPeriods, fb.getPeriods(),
+                                freeBusyRange);
                     } else if (FbType.BUSY_TENTATIVE.equals(fbt)) {
-                        busyTentativePeriods.addAll(fb.getPeriods());
+                        addRelevantPeriods(busyTentativePeriods, fb
+                                .getPeriods(), freeBusyRange);
                     } else if (FbType.BUSY_UNAVAILABLE.equals(fbt)) {
-                        busyUnavailablePeriods.addAll(fb.getPeriods());
+                        addRelevantPeriods(busyUnavailablePeriods, fb
+                                .getPeriods(), freeBusyRange);
                     }
                 }
             }
@@ -225,6 +228,19 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
                     busyPeriods.add(new Period(start, end));
                 }
             }
+        }
+    }
+    
+    /**
+     * Add all periods that intersect a given period to the result PeriodList.
+     */
+    private void addRelevantPeriods(PeriodList results, PeriodList periods,
+            Period range) {
+
+        for (Iterator<Period> it = periods.iterator(); it.hasNext();) {
+            Period p = it.next();
+            if (p.intersects(range))
+                results.add(p);
         }
     }
     

@@ -48,24 +48,24 @@ public class UserVoter extends UserResourceVoter
 
         UriTemplate.Match match = null;
 
-        match = TEMPLATE_COLLECTION.match(path);
+        match = TEMPLATE_COLLECTION.match(false, path);
         if (match != null)
             return voteOnCollection(match, method, authenticated);
 
-        match = TEMPLATE_ITEM.match(path);
+        match = TEMPLATE_ITEM.match(false, path);
         if (match != null)
             return voteOnItemResource(match, method, authenticated);
 
-        match = TEMPLATE_USERS.match(path);
+        match = TEMPLATE_USERS.match(false, path);
         if (match != null)
             return voteOnUserPrincipalCollection(match, method,
                                                  authenticated);
 
-        match = TEMPLATE_USER.match(path);
+        match = TEMPLATE_USER.match(false, path);
         if (match != null)
             return voteOnUserPrincipalResource(match, method, authenticated);
 
-        match = TEMPLATE_HOME.match(path);
+        match = TEMPLATE_HOME.match(false, path);
         if (match != null)
             return voteOnHomeResource(match, method, authenticated);
 

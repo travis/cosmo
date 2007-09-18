@@ -38,6 +38,7 @@ public class TicketDiscovery extends StandardDavProperty
     public TicketDiscovery(DavResourceLocator locator,
                            Set<Ticket> tickets) {
         super(TICKETDISCOVERY, tickets, true);
+        this.locator = locator;
     }
 
     public Set<Ticket> getTickets() {

@@ -176,9 +176,26 @@ public class UriTemplate {
 
     /**
      * <p>
-     * Matches a candidate uri-path against the template. Returns a
+     * Matches an escaped candidate uri-path against the template using the
+     * same algorithm as {@link match(boolean, String)}. Returns a
      * <code>Match</code> instance containing the names and values of
      * all variables found in the uri-path as specified by the
+     * template.
+     * </p>
+     *
+     * @param path the candidate uri-path
+     * @return a <code>Match</code>, or <code>null</code> if the path
+     * did not successfully match
+     */
+    public Match match(String path) {
+        return match(true, path);
+    }
+
+    /**
+     * <p>
+     * Matches a possibly-escaped candidate uri-path against the template.
+     * Returns a <code>Match</code> instance containing the names and values
+     * of all variables found in the uri-path as specified by the
      * template.
      * </p>
      * <p>
@@ -193,11 +210,13 @@ public class UriTemplate {
      * uri-path after the last matching segment.
      * </p>
      *
+     * @param escaped whether or not the uri-path is escaped
      * @param path the candidate uri-path
      * @return a <code>Match</code>, or <code>null</code> if the path
      * did not successfully match
      */
-    public Match match(String path) {
+    public Match match(boolean escaped,
+                       String path) {
         Match match = new Match(path);
 
         //if (log.isDebugEnabled())
@@ -230,10 +249,11 @@ public class UriTemplate {
                 String saved = match.get("*");
                 if (saved == null)
                     saved = "";
-                saved += "/" + unescape(token);
+                saved += "/" + (escaped ? unescape(token) : token);
                 match.put("*", saved);
             } else if (segment.isVariable())
-                match.put(segment.getData(), unescape(token));
+                match.put(segment.getData(),
+                          escaped ? unescape(token) : token);
             else if (! segment.getData().equals(token))
                 // literal segment doesn't match, so path is not a match
                 return null;

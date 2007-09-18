@@ -114,7 +114,7 @@
         <dependency>
             <groupId>net.fortuna</groupId>
             <artifactId>ical4j</artifactId>
-            <version>1.0-beta4-osaf-20070821</version>
+            <version>1.0-beta5-osaf-20070918</version>
         </dependency>
         <!-- required by jcr-server -->
         <!-- XXX: should be 1.0 release version -->

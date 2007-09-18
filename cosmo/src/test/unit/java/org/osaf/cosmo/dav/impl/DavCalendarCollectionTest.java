@@ -36,7 +36,6 @@ public class DavCalendarCollectionTest extends BaseDavTestCase
     implements ExtendedDavConstants,CaldavConstants  {
     private static final Log log = LogFactory.getLog(DavCalendarCollectionTest.class);
 
-    /** */
     public void testSupportedCollationSetProperty() throws Exception {
         CollectionItem col = testHelper.makeAndStoreDummyCalendarCollection();
         

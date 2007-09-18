@@ -346,14 +346,6 @@ public class DavCalendarCollection extends DavCollectionBase
         EventStamp event = EventStamp.getStamp(content);
         Calendar calendar = event.getCalendar();
 
-        // XXX CALDAV:min-date-time
-
-        // XXX CALDAV:max-date-time
-
-        // XXX CALDAV:max-instances
-
-        // XXX CALDAV:max-attendees-per-instance
-
         if (event.getId() != -1) {
             if (log.isDebugEnabled())
                 log.debug("updating event " + member.getResourcePath());

@@ -27,8 +27,8 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.osaf.cosmo.calendar.util.CalendarBuilderDispenser;
-import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.caldav.InvalidCalendarDataException;
 import org.osaf.cosmo.dav.property.DavProperty;
 
 /**
@@ -115,18 +115,18 @@ public class TimeZoneExtractor {
         } catch (IOException e) {
             throw new DavException(e);
         } catch (ParserException e) {
-            throw new BadRequestException("Calendar object not parseable: " + e.getMessage());
+            throw new InvalidCalendarDataException("Calendar object not parseable: " + e.getMessage());
         } catch (ValidationException e) {
-            throw new BadRequestException("Invalid calendar object: " + e.getMessage());
+            throw new InvalidCalendarDataException("Invalid calendar object: " + e.getMessage());
         }
 
         if (calendar.getComponents().size() > 1)
-            throw new BadRequestException("Calendar object contains more than one VTIMEZONE component");
+            throw new InvalidCalendarDataException("Calendar object contains more than one VTIMEZONE component");
 
         VTimeZone vtz = (VTimeZone)
             calendar.getComponent(Component.VTIMEZONE);
         if (vtz == null)
-            throw new BadRequestException("Calendar object must contain a VTIMEZONE component");
+            throw new InvalidCalendarDataException("Calendar object must contain a VTIMEZONE component");
 
         return calendar;
     }

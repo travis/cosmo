@@ -26,7 +26,6 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 
-import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
@@ -54,9 +53,7 @@ import org.w3c.dom.Element;
  */
 public class FreeBusyReport extends SimpleReport implements CaldavConstants {
     private static final Log log = LogFactory.getLog(FreeBusyReport.class);
-    private static final VersionFourGenerator uuidGenerator =
-        new VersionFourGenerator();
-
+    
     private Period freeBusyRange;
     private ArrayList<VFreeBusy> freeBusyResults;
 

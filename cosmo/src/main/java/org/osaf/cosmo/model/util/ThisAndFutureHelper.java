@@ -27,6 +27,7 @@ import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
 import org.osaf.cosmo.calendar.util.Dates;
 import org.osaf.cosmo.model.EventExceptionStamp;
@@ -35,7 +36,6 @@ import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.util.DateUtil;
-import org.osaf.cosmo.util.ICalendarUtils;
 
 /**
  * Helper class to handle breaking a recurring series to

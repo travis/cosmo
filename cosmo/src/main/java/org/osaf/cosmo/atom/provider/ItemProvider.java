@@ -502,68 +502,91 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
         processor.processContent(entry.getContent(), item);
         
+        // oldStart will have a value if the item has an EventStamp
+        // and the EventStamp is recurring
         if (oldstart != null) {
-            Date newstart = es.getStartDate();
-            if (newstart != null && ! newstart.equals(oldstart)) {
-                long delta = newstart.getTime() - oldstart.getTime();
-                if (log.isDebugEnabled())
-                    log.debug("master event start date changed; " +
-                              "adjusting modifications by " + delta +
-                              " milliseconds");
-
+            es = EventStamp.getStamp(item);
+            // Case 1: EventStamp was removed from recurring event, so we
+            // have to remove all modifications (a modification doesn't make
+            // sense if there is no recurring event)
+            if(es==null) {
                 LinkedHashSet<ContentItem> updates = new LinkedHashSet<ContentItem>();
-                HashSet<NoteItem> copies = new HashSet<NoteItem>();
-                HashSet<NoteItem> removals = new HashSet<NoteItem>();
-
-                // copy each modification and update the copy's uid
-                // with the new start date
-                Iterator<NoteItem> mi = item.getModifications().iterator();
-                while (mi.hasNext()) {
-                    NoteItem mod = mi.next();
+                for(NoteItem mod: item.getModifications()) {
                     mod.setIsActive(false);
-                    removals.add(mod);
-
-                    NoteItem copy = (NoteItem) mod.copy();
-                    copy.setModifies(item);
-                    
-                    EventExceptionStamp ees =
-                        EventExceptionStamp.getStamp(copy);
-                    
-                    DateTime oldRid = (DateTime) ees.getRecurrenceId();
-                    java.util.Date newRidTime =
-                        new java.util.Date(oldRid.getTime() + delta);
-                    DateTime newRid = (DateTime)
-                        Dates.getInstance(newRidTime, Value.DATE_TIME);
-                    if (oldRid.isUtc())
-                        newRid.setUtc(true);
-                    else
-                        newRid.setTimeZone(oldRid.getTimeZone());
-                    
-                    copy.setUid(new ModificationUid(item, newRid).toString());
-                    ees.setRecurrenceId(newRid);
-
-                    // If the modification's dtstart is missing, then
-                    // we have to adjust dtstart to be equal to the
-                    // recurrenceId.
-                    if(isDtStartMissing(BaseEventStamp.getStamp(mod))) {
-                        ees.setStartDate(ees.getRecurrenceId());
-                    }
-                    
-                    copies.add(copy);
+                    updates.add(mod);
                 }
-
-                // add removals first
-                updates.addAll(removals);
-                // then additions
-                updates.addAll(copies);
-                // then updates
                 updates.add(item);
-                
-                // Update everything in one atomic service call
+                item.getModifications().clear();
+                // Update item and remove modifications in one atomic service call
                 contentService.updateContentItems(item.getParents(), updates);
-            } else {
-                // use simple update
-                item = (NoteItem) contentService.updateItem(item);
+            } 
+            // Case 2: Start date may have changed on master event.
+            else {
+                Date newstart = es.getStartDate();
+                
+                // If changed, we have to update all the recurrenceIds
+                // for any modifications
+                if (newstart != null && ! newstart.equals(oldstart)) {
+                    long delta = newstart.getTime() - oldstart.getTime();
+                    if (log.isDebugEnabled())
+                        log.debug("master event start date changed; " +
+                                  "adjusting modifications by " + delta +
+                                  " milliseconds");
+    
+                    LinkedHashSet<ContentItem> updates = new LinkedHashSet<ContentItem>();
+                    HashSet<NoteItem> copies = new HashSet<NoteItem>();
+                    HashSet<NoteItem> removals = new HashSet<NoteItem>();
+    
+                    // copy each modification and update the copy's uid
+                    // with the new start date
+                    Iterator<NoteItem> mi = item.getModifications().iterator();
+                    while (mi.hasNext()) {
+                        NoteItem mod = mi.next();
+                        mod.setIsActive(false);
+                        removals.add(mod);
+    
+                        NoteItem copy = (NoteItem) mod.copy();
+                        copy.setModifies(item);
+                        
+                        EventExceptionStamp ees =
+                            EventExceptionStamp.getStamp(copy);
+                        
+                        DateTime oldRid = (DateTime) ees.getRecurrenceId();
+                        java.util.Date newRidTime =
+                            new java.util.Date(oldRid.getTime() + delta);
+                        DateTime newRid = (DateTime)
+                            Dates.getInstance(newRidTime, Value.DATE_TIME);
+                        if (oldRid.isUtc())
+                            newRid.setUtc(true);
+                        else
+                            newRid.setTimeZone(oldRid.getTimeZone());
+                        
+                        copy.setUid(new ModificationUid(item, newRid).toString());
+                        ees.setRecurrenceId(newRid);
+    
+                        // If the modification's dtstart is missing, then
+                        // we have to adjust dtstart to be equal to the
+                        // recurrenceId.
+                        if(isDtStartMissing(BaseEventStamp.getStamp(mod))) {
+                            ees.setStartDate(ees.getRecurrenceId());
+                        }
+                        
+                        copies.add(copy);
+                    }
+    
+                    // add removals first
+                    updates.addAll(removals);
+                    // then additions
+                    updates.addAll(copies);
+                    // then updates
+                    updates.add(item);
+                    
+                    // Update everything in one atomic service call
+                    contentService.updateContentItems(item.getParents(), updates);
+                } else {
+                    // otherwise use simple update
+                    item = (NoteItem) contentService.updateItem(item);
+                }
             }
         } else {
             // use simple update

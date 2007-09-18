@@ -53,7 +53,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     this.selectedItemCache = {};
     this.currSortCol = 'Triage';
     this.currSortDir = 'Desc';
-    this.itemsPerPage = 20;
+    this.itemsPerPage = 200;
     this.itemCount = 0;
     this.pageCount = 0;
     this.currPageNum = 1;
@@ -271,27 +271,32 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var item = val;
             var display = item.display;
             var sort = item.sort;
-            var selCss = 'listView_item' + display.uid == selId ? ' listViewSelectedCell' : '';
+            var selCss = 'listView_item' + display.uid == selId ?
+              ' listViewSelectedCell' : '';
             r = '';
             r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + '">';
             if (display.task) {
-                var backgroundStyle = (dojo.render.html.safari? 
-                                       ('background-position-x: ' + taskIconStyle.backgroundPositionX + '; background-position-y: ' +
-                                        taskIconStyle.backgroundPositionY) :
-                                       ('background-position: ' + taskIconStyle.backgroundPosition))  + ";";
-                    
+                var backgroundStyle = (dojo.render.html.safari ?
+                   ('background-position-x: ' + taskIconStyle.backgroundPositionX +
+                   '; background-position-y: ' +
+                    taskIconStyle.backgroundPositionY) :
+                   ('background-position: ' + taskIconStyle.backgroundPosition))  + ";";
+
                 r += '<div id="foo" style="margin: 0px 2px; width: ' + taskIconStyle.width +
                     '; height: ' + taskIconStyle.height +
                     '; font-size: 1px; background-image: ' +
-                    taskIconStyle.backgroundImage + ';' + 
-                    backgroundStyle + 
+                    taskIconStyle.backgroundImage + ';' +
+                    backgroundStyle +
                     '">&nbsp;</div>';
             }
             r += '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.title) + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '">' + fillCell(display.who) + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '" style="white-space: nowrap;">' + fillCell(display.startDate) + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' +
+              fillCell(display.title) + '</td>';
+            r += '<td class="listViewDataCell' + selCss + '">' +
+              fillCell(display.who) + '</td>';
+            r += '<td class="listViewDataCell' + selCss +
+              '" style="white-space: nowrap;">' + fillCell(display.startDate) + '</td>';
             r += '<td class="listViewDataCell' +
                 ' listViewTriageCell listViewTriage' +
                 _tMap[item.data.getTriageStatus()] + selCss + '">' +

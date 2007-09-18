@@ -15,13 +15,13 @@
  */
 package org.osaf.cosmo.dav.acl;
 
-import javax.xml.namespace.QName;
-
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.ResourceType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.Namespace;
+
+import org.osaf.cosmo.xml.QName;
 
 /**
  * Provides constants for media types, XML namespaces, names and

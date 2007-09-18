@@ -15,12 +15,17 @@
  */
 package org.osaf.cosmo.dav.property;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -97,8 +102,10 @@ public class StandardDavProperty
     /**
      * <p>
      * If the property value is an <code>Element</code>, the text and character
-     * data content of the element and every child element are concatenated
-     * and returned.
+     * data content of the element and every child element are concatenated.
+     * </p>
+     * <p>
+     * If the property is a <code>Set</code>, the set is sorted and joined.
      * </p>
      * <p>
      * If the property value is otherwise not null, {@link Object.toString()} is
@@ -112,6 +119,10 @@ public class StandardDavProperty
             String text = DomUtil.getText((Element) value);
             if (text != null)
                 return text;
+        }
+        if (value instanceof Set) {
+            TreeSet<Object> sorted = new TreeSet<Object>((Set)value);
+            return StringUtils.join(sorted, ", ");
         }
         return value.toString();
     }

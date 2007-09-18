@@ -17,6 +17,8 @@ package org.osaf.cosmo.dav;
 
 import java.net.URL;
 
+import org.osaf.cosmo.model.User;
+
 /**
  * <p>
  * The interface for factory classes that create instances of
@@ -31,12 +33,10 @@ public interface DavResourceLocatorFactory {
      * to the given context URL. The context URL includes enough path
      * information to identify the dav namespace.
      * </p>
-     * <p>
      *
      * @param context the URL specifying protocol, authority and unescaped
      * base path
      * @param path the unescaped path of the resource
-     * </p>
      */
     public DavResourceLocator createResourceLocatorByPath(URL context,
                                                           String path);
@@ -55,9 +55,36 @@ public interface DavResourceLocatorFactory {
      * @param context the URL specifying protocol, authority and unescaped
      * base path
      * @param path the unescaped path of the resource
-     * </p>
      */
     public DavResourceLocator createResourceLocatorByUri(URL context,
                                                          String uri)
+        throws DavException;
+
+    /**
+     * <p>
+     * Returns a locator for the home collection of the given user
+     * relative to the given context URL.
+     * </p>
+     *
+     * @param context the URL specifying protocol, authority and unescaped
+     * base path
+     * @param path the user
+     */
+    public DavResourceLocator createHomeLocator(URL context,
+                                                User user)
+        throws DavException;
+
+    /**
+     * <p>
+     * Returns a locator for the principal resource of the given user
+     * relative to the given context URL.
+     * </p>
+     *
+     * @param context the URL specifying protocol, authority and unescaped
+     * base path
+     * @param path the user
+     */
+    public DavResourceLocator createPrincipalLocator(URL context,
+                                                     User user)
         throws DavException;
 }

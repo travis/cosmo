@@ -21,6 +21,9 @@ import java.net.URL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.dav.ExtendedDavConstants;
+import org.osaf.cosmo.model.User;
+
 /**
  * Standard implementation of {@link DavResourceLocatorFactory}.
  * Returns instances of {@link StandardResourceLocator}.
@@ -28,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * @see DavResourceLocatorFactory
  */
 public class StandardResourceLocatorFactory
-    implements DavResourceLocatorFactory {
+    implements DavResourceLocatorFactory, ExtendedDavConstants {
     private static final Log log =
         LogFactory.getLog(StandardResourceLocatorFactory.class);
 
@@ -76,5 +79,19 @@ public class StandardResourceLocatorFactory
                 throw (DavException) e;
             throw new BadRequestException("Invalid URL: " + e.getMessage());
         }
+    }
+
+    public DavResourceLocator createHomeLocator(URL context,
+                                                User user)
+        throws DavException {
+        String path = TEMPLATE_HOME.bind(user.getUsername());
+        return new StandardResourceLocator(context, path, this);
+    }
+
+    public DavResourceLocator createPrincipalLocator(URL context,
+                                                     User user)
+        throws DavException {
+        String path = TEMPLATE_USER.bind(user.getUsername());
+        return new StandardResourceLocator(context, path, this);
     }
 }

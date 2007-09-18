@@ -81,7 +81,7 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
             contentDao.createContent(calendar, event);
         }
         
-        FreeBusyItem fb = generateFreeBusy("test4.ics", "Vfreebusy.ics", "testuser");
+        FreeBusyItem fb = generateFreeBusy("test4.ics", "vfreebusy.ics", "testuser");
         fb.setUid(CALENDAR_UID + "4");
         contentDao.createContent(calendar, fb);
         

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,6 +34,7 @@ import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
+import org.apache.jackrabbit.webdav.property.DavPropertyIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
@@ -62,7 +64,9 @@ import org.osaf.cosmo.dav.property.IsCollection;
 import org.osaf.cosmo.dav.property.LastModified;
 import org.osaf.cosmo.dav.property.ResourceType;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.util.PathUtil;
+import org.osaf.cosmo.xml.DomWriter;
+
+import org.w3c.dom.Element;
 
 /**
 * <p>
@@ -131,18 +135,7 @@ public class DavUserPrincipal extends DavResourceBase
 
     public void writeTo(OutputContext context)
         throws DavException, IOException {
-        context.setContentType(IOUtil.buildContentType("text/plain",
-                                                       "UTF-8"));
-
-        if (! context.hasStream())
-            return;
-
-        PrintWriter writer =
-            new PrintWriter(new OutputStreamWriter(context.getOutputStream(),
-                                                   "utf8"));
-        writer.write(user.getUsername());
-        writer.write("\n");
-        writer.close();
+        writeHtmlRepresentation(context);
     }
 
     public void addMember(org.apache.jackrabbit.webdav.DavResource member,
@@ -248,5 +241,79 @@ public class DavUserPrincipal extends DavResourceBase
     protected void removeDeadProperty(DavPropertyName name)
         throws DavException {
         throw new ForbiddenException("Dead properties are not supported on this resource");
+    }
+
+    private void writeHtmlRepresentation(OutputContext context)
+        throws DavException, IOException {
+        if (log.isDebugEnabled())
+            log.debug("writing html representation for user principal " +
+                      getDisplayName());
+
+        context.setContentType(IOUtil.buildContentType("text/html", "UTF-8"));
+        context.setModificationTime(getModificationTime());
+        context.setETag(getETag());
+
+        if (! context.hasStream()) {
+            return;
+        }
+
+        PrintWriter writer =
+            new PrintWriter(new OutputStreamWriter(context.getOutputStream(),
+                                                   "utf8"));
+
+        writer.write("<html>\n<head><title>");
+        writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
+        writer.write("</title></head>\n");
+        writer.write("<body>\n");
+        writer.write("<h1>");
+        writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
+        writer.write("</h1>\n");
+
+        writer.write("<h2>Properties</h2>\n");
+        writer.write("<dl>\n");
+        for (DavPropertyIterator i=getProperties().iterator(); i.hasNext();) {
+            DavProperty prop = (DavProperty) i.nextProperty();
+            Object value = prop.getValue();
+            String text = null;
+            if (value instanceof Element) {
+                try {
+                    text = DomWriter.write((Element)value);
+                } catch (Exception e) {
+                    log.warn("Error serializing value for property " + prop.getName());
+                }
+            }
+            if (text == null)
+                text = prop.getValueText();
+            writer.write("<dt>");
+            writer.write(StringEscapeUtils.escapeHtml(prop.getName().toString()));
+            writer.write("</dt><dd>");
+            writer.write(StringEscapeUtils.escapeHtml(text));
+            writer.write("</dd>\n");
+        }
+        writer.write("</dl>\n");
+
+        DavResource parent = getParent();
+        writer.write("<a href=\"");
+        writer.write(parent.getResourceLocator().getHref(true));
+        writer.write("\">");
+        writer.write(StringEscapeUtils.escapeHtml(parent.getDisplayName()));
+        writer.write("</a></li>\n");
+        
+        User user = getSecurityManager().getSecurityContext().getUser();
+        if (user != null) {
+            writer.write("<p>\n");
+            DavResourceLocator homeLocator =
+                getResourceLocator().getFactory().
+                createHomeLocator(getResourceLocator().getContext(), user);
+            writer.write("<a href=\"");
+            writer.write(homeLocator.getHref(true));
+            writer.write("\">");
+            writer.write("Home collection");
+            writer.write("</a><br>\n");
+        }
+
+        writer.write("</body>");
+        writer.write("</html>\n");
+        writer.close();
     }
 }

@@ -614,7 +614,15 @@ public class User extends AuditableObject {
         }
         return false;
     }
-    
+
+    @Transient
+    public String getEntityTag() {
+        String username = getUsername() != null ? getUsername() : "-";
+        String modTime = getModifiedDate() != null ?
+            new Long(getModifiedDate().getTime()).toString() : "-";
+        String etag = username + ":" + modTime;
+        return encodeEntityTag(etag.getBytes());
+    }
 
     /*
      * I'm not sure about putting this enum here, but it seems weird in other

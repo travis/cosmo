@@ -103,15 +103,10 @@ public class StandardRequestHandler implements HttpRequestHandler {
             preconditions(wreq, wres, resource);
             process(wreq, wres, resource);
         } catch (Throwable e) {
-            DavException de = null;
-            if (e instanceof DavException) {
-                de = (DavException) e;
-                if (de.getErrorCode() >= 500)
-                    log.error("Internal dav error", e);
-            } else {
-                log.error("Unknown error", e);
-                de = new DavException(e);
-            }
+            DavException de = e instanceof DavException ?
+                (DavException) e : new DavException(e);    
+            if (de.getErrorCode() >= 500)
+                log.error("Internal dav error", e);
             wres.sendDavError(de);
         }
     }

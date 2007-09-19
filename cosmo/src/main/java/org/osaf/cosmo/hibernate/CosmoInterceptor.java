@@ -51,8 +51,8 @@ public class CosmoInterceptor extends EmptyInterceptor {
             return false;
         
         boolean changed = false;
+        Date currDate = new Date();
         for ( int i=0; i < propertyNames.length; i++ ) {
-            Date currDate = new Date();
             if ( "creationDate".equals(propertyNames[i]) ||
                   "modifiedDate".equals(propertyNames[i]) ) {
                 state[i] = currDate;

@@ -22,11 +22,13 @@ import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
@@ -37,8 +39,11 @@ import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.property.ContentLength;
 import org.osaf.cosmo.dav.property.ContentType;
 import org.osaf.cosmo.dav.property.DavProperty;
+import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
+import org.osaf.cosmo.dav.caldav.UidConflictException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.IcalUidInUseException;
 
 /**
  * Abstract calendar resource.
@@ -66,7 +71,11 @@ public abstract class DavCalendarResource extends DavContentBase
     public void move(DavResource destination)
         throws org.apache.jackrabbit.webdav.DavException {
         validateDestination((DavItemResource)destination);
-        super.move(destination);
+        try {
+            super.move(destination);
+        } catch (IcalUidInUseException e) {
+            throw new UidConflictException(e.getMessage());
+        }
     }
 
     /** */
@@ -74,7 +83,11 @@ public abstract class DavCalendarResource extends DavContentBase
                      boolean shallow)
         throws org.apache.jackrabbit.webdav.DavException {
         validateDestination((DavItemResource)destination);
-        super.copy(destination, shallow);
+        try {
+            super.copy(destination, shallow);
+        } catch (IcalUidInUseException e) {
+            throw new UidConflictException(e.getMessage());
+        }
     }
 
     // DavResourceBase methods
@@ -113,7 +126,7 @@ public abstract class DavCalendarResource extends DavContentBase
         // calendar collections into regular collections, but they
         // need to be stripped of their calendar-ness
         if (! (destination.getParent() instanceof DavCalendarCollection))
-            throw new PreconditionFailedException("Destination collection must be a calendar collection");
+            throw new InvalidCalendarLocationException("Destination collection must be a calendar collection");
     }
 
     public void writeTo(OutputContext outputContext)

@@ -66,6 +66,7 @@ public class CalendarCollectionProvider extends CollectionProvider {
             throw new MissingParentException("One or more intermediate collections must be created");
         if (parent.isCalendarCollection())
             throw new InvalidCalendarLocationException("A calendar collection may not be created within a calendar collection");
+        // XXX DAV:needs-privilege DAV:bind on parent collection
 
         if (log.isDebugEnabled())
             log.debug("MKCALENDAR at " + collection.getResourcePath());

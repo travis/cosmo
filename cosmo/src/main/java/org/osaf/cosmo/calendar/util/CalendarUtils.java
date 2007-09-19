@@ -135,4 +135,13 @@ public class CalendarUtils implements ICalendarConstants {
         }
         return false;
     }
+
+    public static boolean hasSupportedComponent(Calendar calendar) {
+        for (Iterator<Component> i=calendar.getComponents().iterator();
+             i.hasNext();) {
+            if (isSupportedComponent(i.next().getName()))
+                 return true;
+         }
+         return false;
+    }
 }

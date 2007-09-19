@@ -69,7 +69,7 @@ cosmo.ui.imagegrid.getPosString = function (o) {
 };
 
 cosmo.ui.imagegrid.createImageIcon = function (p) {
-    //domNode, defaultState
+    //domNode, iconState
     var params = p || {};
     params.defaultState = p.iconState;
     params.isButton = false;
@@ -103,14 +103,22 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
           d.style.backgroundPosition = imgOver.bgPos;
         }
         else if (p.rolloverState) {
-            var over = function () {
+            var over = function (e) {
                 // Do this look up locally so the value doesn't persist
                 // in the closure
                 var imgOver = cosmo.ui.imagegrid.getImage(p.rolloverState);
                 d.style.backgroundPosition = imgOver.bgPos;
+                // Handle any extra mouseover function specified
+                if (p.handleMouseOver) {
+                  p.handleMouseOver(e);
+                }
             };
-            var out = function () {
+            var out = function (e) {
                 d.style.backgroundPosition = img.bgPos;
+                // Handle any extra mouseout function specified
+                if (p.handleMouseOut) {
+                  p.handleMouseOut(e);
+                }
             };
             dojo.event.connect(d, 'onmouseover', over);
             dojo.event.connect(d, 'onmouseout', out);

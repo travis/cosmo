@@ -249,14 +249,25 @@
     overflow: auto;
 }
 .listViewHeaderCell {
-    color: #666;
+    color: #000;
     font-weight: bold;
-    padding: 3px;
-    border-bottom: 1px solid #ddd;
+    padding: 0px 5px;
+    height: 15px;
+    line-height: 15px;
     border-right: 1px solid #ddd;
-    background-image: url(images/day_col_header_background.gif);
+    background-image: url(images/tiling_horizontal.png);
+    background-position: 0px 0px;
     cursor: pointer;
     white-space: nowrap;
+}
+.listViewHeaderCellLit {
+    background-position: 0px -20px;
+}
+.listViewHeaderCellSel {
+    background-position: 0px -40px;
+}
+.listViewHeaderCellSelLit {
+    background-position: 0px -60px;
 }
 .listViewDataCell {
     cursor: pointer;

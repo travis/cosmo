@@ -115,24 +115,51 @@ cosmo.view.list.canvas.Canvas = function (p) {
             return false;
         }
         if (e && e.target) {
-            // get the UID from the row's DOM node id
-            var p = e.target.parentNode;
-            if (!p.id) { return false; }
-            var ch = p.childNodes;
-            for (var i = 0; i < ch.length; i++) {
-                dojo.html.addClass(ch[i], 'listViewSelectedCell');
+            var targ = e.target;
+            targ = targ.id ? targ : targ.parentNode;
+            if (targ.id && targ.id.indexOf('Header') > -1) {
+                if (targ.className.indexOf('Sel') > -1) {
+                    dojo.html.replaceClass(targ, 'listViewHeaderCellSelLit',
+                      'listViewHeaderCellSel');
+                }
+                else {
+                    dojo.html.addClass(targ, 'listViewHeaderCellLit');
+                }
+            }
+            else {
+                // get the UID from the row's DOM node id
+                // Header cell clicked
+                var p = targ.parentNode;
+                if (!p.id) { return false; }
+                var ch = p.childNodes;
+                for (var i = 0; i < ch.length; i++) {
+                    dojo.html.addClass(ch[i], 'listViewSelectedCell');
+                }
             }
         }
     };
     this.handleMouseOut = function (e) {
         if (e && e.target) {
-            // get the UID from the row's DOM node id
-            var p = e.target.parentNode;
-            if (!p.id || (p.id ==  'listView_item' +
-                self.getSelectedItemId())) { return false; }
-            var ch = p.childNodes;
-            for (var i = 0; i < ch.length; i++) {
-                dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+            var targ = e.target;
+            targ = targ.id ? targ : targ.parentNode;
+            if (targ.id && targ.id.indexOf('Header') > -1) {
+                if (targ.className.indexOf('Sel') > -1) {
+                    dojo.html.replaceClass(targ, 'listViewHeaderCellSel',
+                      'listViewHeaderCellSelLit');
+                }
+                else {
+                  dojo.html.removeClass(targ, 'listViewHeaderCellLit');
+                }
+            }
+            else {
+                // get the UID from the row's DOM node id
+                var p = e.target.parentNode;
+                if (!p.id || (p.id ==  'listView_item' +
+                    self.getSelectedItemId())) { return false; }
+                var ch = p.childNodes;
+                for (var i = 0; i < ch.length; i++) {
+                    dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+                }
             }
         }
     };
@@ -140,6 +167,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (e && e.target) {
             var targ = e.target;
             // Header cell clicked
+            targ = targ.id ? targ : targ.parentNode;
             if (targ.id && targ.id.indexOf('Header') > -1) {
                 this._doSortAndDisplay(targ.id);
             }
@@ -195,7 +223,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
             }
 
-
             // The new selection
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
@@ -225,43 +252,32 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var selId = 'listView_item' + self.getSelectedItemId();
         var map = cosmo.view.list.triageStatusCodeMappings;
         var d = _createElem('div'); // Dummy div
+        // Proxy icon div for getting background image properties
         var taskIcon = cosmo.ui.imagegrid.createImageIcon({ domNode: d,
             iconState: 'listViewTaskIcon' });
-        var taskIconStyle = taskIcon.style;
+        var taskStyle = taskIcon.style;
+        var taskBgImg = taskStyle.backgroundImage;
+        // Safari 2 will render backgroundPosition, but doesn't preserve
+        // the actual value set, so reconstruct it from the X-/Y-specific
+        // values that it does set on the proxy div
+        // This is fixed in the Safari 3 Beta, which is why we're checking
+        // here for a specific version string
+        var taskBgPos = (navigator.userAgent.indexOf('Safari/41') > -1) ?
+            taskStyle.backgroundPositionX + ' ' + taskStyle.backgroundPositionY :
+            taskStyle.backgroundPosition;
+        var taskBgPos = taskStyle.backgroundPosition;
+        // Icon/buttons living in the col headers (task, triage)
+        var colHeaderIcons = {};
         var t = '';
         var r = '';
         var cols = [
-            { name: 'Task', width: 16, display: '' },
-            { name: 'Title', width: null, display: 'Title' },
-            { name: 'Who', width: null, display: 'UpdatedBy' },
-            { name: 'Start', width: null, display: 'StartsOn' },
-            { name: 'Triage', width: null, display: 'Triage' }
+            { name: 'Task', width: 16, display: 'taskColumn', isIcon: true },
+            { name: 'Title', width: null, display: 'Title', isIcon: false },
+            { name: 'Who', width: null, display: 'UpdatedBy', isIcon: false },
+            { name: 'Start', width: null, display: 'StartsOn', isIcon: false },
+            { name: 'Triage', width: 32, display: 'triageStatusColumn', isIcon: true }
         ];
         var colCount = 0; // Used to generated the 'processing' row
-
-        t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
-        // Header row
-        r += '<tr>';
-        for (var i = 0; i < cols.length; i++) {
-            var col = cols[i];
-            r += '<td id="listView' + col.name +
-                'Header" class="listViewHeaderCell"';
-            if (col.width) {
-                r += ' style="width: 16px;"';
-            }
-            r += '>';
-            if (col.display) {
-                r += _('Dashboard.ColHeaders.' + col.display);
-            }
-            else {
-                r += '&nbsp;';
-            }
-            r += '</td>';
-            colCount++;
-        }
-        r += '</tr>\n';
-        t += r;
-
         var fillCell = function (s) {
             var cell = s;
             if (s) s = dojo.string.escapeXml(s);
@@ -277,18 +293,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + '">';
             if (display.task) {
-                var backgroundStyle = (dojo.render.html.safari ?
-                   ('background-position-x: ' + taskIconStyle.backgroundPositionX +
-                   '; background-position-y: ' +
-                    taskIconStyle.backgroundPositionY) :
-                   ('background-position: ' + taskIconStyle.backgroundPosition))  + ";";
-
-                r += '<div id="foo" style="margin: 0px 2px; width: ' + taskIconStyle.width +
-                    '; height: ' + taskIconStyle.height +
-                    '; font-size: 1px; background-image: ' +
-                    taskIconStyle.backgroundImage + ';' +
-                    backgroundStyle +
-                    '">&nbsp;</div>';
+                r += '<div style="margin: 0px 2px; width: ' + taskStyle.width +
+                    '; height: ' + taskStyle.height +
+                    '; font-size: 1px; background-image: ' + taskBgImg +
+                    '; background-position: ' + taskBgPos + ';">&nbsp;</div>';
             }
             r += '</td>';
             r += '<td class="listViewDataCell' + selCss + '">' +
@@ -306,6 +314,53 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         var size = this.itemsPerPage;
         var st = (this.currPageNum * size) - size;
+
+        t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: 100%;">\n';
+        // Header row
+        r += '<tr>';
+        for (var i = 0; i < cols.length; i++) {
+            var col = cols[i];
+            var colStyle = '';
+            var isSelected = (col.name == this.currSortCol);
+            if (col.isIcon) {
+                var iconPrefix = isSelected ? 'Selected' : 'Default';
+                var iconDiv = _createElem('div');
+                var mouseOver = function (e) { self.handleMouseOver(e); }
+                var mouseOut = function (e) { self.handleMouseOut(e); }
+                var click = function (e) { self.handleClick(e); }
+                var colIcon = cosmo.ui.imagegrid.createImageButton({ domNode: iconDiv,
+                    defaultState: col.display + iconPrefix,
+                    rolloverState: col.display + iconPrefix + 'Rollover',
+                    handleMouseOver: mouseOver,
+                    handleMouseOut: mouseOut,
+                    handleClick: click });
+                iconDiv.style.margin = 'auto';
+                colHeaderIcons[col.name] = iconDiv;
+                colStyle += ' text-align: center;';
+            }
+            if (col.width) {
+                colStyle += ' width: ' + col.width + 'px;';
+            }
+
+            r += '<td id="listView' + col.name +
+                'Header" class="listViewHeaderCell';
+            if (isSelected) {
+              r += ' listViewHeaderCellSel'
+            }
+            r += '"';
+            if (colStyle) {
+              r += ' style="' + colStyle + '"';
+            }
+            r += '>';
+            if (!col.isIcon) {
+                r += _('Dashboard.ColHeaders.' + col.display);
+            }
+            r += '</td>';
+            colCount++;
+        }
+        r += '</tr>\n';
+        t += r;
+
         hash.each(createContentRow, { start: st, items: size });
 
         t += '</table>';
@@ -313,6 +368,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
         // Create the table
         // ============
         this.domNode.innerHTML = t;
+
+        // Add column header icons
+        for (var i in colHeaderIcons) {
+          var icon = colHeaderIcons[i];
+          $('listView' + i + 'Header').appendChild(icon);
+        }
 
         // Create the 'processing' row
         var row = _createElem('tr');

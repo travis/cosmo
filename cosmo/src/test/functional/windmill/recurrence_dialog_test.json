@@ -13,7 +13,7 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Mazatlan", "id": "tzId"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": " {$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Barbados", "id": "tzId"}, "version": "0.1", "method": "select"}
@@ -23,3 +23,4 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Miquelon", "id": "tzId"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
+{"params": {"jsid": "{$btnsRight1}"}, "version": "0.1", "method": "click"}

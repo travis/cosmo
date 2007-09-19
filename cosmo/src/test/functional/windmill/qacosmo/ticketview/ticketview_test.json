@@ -6,7 +6,5 @@
 {"params": {"id": "hourDiv0-900"}, "version": "0.1", "method": "doubleClick"}
 {"params": {"milliseconds": "2000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"id": "hourDiv0-1100"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"milliseconds": "2000"}, "version": "0.1", "method": "waits.sleep"}
-{"params": {"url": "\/"}, "version": "0.1", "method": "open"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"link": "Log out"}, "version": "0.1", "method": "click"}

@@ -3,5 +3,4 @@
 {"params": {"link": "[Chandler]"}, "version": "0.1", "method": "storeURL"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"params": {"url": "{$[Chandler]}"}, "version": "0.1", "method": "open"}
-{"method": "waits.forElement", "params": {"id" : "_month2_day28"}}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}

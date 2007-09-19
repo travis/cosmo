@@ -117,10 +117,9 @@ public abstract class Stamp extends AuditableObject implements
    
     /**
      * Return a new instance of Stamp containing a copy of the Stamp
-     * @param item Item stamp is copied to
      * @return copy of Stamp
      */
-    public abstract Stamp copy(Item item);
+    public abstract Stamp copy();
     
     
     /**

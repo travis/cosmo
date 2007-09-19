@@ -237,8 +237,8 @@ public class EventExceptionStamp extends BaseEventStamp implements
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.Stamp#copy()
      */
-    public Stamp copy(Item item) {
-        EventExceptionStamp stamp = new EventExceptionStamp(item);
+    public Stamp copy() {
+        EventExceptionStamp stamp = new EventExceptionStamp();
         
         // Need to copy Calendar
         try {

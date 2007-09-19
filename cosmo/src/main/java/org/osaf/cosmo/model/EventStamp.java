@@ -30,7 +30,6 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -40,6 +39,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.osaf.cosmo.calendar.ICalendarUtils;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Event;
 
 
@@ -85,14 +85,8 @@ public class EventStamp extends BaseEventStamp implements
     
     @Transient
     public Calendar getCalendar() {
-        Calendar masterCal = null;
-        
-        try {
-            masterCal = new Calendar(getEventCalendar());
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot copy calendar", e);
-        }
-
+        Calendar masterCal = CalendarUtils.copyCalendar(getEventCalendar());
+       
         // the master calendar might not have any events; for
         // instance, a client might be trying to save a VTODO
         if (masterCal.getComponents(Component.VEVENT).isEmpty())
@@ -150,13 +144,9 @@ public class EventStamp extends BaseEventStamp implements
                 continue;
             
             // Get exception event copy
-            VEvent exceptionEvent = null;
-            try {
-                exceptionEvent = (VEvent) exceptionStamp.getExceptionEvent().copy();
-            } catch (Exception e) {
-                throw new RuntimeException("Cannot copy calendar", e);
-            }
-            
+            VEvent exceptionEvent = (VEvent) CalendarUtils
+                    .copyComponent(exceptionStamp.getExceptionEvent());
+
             // merge item properties to icalendar props
             mergeCalendarProperties(exceptionEvent, exception);
             
@@ -258,8 +248,8 @@ public class EventStamp extends BaseEventStamp implements
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.Stamp#copy()
      */
-    public Stamp copy(Item item) {
-        EventStamp stamp = new EventStamp(item);
+    public Stamp copy() {
+        EventStamp stamp = new EventStamp();
         
         // Need to copy Calendar, and indexes
         try {

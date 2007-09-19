@@ -226,7 +226,7 @@ public class MessageStamp extends Stamp implements
         return (MessageStamp) item.getStamp(MessageStamp.class);
     }
     
-    public Stamp copy(Item item) {
+    public Stamp copy() {
         MessageStamp stamp = new MessageStamp();
         return stamp;
     }

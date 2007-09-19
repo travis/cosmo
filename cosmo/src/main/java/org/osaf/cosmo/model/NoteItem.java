@@ -36,6 +36,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.osaf.cosmo.calendar.ICalendarUtils;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Journal;
 
 /**
@@ -140,8 +141,10 @@ public class NoteItem extends ICalendarItem {
         
         // otherwise, start with new calendar
         if (calendar == null)
-            calendar = ICalendarUtils.createBaseCalendar(new VJournal(),
-                    getIcalUid());
+            calendar = ICalendarUtils.createBaseCalendar(new VJournal());
+        else
+            // use copy when merging calendar with item properties
+            calendar = CalendarUtils.copyCalendar(calendar);
         
         // merge in displayName,body
         VJournal journal = (VJournal) calendar.getComponent(Component.VJOURNAL);

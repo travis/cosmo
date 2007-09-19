@@ -26,6 +26,7 @@ import net.fortuna.ical4j.model.component.VToDo;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.osaf.cosmo.calendar.ICalendarUtils;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Task;
 
 
@@ -102,8 +103,10 @@ public class TaskStamp extends Stamp implements
         
         // otherwise, start with new calendar
         if (calendar == null)
-            calendar = ICalendarUtils.createBaseCalendar(new VToDo(),
-                    ((NoteItem) getItem()).getIcalUid());
+            calendar = ICalendarUtils.createBaseCalendar(new VToDo());
+        else
+            // use copy when merging calendar with item properties
+            calendar = CalendarUtils.copyCalendar(calendar);
         
         // merge in displayName,body
         VToDo task = (VToDo) calendar.getComponent(Component.VTODO);
@@ -121,7 +124,7 @@ public class TaskStamp extends Stamp implements
         return (TaskStamp) item.getStamp(TaskStamp.class);
     }
     
-    public Stamp copy(Item item) {
+    public Stamp copy() {
         TaskStamp stamp = new TaskStamp();
         return stamp;
     }

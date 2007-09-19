@@ -21,11 +21,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
 import javax.persistence.Transient;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -40,8 +37,6 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Type;
-
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.hibernate.validator.Timezone;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
@@ -52,8 +47,6 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
  */
 @Entity
 @DiscriminatorValue("calendar")
-@SecondaryTable(name="calendar_stamp", pkJoinColumns={
-        @PrimaryKeyJoinColumn(name="stampid", referencedColumnName="id")})
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CalendarCollectionStamp extends Stamp implements
         java.io.Serializable, ICalendarConstants {
@@ -62,13 +55,17 @@ public class CalendarCollectionStamp extends Stamp implements
     public static final QName ATTR_CALENDAR_SUPPORTED_COMPONENT_SET = new QName(
             CalendarCollectionStamp.class, "supportedComponentSet");
     
+    public static final QName ATTR_CALENDAR_TIMEZONE = new QName(
+            CalendarCollectionStamp.class, "timezone");
+    
+    public static final QName ATTR_CALENDAR_DESCRIPTION = new QName(
+            CalendarCollectionStamp.class, "description");
+    
+    public static final QName ATTR_CALENDAR_LANGUAGE = new QName(
+            CalendarCollectionStamp.class, "language");
+    
     private Calendar calendar;
-    private Calendar timezone;
-    private String description;
-    private String language;
- 
-    private static final long serialVersionUID = -6197756070431706553L;
-
+    
     /** default constructor */
     public CalendarCollectionStamp() {
     }
@@ -83,47 +80,71 @@ public class CalendarCollectionStamp extends Stamp implements
         setItem(collection);
     }
 
-    public Stamp copy(Item item) {
-        Calendar tz = null;
-        try {
-            tz = new Calendar(timezone);
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot copy timezone calendar", e);
-        }
-
+    public Stamp copy() {
         CalendarCollectionStamp stamp = new CalendarCollectionStamp();
-        stamp.language = language;
-        stamp.description = description;
-        stamp.timezone = tz;
         return stamp;
     }
     
-    @Column(table="calendar_stamp", name="description")
+    @Transient
     public String getDescription() {
-        return description;
+        // description stored as StringAttribute on Item
+        StringAttribute descAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_DESCRIPTION);
+        if(descAttr!=null)
+            return descAttr.getValue();
+        else
+            return null;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        // description stored as StringAttribute on Item
+        StringAttribute descAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_DESCRIPTION);
+        if(descAttr==null && description!=null) {
+            descAttr = new StringAttribute(ATTR_CALENDAR_DESCRIPTION,description);
+            addAttribute(descAttr);
+            return;
+        }
+        if(description==null)
+            removeAttribute(ATTR_CALENDAR_DESCRIPTION);
+        else
+            descAttr.setValue(description);
     }
 
-    @Column(table="calendar_stamp", name="language")
+    @Transient
     public String getLanguage() {
-        return language;
+        // language stored as StringAttribute on Item
+        StringAttribute langAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_LANGUAGE);
+        if(langAttr!=null)
+            return langAttr.getValue();
+        else
+            return null;
     }
 
     public void setLanguage(String language) {
-        this.language = language;
+        // language stored as StringAttribute on Item
+        StringAttribute langAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_LANGUAGE);
+        if(langAttr==null && language!=null) {
+            langAttr = new StringAttribute(ATTR_CALENDAR_LANGUAGE,language);
+            addAttribute(langAttr);
+            return;
+        }
+        if(language==null)
+            removeAttribute(ATTR_CALENDAR_LANGUAGE);
+        else
+            langAttr.setValue(language);
     }
 
     /**
      * @return calendar object representing timezone
      */
-    @Column(table="calendar_stamp", name = "timezone", length=100000)
-    @Type(type="calendar_clob")
     @Timezone
+    @Transient
     public Calendar getTimezoneCalendar() {
-        return timezone;
+        // calendar stored as ICalendarAttribute on Item
+        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_CALENDAR_TIMEZONE);
+        if(calAttr!=null)
+            return calAttr.getValue();
+        else
+            return null;
     }
 
     /**
@@ -131,6 +152,7 @@ public class CalendarCollectionStamp extends Stamp implements
      */
     @Transient
     public TimeZone getTimezone() {
+        Calendar timezone = getTimezoneCalendar();
         if (timezone == null)
             return null;
         VTimeZone vtz = (VTimeZone) timezone.getComponents().getComponent(Component.VTIMEZONE);
@@ -142,6 +164,7 @@ public class CalendarCollectionStamp extends Stamp implements
      */
     @Transient
     public String getTimezoneName() {
+        Calendar timezone = getTimezoneCalendar();
         if (timezone == null)
             return null;
         return timezone.getComponents().getComponent(Component.VTIMEZONE).
@@ -155,7 +178,17 @@ public class CalendarCollectionStamp extends Stamp implements
      *            timezone definition in ical format
      */
     public void setTimezoneCalendar(Calendar timezone) {
-        this.timezone = timezone;
+        // timezone stored as ICalendarAttribute on Item
+        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_CALENDAR_TIMEZONE);
+        if(calAttr==null && timezone!=null) {
+            calAttr = new ICalendarAttribute(ATTR_CALENDAR_TIMEZONE, timezone);
+            addAttribute(calAttr);
+        }
+        
+        if(timezone==null)
+            removeAttribute(ATTR_CALENDAR_TIMEZONE);
+        else
+            calAttr.setValue(timezone);
     }
 
     /**

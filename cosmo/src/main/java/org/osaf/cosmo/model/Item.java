@@ -698,6 +698,6 @@ public abstract class Item extends AuditableObject {
         
         // copy stamps
         for(Stamp stamp: getStamps())
-            item.addStamp(stamp.copy(item));
+            item.addStamp(stamp.copy());
     }
 }

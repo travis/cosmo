@@ -106,6 +106,22 @@ public class CalendarUtils implements ICalendarConstants {
                 .build(is);
         return calendar;
     }
+    
+    public static Calendar copyCalendar(Calendar calendar) {
+        try {
+            return new Calendar(calendar);
+        } catch (Exception e) {
+           throw new RuntimeException("error copying calendar: " + calendar, e);
+        } 
+    }
+    
+    public static Component copyComponent(Component comp) {
+        try {
+            return comp.copy();
+        } catch (Exception e) {
+           throw new RuntimeException("error copying component: " + comp, e);
+        } 
+    }
 
     public static boolean isSupportedComponent(String type) {
         for (String s : SUPPORTED_COMPONENT_TYPES)

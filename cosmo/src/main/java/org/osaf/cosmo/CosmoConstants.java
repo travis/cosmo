@@ -58,7 +58,7 @@ public class CosmoConstants {
      * The Cosmo secham version.  This may or may not change when the
      * PRODUCT_VERSION changes.
      */
-    public static final String SCHEMA_VERSION = "110";
+    public static final String SCHEMA_VERSION = "120";
 
     /**
      * The servlet context attribute which contains the Cosmo server

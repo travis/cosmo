@@ -85,13 +85,14 @@ cosmo.model.declare("cosmo.model.Duration", null,
             var durationString = [
                     multiplier < 0? "-" : "", 
                     "P",
-                    this._year? multiplier * this._year + "Y" : "",
-                    this._month? multiplier * this._month + "M" : "",
-                    this._day? multiplier * this._day + "D" : "",
+                    this._year ? multiplier * this._year + "Y" : "",
+                    this._month ? multiplier * this._month + "M" : "",
+                    this._week ? multiplier * this._week + "W" : "",
+                    this._day ? multiplier * this._day + "D" : "",
                     (this._hour || this._second || this._minute)? "T" : "",
-                    this._hour? multiplier * this._hour + "H" : "",
-                    this._minute? multiplier * this._minute + "M" : "",
-                    this._second? multiplier * this._second + "S" : ""].join("");
+                    this._hour ? multiplier * this._hour + "H" : "",
+                    this._minute ? multiplier * this._minute + "M" : "",
+                    this._second ? multiplier * this._second + "S" : ""].join("");
             if (durationString == "P") return cosmo.model.ZERO_DURATION;
             else return durationString;
                     

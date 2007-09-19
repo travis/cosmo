@@ -54,7 +54,8 @@ function parseIso8601Duration(/*String*/duration){
      day: (parseFloat(dateArray[3]) || 0) * multiplier,
      hour: (parseFloat(dateArray[4]) || 0) * multiplier,
      minute: (parseFloat(dateArray[5]) || 0) * multiplier,
-     second: (parseFloat(dateArray[6]) || 0) * multiplier
+     second: (parseFloat(dateArray[6]) || 0) * multiplier,
+     week: (parseFloat(dateArray[7]) || 0) * multiplier
    }
    return dateHash
 }

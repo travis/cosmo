@@ -258,6 +258,11 @@ test_dateUTCSetters: function () {
        var duration = new cosmo.model.Duration({year:1});
        date.addDuration(duration);
        jum.assertTrue(date.equals(new cosmo.datetime.Date(2001,0,1,12,0,0)));
+
+       var date = new cosmo.datetime.Date(2000,0,1,12,0,0);
+       var duration = new cosmo.model.Duration("P1W");
+       date.addDuration(duration);
+       jum.assertTrue(date.equals(new cosmo.datetime.Date(2000,0,8,12,0,0)));
    },
    
    test_dojoFromIso8601: function(){

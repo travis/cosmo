@@ -84,8 +84,15 @@ cosmotest.datetime.test_serialize = {
           );
         
         cosmotest.datetime.test_serialize.durationsEqual("3", d1, d2);
+        
+        d1 = {week:1};
+        d2 = cosmo.datetime.parseIso8601Duration(
+          cosmo.datetime.durationHashToIso8601(d1)
+        );
 
+        cosmotest.datetime.test_serialize.durationsEqual("4", d1, d2);
     },
+    
     
     /* Makes sure properties specified in the expected match the actual.
      * Also, makes sure properties not specified in the expected

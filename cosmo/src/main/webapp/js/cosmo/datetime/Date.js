@@ -410,6 +410,9 @@ cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ du
         if (duration.getSecond()){
             utc = dojo.date.add(utc, SECOND, duration.getSecond()).getTime();
         }
+        if (duration.getWeek()){
+            utc = dojo.date.add(utc, WEEK, duration.getWeek()).getTime();
+        }
     }
     this.updateFromUTC(utc);
 }

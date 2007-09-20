@@ -195,6 +195,27 @@ public class NoteItem extends ICalendarItem {
         this.modifies = modifies;
     }
     
+    @Override
+    public String getEntityTag() {
+        String uid = getUid() != null ? getUid() : "-";
+        String modTime = getModifiedDate() != null ?
+            new Long(getModifiedDate().getTime()).toString() : "-";
+         
+        StringBuffer etag = new StringBuffer(uid + ":" + modTime);
+        
+        // etag is constructed from self plus modifications
+        if(modifies==null) {
+            for(NoteItem mod: modifications) {
+                uid = mod.getUid() != null ? mod.getUid() : "-";
+                modTime = mod.getModifiedDate() != null ?
+                        new Long(mod.getModifiedDate().getTime()).toString() : "-";
+                etag.append("," + uid + ":" + modTime);
+            }
+        }
+      
+        return encodeEntityTag(etag.toString().getBytes());
+    }
+
     private void mergeCalendarProperties(VJournal journal) {
         //uid = icaluid or uid
         //summary = displayName

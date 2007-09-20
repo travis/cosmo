@@ -1,3 +1,4 @@
+{"method": "waits.forElement", "params": {"id" : "_month2_day28"}}
 {"params": {"text": "testing testing", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$quickCreateButton}"}, "version": "0.1", "method": "click"}
 {"params": {"milliseconds": "7000"}, "version": "0.1", "method": "waits.sleep"}

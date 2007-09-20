@@ -1,7 +1,7 @@
+{"method": "waits.forElement", "params": {"xpath" : "html/body/div/div/form/span[4]/span[3]/button"}}
 {"params": {"xpath": "html/body/div/div/form/span[4]/span[3]/button"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
+{"method": "waits.forElement", "params": {"link" : "[Chandler]"}}
 {"params": {"link": "[Chandler]"}, "version": "0.1", "method": "storeURL"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"params": {"url": "{$[Chandler]}"}, "version": "0.1", "method": "open"}
 {"method": "waits.forElement", "params": {"id" : "_month2_day28"}}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}

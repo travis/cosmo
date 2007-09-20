@@ -1,3 +1,4 @@
+{"method": "waits.forElement", "params": {"link": "Sign up."}}
 {"params": {"link": "Sign up."}, "version": "0.1", "method": "click"}
 {"params": {"text": "{$random1}", "id": "username"}, "version": "0.1", "method": "type"}
 {"params": {"text": "{$random1}", "id": "firstName"}, "version": "0.1", "method": "type"}

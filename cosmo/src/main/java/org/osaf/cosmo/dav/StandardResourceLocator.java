@@ -62,15 +62,32 @@ public class StandardResourceLocator implements DavResourceLocator {
         String path = isCollection && ! this.path.equals("/") ?
             this.path  + "/" : this.path;
         try {
-            URL url = new URL(context, context.getPath() + path);
-            if (absolute)
-                return url.toURI().toASCIIString();
-            // relative dav URLs need to be path-absolute, so we can't just
-            // use path itself - we have to relativize it based on the context
-            return new URI(null, null, url.getPath(), null).toASCIIString();
+            path = context.getPath() + path;
+            String scheme = absolute ? context.getProtocol() : null;
+            String host = absolute ? context.getHost() : null;
+            int port = absolute ? context.getPort() : -1;
+            URI uri = new URI(scheme, null, host, port, path, null, null);
+            return uri.toASCIIString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public URL getUrl(boolean isCollection) {
+        try {
+            return new URL(getHref(isCollection));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public URL getUrl(boolean absolute,
+                      boolean isCollection) {
+    try {
+        return new URL(getHref(absolute, isCollection));
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
     }
 
     public String getPrefix() {

@@ -315,10 +315,15 @@ public class TestHelper {
         return content;
     }
 
-    /** */
     public NoteItem makeDummyItem(User user) {
+        return makeDummyItem(user, null);
+    }
+
+    public NoteItem makeDummyItem(User user,
+                                  String name) {
         String serial = new Integer(++iseq).toString();
-        String name = "test item " + serial;
+        if (name == null)
+            name = "test item " + serial;
 
         NoteItem note = new NoteItem();
 
@@ -349,10 +354,15 @@ public class TestHelper {
         return collection;
     }
     
-    /** */
     public CollectionItem makeDummyCalendarCollection(User user) {
+        return makeDummyCalendarCollection(user, null);
+    }
+
+    public CollectionItem makeDummyCalendarCollection(User user,
+                                                      String name) {
         String serial = new Integer(++lseq).toString();
-        String name = "test calendar collection " + serial;
+        if (name == null)
+            name = "test calendar collection " + serial;
 
         CollectionItem collection = new CollectionItem();
         collection.setUid(serial);

@@ -35,7 +35,11 @@ import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.StandardResourceFactory;
+import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.PathUtil;
 import org.osaf.cosmo.util.UriTemplate;
@@ -121,5 +125,29 @@ public class DavTestHelper extends MockHelper
         String href = collection.getResourceLocator().getHref(false) + "/" +
             UriTemplate.escape(segment);
         return collection.findMember(href);
+    }
+
+    public DavCalendarCollection initializeDavCalendarCollection(String name)
+        throws Exception {
+        CollectionItem collection = (CollectionItem)
+            getHomeCollection().getChildByName(name);
+        if (collection == null)
+            collection = makeAndStoreDummyCalendarCollection(name);
+        DavResourceLocator locator =
+            createMemberLocator(homeLocator, collection.getName());
+        return new DavCalendarCollection(collection, locator,
+                                         resourceFactory);
+    }
+
+    public DavEvent initializeDavEvent(DavCalendarCollection parent,
+                                       String name)
+        throws Exception {
+        CollectionItem collection = (CollectionItem) parent.getItem();
+        NoteItem item = (NoteItem) collection.getChildByName(name);
+        if (item == null)
+            item = makeAndStoreDummyItem(collection, name);
+        DavResourceLocator locator =
+            createMemberLocator(parent.getResourceLocator(), item.getName());
+        return new DavEvent(item, locator, resourceFactory);
     }
 }

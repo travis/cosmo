@@ -93,19 +93,18 @@ public class MockHelper extends TestHelper {
         userService.setUserDao(userDao);
         userService.setPasswordGenerator(new SessionIdGenerator());
         userService.init();
-    }
 
-    public void setUp() throws Exception {
-        user = makeDummyUser();
-        userService.createUser(user);
+        user = userService.getUser("test");
+        if (user == null) {
+            user = makeDummyUser("test", "password");
+            userService.createUser(user);
+        }
         homeCollection = contentService.getRootItem(user);
     }
 
-    public void tearDown() throws Exception {
-        userService.removeUser(user);
-        userService.destroy();
-        contentService.destroy();
-    }
+    public void setUp() throws Exception {}
+
+    public void tearDown() throws Exception {}
 
     public void logIn() {
         logInUser(user);
@@ -155,8 +154,13 @@ public class MockHelper extends TestHelper {
     }
     
     public CollectionItem makeAndStoreDummyCalendarCollection()
+        throws Exception {
+        return makeAndStoreDummyCalendarCollection(null);
+    }
+
+    public CollectionItem makeAndStoreDummyCalendarCollection(String name)
             throws Exception {
-        CollectionItem c = makeDummyCalendarCollection(user);
+        CollectionItem c = makeDummyCalendarCollection(user, name);
         return contentService.createCollection(homeCollection, c);
     }
 
@@ -182,7 +186,13 @@ public class MockHelper extends TestHelper {
 
     public NoteItem makeAndStoreDummyItem(CollectionItem parent)
         throws Exception {
-        NoteItem i = makeDummyItem(user);
+        return makeAndStoreDummyItem(parent, null);
+    }
+
+    public NoteItem makeAndStoreDummyItem(CollectionItem parent,
+                                          String name)
+        throws Exception {
+        NoteItem i = makeDummyItem(user, name);
         return (NoteItem) contentService.createContent(parent, i);
     }
 

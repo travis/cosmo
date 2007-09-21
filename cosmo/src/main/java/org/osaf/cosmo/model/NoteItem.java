@@ -196,6 +196,7 @@ public class NoteItem extends ICalendarItem {
     }
     
     @Override
+    @Transient
     public String getEntityTag() {
         String uid = getUid() != null ? getUid() : "-";
         String modTime = getModifiedDate() != null ?

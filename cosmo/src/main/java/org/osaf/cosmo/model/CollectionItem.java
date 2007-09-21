@@ -72,6 +72,14 @@ public class CollectionItem extends Item {
         return null;
     }
 
+    public Item getChildByName(String name) {
+        for (Item child : children) {
+            if (child.getName().equals(name))
+                return child;
+        }
+        return null;
+    }
+
     @Transient
     public boolean isExcludeFreeBusyRollup() {
         Boolean val =

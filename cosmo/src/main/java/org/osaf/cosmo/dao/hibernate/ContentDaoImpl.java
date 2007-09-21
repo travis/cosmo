@@ -567,9 +567,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         
         setBaseItemProps(content);
         
-        // add parent to new content
-        content.getParents().add(parent);
-        
+       
         // When a note modification is added, it must be added to all
         // collections that the parent note is in, because a note modification's
         // parents are tied to the parent note.
@@ -579,12 +577,20 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if(!note.getModifies().getParents().contains(parent))
                 throw new IllegalArgumentException("note modification cannot be added to collection that parent note is not in");
             
-            note.getParents().addAll(note.getModifies().getParents());
+            // Add modification to all parents of master
+            for (CollectionItem col : note.getModifies().getParents()) {
+                if (col.removeTombstone(content) == true)
+                    getSession().update(col);
+                note.getParents().add(col);
+            }
+        } else {
+            // add parent to new content
+            content.getParents().add(parent);
+            
+            // remove tombstone (if it exists) from parent
+            if(parent.removeTombstone(content)==true)
+                getSession().update(parent);
         }
-        
-        // remove tombstone (if it exists) from parent
-        if(parent.removeTombstone(content)==true)
-            getSession().update(parent);
         
         applyStampHandlerCreate(content);
         
@@ -617,6 +623,15 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             checkForDuplicateICalUid((ICalendarItem) content, content.getParents());
         
         setBaseItemProps(content);
+        
+        // Ensure NoteItem modifications have the same parents as the 
+        // master note.
+        if (isNoteModification(content)) {
+            NoteItem note = (NoteItem) content;
+            if (!note.getParents().equals(parents))
+                throw new IllegalArgumentException(
+                        "Note modification parents must equal to the parents of master note");
+        }
         
         for(CollectionItem parent: parents) {
             content.getParents().add(parent);
@@ -663,11 +678,25 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     @Override
     protected void addItemToCollectionInternal(Item item,
             CollectionItem collection) {
+
+        // Don't allow note modifications to be added to a collection
+        // When a master is added, all the modifications are added
+        if (isNoteModification(item)) {
+            throw new IllegalArgumentException("cannot add modification, only master");
+        }
+        
         if (item instanceof ICalendarItem)
             // verify icaluid is unique within collection
             checkForDuplicateICalUid((ICalendarItem) item, collection);
 
+        
         super.addItemToCollectionInternal(item, collection);
+        
+        // Add all modifications
+        if(item instanceof NoteItem) {
+            for(NoteItem mod: ((NoteItem) item).getModifications())
+                super.addItemToCollectionInternal(mod, collection);
+        }
     }
     
     @Override

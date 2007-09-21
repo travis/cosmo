@@ -1318,10 +1318,11 @@ cosmo.ui.detail.EventFormElements= function () {
             var txtElem = formElements.recurrenceEnd;
             if (elem.selectedIndex == 0) {
                 cosmo.util.html.clearAndDisableFormElem(txtElem, 'text');
-            }
-            else {
+            } else {
                 cosmo.util.html.enableFormElem(txtElem, 'text');
-                cosmo.util.html.setTextInput(txtElem, 'mm/dd/yyyy', true);
+                if (!txtElem.value){
+                    cosmo.util.html.setTextInput(txtElem, 'mm/dd/yyyy', true);
+                }
             }
         }
         dojo.event.connect(elem, 'onchange', func);

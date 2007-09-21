@@ -20,15 +20,40 @@ package org.osaf.cosmo.model;
  * already in use by another item.
  */
 public class IcalUidInUseException extends RuntimeException {
-
+    
+    public String testUid = null;
+    public String existingUid = null;
+    
     /** */
     public IcalUidInUseException(String message) {
         super(message);
+    }
+    
+    /** */
+    public IcalUidInUseException(String message, String testUid,
+            String existingUid) {
+        super(message);
+        this.testUid = testUid;
+        this.existingUid = existingUid;
     }
 
     /** */
     public IcalUidInUseException(String message,
                              Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * The uid of the item tested
+     */
+    public String getTestUid() {
+        return testUid;
+    }
+
+    /**
+     * The uid of the existing item with the duplicate icalUid.
+     */
+    public String getExistingUid() {
+        return existingUid;
     }
 }

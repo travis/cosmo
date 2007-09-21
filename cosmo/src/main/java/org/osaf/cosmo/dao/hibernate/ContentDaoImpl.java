@@ -452,8 +452,13 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // Remove modifications
         if(content instanceof NoteItem) {
             NoteItem note = (NoteItem) content;
-            for(NoteItem mod: note.getModifications())
-                removeContentRecursive(mod);
+            if(note.getModifies()!=null) {
+                // ensure master is dirty so that etag gets updated
+                note.getModifies().updateTimestamp();
+            } else {   
+                for(NoteItem mod: note.getModifications())
+                    removeContentRecursive(mod);
+            }
         }
             
         getSession().delete(content);
@@ -574,6 +579,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if(isNoteModification(content)) {
             NoteItem note = (NoteItem) content;
            
+            // ensure master is dirty so that etag gets updated
+            note.getModifies().updateTimestamp();
+            
             if(!note.getModifies().getParents().contains(parent))
                 throw new IllegalArgumentException("note modification cannot be added to collection that parent note is not in");
             
@@ -628,6 +636,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // master note.
         if (isNoteModification(content)) {
             NoteItem note = (NoteItem) content;
+            
+            // ensure master is dirty so that etag gets updated
+            note.getModifies().updateTimestamp();
+            
             if (!note.getParents().equals(parents))
                 throw new IllegalArgumentException(
                         "Note modification parents must equal to the parents of master note");
@@ -655,6 +667,11 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             throw new IllegalArgumentException("content must have owner");
         
         content.setModifiedDate(new Date());
+        
+        if(isNoteModification(content)) {
+            // ensure master is dirty so that etag gets updated
+            ((NoteItem) content).getModifies().updateTimestamp();
+        }
         
         applyStampHandlerUpdate(content); 
     }

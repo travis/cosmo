@@ -81,9 +81,9 @@ public class Preference extends AuditableObject {
     public void setUser(User user) {
         this.user = user;
     }
-
+    
     @Transient
-    public String getEntityTag() {
+    public String calculateEntityTag() {
         // preference is unique by name for its user
         String uid = (getUser() != null && getUser().getUid() != null) ?
             getUser().getUid() : "-";

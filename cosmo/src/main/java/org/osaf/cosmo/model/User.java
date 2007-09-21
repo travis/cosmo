@@ -16,9 +16,7 @@
 package org.osaf.cosmo.model;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,8 +24,6 @@ import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -37,10 +33,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Index;
-import org.hibernate.annotations.MapKey;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.Email;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
@@ -615,8 +608,9 @@ public class User extends AuditableObject {
         return false;
     }
 
+    
     @Transient
-    public String getEntityTag() {
+    public String calculateEntityTag() {
         String username = getUsername() != null ? getUsername() : "-";
         String modTime = getModifiedDate() != null ?
             new Long(getModifiedDate().getTime()).toString() : "-";

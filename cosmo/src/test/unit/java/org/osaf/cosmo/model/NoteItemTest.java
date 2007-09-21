@@ -36,11 +36,11 @@ public class NoteItemTest extends TestCase {
         mod.setModifiedDate(new Date());
         mod.setModifies(master);
         
-        String etag1 = master.getEntityTag();
+        String etag1 = master.calculateEntityTag();
         
         master.getModifications().add(mod);
         
-        String etag2 = master.getEntityTag();
+        String etag2 = master.calculateEntityTag();
         
         // etag should have changed when modification was added
         Assert.assertFalse(etag1.equals(etag2));
@@ -48,18 +48,18 @@ public class NoteItemTest extends TestCase {
         mod.setModifiedDate(new Date(mod.getModifiedDate().getTime()+1));
         
         etag1 = etag2;
-        etag2 = master.getEntityTag();
+        etag2 = master.calculateEntityTag();
         
         // etag should have changed when modification was changed
         Assert.assertFalse(etag1.equals(etag2));
         
         // etag shouldn't change between calls
-        Assert.assertTrue(etag2.equals(master.getEntityTag()));
+        Assert.assertTrue(etag2.equals(master.calculateEntityTag()));
         
         master.getModifications().clear();
         
         etag1 = etag2;
-        etag2 = master.getEntityTag();
+        etag2 = master.calculateEntityTag();
         
         // etag should have changed when modification was removed
         Assert.assertFalse(etag1.equals(etag2));

@@ -42,7 +42,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
         assertFalse("Matching etags",
-                    pref.getEntityTag().equals(newpref.getEntityTag()));
+                    pref.calculateEntityTag().equals(newpref.calculateEntityTag()));
         assertNotNull("Null last modified", res.getLastModified());
 
         String username = helper.getUser().getUsername();

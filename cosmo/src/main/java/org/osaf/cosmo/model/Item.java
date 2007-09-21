@@ -655,6 +655,7 @@ public abstract class Item extends AuditableObject {
         tombstones.add(tombstone);
     }
     
+    
     /**
      * Item uid determines equality 
      */
@@ -677,9 +678,10 @@ public abstract class Item extends AuditableObject {
     }
     
     public abstract Item copy();
-
-    @Transient
-    public String getEntityTag() {
+   
+    
+    @Override
+    public String calculateEntityTag() {
         String uid = getUid() != null ? getUid() : "-";
         String modTime = getModifiedDate() != null ?
             new Long(getModifiedDate().getTime()).toString() : "-";

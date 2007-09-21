@@ -42,7 +42,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
         assertFalse("Matching etags",
-                    sub.getEntityTag().equals(newsub.getEntityTag()));
+                    sub.calculateEntityTag().equals(newsub.calculateEntityTag()));
         assertNotNull("Null last modified", res.getLastModified());
 
         String username = helper.getUser().getUsername();

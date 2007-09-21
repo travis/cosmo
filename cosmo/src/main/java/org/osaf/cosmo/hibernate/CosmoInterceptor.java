@@ -35,13 +35,21 @@ public class CosmoInterceptor extends EmptyInterceptor {
         if(! (object instanceof AuditableObject))
             return false;
         
+        // Set new modifyDate so that calculateEntityTag()
+        // has access to it
+        AuditableObject ao = (AuditableObject) object;
+        Date curDate = new Date();
+        ao.setModifiedDate(curDate);
+        
+        // update modifiedDate and entityTag
         for ( int i=0; i < propertyNames.length; i++ ) {
             if ( "modifiedDate".equals( propertyNames[i] ) ) {
                 currentState[i] = new Date(System.currentTimeMillis());
-                return true;
+            } else if("entityTag".equals( propertyNames[i] )) {
+                currentState[i] = ao.calculateEntityTag();
             }
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -50,16 +58,22 @@ public class CosmoInterceptor extends EmptyInterceptor {
         if(! (object instanceof AuditableObject))
             return false;
         
-        boolean changed = false;
-        Date currDate = new Date();
+        // Set new modifyDate so that calculateEntityTag()
+        // has access to it
+        AuditableObject ao = (AuditableObject) object;
+        Date curDate = new Date();
+        ao.setModifiedDate(curDate);
+        
+        // initialize modifiedDate, creationDate and entityTag
         for ( int i=0; i < propertyNames.length; i++ ) {
             if ( "creationDate".equals(propertyNames[i]) ||
                   "modifiedDate".equals(propertyNames[i]) ) {
-                state[i] = currDate;
-                changed = true;
+                state[i] = curDate;
+            } else if("entityTag".equals( propertyNames[i] )) {
+                state[i] = ao.calculateEntityTag();
             }
         }
-        return changed;
+        return true;
     }
 
 }

@@ -20,10 +20,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
 
 import org.apache.commons.codec.binary.Base64;
-
 import org.hibernate.annotations.Type;
 
 /**
@@ -46,6 +44,7 @@ public abstract class AuditableObject extends BaseModelObject {
 
     private Date creationDate;
     private Date modifiedDate;
+    private String etag = "";
     
     /**
      * @return date object was created
@@ -82,18 +81,42 @@ public abstract class AuditableObject extends BaseModelObject {
     }
 
     /**
+     * Update modifiedDate with current system time.
+     */
+    public void updateTimestamp() {
+        modifiedDate = new Date();
+    }
+    
+    /**
      * <p>
      * Returns a string representing the state of the object. Entity tags can
      * be used to compare two objects in remote environments where the
      * equals method is not available.
      * </p>
+     */
+    @Column(name="etag")
+    public String getEntityTag() {
+        return etag;
+    }
+    
+    public void setEntityTag(String etag) {
+        this.etag = etag;
+    }
+    
+    /**
+     * <p>
+     * Calculates updates object's entity tag.
+     * Returns calculated entity tag.  
+     * </p>
      * <p>
      * This implementation simply returns the empty string. Subclasses should
      * override it when necessary.
      * </p>
+     * 
+     * Subclasses should override
+     * this.
      */
-    @Transient
-    public String getEntityTag() {
+    public String calculateEntityTag() {
         return "";
     }
 

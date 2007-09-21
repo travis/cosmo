@@ -137,6 +137,7 @@ public class MockDaoStorage {
             item.setUid(calculateUid());
         item.setCreationDate(new Date());
         item.setModifiedDate(item.getCreationDate());
+        item.setEntityTag(item.calculateEntityTag());
 
         if(item.getParent()!=null) {
             for (Item sibling : item.getParent().getChildren()) {

@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.component.VFreeBusy;
@@ -29,8 +30,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.CalendarFilterEvaluater;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.ContentDao;
+import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
@@ -757,8 +760,12 @@ public class StandardContentService implements ContentService {
                            CalendarFilter filter) {
         if (log.isDebugEnabled())
             log.debug("matching item " + item.getUid() + " to filter " + filter);
-        // XXX
-        return false;
+        
+        Calendar calendar = ICalendarOutputter.getCalendarFromNote(item);
+        if(calendar!=null)
+            return new CalendarFilterEvaluater().evaluate(calendar, filter);
+        else
+            return false;
     }
     
     /**

@@ -19,6 +19,7 @@ import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Defines the api for free-busy queries.
@@ -33,4 +34,13 @@ public interface FreeBusyQueryProcessor {
      * @return VFREEBUSY component containing freebusy periods
      */
     public VFreeBusy generateFreeBusy(CollectionItem collection, Period period);
+
+    /**
+     * Generate a VFREEBUSY component containing freebusy 
+     * periods for an item.
+     * @param item item to query
+     * @param period time range to query freebusy information
+     * @return VFREEBUSY component containing freebusy periods
+     */
+    public VFreeBusy generateFreeBusy(NoteItem item, Period period);
 }

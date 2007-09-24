@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.component.VFreeBusy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +34,7 @@ import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
 
+import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
@@ -49,6 +52,7 @@ import org.osaf.cosmo.dav.property.ContentType;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 
 /**
@@ -116,6 +120,26 @@ public abstract class DavCalendarResource extends DavContentBase
     }
 
     // our methods
+
+    /**
+     * Returns true if this resource matches the given filter.
+     */
+    public boolean matches(CalendarFilter filter)
+        throws DavException {
+        return getContentService().matches((NoteItem)getItem(), filter);
+    }
+
+    /**
+     * Returns a VFREEBUSY component containing
+     * the freebusy periods for the resource for the specified time range.
+     * @param period time range for freebusy information
+     * @return VFREEBUSY component containing FREEBUSY periods for
+     *         specified timerange
+     */
+    public VFreeBusy generateFreeBusy(Period period) {
+        return getContentService().
+            generateFreeBusy((NoteItem)getItem(), period);
+    }
 
     /**
      * Returns the calendar object associated with this resource.

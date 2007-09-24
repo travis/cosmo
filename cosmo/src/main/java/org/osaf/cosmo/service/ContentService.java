@@ -312,6 +312,13 @@ public interface ContentService extends Service {
                                              CalendarFilter filter);
 
     /**
+     * Determines whether or not an item matches the criteria specified by
+     * a calendar filter.
+     */
+    public boolean matches(NoteItem item,
+                           CalendarFilter filter);
+
+    /**
      * Find calendar events by time range.
      *
      * @param collection
@@ -423,5 +430,16 @@ public interface ContentService extends Service {
      * @param period time range to query freebusy information
      * @return VFREEBUSY component containing freebusy periods
      */
-    public VFreeBusy generateFreeBusy(CollectionItem collection, Period period);
+    public VFreeBusy generateFreeBusy(CollectionItem collection,
+                                      Period period);
+
+    /**
+     * Generate a VFREEBUSY component containing freebusy 
+     * periods for an item.
+     * @param item item to query
+     * @param period time range to query freebusy information
+     * @return VFREEBUSY component containing freebusy periods
+     */
+    public VFreeBusy generateFreeBusy(NoteItem item,
+                                      Period period);
 }

@@ -27,6 +27,7 @@ import org.apache.jackrabbit.webdav.version.report.ReportType;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.UnsupportedCollationException;
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavContent;
@@ -34,8 +35,10 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.caldav.SupportedCollationException;
 import org.osaf.cosmo.dav.caldav.TimeZoneExtractor;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
 
 import org.w3c.dom.Element;
 
@@ -100,9 +103,16 @@ public class QueryReport extends CaldavMultiStatusReport
      */
     protected void doQuerySelf(DavResource resource)
         throws DavException {
+        if (resource instanceof DavCalendarResource) {
+            DavCalendarResource dcr = (DavCalendarResource) resource;
+            if (dcr.matches(queryFilter))
+                getResults().add(dcr);
+            return;
+        }
         if (resource instanceof DavContent)
-            throw new UnprocessableEntityException(getType() + " report not supported for non-collection resources");
-        // collection never matches a calendar query
+            throw new UnprocessableEntityException(getType() + " report not supported for non-calendar resources");
+        // if the resource is a collection, it will not match a calendar
+        // query, which only matches calendar resource, so we can ignore it
     }
 
     /**
@@ -157,9 +167,13 @@ public class QueryReport extends CaldavMultiStatusReport
             return null;
 
         try {
-            return new CalendarFilter(filterdata, tz);
+            CalendarFilter filter = new CalendarFilter(filterdata, tz);
+            filter.validate();
+            return filter;
         } catch (ParseException e) {
             throw new BadRequestException("Calendar filter not parseable: " + e.getMessage());
+        } catch (UnsupportedCollationException e) {
+            throw new SupportedCollationException();
         }
     }
 }

@@ -50,6 +50,7 @@ import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor;
 
 /**
@@ -102,7 +103,15 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
 
         return vfb;
     }
-    
+
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor#generateFreeBusy(org.osaf.cosmo.model.NoteItem, net.fortuna.ical4j.model.Period)
+     */
+    public VFreeBusy generateFreeBusy(NoteItem item, Period period) {
+        // XXX
+        return null;
+    }
+
     protected void doQuery(PeriodList busyPeriods,
             PeriodList busyTentativePeriods, PeriodList busyUnavailablePeriods,
             CollectionItem collection, Period period) {

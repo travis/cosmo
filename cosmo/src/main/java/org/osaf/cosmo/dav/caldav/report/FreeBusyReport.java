@@ -41,6 +41,7 @@ import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavItemCollection;
 import org.osaf.cosmo.dav.report.SimpleReport;
 import org.w3c.dom.Element;
@@ -70,7 +71,7 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
     // ReportBase methods
 
     /**
-     * Parses the report info, extracting the time range and query filter.
+     * Parses the report info, extracting the time range.
      */
     protected void parseReport(ReportInfo info)
         throws DavException {
@@ -88,15 +89,18 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
      */
     protected void runQuery()
         throws DavException {
-        if (! (getResource() instanceof DavItemCollection))
-            throw new UnprocessableEntityException(getType() + " report not supported for non-collection resources");
+        if (! (getResource().isCollection() ||
+               getResource() instanceof DavCalendarResource))
+            throw new UnprocessableEntityException(getType() + " report not supported for non-calendar resources");
 
-        // if the collection or any of its parent is excluded from
+        // if the resource or any of its ancestors is excluded from
         // free busy rollups, deny the query
-        DavItemCollection dc = (DavItemCollection) getResource();
+        DavItemCollection dc = getResource().isCollection() ?
+            (DavItemCollection) getResource() :
+            (DavItemCollection) getResource().getParent();
         while (dc != null) {
             if (dc.isExcludedFromFreeBusyRollups())
-                throw new ForbiddenException("Targeted collection does not participate in freebusy rollups");
+                throw new ForbiddenException("Targeted resource or ancestor collection does not participate in freebusy rollups");
             dc = (DavItemCollection) dc.getParent();
             if (! dc.exists())
                 dc = null;
@@ -118,8 +122,18 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
 
     protected void doQuerySelf(DavResource resource)
         throws DavException {
-        // runQuery already enforced that this is a collection, which never
-        // matches a calendar report query
+        if (! resource.isCollection()) {
+            if (isExcluded(resource.getParent()))
+                return;
+            // runQuery() has already determined that this is a calendar
+            // resource
+            DavCalendarResource dcr = (DavCalendarResource) resource;
+            VFreeBusy vfb = dcr.generateFreeBusy(freeBusyRange);
+            if (vfb != null)
+                freeBusyResults.add(vfb);
+            return;
+        }
+        // collections themselves never match - only calendar resources
     }
 
     protected void doQueryChildren(DavCollection collection)

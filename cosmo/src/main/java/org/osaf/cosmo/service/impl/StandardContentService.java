@@ -751,7 +751,15 @@ public class StandardContentService implements ContentService {
         }
         return calendarDao.findCalendarItems(calendar, filter);
     }
+
     
+    public boolean matches(NoteItem item,
+                           CalendarFilter filter) {
+        if (log.isDebugEnabled())
+            log.debug("matching item " + item.getUid() + " to filter " + filter);
+        // XXX
+        return false;
+    }
     
     /**
      * Find calendar events by time range.
@@ -805,6 +813,18 @@ public class StandardContentService implements ContentService {
      */
     public VFreeBusy generateFreeBusy(CollectionItem collection, Period period) {
         return freeBusyQueryProcessor.generateFreeBusy(collection, period);
+    }
+
+    /**
+     * Generate a VFREEBUSY component containing freebusy 
+     * periods for an item.
+     * @param item item to query
+     * @param period time range to query freebusy information
+     * @return VFREEBUSY component containing freebusy periods
+     */
+    public VFreeBusy generateFreeBusy(NoteItem item,
+                                      Period period) {
+        return freeBusyQueryProcessor.generateFreeBusy(item, period);
     }
 
     /**

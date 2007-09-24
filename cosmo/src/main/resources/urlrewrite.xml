@@ -23,6 +23,12 @@
     <from>/js-${pom.version}/</from>
      <to last="false">/js/</to>
   </rule>
+
+  <rule>
+    <from>/lib/olson-tzdata/</from>
+    <to last="false">/lib/olson-tzdata/</to>
+    <set type="content-type">text/plain</set>
+  </rule>
   
   <rule enabled="true">
   <condition name="accept-encoding" operator="equal" next="and">.*gzip.*</condition>

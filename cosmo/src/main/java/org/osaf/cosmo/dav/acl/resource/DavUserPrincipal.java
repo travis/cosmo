@@ -114,7 +114,7 @@ public class DavUserPrincipal extends DavResourceBase
     }
 
     public boolean isCollection() {
-        return true;
+        return false;
     }
 
     public long getModificationTime() {

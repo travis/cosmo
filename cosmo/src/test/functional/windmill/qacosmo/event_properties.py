@@ -15,4 +15,4 @@ def test():
     client.radio(id=u'endMeridianPM')
     client.select(id=u'eventStatus', option=u'Tentative')
     client.type(text=u'A description for the properties test', id=u'noteDescription')
-    client.click(jsid=u'windmill.testingApp.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId')
+    client.click(jsid=u'windmill.testWindow.cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.widgetId')

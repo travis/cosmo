@@ -7,9 +7,9 @@ var fixture_unsavedSetUpLozenges = [
 ];
 
 var test_unsavedClickLozengeDiscard = [
-  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testingApp.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
   { method: "type", params: { id: "noteTitle", text: "Unsaved Lozenge" } },
-  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testingApp.cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
+  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
   { method: "waits.sleep", params: { milliseconds: 4000 } },
   function () {
     var dialogText = app.$('modalDialogContent').innerHTML;
@@ -25,9 +25,9 @@ var test_unsavedClickLozengeDiscard = [
 
 var test_unsavedClickLozengeSave = [
   { method: "waits.sleep", params: { milliseconds: 4000 } },
-  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testingApp.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
   { method: "type", params: { id: "noteTitle", text: "Unsaved Lozenge" } },
-  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testingApp.cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
+  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
   { method: "waits.sleep", params: { milliseconds: 4000 } },
   function () {
     var dialogText = app.$('modalDialogContent').innerHTML;
@@ -43,7 +43,7 @@ var test_unsavedClickLozengeSave = [
 
 var test_unsavedViewChangeDiscard = [
   { method: "waits.sleep", params: { milliseconds: 4000 } },
-  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testingApp.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
   { method: "type", params: { id: "noteTitle", text: "Unsaved View Change" } },
   { method: "click", params: { jsid: "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id" } },
   { method: "waits.sleep", params: { milliseconds: 4000 } },
@@ -62,7 +62,7 @@ var test_unsavedViewChangeDiscard = [
 var test_unsavedViewChangeSave = [
   { method: "waits.sleep", params: { milliseconds: 4000 } },
   { method: "click", params: { jsid: "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[1].id" } },
-  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testingApp.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+  { method: 'extensions.clickLozenge', params: { jsid: "windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
   { method: "type", params: { id: "noteTitle", text: "Unsaved View Change" } },
   { method: "click", params: { jsid: "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[0].id" } },
   { method: "waits.sleep", params: { milliseconds: 4000 } },

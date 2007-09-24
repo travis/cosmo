@@ -9,17 +9,17 @@
 {"params": {"id": "hourDiv0-1300"}, "version": "0.1", "method": "doubleClick"}
 {"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getCurrent().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getCurrent().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Mazatlan", "id": "tzId"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Barbados", "id": "tzId"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
 {"params": {"jsid": "{$btnsRight1}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testingApp.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Miquelon", "id": "tzId"}, "version": "0.1", "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}

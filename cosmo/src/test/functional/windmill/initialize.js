@@ -1,5 +1,5 @@
 // Some environment setup
-var app = windmill.testingApp;
+var app = windmill.testWindow;
 var cosmo = app.cosmo;
 
 // The tests, in order

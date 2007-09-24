@@ -17,6 +17,8 @@ package org.osaf.cosmo.dav.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
 
@@ -28,6 +30,7 @@ import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.apache.jackrabbit.webdav.version.report.ReportType;
 
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
@@ -35,12 +38,15 @@ import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
+import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
+import org.osaf.cosmo.dav.caldav.UidConflictException;
+import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
+import org.osaf.cosmo.dav.caldav.report.MultigetReport;
+import org.osaf.cosmo.dav.caldav.report.QueryReport;
 import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.property.ContentLength;
 import org.osaf.cosmo.dav.property.ContentType;
 import org.osaf.cosmo.dav.property.DavProperty;
-import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
-import org.osaf.cosmo.dav.caldav.UidConflictException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
@@ -52,10 +58,16 @@ public abstract class DavCalendarResource extends DavContentBase
     implements ICalendarConstants {
     private static final Log log =
         LogFactory.getLog(DavCalendarResource.class);
-
+    private static final Set<ReportType> REPORT_TYPES =
+        new HashSet<ReportType>();
+    
     static {
         registerLiveProperty(DavPropertyName.GETCONTENTLENGTH);
         registerLiveProperty(DavPropertyName.GETCONTENTTYPE);
+
+        REPORT_TYPES.add(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY);
+        REPORT_TYPES.add(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET);
+        REPORT_TYPES.add(QueryReport.REPORT_TYPE_CALDAV_QUERY);
     }
 
     public DavCalendarResource(ContentItem item,
@@ -153,6 +165,10 @@ public abstract class DavCalendarResource extends DavContentBase
         // spool calendar bytes
         ByteArrayInputStream bois = new ByteArrayInputStream(calendarBytes);
         IOUtil.spool(bois, outputContext.getOutputStream());
+    }
+
+    public Set<ReportType> getReportTypes() {
+        return REPORT_TYPES;
     }
 
     /** */

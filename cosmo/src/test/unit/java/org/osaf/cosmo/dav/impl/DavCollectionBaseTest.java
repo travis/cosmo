@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import org.apache.jackrabbit.webdav.property.DavProperty;
 
 import org.osaf.cosmo.dav.BaseDavTestCase;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
+import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
+import org.osaf.cosmo.dav.caldav.report.MultigetReport;
+import org.osaf.cosmo.dav.caldav.report.QueryReport;
 import org.osaf.cosmo.dav.property.ExcludeFreeBusyRollup;
 import org.osaf.cosmo.model.CollectionItem;
 
@@ -105,5 +108,19 @@ public class DavCollectionBaseTest extends BaseDavTestCase
 
         assertTrue("removed exclude-free-busy-rollup property is true",
                    ! testHelper.getHomeCollection().isExcludeFreeBusyRollup());
+    }
+
+    public void testCaldavReportTypes() throws Exception {
+        DavCollectionBase test = new DavCollectionBase(null, null);
+
+        assert(test.getReportTypes().contains(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY));
+        assert(test.getReportTypes().contains(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET));
+        assert(test.getReportTypes().contains(QueryReport.REPORT_TYPE_CALDAV_QUERY));
+    }
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        testHelper.logIn();
     }
 }

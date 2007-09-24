@@ -73,7 +73,11 @@ public class CalendarResourceProvider extends FileProvider {
                                              ctx.getCalendar());
         content.getParent().addContent(content, ctx);
         response.setStatus(status);
-        response.setHeader("ETag", content.getETag());
+        // since the iCalendar body is parsed and re-serialized for storage,
+        // it's possible that what will be served for subsequent GETs is
+        // slightly different than what was provided in the PUT, so send a
+        // weak etag
+        response.setHeader("ETag", "W/" + content.getETag());
     }
 
     protected DavResource resolveDestination(DavResourceLocator locator,

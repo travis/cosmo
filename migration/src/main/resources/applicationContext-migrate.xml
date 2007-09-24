@@ -63,6 +63,10 @@
     <bean id="zeroPointSixOneToZeroPointSeven"
         class="org.osaf.cosmo.migrate.ZeroPointSixOneToZeroPointSevenMigration">
     </bean>
+    
+    <bean id="zeroPointSevenToZeroPointEight"
+        class="org.osaf.cosmo.migrate.ZeroPointSevenToZeroPointEightMigration">
+    </bean>
 
     <bean id="propertyPlaceHolderConfigurer"
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -81,6 +85,7 @@
                 <ref local="zeroPointSixToZeroPointSixZeroOne"/>
                 <ref local="zeroPointSixZeroOneToZeroPointSixOne"/>
                 <ref local="zeroPointSixOneToZeroPointSeven"/>
+                <ref local="zeroPointSevenToZeroPointEight"/>
             </list>
         </property>
     </bean>

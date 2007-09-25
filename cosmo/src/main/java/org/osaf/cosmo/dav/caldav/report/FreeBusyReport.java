@@ -82,10 +82,20 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
     }
 
     /**
-     * Runs the query, extracts the set of periods for busy time for
-     * each occurrence of each found calendar item, creates a
-     * VFREEBUSY component, and sets the report's stream, content type
-     * and character set.
+     * <p>
+     * Runs the report query and generates a resulting <code>VFREEBUSY</code>.
+     * </p>
+     * <p>
+     * The set of <code>VFREEBUSY</code> components that are returned by the
+     * query are merged into a single component. It is wrapped in a calendar
+     * object and converted using UTF-8 to bytes which are set as the report
+     * stream. The report's content type and encoding are also set.
+     * </p>
+     *
+     * @throws UnprocessableEntityException if the targeted resource is not a
+     * collection and is not a calendar resource.
+     * @throws ForbiddenException if the targeted resource or an ancestor
+     * collection is excluded from free-busy rollups
      */
     protected void runQuery()
         throws DavException {
@@ -105,19 +115,23 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
             if (! dc.exists())
                 dc = null;
         }
-        
-        // Results are stored as VFREEBUSY components that
-        // get merged at the end
+
         freeBusyResults = new ArrayList<VFreeBusy>();
         
         super.runQuery();
 
-        Calendar calendar = buildFreeBusy();
+        VFreeBusy vfb =
+            FreeBusyUtils.mergeComponents(freeBusyResults, freeBusyRange);
+        Calendar calendar = ICalendarUtils.createBaseCalendar(vfb);
         String output = writeCalendar(calendar);
 
         setContentType("text/calendar");
         setEncoding("UTF-8"); 
-        setStream(new ByteArrayInputStream(output.getBytes()));
+        try {
+            setStream(new ByteArrayInputStream(output.getBytes("UTF-8")));
+        } catch (Exception e) {
+            throw new DavException(e);
+        }
     }    
 
     protected void doQuerySelf(DavResource resource)
@@ -192,25 +206,7 @@ public class FreeBusyReport extends SimpleReport implements CaldavConstants {
         return dic.isExcludedFromFreeBusyRollups();
     }
 
-    /**
-     * Build VCALENDAR with single VFREEBUSY
-     */
-    private Calendar buildFreeBusy()
-        throws DavException {
-
-        VFreeBusy vfb = mergeFreeBusyResults();
-        
-        // Now add VFREEBUSY to a calendar
-        Calendar calendar = ICalendarUtils.createBaseCalendar(vfb);
-
-        return calendar;
-    }
-    
-    /**
-     * Build single VFREEBUSY
-     */
     private VFreeBusy mergeFreeBusyResults() {
-        
         // If there is only one result, return it
         if(freeBusyResults.size()==1)
             return freeBusyResults.get(0);

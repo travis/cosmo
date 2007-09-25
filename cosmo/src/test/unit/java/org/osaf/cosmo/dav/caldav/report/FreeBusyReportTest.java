@@ -18,54 +18,59 @@ package org.osaf.cosmo.dav.caldav.report;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 
-import org.osaf.cosmo.dav.BaseDavTestCase;
 import org.osaf.cosmo.dav.DavCollection;
+import org.osaf.cosmo.dav.DavResource;
+import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
+import org.osaf.cosmo.dav.report.BaseReportTestCase;
 import org.osaf.cosmo.model.CollectionItem;
 
 import org.w3c.dom.Document;
 
 /**
  * Test case for <code>FreeBusyReport</code>.
- * <p>
  */
-public class FreeBusyReportTest extends BaseDavTestCase
-    implements DavConstants {
-    private static final Log log = LogFactory.getLog(FreeBusyReportTest.class);
+public class FreeBusyReportTest extends BaseReportTestCase {
+    private static final Log log =
+        LogFactory.getLog(FreeBusyReportTest.class);
 
-    /** */
+    public void testWrongType() throws Exception {
+        DavCalendarCollection dcc =
+            testHelper.initializeDavCalendarCollection("freebusy");
+
+        FreeBusyReport report = new FreeBusyReport();
+        try {
+            report.init(dcc, makeReportInfo("multiget1.xml", DEPTH_1));
+            fail("Non-freebusy report info initalized");
+        } catch (Exception e) {}
+    }
+
     public void testIncludedCollection() throws Exception {
         testHelper.getHomeCollection().setExcludeFreeBusyRollup(false);
         DavHomeCollection home = testHelper.initializeHomeResource();
 
-        FreeBusyReport report = new FreeBusyReport();
-        report.init(home, makeReportInfo("freebusy1.xml", DEPTH_1));
+        FreeBusyReport report = makeReport("freebusy1.xml", DEPTH_1, home);
 
         report.runQuery();
     }
 
-    /** */
     public void testExcludedCollection() throws Exception {
         testHelper.getHomeCollection().setExcludeFreeBusyRollup(true);
         DavHomeCollection home = testHelper.initializeHomeResource();
 
-        FreeBusyReport report = new FreeBusyReport();
-        report.init(home, makeReportInfo("freebusy1.xml", DEPTH_1));
+        FreeBusyReport report = makeReport("freebusy1.xml", DEPTH_1, home);
 
         try {
             report.runQuery();
             fail("free-busy report targeted at excluded collection should not have succeeded but did");
         } catch (DavException e) {
-            assertEquals("free-busy report targeted at excluded collection did not return Forbidden", DavServletResponse.SC_FORBIDDEN, e.getErrorCode());
+            assertEquals("free-busy report targeted at excluded collection did not return 403", 403, e.getErrorCode());
         }
     }
 
-    /** */
     public void testExcludedParentCollection() throws Exception {
         testHelper.getHomeCollection().setExcludeFreeBusyRollup(true);
         CollectionItem coll = testHelper.
@@ -76,20 +81,21 @@ public class FreeBusyReportTest extends BaseDavTestCase
         DavCollection dc =
             (DavCollection) testHelper.findMember(home, coll.getName());
 
-        FreeBusyReport report = new FreeBusyReport();
-        report.init(dc, makeReportInfo("freebusy1.xml", DEPTH_1));
+        FreeBusyReport report = makeReport("freebusy1.xml", DEPTH_1, dc);
 
         try {
             report.runQuery();
             fail("free-busy report targeted at collection with excluded parent should not have succeeded but did");
         } catch (DavException e) {
-            assertEquals("free-busy report targeted at collection with excluded parent did not return Forbidden", DavServletResponse.SC_FORBIDDEN, e.getErrorCode());
+            assertEquals("free-busy report targeted at collection with excluded parent did not return 403", 403, e.getErrorCode());
         }
     }
 
-    private ReportInfo makeReportInfo(String resource, int depth)
+    private FreeBusyReport makeReport(String reportXml,
+                                      int depth,
+                                      DavResource target)
         throws Exception {
-        Document doc = testHelper.loadXml(resource);
-        return new ReportInfo(doc.getDocumentElement(), depth);
+        return (FreeBusyReport)
+            super.makeReport(FreeBusyReport.class, reportXml, depth, target);
     }
 }

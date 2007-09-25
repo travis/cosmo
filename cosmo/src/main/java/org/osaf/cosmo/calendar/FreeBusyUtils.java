@@ -111,7 +111,12 @@ public class FreeBusyUtils {
      * @param range time range of new component (DTSTART/DTEND)
      * @return merged component
      */
-    public static VFreeBusy mergeComponents(List<VFreeBusy> components, Period range) {
+    public static VFreeBusy mergeComponents(List<VFreeBusy> components,
+                                            Period range) {
+        // no merging required if there's only one component
+        if (components.size() == 1)
+            return components.get(0);
+
         // merge results into single VFREEBUSY
         PeriodList busyPeriods = new PeriodList();
         PeriodList busyTentativePeriods = new PeriodList();

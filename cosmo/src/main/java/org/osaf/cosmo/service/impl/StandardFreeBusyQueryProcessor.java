@@ -50,7 +50,7 @@ import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor;
 
 /**
@@ -74,42 +74,28 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
         
         doQuery(busyPeriods, busyTentativePeriods, busyUnavailablePeriods,
                 collection, period);
-        
-        // Merge periods
-        busyPeriods = busyPeriods.normalise();
-        busyTentativePeriods = busyTentativePeriods.normalise();
-        busyUnavailablePeriods = busyUnavailablePeriods.normalise();
 
-        // Now create a VFREEBUSY 
-        VFreeBusy vfb = new VFreeBusy(period.getStart(), period.getEnd());
-        String uid = uuidGenerator.nextIdentifier().toString();
-        vfb.getProperties().add(new Uid(uid));
-       
-        // Add all periods to the VFREEBUSY
-        if (busyPeriods.size() != 0) {
-            FreeBusy fb = new FreeBusy(busyPeriods);
-            vfb.getProperties().add(fb);
-        }
-        if (busyTentativePeriods.size() != 0) {
-            FreeBusy fb = new FreeBusy(busyTentativePeriods);
-            fb.getParameters().add(FbType.BUSY_TENTATIVE);
-            vfb.getProperties().add(fb);
-        }
-        if (busyUnavailablePeriods.size() != 0) {
-            FreeBusy fb = new FreeBusy(busyUnavailablePeriods);
-            fb.getParameters().add(FbType.BUSY_UNAVAILABLE);
-            vfb.getProperties().add(fb);
-        }
-
-        return vfb;
+        return createVFreeBusy(busyPeriods, busyTentativePeriods,
+                busyUnavailablePeriods, period);
     }
 
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor#generateFreeBusy(org.osaf.cosmo.model.NoteItem, net.fortuna.ical4j.model.Period)
+     * @see org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor#generateFreeBusy(org.osaf.cosmo.model.ICalendarItem, net.fortuna.ical4j.model.Period)
      */
-    public VFreeBusy generateFreeBusy(NoteItem item, Period period) {
-        // XXX
-        return null;
+    public VFreeBusy generateFreeBusy(ICalendarItem item, Period period) {
+        PeriodList busyPeriods = new PeriodList();
+        PeriodList busyTentativePeriods = new PeriodList();
+        PeriodList busyUnavailablePeriods = new PeriodList();
+        
+        Calendar calendar = ICalendarOutputter.getCalendar(item);
+        
+        // Add busy details from the calendar data
+        addBusyPeriods(calendar, null, period, busyPeriods,
+                busyTentativePeriods, busyUnavailablePeriods);
+        
+        return createVFreeBusy(busyPeriods, busyTentativePeriods,
+                busyUnavailablePeriods, period);
     }
 
     protected void doQuery(PeriodList busyPeriods,
@@ -312,6 +298,38 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
         filters[1] = filter;
 
         return filters;
+    }
+    
+    private VFreeBusy createVFreeBusy(PeriodList busyPeriods,
+            PeriodList busyTentativePeriods, PeriodList busyUnavailablePeriods,
+            Period period) {
+        // Merge periods
+        busyPeriods = busyPeriods.normalise();
+        busyTentativePeriods = busyTentativePeriods.normalise();
+        busyUnavailablePeriods = busyUnavailablePeriods.normalise();
+
+        // Now create a VFREEBUSY
+        VFreeBusy vfb = new VFreeBusy(period.getStart(), period.getEnd());
+        String uid = uuidGenerator.nextIdentifier().toString();
+        vfb.getProperties().add(new Uid(uid));
+
+        // Add all periods to the VFREEBUSY
+        if (busyPeriods.size() != 0) {
+            FreeBusy fb = new FreeBusy(busyPeriods);
+            vfb.getProperties().add(fb);
+        }
+        if (busyTentativePeriods.size() != 0) {
+            FreeBusy fb = new FreeBusy(busyTentativePeriods);
+            fb.getParameters().add(FbType.BUSY_TENTATIVE);
+            vfb.getProperties().add(fb);
+        }
+        if (busyUnavailablePeriods.size() != 0) {
+            FreeBusy fb = new FreeBusy(busyUnavailablePeriods);
+            fb.getParameters().add(FbType.BUSY_UNAVAILABLE);
+            vfb.getProperties().add(fb);
+        }
+
+        return vfb;
     }
 
     public void setCalendarDao(CalendarDao calendarDao) {

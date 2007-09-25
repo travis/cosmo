@@ -27,6 +27,7 @@ import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
@@ -440,6 +441,6 @@ public interface ContentService extends Service {
      * @param period time range to query freebusy information
      * @return VFREEBUSY component containing freebusy periods
      */
-    public VFreeBusy generateFreeBusy(NoteItem item,
+    public VFreeBusy generateFreeBusy(ICalendarItem item,
                                       Period period);
 }

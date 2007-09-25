@@ -40,6 +40,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModificationUid;
@@ -829,7 +830,7 @@ public class StandardContentService implements ContentService {
      * @param period time range to query freebusy information
      * @return VFREEBUSY component containing freebusy periods
      */
-    public VFreeBusy generateFreeBusy(NoteItem item,
+    public VFreeBusy generateFreeBusy(ICalendarItem item,
                                       Period period) {
         return freeBusyQueryProcessor.generateFreeBusy(item, period);
     }

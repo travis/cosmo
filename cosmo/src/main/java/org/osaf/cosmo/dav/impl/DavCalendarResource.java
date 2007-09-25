@@ -26,20 +26,17 @@ import net.fortuna.ical4j.model.component.VFreeBusy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.report.ReportType;
-
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
 import org.osaf.cosmo.dav.caldav.UidConflictException;
@@ -52,8 +49,9 @@ import org.osaf.cosmo.dav.property.ContentType;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
+import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Abstract calendar resource.
@@ -138,7 +136,7 @@ public abstract class DavCalendarResource extends DavContentBase
      */
     public VFreeBusy generateFreeBusy(Period period) {
         return getContentService().
-            generateFreeBusy((NoteItem)getItem(), period);
+            generateFreeBusy((ICalendarItem)getItem(), period);
     }
 
     /**

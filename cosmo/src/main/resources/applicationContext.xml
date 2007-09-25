@@ -255,8 +255,8 @@
     </property>
   </bean>
 
-  <bean id="eventStampHandler"
-        class="org.osaf.cosmo.model.EventStampHandler" />
+  <bean id="eventStampIndexListener"
+        class="org.osaf.cosmo.model.EventStampIndexItemListener" />
 
   <bean id="standardItemFilterProcessor"
         class="org.osaf.cosmo.dao.hibernate.query.StandardItemFilterProcessor" />
@@ -280,15 +280,10 @@
     <property name="itemFilterProcessor">
       <ref local="standardItemFilterProcessor" />
     </property>
-    <property name="stampHandlers">
-      <map>
-        <entry key="org.osaf.cosmo.model.EventStamp">
-          <ref local="eventStampHandler"/>
-        </entry>
-        <entry key="org.osaf.cosmo.model.EventExceptionStamp">
-          <ref local="eventStampHandler"/>
-        </entry>
-      </map>
+    <property name="itemListeners">
+      <list>
+          <ref local="eventStampIndexListener"/>
+      </list>
     </property>
   </bean>
 

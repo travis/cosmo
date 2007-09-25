@@ -23,34 +23,24 @@ import org.osaf.cosmo.calendar.RecurrenceExpander;
 import org.osaf.cosmo.calendar.util.Dates;
 
 /**
- * StampHandler for EventStamps.
- * Updates EventStamp timerange index.
+ * ItemListener that updates BaseEventStamp timerange index.
  */
-public class EventStampHandler implements StampHandler {
+public class EventStampIndexItemListener extends EmptyItemListener {
 
-    public EventStampHandler() {}
+    public EventStampIndexItemListener() {}
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.StampHandler#createItem(org.osaf.cosmo.model.Stamp)
-     */
-    public void onCreateItem(Stamp stamp) {
-        if(stamp instanceof BaseEventStamp)
-            updateEventStampIndexes((BaseEventStamp) stamp);
+    @Override
+    public void onCreateItem(Item item) {
+        BaseEventStamp stamp = BaseEventStamp.getStamp(item);
+        if(stamp != null)
+            updateEventStampIndexes(stamp);
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.StampHandler#deleteItem(org.osaf.cosmo.model.Stamp)
-     */
-    public void onDeleteItem(Stamp stamp) {
-        // nothing
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.StampHandler#updateItem(org.osaf.cosmo.model.Stamp)
-     */
-    public void onUpdateItem(Stamp stamp) {
-        if(stamp instanceof BaseEventStamp)
-            updateEventStampIndexes((BaseEventStamp) stamp);
+    @Override
+    public void onUpdateItem(Item item) {
+        BaseEventStamp stamp = BaseEventStamp.getStamp(item);
+        if(stamp != null)
+            updateEventStampIndexes(stamp);
     }
     
     /**

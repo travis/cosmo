@@ -29,9 +29,9 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 /**
  * Test EventStampHandler
  */
-public class EventStampHandlerTest extends TestCase {
+public class EventStampIndexItemListenerTest extends TestCase {
    
-    EventStampHandler handler = new EventStampHandler();
+    EventStampIndexItemListener handler = new EventStampIndexItemListener();
     TimeZoneRegistry registry =
         TimeZoneRegistryFactory.getInstance().createRegistry();
     
@@ -42,8 +42,9 @@ public class EventStampHandlerTest extends TestCase {
         eventStamp.createCalendar();
         eventStamp.setStartDate(new DateTime("20070212T074500"));
         eventStamp.setEndDate(new DateTime("20070212T094500"));
+        master.addStamp(eventStamp);
         
-        handler.onCreateItem(eventStamp);
+        handler.onCreateItem(master);
         
         Assert.assertEquals("20070212T074500", eventStamp.getTimeRangeIndex().getDateStart());
         Assert.assertEquals("20070212T094500", eventStamp.getTimeRangeIndex().getDateEnd());
@@ -61,7 +62,7 @@ public class EventStampHandlerTest extends TestCase {
         List recurs = EimValueConverter.toICalRecurs(recur1);
         eventStamp.setRecurrenceRules(recurs);
         
-        handler.onUpdateItem(eventStamp);
+        handler.onUpdateItem(master);
         Assert.assertEquals("20070212T134500Z", eventStamp.getTimeRangeIndex().getDateStart());
         Assert.assertEquals(EventStamp.TIME_INFINITY, eventStamp.getTimeRangeIndex().getDateEnd());
         Assert.assertFalse(eventStamp.getTimeRangeIndex().getIsFloating().booleanValue());

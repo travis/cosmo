@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -35,10 +35,9 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ItemListener;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.Stamp;
-import org.osaf.cosmo.model.StampHandler;
 
 /**
  * Implementation of ContentDao using hibernate persistence objects
@@ -47,7 +46,7 @@ import org.osaf.cosmo.model.StampHandler;
 public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
     private static final Log log = LogFactory.getLog(ContentDaoImpl.class);
-    private HashMap<String, StampHandler> stampHandlers = new HashMap<String, StampHandler>();
+    private List<ItemListener> itemListeners = new ArrayList<ItemListener>(0);
 
     /*
      * (non-Javadoc)
@@ -423,15 +422,14 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             super.removeItem(item);
     }
     
-       
-    public HashMap<String, StampHandler> getStampHandlers() {
-        return stampHandlers;
+      
+    public List<ItemListener> getItemListeners() {
+        return itemListeners;
     }
 
-    public void setStampHandlers(HashMap<String, StampHandler> stampHandlers) {
-        this.stampHandlers = stampHandlers;
+    public void setItemListeners(List<ItemListener> itemListeners) {
+        this.itemListeners = itemListeners;
     }
-
 
     /**
      * Initializes the DAO, sanity checking required properties and defaulting
@@ -521,32 +519,19 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         
     }
     
-    private void applyStampHandlerCreate(Item item) {
-        
-        if(stampHandlers.size()==0)
-            return;
-        
-        for(Stamp stamp : item.getStamps()) {
-            StampHandler sh = stampHandlers.get(stamp.getClass().getName());
-            if(sh != null) {
-                sh.onCreateItem(stamp);
-                continue;
-            }
-        }
+    private void fireItemCreateEvent(Item item) {
+        for(ItemListener listener: itemListeners)
+            listener.onCreateItem(item);
     }
     
-    private void applyStampHandlerUpdate(Item item) {
-        
-        if(stampHandlers.size()==0)
-            return;
-        
-        for(Stamp stamp : item.getStamps()) {
-            StampHandler sh = stampHandlers.get(stamp.getClass().getName());
-            if(sh != null) {
-                sh.onUpdateItem(stamp);
-                continue;
-            }
-        }
+    private void fireItemUpdateEvent(Item item) {
+        for(ItemListener listener: itemListeners)
+            listener.onUpdateItem(item);
+    }
+    
+    private void fireItemDeleteEvent(Item item) {
+        for(ItemListener listener: itemListeners)
+            listener.onDeleteItem(item);
     }
     
     protected void createContentInternal(CollectionItem parent, ContentItem content) {
@@ -600,7 +585,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 getSession().update(parent);
         }
         
-        applyStampHandlerCreate(content);
+        fireItemCreateEvent(content);
         
         getSession().save(content);    
     }
@@ -651,7 +636,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 getSession().update(parent);
         }
         
-        applyStampHandlerCreate(content);
+        fireItemCreateEvent(content);
         
         getSession().save(content);
     }
@@ -673,7 +658,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             ((NoteItem) content).getModifies().updateTimestamp();
         }
         
-        applyStampHandlerUpdate(content); 
+        fireItemUpdateEvent(content); 
     }
     
     protected void updateCollectionInternal(CollectionItem collection) {

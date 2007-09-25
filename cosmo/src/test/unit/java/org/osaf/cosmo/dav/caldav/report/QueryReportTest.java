@@ -24,7 +24,7 @@ import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 import org.osaf.cosmo.dav.impl.DavFile;
-import org.osaf.cosmo.dav.impl.DavEvent;
+import org.osaf.cosmo.dav.impl.mock.MockCalendarResource;
 import org.osaf.cosmo.dav.report.BaseReportTestCase;
 
 /**
@@ -46,14 +46,18 @@ public class QueryReportTest extends BaseReportTestCase {
     }
 
     public void testQuerySelfCalendarResource() throws Exception {
-        DavResource test = makeTarget(DavEvent.class);
+        MockCalendarResource test = (MockCalendarResource)
+            makeTarget(MockCalendarResource.class);
+        test.setMatchFilters(true);
         QueryReport report = makeReport("query1.xml", DEPTH_0, test);
         try {
             report.doQuerySelf(test);
         } catch (Exception e) {
             e.printStackTrace();
-            fail("Self query failed for calendar collection");
+            fail("Self query failed for calendar resource");
         }
+        assertTrue("Calendar resource not found in results",
+                   report.getResults().contains(test));
     }
 
     public void testQuerySelfNonCalendarResource() throws Exception {

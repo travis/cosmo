@@ -166,7 +166,7 @@ public abstract class ReportBase implements Report, ExtendedDavConstants {
         return info;
     }
 
-    protected Set<DavResource> getResults() {
+    public Set<DavResource> getResults() {
         return results;
     }
 }

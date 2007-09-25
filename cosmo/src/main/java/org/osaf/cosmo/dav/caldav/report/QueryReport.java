@@ -103,7 +103,8 @@ public class QueryReport extends CaldavMultiStatusReport
      * </p>
      * <p>
      * If the resource is a calendar resource, attempts to match the query
-     * filter. If non-calendar resource, throws an exception. If a collection,
+     * filter using {@link DavCalendarResource#matches(CalendarFilter)}.
+     * If a non-calendar resource, throws an exception. If a collection,
      * does nothing, as query reports only match non-collection resources.
      * </p>
      *
@@ -125,8 +126,16 @@ public class QueryReport extends CaldavMultiStatusReport
     }
 
     /**
-     * Saves a result for each member that matches the query filter, if the
-     * given collection is a calendar collection. Otherwise, does nothing.
+    * <p>
+    * Runs the report query against the members of the collection. All
+    * resulting members are added to the results list.
+    * </p>
+    * <p>
+    * If the collection is a calendar collection, attempts to match the query
+    * filter using {@link DavCalendarCollection#findMembers(CalendarFilter)}.
+    * Otherwise does nothing, as only calendar resources can match the query,
+    * and regular collections cannot contain calendar resources.
+    * </p>
      */
     protected void doQueryChildren(DavCollection collection)
         throws DavException {

@@ -38,7 +38,6 @@
 <c:if test="${not empty sessionScope[SecureContext] &&
               not empty sessionScope[SecureContext].authentication}">
   <c:set var="authen" value="${sessionScope[SecureContext].authentication}"/>
-  <c:set var="username" value="${authen.principal.username}"/>
   <c:forEach var="role" items="${authen.authorities}">
     <c:if test="${role == 'ROLE_USER'}">
       <c:set var="isUser" value="true"/>
@@ -51,6 +50,7 @@
 
 <c:choose>
   <c:when test="${isUser}">
+  <c:set var="username" value="${authen.principal.username}"/>
 <p>
   <fmt:message key="Error.Forbidden.NotWhileLoggedIn">
     <fmt:param><c:out value="${username}"/></fmt:param>

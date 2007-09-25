@@ -18,20 +18,19 @@ package org.osaf.cosmo.dav.caldav.report;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.jackrabbit.webdav.version.report.ReportInfo;
-
-import org.osaf.cosmo.dav.BadRequestException;
-import org.osaf.cosmo.dav.BaseDavTestCase;
-import org.osaf.cosmo.dav.DavException;
+import org.osaf.cosmo.dav.DavCollection;
+import org.osaf.cosmo.dav.DavResource;
+import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavCollectionBase;
+import org.osaf.cosmo.dav.impl.DavFile;
 import org.osaf.cosmo.dav.impl.DavEvent;
-
-import org.w3c.dom.Document;
+import org.osaf.cosmo.dav.report.BaseReportTestCase;
 
 /**
  * Test case for <code>QueryReport</code>.
  */
-public class QueryReportTest extends BaseDavTestCase {
+public class QueryReportTest extends BaseReportTestCase {
     private static final Log log =
         LogFactory.getLog(QueryReportTest.class);
 
@@ -41,14 +40,82 @@ public class QueryReportTest extends BaseDavTestCase {
 
         QueryReport report = new QueryReport();
         try {
-            report.init(dcc, makeReportInfo("freebusy1.xml"));
-            fail("Freebusy report initalized");
-        } catch (DavException e) {}
+            report.init(dcc, makeReportInfo("freebusy1.xml", DEPTH_1));
+            fail("Non-query report info initalized");
+        } catch (Exception e) {}
     }
 
-    private ReportInfo makeReportInfo(String resource)
+    public void testQuerySelfCalendarResource() throws Exception {
+        DavResource test = makeTarget(DavEvent.class);
+        QueryReport report = makeReport("query1.xml", DEPTH_0, test);
+        try {
+            report.doQuerySelf(test);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Self query failed for calendar collection");
+        }
+    }
+
+    public void testQuerySelfNonCalendarResource() throws Exception {
+        DavResource test = makeTarget(DavFile.class);
+        QueryReport report = makeReport("query1.xml", DEPTH_0, test);
+        try {
+            report.doQuerySelf(test);
+            fail("Self query succeeded for non-calendar resource");
+        } catch (UnprocessableEntityException e) {}
+    }
+
+    public void testQuerySelfCalendarCollection() throws Exception {
+        DavResource test = makeTarget(DavCalendarCollection.class);
+        QueryReport report = makeReport("query1.xml", DEPTH_0, test);
+        try {
+            report.doQuerySelf(test);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Self query failed for calendar collection");
+        }
+    }
+
+    public void testQuerySelfNonCalendarCollection() throws Exception {
+        DavResource test = makeTarget(DavCollectionBase.class);
+        QueryReport report = makeReport("query1.xml", DEPTH_0, test);
+        try {
+            report.doQuerySelf(test);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Self query failed for non-calendar collection");
+        }
+    }
+
+    public void testQueryChildrenCalendarCollection() throws Exception {
+        DavCollection test = (DavCollection)
+            makeTarget(DavCalendarCollection.class);
+        QueryReport report = makeReport("query1.xml", DEPTH_1, test);
+        try {
+            report.doQueryChildren(test);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Children query failed for calendar collection");
+        }
+    }
+
+    public void testQueryChildrenNonCalendarCollection() throws Exception {
+        DavCollection test = (DavCollection)
+            makeTarget(DavCollectionBase.class);
+        QueryReport report = makeReport("query1.xml", DEPTH_0, test);
+        try {
+            report.doQueryChildren(test);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Children query failed for non-calendar collection");
+        }
+    }
+
+    private QueryReport makeReport(String reportXml,
+                                   int depth,
+                                   DavResource target)
         throws Exception {
-        Document doc = testHelper.loadXml(resource);
-        return new ReportInfo(doc.getDocumentElement(), DEPTH_1);
+        return (QueryReport)
+            super.makeReport(QueryReport.class, reportXml, depth, target);
     }
 }

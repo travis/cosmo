@@ -97,9 +97,18 @@ public class QueryReport extends CaldavMultiStatusReport
     }
 
     /**
-     * Does nothing, if the targeted resource is a collection. Throws an
-     * exception if the targeted resource is not a collection, since
-     * this report is only supported for collections.
+     * <p>
+     * Runs the report query against the given resource. If the query
+     * succeeds, the resource is added to the results list.
+     * </p>
+     * <p>
+     * If the resource is a calendar resource, attempts to match the query
+     * filter. If non-calendar resource, throws an exception. If a collection,
+     * does nothing, as query reports only match non-collection resources.
+     * </p>
+     *
+     * @throws UnprocessableEntityException if the resource is not a
+     * collection and is not a calendar resource.
      */
     protected void doQuerySelf(DavResource resource)
         throws DavException {

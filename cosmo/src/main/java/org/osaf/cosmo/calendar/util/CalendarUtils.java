@@ -108,6 +108,8 @@ public class CalendarUtils implements ICalendarConstants {
     }
     
     public static Calendar copyCalendar(Calendar calendar) {
+        if (calendar == null)
+            return null;
         try {
             return new Calendar(calendar);
         } catch (Exception e) {

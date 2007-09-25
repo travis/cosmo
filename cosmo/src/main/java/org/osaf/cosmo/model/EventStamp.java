@@ -86,6 +86,8 @@ public class EventStamp extends BaseEventStamp implements
     @Transient
     public Calendar getCalendar() {
         Calendar masterCal = CalendarUtils.copyCalendar(getEventCalendar());
+        if (masterCal == null)
+            return null;
        
         // the master calendar might not have any events; for
         // instance, a client might be trying to save a VTODO

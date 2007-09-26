@@ -189,7 +189,7 @@ public class QueryReport extends CaldavMultiStatusReport
             filter.validate();
             return filter;
         } catch (ParseException e) {
-            throw new BadRequestException("Calendar filter not parseable: " + e.getMessage());
+            throw new InvalidFilterException(e);
         } catch (UnsupportedCollationException e) {
             throw new SupportedCollationException();
         }

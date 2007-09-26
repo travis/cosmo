@@ -123,7 +123,7 @@ public class DavTestHelper extends MockHelper
                                   String segment)
         throws DavException {
         String href = collection.getResourceLocator().getHref(false) + "/" +
-            UriTemplate.escape(segment);
+            UriTemplate.escapeSegment(segment);
         return collection.findMember(href);
     }
 

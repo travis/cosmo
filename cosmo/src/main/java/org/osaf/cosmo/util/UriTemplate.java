@@ -155,7 +155,7 @@ public class UriTemplate {
                         continue;
                     throw new IllegalArgumentException("Not enough values");
                 }
-                buf.append(escape ? escape(value) : value);
+                buf.append(escape ? escapeSegment(value) : value);
             } else if (! segment.isAll()) {
                 buf.append(segment.getData());
             }
@@ -167,7 +167,7 @@ public class UriTemplate {
         if (vi.hasNext())
             if (segment.isAll()) {
                 while (vi.hasNext())
-                    buf.append(escape ? escape(vi.next()) : vi.next());
+                    buf.append(escape ? escapeSegment(vi.next()) : vi.next());
             } else
                 throw new IllegalArgumentException("Too many values");
 
@@ -249,11 +249,11 @@ public class UriTemplate {
                 String saved = match.get("*");
                 if (saved == null)
                     saved = "";
-                saved += "/" + (escaped ? unescape(token) : token);
+                saved += "/" + (escaped ? unescapeSegment(token) : token);
                 match.put("*", saved);
             } else if (segment.isVariable())
                 match.put(segment.getData(),
-                          escaped ? unescape(token) : token);
+                          escaped ? unescapeSegment(token) : token);
             else if (! segment.getData().equals(token))
                 // literal segment doesn't match, so path is not a match
                 return null;
@@ -273,7 +273,7 @@ public class UriTemplate {
         return pattern;
     }
 
-    public static final String escape(String raw) {
+    public static final String escapeSegment(String raw) {
         try {
             return new URI(null, null, raw, null).toASCIIString();
         } catch (Exception e) {
@@ -281,9 +281,9 @@ public class UriTemplate {
         }
     }
 
-    public static final String unescape(String escaped) {
+    public static final String unescapeSegment(String escaped) {
         try {
-            return new URI(escaped).getPath();
+            return new URI(null, null, "/" + escaped, null).getPath().substring(1);
         } catch (Exception e) {
             throw new RuntimeException("Could not unescape string " + escaped, e);
         }

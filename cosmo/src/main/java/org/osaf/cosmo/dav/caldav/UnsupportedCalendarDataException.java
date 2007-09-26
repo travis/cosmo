@@ -28,6 +28,11 @@ import org.osaf.cosmo.icalendar.ICalendarConstants;
 public class UnsupportedCalendarDataException
     extends ForbiddenException
     implements ICalendarConstants, CaldavConstants {
+
+    public UnsupportedCalendarDataException() {
+        super("Calendar data must be of media type " + ICALENDAR_MEDIA_TYPE + ", version " + ICALENDAR_VERSION);
+        getNamespaceContext().addNamespace(PRE_CALDAV, NS_CALDAV);
+    }
     
     public UnsupportedCalendarDataException(String mediaType) {
         super("Calendar data of type " + mediaType + " not allowed; only " +

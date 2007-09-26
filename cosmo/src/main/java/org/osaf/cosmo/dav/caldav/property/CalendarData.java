@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006 Open Source Applications Foundation
+ * Copyright 2005-2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,14 @@
  */
 package org.osaf.cosmo.dav.caldav.property;
 
+import org.apache.jackrabbit.webdav.xml.DomUtil;
+
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Represents the <code>CALDAV:calendar-data</code> property as used
@@ -24,11 +30,20 @@ import org.osaf.cosmo.dav.property.StandardDavProperty;
  * response.
  */
 public class CalendarData extends StandardDavProperty
-    implements CaldavConstants {
+    implements CaldavConstants, ICalendarConstants {
 
-
-    /** */
     public CalendarData(String calendarData) {
         super(CALENDARDATA, calendarData, true);
+    }
+
+    public Element toXml(Document document) {
+        Element e = super.toXml(document);
+
+        DomUtil.setAttribute(e, ATTR_CALDAV_CONTENT_TYPE,
+                             NAMESPACE_CALDAV, ICALENDAR_MEDIA_TYPE);
+        DomUtil.setAttribute(e, ATTR_CALDAV_VERSION,
+                             NAMESPACE_CALDAV, ICALENDAR_VERSION);
+
+        return e;
     }
 }

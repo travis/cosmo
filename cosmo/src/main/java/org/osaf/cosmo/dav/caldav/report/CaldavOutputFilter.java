@@ -29,9 +29,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.data.OutputFilter;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
+import org.osaf.cosmo.dav.caldav.UnsupportedCalendarDataException;
 
 import org.w3c.dom.Element;
 
@@ -39,7 +41,7 @@ import org.w3c.dom.Element;
  * A utility for parsing an {@link OutputFilter} from XML.
  */
 public class CaldavOutputFilter
-    implements DavConstants, CaldavConstants {
+    implements DavConstants, CaldavConstants, ICalendarConstants {
     private static final Log log = LogFactory.getLog(CaldavOutputFilter.class);
 
     /**
@@ -52,6 +54,17 @@ public class CaldavOutputFilter
         Period expand = null;
         Period limit = null;
         Period limitfb = null;
+
+        String contentType =
+            DomUtil.getAttribute(cdata, ATTR_CALDAV_CONTENT_TYPE,
+                                 NAMESPACE_CALDAV);
+        if (contentType != null && ! contentType.equals(ICALENDAR_MEDIA_TYPE))
+            throw new UnsupportedCalendarDataException(contentType);
+        String version =
+            DomUtil.getAttribute(cdata, ATTR_CALDAV_CONTENT_TYPE,
+                                 NAMESPACE_CALDAV);
+        if (version != null && ! version.equals(ICALENDAR_VERSION))
+                throw new UnsupportedCalendarDataException();
 
         // Look at each child element of calendar-data
         for (ElementIterator iter = DomUtil.getChildren(cdata);

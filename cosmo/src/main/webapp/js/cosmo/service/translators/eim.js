@@ -1012,6 +1012,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 // their parents' anyTime.
                 if (properties.anyTime) properties.allDay = false;
                 if (properties.allDay) properties.anyTime = false;
+                if (record.fields.lastPastOccurrence) {
+                    properties.lastPastOccurrence = this.fromEimDate(record.fields.lastPastOccurrence[1]);
+                    properties.lastPastOccurrence.tzId = properties.startDate.tzId;
+                }
             }
             if (record.fields.duration) properties.duration =
                     new cosmo.model.Duration(record.fields.duration[1]);

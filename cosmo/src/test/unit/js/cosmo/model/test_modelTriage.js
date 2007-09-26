@@ -65,6 +65,20 @@ dojo.lang.mixin(cosmotest.model.test_modelTriage,{
         startDate.updateFromUTC(twoHoursBeforeNow);
         var doneOccurrence = note.getNoteOccurrence(startDate);
         jum.assertEquals("event happened", cosmo.model.TRIAGE_DONE, doneOccurrence.getTriageStatus());
+
+        //now let's assume Chandler synced and set lastPastOccurrence
+        startDate.updateFromUTC(halfAnHourBeforeNow);
+        eventStamp.setLastPastOccurrence(startDate);
+        jum.assertEquals("event is happening now, but Chandler marked done", 
+                         cosmo.model.TRIAGE_DONE, nowOccurrence.getTriageStatus());
+        
+        startDate.updateFromUTC(halfAnHourAfterNow);
+        eventStamp.setLastPastOccurrence(startDate);
+        jum.assertEquals("event is happening later and Chandler synced", cosmo.model.TRIAGE_LATER, laterOccurrence.getTriageStatus());
+
+        startDate.updateFromUTC(twoHoursBeforeNow);
+        eventStamp.setLastPastOccurrence(startDate);
+        jum.assertEquals("event happened and Chandler synced", cosmo.model.TRIAGE_DONE, doneOccurrence.getTriageStatus());
     },
     
     test_autotriage: function(){

@@ -26,12 +26,14 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtStamp;
 
 import org.apache.commons.id.IdentifierGenerator;
 import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.lang.StringUtils;
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventExceptionStamp;
@@ -151,12 +153,7 @@ public class EventUtils {
         
         masterNote.setIcalUid(eventStamp.getIcalUid());
         
-        // for now displayName is limited to 255 chars
-        if(event.getSummary()!=null)
-            masterNote.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
-       
-        if(event.getDescription()!=null)
-            masterNote.setBody(event.getDescription().getValue());
+        setCalendarAttributes(masterNote, event);
         
         // synchronize exceptions with master NoteItem modifications
         syncExceptions(exceptions, masterNote);
@@ -213,12 +210,7 @@ public class EventUtils {
         noteMod.setOwner(masterNote.getOwner());
         noteMod.setName(noteMod.getUid());
         
-        // for now displayName is limited to 255 chars
-        if(event.getSummary()!=null)
-            noteMod.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
-       
-        if(event.getDescription()!=null)
-            noteMod.setBody(event.getDescription().getValue());
+        setCalendarAttributes(noteMod, event);
 
         noteMod.setClientCreationDate(new Date());
         noteMod.setClientModifiedDate(noteMod.getClientCreationDate());
@@ -246,5 +238,24 @@ public class EventUtils {
         noteMod.setClientModifiedDate(new Date());
         noteMod.setLastModifiedBy(noteMod.getModifies().getLastModifiedBy());
         noteMod.setLastModification(ContentItem.Action.EDITED);
+    }
+    
+    private static void setCalendarAttributes(NoteItem note, VEvent event) {
+        // for now displayName is limited to 255 chars
+        if (event.getSummary() != null)
+            note.setDisplayName(StringUtils.substring(event.getSummary()
+                    .getValue(), 0, 255));
+
+        if (event.getDescription() != null)
+            note.setBody(event.getDescription().getValue());
+
+        // look for VALARM
+        VAlarm va = ICalendarUtils.getDisplayAlarm(event);
+        if (va != null) {
+            Date reminderTime = ICalendarUtils.getTriggerDate(va.getTrigger(),
+                    event);
+            if (reminderTime != null)
+                note.setReminderTime(reminderTime);
+        }
     }
 }

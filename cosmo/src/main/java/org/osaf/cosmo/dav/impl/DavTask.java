@@ -18,25 +18,20 @@ package org.osaf.cosmo.dav.impl;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Summary;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.calendar.ICalendarUtils;
+import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
-import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.TaskStamp;
 
 /**
  * Extends <code>DavCalendarResource</code> to adapt the Cosmo
@@ -97,6 +92,8 @@ public class DavTask extends DavCalendarResource {
      * SUMMARY is blank)</li>
      * <li>icalUid: the VTODO's UID</li>
      * <li>body: the VTODO's DESCRIPTION</li>
+     * <li>reminderTime: if the VTODO has a DISPLAY VALARM
+     *     the reminderTime will be set to the trigger time</li>
      * </ul>
      */
     public void setCalendar(Calendar cal)
@@ -134,5 +131,14 @@ public class DavTask extends DavCalendarResource {
         if (val == null)
             val = "";
         note.setBody(val);
+        
+        // look for VALARM
+        VAlarm va = ICalendarUtils.getDisplayAlarm(vtodo);
+        if (va != null) {
+            Date reminderTime = ICalendarUtils.getTriggerDate(va.getTrigger(),
+                    vtodo);
+            if (reminderTime != null)
+                note.setReminderTime(reminderTime);
+        }
     }
 }

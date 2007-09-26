@@ -17,6 +17,7 @@ package org.osaf.cosmo.calendar;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.fortuna.ical4j.model.Calendar;
@@ -32,6 +33,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.parameter.Related;
+import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -228,6 +230,9 @@ public class ICalendarUtils {
      */
     public static Date getTriggerDate(Trigger trigger, Component parent) {
         
+        if(trigger==null)
+            return null;
+        
         // if its absolute then we are done
         if(trigger.getDateTime()!=null)
             return trigger.getDateTime();
@@ -273,5 +278,30 @@ public class ICalendarUtils {
             
             return Dates.getInstance(trigger.getDuration().getTime(endDate), endDate);
         }
+    }
+    
+    /**
+     * Find and return the first DISPLAY VALARM in a comoponent
+     * @param component VEVENT or VTODO
+     * @return first DISPLAY VALARM, null if there is none
+     */
+    public static VAlarm getDisplayAlarm(Component component) {
+        ComponentList alarms = null;
+        
+        if(component instanceof VEvent)
+            alarms = ((VEvent) component).getAlarms();
+        else if(component instanceof VToDo)
+            alarms = ((VToDo) component).getAlarms();
+        
+        if(alarms==null || alarms.size()==0)
+            return null;
+        
+        for(Iterator<VAlarm> it = alarms.iterator();it.hasNext();) {
+            VAlarm alarm = it.next();
+            if(Action.DISPLAY.equals(alarm.getAction()))
+                return alarm;
+        }
+        
+        return null;   
     }
 }

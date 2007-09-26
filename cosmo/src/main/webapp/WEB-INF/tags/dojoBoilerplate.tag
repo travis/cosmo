@@ -71,6 +71,7 @@ function bootstrap(){
     dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
 
     dojo.require("cosmo.env");
+    cosmo.env.setVersion("${PRODUCT_VERSION}");
     dojo.require("cosmo.ui.conf");
 
     <%-- 

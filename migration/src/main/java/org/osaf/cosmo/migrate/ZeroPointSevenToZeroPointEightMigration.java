@@ -60,7 +60,6 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
 
     @Override
     public String getToVersion() {
-        // switching to different schema version format
         return "120";
     }
 
@@ -100,12 +99,12 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
         try {
             // get all data to migrate
             stmt = conn.prepareStatement("select id, uid, modifydate from item");
-            // migration statment
+            // migration statement
             updateStmt = conn.prepareStatement("update item set etag=? where id=?");
             
             rs = stmt.executeQuery();
             
-            // migrate each event_stamp row
+            // migrate each item row
             while(rs.next()) {
                 long id = rs.getLong(1);
                 String uid = rs.getString(2);
@@ -143,8 +142,8 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
         
         try {
             // get all to migrate
-            stmt = conn.prepareStatement("select s.id, u.uid, s.displayName, s.modifydate from subscription s, users u where s.ownerid=u.id");
-            // migration statment
+            stmt = conn.prepareStatement("select s.id, u.uid, s.displayname, s.modifydate from subscription s, users u where s.ownerid=u.id");
+            // migration statement
             updateStmt = conn.prepareStatement("update subscription set etag=? where id=?");
             
             rs = stmt.executeQuery();

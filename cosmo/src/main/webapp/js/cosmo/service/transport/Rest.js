@@ -97,7 +97,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             // create callback that calls the Deferreds errback method
             return function(type, e, xhr){
                 // Workaround to not choke on 204s
-                if ((dojo.render.safari &&
+                if ((dojo.render.html.safari &&
                     !xhr.status) || (dojo.render.html.ie &&
                          xhr.status == 1223)){
                     xhr = {};

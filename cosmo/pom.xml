@@ -583,7 +583,7 @@
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
                                     <artifactId>dojo</artifactId>
-                                    <version>0.4.1-080-SNAPSHOT</version>
+                                    <version>0.4.3-080-SNAPSHOT</version>
                                     <type>jar</type>
                                   </artifactItem>
                                   <artifactItem>
@@ -623,7 +623,7 @@
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
                                     <artifactId>dojo</artifactId>
-                                    <version>0.4.1-080-SNAPSHOT</version>
+                                    <version>0.4.3-080-SNAPSHOT</version>
                                     <type>jar</type>
                                   </artifactItem>
                                   <artifactItem>

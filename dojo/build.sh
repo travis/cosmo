@@ -1,11 +1,11 @@
 #!/bin/bash
-
-if [ ! -d "release-0.4.1" ]; then
-    svn co http://svn.dojotoolkit.org/dojo/tags/release-0.4.1
-    cd release-0.4.1/buildscripts
+DOJO_VERSION="release-0.4.3"
+if [ ! -d "$DOJO_VERSION" ]; then
+    svn co http://svn.dojotoolkit.org/dojo/tags/$DOJO_VERSION
+    cd $DOJO_VERSION/buildscripts
     ant fix-config
 fi
-cd release-0.4.1/buildscripts
+cd $DOJO_VERSION/buildscripts
 if [ "$1" == "release" ]; then
     ant -Ddocless=true -Dprofile=../../../cosmo clean release
 else

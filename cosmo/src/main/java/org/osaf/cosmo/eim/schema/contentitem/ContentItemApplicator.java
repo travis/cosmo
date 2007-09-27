@@ -67,6 +67,7 @@ public class ContentItemApplicator extends BaseItemApplicator
             else {
                 String value = EimFieldValidator.validateText(field, MAXLEN_TITLE);
                 contentItem.setDisplayName(value);
+                contentItem.setName(value);
             }
         } else if (field.getName().equals(FIELD_TRIAGE)) {
             if(field.isMissing()) {

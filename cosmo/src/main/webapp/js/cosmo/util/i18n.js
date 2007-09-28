@@ -43,7 +43,7 @@ cosmo.util.i18n.getText = function () {
 };
 
 cosmo.util.i18n.setLocalizationMessages = function(messages){
-    this._localtext = messages;
+    this._localtext = messages || {};
 };
 
 // Legacy

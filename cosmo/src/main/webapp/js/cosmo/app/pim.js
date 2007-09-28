@@ -37,7 +37,7 @@ dojo.require('cosmo.service.conduits.common');
 dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
 dojo.require("cosmo.view.names");
-
+dojo.require("cosmo.account.preferences");
 // Global variables for X and Y position for mouse
 xPos = 0;
 yPos = 0;
@@ -92,8 +92,13 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.init = function (p) {
         var params = p || {};
         var collectionUrl = params.collectionUrl;
-        var startView = params.initialView || this.currentView;
+        var startView = params.initialView 
+            || cosmo.account.preferences.getCookiePreference(cosmo.account.preferences.DEFAULT_VIEW)
+            || this.currentView;
 
+        // Now that we've figured out the start view, remember it.
+        cosmo.account.preferences.setCookiePreference(cosmo.account.preferences.DEFAULT_VIEW, startView);
+        
         this.authAccess = params.authAccess;
         this.ticketKey = params.ticketKey;
         this.currDate = new Date();

@@ -32,6 +32,7 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.list.common");
+dojo.require("cosmo.account.preferences");
 
 cosmo.ui.navbar.Bar = function (p) {
     var self = this;
@@ -136,6 +137,10 @@ cosmo.ui.navbar.Bar = function (p) {
 
         // Set currentView to the new selected view
         _pim.currentView = viewName;
+
+        // Save new selected view name for reloading
+        cosmo.account.preferences.setCookiePreference(
+            cosmo.account.preferences.DEFAULT_VIEW, viewName)
 
         // Set up the view on initial display
         if (!_view.hasBeenInitialized) {

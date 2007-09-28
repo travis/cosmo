@@ -20,5 +20,8 @@ cosmotest.account.test_preferences = {
     test_cookiePreferences: function(){
         cosmo.account.preferences.setCookiePreference("foo", "bar");
         jum.assertEquals("foo preference", "bar", cosmo.account.preferences.getCookiePreference("foo"));
+
+        jum.assertEquals("baz preference", null, cosmo.account.preferences.getCookiePreference("baz"));
+        
     }
 }

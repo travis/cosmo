@@ -58,8 +58,9 @@
      </property>
      <property name="objectDefinitionSource">
        <value>
-	       CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-	       PATTERN_TYPE_APACHE_ANT
+	     CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+	     PATTERN_TYPE_APACHE_ANT
+         /dav/users=ROLE_ROOT,ROLE_USER
          /**=ROLE_ROOT
        </value>
      </property>

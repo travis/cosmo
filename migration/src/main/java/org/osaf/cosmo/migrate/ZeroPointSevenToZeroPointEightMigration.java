@@ -75,10 +75,93 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
     public void migrateData(Connection conn, String dialect) throws Exception {
         
         log.debug("starting migrateData()");
+        fixDuplicateIcalUids(conn);
         migrateItems(conn);
         migrateSubscriptions(conn);
         migratePreferences(conn);
         migrateUsers(conn);
+    }
+    
+    /**
+     * ensure collections do not contain duplicate icaluids
+     */
+    private void fixDuplicateIcalUids(Connection conn) throws Exception {
+        
+        PreparedStatement stmt = null;
+        PreparedStatement selectByIcalUid = null;
+        PreparedStatement selectNumDuplicates = null;
+        PreparedStatement updateStmt = null;
+        PreparedStatement updateColStmt = null;
+        
+        ResultSet rs = null;
+        
+        long count = 0;
+        
+        log.debug("starting fixDuplicateIcalUids()");
+        
+        try {
+            // get all to migrate
+            stmt = conn.prepareStatement("select * from (SELECT ci.collectionid, i.icaluid, count(*) counticaluid from item i, collection_item ci where ci.itemid=i.id and i.icaluid is not null and i.modifiesitemid is null group by i.icaluid, ci.collectionid) as ss where counticaluid > 1");
+            selectNumDuplicates = conn.prepareStatement("select count(*) from item i, collection_item ci where ci.collectionid=? and ci.itemid=i.id and i.icaluid=?");
+            selectByIcalUid = conn.prepareStatement("select i.id from item i, collection_item ci where ci.collectionid=? and ci.itemid=i.id and i.icaluid=? and upper(i.icaluid)!=upper(i.uid)");
+            // migration statements
+            updateStmt = conn.prepareStatement("update item set icaluid=upper(uid), modifydate=?, version=version+1 where id=?");
+            updateStmt.setLong(1, System.currentTimeMillis());
+            
+            updateColStmt = conn.prepareStatement("update item set modifydate=?, version=version+1 where id=?");
+            updateColStmt.setLong(1, System.currentTimeMillis());
+            
+            rs = stmt.executeQuery();
+            
+            // migrate each duplicate icaluid
+            while(rs.next()) {
+                long collectionId = rs.getLong(1);
+                String icalUid = rs.getString(2);
+                
+                selectNumDuplicates.setLong(1, collectionId);
+                selectNumDuplicates.setString(2, icalUid);
+                ResultSet duplicatesRs = selectNumDuplicates.executeQuery();
+                duplicatesRs.next();
+                int numDuplicates = duplicatesRs.getInt(1);
+                duplicatesRs.close();
+                
+                while(numDuplicates>1) {
+                    log.debug("found " + numDuplicates + " for icaluid " + icalUid + " collectionid " + collectionId);
+                    log.debug("fixing collection " + collectionId + " icaluid " + icalUid);
+                    
+                    selectByIcalUid.setLong(1, collectionId);
+                    selectByIcalUid.setString(2, icalUid);
+                    ResultSet toFix = selectByIcalUid.executeQuery();
+                    toFix.next();
+                    
+                    // fix icaluid to be uid, update timestamp
+                    long itemId = toFix.getLong(1);
+                    updateStmt.setLong(2, itemId);
+                    updateStmt.executeUpdate();
+                    toFix.close();
+                    
+                    // update collection timestamp
+                    updateColStmt.setLong(2, collectionId);
+                    updateColStmt.executeUpdate();
+                    
+                    count++;
+                    
+                    duplicatesRs = selectNumDuplicates.executeQuery();
+                    duplicatesRs.next();
+                    numDuplicates = duplicatesRs.getInt(1);
+                }
+                
+            }
+            
+            
+        } finally {
+            close(stmt);
+            close(updateStmt);
+            close(selectNumDuplicates);
+            close(selectByIcalUid);
+        }
+        
+        log.debug("fixed " + count + " items with duplicate icaluids");
     }
     
     

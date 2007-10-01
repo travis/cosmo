@@ -22,3 +22,5 @@ alter table attribute add column etag varchar(255)
 # migrate data
 update attribute set etag='';
 update stamp set etag='';
+
+update item set icaluid=null where modifiesitemid is not null

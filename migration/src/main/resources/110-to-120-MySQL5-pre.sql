@@ -24,5 +24,7 @@ insert into attribute (itemid, attributetype, namespace, localname, stringvalue,
 insert into attribute (itemid, attributetype, namespace, localname, stringvalue, createdate, modifydate) select s.itemid, 'string', 'org.osaf.cosmo.model.CalendarCollectionStamp', 'language', cs.language, s.createdate, s.modifydate from stamp s, calendar_stamp cs where s.id=cs.stampid and s.stamptype='calendar';
 insert into attribute (itemid, attributetype, namespace, localname, textvalue, createdate, modifydate) select s.itemid, 'icalendar', 'org.osaf.cosmo.model.CalendarCollectionStamp', 'timezone', cs.timezone, s.createdate, s.modifydate from stamp s, calendar_stamp cs where s.id=cs.stampid and s.stamptype='calendar';
 
+update item set icaluid=null where modifiesitemid is not null;
+
 update attribute set etag='';
 update stamp set etag='';

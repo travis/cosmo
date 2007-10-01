@@ -40,6 +40,7 @@ import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.report.Report;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
+import org.apache.jackrabbit.webdav.version.report.ReportType;
 
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavContent;
@@ -53,6 +54,7 @@ import org.osaf.cosmo.dav.acl.AclConstants;
 import org.osaf.cosmo.dav.acl.property.AlternateUriSet;
 import org.osaf.cosmo.dav.acl.property.GroupMembership;
 import org.osaf.cosmo.dav.acl.property.PrincipalUrl;
+import org.osaf.cosmo.dav.acl.report.PrincipalMatchReport;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.property.CalendarHomeSet;
 import org.osaf.cosmo.dav.impl.DavResourceBase;
@@ -80,7 +82,9 @@ import org.w3c.dom.Element;
  */
 public class DavUserPrincipal extends DavResourceBase
     implements AclConstants, CaldavConstants, DavContent {
-    private static final Log log = LogFactory.getLog(DavUserPrincipal.class);
+    private static final Log log = LogFactory.getLog(DavUserPrincipal.class);    
+    private static final Set<ReportType> REPORT_TYPES =
+        new HashSet<ReportType>();
 
     static {
         registerLiveProperty(DavPropertyName.CREATIONDATE);
@@ -93,6 +97,8 @@ public class DavUserPrincipal extends DavResourceBase
         registerLiveProperty(ALTERNATEURISET);
         registerLiveProperty(PRINCIPALURL);
         registerLiveProperty(GROUPMEMBERSHIP);
+
+        REPORT_TYPES.add(PrincipalMatchReport.REPORT_TYPE_PRINCIPAL_MATCH);
     }
 
     private User user;
@@ -190,11 +196,6 @@ public class DavUserPrincipal extends DavResourceBase
         return parent;
     }
 
-    public Report getReport(ReportInfo reportInfo)
-        throws DavException {
-        throw new UnsupportedOperationException();
-    }
-
     // our methods
 
     public User getUser() {
@@ -205,6 +206,10 @@ public class DavUserPrincipal extends DavResourceBase
         HashSet<QName> rt = new HashSet<QName>(1);
         rt.add(RESOURCE_TYPE_PRINCIPAL);
         return rt;
+    }
+
+    public Set<ReportType> getReportTypes() {
+        return REPORT_TYPES;
     }
     
     protected void loadLiveProperties(DavPropertySet properties) {

@@ -49,9 +49,10 @@ import org.w3c.dom.Element;
  * <p>
  * If the report includes the <code>DAV:self</code> element, it matches
  * any principal resource in the target collection that represents the
- * currently authenticated user. This form of the report is used to search
- * through a principal collection for any principal resources that match
- * the current user.
+ * currently authenticated user. This form of the report is used to
+ * search through a principal collection for any principal resources that match
+ * the current user. Alternatively, it can be used to find information about a
+ * particular principal by targeting a specific principal resource.
  * </p>
  * <p>
  * If the report includes the <code>DAV:principal-property</code> element,
@@ -73,8 +74,7 @@ import org.w3c.dom.Element;
  * provided for each resource.
  * </p>
  * <p>
- * As per RFC 3744, the report must be specified with depth 0. The report
- * must be targeted at a collection.
+ * As per RFC 3744, the report must be specified with depth 0.
  * </p>
  */
 public class PrincipalMatchReport extends MultiStatusReport
@@ -106,12 +106,10 @@ public class PrincipalMatchReport extends MultiStatusReport
     protected void parseReport(ReportInfo info)
         throws DavException {
         if (! getType().isRequestedReportType(info))
-            throw new DavException("Report not of type " + getType());
+            throw new DavException("Report not of type " + getType().getReportName());
 
-        if (! getResource().isCollection())
-            throw new BadRequestException(getType() + " report must target a collection");
         if (info.getDepth() != DEPTH_0)
-            throw new BadRequestException(getType() + " report must be made with depth 0");
+            throw new BadRequestException(getType().getReportName() + " report must be made with depth 0");
 
         setPropFindProps(info.getPropertyNameSet());
         setPropFindType(PROPFIND_BY_PROPERTY);
@@ -152,11 +150,13 @@ public class PrincipalMatchReport extends MultiStatusReport
      */
     protected void runQuery()
         throws DavException {
+        doQuerySelf(getResource());
+        if (! getResource().isCollection())
+            return;
         DavCollection collection = (DavCollection) getResource();
-        doQuerySelf(collection);
         doQueryChildren(collection);
-        // don't use doQueryDescendents, because that would cause us to have to
-        // iterate through the members twice. instead, we implement
+        // don't use doQueryDescendents, because that would cause us to have
+        // to iterate through the members twice. instead, we implement
         // doQueryChildren to call itself recursively.
         // XXX: refactor ReportBase.runQuery() to use a helper object rather
         // than specifying doQuerySelf etc interface methods.

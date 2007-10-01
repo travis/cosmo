@@ -16,7 +16,7 @@
 
 dojo.provide("cosmo.service.translators.eim.constants");
 
-cosmo.service.eim.constants = {
+cosmo.service.translators.eim.constants = {
     prefix: {
         ITEM: "item",
         NOTE: "note",

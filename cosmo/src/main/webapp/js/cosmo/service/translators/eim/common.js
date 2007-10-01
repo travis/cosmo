@@ -454,7 +454,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          }
         );
         for (recordName in recordSet.records){
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
 
            var record = recordSet.records[recordName]
 
@@ -502,7 +502,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         for (recordName in recordSet.records){
             deletedStamps[recordName] = false;
-            with (cosmo.service.eim.constants){
+            with (cosmo.service.translators.eim.constants){
                var record = recordSet.records[recordName];
                 
                switch(recordName){
@@ -746,7 +746,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     propsToItemRecord: function(props){
         var fields = {};
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
         
             if (props.displayName !== undefined) fields.title = [type.TEXT, props.displayName];
             if (props.creationDate !== undefined) fields.createdOn = [type.DECIMAL, props.creationDate/1000];
@@ -809,7 +809,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     propsToNoteRecord: function (props){
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
             var fields = {};
             if (props.body !== undefined) fields.body = [type.CLOB, props.body];
             if (props.icalUid !== undefined) fields.icalUid = [type.TEXT, props.icalUid];
@@ -863,7 +863,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     propsToMailRecord: function(props){
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
             var fields = {};
             var missingFields = [];
             if (props.messageId !== undefined) fields.messageId = [type.TEXT, props.messageId];
@@ -922,7 +922,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
     
     propsToEventRecord: function(props){
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
             var fields = {};
             if (props.startDate !== undefined) fields.dtstart = 
                 [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
@@ -972,7 +972,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     noteToTaskRecord: function (note){
 
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
             return {
                 prefix: prefix.TASK,
                 ns: ns.TASK,
@@ -987,7 +987,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     noteToModbyRecord: function(note){
-        with (cosmo.service.eim.constants){
+        with (cosmo.service.translators.eim.constants){
             return {
                 prefix: prefix.MODBY,
                 ns: ns.MODBY,

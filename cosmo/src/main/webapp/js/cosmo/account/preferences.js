@@ -25,11 +25,11 @@ cosmo.account.preferences = new function () {
 	this.DEFAULT_COLLECTION = 'Pim.Default.Collection';
 
     this.getCookiePreference = function(key){
-        return dojo.io.cookie.getCookie(key);
+        return cosmo.util.cookie.get(key);
     };
 
     this.setCookiePreference = function(key, val){
-        return dojo.io.cookie.setCookie(key, val);
+        return cosmo.util.cookie.set(key, val);
     };
 	
     this.getPreference = function(key, kwArgs){

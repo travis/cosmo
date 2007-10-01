@@ -77,8 +77,14 @@ public class UserVoter extends UserResourceVoter
     private int voteOnCollection(UriTemplate.Match match,
                                  String method,
                                  User authenticated) {
-        // the authenticated user and the user who owns the collection
-        // represented by the URI need to match
+        // read methods - user must have DAV:read and/or
+        //                DAV:current-user-privilege-set
+        // write methods - user must have DAV:write if the resource exists, or
+        //                DAV:bind on the parent if the resource does not exist
+        //                (for PUT or MKCOL), or DAV:unbind on the parent (for
+        //                DELETE)
+        // all of these conditions are satisfied if the authenticated user owns
+        // the targeted collection.
 
         String uid = match.get("uid");
         Item item = getContentService().findItemByUid(uid);
@@ -95,8 +101,14 @@ public class UserVoter extends UserResourceVoter
     private int voteOnItemResource(UriTemplate.Match match,
                                    String method,
                                    User authenticated) {
-        // the authenticated user and the user who owns the item
-        // represented by the URI need to match
+        // read methods - user must have DAV:read and/or
+        //                DAV:current-user-privilege-set
+        // write methods - user must have DAV:write if the resource exists, or
+        //                DAV:bind on the parent if the resource does not exist
+        //                (for PUT or MKCOL), or DAV:unbind on the parent (for
+        //                DELETE)
+        // all of these conditions are satisfied if the authenticated user owns
+        // the targeted item.
         
         String uid = match.get("uid");
         Item item = getContentService().findItemByUid(uid);
@@ -113,17 +125,23 @@ public class UserVoter extends UserResourceVoter
     private int voteOnUserPrincipalCollection(UriTemplate.Match match,
                                               String method,
                                               User authenticated) {
-        // allow anybody to read the principal collection, but abstain
-        // on write methods so that other voters have the opportunity to
-        // allow
-        return Methods.isReadMethod(method) ? ACCESS_GRANTED : ACCESS_ABSTAIN;
+        // read methods - user must have DAV:read and/or
+        //                DAV:current-user-privilege-set
+        // write methods - not allowed
+        // all of these conditions are satisfied simply by a user being
+        // authenticated.
+        
+        return Methods.isReadMethod(method) ? ACCESS_GRANTED : ACCESS_DENIED;
     }
 
     private int voteOnUserPrincipalResource(UriTemplate.Match match,
                                             String method,
                                             User authenticated) {
-        // the authenticated user and the user represented by the
-        // principal URL need to match
+        // read methods - user must have DAV:read and/or
+        //                DAV:current-user-privilege-set
+        // write methods - not allowed
+        // all of these conditions are satisfied if the authenticated user is
+        // the user represented by the targeted principal.
 
         User principal = getUserService().getUser(match.get("username"));
         if (principal == null) {
@@ -139,8 +157,14 @@ public class UserVoter extends UserResourceVoter
     private int voteOnHomeResource(UriTemplate.Match match,
                                    String method,
                                    User authenticated) {
-        // the authenticated user and the user who owns the home collection
-        // represented by the URI need to match
+        // read methods - user must have DAV:read and/or
+        //                DAV:current-user-privilege-set
+        // write methods - user must have DAV:write if the resource exists, or
+        //                DAV:bind on the parent if the resource does not exist
+        //                (for PUT or MKCOL), or DAV:unbind on the parent (for
+        //                DELETE)
+        // all of these conditions are satisfied if the authenticated user owns
+        // the home collection of the targeted item.
 
         User owner = getUserService().getUser(match.get("username"));
         if (owner == null) {

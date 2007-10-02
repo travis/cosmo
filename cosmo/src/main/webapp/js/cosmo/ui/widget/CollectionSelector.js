@@ -55,7 +55,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var t = e.target;
             // Set local currentCollection var
             var c = this.collections[t.selectedIndex];
-            
+
             // Check for unsaved changes in the selected item
             // before switching collections
             var view = cosmo.view[cosmo.app.pim.currentView];
@@ -75,7 +75,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }
 
             this.currentCollection = c;
-            
+
             cosmo.app.pim.currentCollection = c;
             // Publish this through a setTimeout call so that the
             // select box doesn't just sit open while waiting for
@@ -145,10 +145,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                     : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
                                 return cosmo.app.showAndWait(message, null);
                             }
-    
+
                             var displayName = "";
-    
-                            var displayNameDeferred = cosmo.app.getValue(_("Main.CollectionAdd.EnterDisplayNamePrompt"), 
+
+                            var displayNameDeferred = cosmo.app.getValue(_("Main.CollectionAdd.EnterDisplayNamePrompt"),
                                                curr.getDisplayName(), [
                                                function (displayName){
                                                    if (!self._validateDisplayName(displayName)){
@@ -166,13 +166,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                                 if (displayName == null) {
                                     return null;
                                 }
-        
+
                                 var subscription = new cosmo.model.Subscription({
                                     displayName: displayName,
                                     uid: curr.getUid(),
                                     ticketKey: passedKey
                                 })
-        
+
                                 return cosmo.app.pim.serv.createSubscription(subscription);
                             });
                             return displayNameDeferred;
@@ -296,7 +296,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     name: 'calSelectElem',
                     options: options, className: 'selectElem' }, d);
                 sel.style.width = '120px';
-                
+
                 self.selector = sel;
 
                 // Set the select to the current collection
@@ -410,13 +410,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }
             this._redraw();
         },
-        
+
         updateCollectionSelectorOptions: function(collections, currentCollection){
             this.currentCollection = currentCollection;
             this.collections = collections;
             this._redraw();
         },
-        
+
         setSelectorByDisplayName: function(displayName){
             var index = this._getIndexByDisplayName(this.collections, displayName);
             if (index == -1){
@@ -424,13 +424,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }
             this.setSelectorByIndex(index);
         },
-        
+
         setSelectorByIndex: function(index){
-            cosmo.util.html.setSelect(this._getSelect(), index);    
-        }, 
-        
+            cosmo.util.html.setSelect(this._getSelect(), index);
+        },
+
         _getSelect: function(){ return this.selector;},
-        
+
         _getIndexByDisplayName: function(collections, displayName){
             for (var x = 0; x < collections.length; x++){
                 if (collections[x].getDisplayName() == displayName){
@@ -439,19 +439,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             }
             return -1;
         },
-        
+
         _createOptionsFromCollections: function(collections, /*String?*/ displayName){
                 var options = [];
                 for (var x = 0; x < collections.length; x++) {
                     var collection = collections[x];
-                    var selected = displayName && collection.displayName == displayName ? true : false; 
-                    options.push( { value: x, 
+                    var selected = displayName && collection.displayName == displayName ? true : false;
+                    options.push( { value: x,
                                     text: collection.getDisplayName(),
                                     selected: selected} );
                 }
                 return options;
         },
-        
+
         _redraw: function () {
             while (this.domNode.firstChild) {
                 this.domNode.removeChild(this.domNode.firstChild);
@@ -463,7 +463,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             var index = this._getIndexByDisplayName(cols, displayName);
             return index != -1;
         },
-        
+
         _collectionWithUidExists: function(cols, uid){
             for (var x = 0; x < cols.length; x++){
                 if (cols[x].getUid() == uid){

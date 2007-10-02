@@ -625,9 +625,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             // ensure master is dirty so that etag gets updated
             note.getModifies().updateTimestamp();
             
-            if (!note.getParents().equals(parents))
+            if (!note.getModifies().getParents().equals(parents))
                 throw new IllegalArgumentException(
-                        "Note modification parents must equal to the parents of master note");
+                        "Note modification parents must equal the parents of master note");
         }
         
         for(CollectionItem parent: parents) {

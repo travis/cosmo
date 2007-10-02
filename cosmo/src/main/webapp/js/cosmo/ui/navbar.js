@@ -411,7 +411,11 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             disabled: writeable ? false : true
         };
         var text = cosmo.util.html.createInput(o);
-        text.style.width = '220px';
+        // Dynamically size the quick-entry text so the 
+        // page nav can fit -- max it out at 220px wide
+        var w = this.parent.width - 300;
+        w = w > 220 ? 220 : w;
+        text.style.width = w + 'px';
         this.createTextBox = text;
         if (writeable) {
             var func = cosmo.util.html.handleTextInputFocus;

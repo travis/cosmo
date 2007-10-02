@@ -78,13 +78,15 @@ cosmo.view.viewBase = new function () {
                     break;
                 // Matching ids -- candidates for removal
                 case (str.indexOf(',' + item.data.getUid() + ',') > -1):
-                    var eventStamp = item.data.getEventStamp();
-                    var startDate = eventStamp.getStartDate();
-                    var endDate = eventStamp.getEndDate();
                     // If also filtering by date, check the start date of
                     // matching items as well
-                    if (compDt && (startDate.toUTC() < compDt.toUTC())) {
-                        keep = true;
+                    if (compDt){
+                        var eventStamp = item.data.getEventStamp();
+                        var startDate = eventStamp.getStartDate();
+                        var endDate = eventStamp.getEndDate();
+                        if (startDate.toUTC() < compDt.toUTC()) {
+                            keep = true;
+                        }
                     }
                     break;
                 default:

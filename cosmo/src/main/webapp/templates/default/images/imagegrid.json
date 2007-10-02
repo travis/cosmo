@@ -45,10 +45,10 @@
 "triageStatusColumnSelected": { "row": 4, "column": 4, "width": 36, "height": 15 },
 "triageStatusColumnSelectedRollover": { "row": 4, "column": 4, "width": 36, "height": 15 },
 
-"taskColumnDefault": { "row": 4, "column": 5, "width": 22, "height": 15 },
-"taskColumnDefaultRollover": { "row": 4, "column": 6, "width": 22, "height": 15 },
-"taskColumnSelected": { "row": 4, "column": 8, "width": 22, "height": 15 },
-"taskColumnSelectedRollover": { "row": 4, "column": 8, "width": 22, "height": 15 },
+"taskColumnDefault": { "row": 4, "column": 5, "width": 20, "height": 15 },
+"taskColumnDefaultRollover": { "row": 4, "column": 6, "width": 20, "height": 15 },
+"taskColumnSelected": { "row": 4, "column": 8, "width": 20, "height": 15 },
+"taskColumnSelectedRollover": { "row": 4, "column": 8, "width": 20, "height": 15 },
 
 "listViewTaskIcon": { "row": 4, "column": 9, "width": 12, "height": 12 }
 }

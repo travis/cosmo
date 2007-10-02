@@ -1242,6 +1242,20 @@ cosmo.view.cal.canvas = new function () {
         var qual = cmd.qualifier;
         var eventStamp = ev.data.getEventStamp();
 
+        function doProcessing() {
+            ev.lozenge.setInputDisabled(true);
+            ev.lozenge.showProcessing();
+            if (rrule) {
+                var f = function (i, e) {
+                    if (e.data.getUid() == ev.data.getUid()) {
+                        e.lozenge.setInputDisabled(true);
+                        e.lozenge.showProcessing();
+                    }
+                }
+                cosmo.view.cal.itemRegistry.each(f);
+            }
+        }
+
         // If the user has navigated off the week displaying the
         // current selected item, it's not in the itemRegistry,
         // it's being pulled from selectedItemCache, so its Lozenge
@@ -1253,8 +1267,7 @@ cosmo.view.cal.canvas = new function () {
         // lozenge to a processing state and wait for edit
         // to return to remove the lozenge from the canvas
         if (!eventStamp) {
-            ev.lozenge.setInputDisabled(true);
-            ev.lozenge.showProcessing();
+            doProcessing();
             return true;
         }
 
@@ -1291,22 +1304,7 @@ cosmo.view.cal.canvas = new function () {
         ev.lozenge.updateElements();
 
         // Display processing animation
-        ev.lozenge.setInputDisabled(true);
-        ev.lozenge.showProcessing();
-        if (rrule) {
-
-            var f = function (i, e) {
-                if (e.data.id == ev.data.id) {
-                    if (qual == 'allEvents' || (qual == 'allFuture' &&
-                        (startDate.toUTC() < e.data.getEventStamp().getStartDate().toUTC()))) {
-                        e.lozenge.setInputDisabled(true);
-                        e.lozenge.showProcessing();
-                    }
-                }
-            }
-            var evReg = cosmo.view.cal.itemRegistry;
-            evReg.each(f);
-        }
+        doProcessing(rrule);
         return true;
     }
 

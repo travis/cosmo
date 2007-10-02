@@ -246,12 +246,15 @@
     display: none;
     border-left: 1px solid #999;
     border-right: 1px solid #999;
-    overflow: auto;
+    overflow: hidden;
+}
+#listViewTable {
+  table-layout: fixed;
+  width: 100%;
 }
 .listViewHeaderCell {
     color: #000;
     font-weight: bold;
-    padding: 0px 5px;
     height: 15px;
     line-height: 15px;
     border-right: 1px solid #ddd;
@@ -259,6 +262,7 @@
     background-position: 0px 0px;
     cursor: pointer;
     white-space: nowrap;
+    overflow: hidden;
 }
 .listViewHeaderCellLit {
     background-position: 0px -20px;
@@ -270,8 +274,12 @@
     background-position: 0px -60px;
 }
 .listViewDataCell {
+    height: 20px;
+    line-height: 20px;
+    overflow: hidden;
+    white-space: nowrap;
     cursor: pointer;
-    padding: 3px;
+    vertical-align: top;
     border-bottom: 1px solid #ddd;
 }
 .listViewSelectedCell {

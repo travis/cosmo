@@ -291,6 +291,8 @@ public abstract class DavResourceBase
         try {
             return ReportType.getType(reportInfo).createReport(this, reportInfo);
         } catch (org.apache.jackrabbit.webdav.DavException e){
+            if (e instanceof DavException)
+                throw (DavException) e;
             throw new DavException(e);
         }
     }

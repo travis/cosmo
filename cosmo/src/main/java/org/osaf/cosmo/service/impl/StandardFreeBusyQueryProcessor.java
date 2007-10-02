@@ -17,7 +17,6 @@ package org.osaf.cosmo.service.impl;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TreeSet;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -32,14 +31,13 @@ import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.parameter.FbType;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.FreeBusy;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.id.uuid.VersionFourGenerator;
+import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.Instance;
 import org.osaf.cosmo.calendar.InstanceList;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
@@ -133,7 +131,6 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
         // Create list of instances within the specified time-range
         InstanceList instances = new InstanceList();
         instances.setUTC(true);
-
         instances.setTimezone(timezone);
 
         // Look at each VEVENT/VFREEBUSY component only
@@ -184,8 +181,7 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
         }
 
         // Add start/end period for each instance
-        TreeSet sortedKeys = new TreeSet(instances.keySet());
-        for (Iterator i = sortedKeys.iterator(); i.hasNext();) {
+        for (Iterator i = instances.keySet().iterator(); i.hasNext();) {
             String ikey = (String) i.next();
             Instance instance = (Instance) instances.get(ikey);
 
@@ -200,29 +196,26 @@ public class StandardFreeBusyQueryProcessor implements FreeBusyQueryProcessor {
             }
 
             // Can only have DATE-TIME values in PERIODs
-            if (instance.getStart() instanceof DateTime) {
-                DateTime start = (DateTime) instance.getStart();
-                DateTime end = (DateTime) instance.getEnd();
-                Value sv = freeBusyRange.getStart() instanceof DateTime ? Value.DATE_TIME
-                        : Value.DATE;
-                Value se = freeBusyRange.getEnd() instanceof DateTime ? Value.DATE_TIME
-                        : Value.DATE;
-
-                if (start.compareTo(freeBusyRange.getStart()) < 0) {
-                    start = (DateTime) Dates.getInstance(freeBusyRange
-                            .getStart(), sv);
-                }
-                if (end.compareTo(freeBusyRange.getEnd()) > 0) {
-                    end = (DateTime) Dates.getInstance(freeBusyRange.getEnd(),
-                            se);
-                }
-                if (Status.VEVENT_TENTATIVE.equals(instance.getComp()
-                        .getProperties().getProperty(Property.STATUS))) {
-                    busyTentativePeriods.add(new Period(start, end));
-                } else {
-                    busyPeriods.add(new Period(start, end));
-                }
+            DateTime start, end = null;
+            
+            start = (DateTime) instance.getStart();
+            end = (DateTime) instance.getEnd();
+           
+            if (start.compareTo(freeBusyRange.getStart()) < 0) {
+                start = (DateTime) org.osaf.cosmo.calendar.util.Dates.getInstance(freeBusyRange
+                        .getStart(), start);
             }
+            if (end.compareTo(freeBusyRange.getEnd()) > 0) {
+                end = (DateTime) org.osaf.cosmo.calendar.util.Dates.getInstance(freeBusyRange.getEnd(),
+                        end);
+            }
+            if (Status.VEVENT_TENTATIVE.equals(instance.getComp()
+                    .getProperties().getProperty(Property.STATUS))) {
+                busyTentativePeriods.add(new Period(start, end));
+            } else {
+                busyPeriods.add(new Period(start, end));
+            }
+            
         }
     }
     

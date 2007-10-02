@@ -18,11 +18,16 @@ package org.osaf.cosmo.service.impl;
 import java.util.Iterator;
 
 import junit.framework.Assert;
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.PeriodList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.parameter.FbType;
 import net.fortuna.ical4j.model.property.FreeBusy;
@@ -51,6 +56,10 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
     protected CalendarDaoImpl calendarDao = null;
     protected UserDaoImpl userDao = null;
     protected StandardFreeBusyQueryProcessor queryProcessor = null;
+    
+    private static final TimeZoneRegistry TIMEZONE_REGISTRY =
+        TimeZoneRegistryFactory.getInstance().createRegistry();
+
     
     protected final String CALENDAR_UID = "calendaruid";
 
@@ -86,6 +95,31 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
         contentDao.createContent(calendar, fb);
         
         clearSession();
+    }
+    
+    public void testAddBusyPeriodsRecurringAllDay() throws Exception {
+        PeriodList busyPeriods = new PeriodList();
+        PeriodList busyTentativePeriods = new PeriodList();
+        PeriodList busyUnavailablePeriods = new PeriodList();
+        
+        DateTime start = new DateTime("20070103T090000Z");
+        DateTime end = new DateTime("20070117T090000Z");
+        
+        Period fbRange = new Period(start, end);
+        
+        Calendar calendar = CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/allday_weekly_recurring.ics"));
+        TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
+        
+        queryProcessor.addBusyPeriods(calendar, tz, fbRange, busyPeriods, busyTentativePeriods, busyUnavailablePeriods);
+        
+        Assert.assertEquals("20070108T060000Z/20070109T060000Z,20070115T060000Z/20070116T060000Z", busyPeriods.toString());
+        
+        busyPeriods.clear();
+        
+        tz = TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles");
+        queryProcessor.addBusyPeriods(calendar, tz, fbRange, busyPeriods, busyTentativePeriods, busyUnavailablePeriods);
+        
+        Assert.assertEquals("20070108T080000Z/20070109T080000Z,20070115T080000Z/20070116T080000Z", busyPeriods.toString());
     }
 
     public void testFreeBusyQuery() throws Exception {

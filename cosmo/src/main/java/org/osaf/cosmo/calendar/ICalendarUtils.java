@@ -161,12 +161,147 @@ public class ICalendarUtils {
      * @return new DateTime instance representing floating time pinned to
      *         the specified timezone
      */
-    public static DateTime pinFloatingTime(DateTime date, TimeZone tz) {
-        try {
-            return new DateTime(date.toString(), tz);
+    public static DateTime pinFloatingTime(Date date, TimeZone tz) {
+        
+        try {   
+            if(date instanceof DateTime) {
+                DateTime dt = (DateTime) date;
+                if(dt.isUtc() || dt.getTimeZone()!=null)
+                    return dt;
+                else
+                    return new DateTime(date.toString(), tz); 
+            }
+            else
+                return new DateTime(date.toString() + "T000000", tz);
         } catch (ParseException e) {
             throw new RuntimeException("error parsing date");
         }
+    }
+    
+    /**
+     * Return a Date instance that represents the day that a point in
+     * time translates into local time given a timezone.
+     * @param utcDateTime point in time
+     * @param tz timezone
+     */
+    public static Date normalizeUTCDateTimeToDate(DateTime utcDateTime, TimeZone tz) {
+        if(!utcDateTime.isUtc())
+            throw new IllegalArgumentException("datetime must be utc");
+        
+        // if no timezone, use default
+        if(tz==null)
+            return new Date(utcDateTime);
+        
+        DateTime copy = (DateTime) Dates.getInstance(utcDateTime, utcDateTime);
+        copy.setTimeZone(tz);
+        
+        try {
+            return new Date(copy.toString().substring(0, 8));
+        } catch (ParseException e) {
+            throw new RuntimeException("error creating Date instance");
+        }
+    }
+    
+    /**
+     * Convert a Date instance to a utc DateTime instance for a
+     * specified timezone.
+     * @param date date to convert
+     * @param tz timezone
+     * @return UTC DateTime instance
+     */
+    public static DateTime convertToUTC(Date date, TimeZone tz) {
+        
+        // handle DateTime
+        if(date instanceof DateTime) {
+            DateTime dt = (DateTime) date;
+            
+            // if utc already, then nothing to do
+            if(dt.isUtc())
+                return dt;
+            
+            // if DateTime has timezone, then create copy, set to utc
+            if(dt.getTimeZone()!=null) {
+                dt = (DateTime) Dates.getInstance(date, date);
+                dt.setUtc(true);
+                return dt;
+            }
+            
+            // otherwise DateTime is floating
+            
+            // If timezone specified, use it to pin the floating DateTime
+            // to an instant
+            if(tz!=null) {
+                dt = pinFloatingTime(date, tz);
+                dt.setUtc(true);
+                return dt;
+            }
+            
+            // Otherwise use default timezone for utc instant
+            dt = (DateTime) Dates.getInstance(date, date);
+            dt.setUtc(true);
+            return dt;
+        }
+        
+        
+        // handle Date instances
+        
+        // If timezone specified, use it to pin the floating Date
+        // to an instant
+        if(tz!=null) {
+            DateTime dt = pinFloatingTime(date, tz);
+            dt.setUtc(true);
+            return dt;
+        }
+        
+        // Otherwise use default timezone for utc instant
+        DateTime dt = new DateTime(date);
+        dt.setUtc(true);
+        return dt;
+    }
+    
+    /**
+     * Compare Date instances using a timezone to pin floating Date and 
+     * DateTimes.
+     * @param date1
+     * @param date2
+     * @param tz timezone to use when interpreting floating Date and DateTime
+     */
+    public static int compareDates(Date date1, Date date2, TimeZone tz) {
+       
+        if(tz!=null) {
+            if(isFloating(date1))
+                date1 = pinFloatingTime(date1, tz);
+            if(isFloating(date2))
+                date2 = pinFloatingTime(date2, tz);
+        }
+        
+        return date1.compareTo(date2);
+    }
+    
+    /**
+     * Determine if a Date is floating.  A floating Date is a Date
+     * instance or a DateTime that is not utc and does not have a timezone.
+     * @param date
+     * @return true if the date is floating, otherwise false
+     */
+    public static boolean isFloating(Date date) {
+        if(date instanceof DateTime) {
+            DateTime dt = (DateTime) date;
+            return !dt.isUtc() && dt.getTimeZone()==null;
+        } else
+            return true;
+    }
+    
+    public static boolean beforeDate(Date test, Date date, TimeZone tz) {
+        return (compareDates(test, date, tz) < 0);
+    }
+    
+    public static boolean afterDate(Date test, Date date, TimeZone tz) {
+        return (compareDates(test, date, tz) > 0);
+    }
+    
+    public static boolean equalsDate(Date test, Date date, TimeZone tz) {
+        return (compareDates(test, date, tz)==0);
     }
     
     /**

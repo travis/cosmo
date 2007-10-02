@@ -129,20 +129,20 @@ public class InstanceList extends TreeMap {
         if (start == null) {
             return;
         }
+ 
+        Value startValue = start instanceof DateTime ? Value.DATE_TIME : Value.DATE;
         
+        start = convertToUTCIfNecessary(start);
         
         if(start instanceof DateTime) {
-            // convert to UTC if configured
-            start = convertToUTCIfNecessary((DateTime) start);
             // adjust floating time if timezone is present
             start = adjustFloatingDateIfNecessary(start);
         }
         
-        
         Dur duration = null;
         Date end = getEndDate(comp);
         if (end == null) {
-            if (start instanceof DateTime) {
+            if (startValue.equals(Value.DATE_TIME)) {
                 // Its an timed event with no duration
                 duration = new Dur(0, 0, 0, 0);
             } else {
@@ -151,9 +151,8 @@ public class InstanceList extends TreeMap {
             }
             end = org.osaf.cosmo.calendar.util.Dates.getInstance(duration.getTime(start), start);
         } else {
-            if(end instanceof DateTime) {
-                // Convert to UTC if needed
-                end = convertToUTCIfNecessary((DateTime) end);
+            end = convertToUTCIfNecessary(end);
+            if(startValue.equals(Value.DATE_TIME)) {
                 // Adjust floating end time if timezone present
                 end = adjustFloatingDateIfNecessary(end);
                 // Handle case where dtend is before dtstart, in which the duration
@@ -207,6 +206,7 @@ public class InstanceList extends TreeMap {
             } else {
                 for (Iterator j = rdate.getDates().iterator(); j.hasNext();) {
                     Date startDate = (Date) j.next();
+                    startDate = convertToUTCIfNecessary(startDate);
                     startDate = adjustFloatingDateIfNecessary(startDate);
                     Date endDate = org.osaf.cosmo.calendar.util.Dates.getInstance(duration
                             .getTime(startDate), startDate);
@@ -294,9 +294,11 @@ public class InstanceList extends TreeMap {
         if (dtstart == null)
             return false;
 
+        Value startValue = dtstart instanceof DateTime ? Value.DATE_TIME : Value.DATE;
+        
+        dtstart = convertToUTCIfNecessary(dtstart);
+        
         if(dtstart instanceof DateTime) {
-            // convert to UTC if configured
-            dtstart = convertToUTCIfNecessary((DateTime) dtstart);
             // adjust floating time if timezone is present
             dtstart = adjustFloatingDateIfNecessary(dtstart);
         }
@@ -305,7 +307,7 @@ public class InstanceList extends TreeMap {
         Date dtend = getEndDate(comp);
         if (dtend == null) {
             Dur duration;
-            if (dtstart instanceof DateTime) {
+            if (startValue.equals(Value.DATE_TIME)) {
                 // Its an timed event with no duration
                 duration = new Dur(0, 0, 0, 0);
             } else {
@@ -315,8 +317,8 @@ public class InstanceList extends TreeMap {
             dtend = org.osaf.cosmo.calendar.util.Dates.getInstance(duration.getTime(dtstart), dtstart);
         } else {
             // Convert to UTC if needed
-            if(dtend instanceof DateTime) {
-                dtend = convertToUTCIfNecessary((DateTime) dtend);
+            dtend = convertToUTCIfNecessary(dtend);
+            if(startValue.equals(Value.DATE_TIME)) {
                 // Adjust floating end time if timezone present
                 dtend = adjustFloatingDateIfNecessary(dtend);
                 // Handle case where dtend is before dtstart, in which the duration
@@ -337,8 +339,8 @@ public class InstanceList extends TreeMap {
 
         // Now create the map entry
         Date riddt = getRecurrenceId(comp);
+        riddt = convertToUTCIfNecessary((DateTime) riddt);
         if(riddt instanceof DateTime) {
-            riddt = convertToUTCIfNecessary((DateTime) riddt);
             riddt = adjustFloatingDateIfNecessary(riddt);
         }
         
@@ -496,39 +498,13 @@ public class InstanceList extends TreeMap {
     
     /**
      * If the InstanceList is configured to convert all date/times to UTC,
-     * then convert the given DateTime instance into a UTC DateTime.
+     * then convert the given Date instance into a UTC DateTime.
      */
-    private DateTime convertToUTCIfNecessary(DateTime date) {
-        // If date is not UTC and InstanceList is configured
-        // to convert to UTC, then convert time to UTC
-        if(!date.isUtc() && isUTC) {
-            // If there is a timezone in the time, then use that
-            if(date.getTimeZone()!=null) {
-                try {
-                    DateTime newDT = new DateTime(date.toString(),date.getTimeZone());
-                    newDT.setUtc(true);
-                    return newDT;
-                } catch (ParseException e) {
-                    // shouldnt occur
-                }
-            }
-            // Otherwise use timezone that InstanceList is configured
-            // with, or use the system default.
-            else {
-                try {
-                    DateTime newDT = null;
-                    if(timezone == null)
-                        newDT = new DateTime(date.toString());
-                    else
-                        newDT = new DateTime(date.toString(),timezone);
-                    newDT.setUtc(true);
-                    return newDT;
-                } catch (ParseException e) {
-                   // shouldn't occur
-                }
-            }    
-        }
-        return date;
+    private Date convertToUTCIfNecessary(Date date) {
+        if(!isUTC)
+            return date;
+        
+        return ICalendarUtils.convertToUTC(date, timezone);
     }
     
     /**

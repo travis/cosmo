@@ -179,6 +179,55 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20060106T200000Z", instance.getEnd().toString());
     }
     
+    public void testUTCInstanceListAllDayEvent() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "allday_weekly_recurring.ics");
+        Calendar calendar = cb.build(fis);
+        
+        InstanceList instances = new InstanceList();
+        instances.setUTC(true);
+        instances.setTimezone(TIMEZONE_REGISTRY.getTimeZone("America/Chicago"));
+        
+        DateTime start = new DateTime("20070103T090000Z");
+        DateTime end = new DateTime("20070117T090000Z");
+        
+        ComponentList comps = calendar.getComponents();
+        Iterator<VEvent> it = comps.getComponents("VEVENT").iterator();
+        boolean addedMaster = false;
+        while(it.hasNext()) {
+            VEvent event = it.next();
+            if(event.getRecurrenceId()==null) {
+                addedMaster = true;
+                instances.addComponent(event, start, end);
+            }
+            else {
+                Assert.assertTrue(addedMaster);
+                instances.addOverride(event, start, end);
+            }
+        }
+        
+        Assert.assertEquals(2, instances.size() );
+        
+        Iterator<String> keys = instances.keySet().iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070108T060000Z", key);
+        Assert.assertEquals("20070108T060000Z", instance.getStart().toString());
+        Assert.assertEquals("20070109T060000Z", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070115T060000Z", key);
+        Assert.assertEquals("20070115T060000Z", instance.getStart().toString());
+        Assert.assertEquals("20070116T060000Z", instance.getEnd().toString());
+    }
+    
     public void testInstanceListInstanceBeforeStartRange() throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
         FileInputStream fis = new FileInputStream(baseDir + "eventwithtimezone3.ics");
@@ -625,6 +674,63 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070103", key);
         Assert.assertEquals("20070103", instance.getStart().toString());
         Assert.assertEquals("20070104", instance.getEnd().toString());
+    }
+    
+    public void XXtestAllDayRecurringWithTimeZone() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "allday_recurring.ics");
+        Calendar calendar = cb.build(fis);
+        
+        InstanceList instances = new InstanceList();
+        
+        TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("Australia/Sydney");
+        instances.setTimezone(tz);
+        
+        DateTime start = new DateTime("20070102T140000Z");
+        DateTime end = new DateTime("20070104T140000Z");
+        
+        ComponentList comps = calendar.getComponents();
+        Iterator<VEvent> it = comps.getComponents("VEVENT").iterator();
+        boolean addedMaster = false;
+        while(it.hasNext()) {
+            VEvent event = it.next();
+            if(event.getRecurrenceId()==null) {
+                addedMaster = true;
+                instances.addComponent(event, start, end);
+            }
+            else {
+                Assert.assertTrue(addedMaster);
+                instances.addOverride(event, start, end);
+            }
+        }
+        
+        Assert.assertEquals(3, instances.size() );
+        
+        Iterator<String> keys = instances.keySet().iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070103", key);
+        Assert.assertEquals("20070103", instance.getStart().toString());
+        Assert.assertEquals("20070104", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070104", key);
+        Assert.assertEquals("20070104", instance.getStart().toString());
+        Assert.assertEquals("20070105", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070105", key);
+        Assert.assertEquals("20070105", instance.getStart().toString());
+        Assert.assertEquals("20070106", instance.getEnd().toString());
     }
     
     public void testInstanceStartBeforeRange() throws Exception {

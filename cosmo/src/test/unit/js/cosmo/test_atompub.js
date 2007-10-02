@@ -22,9 +22,11 @@ dojo.require("cosmo.atompub");
 
 cosmotest.test_atompub = {
     test_Service: function(){
+        dojo.debug(1)
         var service = new cosmo.atompub.Service(cosmotest.test_atompub.serviceTestDoc);
-        xxx = service
-        jum.assertEquals("workspaces not created", 2, service.workspaces.length)
+        jum.assertEquals("workspaces not created", 2, service.workspaces.length);
+        jum.assertEquals("first workspace wrong number of collections", 2, service.workspaces[0].collections.length);
+        jum.assertEquals("first workspace first collection href", "http://example.org/blog/main", service.workspaces[0].collections[0].href);
     },
 
     test_Workspace: function(){

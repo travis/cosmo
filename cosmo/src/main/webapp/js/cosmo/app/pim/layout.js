@@ -44,9 +44,17 @@ dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.detail");
 dojo.require("cosmo.ui.imagegrid");
 
-
 cosmo.app.pim.layout = new function () {
     this.baseLayout = null;
+    // Min/max vals for the linear interpolation used in
+    // the viewport code to do sizing and placement of
+    // the left/right sidebars and center column
+    this.screenConstraints = {
+        MIN_WIDTH: 320,
+        MIN_HEIGHT: 240,
+        MAX_WIDTH: 12800,
+        MAX_HEIGHT: 9600
+    };
     this.initBaseLayout = function (node) {
         cosmo.ui.resize.Viewports.initialize();
         this.baseLayout = new cosmo.app.pim.layout.BaseLayout(node);
@@ -163,13 +171,28 @@ cosmo.app.pim.layout.LeftSidebar = function (p) {
     */
     this.domNode = d;
     this.children = [];
-    this.renderSelf = function () {
-    }
-    var vp = new cosmo.ui.resize.Viewport(d)
+    this.renderSelf = function () {};
+
+    var constr = cosmo.app.pim.layout.screenConstraints;
+    var vp = new cosmo.ui.resize.Viewport(d);
     // add scaling
     // (screenwidth, screenheight, left,top,right,botton)
-    vp.setMinSize([300,300,0,0,LEFT_SIDEBAR_WIDTH,(300 - TOP_MENU_HEIGHT)]);
-    vp.setMaxSize([1600,1200,0,0,LEFT_SIDEBAR_WIDTH,(1200 - TOP_MENU_HEIGHT)]);
+    vp.setMinSize([
+        constr.MIN_WIDTH,
+        constr.MIN_HEIGHT,
+        0,
+        0,
+        LEFT_SIDEBAR_WIDTH,
+        (constr.MIN_HEIGHT - TOP_MENU_HEIGHT)
+    ]);
+    vp.setMaxSize([
+        constr.MAX_WIDTH,
+        constr.MAX_HEIGHT,
+        0,
+        0,
+        LEFT_SIDEBAR_WIDTH,
+        (constr.MAX_HEIGHT - TOP_MENU_HEIGHT)
+    ]);
     vp.addResize("renderSelf",this.renderSelf);
     /*
     var h = new cosmo.ui.resize.Handle(handle);
@@ -196,11 +219,25 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
         //add any special child rendering
     }
     //viewport fun
+    var constr = cosmo.app.pim.layout.screenConstraints;
     var vp = new cosmo.ui.resize.Viewport(d)
     // add scaling
-    var w = LEFT_SIDEBAR_WIDTH + 1;
-    vp.setMinSize([500,300,w,0,300,(300 - TOP_MENU_HEIGHT)]);
-    vp.setMaxSize([1600,1200,w,0,1600,(1200 - TOP_MENU_HEIGHT)]);
+    vp.setMinSize([
+        constr.MIN_WIDTH,
+        constr.MIN_HEIGHT,
+        (LEFT_SIDEBAR_WIDTH + 1),
+        0,
+        (constr.MIN_WIDTH - RIGHT_SIDEBAR_WIDTH),
+        (constr.MIN_HEIGHT - TOP_MENU_HEIGHT)
+    ]);
+    vp.setMaxSize([
+        constr.MAX_WIDTH,
+        constr.MAX_HEIGHT,
+        (LEFT_SIDEBAR_WIDTH + 1),
+        0,
+        (constr.MAX_WIDTH - RIGHT_SIDEBAR_WIDTH),
+        (constr.MAX_HEIGHT - TOP_MENU_HEIGHT)
+    ]);
     vp.addResize("renderSelf",this.renderSelf)    ;
 };
 cosmo.app.pim.layout.CenterColumn.prototype =
@@ -232,9 +269,24 @@ cosmo.app.pim.layout.RightSidebar = function (p) {
     }
     this.children = [];
     //viewport fun
+    var constr = cosmo.app.pim.layout.screenConstraints;
     var vp = new cosmo.ui.resize.Viewport(d);
-    vp.setMinSize([300,300,(299 - RIGHT_SIDEBAR_WIDTH),0,300,(300 - TOP_MENU_HEIGHT)]);
-    vp.setMaxSize([1600,1200,(1599 - RIGHT_SIDEBAR_WIDTH),0,1600,(1200 - TOP_MENU_HEIGHT)]);
+    vp.setMinSize([
+        constr.MIN_WIDTH,
+        constr.MIN_HEIGHT,
+        (constr.MIN_WIDTH - RIGHT_SIDEBAR_WIDTH - 1),
+        0,
+        constr.MIN_WIDTH,
+        (constr.MIN_HEIGHT - TOP_MENU_HEIGHT)
+    ]);
+    vp.setMaxSize([
+        constr.MAX_WIDTH,
+        constr.MAX_HEIGHT,
+        (constr.MAX_WIDTH - RIGHT_SIDEBAR_WIDTH - 1),
+        0,
+        constr.MAX_WIDTH,
+        (constr.MAX_HEIGHT - TOP_MENU_HEIGHT)
+    ]);
     vp.addResize("renderSelf",this.renderSelf);
     /*
     var h = new cosmo.ui.resize.Handle(handle);
@@ -247,7 +299,7 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
-  
+
     var menuBar = this.baseLayout.menuBar;
     var centerColumn = this.baseLayout.mainApp.centerColumn;
     var leftSidebar = this.baseLayout.mainApp.leftSidebar;

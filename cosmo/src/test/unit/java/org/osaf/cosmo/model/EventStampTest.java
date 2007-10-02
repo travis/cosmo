@@ -41,6 +41,8 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 public class EventStampTest extends TestCase {
    
     protected String baseDir = "src/test/unit/resources/testdata/";
+    private static final TimeZoneRegistry TIMEZONE_REGISTRY =
+        TimeZoneRegistryFactory.getInstance().createRegistry();
     
     public void testEventStampGetCalendar() throws Exception {
         TimeZoneRegistry registry =
@@ -48,18 +50,17 @@ public class EventStampTest extends TestCase {
         NoteItem master = new NoteItem();
         master.setDisplayName("displayName");
         master.setBody("body");
+        master.setIcalUid("icaluid");
         EventStamp eventStamp = new EventStamp(master);
         eventStamp.createCalendar();
-        Date date = new ICalDate(";VALUE=DATE-TIME:20070212T074500").getDate();
-        eventStamp.setStartDate(date);
+        eventStamp.setStartDate(new DateTime("20070212T074500"));
         
         Calendar cal = eventStamp.getCalendar();
         
         // date has no timezone, so there should be no timezones
         Assert.assertEquals(0, cal.getComponents(Component.VTIMEZONE).size());
-        
-        date = new ICalDate(";VALUE=DATE-TIME;TZID=America/Chicago:20070212T074500").getDate();
-        eventStamp.setStartDate(date);
+      
+        eventStamp.setStartDate(new DateTime("20070212T074500",TIMEZONE_REGISTRY.getTimeZone("America/Chicago")));
         
         cal = eventStamp.getCalendar();
         
@@ -71,12 +72,12 @@ public class EventStampTest extends TestCase {
         // test item properties got merged into calendar
         Assert.assertEquals("displayName", event.getSummary().getValue());
         Assert.assertEquals("body", event.getDescription().getValue());
+        Assert.assertEquals("icaluid", event.getUid().getValue());
         
         // date has timezone, so there should be a timezone
         Assert.assertEquals(1, cal.getComponents(Component.VTIMEZONE).size());
         
-        date = new ICalDate(";VALUE=DATE-TIME;TZID=America/Los_Angeles:20070212T074500").getDate();
-        eventStamp.setEndDate(date);
+        eventStamp.setEndDate(new DateTime("20070212T074500",TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles")));
         
         cal = eventStamp.getCalendar();
         
@@ -93,6 +94,7 @@ public class EventStampTest extends TestCase {
     
     public void testInheritedAlarm() throws Exception {
         NoteItem master = new NoteItem();
+        master.setIcalUid("icaluid");
         EventStamp eventStamp = new EventStamp(master);
         eventStamp.createCalendar();
         eventStamp.creatDisplayAlarm();
@@ -131,6 +133,7 @@ public class EventStampTest extends TestCase {
         // test merged properties
         Assert.assertEquals("modDisplayName", modEvent.getSummary().getValue());
         Assert.assertEquals("modBody", modEvent.getDescription().getValue());
+        Assert.assertEquals("icaluid", modEvent.getUid().getValue());
         
         // test inherited alarm
         VAlarm masterAlarm = (VAlarm) masterEvent.getAlarms().get(0);

@@ -307,6 +307,12 @@ public class EventStamp extends BaseEventStamp implements
     private void mergeCalendarProperties(VEvent event, NoteItem note) {
         //summary = displayName
         //description = body
+        //uid = icalUid
+        if(note.getModifies()!=null)
+            ICalendarUtils.setUid(note.getModifies().getIcalUid(), event);
+        else
+            ICalendarUtils.setUid(note.getIcalUid(), event);
+        
         ICalendarUtils.setSummary(note.getDisplayName(), event);
         ICalendarUtils.setDescription(note.getBody(), event);
     }

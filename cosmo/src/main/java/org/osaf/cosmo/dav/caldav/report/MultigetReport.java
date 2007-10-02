@@ -16,6 +16,8 @@
 package org.osaf.cosmo.dav.caldav.report;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -106,12 +108,7 @@ public class MultigetReport extends CaldavMultiStatusReport {
         for (Element element : hrefElements) {
             String href = DomUtil.getTextTrim(element);
             // validate and absolutize submitted href
-            URL memberUrl = null;
-            try {
-                memberUrl = new URL(resourceUrl, href);
-            } catch (MalformedURLException e) {
-                throw new BadRequestException("Malformed href " + href + ": " + e.getMessage());
-            }
+            URL memberUrl = normalizeHref(resourceUrl, href);
 
             // check if the href refers to the targeted resource (or to a
             // descendent if the target is a collection)
@@ -123,7 +120,8 @@ public class MultigetReport extends CaldavMultiStatusReport {
                     throw new BadRequestException("Href " + href + " does not refer to the requested resource " + resourceUrl);
             }
 
-            hrefs.add(href);
+            // use the absolute path of our normalized URL as the href
+            hrefs.add(memberUrl.getPath());
         }
     }
 
@@ -160,6 +158,30 @@ public class MultigetReport extends CaldavMultiStatusReport {
         throw new UnprocessableEntityException(getType() + " report not supported for non-calendar resources");
     }
 
+    private static URL normalizeHref(URL context,
+                                     String href)
+        throws DavException {
+        URL url = null;
+        try {
+            url = new URL(context, href);
+            // check that the URL is escaped. it's questionable whether or
+            // not we should all unescaped URLs, but at least as of
+            // 10/02/2007, iCal 3.0 generates them
+            url.toURI();
+            return url;
+        } catch (URISyntaxException e) {
+            try {
+                URI escaped =
+                    new URI(url.getProtocol(), url.getAuthority(), url.getPath(),
+                            url.getQuery(), url.getRef());
+                return new URL(escaped.toASCIIString());
+            } catch (Exception e2) {
+                throw new BadRequestException("Malformed unescaped href " + href + ": " + e.getMessage());
+            }
+        } catch (MalformedURLException e) {
+            throw new BadRequestException("Malformed href " + href + ": " + e.getMessage());
+        }
+    }
 
     private static boolean isDescendentOrEqual(URL collection,
                                                URL test) {

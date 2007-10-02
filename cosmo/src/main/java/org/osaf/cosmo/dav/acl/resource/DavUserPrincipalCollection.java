@@ -52,6 +52,7 @@ import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.report.PrincipalMatchReport;
 import org.osaf.cosmo.dav.acl.report.PrincipalPropertySearchReport;
 import org.osaf.cosmo.dav.acl.report.PrincipalSearchPropertySetReport;
@@ -212,6 +213,24 @@ public class DavUserPrincipalCollection extends DavResourceBase
 
     public Set<ReportType> getReportTypes() {
         return REPORT_TYPES;
+    }
+
+    /**
+     * <p>
+     * Extends the superclass method to return {@link DavPrivilege#READ} if
+     * the the current principal is a non-admin user.
+     * </p>
+     */
+    protected Set<DavPrivilege> getCurrentPrincipalPrivileges() {
+        Set<DavPrivilege> privileges = super.getCurrentPrincipalPrivileges();
+        if (! privileges.isEmpty())
+            return privileges;
+
+        User user = getSecurityManager().getSecurityContext().getUser();
+        if (user != null)
+            privileges.add(DavPrivilege.READ);
+
+        return privileges;
     }
 
     protected void loadLiveProperties(DavPropertySet properties) {

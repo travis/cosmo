@@ -69,6 +69,8 @@ public interface AclConstants extends DavConstants {
         "group-membership";
     public static final String PROPERTY_ACL_PRINCIPAL_COLLECTION_SET =
         "principal-collection-set";
+    public static final String PROPERTY_ACL_CURRENT_USER_PRIVILEGE_SET =
+        "current-user-privilege-set";
 
     /** The ACL property DAV:alternate-URI-set */
     public static final DavPropertyName ALTERNATEURISET =
@@ -81,6 +83,9 @@ public interface AclConstants extends DavConstants {
         DavPropertyName.create(PROPERTY_ACL_GROUP_MEMBERSHIP, NAMESPACE);
     public static final DavPropertyName PRINCIPALCOLLECTIONSET =
         DavPropertyName.create(PROPERTY_ACL_PRINCIPAL_COLLECTION_SET,
+                               NAMESPACE);
+    public static final DavPropertyName CURRENTUSERPRIVILEGESET =
+        DavPropertyName.create(PROPERTY_ACL_CURRENT_USER_PRIVILEGE_SET,
                                NAMESPACE);
 
     public static final QName RESOURCE_TYPE_PRINCIPAL =

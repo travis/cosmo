@@ -51,6 +51,7 @@ import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.property.AlternateUriSet;
 import org.osaf.cosmo.dav.acl.property.GroupMembership;
 import org.osaf.cosmo.dav.acl.property.PrincipalUrl;
@@ -210,6 +211,25 @@ public class DavUserPrincipal extends DavResourceBase
 
     public Set<ReportType> getReportTypes() {
         return REPORT_TYPES;
+    }
+
+    /**
+     * <p>
+     * Extends the superclass method to return {@link DavPrivilege#READ} if
+     * the the current principal is the non-admin user represented by this
+     * resource.
+     * </p>
+     */
+    protected Set<DavPrivilege> getCurrentPrincipalPrivileges() {
+        Set<DavPrivilege> privileges = super.getCurrentPrincipalPrivileges();
+        if (! privileges.isEmpty())
+            return privileges;
+
+        User user = getSecurityManager().getSecurityContext().getUser();
+        if (user != null && user.equals(this.user))
+            privileges.add(DavPrivilege.READ);
+
+        return privileges;
     }
     
     protected void loadLiveProperties(DavPropertySet properties) {

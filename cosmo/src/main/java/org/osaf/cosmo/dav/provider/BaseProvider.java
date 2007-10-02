@@ -47,6 +47,7 @@ import org.osaf.cosmo.dav.MethodNotAllowedException;
 import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.UnsupportedMediaTypeException;
+import org.osaf.cosmo.dav.acl.AclConstants;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.impl.DavFile;
@@ -63,7 +64,8 @@ import org.osaf.cosmo.security.CosmoSecurityContext;
  *
  * @see DavProvider
  */
-public abstract class BaseProvider implements DavProvider, DavConstants {
+public abstract class BaseProvider
+    implements DavProvider, DavConstants, AclConstants {
     private static final Log log = LogFactory.getLog(BaseProvider.class);
 
     private DavResourceFactory resourceFactory;
@@ -101,6 +103,11 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
 
         DavPropertyNameSet props = request.getPropFindProperties();
         int type = request.getPropFindType();
+
+        // Since the propfind properties could not be determined in the
+        // security filter in order to check specific property privileges, the
+        // check must be done manually here.
+        checkPropFindAccess(props, type);
 
         MultiStatus ms = new MultiStatus();
         ms.addResourceProperties(resource, props, type, depth);
@@ -361,6 +368,7 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
 
         User user = getSecurityContext().getUser();
         if (user != null) {
+            // requires DAV:bind on parent of destination tiem
             if (user.equals(destinationItem.getOwner()))
                 return;
             throw new ForbiddenException("User privileges deny access");
@@ -368,6 +376,7 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
 
         Ticket ticket = getSecurityContext().getTicket();
         if (ticket != null) {
+            // requires DAV:bind on parent of destination item
             if (ticket.isGranted(destinationItem) &&
                 ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE))
                 return;
@@ -377,6 +386,29 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
         throw new ForbiddenException("Anonymous privileges deny access");
     }
 
+    protected void checkPropFindAccess(DavPropertyNameSet props,
+                                       int type)
+        throws DavException {
+        Ticket ticket = getSecurityContext().getTicket();
+        if (ticket == null)
+            return;
+
+        if (props.contains(CURRENTUSERPRIVILEGESET)) {
+            // requires DAV:read-current-user-privilege-set, which all tickets
+            // have, even those without DAV:read
+            if (! ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ) &&
+                props.getContentSize() > 1)
+                log.warn("Exposing secured properties to ticket without DAV:read");
+            return;
+        }
+
+        // requires DAV:read
+        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
+            return;
+
+        throw new ForbiddenException("Ticket privileges deny access");
+    }
+
     protected void checkReportAccess(ReportInfo info)
         throws DavException {
         Ticket ticket = getSecurityContext().getTicket();
@@ -384,15 +416,15 @@ public abstract class BaseProvider implements DavProvider, DavConstants {
             return;
 
         if (isFreeBusyReport(info)) {
+            // requires DAV:read-free-busy
             if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY))
-                return;
-            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
                 return;
             // Do not allow the client to know that this resource actually
             // exists, as per CalDAV report definition
             throw new NotFoundException();
         }
 
+        // requires DAV:read
         if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
             return;
 

@@ -47,6 +47,7 @@ import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.property.Owner;
 import org.osaf.cosmo.dav.acl.property.PrincipalCollectionSet;
 import org.osaf.cosmo.dav.property.CreationDate;
@@ -266,6 +267,10 @@ public abstract class DavItemResourceBase extends DavResourceBase
         if (log.isDebugEnabled())
             log.debug("adding ticket for " + item.getName());
 
+        // automatically add freebusy privilege along with read
+        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
+            ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
+
         getContentService().createTicket(item, ticket);
     }
 
@@ -378,6 +383,56 @@ public abstract class DavItemResourceBase extends DavResourceBase
         msr.add(failed, error.getErrorCode());
 
         return msr;
+    }
+
+    /**
+     * <p>
+     * Extends the superclass method.
+     * </p>
+     * <p>
+     * If the principal is a user, returns {@link DavPrivilege#READ} and
+     * {@link DavPrivilege@WRITE}. This is a shortcut that assumes the
+     * security layer has only allowed access to the owner of the home
+     * collection specified in the URL used to access this resource.
+     * Eventually this method will check the ACL for all ACEs corresponding
+     * to the current principal and return the privileges those ACEs grant.
+     * </p>
+     * <p>
+     * If the principal is a ticket, returns the dav privileges corresponding
+     * to the ticket's privileges, since a ticket is in effect its own ACE.
+     * </p>
+     */
+    protected Set<DavPrivilege> getCurrentPrincipalPrivileges() {
+        Set<DavPrivilege> privileges = super.getCurrentPrincipalPrivileges();
+        if (! privileges.isEmpty())
+            return privileges;
+
+        // XXX eventually we will want to find the aces for the user and
+        // add each of their granted privileges
+        User user = getSecurityManager().getSecurityContext().getUser();
+        if (user != null) {
+            privileges.add(DavPrivilege.READ);
+            privileges.add(DavPrivilege.WRITE);
+            privileges.add(DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET);
+            privileges.add(DavPrivilege.READ_FREE_BUSY);
+            return privileges;
+        }
+
+        Ticket ticket = getSecurityManager().getSecurityContext().getTicket();
+        if (ticket != null) {
+            privileges.add(DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET);
+
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
+                privileges.add(DavPrivilege.READ);
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE))
+                privileges.add(DavPrivilege.WRITE);
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY))
+                privileges.add(DavPrivilege.READ_FREE_BUSY);
+
+            return privileges;
+        }
+
+        return privileges;
     }
 
     protected void loadLiveProperties(DavPropertySet properties) {

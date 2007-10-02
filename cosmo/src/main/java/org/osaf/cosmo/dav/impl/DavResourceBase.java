@@ -51,6 +51,9 @@ import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
+import org.osaf.cosmo.dav.acl.property.CurrentUserPrivilegeSet;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.dav.property.SupportedReportSet;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -61,13 +64,20 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  * which provides behavior common to all resources.
  * </p>
  * <p>
- * This class does not define any live properties or resource types.
+ * This class declares the following live properties:
+ * </p>
+ * <ul>
+ * <li> DAV:supported-report-set </li>
+ * <li> DAV:current-user-privilege-set </li>
+ * </ul>
+ * <p>
+ * This class does not declare any reports.
  * </p>
  * 
  * @see DavResource
  */
 public abstract class DavResourceBase
-    implements ExtendedDavConstants, DavResource {
+    implements ExtendedDavConstants, AclConstants, DavResource {
     private static final Log log =
         LogFactory.getLog(DavResourceBase.class);
     private static final HashSet<DavPropertyName> LIVE_PROPERTIES =
@@ -77,6 +87,7 @@ public abstract class DavResourceBase
 
     static {
         registerLiveProperty(SUPPORTEDREPORTSET);
+        registerLiveProperty(CURRENTUSERPRIVILEGESET);
     }
 
     private DavResourceLocator locator;
@@ -323,9 +334,35 @@ public abstract class DavResourceBase
         return false;
     }
 
-     protected Set<ReportType> getReportTypes() {
-         return REPORT_TYPES;
-     }
+    protected Set<ReportType> getReportTypes() {
+     return REPORT_TYPES;
+    }
+
+    /**
+     * <p>
+     * Returns the set of privileges granted on the resource to the current
+     * principal.
+     * </p>
+     * <p>
+     * If the request is unauthenticated, returns an empty set. If the
+     * current principal is an admin user, returns {@link DavPrivilege#ALL}.
+     * </p>
+     */
+    protected Set<DavPrivilege> getCurrentPrincipalPrivileges() {
+        HashSet<DavPrivilege> privileges = new HashSet<DavPrivilege>();
+
+        // anonymous access has no privileges
+        if (getSecurityManager().getSecurityContext().isAnonymous())
+            return privileges;
+
+        // all privileges are implied for admin users
+        if (getSecurityManager().getSecurityContext().isAdmin()) {
+            privileges.add(DavPrivilege.ALL);
+            return privileges;
+        }
+
+        return privileges;
+    }
 
     /**
      * <p>
@@ -372,6 +409,7 @@ public abstract class DavResourceBase
             return;
 
         properties.add(new SupportedReportSet(getReportTypes()));
+        properties.add(new CurrentUserPrivilegeSet(getCurrentPrincipalPrivileges()));
 
         loadLiveProperties(properties);
         loadDeadProperties(properties);

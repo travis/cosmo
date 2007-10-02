@@ -73,7 +73,7 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
     private Date created;
     private User owner;
     private Item item;
-    
+
     /**
      */
     public Ticket() {
@@ -296,11 +296,13 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
     public static class Type {
         public static final String ID_READ_ONLY = "read-only";
         public static final Type READ_ONLY =
-            new Type(ID_READ_ONLY, new String[] { PRIVILEGE_READ });
+            new Type(ID_READ_ONLY,
+                     new String[] { PRIVILEGE_READ, PRIVILEGE_FREEBUSY });
         public static final String ID_READ_WRITE = "read-write";
         public static final Type READ_WRITE =
             new Type(ID_READ_WRITE,
-                     new String[] { PRIVILEGE_READ, PRIVILEGE_WRITE });
+                     new String[] { PRIVILEGE_READ, PRIVILEGE_WRITE,
+                                    PRIVILEGE_FREEBUSY });
         public static final String ID_FREE_BUSY = "free-busy";
         public static final Type FREE_BUSY =
             new Type(ID_FREE_BUSY, new String[] { PRIVILEGE_FREEBUSY });

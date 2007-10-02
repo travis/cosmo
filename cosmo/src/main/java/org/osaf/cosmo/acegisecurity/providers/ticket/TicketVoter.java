@@ -53,11 +53,11 @@ public class TicketVoter implements AccessDecisionVoter {
         FilterInvocation fi = (FilterInvocation) object;
         String method = fi.getHttpRequest().getMethod();
 
-        // freebusy reports have their own rules, and since we don't
-        // have any idea what kind of report this is until the content
-        // is parsed, we have to defer authorization to the servlet
-        // layer
-        if (method.equals("REPORT")) {
+        // freebusy reports and certain propfinds have their own rules, and
+        // since we haven't parsed the request body yet, we have to defer
+        // authorization to the servlet layer
+        if (method.equals("REPORT") ||
+            method.equals("PROPFIND")) {
             return ACCESS_GRANTED;
         }
 

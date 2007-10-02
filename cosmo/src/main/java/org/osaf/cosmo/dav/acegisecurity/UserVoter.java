@@ -77,7 +77,8 @@ public class UserVoter extends UserResourceVoter
     private int voteOnCollection(UriTemplate.Match match,
                                  String method,
                                  User authenticated) {
-        // read methods - user must have DAV:read and/or
+        // read methods - user must have DAV:read for GET/HEAD/PROPFIND/REPORT
+        //                or DAV:read-current-user-privilege-set to PROPFIND
         //                DAV:current-user-privilege-set
         // write methods - user must have DAV:write if the resource exists, or
         //                DAV:bind on the parent if the resource does not exist
@@ -101,7 +102,8 @@ public class UserVoter extends UserResourceVoter
     private int voteOnItemResource(UriTemplate.Match match,
                                    String method,
                                    User authenticated) {
-        // read methods - user must have DAV:read and/or
+        // read methods - user must have DAV:read for GET/HEAD/PROPFIND/REPORT
+        //                or DAV:read-current-user-privilege-set to PROPFIND
         //                DAV:current-user-privilege-set
         // write methods - user must have DAV:write if the resource exists, or
         //                DAV:bind on the parent if the resource does not exist
@@ -125,7 +127,8 @@ public class UserVoter extends UserResourceVoter
     private int voteOnUserPrincipalCollection(UriTemplate.Match match,
                                               String method,
                                               User authenticated) {
-        // read methods - user must have DAV:read and/or
+        // read methods - user must have DAV:read for GET/HEAD/PROPFIND/REPORT
+        //                or DAV:read-current-user-privilege-set to PROPFIND
         //                DAV:current-user-privilege-set
         // write methods - not allowed
         // all of these conditions are satisfied simply by a user being
@@ -137,7 +140,8 @@ public class UserVoter extends UserResourceVoter
     private int voteOnUserPrincipalResource(UriTemplate.Match match,
                                             String method,
                                             User authenticated) {
-        // read methods - user must have DAV:read and/or
+        // read methods - user must have DAV:read for GET/HEAD/PROPFIND/REPORT
+        //                or DAV:read-current-user-privilege-set to PROPFIND
         //                DAV:current-user-privilege-set
         // write methods - not allowed
         // all of these conditions are satisfied if the authenticated user is
@@ -157,7 +161,8 @@ public class UserVoter extends UserResourceVoter
     private int voteOnHomeResource(UriTemplate.Match match,
                                    String method,
                                    User authenticated) {
-        // read methods - user must have DAV:read and/or
+        // read methods - user must have DAV:read for GET/HEAD/PROPFIND/REPORT
+        //                or DAV:read-current-user-privilege-set to PROPFIND
         //                DAV:current-user-privilege-set
         // write methods - user must have DAV:write if the resource exists, or
         //                DAV:bind on the parent if the resource does not exist

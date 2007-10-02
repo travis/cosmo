@@ -107,6 +107,8 @@ public class StandardRequestHandler implements HttpRequestHandler {
                 (DavException) e : new DavException(e);    
             if (de.getErrorCode() >= 500)
                 log.error("Internal dav error", e);
+            else if (de.getErrorCode() >= 400)
+                log.info("Client error (" + de.getErrorCode() + "): " + e.getMessage());
             wres.sendDavError(de);
         }
     }

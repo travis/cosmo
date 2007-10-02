@@ -70,14 +70,16 @@ public class ThisAndFutureHelperTest extends TestCase {
         
         Assert.assertEquals(new DateTime("20070807T235959Z"), recur.getUntil());
         
-        Assert.assertEquals(6, results.size());
+        Assert.assertEquals(8, results.size());
         
         assertContains("oldmaster:20070808T081500", results, false);
         assertContains("oldmaster:20070809T081500", results, false);
         assertContains("oldmaster:20070810T081500", results, false);
+        assertContains("oldmaster:20070811T081500", results, false);
         assertContains("newmaster:20070808T081500", results, true);
         assertContains("newmaster:20070809T081500", results, true);
         assertContains("newmaster:20070810T081500", results, true);
+        assertContains("newmaster:20070811T081500", results, true);
     }
     
     public void testBreakFloatingSeriesWithTimeShift() throws Exception {
@@ -99,14 +101,26 @@ public class ThisAndFutureHelperTest extends TestCase {
         
         Assert.assertEquals(new DateTime("20070807T235959Z"), recur.getUntil());
         
-        Assert.assertEquals(6, results.size());
+        Assert.assertEquals(8, results.size());
         
         assertContains("oldmaster:20070808T081500", results, false);
         assertContains("oldmaster:20070809T081500", results, false);
         assertContains("oldmaster:20070810T081500", results, false);
+        assertContains("oldmaster:20070811T081500", results, false);
         assertContains("newmaster:20070808T101500", results, true);
         assertContains("newmaster:20070809T101500", results, true);
         assertContains("newmaster:20070810T101500", results, true);
+        assertContains("newmaster:20070811T101500", results, true);
+        
+        // verify that start date was also changed for mod where
+        // recurrenceId==dtstart
+        NoteItem mod = getByUid("newmaster:20070811T101500", results);
+        Assert.assertNotNull(mod);
+        
+        EventExceptionStamp ees = EventExceptionStamp.getStamp(mod);
+        Assert.assertNotNull(ees);
+        
+        Assert.assertTrue(ees.getStartDate().equals(ees.getRecurrenceId()));
     }
     
     public void testBreakTimeZoneSeries() throws Exception {
@@ -176,6 +190,14 @@ public class ThisAndFutureHelperTest extends TestCase {
         Assert.fail(uid + " not in collection");
     }
     
+    protected NoteItem getByUid(String uid, Collection<NoteItem> notes) {
+        for(NoteItem note: notes)
+            if(note.getUid().equals(uid))
+                    return note;
+        
+        return null;
+    }
+    
     protected Calendar getCalendar(String name) throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
         FileInputStream fis = new FileInputStream(baseDir + name);
@@ -207,6 +229,8 @@ public class ThisAndFutureHelperTest extends TestCase {
                 mod.addStamp(ees);
                 ees.createCalendar();
                 ees.setRecurrenceId(event.getRecurrenceId().getDate());
+                ees.setStartDate(event.getStartDate().getDate());
+                ees.setAnyTime(null);
             } 
         }
         

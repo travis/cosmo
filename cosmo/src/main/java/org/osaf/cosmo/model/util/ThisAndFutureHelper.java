@@ -172,20 +172,38 @@ public class ThisAndFutureHelper {
         for(NoteItem mod: oldSeries.getModifications()) {
             EventExceptionStamp event = EventExceptionStamp.getStamp(mod);
             Date recurrenceId = event.getRecurrenceId();
+            Date dtStart = event.getStartDate();
+            
+            // determine if modification start date is "missing", which
+            // translates to the recurrenceId being the same as the dtstart
+            boolean isDtStartMissing = event.getStartDate()
+                    .equals(recurrenceId)
+                    && event.isAnyTime() == null;
             
             // Account for shift in startDate by calculating a new
-            // recurrenceId based on the shift.
+            // recurrenceId, dtStart based on the shift.
             if(delta!=0) {
                 java.util.Date newRidTime =
                     new java.util.Date(recurrenceId.getTime() + delta);
                 recurrenceId = (DateTime)
                     Dates.getInstance(newRidTime, recurrenceId);
+                
+                // If dtStart is missing and there is a shift, we need
+                // to shift dtstart also so that dtStart will be "missing"
+                // for the new series
+                if(isDtStartMissing) {
+                    java.util.Date newDtStart =
+                        new java.util.Date(event.getStartDate().getTime() + delta);
+                    dtStart = 
+                        Dates.getInstance(newDtStart, dtStart);
+                }
             }
             
             // If modification matches an occurrence in the new series
             // then add it to the list
             if(expander.isOccurrence(newEventCal, recurrenceId)) {
                 event.setRecurrenceId(recurrenceId);
+                event.setStartDate(dtStart);
                 
                 // If modification is the start of the series and there 
                 // was a time change, then match up the startDate

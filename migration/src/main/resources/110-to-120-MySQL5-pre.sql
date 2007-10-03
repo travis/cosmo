@@ -4,11 +4,11 @@
 # subscription
 alter table subscription add column etag varchar(255);
 
-# user_preferences
-alter table user_preferences add column etag varchar(255);
-
 # users
 alter table users add column etag varchar(255);
+
+# user_preferences
+alter table user_preferences add column etag varchar(255);
 
 #item
 alter table item add column etag varchar(255);
@@ -25,6 +25,5 @@ insert into attribute (itemid, attributetype, namespace, localname, stringvalue,
 insert into attribute (itemid, attributetype, namespace, localname, textvalue, createdate, modifydate) select s.itemid, 'icalendar', 'org.osaf.cosmo.model.CalendarCollectionStamp', 'timezone', cs.timezone, s.createdate, s.modifydate from stamp s, calendar_stamp cs where s.id=cs.stampid and s.stamptype='calendar';
 
 update item set icaluid=null where modifiesitemid is not null;
-
 update attribute set etag='';
 update stamp set etag='';

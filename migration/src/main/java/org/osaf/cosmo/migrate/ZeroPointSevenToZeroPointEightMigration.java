@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -95,8 +97,9 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
         
         ResultSet rs = null;
         
-        long count = 0;
-        
+        long itemCount = 0;
+        HashSet<Long> collectionIds = new HashSet<Long>();
+       
         log.debug("starting fixDuplicateIcalUids()");
         
         try {
@@ -113,10 +116,13 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
             
             rs = stmt.executeQuery();
             
+            
             // migrate each duplicate icaluid
             while(rs.next()) {
                 long collectionId = rs.getLong(1);
                 String icalUid = rs.getString(2);
+                
+                collectionIds.add(collectionId);
                 
                 selectNumDuplicates.setLong(1, collectionId);
                 selectNumDuplicates.setString(2, icalUid);
@@ -125,6 +131,9 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
                 int numDuplicates = duplicatesRs.getInt(1);
                 duplicatesRs.close();
                 
+                // While there are more than one item with the same
+                // icaluid in the collection, attempt to fix by updating
+                // a single item in the list of duplicates.
                 while(numDuplicates>1) {
                     log.debug("found " + numDuplicates + " for icaluid " + icalUid + " collectionid " + collectionId);
                     log.debug("fixing collection " + collectionId + " icaluid " + icalUid);
@@ -136,6 +145,7 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
                     
                     // fix icaluid to be uid, update timestamp
                     long itemId = toFix.getLong(1);
+                    log.debug("fixing item " + itemId + " by setting icalUid to uid");
                     updateStmt.setLong(2, itemId);
                     updateStmt.executeUpdate();
                     toFix.close();
@@ -144,7 +154,7 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
                     updateColStmt.setLong(2, collectionId);
                     updateColStmt.executeUpdate();
                     
-                    count++;
+                    itemCount++;
                     
                     duplicatesRs = selectNumDuplicates.executeQuery();
                     duplicatesRs.next();
@@ -161,7 +171,8 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
             close(selectByIcalUid);
         }
         
-        log.debug("fixed " + count + " items with duplicate icaluids");
+        log.debug("fixed " + collectionIds.size() + " collections that contained duplicate icaluids");
+        log.debug("fixed " + itemCount + " items with duplicate icaluids");
     }
     
     

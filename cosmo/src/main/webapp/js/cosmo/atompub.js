@@ -28,67 +28,63 @@
  *
  */
 
-
 dojo.provide("cosmo.atompub");
 
-cosmo.atompub._processRepeatableElementSpecification = function (elementSpecification){
-    var elementName = elementSpecification[0];
-    var objectName = elementSpecification[2] || elementName;
-    var constructor = elementSpecification[1];
-    dojo.debug("Processing repeatable element: " + elementName);
-    this[objectName] = dojo.lang.map(
-        this.xml.getElementsByTagName(elementName),
-        function(xml){
-            return new constructor(xml);
-        } 
-    );
- }
-
-cosmo.atompub._processElementSpecification = function (elementSpecification){
-    var elementName = elementSpecification[0];
-    var objectName = elementSpecification[2] || elementName;
-    var constructor = elementSpecification[1];
-    dojo.debug("Processing element: " + elementName);
-    var el = this.xml.getElementsByTagName(elementName)[0];
-    if (el){
-        this[objectName] = new constructor(el);
-    }
-}
-
-cosmo.atompub._processAttributeSpecification = function (elementSpecification){
-    var elementName = elementSpecification[0];
-    var objectName = elementSpecification[2] || elementName;
-    var constructor = elementSpecification[1];
-    dojo.debug("Processing attribute: " + elementName);
-    var el = this.xml.getAttribute(elementName);
-    if (el){
-        this[objectName] = new constructor(el);
-    }
-}
+dojo.require("cosmo.service.transport.Rest");
 
 dojo.declare("cosmo.atompub.AppElement", null, {
     __elements__: [],
     __relements__: [],
     __attributes__: [],
-    initializer: function(xml){
-        dojo.debug("init")
+    initializer: function(xml, service){
+        this.service = service;
         if (xml){
-            this.xml = xml;
-            this.fromMyXml();
+            this.fromXml(xml);
         }
     },
 
-    _processElementSpecification: cosmo.atompub._processElementSpecification,
-    _processRepeatableElementSpecification: cosmo.atompub._processRepeatableElementSpecification,
-    _processAttributeSpecification: cosmo.atompub._processAttributeSpecification,
+    _processRepeatableElementSpecification: function (xml, elementSpecification){
+        var elementName = elementSpecification[0];
+        var objectName = elementSpecification[2] || elementName;
+        var constructor = elementSpecification[1];
+        dojo.debug("Processing repeatable element: " + elementName);
+        this[objectName] = dojo.lang.map(
+            xml.getElementsByTagName(elementName),
+            function(xml){
+                return new constructor(xml, this.service);
+            } 
+        );
+    },
 
-    fromMyXml: function(){
-        dojo.debug("from")
-        dojo.lang.map(this.__relements__, dojo.lang.hitch(this, this._processRepeatableElementSpecification));
-        dojo.lang.map(this.__elements__, dojo.lang.hitch(this, this._processElementSpecification));
-        dojo.lang.map(this.__attributes__, dojo.lang.hitch(this, this._processAttributeSpecification));
+    _processElementSpecification: function (xml, elementSpecification){
+        var elementName = elementSpecification[0];
+        var objectName = elementSpecification[2] || elementName;
+        var constructor = elementSpecification[1];
+        dojo.debug("Processing element: " + elementName);
+        var el = xml.getElementsByTagName(elementName)[0];
+        if (el){
+            this[objectName] = new constructor(el, this.service);
+        }
+    },
+
+    _processAttributeSpecification: function (xml, elementSpecification){
+        var elementName = elementSpecification[0];
+        var objectName = elementSpecification[2] || elementName;
+        var constructor = elementSpecification[1];
+        dojo.debug("Processing attribute: " + elementName);
+        var el = xml.getAttribute(elementName);
+        if (el){
+            this[objectName] = new constructor(el, this.service);
+        }
+    },
+
+    fromXml: function(xml){
+        dojo.lang.map(this.__relements__, dojo.lang.curry(this, "_processRepeatableElementSpecification", xml));
+        dojo.lang.map(this.__elements__, dojo.lang.curry(this,  "_processElementSpecification", xml));
+        dojo.lang.map(this.__attributes__, dojo.lang.curry(this,  "_processAttributeSpecification", xml));
     }
 });
+
 dojo.declare("cosmo.atompub.Accept", null, {});
 dojo.declare("cosmo.atompub.Categories", null, {});
 dojo.declare("cosmo.atompub.Title", null, {});
@@ -105,8 +101,16 @@ dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
     __relements__: [
         ["accept", cosmo.atompub.Accept, "accepts"],
         ["categories", cosmo.atompub.Categories, "categoryLists"]
-    ]
-
+    ],
+    
+    getFeed: function(){
+        var feedDeferred = this.service.bind({
+            url: this.href
+        });
+        
+        feedDeferred.addCallback(dojo.lang.hitch(this, function(xml){return new cosmo.atompub.Feed(xml, this.service)}));
+    }
+    
 });
 
 dojo.declare("cosmo.atompub.Feed", cosmo.atompub.AppElement, {
@@ -143,8 +147,21 @@ dojo.declare("cosmo.atompub.Workspace", cosmo.atompub.AppElement, {
     ]
 });
 
-dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement, {
+dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement], {
     __relements__: [
         ["workspace", cosmo.atompub.Workspace, "workspaces"]
     ]
 });
+
+/* Factory method for initializing a cosmo.atompub.Service instance from a
+   url.
+*/
+cosmo.atompub.initializeService = function(url){
+    var service = new cosmo.service.transport.Rest();
+    appServiceDeferred = service.bind({
+        url: url
+    });
+    appServiceDeferred.addCallback(function(xml){
+        return new cosmo.atompub.Service(xml, service);
+    });
+}

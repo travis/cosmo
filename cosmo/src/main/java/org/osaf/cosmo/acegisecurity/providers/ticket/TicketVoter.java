@@ -61,6 +61,11 @@ public class TicketVoter implements AccessDecisionVoter {
             return ACCESS_GRANTED;
         }
 
+        // you can't make or delete a ticket with another ticket
+        if (method.equals("MKTICKET") ||
+            method.equals("DELTICKET"))
+            return ACCESS_DENIED;
+
         if (Methods.isReadMethod(method)) {
             return ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ) ?
                 ACCESS_GRANTED :

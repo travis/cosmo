@@ -24,6 +24,7 @@ import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
+import org.osaf.cosmo.dav.acl.DavPrivilegeSet;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.Ticket;
 
@@ -93,27 +94,8 @@ public class TicketContent
         DomUtil.setText(timeout, ticket.getTimeout());
         e.appendChild(timeout);
 
-        Element privilege = DomUtil.createElement(doc, XML_PRIVILEGE,
-                                                  NAMESPACE);
-        for (String priv : (Set<String>) ticket.getPrivileges()) {
-            if (priv.equals(Ticket.PRIVILEGE_READ)) {
-                Element read = DomUtil.createElement(doc, XML_READ,
-                                                     NAMESPACE);
-                privilege.appendChild(read);
-            } else if (priv.equals(Ticket.PRIVILEGE_WRITE)) { 
-                Element write = DomUtil.createElement(doc, XML_WRITE,
-                                                      NAMESPACE);
-                privilege.appendChild(write);
-            } else if (priv.equals(Ticket.PRIVILEGE_FREEBUSY)) {
-                Element freebusy =
-                    DomUtil.createElement(doc, ELEMENT_TICKET_FREEBUSY,
-                                          NAMESPACE);
-                privilege.appendChild(freebusy);
-            } else {
-                throw new IllegalStateException("Unrecognized ticket privilege " + priv);
-            }
-        }
-        e.appendChild(privilege);
+        DavPrivilegeSet privileges = new DavPrivilegeSet(ticket);
+        e.appendChild(privileges.toXml(doc));
 
         return e;
     }
@@ -144,24 +126,9 @@ public class TicketContent
                                      NAMESPACE_TICKET);
         ticket.setTimeout(timeout);
 
-        Element privilege =
-            DomUtil.getChildElement(root, XML_PRIVILEGE, NAMESPACE);
-        Element read =
-            DomUtil.getChildElement(privilege, XML_READ, NAMESPACE);
-        Element write =
-            DomUtil.getChildElement(privilege, XML_WRITE, NAMESPACE);
-        Element freebusy =
-            DomUtil.getChildElement(privilege, ELEMENT_TICKET_FREEBUSY,
-                                    NAMESPACE);
-        if (read != null) {
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
-        }
-        if (write != null) {
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
-        }
-        if (freebusy != null) {
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
-        }
+        Element pe = DomUtil.getChildElement(root, XML_PRIVILEGE, NAMESPACE);
+        DavPrivilegeSet privileges = DavPrivilegeSet.createFromXml(pe);
+        privileges.setTicketPrivileges(ticket);
 
         Element owner = DomUtil.getChildElement(root, XML_OWNER, NAMESPACE);
         String ownerHref =

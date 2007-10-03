@@ -27,7 +27,7 @@ import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.osaf.cosmo.dav.ForbiddenException;
+import org.osaf.cosmo.dav.acl.NeedsPrivilegesException;
 import org.osaf.cosmo.dav.impl.StandardDavResponse;
 
 /**
@@ -47,6 +47,6 @@ public class AccessDeniedHandler
         throws IOException, ServletException {
         StandardDavResponse sdr =
             new StandardDavResponse((HttpServletResponse)response);
-        sdr.sendDavError(new ForbiddenException(exception.getMessage()));
+        sdr.sendDavError(new NeedsPrivilegesException());
     }
 }

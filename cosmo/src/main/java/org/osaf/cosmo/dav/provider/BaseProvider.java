@@ -48,10 +48,13 @@ import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.UnsupportedMediaTypeException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
+import org.osaf.cosmo.dav.acl.NeedsPrivilegesException;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.impl.DavFile;
 import org.osaf.cosmo.dav.io.DavInputContext;
+import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -65,7 +68,7 @@ import org.osaf.cosmo.security.CosmoSecurityContext;
  * @see DavProvider
  */
 public abstract class BaseProvider
-    implements DavProvider, DavConstants, AclConstants {
+    implements DavProvider, DavConstants, AclConstants, TicketConstants {
     private static final Log log = LogFactory.getLog(BaseProvider.class);
 
     private DavResourceFactory resourceFactory;
@@ -107,7 +110,7 @@ public abstract class BaseProvider
         // Since the propfind properties could not be determined in the
         // security filter in order to check specific property privileges, the
         // check must be done manually here.
-        checkPropFindAccess(props, type);
+        checkPropFindAccess(resource, props, type);
 
         MultiStatus ms = new MultiStatus();
         ms.addResourceProperties(resource, props, type, depth);
@@ -223,7 +226,7 @@ public abstract class BaseProvider
             // Since the report type could not be determined in the security
             // filter in order to check ticket permissions on REPORT, the
             // check must be done manually here.
-            checkReportAccess(info);
+            checkReportAccess(resource, info);
 
             resource.getReport(info).run(response);
         } catch (org.apache.jackrabbit.webdav.DavException e) {
@@ -247,10 +250,7 @@ public abstract class BaseProvider
             log.debug("MKTICKET for " + resource.getResourcePath());
 
         Ticket ticket = request.getTicketInfo();
-        User user = getSecurityContext().getUser();
-        if (user == null)
-            throw new ForbiddenException("MKTICKET requires an authenticated user");
-        ticket.setOwner(user);
+        ticket.setOwner(getSecurityContext().getUser());
 
         dir.saveTicket(ticket);
 
@@ -276,8 +276,6 @@ public abstract class BaseProvider
         Ticket ticket = dir.getTicket(key);
         if (ticket == null)
             throw new PreconditionFailedException("Ticket " + key + " does not exist");
-
-        checkDelTicketAccess(ticket);
 
         dir.removeTicket(ticket);
 
@@ -365,13 +363,18 @@ public abstract class BaseProvider
         Item destinationItem = destination.exists() ?
                 ((DavItemResource)destination).getItem() :
                 ((DavItemResource)destination.getParent()).getItem();
+        DavResourceLocator locator = destination.exists() ?
+            destination.getResourceLocator() :
+            destination.getParent().getResourceLocator();
+
+        DavPrivilege privilege = destination.exists() ?
+            DavPrivilege.WRITE : DavPrivilege.BIND;
 
         User user = getSecurityContext().getUser();
         if (user != null) {
-            // requires DAV:bind on parent of destination tiem
             if (user.equals(destinationItem.getOwner()))
                 return;
-            throw new ForbiddenException("User privileges deny access");
+            throw new NeedsPrivilegesException(locator, privilege);
         }
 
         Ticket ticket = getSecurityContext().getTicket();
@@ -380,72 +383,64 @@ public abstract class BaseProvider
             if (ticket.isGranted(destinationItem) &&
                 ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE))
                 return;
-            throw new ForbiddenException("Ticket privileges deny access");
+            throw new NeedsPrivilegesException(locator, privilege);
         }
-
-        throw new ForbiddenException("Anonymous privileges deny access");
+        
+        throw new NeedsPrivilegesException(locator, privilege);
     }
 
-    protected void checkPropFindAccess(DavPropertyNameSet props,
+    protected void checkPropFindAccess(DavResource resource,
+                                       DavPropertyNameSet props,
                                        int type)
         throws DavException {
         Ticket ticket = getSecurityContext().getTicket();
         if (ticket == null)
             return;
 
-        if (props.contains(CURRENTUSERPRIVILEGESET)) {
-            // requires DAV:read-current-user-privilege-set, which all tickets
-            // have, even those without DAV:read
-            if (! ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ) &&
-                props.getContentSize() > 1)
-                log.warn("Exposing secured properties to ticket without DAV:read");
-            return;
-        }
-
-        // requires DAV:read
         if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
             return;
 
-        throw new ForbiddenException("Ticket privileges deny access");
+        // all tickets have the ability to examine
+        // DAV:current-user-privilege-set and ticket:ticketdiscovery
+
+        int unprotected = 0;
+        if (props.contains(CURRENTUSERPRIVILEGESET))
+            unprotected++;
+        if (props.contains(TICKETDISCOVERY))
+            unprotected++;
+
+        if (unprotected > 0 && props.getContentSize() > unprotected) {
+            // XXX: if they don't have DAV:read, they shouldn't be able to
+            // access any other properties.
+            log.warn("Exposing secured properties to ticket without DAV:read");
+            return;
+        }
+
+        // Do not allow the client to know that this resource actually
+        // exists
+        throw new NotFoundException();
     }
 
-    protected void checkReportAccess(ReportInfo info)
+    protected void checkReportAccess(DavResource resource,
+                                     ReportInfo info)
         throws DavException {
         Ticket ticket = getSecurityContext().getTicket();
         if (ticket == null)
             return;
 
-        if (isFreeBusyReport(info)) {
-            // requires DAV:read-free-busy
-            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY))
+        if (! isFreeBusyReport(info)) {
+            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
                 return;
-            // Do not allow the client to know that this resource actually
-            // exists, as per CalDAV report definition
-            throw new NotFoundException();
+            throw new NeedsPrivilegesException(resource.getResourceLocator(),
+                                               DavPrivilege.READ);
         }
 
-        // requires DAV:read
-        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
+        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY))
             return;
 
-       throw new ForbiddenException("Ticket privileges deny access");
-    }
-
-    private void checkDelTicketAccess(Ticket ticket)
-        throws DavException {
-        User user = getSecurityContext().getUser();
-        if (user != null) {
-            // user must either own the ticket or be an administrator
-            if (! (ticket.getOwner().equals(user) || getSecurityContext().isAdmin()))
-                throw new ForbiddenException("Authenticated user not ticket owner");
-            return;
-        }
-        Ticket authTicket = getSecurityContext().getTicket();
-        if (authTicket != null)
-            // security layer has already validated this ticket
-            return;
-
-        throw new ForbiddenException("Anonymous user not ticket owner");
+        // Do not allow the client to know that this resource actually
+        // exists, as per CalDAV report definition
+        throw new NotFoundException();
     }
 
     protected void checkNoRequestBody(DavRequest request)

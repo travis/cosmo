@@ -20,6 +20,8 @@ import java.util.Set;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
+import org.osaf.cosmo.dav.acl.DavPrivilegeSet;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.Ticket;
@@ -86,26 +88,9 @@ public class TicketDiscovery extends StandardDavProperty
                                       NAMESPACE_TICKET);
             DomUtil.setText(visits, VALUE_INFINITY);
             ticketInfo.appendChild(visits);
- 
-            Element privilege =
-                DomUtil.createElement(document, XML_PRIVILEGE, NAMESPACE);
-            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ)) {
-                Element read =
-                    DomUtil.createElement(document, XML_READ, NAMESPACE);
-                privilege.appendChild(read);
-            }
-            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE)) {
-                Element write =
-                    DomUtil.createElement(document, XML_WRITE, NAMESPACE);
-                privilege.appendChild(write);
-            }
-            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY)) {
-                Element freebusy =
-                    DomUtil.createElement(document, ELEMENT_TICKET_FREEBUSY,
-                                          NAMESPACE);
-                privilege.appendChild(freebusy);
-            }
-            ticketInfo.appendChild(privilege);
+
+            DavPrivilegeSet privileges = new DavPrivilegeSet(ticket);
+            ticketInfo.appendChild(privileges.toXml(document));
         }
 
         return name;

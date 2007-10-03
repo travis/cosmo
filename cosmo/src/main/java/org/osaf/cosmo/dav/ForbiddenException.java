@@ -30,7 +30,8 @@ public class ForbiddenException extends DavException {
     protected void writeContent(XMLStreamWriter writer)
         throws XMLStreamException {
         writer.writeStartElement(NS_COSMO, "forbidden");
-        writer.writeCharacters(getMessage());
+        if (getMessage() != null)
+            writer.writeCharacters(getMessage());
         writer.writeEndElement();
     }
 }

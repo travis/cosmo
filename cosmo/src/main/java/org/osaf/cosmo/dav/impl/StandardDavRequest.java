@@ -47,6 +47,8 @@ import org.osaf.cosmo.dav.DavResourceLocatorFactory;
 import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.UnsupportedMediaTypeException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
+import org.osaf.cosmo.dav.acl.DavPrivilegeSet;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.InvalidCalendarDataException;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
@@ -384,28 +386,18 @@ public class StandardDavRequest extends WebdavRequestImpl
 
         // visit limits are not supported
 
-        Element privilege =
-            DomUtil.getChildElement(root, XML_PRIVILEGE, NAMESPACE);
-        if (privilege == null)
+        Element pe = DomUtil.getChildElement(root, XML_PRIVILEGE, NAMESPACE);
+        if (pe == null)
             throw new BadRequestException("Expected " + QN_PRIVILEGE + " child of " + QN_TICKET_TICKETINFO);
-        Element read =
-            DomUtil.getChildElement(privilege, XML_READ, NAMESPACE);
-        Element write =
-            DomUtil.getChildElement(privilege, XML_WRITE, NAMESPACE);
-        Element freebusy =
-            DomUtil.getChildElement(privilege, ELEMENT_TICKET_FREEBUSY,
-                                    NAMESPACE);
-        if (read == null && write == null && freebusy == null)
+
+        DavPrivilegeSet privileges = DavPrivilegeSet.createFromXml(pe);
+        if (! privileges.containsAny(DavPrivilege.READ, DavPrivilege.WRITE,
+                                     DavPrivilege.READ_FREE_BUSY))
             throw new BadRequestException("Empty or invalid " + QN_PRIVILEGE);
 
         Ticket ticket = new Ticket();
         ticket.setTimeout(timeout);
-        if (read != null)
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
-        if (write != null)
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
-        if (freebusy != null)
-            ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
+        privileges.setTicketPrivileges(ticket);
 
         return ticket;
     }

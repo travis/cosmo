@@ -996,7 +996,7 @@ cosmo.view.cal.canvas = new function () {
             };
             deferred.addCallback(addExpandedOccurrences);
         }
-        // Non-recurring / "only this item'
+        // Non-recurring (normal single item, recurrence removal), "only this item'
         else {
             // The item just had its recurrence removed.
             // The only item that should remain is the item that was the
@@ -1026,12 +1026,13 @@ cosmo.view.cal.canvas = new function () {
                 updateEventsDisplay();
                 return;
             }
+            // Single item, "only this item" change for a recurrence
             else {
-                // Saved event is still in view
+                // Saved event is in the current view slice
                 var inRange = !item.isOutOfViewRange();
                 // Lozenge is in the current week, update it
                 if (inRange) {
-                    // Item is being edited was off-canvas
+                    // Item being edited was off-canvas
                     if (item.lozenge.isOrphaned()){
                         var id = item.data.getItemUid();
                         // Create a new CalItem from the stamped Note on the item
@@ -1041,9 +1042,22 @@ cosmo.view.cal.canvas = new function () {
                         // Repaint the updated list
                         self.view.itemRegistry.each(appendLozenge);
                         updateEventsDisplay();
-                    } else {
+                    }
+                    else {
                         item.lozenge.setInputDisabled(false);
                         item.lozenge.updateDisplayMain();
+                        // 'Only this event' change to a recurrence
+                        // Unlock all the other items in the series
+                        // from their 'processing' state
+                        if (item.data.hasRecurrence()) {
+                            var f = function (i, e) {
+                                if (e.data.getUid() == item.data.getUid()) {
+                                    e.lozenge.setInputDisabled(false);
+                                    e.lozenge.updateDisplayMain();
+                                }
+                            }
+                            cosmo.view.cal.itemRegistry.each(f);
+                        }
                     }
                 }
                 // Lozenge was in view, event was explicitly edited
@@ -1119,7 +1133,7 @@ cosmo.view.cal.canvas = new function () {
      * @param opts JS Object, options for the removal that
      * tell you what kind of remove is happening
      */
-    function removeSuccess(ev, opts) {
+    function removeSuccess(item, opts) {
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var removeType = opts.removeType;
         dojo.debug("removeSuccess, removeType: " + removeType);
@@ -1130,35 +1144,45 @@ cosmo.view.cal.canvas = new function () {
         // object has been 'orphaned' -- the DOM node is not on
         // the currently displayed canvas
         // just send the 'clear selected' message
-        if (ev.lozenge.isOrphaned()) {
+        if (item.lozenge.isOrphaned()) {
             dojo.event.topic.publish('/calEvent', { 'action':
                 'clearSelected', 'data': null });
             return;
         }
-
+        var reg;
         switch(removeType){
             case 'singleEvent':
-                removeEvent(ev);
+                removeEvent(item);
                 break;
             case recurOpts.ALL_EVENTS:
-                var eventRegistry = cosmo.view.cal.itemRegistry.clone();
-                eventRegistry = self.view.filterOutRecurrenceGroup(
-                    eventRegistry, [ev.data.getUid()]);
+                reg = cosmo.view.cal.itemRegistry.clone();
+                reg = self.view.filterOutRecurrenceGroup(
+                    reg, [ev.data.getUid()]);
                 removeAllEventsFromDisplay();
-                cosmo.view.cal.itemRegistry = eventRegistry;
+                cosmo.view.cal.itemRegistry = reg;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
                 break;
             case recurOpts.ALL_FUTURE_EVENTS:
-                var eventRegistry = cosmo.view.cal.itemRegistry.clone();
-                eventRegistry = self.view.filterOutRecurrenceGroup(
-                    eventRegistry, [ev.data.getUid()],
+                reg = cosmo.view.cal.itemRegistry.clone();
+                reg = self.view.filterOutRecurrenceGroup(
+                    reg, [ev.data.getUid()],
                     ev.data.getEventStamp().getRrule().getEndDate());
                 removeAllEventsFromDisplay();
-                cosmo.view.cal.itemRegistry = eventRegistry;
+                cosmo.view.cal.itemRegistry = reg;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
                 break;
             case recurOpts.ONLY_THIS_EVENT:
-                removeEvent(ev);
+                removeEvent(item);
+                // 'Only this event' removal from a recurrence
+                // Unlock all the other items in the series
+                // from their 'processing' state
+                var f = function (i, e) {
+                    if (e.data.getUid() == item.data.getUid()) {
+                        e.lozenge.setInputDisabled(false);
+                        e.lozenge.updateDisplayMain();
+                    }
+                }
+                cosmo.view.cal.itemRegistry.each(f);
                 break;
         }
         // If we just removed the last item, clear the form

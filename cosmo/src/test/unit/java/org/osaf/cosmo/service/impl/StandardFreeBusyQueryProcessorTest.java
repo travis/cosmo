@@ -102,12 +102,15 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
         PeriodList busyTentativePeriods = new PeriodList();
         PeriodList busyUnavailablePeriods = new PeriodList();
         
+        // the range
         DateTime start = new DateTime("20070103T090000Z");
         DateTime end = new DateTime("20070117T090000Z");
         
         Period fbRange = new Period(start, end);
         
         Calendar calendar = CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/allday_weekly_recurring.ics"));
+        
+        // test several timezones
         TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
         
         queryProcessor.addBusyPeriods(calendar, tz, fbRange, busyPeriods, busyTentativePeriods, busyUnavailablePeriods);
@@ -120,6 +123,13 @@ public class StandardFreeBusyQueryProcessorTest extends AbstractHibernateDaoTest
         queryProcessor.addBusyPeriods(calendar, tz, fbRange, busyPeriods, busyTentativePeriods, busyUnavailablePeriods);
         
         Assert.assertEquals("20070108T080000Z/20070109T080000Z,20070115T080000Z/20070116T080000Z", busyPeriods.toString());
+        
+        busyPeriods.clear();
+        
+        tz = TIMEZONE_REGISTRY.getTimeZone("Australia/Sydney");
+        queryProcessor.addBusyPeriods(calendar, tz, fbRange, busyPeriods, busyTentativePeriods, busyUnavailablePeriods);
+        
+        Assert.assertEquals("20070107T130000Z/20070108T130000Z,20070114T130000Z/20070115T130000Z", busyPeriods.toString());
     }
 
     public void testFreeBusyQuery() throws Exception {

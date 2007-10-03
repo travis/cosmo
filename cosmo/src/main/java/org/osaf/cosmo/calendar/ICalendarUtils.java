@@ -203,6 +203,36 @@ public class ICalendarUtils {
     }
     
     /**
+     * Return a DateTime instance that is normalized according to the
+     * offset of the specified timezone as compared to the default
+     * system timezone.
+     * 
+     * @param utcDateTime point in time
+     * @param tz timezone
+     */
+    public static Date normalizeUTCDateTimeToDefaultOffset(DateTime utcDateTime, TimeZone tz) {
+        if(!utcDateTime.isUtc())
+            throw new IllegalArgumentException("datetime must be utc");
+        
+        // if no timezone nothing to do
+        if(tz==null)
+            return utcDateTime;
+        
+        // create copy, and set timezone
+        DateTime copy = (DateTime) Dates.getInstance(utcDateTime, utcDateTime);
+        copy.setTimeZone(tz);
+        
+        
+        // Create floating instance of local time, which will give
+        // us the correct offset
+        try {
+            return new DateTime(copy.toString());
+        } catch (ParseException e) {
+            throw new RuntimeException("error creating Date instance");
+        }
+    }
+    
+    /**
      * Convert a Date instance to a utc DateTime instance for a
      * specified timezone.
      * @param date date to convert

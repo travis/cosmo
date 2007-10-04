@@ -22,15 +22,15 @@
       </span>
         <span class="smData">
         <span>
-          <input type="radio" name="privileges" value="ro"/> Read
-          <input type="radio" name="privileges" value="rw"/> Read/Write
-          <input type="radio" name="privileges" value="fb"/> Free-Busy
+          <input type="radio" name="privileges" value="ro" id="ticketPrivilegeReadRadio"/> Read
+          <input type="radio" name="privileges" value="rw" id="ticketPrivilegeReadRadio"/> Read/Write
+          <input type="radio" name="privileges" value="fb" id="ticketPrivilegeReadRadio"/> Free-Busy
         </span>
 
 <span class="inputError" dojoAttachPoint="privilegesErrorSpan"></span>
 
     <span>
-      <button styleClass="buttonInput"  dojoAttachEvent="onClick:createTicket"/>
+      <button styleClass="buttonInput"  dojoAttachEvent="onClick:createTicket" id="grantTicketButton"/>
 		Grant Ticket
 		</button>
     </span>

@@ -319,7 +319,7 @@ public class DavCalendarCollection extends DavCollectionBase
             try {
                 super.saveContent(member);
             } catch (IcalUidInUseException e) {
-                throw new UidConflictException(e.getMessage());
+                throw new UidConflictException(e);
             }
         }
     }
@@ -341,7 +341,7 @@ public class DavCalendarCollection extends DavCollectionBase
                                        (NoteItem) content,
                                        event.getEventCalendar());
             } catch (IcalUidInUseException e) {
-                throw new UidConflictException(e.getMessage());
+                throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
                 throw new LockedException();
             }
@@ -354,7 +354,7 @@ public class DavCalendarCollection extends DavCollectionBase
                                                  (NoteItem) content,
                                                  event.getEventCalendar());
             } catch (IcalUidInUseException e) {
-                throw new UidConflictException(e.getMessage());
+                throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
                 throw new LockedException();
             }

@@ -19,23 +19,34 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.osaf.cosmo.dav.ConflictException;
+import org.osaf.cosmo.dav.ExtendedDavConstants;
+import org.osaf.cosmo.model.IcalUidInUseException;
 
 /**
  * An exception indicating that the UID of a submitted calendar resource is
  * already in use within the calendar collection.
  */
-public class UidConflictException
-    extends ConflictException implements CaldavConstants {
+public class UidConflictException extends ConflictException
+    implements ExtendedDavConstants, CaldavConstants {
+
+    private IcalUidInUseException root;
     
-    public UidConflictException(String message) {
-        super(message);
+    public UidConflictException(IcalUidInUseException e) {
+        super(e.getMessage());
+        this.root = e;
         getNamespaceContext().addNamespace(PRE_CALDAV, NS_CALDAV);
+        getNamespaceContext().addNamespace(PRE_COSMO, NS_COSMO);
     }
 
     protected void writeContent(XMLStreamWriter writer)
         throws XMLStreamException {
         writer.writeStartElement(NS_CALDAV, "no-uid-conflict");
-        writer.writeCharacters(getMessage());
+        writer.writeStartElement(NS_COSMO, "existing-uuid");
+        writer.writeCharacters(root.getExistingUid());
+        writer.writeEndElement();
+        writer.writeStartElement(NS_COSMO, "conflicting-uuid");
+        writer.writeCharacters(root.getTestUid());
+        writer.writeEndElement();
         writer.writeEndElement();
     }
 }

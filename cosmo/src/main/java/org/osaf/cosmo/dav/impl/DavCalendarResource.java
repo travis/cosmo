@@ -88,7 +88,7 @@ public abstract class DavCalendarResource extends DavContentBase
         try {
             super.move(destination);
         } catch (IcalUidInUseException e) {
-            throw new UidConflictException(e.getMessage());
+            throw new UidConflictException(e);
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class DavCalendarResource extends DavContentBase
         try {
             super.copy(destination, shallow);
         } catch (IcalUidInUseException e) {
-            throw new UidConflictException(e.getMessage());
+            throw new UidConflictException(e);
         }
     }
 

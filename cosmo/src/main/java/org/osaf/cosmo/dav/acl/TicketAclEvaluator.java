@@ -60,7 +60,7 @@ public class TicketAclEvaluator implements AclEvaluator {
     public boolean evaluate(Item item,
                             DavPrivilege privilege) {
         if (log.isDebugEnabled())
-            log.debug("Evaluating privilege " + privilege +  " against item " + item.getUid() + " for ticket " + principal.getKey() + " with privileges " + privileges);
+            log.debug("Evaluating privilege " + privilege +  " against item '" + item.getName() + "' for ticket " + principal.getKey() + " with privileges " + privileges);
         if (privilege.equals(DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET))
             return true;
         return privileges.containsRecursive(privilege);

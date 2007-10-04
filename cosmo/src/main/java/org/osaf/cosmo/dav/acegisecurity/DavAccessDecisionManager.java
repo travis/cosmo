@@ -284,7 +284,7 @@ public class DavAccessDecisionManager
 
         if (path != null) {
             if (log.isDebugEnabled())
-                log.debug("Looking up resource at " + path + " within home collection of " + username);
+                log.debug("Looking up resource at '" + path + "' within home collection of " + username);
         } else {
             if (log.isDebugEnabled())
                 log.debug("Looking up home collection of " + username);
@@ -297,38 +297,58 @@ public class DavAccessDecisionManager
             return;
         }
 
-        Item home = contentService.getRootItem(homeowner);
+        CollectionItem home = contentService.getRootItem(homeowner);
         Item item = path != null ?
             contentService.findItemByPath(path, home.getUid()) :
             home;
-        CollectionItem parent = null;
         if (item == null) {
             if (! (method.equals("PUT") || method.equals("MKCOL") ||
                    method.equals("MKCALENDAR"))) {
                 if (log.isDebugEnabled())
-                    log.debug("Item " + path + " within home collection for " + username + " not found; allowing for 404");
+                    log.debug("Item '" + path + "' within home collection for " + username + " not found; allowing for 404");
                 return;
             }
+        }
 
+        CollectionItem parent = home;
+        if (path != null && path != "/") {
+            String parentPath = PathUtil.getParentPath(path);
             try {
-                String parentPath = PathUtil.getParentPath(path);
                 parent = (CollectionItem)
                     contentService.findItemByPath(parentPath, home.getUid());
                 if (parent == null) {
                     if (log.isDebugEnabled())
-                        log.debug("Parent item " + parentPath + " within home collection for " + username + " not found; allowing for 409");
+                        log.debug("Parent item '" + parentPath + "' within home collection for " + username + " not found; allowing for 409");
                     return;
                 }
             } catch (ClassCastException e) {
                 if (log.isDebugEnabled())
-                    log.debug("Item at path " + path + " not a collection; allowing for 403");
+                    log.debug("Parent item '" + parentPath + "' not a collection; allowing for 403");
                 return;
             }
         }
-            
+
         evaluateItemAcl(item, parent, method, evaluator);
     }
 
+    /**
+     * <p>
+     * Evaluates the ACL of the provided item for the given method. Chooses
+     * the privilege to evaluate based on the method.
+     * </p>
+     * <p> For <code>MKCOL</code>, <code>MKCALENDAR</code>,
+     * <code>DELETE</code>, and for <code>PUT</code> when the item does not
+     * already exist, the privilege is actually evaluated against the parent
+     * collection instead.
+     * </p>
+     * <p>
+     * To account for re-publishing shared items, if a principal is
+     * attempts to access an item he does not have the privilege for, the
+     * parent collection of the item (as accessed through the request URL) is
+     * also checked, unless the method is one of those listed above that was
+     * checked against the parent collection to begin with.
+     * </p>
+     */
     protected void evaluateItemAcl(Item item,
                                    CollectionItem parent,
                                    String method,
@@ -365,9 +385,27 @@ public class DavAccessDecisionManager
             throw new IllegalStateException("No item to evaluate");
 
         if (log.isDebugEnabled())
-            log.debug("Deciding on item " + item.getUid() + " for privilege " + privilege);
+            log.debug("Deciding on resource '" + item.getName() + "' for privilege " + privilege);
 
-        if (! evaluator.evaluate(item, privilege))
+        if (evaluator.evaluate(item, privilege)) {
+            if (log.isDebugEnabled())
+                log.debug("Principal has privilege " + privilege + "; allowing " + method);
+            return;
+        }
+
+        if (parent != null && item != parent) {
+            if (log.isDebugEnabled())
+                log.debug("Deciding on parent '" + parent.getName() + "' for privilege " + privilege);
+
+            if (evaluator.evaluate(parent, privilege)) {
+                if (log.isDebugEnabled())
+                    log.debug("Principal has privilege " + privilege + " on parent; allowing " + method);
+                return;
+            }
+        }
+
+        if (log.isDebugEnabled())
+            log.debug("Principal does not have privilege " + privilege + "; denying " + method);
             throw new AclEvaluationException(item, privilege);
     }
 

@@ -58,7 +58,7 @@ public class UserAclEvaluator implements AclEvaluator {
                             DavPrivilege privilege) {
 
         if (log.isDebugEnabled())
-            log.debug("Evaluating privilege " + privilege +  " against item " + item.getUid() + " owned by " + item.getOwner().getUsername() + " for principal " + principal.getUsername());
+            log.debug("Evaluating privilege " + privilege +  " against item '" + item.getName() + "' owned by " + item.getOwner().getUsername() + " for principal " + principal.getUsername());
         if (principal.getAdmin())
             return true;
         if (privilege.equals(DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET))

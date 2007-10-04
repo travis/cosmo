@@ -19,12 +19,18 @@ dojo.provide("cosmotest.integration.test_atompub")
 dojo.require("cosmotest.util");
 
 dojo.require("cosmo.atompub");
+dojo.require("cosmo.env");
 
 cosmotest.integration.test_atompub = {
     test_Service: function(){
-        var service = new cosmo.atompub.Service(cosmotest.integration.test_atompub.serviceTestDoc);
-        jum.assertEquals("workspaces not created", 2, service.workspaces.length);
-        jum.assertEquals("first workspace wrong number of collections", 2, service.workspaces[0].collections.length);
-        jum.assertEquals("first workspace first collection href", "http://example.org/blog/main", service.workspaces[0].collections[0].href);
+        try { 
+            var user = cosmotest.util.createTestAccount();
+            var service = cosmo.atompub.initializeService(cosmo.env.getBaseUrl() + "/atom/user/" + user.username);
+            service.
+        }
+        finally{
+            cosmotest.util.cleanup(user);            
+        }
+
     }
 }

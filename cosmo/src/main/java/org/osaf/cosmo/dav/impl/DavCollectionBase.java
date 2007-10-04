@@ -154,10 +154,17 @@ public class DavCollectionBase extends DavItemResourceBase
 
     public void removeMember(org.apache.jackrabbit.webdav.DavResource member)
         throws org.apache.jackrabbit.webdav.DavException {
-        if (member instanceof DavItemCollection) {
-            removeSubcollection((DavItemCollection)member);
-        } else {
-            removeContent((DavItemContent)member);
+        if (log.isDebugEnabled())
+            log.debug("removing resource '" + member.getDisplayName() +
+                      "' from '" + getDisplayName() + ";");
+
+        CollectionItem collection = (CollectionItem) getItem();
+        Item item = ((DavItemResource)member).getItem();
+
+        try {
+            getContentService().removeItemFromCollection(item, collection);
+        } catch (CollectionLockedException e) {
+            throw new LockedException();
         }
 
         members.remove(member);
@@ -319,44 +326,6 @@ public class DavCollectionBase extends DavItemResourceBase
         }
 
         member.setItem(content);
-    }
-
-    /**
-     * Removes the given collection resource from storage.
-     */
-    protected void removeSubcollection(DavItemCollection member)
-        throws DavException {
-        CollectionItem collection = (CollectionItem) getItem();
-        CollectionItem subcollection = (CollectionItem) member.getItem();
-
-        if (log.isDebugEnabled())
-            log.debug("removing collection " + subcollection.getName() +
-                      " from " + collection.getName());
-
-        try {
-            getContentService().removeCollection(subcollection);
-        } catch (CollectionLockedException e) {
-            throw new LockedException();
-        }
-    }
-
-    /**
-     * Removes the given content resource from storage.
-     */
-    protected void removeContent(DavItemContent member)
-        throws DavException {
-        CollectionItem collection = (CollectionItem) getItem();
-        ContentItem content = (ContentItem) member.getItem();
-
-        if (log.isDebugEnabled())
-            log.debug("removing content " + content.getName() +
-                      " from " + collection.getName());
-
-        try {
-            getContentService().removeContent(content);
-        } catch (CollectionLockedException e) {
-            throw new LockedException();
-        }
     }
 
     protected DavResource memberToResource(Item item)

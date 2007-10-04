@@ -47,6 +47,14 @@ public class AccessDeniedHandler
         throws IOException, ServletException {
         StandardDavResponse sdr =
             new StandardDavResponse((HttpServletResponse)response);
-        sdr.sendDavError(new NeedsPrivilegesException());
+        NeedsPrivilegesException toSend = null;
+        if (exception instanceof AclAccessDeniedException) {
+            AclAccessDeniedException e = (AclAccessDeniedException) exception;
+            toSend =
+                new NeedsPrivilegesException(e.getHref(), e.getPrivilege());
+        } else {
+            toSend = new NeedsPrivilegesException(exception.getMessage());
+        }
+        sdr.sendDavError(toSend);
     }
 }

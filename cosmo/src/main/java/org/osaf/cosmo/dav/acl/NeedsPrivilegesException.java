@@ -18,7 +18,6 @@ package org.osaf.cosmo.dav.acl;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ForbiddenException;
 
 /**
@@ -30,17 +29,17 @@ import org.osaf.cosmo.dav.ForbiddenException;
  */
 public class NeedsPrivilegesException extends ForbiddenException {
 
-    private DavResourceLocator locator;
+    private String href;
     private DavPrivilege privilege;
-    
-    public NeedsPrivilegesException() {
-        this(null, null);
+
+    public NeedsPrivilegesException(String message) {
+        super(message);
     }
 
-    public NeedsPrivilegesException(DavResourceLocator locator,
+    public NeedsPrivilegesException(String href,
                                     DavPrivilege privilege) {
         super(null);
-        this.locator = locator;
+        this.href = href;
         this.privilege = privilege;
     }
 
@@ -53,10 +52,10 @@ public class NeedsPrivilegesException extends ForbiddenException {
     protected void writeContent(XMLStreamWriter writer)
         throws XMLStreamException {
         writer.writeStartElement("DAV:", "needs-privileges");
-        if (locator != null && privilege != null) {
+        if (href != null && privilege != null) {
             writer.writeStartElement("DAV:", "resource");
             writer.writeStartElement("DAV:", "href");
-            writer.writeCharacters(locator.getHref(true));
+            writer.writeCharacters(href);
             writer.writeEndElement();
             writer.writeStartElement("DAV:", "privilege");
             writer.writeStartElement(privilege.getQName().getNamespaceURI(),
@@ -64,7 +63,17 @@ public class NeedsPrivilegesException extends ForbiddenException {
             writer.writeEndElement();
             writer.writeEndElement();
             writer.writeEndElement();
+        } else if (getMessage() != null) {
+            writer.writeCharacters(getMessage());
         }
         writer.writeEndElement();
+    }
+
+    public String getHref() {
+        return href;
+    }
+
+    public DavPrivilege getPrivilege() {
+        return privilege;
     }
 }

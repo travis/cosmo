@@ -22,61 +22,38 @@
 
 <beans>
 
-  <bean id="userVoter"
-        class="org.osaf.cosmo.dav.acegisecurity.UserVoter">
-    <property name="contentService">
-      <ref bean="contentService"/>
-    </property>
-    <property name="userService">
-      <ref bean="userService"/>
-    </property>
-  </bean>
-
-  <bean id="davAccessDecisionManager"
-        class="org.acegisecurity.vote.AffirmativeBased">
-    <property name="allowIfAllAbstainDecisions">
-      <value>false</value>
-    </property>
-    <property name="decisionVoters">
-      <list>
-        <ref bean="ticketVoter"/>
-        <ref bean="userVoter"/>
-        <ref bean="roleVoter"/>
-      </list>
-    </property>
-  </bean>
-
   <!-- interceptor which performs authorization for DAV requests -->
 
-   <bean id="davFilterInvocationInterceptor"
-         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
-     <property name="authenticationManager">
-       <ref bean="authenticationManager"/>
-     </property>
-     <property name="accessDecisionManager">
-       <ref bean="davAccessDecisionManager"/>
-     </property>
+  <bean id="davFilterInvocationInterceptor"
+        class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+    <property name="authenticationManager">
+      <ref bean="authenticationManager"/>
+    </property>
+    <property name="accessDecisionManager">
+      <bean class="org.osaf.cosmo.dav.acegisecurity.DavAccessDecisionManager">
+         <constructor-arg><ref bean="userService"/></constructor-arg>
+         <constructor-arg><ref bean="contentService"/></constructor-arg>
+      </bean>
+    </property>
      <property name="objectDefinitionSource">
        <value>
 	     CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
 	     PATTERN_TYPE_APACHE_ANT
-         /dav/users=ROLE_ROOT,ROLE_USER
-         /**=ROLE_ROOT
+	     /**=this is a meaningless value
        </value>
      </property>
-   </bean>
+  </bean>
 
-
-   <bean id="davExceptionTranslationFilter"
-         class="org.acegisecurity.ui.ExceptionTranslationFilter">
-     <property name="authenticationEntryPoint">
-       <ref bean="protocolAuthenticationEntryPoint"/>
-     </property>
-     <property name="accessDeniedHandler">
-       <bean class="org.osaf.cosmo.dav.acegisecurity.AccessDeniedHandler"/>
-     </property>
-     <property name="createSessionAllowed" value="false"/>
-   </bean>
+  <bean id="davExceptionTranslationFilter"
+        class="org.acegisecurity.ui.ExceptionTranslationFilter">
+    <property name="authenticationEntryPoint">
+      <ref bean="protocolAuthenticationEntryPoint"/>
+    </property>
+    <property name="accessDeniedHandler">
+      <bean class="org.osaf.cosmo.dav.acegisecurity.AccessDeniedHandler"/>
+    </property>
+    <property name="createSessionAllowed" value="false"/>
+  </bean>
 
   <!-- filter chain that kicks off request-time processing -->
 

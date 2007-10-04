@@ -18,6 +18,8 @@ package org.osaf.cosmo.dav.acl;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
@@ -82,6 +84,14 @@ public class DavPrivilegeSet extends HashSet<DavPrivilege>
         return false;
     }
 
+    public boolean containsRecursive(DavPrivilege test) {
+        for (DavPrivilege p : this) {
+            if (p.equals(test) || p.containsRecursive(test))
+                return true;
+        }
+        return false;
+    }
+
     public void setTicketPrivileges(Ticket ticket) {
         ticket.getPrivileges().clear();
         if (contains(DavPrivilege.READ))
@@ -90,6 +100,10 @@ public class DavPrivilegeSet extends HashSet<DavPrivilege>
             ticket.getPrivileges().add(Ticket.PRIVILEGE_WRITE);
         if (contains(DavPrivilege.READ_FREE_BUSY))
             ticket.getPrivileges().add(Ticket.PRIVILEGE_FREEBUSY);
+    }
+
+    public String toString() {
+        return StringUtils.join(this, ", ");
     }
 
     public static final DavPrivilegeSet createFromXml(Element root) {

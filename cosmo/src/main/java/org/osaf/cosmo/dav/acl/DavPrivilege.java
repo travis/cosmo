@@ -56,7 +56,8 @@ import org.w3c.dom.Element;
  * </blockquote>
  */
 public class DavPrivilege
-    implements ExtendedDavConstants, CaldavConstants, XmlSerializable {
+    implements ExtendedDavConstants, CaldavConstants, XmlSerializable,
+    Comparable<DavPrivilege> {
 
     public static final DavPrivilege READ =
         new DavPrivilege(qn("read"));
@@ -127,7 +128,32 @@ public class DavPrivilege
         return root;
     }
 
+    // Comparable methods
+
+    public int compareTo(DavPrivilege o) {
+        return getQName().toString().compareTo(o.getQName().toString());
+    }
+
     // our methods
+
+    public boolean equals(Object o) {
+        if (! (o instanceof DavPrivilege))
+            return false;
+        DavPrivilege p = (DavPrivilege) o;
+        return p.getQName().equals(qname);
+    }
+
+    public boolean containsRecursive(DavPrivilege test) {
+        for (DavPrivilege p : subPrivileges) {
+            if (p.equals(test) || p.containsRecursive(test))
+                return true;
+        }
+        return false;
+    }
+
+    public String toString() {
+        return qname.toString();
+    }
 
     public QName getQName() {
         return qname;

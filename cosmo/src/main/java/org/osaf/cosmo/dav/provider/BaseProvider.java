@@ -48,8 +48,13 @@ import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.UnsupportedMediaTypeException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.AclEvaluator;
 import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.NeedsPrivilegesException;
+import org.osaf.cosmo.dav.acl.TicketAclEvaluator;
+import org.osaf.cosmo.dav.acl.UserAclEvaluator;
+import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
+import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
 import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.impl.DavFile;
@@ -360,86 +365,151 @@ public abstract class BaseProvider
         if (getSecurityContext().isAdmin())
             return;
 
-        Item destinationItem = destination.exists() ?
-                ((DavItemResource)destination).getItem() :
-                ((DavItemResource)destination.getParent()).getItem();
-        DavResourceLocator locator = destination.exists() ?
-            destination.getResourceLocator() :
-            destination.getParent().getResourceLocator();
-
+        DavResource toCheck = destination.exists() ?
+            destination : destination.getParent();
+        Item item = ((DavItemResource)toCheck).getItem();
+        DavResourceLocator locator = toCheck.getResourceLocator();
+        String href = locator.getHref(toCheck.isCollection());
         DavPrivilege privilege = destination.exists() ?
             DavPrivilege.WRITE : DavPrivilege.BIND;
 
         User user = getSecurityContext().getUser();
         if (user != null) {
-            if (user.equals(destinationItem.getOwner()))
+            UserAclEvaluator evaluator = new UserAclEvaluator(user);
+            if (evaluator.evaluate(item, privilege))
                 return;
-            throw new NeedsPrivilegesException(locator, privilege);
+            throw new NeedsPrivilegesException(href, privilege);
         }
 
         Ticket ticket = getSecurityContext().getTicket();
         if (ticket != null) {
-            // requires DAV:bind on parent of destination item
-            if (ticket.isGranted(destinationItem) &&
-                ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE))
+            TicketAclEvaluator evaluator = new TicketAclEvaluator(ticket);
+            if (evaluator.evaluate(item, privilege))
                 return;
-            throw new NeedsPrivilegesException(locator, privilege);
+            throw new NeedsPrivilegesException(href, privilege);
         }
         
-        throw new NeedsPrivilegesException(locator, privilege);
+        throw new NeedsPrivilegesException(href, privilege);
+    }
+
+    protected AclEvaluator createAclEvaluator() {
+        User user = getSecurityContext().getUser();
+        if (user != null)
+            return new UserAclEvaluator(user);
+        Ticket ticket = getSecurityContext().getTicket();
+        if (ticket != null)
+            return new TicketAclEvaluator(ticket);
+        throw new IllegalStateException("Anonymous principal not supported for ACL evaluation");
+    }
+
+    protected boolean hasPrivilege(DavResource resource,
+                                   AclEvaluator evaluator,
+                                   DavPrivilege privilege) {
+        boolean hasPrivilege = false;
+        if (resource instanceof DavUserPrincipalCollection ||
+            resource instanceof DavUserPrincipal) {
+            if (evaluator instanceof TicketAclEvaluator)
+                throw new IllegalStateException("A ticket may not be used to access a user principal collection or resource");
+            UserAclEvaluator uae = (UserAclEvaluator) evaluator;
+
+            if (resource instanceof DavUserPrincipalCollection) {
+                hasPrivilege = uae.evaluateUserPrincipalCollection(privilege);
+            } else {
+                User user = ((DavUserPrincipal)resource).getUser();
+                hasPrivilege = uae.evaluateUserPrincipal(user, privilege);
+            }
+        } else {
+            Item item = ((DavItemResource)resource).getItem();
+            hasPrivilege = evaluator.evaluate(item, privilege);
+        }        
+
+        if (hasPrivilege) {
+            if (log.isDebugEnabled())
+                log.debug("Principal has privilege " + privilege);
+            return true;
+        }
+
+        
+        if (log.isDebugEnabled())
+            log.debug("Principal does not have privilege " + privilege);
+        return false;
     }
 
     protected void checkPropFindAccess(DavResource resource,
                                        DavPropertyNameSet props,
                                        int type)
         throws DavException {
-        Ticket ticket = getSecurityContext().getTicket();
-        if (ticket == null)
-            return;
+        AclEvaluator evaluator = createAclEvaluator();
 
-        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
-            return;
-
-        // all tickets have the ability to examine
-        // DAV:current-user-privilege-set and ticket:ticketdiscovery
-
-        int unprotected = 0;
-        if (props.contains(CURRENTUSERPRIVILEGESET))
-            unprotected++;
-        if (props.contains(TICKETDISCOVERY))
-            unprotected++;
-
-        if (unprotected > 0 && props.getContentSize() > unprotected) {
-            // XXX: if they don't have DAV:read, they shouldn't be able to
-            // access any other properties.
-            log.warn("Exposing secured properties to ticket without DAV:read");
+        // if the principal has DAV:read, then the propfind can continue
+        if (hasPrivilege(resource, evaluator, DavPrivilege.READ)) {
+            if (log.isDebugEnabled())
+                log.debug("Allowing PROPFIND");
             return;
         }
 
-        // Do not allow the client to know that this resource actually
+        // if there is at least one property that can be viewed with
+        // DAV:read-current-user-privilege-set, then check for that
+        // privilege as well.
+        int unprotected = 0;
+        if (props.contains(CURRENTUSERPRIVILEGESET))
+            unprotected++;
+        // ticketdiscovery is only unprotected when the principal is a
+        // ticket
+        if (props.contains(TICKETDISCOVERY) &&
+            evaluator instanceof TicketAclEvaluator)
+            unprotected++;
+
+        if (unprotected > 0) {
+            if (hasPrivilege(resource, evaluator,
+                             DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET)) {
+
+                if (props.getContentSize() > unprotected)
+                    // XXX: if they don't have DAV:read, they shouldn't be
+                    // able to access any other properties
+                    log.warn("Exposing secured properties to ticket without DAV:read");
+                             
+                if (log.isDebugEnabled())
+                    log.debug("Allowing PROPFIND");
+                return;
+             }
+        }
+
+        // don't allow the client to know that this resource actually
         // exists
+        if (log.isDebugEnabled())
+            log.debug("Denying PROPFIND");
         throw new NotFoundException();
     }
 
     protected void checkReportAccess(DavResource resource,
                                      ReportInfo info)
         throws DavException {
-        Ticket ticket = getSecurityContext().getTicket();
-        if (ticket == null)
-            return;
+        AclEvaluator evaluator = createAclEvaluator();
 
-        if (! isFreeBusyReport(info)) {
-            if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ))
-                return;
-            throw new NeedsPrivilegesException(resource.getResourceLocator(),
-                                               DavPrivilege.READ);
+        // if the principal has DAV:read, then the propfind can continue
+        if (hasPrivilege(resource, evaluator, DavPrivilege.READ)) {
+            if (log.isDebugEnabled())
+                log.debug("Allowing REPORT");
+            return;
         }
 
-        if (ticket.getPrivileges().contains(Ticket.PRIVILEGE_FREEBUSY))
-            return;
+        // if this is a free-busy report, then check CALDAV:read-free-busy
+        // also
+        if (isFreeBusyReport(info)) {
+            Item item = ((DavItemResource)resource).getItem();
+            if (hasPrivilege(resource, evaluator,
+                             DavPrivilege.READ_FREE_BUSY)) {
+                if (log.isDebugEnabled())
+                    log.debug("Allowing REPORT");
+                return;
+            }
+        }
 
-        // Do not allow the client to know that this resource actually
-        // exists, as per CalDAV report definition
+        // don't allow the client to know that this resource actually
+        // exists
+        if (log.isDebugEnabled())
+            log.debug("Denying PROPFIND");
         throw new NotFoundException();
     }
 

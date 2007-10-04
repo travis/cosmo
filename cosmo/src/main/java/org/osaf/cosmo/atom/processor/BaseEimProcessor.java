@@ -112,6 +112,7 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
 
         child.setName(recordset.getUuid());
         child.setUid(recordset.getUuid());
+        child.setIcalUid(child.getUid());
         child.setOwner(collection.getOwner());
 
         // if the item is a modification, relate it to the item it
@@ -121,6 +122,9 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
             ModificationUid modUid = toModificationUid(child.getUid());
             String masterUid = modUid.getParentUid();
 
+            // modification should inherit icaluid
+            child.setIcalUid(null);
+            
             NoteItem master  = null;
             for (Item sibling : collection.getChildren()) {
                 if (sibling.getUid().equals(masterUid)) {

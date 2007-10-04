@@ -497,6 +497,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         NoteItem child = new NoteItem();
         child.setName(recordset.getUuid());
         child.setUid(recordset.getUuid());
+        child.setIcalUid(child.getUid());
         child.setOwner(collection.getOwner());
         
         // Add reference to parent collection so that applicator can
@@ -528,6 +529,9 @@ public class StandardMorseCodeController implements MorseCodeController {
                 return true;
             }
         }
+        
+        // mods should not have icaluid as its inherited from the master
+        noteMod.setIcalUid(null);
         
         log.debug("could not find parent item for " + noteMod.getUid());
         throw new ValidationException("no parent found for " + noteMod.getUid());

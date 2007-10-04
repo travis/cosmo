@@ -150,6 +150,7 @@ cosmo.model.Item.triageStatusCodeNumbers = {
 
 cosmo.model.declare("cosmo.model.Note", cosmo.model.Item, 
     [ ["body", {"default": null}],
+      ["icalUid", {"default": null}],
       ["modifiedBy", {"default": function(){return new cosmo.model.ModifiedBy()}}]],
     {
         //TODO could be useful to use the same format as is in the UUID in EIM

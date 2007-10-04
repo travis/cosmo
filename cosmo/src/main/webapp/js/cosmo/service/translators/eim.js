@@ -773,16 +773,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     noteToNoteRecord: function(note){
-        var props = {}
+        var props = {};
         var uid = this.getUid(note);
         props.body = note.getBody();
-        props.icalUid = uid;
+        props.icalUid = note.getIcalUid() || uid;
         props.uuid = uid;
         return this.propsToNoteRecord(props);
     },
     
     modificationHasNoteModifications: function (modification){
-        return !!modification.getModifiedProperties().body;
+        var props = modification.getModifiedProperties();
+        return (props.body || props.icalUid);
     },
     
     
@@ -793,6 +794,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var record = this.propsToNoteRecord(props);
         var missingFields = [];
         if (record.fields.body == undefined) missingFields.push("body");
+        if (record.fields.icalUid == undefined) missingFields.push("icalUid");
         record.missingFields = missingFields;
         return record;
     },
@@ -800,7 +802,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     generateEmptyNote: function (note){
         var record = this.propsToNoteRecord({uuid: note.getUid()});
         record.missingFields = [
-            "body"
+            "body",
+            "icalUid"
         ];
         return record;
     },
@@ -809,6 +812,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         with (cosmo.service.eim.constants){
             var fields = {};
             if (props.body !== undefined) fields.body = [type.CLOB, props.body];
+            if (props.icalUid !== undefined) fields.icalUid = [type.TEXT, props.icalUid];
             return {
                 prefix: prefix.NOTE,
                 ns: ns.NOTE,
@@ -1070,6 +1074,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var props = {};
         if (record.fields){
             if (record.fields.body) props.body = record.fields.body[1];
+            if (record.fields.icalUid) props.icalUid = record.fields.icalUid[1];
         }
         return props;
     },

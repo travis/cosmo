@@ -23,6 +23,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.acegisecurity.AccessDeniedException;
+import org.acegisecurity.ui.AccessDeniedHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,10 +37,9 @@ import org.osaf.cosmo.dav.impl.StandardDavResponse;
  * enclosing an XML body describing the error.
  * </p>
  */
-public class AccessDeniedHandler
-    implements org.acegisecurity.ui.AccessDeniedHandler {
+public class DavAccessDeniedHandler implements AccessDeniedHandler {
     private static final Log log =
-        LogFactory.getLog(AccessDeniedHandler.class);
+        LogFactory.getLog(DavAccessDeniedHandler.class);
 
     public void handle(ServletRequest request,
                        ServletResponse response,
@@ -48,8 +48,8 @@ public class AccessDeniedHandler
         StandardDavResponse sdr =
             new StandardDavResponse((HttpServletResponse)response);
         NeedsPrivilegesException toSend = null;
-        if (exception instanceof AclAccessDeniedException) {
-            AclAccessDeniedException e = (AclAccessDeniedException) exception;
+        if (exception instanceof DavAccessDeniedException) {
+            DavAccessDeniedException e = (DavAccessDeniedException) exception;
             toSend =
                 new NeedsPrivilegesException(e.getHref(), e.getPrivilege());
         } else {

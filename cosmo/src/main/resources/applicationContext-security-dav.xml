@@ -50,7 +50,7 @@
       <ref bean="protocolAuthenticationEntryPoint"/>
     </property>
     <property name="accessDeniedHandler">
-      <bean class="org.osaf.cosmo.dav.acegisecurity.AccessDeniedHandler"/>
+      <bean class="org.osaf.cosmo.dav.acegisecurity.DavAccessDeniedHandler"/>
     </property>
     <property name="createSessionAllowed" value="false"/>
   </bean>

@@ -107,7 +107,7 @@ public class DavAccessDecisionManager
         try {
             match(path, request.getMethod(), evaluator);
         } catch (AclEvaluationException e) {
-            throw new AclAccessDeniedException(request.getRequestURI(),
+            throw new DavAccessDeniedException(request.getRequestURI(),
                                                e.getPrivilege());
         }
     }

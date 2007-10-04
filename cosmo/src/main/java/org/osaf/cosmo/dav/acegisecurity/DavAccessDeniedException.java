@@ -25,11 +25,11 @@ import org.osaf.cosmo.dav.acl.DavPrivilege;
  * DAV resource.
  * </p>
  */
-public class AclAccessDeniedException extends AccessDeniedException {
+public class DavAccessDeniedException extends AccessDeniedException {
     private String href;
     private DavPrivilege privilege;
 
-    public AclAccessDeniedException(String href,
+    public DavAccessDeniedException(String href,
                                     DavPrivilege privilege) {
         super(null);
         this.href = href;

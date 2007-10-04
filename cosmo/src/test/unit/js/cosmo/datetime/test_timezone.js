@@ -221,6 +221,17 @@ cosmotest.datetime.test_timezone = {
     jum.assertEquals(-240, offset);
     },
 
+    test_getRuleForDate: function(){
+        //var tz = cosmo.datetime.timezone._timezoneRegistry.getTimezone("America/Barbados");
+        var date = new Date(2006, 1, 1);
+        var ruleSet = cosmo.datetime.timezone.getRuleSet("Barb");
+        var rule = ruleSet._getRuleForDate(date);
+        jum.assertTrue(rule != null);
+        jum.assertTrue(rule.startYear == 1980);
+        jum.assertTrue(rule.letter == "S");
+        
+    },
+
     getPrefixes: function (){
     var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
     var prefixes = {};

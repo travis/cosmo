@@ -267,11 +267,44 @@ cosmo.datetime.timezone.RuleSet.prototype._getRulesForYear = function(year){
      return result;
 };
 
+cosmo.datetime.timezone.RuleSet.prototype._getLastOccurringRule = function(){
+    //sumamry: returns the rule with the latest possible date. In other words
+    //if the date was an infinite amount of years from now, this would be 
+    //the last rule that occurred.
+
+    if (this.rules == null || this.rules.length == 0){
+        return null;
+    }
+
+    //make a copy of the rules array;
+    var rules = this.rules.slice()
+
+    rules.sort(function(a,b){
+        if (a.endYear > b.endYear){
+            return -1;
+        }
+
+        if (a.endYear < b.endYear){
+            return 1;
+        }
+
+        if (a.startMonth > b.startMonth){
+            return -1;
+        }
+
+        return 1;
+    });
+    
+    return rules[0];
+}
+
 cosmo.datetime.timezone.RuleSet.prototype._getRuleForDate = function(date){
     // summary: returns the appropriate Rule given the date
     var rules = this._getRulesForYear(date.getFullYear());
     if (!rules || !rules.length){
-        return null;
+        //if there are no rules for that year, then we must get the last rule that
+        //ever occurred
+        return this._getLastOccurringRule();
     }
 
     rules.sort(function(a,b){return a.startMonth - b.startMonth});

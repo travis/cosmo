@@ -147,7 +147,7 @@ dojo.declare("cosmo.atompub.Workspace", cosmo.atompub.AppElement, {
     ]
 });
 
-dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement], {
+dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement, {
     __relements__: [
         ["workspace", cosmo.atompub.Workspace, "workspaces"]
     ]

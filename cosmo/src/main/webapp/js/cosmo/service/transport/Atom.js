@@ -54,7 +54,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
                 item.getUid() + ": " + item.toString()
             )
         }
-        return editLink;
+        return this.generateUri(editLink,  this.PROJECTION_FULL_EIM_JSON);
     },
     
     getAtomBase: function () {
@@ -116,10 +116,9 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var query = this._generateSearchQuery(searchCrit);
         var editLink = this.getAndCheckEditLink(collection);
         
-        var projection = (searchCrit.projection || "full") + "/eim-json";
         var r = {};
 
-        r.url = this.generateUri(this.getAtomBase() + "/" + editLink, "/" + projection, query);
+        r.url = this.generateUri(this.getAtomBase() + "/" + editLink, "", query);
 
         return this.bind(r, kwArgs);
     },
@@ -129,8 +128,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var editLink = kwArgs.editLink || this.getAndCheckEditLink(item);
 
         var r = {};
-        r.url = this.generateUri(this.getAtomBase() + "/" + 
-                editLink, this.PROJECTION_FULL_EIM_JSON);
+        r.url = this.getAtomBase() + "/" + editLink;
         r.contentType = this.CONTENT_TYPE_ATOM;
         r.postContent = postContent;
         r.method = kwArgs.method || this.METHOD_PUT;
@@ -195,8 +193,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var editLink = this.getAndCheckEditLink(collection);
 
         var r = {};
-        r.url = this.generateUri(this.getAtomBase() + "/" + 
-            editLink, this.PROJECTION_FULL_EIM_JSON);
+        r.url = this.getAtomBase() + "/" + editLink;
         r.contentType = this.CONTENT_TYPE_ATOM;
         r.postContent = postContent;
         r.method = this.METHOD_POST;

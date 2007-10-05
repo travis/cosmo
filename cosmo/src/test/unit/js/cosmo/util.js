@@ -47,10 +47,20 @@ cosmotest.util = {
        return user;
        
     },
-    
+
     cleanup: function(user){
         cosmo.util.auth.setCred("root", "cosmo");
         cosmo.cmp.deleteUser(user.username, {handle: function(){}}, true);
         cosmo.util.auth.clearAuth();
+    },
+    
+    asyncTest: function(callback){
+        var user = cosmotest.util.createTestAccount();
+        var td = new dojo.Deferred();
+        td.addCallback(callback);
+        td.addErrback(function(e){dojo.debug(e)});
+        td.addBoth(dojo.lang.hitch(this, function(){this.cleanup(user)}));
+        td.callback(user);
     }
+
 }

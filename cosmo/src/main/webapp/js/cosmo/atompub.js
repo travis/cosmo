@@ -37,6 +37,7 @@ dojo.declare("cosmo.atompub.AppElement", null, {
     __relements__: [],
     __attributes__: [],
     initializer: function(xml, service){
+        dojo.debug(service)
         this.service = service;
         if (xml){
             this.fromXml(xml);
@@ -50,9 +51,9 @@ dojo.declare("cosmo.atompub.AppElement", null, {
         dojo.debug("Processing repeatable element: " + elementName);
         this[objectName] = dojo.lang.map(
             xml.getElementsByTagName(elementName),
-            function(xml){
+            dojo.lang.hitch(this, function(xml){
                 return new constructor(xml, this.service);
-            } 
+            })
         );
     },
 
@@ -157,11 +158,12 @@ dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement, {
    url.
 */
 cosmo.atompub.initializeService = function(url){
-    var service = new cosmo.service.transport.Rest();
+    var service = new cosmo.service.transport.Rest(cosmo.env.getBaseUrl() + "/atom/");
     appServiceDeferred = service.bind({
         url: url
     });
     appServiceDeferred.addCallback(function(xml){
         return new cosmo.atompub.Service(xml, service);
     });
+    return appServiceDeferred;
 }

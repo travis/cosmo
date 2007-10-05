@@ -29,8 +29,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
     {
         translator: null,
 
-        initializer: function (translator){
-
+        initializer: function (baseUrl){
+            this.baseUrl = baseUrl || "";
         },
         
         methodIsSupported: {
@@ -57,6 +57,10 @@ dojo.declare("cosmo.service.transport.Rest", null,
                     kwArgs.noAuth = true;
                 }
             }
+            if (r.url && (r.url.substring(0, 7) != "http://")){
+                r.url = this.baseUrl + r.url;
+            }
+
             // Add error fo transport layer problems
             
             var request = cosmo.util.auth.getAuthorizedRequest(r, kwArgs);

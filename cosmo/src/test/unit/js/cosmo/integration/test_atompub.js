@@ -20,17 +20,19 @@ dojo.require("cosmotest.util");
 
 dojo.require("cosmo.atompub");
 dojo.require("cosmo.env");
+dojo.require("dojo.Deferred");
 
 cosmotest.integration.test_atompub = {
     test_Service: function(){
-        try { 
-            var user = cosmotest.util.createTestAccount();
-            var service = cosmo.atompub.initializeService(cosmo.env.getBaseUrl() + "/atom/user/" + user.username);
-            service.
-        }
-        finally{
-            cosmotest.util.cleanup(user);            
-        }
-
+        cosmotest.util.asyncTest(
+            function(user){
+                var serviceDeferred = cosmo.atompub.initializeService("user/" + user.username);
+                serviceDeferred.addCallback(function(service){
+                    feedDeferred = service.workspaces[0].collections[0].getFeed();
+                    return feedDeferred;
+                });
+                return serviceDeferred;
+            }
+        );
     }
 }

@@ -57,10 +57,10 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                                              CalendarFilter filter) {
 
         try {
-            
+            CalendarFilterConverter filterConverter = new CalendarFilterConverter();
             try {
                 // translate CalendarFilter to ItemFilter and execute filter
-                ItemFilter itemFilter = new CalendarFilterConverter().translateToItemFilter(collection, filter);
+                ItemFilter itemFilter = filterConverter.translateToItemFilter(collection, filter);
                 Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
                 return (Set<ContentItem>) results;
             } catch (IllegalArgumentException e) {
@@ -69,10 +69,22 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             // Use brute-force method if CalendarFilter can't be translated
             // to an ItemFilter (slower but at least gets the job done).
             HashSet<ContentItem> results = new HashSet<ContentItem>();
+            Set<Item> itemsToProcess = null;
+            
+            // Optimization:
+            // Do a first pass query if possible to reduce the number
+            // of items we have to examine.  Otherwise we have to examine
+            // all items.
+            ItemFilter firstPassItemFilter = filterConverter.getFirstPassFilter(collection, filter);
+            if(firstPassItemFilter!=null)
+                itemsToProcess = itemFilterProcessor.processFilter(getSession(), firstPassItemFilter);
+            else
+                itemsToProcess = collection.getChildren();
+            
             CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
             
             // Evaluate filter against all calendar items
-            for (Item child : collection.getChildren()) {
+            for (Item child : itemsToProcess) {
                 
                 // only care about content items
                 if (child instanceof ContentItem) {
@@ -139,7 +151,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
         }
     }
     
-    
+  
     public ItemFilterProcessor getItemFilterProcessor() {
         return itemFilterProcessor;
     }

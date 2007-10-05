@@ -26,11 +26,14 @@ import org.osaf.cosmo.calendar.query.PropertyFilter;
 import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.StampFilter;
 import org.osaf.cosmo.model.filter.TextAttributeFilter;
 
 
@@ -45,7 +48,7 @@ public class CalendarFilterConverterTest extends TestCase {
         super();
     }
 
-    public void testCalendarFilterConverter() throws Exception {
+    public void testTranslateItemToFilter() throws Exception {
         CollectionItem calendar = new CollectionItem();
         calendar.setUid("calendar");
         CalendarFilter calFilter = new CalendarFilter();
@@ -103,6 +106,40 @@ public class CalendarFilterConverterTest extends TestCase {
         Assert.assertNotNull(sf.getPeriod());
         Assert.assertEquals(sf.getPeriod().getStart().toString(), "20070101T100000Z");
         Assert.assertEquals(sf.getPeriod().getEnd().toString(), "20070201T100000Z");
+    }
+    
+    public void testGetFirstPassFilter() throws Exception {
+        CollectionItem calendar = new CollectionItem();
+        calendar.setUid("calendar");
+        CalendarFilter calFilter = new CalendarFilter();
+        ComponentFilter rootComp = new ComponentFilter();
+        rootComp.setName("VCALENDAR");
+        calFilter.setFilter(rootComp);
+        ComponentFilter taskComp = new ComponentFilter();
+        taskComp.setName("VTODO");
+        rootComp.getComponentFilters().add(taskComp);
+        
+        try {
+            converter.translateToItemFilter(calendar, calFilter);
+            Assert.fail("shouldn't get here");
+        } catch(IllegalArgumentException e) {}
+        
+        
+        ItemFilter itemFilter = converter.getFirstPassFilter(calendar, calFilter);
+        Assert.assertNotNull(itemFilter);
+        Assert.assertTrue(itemFilter instanceof NoteItemFilter);
+        NoteItemFilter noteFilter = (NoteItemFilter) itemFilter;
+      
+        Assert.assertFalse(noteFilter.getIsModification().booleanValue());
+        Assert.assertEquals(2, noteFilter.getStampFilters().size());
+        
+        StampFilter sf = noteFilter.getStampFilters().get(0);
+        Assert.assertEquals(TaskStamp.class, sf.getStampClass());
+        Assert.assertEquals(false, sf.isMissing());
+        
+        sf = noteFilter.getStampFilters().get(1);
+        Assert.assertEquals(EventStamp.class, sf.getStampClass());
+        Assert.assertEquals(true, sf.isMissing());
     }
 
 }

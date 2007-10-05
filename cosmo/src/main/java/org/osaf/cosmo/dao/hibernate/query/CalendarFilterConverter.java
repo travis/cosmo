@@ -26,9 +26,12 @@ import org.osaf.cosmo.calendar.query.PropertyFilter;
 import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
+import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.StampFilter;
 
 /**
  * Translates <code>CalendarFilter</code> into <code>ItemFilter</code>
@@ -37,6 +40,7 @@ public class CalendarFilterConverter {
     
     private static final String COMP_VCALENDAR = "VCALENDAR";
     private static final String COMP_VEVENT = "VEVENT";
+    private static final String COMP_VTODO = "VTODO";
     private static final String PROP_UID = "UID";
     private static final String PROP_DESCRIPTION = "DESCRIPTION";
     private static final String PROP_SUMMARY = "SUMMARY";
@@ -66,6 +70,43 @@ public class CalendarFilterConverter {
         }
         
         return itemFilter;
+    }
+    
+    /**
+     * Translate CalendarFilter into an ItemFilter that can be used
+     * as a first pass.  All items returned may or may not match the
+     * specified CalendarFilter.
+     * @param calendarparent calendar
+     * @param calendarFilter filter to translate
+     * @return ItemFilter that can be used as a first-pass, meaning
+     *         not all items are guaranteed to match the CalendarFilter.
+     *         Further processing is required.
+     */
+    public ItemFilter getFirstPassFilter(CollectionItem calendar, CalendarFilter calendarFilter) {
+        ComponentFilter rootFilter = calendarFilter.getFilter();
+        if(!COMP_VCALENDAR.equalsIgnoreCase(rootFilter.getName()))
+            return null;
+        
+        // only support single comp-filer
+        if(rootFilter.getComponentFilters().size()!=1)
+            return null;
+        
+        ComponentFilter compFilter = (ComponentFilter) rootFilter.getComponentFilters().get(0);
+        
+        // handle finding VTODO for now
+        if (COMP_VTODO.equalsIgnoreCase(compFilter.getName()))
+            return createFirstPassTaskFilter(calendar);
+
+        return null;
+    }
+    
+    private ItemFilter createFirstPassTaskFilter(CollectionItem collection) {
+        NoteItemFilter filter = new NoteItemFilter();
+        filter.setParent(collection);
+        filter.setIsModification(false);
+        filter.getStampFilters().add(new StampFilter(TaskStamp.class, false));
+        filter.getStampFilters().add(new StampFilter(EventStamp.class, true));
+        return filter;
     }
         
     private void handleCompFilter(ComponentFilter compFilter, NoteItemFilter itemFilter) {

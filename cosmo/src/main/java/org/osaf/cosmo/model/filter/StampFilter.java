@@ -26,6 +26,15 @@ public class StampFilter {
     private boolean isMissing = false;
     private Class stampClass = null;
     
+    public StampFilter() {
+        
+    }
+    
+    public StampFilter(Class stampClass, boolean isMissing) {
+        this.stampClass = stampClass;
+        this.isMissing = isMissing;
+    }
+    
     public boolean isMissing() {
         return isMissing;
     }

@@ -25,6 +25,7 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
@@ -147,6 +148,57 @@ public class ICalendarUtils {
             comp.getProperties().add(uid);
         }
         uid.setValue(text);
+    }
+    
+    /**
+     * Get the duration for an event.  If the DURATION property
+     * exist, use that.  Else, calculate duration from DTSTART and
+     * DTEND.
+     * @param event
+     * @return duration for event
+     */
+    public static Dur getDuration(VEvent event) {
+        Duration duration = (Duration)
+            event.getProperties().getProperty(Property.DURATION);
+        if (duration != null)
+            return duration.getDuration();
+        DtStart dtstart = event.getStartDate();
+        if (dtstart == null)
+            return null;
+        DtEnd dtend = event.getEndDate();
+        if (dtend == null)
+            return null;
+        return new Duration(dtstart.getDate(), dtend.getDate()).getDuration();
+    }
+    
+    /**
+     * Set the duration for an event.  If DTEND is present, remove it.
+     * @param event
+     * @param dur
+     */
+    public static void setDuration(VEvent event, Dur dur) {
+        Duration duration = (Duration)
+            event.getProperties().getProperty(Property.DURATION);
+        
+       
+        // remove DURATION if dur is null
+        if(dur==null) {
+            if(duration != null) 
+                event.getProperties().remove(duration);
+            return;
+        }
+        
+        // update dur on existing DURATION
+        if (duration != null)
+            duration.setDuration(dur);
+        else {
+            // remove the dtend if there was one
+            DtEnd dtend = event.getEndDate();
+            if (dtend != null)
+                event.getProperties().remove(dtend);
+            duration = new Duration(dur);
+            event.getProperties().add(duration);
+        }
     }
     
     /**

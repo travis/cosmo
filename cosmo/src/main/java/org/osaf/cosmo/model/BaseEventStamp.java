@@ -299,17 +299,7 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public Dur getDuration() {
-        Duration duration = (Duration)
-            getEvent().getProperties().getProperty(Property.DURATION);
-        if (duration != null)
-            return duration.getDuration();
-        DtStart dtstart = getEvent().getStartDate();
-        if (dtstart == null)
-            return null;
-        DtEnd dtend = getEvent().getEndDate();
-        if (dtend == null)
-            return null;
-        return new Duration(dtstart.getDate(), dtend.getDate()).getDuration();
+        return ICalendarUtils.getDuration(getEvent());
     }
 
     /** 
@@ -319,28 +309,7 @@ public abstract class BaseEventStamp extends Stamp
      */
     @Transient
     public void setDuration(Dur dur) {
-        Duration duration = (Duration)
-            getEvent().getProperties().getProperty(Property.DURATION);
-        
-       
-        // remove DURATION if dur is null
-        if(dur==null) {
-            if(duration != null) 
-                getEvent().getProperties().remove(duration);
-            return;
-        }
-        
-        // update dur on existing DURATION
-        if (duration != null)
-            duration.setDuration(dur);
-        else {
-            // remove the dtend if there was one
-            DtEnd dtend = getEvent().getEndDate();
-            if (dtend != null)
-                getEvent().getProperties().remove(dtend);
-            duration = new Duration(dur);
-            getEvent().getProperties().add(duration);
-        }
+        ICalendarUtils.setDuration(getEvent(), dur);
     }
 
     /**

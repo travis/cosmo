@@ -30,10 +30,16 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Parameter;
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.DateListProperty;
+import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtStart;
 
 import org.hibernate.annotations.Cache;
@@ -123,6 +129,10 @@ public class EventStamp extends BaseEventStamp implements
         // merge item properties to icalendar props
         mergeCalendarProperties(masterEvent, (NoteItem) getItem());
         
+        // bug 10558: remove redundant VALUE=DATE-TIME params because
+        // some clients don't like them
+        fixDateTimeProperties(masterEvent);
+        
         // bug 9606: handle displayAlarm with no trigger by not including
         // in exported icalendar
         if(masterAlarm!=null) {
@@ -149,8 +159,18 @@ public class EventStamp extends BaseEventStamp implements
             VEvent exceptionEvent = (VEvent) CalendarUtils
                     .copyComponent(exceptionStamp.getExceptionEvent());
 
+            // ensure DURATION or DTEND exists on modfication
+            if (ICalendarUtils.getDuration(exceptionEvent) == null) {
+                ICalendarUtils.setDuration(exceptionEvent, ICalendarUtils
+                        .getDuration(masterEvent));
+            }
+            
             // merge item properties to icalendar props
             mergeCalendarProperties(exceptionEvent, exception);
+            
+            // bug 10558: remove redundant VALUE=DATE-TIME params because
+            // some clients don't like them
+            fixDateTimeProperties(masterEvent);
             
             // check for inherited anyTime
             if(exceptionStamp.isAnyTime()==null) {
@@ -315,5 +335,19 @@ public class EventStamp extends BaseEventStamp implements
         
         ICalendarUtils.setSummary(note.getDisplayName(), event);
         ICalendarUtils.setDescription(note.getBody(), event);
+    }
+    
+    // Remove VALUE=DATE-TIME because it is redundant and some clients
+    // don't like when its present.
+    private void fixDateTimeProperties(VEvent event) {
+        PropertyList props = event.getProperties();
+        for(Iterator<Property> it = props.iterator(); it.hasNext();) {
+            Property prop = it.next();
+            if(prop instanceof DateProperty || prop instanceof DateListProperty) {
+                Value v = (Value) prop.getParameter(Parameter.VALUE);
+                if(v!=null && Value.DATE_TIME.equals(v))
+                    prop.getParameters().remove(v);
+            }
+        }
     }
 }

@@ -26,6 +26,7 @@ import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
@@ -69,6 +70,9 @@ public class EventStampTest extends TestCase {
         Assert.assertEquals(1, comps.size());
         VEvent event = (VEvent) comps.get(0);
         
+        // test VALUE=DATE-TIME is note present
+        Assert.assertNull(event.getStartDate().getParameter(Parameter.VALUE));
+        
         // test item properties got merged into calendar
         Assert.assertEquals("displayName", event.getSummary().getValue());
         Assert.assertEquals("body", event.getDescription().getValue());
@@ -90,6 +94,47 @@ public class EventStampTest extends TestCase {
         
         cal = eventStamp.getCalendar();
         Assert.assertEquals(2, cal.getComponents(Component.VTIMEZONE).size());
+    }
+    
+    public void testEventModificationGetCalendar() throws Exception {
+        NoteItem master = new NoteItem();
+        master.setIcalUid("icaluid");
+        EventStamp eventStamp = new EventStamp(master);
+        eventStamp.createCalendar();
+        eventStamp.setStartDate(new DateTime("20070212T074500"));
+        eventStamp.setDuration(new Dur("PT1H"));
+        DateList dates = new ICalDate(";VALUE=DATE-TIME:20070212T074500,20070213T074500").getDateList();
+        eventStamp.setRecurrenceDates(dates);
+        
+        eventStamp.getEventCalendar().validate(true);
+       
+        NoteItem mod = new NoteItem();
+        mod.setDisplayName("modDisplayName");
+        mod.setBody("modBody");
+        mod.setModifies(master);
+        master.getModifications().add(mod);
+        EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
+        mod.addStamp(exceptionStamp);
+        exceptionStamp.createCalendar();
+        exceptionStamp.setStartDate(eventStamp.getStartDate());
+        exceptionStamp.setRecurrenceId(eventStamp.getStartDate());
+
+        
+        // test modification VEVENT gets added properly
+        Calendar cal = eventStamp.getCalendar();
+        ComponentList comps = cal.getComponents(Component.VEVENT);
+        Assert.assertEquals(2, comps.size());
+        VEvent masterEvent = (VEvent) comps.get(0);
+        VEvent modEvent = (VEvent) comps.get(1);
+        
+        // test merged properties
+        Assert.assertEquals("modDisplayName", modEvent.getSummary().getValue());
+        Assert.assertEquals("modBody", modEvent.getDescription().getValue());
+        Assert.assertEquals("icaluid", modEvent.getUid().getValue());
+        
+        // test duration got added to modfication
+        Assert.assertNotNull(modEvent.getDuration());
+        Assert.assertEquals("PT1H", modEvent.getDuration().getDuration().toString());
     }
     
     public void testInheritedAlarm() throws Exception {
@@ -121,7 +166,6 @@ public class EventStampTest extends TestCase {
         exceptionStamp.creatDisplayAlarm();
         exceptionStamp.setStartDate(date);
         exceptionStamp.setRecurrenceId(date);
-
         
         // test inherited alarm
         Calendar cal = eventStamp.getCalendar();
@@ -129,12 +173,7 @@ public class EventStampTest extends TestCase {
         Assert.assertEquals(2, comps.size());
         VEvent masterEvent = (VEvent) comps.get(0);
         VEvent modEvent = (VEvent) comps.get(1);
-        
-        // test merged properties
-        Assert.assertEquals("modDisplayName", modEvent.getSummary().getValue());
-        Assert.assertEquals("modBody", modEvent.getDescription().getValue());
-        Assert.assertEquals("icaluid", modEvent.getUid().getValue());
-        
+      
         // test inherited alarm
         VAlarm masterAlarm = (VAlarm) masterEvent.getAlarms().get(0);
         VAlarm modAlarm = (VAlarm) modEvent.getAlarms().get(0);

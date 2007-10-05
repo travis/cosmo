@@ -117,7 +117,7 @@ public class DavUserPrincipal extends DavResourceBase
     // Jackrabbit DavResource
 
     public String getSupportedMethods() {
-        return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH";
+        return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH, REPORT";
     }
 
     public boolean isCollection() {

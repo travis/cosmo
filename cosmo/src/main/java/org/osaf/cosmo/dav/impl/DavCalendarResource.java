@@ -81,6 +81,10 @@ public abstract class DavCalendarResource extends DavContentBase
        
     // DavResource methods
 
+    public String getSupportedMethods() {
+        return "OPTIONS, GET, HEAD, POST, TRACE, PROPFIND, PROPPATCH, COPY, PUT, DELETE, MOVE, MKTICKET, DELTICKET, REPORT";
+    }
+
     /** */
     public void move(DavResource destination)
         throws org.apache.jackrabbit.webdav.DavException {

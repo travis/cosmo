@@ -501,6 +501,8 @@ public abstract class BaseItemFeedGenerator
         }
 
         String iri = TEMPLATE_DETACHED.bind(masterUid, occurrenceUid);
+        // relativize
+        iri = iri.substring(1);
 
         if (getProjection() != null) {
             StringBuffer buf = new StringBuffer(iri);

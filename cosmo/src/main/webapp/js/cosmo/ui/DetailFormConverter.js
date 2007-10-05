@@ -318,7 +318,15 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 errMsg += '"Starts" and "Ends" time fields: ';
                 errMsg += 'Event cannot end before it starts.';
                 errMsg += '<br/>';                
-            }    
+            }
+            var rrule = eventStampProperties.rrule;
+            if (rrule && rrule.getEndDate()){
+                if (rrule.getEndDate().before(eventStampProperties.startDate)){
+                    errMsg += _("App.Error.RecurEnd") + "<br>";
+                }
+            }
+
+            
         }
         
         return errMsg;

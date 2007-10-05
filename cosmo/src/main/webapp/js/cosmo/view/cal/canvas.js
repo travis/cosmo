@@ -894,7 +894,7 @@ cosmo.view.cal.canvas = new function () {
      * @param val CalItem object, the value in the Hash
      */
     function positionLozenge(key, val) {
-        ev = val;
+        var ev = val;
         ev.lozenge.updateFromEvent(ev);
         ev.lozenge.updateDisplayMain();
     }
@@ -1157,7 +1157,7 @@ cosmo.view.cal.canvas = new function () {
             case recurOpts.ALL_EVENTS:
                 reg = cosmo.view.cal.itemRegistry.clone();
                 reg = self.view.filterOutRecurrenceGroup(
-                    reg, [ev.data.getUid()]);
+                    reg, [item.data.getUid()]);
                 removeAllEventsFromDisplay();
                 cosmo.view.cal.itemRegistry = reg;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);
@@ -1165,8 +1165,8 @@ cosmo.view.cal.canvas = new function () {
             case recurOpts.ALL_FUTURE_EVENTS:
                 reg = cosmo.view.cal.itemRegistry.clone();
                 reg = self.view.filterOutRecurrenceGroup(
-                    reg, [ev.data.getUid()],
-                    ev.data.getEventStamp().getRrule().getEndDate());
+                    reg, [item.data.getUid()],
+                    item.data.getEventStamp().getRrule().getEndDate());
                 removeAllEventsFromDisplay();
                 cosmo.view.cal.itemRegistry = reg;
                 cosmo.view.cal.itemRegistry.each(appendLozenge);

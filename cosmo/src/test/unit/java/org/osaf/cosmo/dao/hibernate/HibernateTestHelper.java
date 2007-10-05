@@ -63,8 +63,8 @@ public class HibernateTestHelper {
         for (Iterator it = item1.getAttributes().keySet().iterator(); it
                 .hasNext();) {
             QName key = (QName) it.next();
-            Object val1 = item1.getAttributeValue(key.getLocalName());
-            Object val2 = item2.getAttributeValue(key.getLocalName());
+            Object val1 = item1.getAttributeValue(key);
+            Object val2 = item2.getAttributeValue(key);
             verifyAttributeValue(val1, val2);
         }
 

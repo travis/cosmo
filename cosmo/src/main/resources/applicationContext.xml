@@ -99,6 +99,7 @@
         <list>
             <value>org.osaf.cosmo.model.Attribute</value>
             <value>org.osaf.cosmo.model.AttributeTombstone</value>
+            <value>org.osaf.cosmo.model.AvailabilityItem</value>
             <value>org.osaf.cosmo.model.BaseEventStamp</value>
             <value>org.osaf.cosmo.model.BinaryAttribute</value>
             <value>org.osaf.cosmo.model.BooleanAttribute</value>

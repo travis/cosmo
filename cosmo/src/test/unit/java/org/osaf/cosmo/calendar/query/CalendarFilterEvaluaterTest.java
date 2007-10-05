@@ -30,6 +30,14 @@ import net.fortuna.ical4j.model.Period;
 public class CalendarFilterEvaluaterTest extends TestCase {
     protected String baseDir = "src/test/unit/resources/testdata/";
     
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        System.setProperty("ical4j.unfolding.relaxed", "true");
+        System.setProperty("ical4j.parsing.relaxed", "true");
+        System.setProperty("ical4j.validation.relaxed", "true");
+    }
+
     public void testEvaluateFilterPropFilter() throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
         FileInputStream fis = new FileInputStream(baseDir + "cal1.ics");
@@ -466,5 +474,20 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         Assert.assertFalse(evaluater.evaluate(calendar1, filter));
         Assert.assertFalse(evaluater.evaluate(calendar2, filter));
         
+    }
+    
+    public void testEvaluateVAvailabilityFilter() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "vavailability.ics");
+        CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+        Calendar calendar = cb.build(fis);
+        
+        CalendarFilter filter = new CalendarFilter();
+        ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
+        ComponentFilter vfbFilter = new ComponentFilter("VAVAILABILITY");
+        filter.setFilter(compFilter);
+        compFilter.getComponentFilters().add(vfbFilter);
+        
+        Assert.assertTrue(evaluater.evaluate(calendar, filter));
     }
 }

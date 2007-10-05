@@ -32,12 +32,14 @@ import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.caldav.SupportedCalendarComponentException;
+import org.osaf.cosmo.dav.impl.DavAvailability;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavFreeBusy;
 import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
 import org.osaf.cosmo.dav.io.DavInputContext;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 
 /**
  * <p>
@@ -91,6 +93,8 @@ public class CalendarResourceProvider extends FileProvider {
             return new DavJournal(locator, getResourceFactory());
         if (original instanceof DavFreeBusy)
             return new DavFreeBusy(locator, getResourceFactory());
+        if (original instanceof DavAvailability)
+            return new DavAvailability(locator, getResourceFactory());
         return new DavEvent(locator, getResourceFactory());
     }
 
@@ -99,14 +103,17 @@ public class CalendarResourceProvider extends FileProvider {
                                                 DavResourceLocator locator,
                                                 Calendar calendar)
         throws DavException {
-        if (! calendar.getComponents(Component.VEVENT).isEmpty())
+        if (!calendar.getComponents(Component.VEVENT).isEmpty())
             return new DavEvent(locator, getResourceFactory());
-        if (! calendar.getComponents(Component.VTODO).isEmpty())
+        if (!calendar.getComponents(Component.VTODO).isEmpty())
             return new DavTask(locator, getResourceFactory());
-        if (! calendar.getComponents(Component.VJOURNAL).isEmpty())
+        if (!calendar.getComponents(Component.VJOURNAL).isEmpty())
             return new DavJournal(locator, getResourceFactory());
-        if (! calendar.getComponents(Component.VFREEBUSY).isEmpty())
+        if (!calendar.getComponents(Component.VFREEBUSY).isEmpty())
             return new DavFreeBusy(locator, getResourceFactory());
+        if (!calendar.getComponents(ICalendarConstants.COMPONENT_VAVAILABLITY)
+                .isEmpty())
+            return new DavAvailability(locator, getResourceFactory());
         throw new SupportedCalendarComponentException();
   }
 }

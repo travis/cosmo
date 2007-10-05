@@ -28,6 +28,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.property.ProdId;
 
 import org.dom4j.Document;
@@ -39,11 +40,13 @@ import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AttributeTombstone;
+import org.osaf.cosmo.model.AvailabilityItem;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
 import org.osaf.cosmo.model.FileItem;
+import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ICalendarAttribute;
 import org.osaf.cosmo.model.IcalUidInUseException;
@@ -1275,6 +1278,65 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(1, queryItem.getAttributes().size());
         Assert.assertEquals(0, queryItem.getTombstones().size());
+    }
+    
+    public void testContentDaoCreateFreeBusy() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        FreeBusyItem newItem = new FreeBusyItem();
+        newItem.setOwner(user);
+        newItem.setName("test");
+        newItem.setIcalUid("icaluid");
+        
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "/vfreebusy.ics");
+        net.fortuna.ical4j.model.Calendar calendar = cb.build(fis);
+        
+        newItem.setFreeBusyCalendar(calendar);
+        
+        newItem = (FreeBusyItem) contentDao.createContent(root, newItem);
+
+        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(newItem.getUid() != null);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        helper.verifyItem(newItem, queryItem);
+    }
+    
+    public void testContentDaoCreateAvailability() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        AvailabilityItem newItem = new AvailabilityItem();
+        newItem.setOwner(user);
+        newItem.setName("test");
+        newItem.setIcalUid("icaluid");
+        
+        // get ical4j to parse VAVAILABILITY
+        System.setProperty("ical4j.unfolding.relaxed", "true");
+        System.setProperty("ical4j.parsing.relaxed", "true");
+        System.setProperty("ical4j.validation.relaxed", "true");
+        
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "/vavailability.ics");
+        net.fortuna.ical4j.model.Calendar calendar = cb.build(fis);
+        
+        newItem.setAvailabilityCalendar(calendar);
+        
+        newItem = (AvailabilityItem) contentDao.createContent(root, newItem);
+
+        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(newItem.getUid() != null);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+
+        helper.verifyItem(newItem, queryItem);
     }
     
     private void verifyTicket(Ticket ticket1, Ticket ticket2) {

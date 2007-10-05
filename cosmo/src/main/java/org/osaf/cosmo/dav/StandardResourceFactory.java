@@ -27,6 +27,7 @@ import org.osaf.cosmo.dav.ExtendedDavConstants;
 import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
+import org.osaf.cosmo.dav.impl.DavAvailability;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 import org.osaf.cosmo.dav.impl.DavEvent;
@@ -35,6 +36,7 @@ import org.osaf.cosmo.dav.impl.DavFreeBusy;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
+import org.osaf.cosmo.model.AvailabilityItem;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -193,6 +195,8 @@ public class StandardResourceFactory
         
         if(item instanceof FreeBusyItem)
             return new DavFreeBusy((FreeBusyItem) item, locator, this);
+        if(item instanceof AvailabilityItem)
+            return new DavAvailability((AvailabilityItem) item, locator, this);
 
         return new DavFile((FileItem) item, locator, this);
     }

@@ -67,7 +67,7 @@ public class FreeBusyValidator implements Validator<FreeBusy>, Serializable {
             return true;
             
         } catch(ValidationException ve) {
-            log.warn("task validation error", ve);
+            log.warn("freebusy validation error", ve);
             if(calendar!=null) {
                 log.warn("error validating freebusy: " + calendar.toString() );
             }
@@ -79,7 +79,7 @@ public class FreeBusyValidator implements Validator<FreeBusy>, Serializable {
         } catch(ParserException e) {
             log.warn("parse error", e);
             if(calendar!=null) {
-                log.warn("error parsing journal: " + calendar.toString() );
+                log.warn("error parsing freebusy: " + calendar.toString() );
             }
             return false;
         }

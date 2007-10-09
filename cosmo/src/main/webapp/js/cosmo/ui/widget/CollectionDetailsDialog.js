@@ -243,7 +243,7 @@ dojo.widget.HtmlWidget, function(){
             var url =  this.protocolUrls[this.clientsToProtocols[client]];
             if (client == "iCal"){
                 if (this.httpSupported){
-                    url = url.replace("https", "http")#.replace(":443", "");
+                    url = url.replace("https", "http").replace(":443", "");
                 } else {
                     url = _("Main.CollectionDetails.na");
                 }

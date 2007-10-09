@@ -2,6 +2,7 @@
 DOJO_VERSION="release-0.4.3"
 if [ ! -d "$DOJO_VERSION" ]; then
     svn co http://svn.dojotoolkit.org/dojo/tags/$DOJO_VERSION
+    curl http://svn.dojotoolkit.org/dojo/branches/0.4/src/query.js > $DOJO_VERSION/src/
     cd $DOJO_VERSION/buildscripts
     ant fix-config
 fi

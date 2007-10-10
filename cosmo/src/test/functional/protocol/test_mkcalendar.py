@@ -55,13 +55,7 @@ def test_mkcalendar_invalid_timezone():
     body = open(FILES_DIR+'mkcalendar/invalidTimezone.xml').read()
     client._request('MKCALENDAR', '%s/%s' % (PRINCIPAL_DAV_PATH, str(random.random()).replace('.', '')), body=body, headers={ 'Content-Type': 'text/xml'})
     assert client.response.status == 207
-    for propstat_element in client.response.tree.find('{DAV:}response').findall('{DAV:}propstat'):
-        if propstat_element.find('{DAV:}prop').find('{DAV:}displayname') is not None:
-            assert propstat_element.find('{DAV:}status').text == 'HTTP/1.1 424 Failed Dependency'
-        elif propstat_element.find('{DAV:}prop').find('{urn:ietf:params:xml:ns:caldav}calendar-timezone') is not None:
-            assert propstat_element.find('{DAV:}status').text == 'HTTP/1.1 400 Bad Request'
-        else:
-            assert False, 'extra propstat element'
+    assert client.response.body.find('<D:responsedescription>Calendar object not parseable: Error at line 22') is not -1
 
 def test_mkcalendar_valid_no_body():
     client._request('MKCALENDAR', '%s/%s' % (PRINCIPAL_DAV_PATH, str(random.random()).replace('.', '')), body=None)

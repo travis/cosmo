@@ -168,12 +168,12 @@ def test_timerangequery_three_in_eastern():
 def test_timerangequery_invalid_not_utc_1():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC1.xml').read()
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Content-Type':'text/xml', 'Depth': '1' })
-    assert client.response.status == 400
+    assert client.response.status == 403
     
 def test_timerangequery_invalid_not_utc_2():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC2.xml').read()
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Content-Type':'text/xml', 'Depth': '1' })
-    assert client.response.status == 400
+    assert client.response.status == 403
 
 def test_timerangequery_invalid_not_utc_3():
     body = open(FILES_DIR+'reports/timerangequery/invalid_nonUTC3.xml').read()

@@ -13,10 +13,11 @@
 #   limitations under the License.
 
 import cosmoclient
+import functest
 import random, uuid, os, sys
 from uuid import uuid1
 
-SERVER_URL = 'http://qacosmo.osafoundation.org'
+SERVER_URL = functest.registry.get('url', 'http://qacosmo.osafoundation.org')
 ADMIN_USER = 'root'
 ADMIN_PASS = 'cosmo'
 PRINCIPAL_ROOT = '/dav'
@@ -40,6 +41,10 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     module.FILES_DIR = FILES_DIR
     
     #Setup client and users
+    path = functest.registry.get('path', '/')
+    cosmoclient.CosmoClient._cosmo_path = path
+    cosmoclient.CosmoClient._cmp_path = path+'cmp'
+    
     client = cosmoclient.CosmoClient(module.SERVER_URL)
     client.set_basic_auth(module.ADMIN_USER, module.ADMIN_PASS)
     module.client = client

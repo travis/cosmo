@@ -141,7 +141,7 @@ END:VEVENT
 END:VCALENDAR"""
     
     client.put('%s/%s/status1.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
-    assert client.response.status == 201
+    assert client.response.status == 403 # Not support for VEVENT
     
     ics = """BEGIN:VCALENDAR
 CALSCALE:GREGORIAN
@@ -156,7 +156,7 @@ END:VTODO
 END:VCALENDAR"""
 
     client.put('%s/%s/status2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
-    assert client.response.status == 201
+    assert client.response.status == 201 # Is supported for VTODO
     
 def test_sunbird_allday():
     

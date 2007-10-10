@@ -102,7 +102,7 @@ def test_freebusy():
 def test_invalid_nosubcomp():
     body = open(FILES_DIR+'reports/invalid/noSubComp.xml').read()
     client._request('REPORT', '%s/%s' % (PRINCIPAL_DAV_PATH, CALENDAR), body=body, headers={ 'Content-Type': 'text/xml', 'Depth': '1' })
-    assert client.response.status == 400
+    assert client.response.status == 403
     
 def test_limitexpand_1():
     body = open(FILES_DIR+'reports/limitexpand/1.xml').read()

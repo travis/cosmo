@@ -52,9 +52,11 @@ def test_view_user():
 #     assert client.response.body.find('new_new_email@fake.com') is not -1
     
 def test_delete_user():
-    client.add_user('test_delete_user', 'test_pass', 'Test', 'Name', 'me@blah.com')
+    import uuid
+    name = str(uuid.uuid1()).replace('-', '')
+    client.add_user(name, 'test_pass', 'Test', 'Name', name+'@blah.com')
     assert client.response.status == 201
-    client.remove_user('test_delete_user')
+    client.remove_user(name)
     assert client.response.status == 204
 
 def test_administrator_tag():

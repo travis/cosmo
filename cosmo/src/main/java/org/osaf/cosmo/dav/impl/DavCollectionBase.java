@@ -162,7 +162,10 @@ public class DavCollectionBase extends DavItemResourceBase
         Item item = ((DavItemResource)member).getItem();
 
         try {
-            getContentService().removeItemFromCollection(item, collection);
+            if(item instanceof CollectionItem)
+                getContentService().removeCollection((CollectionItem) item);
+            else
+                getContentService().removeItemFromCollection(item, collection);
         } catch (CollectionLockedException e) {
             throw new LockedException();
         }

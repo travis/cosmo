@@ -1016,7 +1016,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 // their parents' anyTime.
                 if (properties.anyTime) properties.allDay = false;
                 if (properties.allDay) properties.anyTime = false;
-                if (record.fields.lastPastOccurrence) {
+                if (record.fields.lastPastOccurrence &&
+                    record.fields.lastPastOccurrence[1]) {
                     properties.lastPastOccurrence = this.fromEimDate(record.fields.lastPastOccurrence[1]);
                     properties.lastPastOccurrence.tzId = properties.startDate.tzId;
                 }

@@ -270,6 +270,7 @@ cosmotest.service.translators.test_eim = {
                                "exrule":["text",props.exrule || null],
                                "rdate":["text", props.rdate || null],
                                "exdate":["text", props.exdate || null],
+                               "lastPastOccurrence":["text", props.lastPastOccurrence || null],
                                "status":["text", props.status || null]}}}};
         return recordSet;
         

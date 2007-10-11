@@ -35,7 +35,6 @@ public class ApplicationEntryController extends MultiActionController {
 
     public ModelAndView login(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
         if (securityManager.getSecurityContext().getUser() == null){
             return new ModelAndView(loginView);
         } else {

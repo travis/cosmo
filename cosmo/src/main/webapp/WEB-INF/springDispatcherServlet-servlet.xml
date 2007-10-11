@@ -42,8 +42,7 @@
     </property> 
 </bean> 
 
-<bean id="exceptionHandler"
-  class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+<bean id="exceptionHandler" class="org.osaf.cosmo.ui.ExceptionResolver">
     <property name="exceptionMappings">
        <value>
           org.osaf.cosmo.security.PermissionDeniedException=error_forbidden

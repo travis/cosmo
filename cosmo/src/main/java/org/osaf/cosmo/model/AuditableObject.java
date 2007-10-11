@@ -31,17 +31,9 @@ import org.hibernate.annotations.Type;
 @MappedSuperclass
 public abstract class AuditableObject extends BaseModelObject {
 
-    private static final MessageDigest etagDigest;
+    private static final ThreadLocal<MessageDigest> etagDigestLocal = new ThreadLocal<MessageDigest>();
     private static final Base64 etagEncoder = new Base64();
-
-    static {
-        try {
-            etagDigest = MessageDigest.getInstance("sha1");
-        } catch (Exception e) {
-            throw new RuntimeException("Platform does not support sha1?", e);
-        }
-    }
-
+    
     private Date creationDate;
     private Date modifiedDate;
     private String etag = "";
@@ -125,7 +117,22 @@ public abstract class AuditableObject extends BaseModelObject {
      * Returns a Base64-encoded SHA-1 digest of the provided bytes.
      * </p>
      */
-    protected String encodeEntityTag(byte[] bytes) {
-        return new String(etagEncoder.encode(etagDigest.digest(bytes)));
+    protected static String encodeEntityTag(byte[] bytes) {
+        
+        // Use MessageDigest stored in threadlocal so that each
+        // thread has its own instance.
+        MessageDigest md = etagDigestLocal.get();
+        
+        if(md==null) {
+            try {
+                // initialize threadlocal
+                md = MessageDigest.getInstance("sha1");
+                etagDigestLocal.set(md);
+            } catch (Exception e) {
+                throw new RuntimeException("Platform does not support sha1?", e);
+            }
+        }
+        
+        return new String(etagEncoder.encode(md.digest(bytes)));
     }
 }

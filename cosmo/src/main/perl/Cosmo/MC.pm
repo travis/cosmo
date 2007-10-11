@@ -35,6 +35,28 @@ sub new {
     return bless $self, $class;
 }
 
+sub discover {
+    my $self = shift;
+
+    my $url = $self->user_url();
+
+    my $req = HTTP::Request->new(GET => $url);
+    print $req->as_string . "\n" if $self->{debug};
+
+    my $res = $self->request($req);
+    print $res->as_string . "\n" if $self->{debug};
+
+    if (! $res->is_success) {
+        die "Bad username or password\n" if $res->code == 401;
+        die $res->status_line . "\n";
+    }
+
+    warn "Success code " . $res->code . " not recognized\n"
+        unless $res->code == 200;
+
+    return $res;
+}
+
 sub publish {
     my $self = shift;
     my $uuid = shift;
@@ -201,6 +223,12 @@ sub mc_url {
     my $self = shift;
 
     return sprintf("%s/mc", $self->server_url);
+}
+
+sub user_url {
+    my $self = shift;
+
+    return sprintf("%s/user/%s", $self->mc_url, $self->{username});
 }
 
 sub collection_url {

@@ -23,7 +23,7 @@ use Getopt::Long ();
 
 BEGIN { $0 = File::Basename::basename($0) }
 
-use constant VERSION => '0.02';
+use constant VERSION => '0.03';
 use constant PROGRAM => $0;
 use constant USAGE => <<EOT;
 Usage: $0 [OPTIONS...] -u [username] -p [password]
@@ -31,7 +31,7 @@ Usage: $0 [OPTIONS...] -u [username] -p [password]
 An interactive command shell for interacting with Cosmo over Morse Code.
 
 Options:
-  -s [url]         server root URL (defaults to http://localhost:8080)
+  -s [url]         server root URL (defaults to http://localhost:8080/chandler)
   -u [username]    username of user making the request
   -p [password]    password of user making the request
   -i [uuid]         uuid of the working collection
@@ -42,7 +42,7 @@ Options:
 Report bugs to cosmo-dev\@osafoundation.org
 EOT
 
-use constant DEFAULT_SERVER_URL => 'http://localhost:8080/cosmo';
+use constant DEFAULT_SERVER_URL => 'http://localhost:8080/chandler';
 
 my ($ServerUrl, $Username, $Password, $Ticket, $Uuid, $Debug);
 my ($opt_help, $opt_version);
@@ -148,6 +148,32 @@ sub run_token {
 sub help_token { "Displays the working sync token.\n" }
 sub smry_token { "get the working sync token" }
 
+sub run_discover {
+    my $self = shift;
+
+    do {
+        print "Cannot discover collections using a ticket.\n";
+        return;
+    } if $self->{mc}->ticket();
+
+    warn "Discovering collections.\n" if $self->{debug};
+    my $response = eval { $self->{mc}->discover(); };
+    if ($@) {
+        print "Failed: $@\n";
+        return;
+    }
+
+    my $xpath = XML::XPath->new(xml => $response->content());
+    my $collections = $xpath->findnodes('/service/collection');
+
+    print "Collections:\n";
+    for my $collection ($collections->get_nodelist) {
+        print "\t", $collection->getAttribute('uuid'), "\n";
+    }
+}
+sub help_discover { "Lists the available collections.\n" }
+sub smry_discover { "list the available collections" }
+
 sub run_subscribe {
     my $self = shift;
 
@@ -173,7 +199,7 @@ sub run_subscribe {
                       $response->{ticket_type});
     }
 }
-sub help_subscribe { "Subscribes to the wrrking collection.\n" }
+sub help_subscribe { "Subscribes to the working collection.\n" }
 sub smry_subscribe { "subscribe to the working collection" }
 
 sub run_synchronize {

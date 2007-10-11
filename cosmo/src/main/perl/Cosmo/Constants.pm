@@ -23,7 +23,7 @@ use constant URL_NS_CMP => "/cmp";
 use constant URL_NS_CMP_USER => URL_NS_CMP . "/user";
 use constant URL_NS_MC => "/mc";
 use constant URL_NS_REPOSITORY => "/home";
-use constant REALM => "Cosmo Sharing Server";
+use constant REALM => "Chandler Server";
 use constant MEDIA_TYPE_EIMML => "application/eim+xml";
 
 1;

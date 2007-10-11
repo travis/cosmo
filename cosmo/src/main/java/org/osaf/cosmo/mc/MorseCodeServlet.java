@@ -120,6 +120,17 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
 
     // HttpServlet methods
 
+    protected void service(HttpServletRequest req,
+                           HttpServletResponse res)
+        throws ServletException, IOException {
+        try {
+            super.service(req, res);
+        } catch (Throwable e) {
+            log.error("Internal Morse Code error", e);
+            res.sendError(500, "Internal Morse Code error: " + e.getMessage());
+        }
+    }
+
     /**
      * Handles delete requests.
      */

@@ -132,7 +132,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         event = (EventStamp) queryItem.getStamp(EventStamp.class);
         Assert.assertEquals("20070101", event.getTimeRangeIndex().getDateStart());
         Assert.assertEquals("20070101",event.getTimeRangeIndex().getDateEnd());
-        Assert.assertFalse(event.getTimeRangeIndex().getIsFloating().booleanValue());
+        Assert.assertTrue(event.getTimeRangeIndex().getIsFloating().booleanValue());
     }
     
     public void testStampsUpdate() throws Exception {

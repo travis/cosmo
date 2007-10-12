@@ -85,11 +85,17 @@ public class EventStampIndexItemListener extends EmptyItemListener {
         if(startDate==null)
             return;
         
-        // A floating date is a DateTime with no timezone
+        // A floating date is a DateTime with no timezone, or
+        // a Date
         if(startDate instanceof DateTime) {
             DateTime dtStart = (DateTime) startDate;
             if(dtStart.getTimeZone()==null && !dtStart.isUtc())
                 isFloating = true;
+        } else {
+            // Date instances are really floating because you can't pin
+            // the a date like 20070101 to an instant without first
+            // knowing the timezone
+            isFloating = true;
         }
         
         EventTimeRangeIndex timeRangeIndex = new EventTimeRangeIndex();

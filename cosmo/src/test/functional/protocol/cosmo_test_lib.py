@@ -20,7 +20,10 @@ from uuid import uuid1
 SERVER_URL = functest.registry.get('url', 'http://qacosmo.osafoundation.org')
 ADMIN_USER = 'root'
 ADMIN_PASS = 'cosmo'
-PRINCIPAL_ROOT = '/dav'
+PATH = functest.registry.get('path', '/')
+if not PATH.endswith('/'):
+    PATH += '/'
+PRINCIPAL_ROOT = PATH+'dav'
 FILES_DIR =  os.path.dirname(os.path.abspath(sys.modules[__name__].__file__))+'/files/'
 
 TEST_USER_PREFIX = 'test_user_'
@@ -41,7 +44,7 @@ def setup_module(module, server_url=SERVER_URL, admin_user=ADMIN_USER, admin_pas
     module.FILES_DIR = FILES_DIR
     
     #Setup client and users
-    path = functest.registry.get('path', '/')
+    path = PATH
     cosmoclient.CosmoClient._cosmo_path = path
     cosmoclient.CosmoClient._cmp_path = path+'cmp'
     

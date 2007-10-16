@@ -271,10 +271,6 @@ public abstract class BaseProvider extends AbstractProvider
              rc.setLastModified(auditable.getModifiedDate());
          }
 
-         // override Abdera which sets content type to include the
-         // type attribute because IE chokes on it
-         rc.setContentType(Constants.ATOM_MEDIA_TYPE);
-
          return rc;
     }
 
@@ -288,10 +284,6 @@ public abstract class BaseProvider extends AbstractProvider
             rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
             rc.setLastModified(auditable.getModifiedDate());
         }
-
-        // override Abdera which sets content type to include the
-        // type attribute because IE chokes on it
-        rc.setContentType(Constants.ATOM_MEDIA_TYPE);
 
         try {
             String location = locator.getAtomBase() +
@@ -327,10 +319,6 @@ public abstract class BaseProvider extends AbstractProvider
             rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
             rc.setLastModified(auditable.getModifiedDate());
         }
-
-        // override Abdera which sets content type to include the
-        // type attribute because IE chokes on it
-        rc.setContentType(Constants.ATOM_MEDIA_TYPE);
 
         if (locationChanged) {
             try {

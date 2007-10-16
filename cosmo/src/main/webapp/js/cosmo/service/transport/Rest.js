@@ -137,14 +137,6 @@ dojo.declare("cosmo.service.transport.Rest", null,
                         deferredRequestHandler.errback(err);
                     } else {
                         obj = xhr.responseXML || obj;
-                        if (dojo.render.html.ie) {
-                            var response = xhr.responseText;
-                            response = response.replace(/xmlns:xml.*=".*"/, "");
-                            obj = new ActiveXObject("Microsoft.XMLDOM");
-                            if (!obj.loadXML(response)){
-                               dojo.debug(obj.parseError.reason + " on line " + obj.parseError.line+ " at char " + obj.parseError.linepos)
-                            }
-                        }
                         deferredRequestHandler.callback(obj, xhr);
                     }
                 }

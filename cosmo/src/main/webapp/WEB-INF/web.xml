@@ -147,6 +147,10 @@
   	<filter-class>org.osaf.cosmo.filters.UsernameRequestIntegrationFilter</filter-class>
   </filter>
   <filter>
+  	<filter-name>client-hacks-filter</filter-name>
+  	<filter-class>org.osaf.cosmo.filters.ClientBugAccommodationFilter</filter-class>
+  </filter>
+  <filter>
   	<filter-name>http-override</filter-name>
   	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
   </filter>
@@ -192,6 +196,10 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>deadlock-retry-filter</filter-name>
+    <url-pattern>/atom/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>client-hacks-filter</filter-name>
     <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>

@@ -71,6 +71,10 @@ dojo.declare("cosmo.model.Delta", null, {
         this._deletedStamps[stampName] = true;
     },
     
+    getNote: function(){
+        return this._note;  
+    },
+
     hasChanges: function(){
         if (!this._isEmpty(this._propertyProps)){
             return true;

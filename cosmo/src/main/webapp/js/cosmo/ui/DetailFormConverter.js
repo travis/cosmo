@@ -321,7 +321,9 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             }
             var rrule = eventStampProperties.rrule;
             if (rrule && rrule.getEndDate()){
-                if (rrule.getEndDate().before(eventStampProperties.startDate)){
+                if (rrule.getEndDate()
+                    .before(delta.getNote().getMaster()
+                            .getEventStamp().getStartDate())){
                     errMsg += _("App.Error.RecurEnd") + "<br>";
                 }
             }

@@ -6,6 +6,8 @@ if [ ! -d "$DOJO_VERSION" ]; then
     patch -p0 < ../../0.4.3-buildUtil.js.patch
     ant fix-config
 fi
+cp cosmo-pim.js $DOJO_VERSION/src/
+cp cosmo-login.js $DOJO_VERSION/src/
 cd $DOJO_VERSION/buildscripts
 if [ "$1" == "release" ]; then
     ant -Ddocless=true -Dprofile=../../../cosmo clean release

@@ -1,15 +1,40 @@
+// pull in the dependency list and define it in the var "dependencies". This
+// over-rides the default built into getDependencyList.js. The bootstrap and
+// hostenv files are included by default and don't need to be included here,
+// but you can change the hostenv file that's included by setting the value of
+// the variable "hostenvType" (defaults to "browser").
 var dependencies = [
-    "cosmo.app",
-    "cosmo.app.pim", 
-    "cosmo.ui.global_css",
-    "cosmo.ui.event.listeners",
-    "dojo.debug.console",
-    "dojo.logging.ConsoleLogger",
-    "dojo.logging.Logger",
-    "cosmo.ui.widget.Debug",
-    "cosmo.datetime.timezone.LazyCachingTimezoneRegistry"
+//    "cosmo.app",
+//    "cosmo.ui.global_css",
+//    "dojo.debug.console",
+//    "dojo.logging.ConsoleLogger",
+//    "dojo.logging.Logger",
+//    "cosmo.ui.widget.Debug",
+//    "cosmo.datetime.timezone.LazyCachingTimezoneRegistry"
 ];
 
+dependencies.layers = [
+	{
+		name: "src/cosmo-login.js",
+		resourceName: "dojo.cosmo-login",
+		layerDependencies: [
+			"dojo.js"
+		],
+		dependencies: [
+			"dojo.cosmo-login"
+		]
+	},
+    {
+		name: "src/cosmo-pim.js",
+		resourceName: "dojo.cosmo-pim",
+		layerDependencies: [
+			"dojo.js"
+		],
+		dependencies: [
+			"dojo.cosmo-pim"
+		]
+	}
+];
 dependencies.prefixes = [
    ["cosmo", "../../cosmo/src/main/webapp/js/cosmo"]
 ];

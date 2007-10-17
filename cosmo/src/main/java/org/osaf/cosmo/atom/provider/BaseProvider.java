@@ -404,7 +404,13 @@ public abstract class BaseProvider extends AbstractProvider
             rc.setStatus(status);
         if (reason != null)
             rc.setStatusText(reason);
-
+        
+        // Cosmo data is sufficiently dynamic that clients
+        // should always revalidate with the server rather than caching.
+        rc.setMaxAge(0);
+        rc.setMustRevalidate(true);
+        rc.setExpires(new java.util.Date());
+        
         return rc;
     }
 }

@@ -158,6 +158,23 @@ END:VCALENDAR"""
     client.put('%s/%s/status2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201 # Is supported for VTODO
     
+def test_vjournal():
+    ics = """BEGIN:VCALENDAR
+PRODID:-//Open Source Applications Foundation//NONSGML Chandler Server//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+BEGIN:VJOURNAL
+DTSTAMP:20071018T030257Z
+UID:d6587dcd-3e58-4895-b0e5-db5dba60d04d
+SUMMARY:TestNote
+DESCRIPTION:
+END:VJOURNAL
+END:VCALENDAR
+"""
+    client.put('/'.join([PRINCIPAL_DAV_PATH, CALENDAR, 'vjournal_test.ics']), 
+               body=ics, headers={ 'Content-Type': 'text/calendar'})
+    assert client.response.status == 201
+    
 def test_sunbird_allday():
     
     ics = """BEGIN:VCALENDAR
@@ -238,9 +255,39 @@ END:VCALENDAR"""
     client.put('%s/%s/sunbird2.ics' % (PRINCIPAL_DAV_PATH, CALENDAR), body=ics, headers={ 'Content-Type': 'text/calendar'})
     assert client.response.status == 201
 
+myprop_ics = """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//Apple Computer\, Inc//iCal 3.0//EN
+BEGIN:VEVENT
+SUMMARY:New Event
+MYSTATUS;MYPROP=foobar:NEEDS-ACTION
+DTEND:20060709T143000
+DTSTART:20060709T133000
+DTSTAMP:20060710T225223Z
+UID:95C0F1E7-F691-42DD-8889-4E0Basdfasdf-3
+END:VEVENT
+END:VCALENDAR"""
+
+def test_unknown_property():
+    client.put('/'.join([PRINCIPAL_DAV_PATH, CALENDAR, 'myprop.ics']), body=myprop_ics, 
+               headers={ 'Content-Type': 'text/calendar'})
+    assert client.response.status == 201
+
+vavail_bad_comp = """BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//Apple Computer\, Inc//iCal 3.0//EN
+BEGIN:VAVAILABILTY
+BOGUS:BOGUS
+END:VAVAILABIILITY
+END:VCALENDAR"""
     
-    
-    
+def test_vavailability_bad_comp():
+    client.put('/'.join([PRINCIPAL_DAV_PATH, CALENDAR, 'test_vavailability_bad_comp.ics']), body=vavail_bad_comp, 
+               headers={'Content-Type': 'text/calendar'})
+    assert client.response.status == 403
+    assert client.response.body.find('Failed to parse calendar object') is not -1
     
     
     

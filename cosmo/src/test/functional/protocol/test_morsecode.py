@@ -40,7 +40,8 @@ def test_update():
     path = client._cosmo_path+'mc/collection/'+eimml['uuid']
     request_body = xmlobjects.tostring(eimml)
     client.post(path, request_body, headers={'content-type':'application/eim+xml; charset=UTF-8',
-                                             'X-MorseCode-SyncToken':collections['example']['token']})
+                                             'X-MorseCode-SyncToken':collections['example']['token']}
+                )
     assert client.response.status == 204
     
 def test_get_all_collections():

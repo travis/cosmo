@@ -90,3 +90,52 @@ def test_mkcalendar_valid_no_timezone():
     body = open(FILES_DIR+'mkcalendar/validNoTimezone.xml').read()
     client._request('MKCALENDAR', '%s/%s' % (PRINCIPAL_DAV_PATH, str(random.random()).replace('.', '')), body=body, headers={ 'Content-Type': 'text/xml'})
     assert client.response.status == 201
+
+def test_mkcalendar_invalid_content_type():
+    client._request('MKCALENDAR', '/'.join([PRINCIPAL_DAV_PATH, 'invalid_content_type']), 
+                    headers={'Content-Type':'foo/bar'})
+    assert client.response.status == 415
+    
+malformed_property = """<?xml version='1.0' encoding='UTF-8'?>
+<ns0:mkcalendar xmlns:ns0="urn:ietf:params:xml:ns:caldav">
+  <ns1:set xmlns:ns1="DAV:">
+    <ns1:prop>
+      <ns1:displayname>double plus ungood</ns1:displayname>
+      <ns0:calendar-timezone><![CDATA[
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//Apple Computer\, Inc//iCal 3.0//EN
+BEGIN:VTIMEZONE
+LAST-MODIFIED:20060710T225223Z
+TZID:America/Vancouver
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0000
+DTSTART:20060402T100000
+TZNAME:PDT
+TZOFFSETTO:-0700
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0700
+DTSTART:20061029T020000
+TZNAME:PST
+TZOFFSETTO:-0800
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
+]]></ns0:calendar-timezone>
+    </ns1:prop>
+  </ns1:set>
+</ns0:mkcalendar>
+"""
+
+def test_mkcalendar_malformed_property():
+    client._request('MKCALENDAR', '/'.join([PRINCIPAL_DAV_PATH, 'malformed_property']), body=malformed_property,
+                    headers={'Content-Type':'text/xml'})
+    assert client.response.status == 207
+    assert client.response.body.find('<D:status>HTTP/1.1 403 Forbidden</D:status>') is not -1
+    assert client.response.body.find('<D:status>HTTP/1.1 424 Failed Dependency</D:status>') is not -1
+    assert client.response.body.find('Calendar object not parseable') is not -1
+        
+    
+    

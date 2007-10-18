@@ -68,20 +68,8 @@
         class="org.osaf.cosmo.migrate.ZeroPointSevenToZeroPointEightMigration">
     </bean>
     
-    <bean id="zeroPointEightToZerioPointNine"
-        class="org.osaf.cosmo.migrate.BasicSqlScriptMigration">
-        <property name="fromVersion">
-            <value>120</value>
-        </property>
-        <property name="toVersion">
-            <value>130</value>
-        </property>
-        <property name="supportedDialects">
-            <list>
-                <value>Derby</value>
-                <value>MySQL5</value>
-            </list>
-        </property>
+    <bean id="zeroPointEightToZeroPointNine"
+         class="org.osaf.cosmo.migrate.ZeroPointEightToZeroPointNineMigration">
     </bean>
 
     <bean id="propertyPlaceHolderConfigurer"
@@ -102,7 +90,7 @@
                 <ref local="zeroPointSixZeroOneToZeroPointSixOne"/>
                 <ref local="zeroPointSixOneToZeroPointSeven"/>
                 <ref local="zeroPointSevenToZeroPointEight"/>
-                <ref local="zeroPointEightToZerioPointNine"/>
+                <ref local="zeroPointEightToZeroPointNine"/>
             </list>
         </property>
     </bean>

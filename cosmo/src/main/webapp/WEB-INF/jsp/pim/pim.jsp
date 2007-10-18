@@ -57,7 +57,7 @@
 <link rel="alternate" type="text/calendar" href="${relationLinks['webcal']}"/>
 </c:if>
 
-<cosmo:dojoBoilerplate timezones="true"/>
+<cosmo:dojoBoilerplate timezones="true" dojoLayers="cosmo-pim"/>
 
 <script type="text/javascript">
 // Dojo requires

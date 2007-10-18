@@ -24,6 +24,7 @@
 <%@ attribute name="timezones"        %>
 <%@ attribute name="parseWidgets"        %>
 <%@ attribute name="searchIds"        %>
+<%@ attribute name="dojoLayers"        %>
 
 <u:bind var="PRODUCT_VERSION"
         type="org.osaf.cosmo.CosmoConstants"
@@ -59,9 +60,13 @@
                     searchIds: searchIds}
 </script>
 
-<script type="text/javascript" src="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo.js"></script>
-<script type="text/javascript">
+<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo"/>
+<script type="text/javascript" src="${dojoPath}/dojo.js"></script>
+<c:forEach var="layerName" items="${dojoLayers}">
+<script type="text/javascript" src="${dojoPath}/src/${layerName}.js"></script>
+</c:forEach>
 
+<script type="text/javascript">
 function bootstrap(){
 
     dojo.require("dojo.widget.*");
@@ -82,8 +87,6 @@ function bootstrap(){
     cosmo.env.setTimeoutSeconds(
         cosmo.ui.conf.uiTimeout ||
         <%=session.getMaxInactiveInterval()%>);
-
-    dojo.require("cosmo.ui.widget.Debug");
 
     if (${timezones}){
         dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");

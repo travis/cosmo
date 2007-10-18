@@ -16,7 +16,7 @@
 
 dojo.provide('cosmo.account.create');
 
-dojo.require("dojo.uri");
+dojo.require("dojo.uri.Uri");
 dojo.require("dojo.widget.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");

@@ -15,3 +15,5 @@ else
     ant -Ddocless=true -Dprofile=core clean release
 fi
 gzip -9c ../release/dojo/dojo.js > ../release/dojo/dojo.js.gzip-compressed
+gzip -9c ../release/dojo/src/cosmo-pim.js > ../release/dojo/src/cosmo-pim.js.gzip-compressed
+gzip -9c ../release/dojo/src/cosmo-login.js > ../release/dojo/src/cosmo-login.js.gzip-compressed

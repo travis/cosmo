@@ -4,17 +4,12 @@
 // but you can change the hostenv file that's included by setting the value of
 // the variable "hostenvType" (defaults to "browser").
 var dependencies = [
-//    "cosmo.app",
-//    "cosmo.ui.global_css",
-//    "dojo.debug.console",
-//    "dojo.logging.ConsoleLogger",
-//    "dojo.logging.Logger",
-//    "cosmo.ui.widget.Debug",
-//    "cosmo.datetime.timezone.LazyCachingTimezoneRegistry"
+    "dojo.lang.*",
+    "dojo.debug.console"
 ];
 
 dependencies.layers = [
-	{
+/*	{
 		name: "src/cosmo-login.js",
 		resourceName: "dojo.cosmo-login",
 		layerDependencies: [
@@ -23,7 +18,7 @@ dependencies.layers = [
 		dependencies: [
 			"dojo.cosmo-login"
 		]
-	},
+	},*/
     {
 		name: "src/cosmo-pim.js",
 		resourceName: "dojo.cosmo-pim",

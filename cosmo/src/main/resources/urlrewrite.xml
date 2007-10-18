@@ -33,8 +33,8 @@
   <rule enabled="true">
   <condition name="accept-encoding" operator="equal" next="and">.*gzip.*</condition>
   <condition name="user-agent" operator="notequal">.*MSIE 6.0.*</condition>
-  <from>lib/dojo.js</from>
-  <to>lib/dojo.js.gzip-compressed</to>
+  <from>lib/dojo/dojo.js</from>
+  <to>lib/dojo/dojo.js.gzip-compressed</to>
   <set type="response-header" name="Vary">Accept-Encoding</set>
   <set type="response-header" name="Content-Encoding">gzip</set>
   <set type="content-type">text/javascript</set>

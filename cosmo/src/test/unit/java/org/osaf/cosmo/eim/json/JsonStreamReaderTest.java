@@ -16,6 +16,7 @@
 package org.osaf.cosmo.eim.json;
 
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlStreamReader;
+import org.osaf.cosmo.eim.TextField;
 
 /**
  * Test Case for {@link EimmlStreamReader}.
@@ -42,6 +44,24 @@ public class JsonStreamReaderTest extends TestCase
         testHelper = new TestHelper();
     }
 
+    public void testReadUnicode() throws Exception {
+        Reader in =
+            testHelper.getReader("json/unicode-record-set.json");
+        JsonStreamReader reader = new JsonStreamReader(in);
+        EimRecordSet recordSet = reader.nextRecordSet();
+        EimRecord record = recordSet.getRecords().get(0);
+
+        String unicode = "åß∂ƒ©˙∆˚¬…  ";
+        String unicodeResult = ((TextField)record.getFields().get(0)).getText();
+        
+        for (int x = 0; x < unicode.length(); x++){
+            Character j = new Character(unicode.charAt(x));   
+            Character s = new Character(unicodeResult.charAt(x));
+            assertEquals(j, s);
+        }
+        assertEquals(unicode, unicodeResult);
+    }
+    
     public void testReadChandlerUpdate() throws Exception {
         Reader in =
             testHelper.getReader("json/simple-record-set.json");

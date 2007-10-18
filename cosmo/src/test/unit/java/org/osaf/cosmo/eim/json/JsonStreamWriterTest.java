@@ -108,7 +108,8 @@ public class JsonStreamWriterTest extends TestCase
     }
 
     public void testUnicodeClob() throws Exception {
-        String unicode = "åß∂ƒ©˙∆˚¬…";
+        String unicode = "åß∂ƒ©˙∆˚¬…\u2028\u2029";
+        String unicodeResult = "åß∂ƒ©˙∆˚¬…\\u2028\\u2029";
         log.error("unicode: " + unicode);
         StringReader reader = new StringReader(unicode);
         //log.error("reader: " + IOUtils.toString(reader));
@@ -130,13 +131,11 @@ public class JsonStreamWriterTest extends TestCase
         jsonString = jsonString.substring(preamble.length());
         jsonString = jsonString.substring(0, jsonString.length() - 3);
         
-        log.error("jsonString: " + jsonString);
-        log.error("Json String Length:" +jsonString.length());
-        log.error("Source String Length: " + unicode.length());
         for (int x = 0; x < jsonString.length(); x++){
             Character j = new Character(jsonString.charAt(x));   
-            Character s = new Character(unicode.charAt(x));
-            log.error("comparing char at '"+x+"' result: " +j.compareTo(s));
+            Character s = new Character(unicodeResult.charAt(x));
+            assertEquals(j, s);
         }
+        assertEquals(unicodeResult, jsonString);
     }
 }

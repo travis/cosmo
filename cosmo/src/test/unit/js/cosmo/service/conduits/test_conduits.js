@@ -151,6 +151,22 @@ cosmotest.service.conduits.test_conduits = {
             items = conduit.getDashboardItems(c0, {sync: true});
             
             // TODO add asserts
+
+            // Unicode tests
+            var unicodeItem = new cosmo.model.Note(
+            {
+                displayName: "åß∂ƒ©˙∆˚¬…\u2028\u2029",
+                body: "åß∂ƒ©˙∆˚¬…\u2028\u2029"
+            });
+            var unicodeDeferred = conduit.createItem(unicodeItem, c0, {sync: true});
+            var serverUnicodeItemDeferred = conduit.getItem(unicodeItem.getUid(), 
+                {sync: true});
+            serverUnicodeItemDeferred.addCallback(function(serverUnicodeItem){
+                jum.assertEquals("unicode displayName wrong", 
+                                 unicodeItem.getDisplayName(), serverUnicodeItem.getDisplayName());
+                jum.assertEquals("unicode body wrong", 
+                                 unicodeItem.getBody(), serverUnicodeItem.getBody());
+            });
         }
         finally{
             cosmotest.service.conduits.test_conduits.cleanup(user);            

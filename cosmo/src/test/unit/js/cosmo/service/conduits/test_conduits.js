@@ -147,8 +147,11 @@ cosmotest.service.conduits.test_conduits = {
             );
             
             conduit.createItem(doneItem, c0, {sync: true});
-                      
-            items = conduit.getDashboardItems(c0, {sync: true});
+
+            var itemsDeferred = conduit.getDashboardItems(c0, {sync: true});
+            itemsDeferred.addCallback(function(dashboardItems){
+                jum.assertEquals("dashboard items length wrong", 7, dashboardItems.length);
+            });
             
             // TODO add asserts
 
@@ -250,6 +253,13 @@ cosmotest.service.conduits.test_conduits = {
                {sync: true}
             ).results[0];
             jum.assertEquals("wrong number of occurrences", 7, item0Occurrences.length);
+
+            // Test dashboard projection for collection
+            var deferredItemsDeferred = conduit.getDashboardItems(c0, {sync: true});
+            deferredItemsDeferred.addCallback(function(dashboardItems){
+                jum.assertEquals("dashboard items length wrong", 5, dashboardItems.length);
+            });
+
             
 			// Test dashboard projection for single
 			// recurring events

@@ -124,7 +124,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             throw new Error("Can not get dashboard items for " + item);
         }
 
-        var deferred = this._transport[transportFunc](item, {projection: "dashboard"}, kwArgs);
+        var deferred = this._transport[transportFunc](item, {projection: "/dashboard/eim-json"}, kwArgs);
         this._addTranslation(deferred, "translateGetItems");
         
         return deferred;

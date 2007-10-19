@@ -46,7 +46,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     
     CONTENT_TYPE_ATOM: "application/atom+xml",
     
-    getAndCheckEditLink: function(item){
+    getAndCheckEditLink: function(item, searchCrit){
+        searchCrit = searchCrit || {};
         var editLink = item.getUrls()[this.EDIT_LINK];
         if (!editLink) {
             throw new cosmo.service.exception.ClientSideError(
@@ -54,7 +55,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
                 item.getUid() + ": " + item.toString()
             )
         }
-        return this.generateUri(editLink,  this.PROJECTION_FULL_EIM_JSON);
+        return this.generateUri(editLink,  searchCrit.projection || 
+                                this.PROJECTION_FULL_EIM_JSON);
     },
     
     getAtomBase: function () {
@@ -114,7 +116,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         }
 
         var query = this._generateSearchQuery(searchCrit);
-        var editLink = this.getAndCheckEditLink(collection);
+        var editLink = this.getAndCheckEditLink(collection, searchCrit);
         
         var r = {};
 
@@ -164,7 +166,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
         var query = this._generateSearchQuery(searchCrit);
 
-        var projection = (searchCrit.projection || "full") + "/eim-json";
+        var projection = searchCrit.projection || "/full/eim-json";
         var r = {};
         
         var expandedLink = item.getUrls()['expanded'];

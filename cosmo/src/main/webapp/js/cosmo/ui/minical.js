@@ -322,9 +322,14 @@ cosmo.ui.minical.MiniCal = function (p) {
          * Set vertical size of container div
          */
         function setContainerSize() {
+            // Get the actual vert size of the collection
+            // name-display / selector sitting above to
+            // determine how many months will fit
+            // NOTE: This means the collection display 
+            // must be rendered before minical
+            c = $('collectionDisplay').offsetHeight + 8; // A bit of spacing
             var h = self.navPanel.offsetHeight;
             h += self.goToDateNode.offsetHeight;
-            c = 60; // A bit of spacing
             for (var i = 0; i < self.months.length; i++) {
                 if (h + self.months[i].offsetHeight < (self.parent.height - c)) {
                     h += self.months[i].offsetHeight;

@@ -109,7 +109,8 @@ cosmo.ui.navbar.Bar = function (p) {
         // detail form -- this means user has explicitly chosen
         // Discard Changes in the dialog box
         var discardUnsavedChanges =
-          typeof params.discardUnsavedChanges == 'undefined' ? false : params.discardUnsavedChanges;
+          typeof params.discardUnsavedChanges == 'undefined' ?
+          false : params.discardUnsavedChanges;
         var _pim = cosmo.app.pim;
         var _view = cosmo.view[viewName];
         var _loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
@@ -174,7 +175,7 @@ cosmo.ui.navbar.Bar = function (p) {
                     _view.canvas.init();
                 }
                 // Only switch views if the data for the view loads successfully
-                if (noLoad || _view.loadEvents()) {
+                if (noLoad || _view.triggerLoadEvents()) {
                     self.listCanvas.domNode.style.display = 'none';
                     self.calCanvas.domNode.style.display = 'block';
                     cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();

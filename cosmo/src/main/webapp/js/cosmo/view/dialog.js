@@ -83,12 +83,13 @@ cosmo.view.dialog.RecurrenceDialog = function () {
 
     // All available buttons for the dialog
     var buttons = {
-        'removeAllEvents': function () {
-           dojo.debug("create removeAllEvents button called.");
-           return new Button('allButtonDialog', btnWideWidth,
+        'removeAllEvents': function (only) {
+            var btnText = only ? _('App.Button.Remove') : allEventsMsg;
+            dojo.debug("create removeAllEvents button called.");
+            return new Button('allButtonDialog', btnWideWidth,
                 function () { self.doPublishRemove(
                     cosmo.view.service.recurringEventOptions.ALL_EVENTS); },
-                allEventsMsg, true);
+                btnText, true);
         },
 
         'removeFutureEvents': function () {
@@ -109,14 +110,15 @@ cosmo.view.dialog.RecurrenceDialog = function () {
                 OnlyThisMsg, true);
         },
 
-        'saveAllEvents': function (saveItem, delta) {
+        'saveAllEvents': function (saveItem, delta, only) {
+            var btnText = only ? _('App.Button.Save') : allEventsMsg;
             return new Button('allButtonDialog', btnWideWidth,
                 function () {
                     self.doPublishSave(
                         cosmo.view.service.recurringEventOptions.ALL_EVENTS,
                         saveItem, delta)
                 },
-                allEventsMsg,
+                btnText,
                 true);
         },
 
@@ -199,7 +201,20 @@ cosmo.view.dialog.RecurrenceDialog = function () {
             'btnsRight': [],
             'defaultAction': function () {},
             'width': 480,
-            'content': _('Main.Prompt.RecurSaveConfirmAllEventsOnly')
+            'content': _('Main.Prompt.RecurSaveConfirmAllItemsOnly')
+        };
+    };
+
+    props.removeRecurConfirmAllEventsOnly = function () {
+         return {
+            'type': cosmo.app.modalDialog.CONFIRM,
+            'btnsLeft': [new Button('cancelButtonDialog', 74,
+                function () { self.doCancelSave.apply(self) },
+                _('App.Button.Cancel'), true)],
+            'btnsRight': [],
+            'defaultAction': function () {},
+            'width': 480,
+            'content': _('Main.Prompt.RecurRemoveConfirmAllItemsOnly')
         };
     };
 
@@ -207,38 +222,46 @@ cosmo.view.dialog.RecurrenceDialog = function () {
         var OPTIONS = cosmo.view.service.recurringEventOptions;
         var p = props[key]();
         var opts = opts || {};
-        if (key == 'saveRecurConfirm') {
-            var changeTypes = opts.changeTypes;
-            var delta = opts.delta;
-            var saveItem = opts.saveItem  // CalItem/ListItem
-            p.btnsRight = [];
-            if (!changeTypes[OPTIONS.ALL_EVENTS]) {
-                p.btnsRight.push(buttons.allEventsDisabled());
-            } else {
-                p.btnsRight.push(buttons.saveAllEvents(saveItem, delta));
-            }
+        switch(key) {
+            case 'saveRecurConfirm':
+                var changeTypes = opts.changeTypes;
+                var delta = opts.delta;
+                var saveItem = opts.saveItem  // CalItem/ListItem
+                p.btnsRight = [];
+                if (!changeTypes[OPTIONS.ALL_EVENTS]) {
+                    p.btnsRight.push(buttons.allEventsDisabled());
+                } else {
+                    p.btnsRight.push(buttons.saveAllEvents(saveItem, delta, false));
+                }
 
-            if (changeTypes[OPTIONS.ALL_FUTURE_EVENTS]) {
-                p.btnsRight.push(buttons.saveFutureEvents(saveItem, delta));
-            }
+                if (changeTypes[OPTIONS.ALL_FUTURE_EVENTS]) {
+                    p.btnsRight.push(buttons.saveFutureEvents(saveItem, delta));
+                }
 
-            if (changeTypes[OPTIONS.ONLY_THIS_EVENT]) {
-                p.btnsRight.push(buttons.saveOnlyThisEvent(saveItem, delta));
-            }
-        } else if (key == "saveRecurConfirmAllEventsOnly"){
-            var delta = opts.delta;
-            var saveItem = opts.saveItem  
-            p.btnsRight = [];
-            p.btnsRight.push(buttons.saveAllEvents(saveItem, delta));
-        } else if (key == 'removeRecurConfirm') {
-           var item = cosmo.view.dialog.getSelectedItem();
-            p.btnsRight = [];
-            p.btnsRight.push(buttons.removeAllEvents());
-            if (!item.data.isFirstOccurrence()) {
-                p.btnsRight.push(buttons.removeFutureEvents());
-            }
-            p.btnsRight.push(buttons.removeOnlyThisEvent());
-
+                if (changeTypes[OPTIONS.ONLY_THIS_EVENT]) {
+                    p.btnsRight.push(buttons.saveOnlyThisEvent(saveItem, delta));
+                }
+                break;
+            case 'saveRecurConfirmAllEventsOnly':
+                var delta = opts.delta;
+                var saveItem = opts.saveItem  
+                // Button should say 'Save' instead of 'All Events'
+                p.btnsRight = [buttons.saveAllEvents(saveItem, delta, true)];
+                break;
+            case 'removeRecurConfirm':
+                var item = cosmo.view.dialog.getSelectedItem();
+                p.btnsRight = [];
+                p.btnsRight.push(buttons.removeAllEvents(false));
+                if (!item.data.isFirstOccurrence()) {
+                    p.btnsRight.push(buttons.removeFutureEvents());
+                }
+                p.btnsRight.push(buttons.removeOnlyThisEvent());
+                break;
+            case 'removeRecurConfirmAllEventsOnly':
+                var item = cosmo.view.dialog.getSelectedItem();
+                // Button should say 'Remove' instead of 'All Events'
+                p.btnsRight = [buttons.removeAllEvents(true)];
+                break;
         }
         return p;
     };

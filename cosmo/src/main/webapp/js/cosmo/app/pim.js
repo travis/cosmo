@@ -17,6 +17,7 @@
 dojo.provide("cosmo.app.pim");
 
 dojo.require("dojo.html.common");
+dojo.require("dojo.gfx.color.hsv");
 
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
@@ -33,6 +34,7 @@ dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.timeout");
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.uri');
+dojo.require('cosmo.util.hash');
 dojo.require('cosmo.service.conduits.common');
 dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
@@ -76,8 +78,13 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.currDate = null;
     // The path to the currently selected collection
     this.currentCollection = null;
-    //The list of calendars available to the current user
+    // The list of collections available to the current user
     this.currentCollections = [];
+    // Collections available to the user
+    this.collections = new cosmo.util.hash.Hash();
+    // Colors used to display the different collections
+    // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
+    this.collectionHues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
     // If this is true, we are in normal authenticated user mode
     this.authAccess = true;
     // Ticket passed, if any
@@ -92,13 +99,13 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.init = function (p) {
         var params = p || {};
         var collectionUrl = params.collectionUrl;
-        var startView = params.initialView 
+        var startView = params.initialView
             || cosmo.account.preferences.getCookiePreference(cosmo.account.preferences.DEFAULT_VIEW)
             || this.currentView;
 
         // Now that we've figured out the start view, remember it.
         cosmo.account.preferences.setCookiePreference(cosmo.account.preferences.DEFAULT_VIEW, startView);
-        
+
         this.authAccess = params.authAccess;
         this.ticketKey = params.ticketKey;
         this.currDate = new Date();
@@ -113,15 +120,9 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         //cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
         this.loadCollections(params);
-        if (params.collectionUid){
-            this._selectCollectionByUid(params.collectionUid);
-        } else {
-            this.currentCollection = this.currentCollections[0];
-        }
 
         // Base layout
         // ===============================
-        // FIXME: Safari -- Need to valign-middle the whole-screen mask
         this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
 
         if (!cosmo.app.pim.currentCollection) {
@@ -239,8 +240,25 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     // Collections
     // ==========================
     this.loadCollections = function (params) {
-        // Load/create calendar to view
-        // --------------
+        var calcColors = function (hue) {
+            var getRGB = function (h, s, v) {
+                var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
+                    inputRange: [360, 100, 100], outputRange: 255 });
+                return 'rgb(' + rgb.join() + ')';
+            }
+            var lozengeColors = {};
+            var o = {
+                darkSel: [100, 80],
+                darkUnsel: [80, 90],
+                lightSel: [25, 100],
+                lightUnsel: [10, 100],
+                proc: [30, 90]
+            };
+            for (var p in o) {
+                lozengeColors[p] = getRGB(hue, o[p][0], o[p][1]);
+            }
+            return lozengeColors;
+        };
 
         this.currentCollections = [];
         //If we received a ticket key, use the collectionUrl in params to load a collection
@@ -258,18 +276,18 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
 
         // Otherwise, get all collections for this user
         else {
+            // User's own collections
             var userCollections = this.serv.getCollections({sync: true}).results[0];
             for (var i = 0; i < userCollections.length; i++){
                 var collection = userCollections[i];
                 this.currentCollections.push(collection);
             }
 
+            // Subscriptions
             var subscriptions = this.serv.getSubscriptions({sync:true}).results[0];
-
             var result = this.filterOutDeletedSubscriptions(subscriptions);
             subscriptions = result[0];
             deletedSubscriptions = result[1];
-
             for (var i = 0; i < subscriptions.length; i++){
                 var subscription = subscriptions[i];
                 this.currentCollections.push(subscription);
@@ -290,6 +308,26 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             return r;
         };
         this.currentCollections.sort(f);
+        var c = this.currentCollections;
+        var hues = this.collectionHues;
+        for (var i = 0; i < c.length; i++) {
+            var coll = c[i];
+            coll.isDisplayed = false;
+            coll.isOverlaid = false;
+            coll.doDisplay = false;
+            index = i % hues.length;
+            var hue = hues[index];
+            coll.colors = calcColors(hue);
+            this.collections.addItem(coll.getUid(), coll);
+        }
+
+        if (params.collectionUid){
+            this._selectCollectionByUid(params.collectionUid);
+        }
+        else {
+            this.currentCollection = this.currentCollections[0];
+        }
+        this.currentCollection.doDisplay = true;
 
     };
 
@@ -363,14 +401,19 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
 
         if (this.currentCollection) {
             if (!this._selectCollectionByUid(currentCollection.getUid())){
-                cosmo.app.showErr(_("Main.Error.CollectionRemoved", currentCollection.getDisplayName()));
+                cosmo.app.showErr(_("Main.Error.CollectionRemoved",
+                    currentCollection.getDisplayName()));
                 this.currentCollection = this.currentCollections[0];
             }
 
-            var collectionSelector = cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
-            collectionSelector.updateCollectionSelectorOptions(this.currentCollections, this.currentCollection);
+            var collectionSelector =
+                cosmo.app.pim.baseLayout.mainApp.leftSidebar.collectionSelector.widget;
+            collectionSelector.updateCollectionSelectorOptions(
+                this.currentCollections, this.currentCollection);
 
-            dojo.event.topic.publish('/calEvent', { action: 'loadCollection', opts: { loadType: 'changeCollection', collection: this.currentCollection }, data: {}})
+            dojo.event.topic.publish('/calEvent', { action: 'loadCollection',
+                opts: { loadType: 'changeCollection',
+                collection: this.currentCollection }, data: {}})
         }
     }
 }, cosmo.app.pim);

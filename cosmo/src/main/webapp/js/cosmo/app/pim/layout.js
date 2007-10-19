@@ -43,6 +43,7 @@ dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.detail");
 dojo.require("cosmo.ui.imagegrid");
+dojo.require("cosmo.ui.selector");
 
 cosmo.app.pim.layout = new function () {
     this.baseLayout = null;
@@ -360,20 +361,31 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         calCanvas: cal });
     centerColumn.addChild(navBar);
     centerColumn.navBar = navBar;
-    //navBar.render();
 
-    // Cal selector / single cal name -- the container is a
-    // ContentBox, and the contents is a Dojo widget
+    // Collection name for ticket view, or collection selector
     var selectorDiv = _createElem('div');
-    selectorDiv.id = 'calSelectNav';
-    var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
-    leftSidebar.addChild(cB);
-    leftSidebar.collectionSelector = cB;
-    var widget = dojo.widget.createWidget('cosmo:CollectionSelector', {
-        'collections': cosmo.app.pim.currentCollections,
-        'currentCollection': cosmo.app.pim.currentCollection,
-        'ticketKey': cosmo.app.pim.ticketKey }, selectorDiv, 'last');
-    cB.widget = widget;
+    selectorDiv.id = 'collectionDisplay';
+
+    // Ticket view -- display the collection name with subscription icon
+    if (cosmo.app.pim.ticketKey) {
+        var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
+        leftSidebar.addChild(cB);
+        leftSidebar.collectionSelector = cB;
+        var widget = dojo.widget.createWidget('cosmo:CollectionSelector', {
+            'collections': cosmo.app.pim.currentCollections,
+            'currentCollection': cosmo.app.pim.currentCollection,
+            'ticketKey': cosmo.app.pim.ticketKey }, selectorDiv, 'last');
+        cB.widget = widget;
+    }
+    // Logged-in view -- use the collection selector
+    else {
+        var cB = new cosmo.ui.selector.CollectionSelector({ domNode: selectorDiv,
+            id: selectorDiv.id });
+        leftSidebar.addChild(cB);
+        leftSidebar.collectionSelector = cB;
+        cB.render();
+    }
+
     // Minical -- subclassed ContentBox
     var miniCalDiv = _createElem('div');
     miniCalDiv.id = 'miniCal';
@@ -386,7 +398,8 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     // Detail-view form
     var detailDiv = _createElem('div');
     detailDiv.id = 'detailViewForm';
-    var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: detailDiv, id: detailDiv.id, top: 0 });
+    var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: detailDiv,
+        id: detailDiv.id, top: 0 });
     rightSidebar.addChild(cB);
     rightSidebar.detailViewForm = cB;
     rightSidebar.render();

@@ -108,33 +108,36 @@ cosmo.view.service = new function () {
      */
     function saveItemChangesConfirm(item, delta) {
         var changeTypes = delta.getApplicableChangeTypes();
-        var size = 0;
         var change = null;
+        var changeCount = 0;
         for (change in changeTypes){
             dojo.debug("changeType: " +change);
             if (changeTypes[change]){
-                size++;
+                changeCount++;
             }
         }
 
         if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
             dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
-        } 
+        }
         else {
-            //if only the ALL_EVENTS type of change is possible because of a modification to the 
-            //recurrence rule, we display a special dialog box. 
-            if (size == 1 
-                  && changeTypes[cosmo.view.service.recurringEventOptions.ALL_EVENTS] 
-                  && delta.isStampPropertyChanged("event", "rrule")){
-                var props = cosmo.view.recurrenceDialog.getProps('saveRecurConfirmAllEventsOnly',
-                    { changeTypes: changeTypes, delta: delta, saveItem: item });
-                    dojo.debug(props.content);
-                cosmo.app.showDialog(props);
-            } else {
-                cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps('saveRecurConfirm',
-                    { changeTypes: changeTypes, delta: delta, saveItem: item }));
+            confirmType = '';
+            // If only the ALL_EVENTS type of change is possible
+            // because of a modification to the recurrence rule,
+            // we display a special dialog box.
+            if (changeCount == 1 &&
+                changeTypes[cosmo.view.service.recurringEventOptions.ALL_EVENTS] &&
+                delta.isStampPropertyChanged("event", "rrule")) {
+                confirmType = 'saveRecurConfirmAllEventsOnly';
             }
+            else {
+                confirmType = 'saveRecurConfirm';
+            }
+            var props = cosmo.view.recurrenceDialog.getProps(confirmType,
+                { changeTypes: changeTypes, delta: delta, saveItem: item });
+            dojo.debug(props.content);
+            cosmo.app.showDialog(props);
         }
     }
 
@@ -429,18 +432,24 @@ cosmo.view.service = new function () {
      */
     function removeItemConfirm(item) {
         dojo.debug("removeItemConfirm!");
-        var str = '';
+        var confirmType = '';
         var opts = {};
         opts.masterEvent = false;
         // Display the correct confirmation dialog based on
         // whether or not the item recurs
         if (item.data.hasRecurrence()) {
-            str = 'removeRecurConfirm';
+            if (item.collectionIds.length > 1) {
+                confirmType = 'removeRecurConfirmAllEventsOnly';
+            }
+            else {
+                confirmType = 'removeRecurConfirm';
+            }
         }
         else {
-            str = 'removeConfirm';
+            confirmType = 'removeConfirm';
         }
-        cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps(str, opts));
+        cosmo.app.showDialog(cosmo.view.recurrenceDialog.getProps(
+            confirmType, opts));
     }
 
     /**
@@ -610,10 +619,16 @@ cosmo.view.service = new function () {
             act = 'removeSuccess';
         }
 
-        // Broadcast success
-        dojo.event.topic.publish('/calEvent', { 'action': act,
-            'data': removeEv, 'opts': opts });
-        dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});
+        // Broadcast message for success/failure
+        // Do it in window scope to avoid trapping all the
+        // subsequent UI code errors in the addErrBack for
+        // the service Deferred
+        var f = function () {
+            dojo.event.topic.publish('/calEvent', { 'action': act,
+                'data': removeEv, 'opts': opts });
+            dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});
+        }
+        setTimeout(f, 0);
     }
 
     function getErrDetailMessage(err) {

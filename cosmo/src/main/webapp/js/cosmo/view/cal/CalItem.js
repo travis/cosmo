@@ -32,15 +32,17 @@ dojo.require('cosmo.view.cal.lozenge');
  * @object CalItem -- an event on the Calendar, links to the event's
  * Lozenge and CalItemDate objects
  */
-cosmo.view.cal.CalItem = function(id, lozenge, data) {
+cosmo.view.cal.CalItem = function(data, collectionIds) {
     // Same as the UID for the stamped Note, used as the
     // key for the itemRegistry Hash
     // Lozenge div elements also get their id suffixes from this
-    this.id = id;
-    // Points to this event's Lozenge obj
-    this.lozenge = lozenge || null;
+    this.id = data.getItemUid() || '';
     // Points to this event's stamped Note obj
     this.data = data || null;
+    // The UID for the collection containing this item
+    this.collectionIds = collectionIds || [];
+    // Points to this event's Lozenge obj
+    this.lozenge = null;
     // A backup copy (clone) of the .data property made
     // before trying to edit
     this.dataOrig = null;
@@ -54,6 +56,8 @@ cosmo.view.cal.CalItem = function(id, lozenge, data) {
     this.maxDepth = 0;
     // Row occupied for an untimed event
     this.allDayRow = 0;
+    // Primary collection if item is in multiple
+    this.primaryCollectionId = null;
 };
 
 cosmo.view.cal.CalItem.prototype = new cosmo.view.BaseItem();
@@ -131,4 +135,23 @@ cosmo.view.cal.CalItem.prototype.endsAfterViewRange =
     var dtB = cosmo.view.cal.viewEnd.getTime();
     return inclusive ? dtA >= dtB : dtA > dtB;
 };
+cosmo.view.cal.CalItem.prototype.isInSelectedCollection =
+    function () {
+    var selCollId = cosmo.app.pim.currentCollection.getUid();
+    var selColl = cosmo.view.cal.collectionItemRegistries[selCollId];
+    return !!selColl.getItem(this.id);
+
+};
+cosmo.view.cal.CalItem.prototype.removeCollection =
+    function (coll) {
+    var id = coll.getUid();
+    if (this.primaryCollectionId == id) {
+        this.primaryCollectionId = null;
+    }
+    var collIds = ',' + this.collectionIds.join() + ',';
+    collIds = collIds.replace(',' + id + ',', ',');
+    collIds = collIds.substr(1, collIds.length - 2);
+    this.collectionIds = collIds.length ? collIds.split(',') : [];
+};
+
 

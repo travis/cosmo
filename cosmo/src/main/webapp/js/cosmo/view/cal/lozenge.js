@@ -68,6 +68,7 @@ cosmo.view.cal.lozenge.createNewLozenge = function (id, lozengeType) {
  */
 cosmo.view.cal.lozenge.Lozenge = function () {
     // Properties for position and size
+    this.id = '';
     this.top = 0;
     this.left = 0;
     this.height = 0;
@@ -104,8 +105,8 @@ cosmo.view.cal.lozenge.Lozenge.prototype.minimumMinutes = 30;
  * Enable/disable user input for this event -- should be disabled
  * when a remote operation is processing
  */
-cosmo.view.cal.lozenge.Lozenge.prototype.getItem = function (id) {
-    return cosmo.view.cal.itemRegistry.getItem(id);
+cosmo.view.cal.lozenge.Lozenge.prototype.getItem = function () {
+    return cosmo.view.cal.itemRegistry.getItem(this.id);
 }
 /**
  * Enable/disable user input for this event -- should be disabled
@@ -141,7 +142,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateDisplayMain = function () {
  * and description
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
-    var ev = this.getItem(this.id);
+    var ev = this.getItem();
     var note = ev.data;
     var eventStamp = note.getEventStamp()
     var startDate = eventStamp.getStartDate();
@@ -190,14 +191,14 @@ cosmo.view.cal.lozenge.Lozenge.prototype._mainAreaCursorChange = function (isPro
         '__' + this.id).style.cursor = cursorChange;
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
-    var ev = this.getItem(this.id);
+    var ev = this.getItem();
     var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         cosmo.view.cal.viewStart, ev.data.getEventStamp().getStartDate());
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
-    var ev = this.getItem(this.id);
+    var ev = this.getItem();
     var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
         ev.data.getEventStamp().getStartDate(), ev.data.getEventStamp().getEndDate()))+3;
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
@@ -263,7 +264,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype._setLozengeState = function (isProc) {
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateId) {
 
-    var ev = this.getItem(this.id);
+    var ev = this.getItem();
     var useLightColor = this.useLightColor(ev);
     var imgPath = '';
     var textColor = '';
@@ -276,7 +277,9 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
         '__' + ev.id);
     var titleDiv = $(this.domNodeId + 'Title' +
         '__' + ev.id);
-    var colors = cosmo.view.cal.canvas.colors;
+    var collId = ev.primaryCollectionId ? ev.primaryCollectionId : ev.collectionIds[0];
+    var evColl = cosmo.app.pim.collections.getItem(collId);
+    var colors = evColl.colors;
     var states = cosmo.view.cal.lozenge.lozengeStates;
 
     // If this lozenge is processing, change to 'processing' color
@@ -412,35 +415,31 @@ cosmo.view.cal.lozenge.Lozenge.prototype.useLightColor = function (ev) {
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.setSelected = function () {
     var auxDiv = null;
-
     this.setLozengeAppearance(1);
-
     // Set the z-index to the front
     this.domNode.style.zIndex = 25;
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
-            //auxDiv.style.background = SEL_BLOCK_COLOR;
             auxDiv.style.zIndex = 25;
         }
     }
 }
 /**
  * Make the lozenge look unselected -- change color and
- * move back to z-index of 1
+ * move back to z-index of 5
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.setDeselected = function () {
+    var item = this.getItem();
+    var z = item.isInSelectedCollection() ? 10 : 5;
     var auxDiv = null;
-
     this.setLozengeAppearance(2);
-
     // Set the z-index to the back
-    this.domNode.style.zIndex = 1;
+    this.domNode.style.zIndex = z;
     if (this.auxDivList.length) {
         for (var i = 0; i < this.auxDivList.length; i++) {
             auxDiv = this.auxDivList[i];
-            //auxDiv.style.background = UNSEL_BLOCK_COLOR;
-            auxDiv.style.zIndex = 1;
+            auxDiv.style.zIndex = z;
         }
     }
 }
@@ -922,6 +921,12 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.setHeight = function (size, over
  * Position and resize the lozenge, and turn on its visibility
  */
 cosmo.view.cal.lozenge.HasTimeLozenge.prototype.updateElements = function() {
+    var selItem = cosmo.view.cal.canvasInstance.getSelectedItem();
+    var isSel = (!!selItem && (selItem.id == this.id));
+    // Preserve appropriate z-index/selection-state
+    if (isSel) { this.setSelected() }
+    else { this.setDeselected() }
+    // Pos/size, visibility
     this.setLeft(this.left);
     this.setTop(this.top);
     this.setHeight(this.height);

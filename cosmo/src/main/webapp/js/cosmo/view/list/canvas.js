@@ -520,15 +520,14 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (recurrenceRemoved) {
                 // Remove all the recurrence items from the list
                 var newRegistry = self.view.filterOutRecurrenceGroup(
-                    self.view.itemRegistry.clone(), [item.data.getUid()],
-                    null);
+                    self.view.itemRegistry.clone(), [item.data.getUid()]);
                 // Update the list
                 self.view.itemRegistry = newRegistry;
                 // Create a new item based on the updated version of
                 // the edited ocurrence's master
                 var note = item.data.getMaster();
                 var id = note.getItemUid();
-                var newItem = new cosmo.view.cal.CalItem(id, null, note);
+                var newItem = new cosmo.view.list.ListItem(id, null, note);
                 self.view.itemRegistry.setItem(id, newItem);
                 // Use the updated item from here forward -- set its precalc'd
                 // sort/display props, and point the selection at it in

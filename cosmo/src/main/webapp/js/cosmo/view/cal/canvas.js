@@ -17,7 +17,6 @@
 dojo.provide('cosmo.view.cal.canvas');
 
 dojo.require('dojo.event.*');
-dojo.require("dojo.gfx.color.hsv");
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("dojo.DeferredList");
@@ -50,8 +49,6 @@ cosmo.view.cal.canvas = new function () {
     var hasBeenRendered = false;
     // Resizeable area for all-day events -- a ResizeArea obj
     var allDayArea = null;
-    // Blue, green, red, orange, gold, plum, turquoise, fuschia, indigo
-    var hues = [210, 120, 0, 30, 50, 300, 170, 330, 270];
     // Ref to timed canvas content area to save DOM lookup
     var timedCanvasContentArea = null;
     // Ref to untimed canvas content area to save DOM lookup
@@ -419,8 +416,6 @@ cosmo.view.cal.canvas = new function () {
         showHours();
         setCurrentDayStatus();
 
-        // Calculate color palette for the currrent collection
-        self.calcColors();
         // Render event lozenges
         loadSuccess();
         // HACK: IE6's pixel-calc for 'height: 100%' gets reset
@@ -460,33 +455,6 @@ cosmo.view.cal.canvas = new function () {
         // Subtract height of navbar -- this lives outside the cal view
         top -=  CAL_TOP_NAV_HEIGHT;
         return top;
-    };
-    this.calcColors = function () {
-        var getRGB = function (h, s, v) {
-            var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
-                inputRange: [360, 100, 100], outputRange: 255 });
-            return 'rgb(' + rgb.join() + ')';
-        }
-        var lozengeColors = {};
-        // Use the collection selector's selected index, if
-        // it's on the page, to pick a color -- otherwise just use blue
-        var sel = $('calSelectElem');
-        var index = sel ? sel.selectedIndex : 0;
-        // Start over at zero when we run out of colors
-        index = index % hues.length;
-        var hue = hues[index];
-
-        var o = {
-            darkSel: [100, 80],
-            darkUnsel: [80, 90],
-            lightSel: [25, 100],
-            lightUnsel: [10, 100],
-            proc: [30, 90]
-        };
-        for (var p in o) {
-            lozengeColors[p] = getRGB(hue, o[p][0], o[p][1]);
-        }
-        this.colors = lozengeColors;
     };
     /**
      * Figures out the date based on Y-pos of left edge of event lozenge
@@ -649,11 +617,6 @@ cosmo.view.cal.canvas = new function () {
      * @param p CalItem object or CalItem id string, the event to select
      */
     this.setSelectedCalItem = function (/* Can be CalItem object or String id */ p) {
-        // Deselect previously selected event if any
-        var sel = self.getSelectedItem();
-        if (sel) {
-            sel.lozenge.setDeselected();
-        }
         // Bail out if called without a proper param passed
         // this can happen if this method is called by blindly
         // passing the result of a function without checking
@@ -661,13 +624,30 @@ cosmo.view.cal.canvas = new function () {
         if (!p){
             return;
         }
+        
+        if (typeof p == 'string') {
+            sel = this.view.itemRegistry.getItem(p);
+        }
+        else {
+            sel = p;
+        }
+        if (sel.isInSelectedCollection()) {
+            // Deselect previously selected event if any
+            var origSel = self.getSelectedItem();
+            if (origSel) {
+                if (origSel == sel) { return; }
+                origSel.lozenge.setDeselected();
+            }
+        }
+        else {
+            var collId = sel.primaryCollectionId ?
+                sel.primaryCollectionId : sel.collectionIds[0];
+            var coll = cosmo.app.pim.collections.getItem(collId);
+            cosmo.view.cal.displayCollections(coll);
+        }
         // Pass the item or id, set as the selected item
         // for the current collection
-        self.setSelectedItem(p);
-
-        // Grab the selected item -- have to do this lookup
-        // because the passed-in param might be an id string
-        var sel = self.getSelectedItem();
+        self.setSelectedItem(sel);
 
         // Show the associated lozenge as selected
         sel.lozenge.setSelected();
@@ -818,20 +798,22 @@ cosmo.view.cal.canvas = new function () {
      * @param rem Boolean, if explicit false is passed,
      * don't remove the lozenge along with the CalItem obj
      */
-    function removeEvent(ev, rem) {
-        // Default behavior is to remove the lozenge
-        var removeLozenge = rem != false ? true : false;
-        if (removeLozenge) {
-            removeEventFromDisplay(ev.id, ev);
+    function removeEvent(item, rem) {
+        var currColl = cosmo.app.pim.currentCollection;
+        cosmo.view.cal.removeItemFromCollectionRegistry(item, currColl);
+        if (item.collectionIds.length) {
+            item.lozenge.setInputDisabled(false);
+            item.lozenge.setDeselected();
+            item.lozenge.updateDisplayMain();
         }
-        cosmo.view.cal.itemRegistry.removeItem(ev.id);
-        ev = null;
+        else {
+            cosmo.view.cal.itemRegistry.removeItem(item.id);
+            removeEventFromDisplay(item.id, item);
+        }
     }
     /**
      * Clear the entire itemRegistry, usually clear the
      * lozenges from the canvas as well
-     * @param rem Boolean, if explicit false is passed,
-     * don't remove the lozenges along with the CalItem objs
      */
     function removeAllEventsFromDisplay() {
         cosmo.view.cal.itemRegistry.each(removeEventFromDisplay);
@@ -865,7 +847,8 @@ cosmo.view.cal.canvas = new function () {
         // Current collection has items
         if (cosmo.view.cal.itemRegistry.length) {
             if (cosmo.view.cal.conflict.calc(cosmo.view.cal.itemRegistry) &&
-                positionLozenges()) {
+                positionLozenges() &&
+                foregroundSelectedCollection()) {
                 // If the selected item is not in the on-canvas itemRegistry,
                 // pull the copy from the selectedItemCache
                 var sel = self.getSelectedItem() || self.getSelectedItemCacheCopy();
@@ -893,10 +876,24 @@ cosmo.view.cal.canvas = new function () {
      * itemRegistry
      * @param val CalItem object, the value in the Hash
      */
-    function positionLozenge(key, val) {
-        var ev = val;
-        ev.lozenge.updateFromEvent(ev);
-        ev.lozenge.updateDisplayMain();
+    function positionLozenge(id, item) {
+        item.lozenge.updateFromEvent(item);
+        item.lozenge.updateDisplayMain();
+    }
+    function foregroundSelectedCollection() {
+        var selCollId = cosmo.app.pim.currentCollection.getUid();
+        var selColl = cosmo.view.cal.collectionItemRegistries[selCollId];
+        var selItem = self.getSelectedItem();
+        var f = function(id, item) {
+            if (item == selItem) {
+                item.lozenge.domNode.style.zIndex = 25;
+            }
+            else {
+                item.lozenge.domNode.style.zIndex = 10;
+            }
+        }
+        selColl.each(f);
+        return true;
     }
     /**
      * Restores a cal event to it's previous state after:
@@ -956,13 +953,14 @@ cosmo.view.cal.canvas = new function () {
         if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
             //first remove the event and recurrences from the registry.
             var idsToRemove = [data.getUid()];
+            var collectionIds = item.collectionIds.slice();
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
                 idsToRemove.push(newItemNote.getUid());
             }
-            var newRegistry = self.view.filterOutRecurrenceGroup(
-                self.view.itemRegistry.clone(), idsToRemove);
 
-
+            cosmo.view.cal.removeRecurrenceGroupFromItsCollectionRegistries(
+                collectionIds, idsToRemove);
+            
             //now we have to expand out the item for the viewing range
             var expandDeferred1 = cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)
@@ -987,17 +985,24 @@ cosmo.view.cal.canvas = new function () {
                     var otherOccurrences = results[1][1];
                     occurrences = occurrences.concat(otherOccurrences);
                 }
-                var newHash = cosmo.view.cal.createEventRegistry(occurrences);
-                newRegistry.append(newHash);
+                //var newHash = cosmo.view.cal.createEventRegistry(occurrences);
+                //newRegistry.append(newHash);
+
+                cosmo.view.cal.placeRecurrenceGroupInItsCollectionRegistries(
+                    collectionIds, occurrences);
 
                 removeAllEventsFromDisplay();
-                self.view.itemRegistry = newRegistry;
+                self.view.itemRegistry =
+                    cosmo.view.cal.createItemRegistryFromCollections();
+                //self.view.itemRegistry = newRegistry;
                 self.view.itemRegistry.each(appendLozenge);
             };
             deferred.addCallback(addExpandedOccurrences);
         }
         // Non-recurring (normal single item, recurrence removal), "only this item'
         else {
+            // The id for the current collection -- used in creating new CalItems
+            var currCollId = cosmo.app.pim.currentCollection.getUid();
             // The item just had its recurrence removed.
             // The only item that should remain is the item that was the
             // first occurrence -- put that item on the canvas, if it's
@@ -1005,8 +1010,7 @@ cosmo.view.cal.canvas = new function () {
             if (recurrenceRemoved) {
                 // Remove all the recurrence items from the list
                 var newRegistry = self.view.filterOutRecurrenceGroup(
-                    self.view.itemRegistry.clone(), [item.data.getUid()],
-                    null);
+                    self.view.itemRegistry.clone(), [item.data.getUid()]);
                 // Wipe existing list of items off the canvas
                 removeAllEventsFromDisplay();
                 // Update the list
@@ -1014,12 +1018,12 @@ cosmo.view.cal.canvas = new function () {
                 // Create a new item based on the updated version of
                 // the edited ocurrence's master
                 var note = item.data.getMaster();
-                var id = note.getItemUid();
-                var newItem = new cosmo.view.cal.CalItem(id, null, note);
+                var newItem = new cosmo.view.cal.CalItem(note, item.collectionIds.slice());
                 // If the first item in the removed recurrence series
                 // is in the current view span, add it to the list
                 if (!newItem.isOutOfViewRange()) {
-                    self.view.itemRegistry.setItem(id, newItem);
+                    self.view.itemRegistry.setItem(newItem.id, newItem);
+                    cosmo.view.cal.placeItemInItsCollectionRegistries(newItem);
                 }
                 // Repaint the updated list
                 self.view.itemRegistry.each(appendLozenge);
@@ -1037,8 +1041,9 @@ cosmo.view.cal.canvas = new function () {
                         var id = item.data.getItemUid();
                         // Create a new CalItem from the stamped Note on the item
                         // so we can give it a new on-canvas lozenge
-                        var newItem = new cosmo.view.cal.CalItem(id, null, item.data);
-                        self.view.itemRegistry.setItem(id, newItem);
+                        var newItem = new cosmo.view.cal.CalItem(item.data, item.collectionIds.slice());
+                        self.view.itemRegistry.setItem(newItem.id, newItem);
+                        cosmo.view.cal.placeItemInItsCollectionRegistries(newItem);
                         // Repaint the updated list
                         self.view.itemRegistry.each(appendLozenge);
                         updateEventsDisplay();
@@ -1149,29 +1154,8 @@ cosmo.view.cal.canvas = new function () {
                 'clearSelected', 'data': null });
             return;
         }
-        var reg;
-        switch(removeType){
-            case 'singleEvent':
-                removeEvent(item);
-                break;
-            case recurOpts.ALL_EVENTS:
-                reg = cosmo.view.cal.itemRegistry.clone();
-                reg = self.view.filterOutRecurrenceGroup(
-                    reg, [item.data.getUid()]);
-                removeAllEventsFromDisplay();
-                cosmo.view.cal.itemRegistry = reg;
-                cosmo.view.cal.itemRegistry.each(appendLozenge);
-                break;
-            case recurOpts.ALL_FUTURE_EVENTS:
-                reg = cosmo.view.cal.itemRegistry.clone();
-                reg = self.view.filterOutRecurrenceGroup(
-                    reg, [item.data.getUid()],
-                    item.data.getEventStamp().getRrule().getEndDate());
-                removeAllEventsFromDisplay();
-                cosmo.view.cal.itemRegistry = reg;
-                cosmo.view.cal.itemRegistry.each(appendLozenge);
-                break;
-            case recurOpts.ONLY_THIS_EVENT:
+        if (item.data.hasRecurrence()) {
+            if (removeType == recurOpts.ONLY_THIS_EVENT) {
                 removeEvent(item);
                 // 'Only this event' removal from a recurrence
                 // Unlock all the other items in the series
@@ -1183,13 +1167,25 @@ cosmo.view.cal.canvas = new function () {
                     }
                 }
                 cosmo.view.cal.itemRegistry.each(f);
-                break;
+            }
+            else {
+                removeAllEventsFromDisplay();
+                var currColl = cosmo.app.pim.currentCollection;
+                var dt = removeType == recurOpts.ALL_FUTURE_EVENTS ?
+                    item.data.getEventStamp().getRrule().getEndDate() : null;
+                cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry(
+                    currColl, [item.data.getUid()], { dateToBeginRemoval: dt });
+                self.view.itemRegistry =
+                    cosmo.view.cal.createItemRegistryFromCollections();
+                self.view.itemRegistry.each(appendLozenge);
+            }
         }
-        // If we just removed the last item, clear the form
-        if (self.view.itemRegistry.length == 0) {
-            dojo.event.topic.publish('/calEvent', { 'action':
-                'clearSelected', 'data': null });
+        else {
+            removeEvent(item);
         }
+        self.clearSelectedItem();
+        dojo.event.topic.publish('/calEvent', { 'action':
+            'clearSelected', 'data': null });
         updateEventsDisplay();
     }
 
@@ -1324,7 +1320,7 @@ cosmo.view.cal.canvas = new function () {
         }
         // Reset the lozenge properties from the event
         ev.lozenge.updateFromEvent(ev, true);
-        // Do visual updates to size, position
+        // Do visual updates to size, position, z-index
         ev.lozenge.updateElements();
 
         // Display processing animation
@@ -1339,7 +1335,7 @@ cosmo.view.cal.canvas = new function () {
      */
     function createNewCalItem(evParam) {
         dojo.debug("createNewCalItem 1");
-        var ev = null; // New event
+        var item = null; // New event
         var evSource = '';
         var lozType = ''; // Lozenge type
         var types = cosmo.view.cal.lozenge.lozengeTypes;
@@ -1390,9 +1386,8 @@ cosmo.view.cal.canvas = new function () {
             eventStamp.setAnyTime(true);
         }
 
-
-        // Create the CalItem
-        ev = new cosmo.view.cal.CalItem(id);
+        // Put the new item in the currently selected collection
+        var currCollId = cosmo.app.pim.currentCollection.getUid();
 
         // Set EventStamp start and end calculated from click position
         // --------
@@ -1403,21 +1398,25 @@ cosmo.view.cal.canvas = new function () {
         //normally the delta does the autotriaging, but since this is a new event
         //there is no delta, so we do it manually.
         note.autoTriage();
-        ev.data = note;
+
+        // Create the CalItem
+        item = new cosmo.view.cal.CalItem(note, [currCollId]);
 
         // Register the new event in the event list
-        // ================================
-        cosmo.view.cal.itemRegistry.setItem(id, ev);
+        cosmo.view.cal.itemRegistry.setItem(item.id, item);
+        // Put it in the current collection's registry
+        cosmo.view.cal.placeItemInItsCollectionRegistries(item);
 
         // Set up the lozenge for the event, and put it
         // on the appropriate canvas
-        ev.lozenge = cosmo.view.cal.lozenge.createNewLozenge(ev.id, lozType);
-        ev.lozenge.setUpDomAndAppend(ev.id,
+        item.lozenge = cosmo.view.cal.lozenge.createNewLozenge(item.id, lozType);
+        item.lozenge.setUpDomAndAppend(item.id,
             self.getCanvasAreaByLozengeType(lozType));
+
 
         // Save new event
         dojo.event.topic.publish('/calEvent', { 'action': 'save',
-            'data': ev, 'qualifier': 'new' })
+            'data': item, 'qualifier': 'new' })
         return cosmo.view.cal.itemRegistry.getItem(id);
     };
     /**

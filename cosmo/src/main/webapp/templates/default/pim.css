@@ -50,7 +50,7 @@
     position: absolute;
     border-right: 1px solid #dfdfdf;
 }
-/* Top half-hour of a one-hour block on the timed canvas 
+/* Top half-hour of a one-hour block on the timed canvas
  * NOTE: IE6 needs a background color of these DOM Nodes
  * for the ondblclick event listener to fire
  * */
@@ -173,11 +173,6 @@
     position: absolute;
     top: 8px;
 }
-/* "All to my account" link */
-#addCollectionPrompt {
-    padding-top: 2px;
-    padding-left: 4px;
-}
 /* Jump-to date box */
 #jumpToDateDiv {
     padding: 0px;
@@ -249,8 +244,8 @@
     overflow: hidden;
 }
 #listViewTable {
-  table-layout: fixed;
-  width: 100%;
+    table-layout: fixed;
+    width: 100%;
 }
 .listViewHeaderCell {
     color: #000;
@@ -442,7 +437,7 @@
     z-index: 0;
     background-image: url(images/tiling_horizontal.png);
     background-position: 0px -80px;
-    
+
 }
 .expandoHeadFg {
     position: absolute;
@@ -476,7 +471,7 @@
 }
 #markupBar {
     height: 18px;
-    background-color: #fbfbfb; 
+    background-color: #fbfbfb;
     border-bottom: 1px solid #ccc;
 }
 #detailViewByline {
@@ -487,6 +482,47 @@
 	  font-size: 10px;
     line-height: 12px;
     color: #808080;
+}
+/* Collection selector
+ * --------------------- */
+#collectionDisplay {
+    width: 100%;
+    margin: auto;
+}
+#collectionSelectorContainer {
+    border-bottom: 1px solid #ccc;
+    overflow: auto;
+}
+#collectionSelectorOrLabel {
+    padding-top: 8px;
+    padding-left: 4px;
+}
+/* "All to my account" link */
+#addCollectionPrompt {
+    padding-top: 2px;
+    padding-left: 8px;
+}
+#collectionSelectorTable {
+    table-layout: fixed;
+    width: 100%;
+}
+.collectionSelectorCheckbox {
+    width: 18px;
+    padding-left: 3px;
+    text-align: center;
+}
+.collectionSelectorCollectionName {
+    padding-left: 5px;
+    padding-right: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.collectionSelectorSel {
+    background-color: #deeeff;
+}
+.collectionSelectorDetails {
+    width: 18px;
 }
 
 /* Minical styles
@@ -507,13 +543,14 @@
     position: relative;
     text-align: left;
     margin: auto;
-    width: 140px;
+    width: 160px;
+}
+#miniCalNavPanel {
     border: 1px solid #ccc;
 }
 #miniCalNavPanel td {
     font-size: 0.9em;
     font-weight: bold;
-    border-bottom: 1px solid #ccc;
     line-height: 1.4em;
     padding-left: 4px;
     padding-right: 4px;

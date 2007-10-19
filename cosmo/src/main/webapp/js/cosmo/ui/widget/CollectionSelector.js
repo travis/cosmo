@@ -352,6 +352,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             // The content is several left-floated
             // divs -- this allows for correct vertical alignment of
             // the icon images with the text they sit beside
+            // -----
             // Ticket view -- just show the collection name
             if (passedKey) {
                 renderSingleCollectionName();

@@ -1,0 +1,2 @@
+
+windmill.jsTest.registerTestNamespace('unsavedChangesTests');

@@ -57,34 +57,39 @@ cosmo.view.viewBase = new function () {
      * master item in a recurrence
      * @return a new Hash to be used as your itemRegistry
      */
-    this.filterOutRecurrenceGroup = function (reg, arr, dt, ignore) {
-        // Default behavior is to remove the lozenge
-        var str = ',' + arr.join() + ',';
-        var h = new Hash();
-        var item = null;
-        var compDt = dt ? new cosmo.datetime.Date(dt.getFullYear(),
+    this.filterOutRecurrenceGroup = function (reg, ids, o) {
+        var opts = o || {};
+        var ignore =  opts.ignore || null;
+        var idList = ',' + ids.join() + ',';
+        var newReg = new Hash();
+        var origReg = reg.clone();
+        var dt = opts.dateToBeginRemoval || null;
+        var dateToBegin = dt ? new cosmo.datetime.Date(dt.getFullYear(),
             dt.getMonth(), dt.getDate(), 23, 59) : null;
-        while (item = reg.pop()) {
-            var removeForDate = true;
+        var filterFunc = function (id, item) {
+            if (!item) { 
+                console.log(id);    
+                throw new Error('item does not exist'); 
+            }
             var keep = false;
+            var masterUid = item.data.getUid();
             switch (true) {
                 // Any to be specifically ignored -- this is all-mighty
                 case (item.id == ignore):
                     keep = true;
                     break;
                 // Any that don't have matching ids -- keep these too
-                case (str.indexOf(',' + item.data.getUid() + ',') == -1):
+                case (idList.indexOf(',' + masterUid + ',') == -1):
                     keep = true;
                     break;
                 // Matching ids -- candidates for removal
-                case (str.indexOf(',' + item.data.getUid() + ',') > -1):
-                    // If also filtering by date, check the start date of
-                    // matching items as well
-                    if (compDt){
+                case (idList.indexOf(',' + masterUid + ',') > -1):
+                    // Filtering by date -- All Future Items
+                    if (dateToBegin){
                         var eventStamp = item.data.getEventStamp();
                         var startDate = eventStamp.getStartDate();
                         var endDate = eventStamp.getEndDate();
-                        if (startDate.toUTC() < compDt.toUTC()) {
+                        if (startDate.toUTC() < dateToBegin.toUTC()) {
                             keep = true;
                         }
                     }
@@ -93,9 +98,20 @@ cosmo.view.viewBase = new function () {
                     // Throw it out
                     break;
             }
-            if (keep) { h.setItem(item.id, item); }
+            if (!keep) {
+                if (opts.collectionForRemoval && item.collectionIds) {
+                    item.removeCollection(opts.collectionForRemoval);
+                }
+                origReg.removeItem(item.id);
+            }
         }
-        return h;
+        reg.each(filterFunc);
+        // Do inplace substitution of param Hash passed in
+        // return it
+        var item = null;
+        while (item = reg.pop()) {}
+        reg.append(origReg);
+        return reg;
     };
     /**
      * Handle events published on the '/app' channel -- app-wide

@@ -43,6 +43,7 @@ cosmo.view.cal.viewStart = null;
 cosmo.view.cal.viewEnd = null;
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.cal.itemRegistry = null;
+cosmo.view.cal.collectionItemRegistries = {};
 
 /**
  * Handle events published on the '/calEvent' channel, including
@@ -78,11 +79,20 @@ cosmo.view.cal.handlePub_calEvent = function (cmd) {
     }
 };
 
-cosmo.view.cal.triggerLoadEvents = function (o) {
+cosmo.view.cal.triggerLoadEvents = function (p) {
     dojo.debug("trigger!");
     var _cal = cosmo.view.cal; // Scope-ness
-    var opts = {};
-    var goToNav = o.goTo;
+    var params = p || {};
+    var goToNav = null;
+    var start = null;
+    var end = null;
+    var eventLoadList = null;
+    var isErr = false;
+    var detail = '';
+    var evData = null;
+    var id = '';
+    var ev = null;
+    var collectionReg = cosmo.view.cal.collectionItemRegistries;
 
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
@@ -94,7 +104,8 @@ cosmo.view.cal.triggerLoadEvents = function (o) {
     // of the calendar view, but still display sync'd
     // information -- what's a good way to consolidate this?
     // --------
-    if (goToNav) {
+    if (params.goTo) {
+        goToNav = params.goTo;
         dojo.debug("goto");
         // param is 'back' or 'next'
         if (typeof goToNav == 'string') {
@@ -107,126 +118,193 @@ cosmo.view.cal.triggerLoadEvents = function (o) {
         else {
             queryDate = goToNav;
         }
-        // Update _cal.viewStart and _cal.viewEnd with new dates
-        _cal.setQuerySpan(queryDate);
+        cosmo.app.pim.currDate = queryDate;
     }
+    else {
+        queryDate = cosmo.app.pim.currDate;
+    }
+    _cal.setQuerySpan(queryDate);
 
     // Opts obj to pass to topic publishing
-    opts = {
+    var opts = {
         viewStart: _cal.viewStart,
         viewEnd: _cal.viewEnd,
         currDate: cosmo.app.pim.currDate
     }
-    // Pass along the original opts
-    for (var n in o) { opts[n] = o[n]; }
+    for (var n in params) { opts[n] = params[n]; }
 
-    _cal.loadEvents(opts);
-};
-/**
- * Loading events in the initial app setup, and week-to-week
- * navigation.
- * @param start Number, timestamp for the start of the query
- * period
- * @param end Number, timestamp for the end of the query
- * period
- * @return Boolean, true
- */
-cosmo.view.cal.loadEvents = function (o) {
-    var opts = o || {};
-    var _cal = cosmo.view.cal; // Scope-ness
     // Default to the app's currentCollection if one isn't passed
     var collection = opts.collection || cosmo.app.pim.currentCollection;
-    if (!cosmo.app.pim.currentCollection) return;
-    var start = null;
-    var end = null;
-    var eventLoadList = null;
-    var eventLoadHash = new Hash();
-    var isErr = false;
-    var detail = '';
-    var evData = null;
-    var id = '';
-    var ev = null;
-
-    // If nothing explicit is passed for the query time-bounds,
-    // initialize viewStart and viewEnd to the current week
-    if (!opts.viewStart || !opts.viewEnd) {
-        _cal.setQuerySpan(cosmo.app.pim.currDate);
-        opts.viewStart = _cal.viewStart;
-        opts.viewEnd = _cal.viewEnd;
-    }
+    if (!collection) return;
 
     start = opts.viewStart;
     end = opts.viewEnd;
 
-    var handleErr = function (e) {
-        if (e instanceof cosmo.service.exception.ResourceNotFoundException){
-            cosmo.app.pim.reloadCollections();
-        }
-        cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
-    };
-    // Load the array of events
-    // ======================
-    try {
-        var deferred = cosmo.app.pim.serv.getItems(collection,
-            { start: start, end: end }, { sync: true });
-        var results = deferred.results;
-        // Catch any error stuffed in the deferred
-        if (results[1]) {
-            handleErr(results[1]);
-            return false;
-        }
-        else {
-            eventLoadList = results[0];
+    var _this = this;
+    var loadEach = function (collId, coll) {
+        if (goToNav) { coll.isDisplayed = false; }
+        var handleErr = function (e) {
+            if (e instanceof cosmo.service.exception.ResourceNotFoundException){
+                cosmo.app.pim.reloadCollections();
+            }
+            cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
+        };
+        if (coll.isDisplayed != coll.doDisplay) {
+            if (coll.doDisplay) {
+                try {
+                    var deferred = cosmo.app.pim.serv.getItems(coll,
+                        { start: start, end: end }, { sync: true });
+                    var results = deferred.results;
+                    // Catch any error stuffed in the deferred
+                    if (results[1]) {
+                        handleErr(results[1]);
+                        return false;
+                    }
+                    else {
+                        eventLoadList = results[0];
+                        var h = _this.createEventRegistry(eventLoadList, collId);
+                        collectionReg[collId] = h;
+                    }
+                }
+                catch(e) {
+                    handleErr(e);
+                    return false;
+                }
+            }
+            else {
+                collectionReg[collId] = new cosmo.util.hash.Hash();
+            }
+            coll.isDisplayed = coll.doDisplay;
         }
     }
-    catch(e) {
-        handleErr(e);
-        return false;
-    }
+    cosmo.app.pim.collections.each(loadEach);
 
-    var eventLoadHash = this.createEventRegistry(eventLoadList);
+    var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
+
     dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
-        data: eventLoadHash, opts: opts });
+        data: itemRegistry, opts: opts });
     return true;
 };
 /**
  * Create a Hash of CalItem objects with data property of stamped
  * Note objects.
- * @param arrParam Either an Array, or JS Object with multiple Arrays,
+ * @param arr Array
  * containing stamped Note objects
  * @return Hash, the keys are the UID of the Notes, and the values are
  * the CalItem objects.
  */
-cosmo.view.cal.createEventRegistry = function(arrParam) {
+cosmo.view.cal.createEventRegistry = function(arr, collId) {
     var h = new cosmo.util.hash.Hash();
-    var arr = [];
-
-    // Param may be a single array, or hashmap of arrays -- one
-    // for each recurring event sequence
-    // ---------------------------------
-    // If passed a simple array, use it as-is
-    if (arrParam.length) {
-        arr = arrParam;
+    // Testing for a length property or such is generally
+    // more reliable than instanceof Array
+    if (typeof arr.length != 'number') {
+        throw new Error('Items loaded not in an Array.');
     }
-    // If passed a hashmap of arrays, suck all the array items
-    // into one array
-    else {
-        for (var j in arrParam) {
-            var a = arrParam[j];
-            for (var i = 0; i < a.length; i++) {
-                arr.push(a[i]);
-            }
-        }
-    }
-
     for (var i = 0; i < arr.length; i++) {
         var note = arr[i];
-        var id = note.getItemUid();
-        var ev = new cosmo.view.cal.CalItem(id, null, note);
-        h.setItem(id, ev);
+        var item = cosmo.view.cal.createItemForCollection(note, collId);
+        h.setItem(item.id, item);
     }
     return h;
-}
+};
+cosmo.view.cal.createItemRegistryFromCollections = function () {
+    var itemReg = new cosmo.util.hash.Hash();
+    var collectionReg = cosmo.view.cal.collectionItemRegistries;
+    var currCollId = '';
+    var selCollId = cosmo.app.pim.currentCollection.getUid();
+    // Do something sensible with duplicate items when
+    // building the consolidated itemRegistry
+    var fillInItem = function (id, item) {
+          // Always use the items from the selected collection
+          if (currCollId == selCollId) {
+              item.primaryCollectionId = currCollId;
+          }
+          itemReg.setItem(id, item);
+    };
+    for (var collId in collectionReg) {
+        currCollId = collId;
+        collectionReg[currCollId].each(fillInItem);
+    }
+    return itemReg;
+};
+cosmo.view.cal.createItemForCollection = function (note, collId) {
+    var collectionReg = cosmo.view.cal.collectionItemRegistries;
+    var id = note.getItemUid();
+    var item = null;
+    for (var c in collectionReg) {
+        item = collectionReg[c].getItem(id);
+        if (item) { break; }
+    }
+    // If you found the item already in another collection,
+    // it's a dup, so just add this collection's ID to the
+    // list of collectionIds and return it
+    if (item) {
+        item.collectionIds.push(collId);
+    }
+    // Otherwise create one from scratch
+    else {
+        item = new cosmo.view.cal.CalItem(note, [collId]);
+    }
+    return item;
+};
+cosmo.view.cal.placeItemInItsCollectionRegistries = function (item) {
+    var collIds = item.collectionIds;
+    var itemId = item.data.getItemUid();
+    for (var i = 0; i < collIds.length; i++) {
+        cosmo.view.cal.collectionItemRegistries[collIds[i]].setItem(itemId, item);
+    }
+};
+cosmo.view.cal.removeItemFromCollectionRegistry = function (item, coll) {
+    var itemId = item.data.getItemUid();
+    var collId = coll.getUid();
+    item.removeCollection(coll);
+    cosmo.view.cal.collectionItemRegistries[collId].removeItem(itemId);
+};
+cosmo.view.cal.placeRecurrenceGroupInItsCollectionRegistries =
+    function (collectionIds, occurrenceList) {
+    for (var i = 0; i < collectionIds.length; i++) {
+        var collId = collectionIds[i];
+        var origRegistry =
+            cosmo.view.cal.collectionItemRegistries[collId];
+        var newRegistry = cosmo.view.cal.createEventRegistry(occurrenceList, collId);
+        origRegistry.append(newRegistry);
+    }
+};
+cosmo.view.cal.removeRecurrenceGroupFromItsCollectionRegistries =
+    function (collIds, idsToRemove, o) {
+    for (var i = 0; i < collIds.length; i++) {
+        var coll = cosmo.app.pim.collections.getItem(collIds[i]);
+        cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry(
+            coll, idsToRemove, o);
+    }
+};
+cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry =
+    function (coll, idsToRemove, o) {
+    var opts = o || {};
+    var collId = coll.getUid();
+    var origRegistry =
+        cosmo.view.cal.collectionItemRegistries[collId];
+    var newRegistry = cosmo.view.cal.filterOutRecurrenceGroup(
+        origRegistry, idsToRemove, { dateToBeginRemoval:
+            opts.dateToBeginRemoval, collectionForRemoval: coll });
+    cosmo.view.cal.collectionItemRegistries[collId] = newRegistry;
+};
+cosmo.view.cal.displayCollections = function (c) {
+    var newCollection = c || null;
+    var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+    // Publish this through a setTimeout call to
+    // avoid hanging the UI thread
+    if (newCollection) {
+        cosmo.app.pim.currentCollection = newCollection;
+    }
+    var f = function () { dojo.event.topic.publish('/calEvent', {
+        action: 'loadCollection', opts: { loadType: 'changeCollection',
+        collection: newCollection }, data: {}
+    }); };
+    loading.show();
+    setTimeout(f, 0);
+};
+
 /**
  * Get the start and end for the span of time to view in the cal
  */

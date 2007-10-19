@@ -19,6 +19,7 @@ dojo.provide("cosmotest.service.conduits.test_conduits");
 dojo.require("cosmo.service.conduits.common");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
+dojo.require("dojo.lang.*");
 
 cosmotest.service.conduits.test_conduits = {
     test_Note: function(){
@@ -261,13 +262,6 @@ cosmotest.service.conduits.test_conduits = {
             });
 
             
-			// Test dashboard projection for single
-			// recurring events
-            var item0DashboardOccurrences = conduit.getDashboardItems(item0, 
-               {sync: true}
-            ).results[0];
-            jum.assertEquals("wrong number of occurrences", 2, item0DashboardOccurrences.length);
-
             var item4 = item0Occurrences[3];
             var item4Rid = item4.recurrenceId;
             var newDisplayName = "Ze New Name"
@@ -338,13 +332,13 @@ cosmotest.service.conduits.test_conduits = {
             var masterItem = conduit.getItem(masterUid, {sync: true}).results[0];
 
             jum.assertTrue("Removing stamp didn't work", !masterItem.getStamp('event'));
-   
+
         } finally {
            cosmotest.service.conduits.test_conduits.cleanup(user);            
         }
     },
     
-    test_ThisAndFuture: function(){
+    test_ThisAndFutureCal: function(){
         try {
             var user = cosmotest.service.conduits.test_conduits.createTestAccount();
             
@@ -406,7 +400,59 @@ cosmotest.service.conduits.test_conduits = {
                {sync: true}
             ).results[0];
             jum.assertEquals("wrong number of old item occurrences", 3, item0Occurrences.length);
-                        
+
+        } finally {
+           cosmotest.service.conduits.test_conduits.cleanup(user);            
+        }
+    },
+
+    test_ThisAndFutureDash: function(){
+        try {
+            var user = cosmotest.service.conduits.test_conduits.createTestAccount();
+            
+            var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
+            var collections = conduit.getCollections({sync: true}).results[0];
+            
+            var c0 = collections[0];
+            
+            var newItem = new cosmo.model.Note(
+            {
+                displayName: "Blah blah blah"
+            }
+            );
+            
+            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45);
+            startDate.setMilliseconds(0);
+
+            var duration = new cosmo.model.Duration({hour: 1});
+            var loc = "Wherever";
+            var stat = "CONFIRMED";
+            newItem.getEventStamp(true, {
+                startDate: startDate,
+                duration: duration,
+                location: loc,
+                status: stat,
+                rrule: new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY})
+            });
+
+            conduit.createItem(newItem, c0, {sync: true});
+
+            console.log("futz");
+            var c0Occurrences = conduit.getDashboardItems(c0, 
+               {sync: true}
+            ).results[0];
+            var items = dojo.lang.filter(c0Occurrences, function(item){return item.getUid() == newItem.getUid()});
+            var item = dojo.lang.filter(items, function(item){return item.getTriageStatus() == 200})[0];
+            var newMaster = item.getMaster().clone();
+            newMaster.setDisplayName("Bop bop a lee bop");
+            newMaster.getEventStamp().setStartDate(item.getEventStamp().getStartDate());
+            dojo.require("cosmo.util.uuid");
+            var gen = new cosmo.util.uuid.RandomGenerator()
+            var newUid = gen.generate();
+            newMaster.setUid(newUid);
+            conduit.saveThisAndFuture(item, newMaster, {sync: true});
+            conduit.getDashboardItems(newMaster);
+
         } finally {
            cosmotest.service.conduits.test_conduits.cleanup(user);            
         }

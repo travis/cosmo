@@ -170,16 +170,9 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         var r = {};
         
         var expandedLink = item.getUrls()['expanded'];
-        
-        var defaultProjection = "/full/eim-json";
-        var projectionIndex = expandedLink.indexOf(defaultProjection);
-        if (projectionIndex > 0) {
-            expandedLink = expandedLink.substring(0, projectionIndex) + 
-                           expandedLink.substring(projectionIndex  + defaultProjection.length);
-        }
 
         r.url = this.generateUri(cosmo.env.getBaseUrl() +
-          "/atom/" + expandedLink, "/" + projection, query);
+          "/atom/" + expandedLink, "", query);
 
         r.method = this.METHOD_GET;
         

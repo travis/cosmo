@@ -379,7 +379,7 @@ cosmo.view.service = new function () {
                     self.processingQueue.shift();
                     return;
                 }
-            } else if (err instanceof ccosmo.service.exception.CollectionLockedException){
+            } else if (err instanceof cosmo.service.exception.CollectionLockedException){
                     errMsg = _('Main.Error.EventEditSaveFailed.CollectionLocked');
                     cosmo.app.showErr(errMsg);
                     self.processingQueue.shift();

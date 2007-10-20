@@ -25,6 +25,8 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 
+import org.osaf.cosmo.util.UriTemplate;
+
 /**
  * This class encapsulates the addressing scheme for all client
  * services provided by Cosmo, those protocols and interfaces that
@@ -436,7 +438,8 @@ public class ServiceLocator implements ServerConstants {
         if (absolute)
             buf.append(appMountUrl).append(servicePrefix).append("/");
 
-        buf.append(PATH_USER).append("/").append(user.getUsername());
+        buf.append(PATH_USER).append("/").
+            append(UriTemplate.escapeSegment(user.getUsername()));
 
         return buf.toString();
     }

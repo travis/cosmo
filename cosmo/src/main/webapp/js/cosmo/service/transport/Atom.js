@@ -45,6 +45,10 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     PROJECTION_FULL_EIM_JSON: "/full/eim-json",
     
     CONTENT_TYPE_ATOM: "application/atom+xml",
+
+    _getUsernameForURI: function(){
+        return encodeURIComponent(cosmo.util.auth.getUsername());
+    },
     
     getAndCheckEditLink: function(item, searchCrit){
         searchCrit = searchCrit || {};
@@ -93,7 +97,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
         
         var r = {};
-        r.url = this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername();
+        r.url = this.getAtomBase() + "/user/" + this._getUsernameForURI();
         
         return this.bind(r, kwArgs);
     },
@@ -103,7 +107,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         
         var r = {};
         r.url = this.getAtomBase() + "/user/" + 
-                cosmo.util.auth.getUsername() + "/subscriptions";
+                this._getUsernameForURI() + "/subscriptions";
 
         return this.bind(r, kwArgs);
     },
@@ -204,7 +208,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
         var r = {};
         r.url = this.getAtomBase() + "/user/" + 
-            cosmo.util.auth.getUsername() + "/subscriptions";
+            this._getUsernameForURI() + "/subscriptions";
         r.contentType = this.CONTENT_TYPE_ATOM;
         r.postContent = postContent;
         r.method = this.METHOD_POST;
@@ -269,7 +273,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = dojo.lang.shallowCopy(kwArgs);
         kwArgs.noErr = true;
         return this.bind({
-          url: this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preference/"+ key,
+          url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/"+ key,
           method: this.METHOD_HEAD
         }, kwArgs);
     },
@@ -291,14 +295,14 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         // If exists returned a 200
         existsDeferred.addCallback(dojo.lang.hitch(this, function (){
             request.method = this.METHOD_PUT
-            request.url = this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preference/" + key;
+            request.url = this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key;
             return this.bind(request, kwArgs);
         }));
         
         // If exists returned a 404
         existsDeferred.addErrback(dojo.lang.hitch(this, function (){
             request.method = this.METHOD_POST;
-            request.url = this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preferences";
+            request.url = this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences";
 
             return this.bind(request, kwArgs);
         }));
@@ -307,7 +311,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     getPreferences: function (kwArgs){
         return this.bind(
-            {url: this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preferences"
+            {url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences"
             }, 
             kwArgs);
     },
@@ -315,7 +319,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     getPreference: function (key, kwArgs){
         return this.bind(
             {
-                url: this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preference/" + key,
+                url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
                 method: this.METHOD_GET
             },
             kwArgs);
@@ -324,7 +328,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     deletePreference: function(key, kwArgs){
         return this.bind(
             {
-                url: this.getAtomBase() + "/user/" + cosmo.util.auth.getUsername() + "/preference/" + key,
+                url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
                 method: this.METHOD_DELETE
             },
             kwArgs);

@@ -1,5 +1,7 @@
-{"method": "open", "params": {"url" : "/"}}
+{"method": "waits.forElement", "params": {"id": "loginDialogFormContainer"}}
 {"method": "click", "params": {"link" : "Create a new account"}}
+{"params": {"milliseconds": 6000}, "version": "0.1", "method": "waits.sleep"}
+{"method": "waits.forElement", "params": {"id": "modalDialogTitle", "timeout": 40000}}
 {"params": {"id": "modalDialogTitle"}, "version": "0.1", "method": "asserts.assertNode"}
 {"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
 {"params": {"text": "{$random}", "id": "username"}, "version": "0.1", "method": "type"}
@@ -9,9 +11,11 @@
 {"params": {"text": "testers", "id": "password"}, "version": "0.1", "method": "type"}
 {"params": {"text": "tester", "id": "confirm"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"params": {"milliseconds": 2000}, "version": "0.1", "method": "waits.sleep"}
 {"params": {"validator": "Passwords do not match.", "id": "modalDialogContent"}, "version": "0.1", "method": "asserts.assertText"}
 {"params": {"text": "tester", "id": "password"}, "version": "0.1", "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"method": "waits.forElement", "params": {"id": "modalDialogPrompt", "timeout": 40000}}
 {"params": {"validator": "You have successfully created your Chandler Server account.", "id": "modalDialogPrompt"}, "version": "0.1", "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"}, "version": "0.1", "method": "click"}
 

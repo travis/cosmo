@@ -1,3 +1,5 @@
+{"method": "click", "params": {"jsid": "{$calView}"}}
+{"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": 40000}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
@@ -27,7 +29,7 @@
 {"method": "click", "params": {"jsid" : "{$dvSaveButton}"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
-{"method": "waits.sleep", "params": {"milliseconds" : 7000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"method": "doubleClick", "params": {"id" : "hourDiv1-900"}}
 {"method": "type", "params": {"id" : "noteTitle", "text": "Testing Daily Recurrence"}}
 {"method": "select", "params": {"id" : "recurrenceInterval", "option": "Daily"}}
@@ -53,4 +55,3 @@
 {"method": "select", "params": {"id" : "recurrenceInterval", "option": "Yearly"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description of my test of yearly recurrenceInterval."}}
 {"method": "click", "params": {"jsid" : "{$dvSaveButton}"}}
-{"method": "click", "params": {"link" : "Log out"}}

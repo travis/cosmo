@@ -1,5 +1,5 @@
 {"method": "click", "params": {"jsid": "{$listView}"}}
-{"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}
+{"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": "40000"}}
 {"params": {"id": "listViewQuickItemEntry"}, "version": "0.1", "method": "click"}
 {"params": {"text": "BBQ at my house", "id": "listViewQuickItemEntry"}, "version": "0.1", "method": "type"}
 {"params": {"milliseconds": "3000"}, "version": "0.1", "method": "waits.sleep"}

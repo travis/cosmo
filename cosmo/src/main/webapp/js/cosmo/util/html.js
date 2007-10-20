@@ -252,7 +252,9 @@ cosmo.util.html.handleTextInputFocus = function (e) {
         t.value = '';
     }
     else {
-        t.select();
+        if (typeof t.select == 'function') {
+            t.select();
+        }
     }
 };
 

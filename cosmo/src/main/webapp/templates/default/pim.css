@@ -508,6 +508,7 @@
 }
 .collectionSelectorCheckbox {
     width: 18px;
+    height: 16px;
     padding-left: 3px;
     text-align: center;
 }
@@ -522,7 +523,10 @@
     background-color: #deeeff;
 }
 .collectionSelectorDetails {
-    width: 18px;
+    width: 16px;
+    height: 15px;
+    border-top: 1px solid white;
+    cursor: pointer;
 }
 
 /* Minical styles

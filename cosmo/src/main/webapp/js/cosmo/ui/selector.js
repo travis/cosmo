@@ -18,6 +18,8 @@ dojo.provide("cosmo.ui.selector");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
 dojo.require("dojo.event.*");
+dojo.require("dojo.gfx.color.hsv");
+
 dojo.require("cosmo.app.pim");
 dojo.require('cosmo.convenience');
 dojo.require("cosmo.topics");
@@ -33,12 +35,14 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     for (var n in params) { this[n] = params[n]; }
 
     dojo.event.topic.subscribe('/calEvent', _this, 'handlePub_calEvent');
-    dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, _this, 'handlePub_app');
-    dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, _this, 'handlePub_app');
+    dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
+        _this, 'handlePub_app');
+    dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
+        _this, 'handlePub_app');
 
     // Private vars
     this._selectedIndex = null;
-    this._doRolloverEffect =  function(e, colorString) {
+    this._doRolloverEffect =  function(e, isOver) {
         // Safari 2 sucks -- DOM-event/DOM-node contention problems
         if (navigator.userAgent.indexOf('Safari/41') > -1) {
             return false;
@@ -49,16 +53,33 @@ cosmo.ui.selector.CollectionSelector = function (p) {
             if (targ.id == 'body') { return false; }
             var prefix = 'collectionSelector';
             if (targ.className.indexOf(prefix) > -1) {
-                var par = targ.parentNode;
-                var ch = par.childNodes;
-                for (var i = 0; i < ch.length; i++) {
-                    var node = ch[i];
-                    if (node.className != 'collectionSelectorDetails') {
-                        ch[i].style.backgroundColor = colorString;
+                var colorString;
+                if (targ.className.indexOf('Details') > -1) {
+                    var collId = targ.id.replace('collectionSelectorItemDetails_', '');
+                    var coll = cosmo.app.pim.collections.getItem(collId);
+                    var hue = coll.hue;
+                    var sv = isOver ? [50, 100] : [80, 90];
+                    colorString = this._getRGB(hue, sv[0], sv[1]);
+                    targ.style.backgroundColor = colorString;
+                }
+                else {
+                    colorString = isOver ? '#deeeff' : '';
+                    var par = targ.parentNode;
+                    var ch = par.childNodes;
+                    for (var i = 0; i < ch.length; i++) {
+                        var node = ch[i];
+                        if (node.className != 'collectionSelectorDetails') {
+                            ch[i].style.backgroundColor = colorString;
+                        }
                     }
                 }
             }
         }
+    };
+    this._getRGB = function (h, s, v) {
+        var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
+            inputRange: [360, 100, 100], outputRange: 255 });
+        return 'rgb(' + rgb.join() + ')';
     };
 
     // Interface methods
@@ -78,6 +99,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         this.render();
     };
     this.renderSelf = function () {
+        var _this = this;
         var collections = cosmo.app.pim.collections;
         var currColl = cosmo.app.pim.currentCollection;
         var container = _createElem('div');
@@ -103,7 +125,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     type: 'checkbox',
                     name: 'collectionSelectorItemCheck',
                     id: 'collectionSelectorItemCheck_' + cUid,
-                    checked: isChecked 
+                    checked: isChecked
                 });
                 td.appendChild(ch);
                 className = 'collectionSelectorCheckbox';
@@ -125,11 +147,15 @@ cosmo.ui.selector.CollectionSelector = function (p) {
             tr.appendChild(td);
 
             td = _createElem('td');
-            var icon = cosmo.util.html.createRollOverMouseDownImage(
-                cosmo.env.getImageUrl('collection_details.png'));
-            icon.style.cursor = 'pointer';
-            icon.id = 'collectionSelectorItemDetails_' + cUid;
+            td.id = 'collectionSelectorItemDetails_' + cUid;
+            var d = _createElem('div');
+            d.style.width = '6px';
+            d.style.height = '12px';
+            d.style.margin = 'auto';
+            var icon = cosmo.ui.imagegrid.createImageIcon(
+                { domNode: d, iconState: 'collectionDetailsDefault' });
             td.className = 'collectionSelectorDetails';
+            td.style.backgroundColor = _this._getRGB(c.hue, 80, 90);
             td.appendChild(icon);
             tr.appendChild(td);
 
@@ -156,10 +182,10 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         this.domNode.appendChild(container);
     };
     this.handleMouseOver = function (e) {
-        this._doRolloverEffect(e, '#deeeff');
+        this._doRolloverEffect(e, true);
     };
     this.handleMouseOut = function (e) {
-        this._doRolloverEffect(e, '');
+        this._doRolloverEffect(e, false);
     };
     this.handleClick = function (e) {
         if (e && e.target) {

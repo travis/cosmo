@@ -317,6 +317,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             coll.doDisplay = false;
             index = i % hues.length;
             var hue = hues[index];
+            coll.hue = hue;
             coll.colors = calcColors(hue);
             this.collections.addItem(coll.getUid(), coll);
         }

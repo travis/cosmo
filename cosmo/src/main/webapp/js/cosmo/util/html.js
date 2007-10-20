@@ -16,19 +16,19 @@
 
 dojo.provide("cosmo.util.html");
 
-cosmo.util.html.createSelect = function (id, name, size, 
+cosmo.util.html.createSelect = function (id, name, size,
     multi, selOptions, className, parentNode) {
 
     var sel = document.createElement('select');
     var o = {};
     var options = [];
     var appendElem = null;
-    
+
     // Also accept a keyword obj as a param -- options are passed
     // as a keyword prop, appendElem is a second arg after the obj
     // e.g, createSelect({ name: 'foo', id: 'foo', multi: true,
-    //    options: [{ text: 'Howdy', value: '123' }, 
-    //    { text: 'Hey', value: 'ABC' }], className: 'fooFoo' }, 
+    //    options: [{ text: 'Howdy', value: '123' },
+    //    { text: 'Hey', value: 'ABC' }], className: 'fooFoo' },
     //    nodeToAppendTo);
     if (typeof arguments[0] == 'object') {
         o = arguments[0];
@@ -60,7 +60,7 @@ cosmo.util.html.createSelect = function (id, name, size,
     if (options) {
         cosmo.util.html.setSelectOptions(sel, options);
     }
-    
+
     // Append the select if passed somewhere to put it
     if (appendElem) {
         appendElem.appendChild(sel);
@@ -69,17 +69,17 @@ cosmo.util.html.createSelect = function (id, name, size,
 };
 
 cosmo.util.html.getChildrenByTagName = function (node, tagName){
-    return dojo.lang.filter(node.getElementsByTagName(tagName), 
+    return dojo.lang.filter(node.getElementsByTagName(tagName),
         function(filterTarget){
             return (filterTarget.nodeName == tagName) && (filterTarget.parentNode == node);
         });
 };
-    
+
 cosmo.util.html.setSelectOptions = function (selectElement, options){
     while (selectElement.firstChild){
        selectElement.removeChild(selectElement.firstChild);
     }
-    
+
     for (var i = 0; i < options.length; i++) {
         var opt = document.createElement('option');
         opt.value = options[i].value;
@@ -89,7 +89,7 @@ cosmo.util.html.setSelectOptions = function (selectElement, options){
             selectElement.selectedIndex = i;
         }
     }
-    
+
 };
 
 cosmo.util.html.setSelect = function (sel, val) {
@@ -100,13 +100,13 @@ cosmo.util.html.setSelect = function (sel, val) {
                 break;
             }
         }
-        
+
     while (sel.selectedIndex != index){
         sel.selectedIndex = index;
         try {
             sel.options.item(index).selected = true;
         } catch (e) {
-            
+
         }
     }
 };
@@ -122,10 +122,10 @@ cosmo.util.html.createInput = function (type, id, name,
     var o = {};
     var input = null;
     var str = '';
-    
+
     // Also accept a keyword obj as a param -- options are passed
     // as a keyword prop, appendElem is a second arg after the obj
-    // e.g, createInput({ type: 'password', name: 'foo', id: 'foo', 
+    // e.g, createInput({ type: 'password', name: 'foo', id: 'foo',
     //      value: 'asdf', className: 'fooFoo' },  nodeToAppendTo);
     if (typeof arguments[0] == 'object') {
         o = arguments[0];
@@ -150,12 +150,12 @@ cosmo.util.html.createInput = function (type, id, name,
         }
         appendElem = parentNode;
     }
-    
+
     // Neither IE nor Safari can handle DOM-generated radio
     // or checkbox inputs -- they stupidly assume name and id
     // attributes should be identical. The solution: kick it
     // old-skool with conditional branching and innerHTML
-    if ((document.all || navigator.userAgent.indexOf('Safari') > -1) && 
+    if ((document.all || navigator.userAgent.indexOf('Safari') > -1) &&
         (o.type == 'radio' || o.type == 'checkbox')) {
         str = '<input type="' + o.type + '"' +
             ' name="' + o.name + '"' +
@@ -176,11 +176,11 @@ cosmo.util.html.createInput = function (type, id, name,
             str += ' class="' + o.className + '"';
         }
         str += '/>';
-        
+
         var s = document.createElement('span');
         s.innerHTML = str;
         input = s.firstChild;
-        s.removeChild(input); 
+        s.removeChild(input);
     }
     // Standards-compliant browsers -- all intputs
     // IE -- everything but radio button and checkbox
@@ -189,9 +189,9 @@ cosmo.util.html.createInput = function (type, id, name,
         for (var p in o) {
             input[p] = o[p];
         }
-            
+
     }
-    
+
     if (appendElem) {
         appendElem.appendChild(input);
     }
@@ -258,8 +258,8 @@ cosmo.util.html.handleTextInputFocus = function (e) {
 
 /*
  * Wrapper to hide browser differences in potentially namespaced elements.
- * 
- * Does not really support namespaces in a meaningful way due to the lack of 
+ *
+ * Does not really support namespaces in a meaningful way due to the lack of
  * Element.lookupNamespaceURI method on Safari.
  */
 cosmo.util.html.getElementsByTagName = function(parent, namespace, tagName, kwArgs){
@@ -267,23 +267,23 @@ cosmo.util.html.getElementsByTagName = function(parent, namespace, tagName, kwAr
         tagName = namespace;
         namespace = null;
     }
-    
+
     if (dojo.render.html.ie){
-        tagName = namespace? namespace + ":" + tagName : tagName; 
+        tagName = namespace? namespace + ":" + tagName : tagName;
         return parent.getElementsByTagName(tagName);
     }
     else {
         namespace = "*";
         return parent.getElementsByTagNameNS(namespace, tagName);
     }
-    
+
 };
 
 /**
  * Sets the text in a text input, may add grayed-out CSS class,
  * or disabled, based on passed params
  */
-cosmo.util.html.setTextInput = function (textbox, textValue, isDefaultText, 
+cosmo.util.html.setTextInput = function (textbox, textValue, isDefaultText,
     disabled) {
     textbox.className = isDefaultText ? 'inputTextDim' : 'inputText';
     textbox.value = textValue;
@@ -309,7 +309,7 @@ cosmo.util.html.clearFormElem = function (elem, elemType) {
 
         case 'radio':
         case 'checkbox':
-            if (elem.length) { 
+            if (elem.length) {
                 for (var i = 0; i < elem.length; i++) {
                     elem[i].checked = false;
                 }
@@ -321,11 +321,11 @@ cosmo.util.html.clearFormElem = function (elem, elemType) {
     }
 };
 
-cosmo.util.html.enableDisableFormElem = function (elem, elemType, 
+cosmo.util.html.enableDisableFormElem = function (elem, elemType,
     enabled) {
     var disabled = !enabled;
     if (elemType == 'radio' || elemType == 'checkbox') {
-        if (elem.length) { 
+        if (elem.length) {
             for (var i = 0; i < elem.length; i++) {
                 elem[i].disabled = disabled;
             }
@@ -377,8 +377,8 @@ cosmo.util.html.getElementTextContent = function (element){
 }
 
 cosmo.util.html.getFormValue =  function(form, fieldName){
-        //summary: given a form and a field name returns the value of that field. 
-        //         note: doesn't work with multi-selects (yet). 
+        //summary: given a form and a field name returns the value of that field.
+        //         note: doesn't work with multi-selects (yet).
         //         Checkboxes return the string "1" for checked and the string "0" for unchecked.
         var element = form[fieldName];
         var type = null;
@@ -403,7 +403,7 @@ cosmo.util.html.getFormValue =  function(form, fieldName){
             case "checkbox":
                 return element.checked ? "1" : "0";
                 break;
-            default: 
+            default:
                 alert(type);
                 return "";
                 break;

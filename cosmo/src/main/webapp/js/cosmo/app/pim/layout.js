@@ -372,7 +372,6 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
         var widget = dojo.widget.createWidget('cosmo:CollectionSelector', {
-            'collections': cosmo.app.pim.currentCollections,
             'currentCollection': cosmo.app.pim.currentCollection,
             'ticketKey': cosmo.app.pim.ticketKey }, selectorDiv, 'last');
         cB.widget = widget;
@@ -383,7 +382,6 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
             id: selectorDiv.id });
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
-        cB.render();
     }
 
     // Minical -- subclassed ContentBox
@@ -393,6 +391,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         cosmo.app.pim.currDate });
     leftSidebar.addChild(cB);
     leftSidebar.minical = cB;
+    // Not dependent on data loading -- just render
     cB.render();
 
     // Detail-view form
@@ -402,6 +401,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         id: detailDiv.id, top: 0 });
     rightSidebar.addChild(cB);
     rightSidebar.detailViewForm = cB;
+    // Not dependent on data loading -- just render
     rightSidebar.render();
 
 };

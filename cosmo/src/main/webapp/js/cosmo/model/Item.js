@@ -17,7 +17,7 @@ dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Delta");
-dojo.require("cosmo.util.uuid");
+dojo.require("dojo.uuid.TimeBasedGenerator");
 
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
@@ -37,7 +37,7 @@ cosmo.model.ACTION_CREATED = 500;
 
 cosmo.model._stampRegistry = {};
 
-cosmo.model.uuidGenerator = new cosmo.util.uuid.RandomGenerator();
+cosmo.model.uuidGenerator = dojo.uuid.TimeBasedGenerator;
 
 cosmo.model.getStampMetaData = function(stampName){
     return this._stampRegistry[stampName].constructor.prototype.stampMetaData;

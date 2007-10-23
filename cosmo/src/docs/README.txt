@@ -16,12 +16,6 @@ directory in Chandler Server with any WebDAV client (including the Windows XP,
 Linux and Apple OS X file managers), and you can share them with
 others in the same way as your calendar.
 
-Chandler Server is not a web-based personal information manager. It is a server
-that such an application could use to store and access many users'
-information over the Internet. OSAF's Scooby project aims to provide
-an innovative web interface for calendaring and will be tightly
-integrated with Chandler Server.
-
 Chandler Server is not a content management system. There is no support for
 common CMS features such as versioning, content editing or
 workflow. Chandler Server very simply allows calendar and file management

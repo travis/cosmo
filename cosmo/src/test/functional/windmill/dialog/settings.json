@@ -1,21 +1,20 @@
-{"method": "click", "params": {"link" : "Settings"}}
-{"method": "type", "params": {"id" : "email", "text": "steven@osafoundation.org"}}
-{"method": "type", "params": {"id" : "password", "text": "tester"}}
-{"method": "type", "params": {"id" : "confirm", "text": "testers"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td/input"}}
-{"method": "type", "params": {"id" : "confirm", "text": "tester"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td/input"}}
-{"method": "click", "params": {"link" : "Settings"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/span/div/table/tbody/tr/td[4]"}}
-{"method": "check", "params": {"id" : "showAccountBrowser"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/span/div/table/tbody/tr/td[6]"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td/input"}}
-{"method": "click", "params": {"link" : "Settings"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/span/div/table/tbody/tr/td[4]"}}
-{"method": "check", "params": {"id" : "showAccountBrowser"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td/input"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[2]/form/div/div/span/div[2]/div[3]/img"}}
-{"method": "select", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/div/table/tbody/tr[3]/td[2]/div/select", "option": "Apple iCal v2.x"}}
-{"method": "select", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[4]/div/table/tbody/tr[3]/td[2]/div/select", "option": "Feed Reader"}}
-{"method": "click", "params": {"xpath" : "/html/body/div[4]/table/tbody/tr[2]/td[2]/div[5]/span/table/tbody/tr/td[3]/div/table/tbody/tr/td[3]/input"}}
-{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"link": "Settings"}, "method": "click"}
+{"params": {"id": "password"}, "method": "click"}
+{"params": {"text": "bobber", "id": "password"}, "method": "type"}
+{"params": {"text": "bobbers", "id": "confirm"}, "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"params": {"id": "modalDialogContent"}, "method": "asserts.assertNode"}
+{"params": {"validator": "Passwords do not match.", "id": "modalDialogContent"}, "method": "asserts.assertText"}
+{"params": {"id": "confirm"}, "method": "click"}
+{"params": {"text": "bobber", "id": "confirm"}, "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"params": {"link": "Settings"}, "method": "click"}
+{"params": {"jsid": "{$dialogTab1}"}, "method": "click"}
+{"params": {"id": "showAccountBrowser"}, "method": "check"}
+{"params": {"id": "showAccountBrowser"}, "method": "asserts.assertChecked"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"params": {"link": "Account Browser"}, "method": "asserts.assertNode"}
+{"params": {"link": "Settings"}, "method": "click"}
+{"params": {"jsid": "{$dialogTab1}"}, "method": "click"}
+{"params": {"id": "showAccountBrowser"}, "method": "asserts.assertChecked"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}

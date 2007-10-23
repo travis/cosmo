@@ -8,6 +8,9 @@ test_list = [
 #mini-cal tests
 '../minical/mini_cal.json',
 
+#dialog tests
+'../dialog/settings.json',
+
 #canvas recurrence test
 '../canvas/recurrence/recurrence_dialog_test.json',
 '../canvas/recurrence/recurrence.json',

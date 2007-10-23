@@ -1,9 +1,0 @@
-{"method": "open", "params": {"url" : "http://qacosmo.osafoundation.org/cosmo/browse/{$random}"}}
-{"method":"reWriteAlert", "params":{}}
-{"method": "click", "params": {"link" : "[browse]"}}
-{"method": "click", "params": {"link" : "Log out"}}
-{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "root"}}
-{"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "cosmo"}}
-{"method": "click", "params": {"id" : "loginSubmitButton"}}
-{"method": "click", "params": {"link" : "Users"}}
-{"method": "click", "params": {"link" : "Log out"}}

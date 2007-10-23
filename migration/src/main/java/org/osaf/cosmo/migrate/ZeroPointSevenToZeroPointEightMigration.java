@@ -283,7 +283,7 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
             // get all to migrate
             stmt = conn.prepareStatement("select p.id, u.uid, p.preferencename, p.modifydate from user_preferences p, users u where p.userid=u.id");
             // migration statment
-            updateStmt = conn.prepareStatement("update subscription set etag=? where id=?");
+            updateStmt = conn.prepareStatement("update user_preferences set etag=? where id=?");
             
             rs = stmt.executeQuery();
             

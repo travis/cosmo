@@ -1,4 +1,4 @@
 
 Information on updates and changes to the OSAF Server bundle
-can be found at <http://chandlerproject.org/Developers/WebHome>
+can be found at <http://chandlerproject.org/releasenotes>
 

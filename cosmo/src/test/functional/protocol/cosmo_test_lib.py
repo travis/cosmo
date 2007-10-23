@@ -18,8 +18,8 @@ import random, uuid, os, sys
 from uuid import uuid1
 
 SERVER_URL = functest.registry.get('url', 'http://qacosmo.osafoundation.org')
-ADMIN_USER = 'root'
-ADMIN_PASS = 'cosmo'
+ADMIN_USER = functest.registry.get('admin_user', 'root')
+ADMIN_PASS = functest.registry.get('admin_pass', 'cosmo')
 PATH = functest.registry.get('path', '/')
 if not PATH.endswith('/'):
     PATH += '/'

@@ -19,7 +19,7 @@
  *     A package for interacting with atompub services.
  *
  *     For more information about Atom Publishing Protocol, please see:
- *     http://bitworking.org/projects/atom/draft-ietf-atompub-protocol-17.html
+ *     http://www.atomenabled.org/developers/protocol/atom-protocol-spec.php
  *
  *     cosmo.atompub.AppElement defines a number of functions designed
  *     to read special properties __elements__, __relements__ and __attributes__
@@ -31,19 +31,49 @@
 dojo.provide("cosmo.atompub");
 
 dojo.require("cosmo.service.transport.Rest");
+dojo.require("dojo.lang.*");
 
 dojo.declare("cosmo.atompub.AppElement", null, {
     __elements__: [],
     __relements__: [],
     __attributes__: [],
     initializer: function(xml, service){
-        dojo.debug(service)
         this.service = service;
         if (xml){
             this.fromXml(xml);
         }
     },
 
+    toString: function(){
+        var sList = [];
+        var names = this.getElementNames();
+        for (var i in names){
+            var name = names[i];
+            sList.push(name);
+            var object = this[name];
+            sList.push((object && object.toString)? object.toString() : object);
+            sList.push("\n");
+        }
+        return sList.join(" ");
+    },
+
+    getElementNames: function(){
+        var names = [];
+        for (var i in this.__elements__){
+            var elementSpecification = this.__elements__[i];
+            var elementName = elementSpecification[0];
+            var label = elementSpecification[2] || elementName;
+            names.push(label);
+        }
+        for (var i in this.__relements__){
+            var elementSpecification = this.__relements__[i];
+            var elementName = elementSpecification[0];
+            var label = elementSpecification[2] || elementName;
+            names.push(label);
+        }
+        return names;
+    },
+    
     _processRepeatableElementSpecification: function (xml, elementSpecification){
         var elementName = elementSpecification[0];
         var objectName = elementSpecification[2] || elementName;
@@ -85,10 +115,20 @@ dojo.declare("cosmo.atompub.AppElement", null, {
         dojo.lang.map(this.__attributes__, dojo.lang.curry(this,  "_processAttributeSpecification", xml));
     }
 });
+dojo.declare("cosmo.atompub.TextElement", null, {
+    initializer: function(xml){
+        dojo.debug(xml.textContent);
+        this.value = xml.textContent;
+    },
+    
+    toString: function(){
+        return this.value;
+    }
 
+});
 dojo.declare("cosmo.atompub.Accept", null, {});
 dojo.declare("cosmo.atompub.Categories", null, {});
-dojo.declare("cosmo.atompub.Title", null, {});
+dojo.declare("cosmo.atompub.Title", cosmo.atompub.TextElement, {});
 
 dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
     __attributes__: [
@@ -110,8 +150,31 @@ dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
         });
         
         feedDeferred.addCallback(dojo.lang.hitch(this, function(xml){return new cosmo.atompub.Feed(xml, this.service)}));
+        return feedDeferred;
     }
     
+});
+
+dojo.declare("cosmo.atompub.Generator", null, {});
+dojo.declare("cosmo.atompub.Icon", null, {});
+dojo.declare("cosmo.atompub.Id", null, {});
+dojo.declare("cosmo.atompub.Logo", null, {});
+dojo.declare("cosmo.atompub.Rights", null, {});
+dojo.declare("cosmo.atompub.Subtitle", null, {});
+dojo.declare("cosmo.atompub.Updated", null, {});
+dojo.declare("cosmo.atompub.Author",  cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Category", cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Contributor", null, {});
+dojo.declare("cosmo.atompub.Link", cosmo.atompub.AppElement, {
+    __attributes__: [
+        ["href", String],
+        ["type", String],
+        ["rel", String]
+    ],
+
+    toString: function(){
+        return this.rel + ": " + this.href
+    }
 });
 
 dojo.declare("cosmo.atompub.Feed", cosmo.atompub.AppElement, {
@@ -135,7 +198,6 @@ dojo.declare("cosmo.atompub.Feed", cosmo.atompub.AppElement, {
 });
 
 dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
-    
 });
 
 dojo.declare("cosmo.atompub.Workspace", cosmo.atompub.AppElement, {

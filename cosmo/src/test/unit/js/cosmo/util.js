@@ -38,7 +38,7 @@ cosmotest.util = {
            cosmo.cmp.signup(user, {
                load: function(){success = true}, 
                error: function(){
-                  cosmotest.service.conduits.test_conduits.cleanup(user);
+                  cosmotest.util.cleanup(user);
                   i++;
            }}, true);
        }
@@ -54,10 +54,15 @@ cosmotest.util = {
         cosmo.util.auth.clearAuth();
     },
     
-    asyncTest: function(callback){
+    asyncTest: function(callbackList){
         var user = cosmotest.util.createTestAccount();
         var td = new dojo.Deferred();
-        td.addCallback(callback);
+        
+        for (var i in callbackList){
+            var callback = callbackList[i];
+            td.addCallback(callback);
+        }
+
         td.addErrback(function(e){dojo.debug(e)});
         td.addBoth(dojo.lang.hitch(this, function(){this.cleanup(user)}));
         td.callback(user);

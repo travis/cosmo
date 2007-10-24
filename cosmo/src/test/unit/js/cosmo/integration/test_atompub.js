@@ -24,15 +24,19 @@ dojo.require("dojo.Deferred");
 
 cosmotest.integration.test_atompub = {
     test_Service: function(){
-        cosmotest.util.asyncTest(
+        var ctx = {};
+        cosmotest.util.asyncTest([
             function(user){
-                var serviceDeferred = cosmo.atompub.initializeService("user/" + user.username);
-                serviceDeferred.addCallback(function(service){
-                    feedDeferred = service.workspaces[0].collections[0].getFeed();
-                    return feedDeferred;
-                });
-                return serviceDeferred;
+                return cosmo.atompub.initializeService("user/" + user.username);
+            },
+            function(service){
+                console.log(service.toString());
+                ctx.service = service;
+                return service.workspaces[0].collections[0].getFeed();
+            },
+            function(feed){
+                console.log(feed.toString());
             }
-        );
+        ]);
     }
-}
+};

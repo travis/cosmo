@@ -19,7 +19,6 @@ dojo.provide("cosmotest.test_atompub")
 dojo.require("cosmotest.util");
 
 dojo.require("cosmo.atompub");
-dojo.require("dojo.debug");
 
 cosmotest.test_atompub = {
     test_Service: function(){
@@ -52,9 +51,6 @@ cosmotest.test_atompub = {
     },
 
     test_Feed2: function(){
-        dojo.debug("feed2");
-        console.log(cosmotest.test_atompub.feedDoc2)
-        console.log(cosmotest.test_atompub.feedDoc2.documentElement)
         var feed = new cosmo.atompub.Feed(cosmotest.test_atompub.feedDoc2.documentElement);
         jum.assertEquals("title wrong", "dive into mark", feed.title.text);
         jum.assertEquals("title type wrong", "text", feed.title.type);
@@ -65,7 +61,6 @@ cosmotest.test_atompub = {
         jum.assertEquals("id wrong", "tag:example.org,2003:3",
                          feed.id.text);
         jum.assertEquals("link0 rel wrong", "alternate", feed.links[0].rel);
-        dojo.debug("foo");
         jum.assertEquals("link0 type wrong", "text/html", feed.links[0].type);
         jum.assertEquals("link0 hreflang wrong", "en", feed.links[0].hreflang);
         jum.assertEquals("link0 href wrong", "http://example.org/", feed.links[0].href);
@@ -75,7 +70,7 @@ cosmotest.test_atompub = {
         
         jum.assertEquals("rights wrong", "Copyright (c) 2003, Mark Pilgrim", feed.rights.text);
         jum.assertEquals("generator wrong", "Example Toolkit", feed.generator.text);
-        jum.assertEquals("generator uri wrong", "http://www.example.com", feed.generator.uri);
+        jum.assertEquals("generator uri wrong", "http://www.example.com/", feed.generator.uri);
         jum.assertEquals("generator version wrong", "1.0", feed.generator.version);
         var entry1 = feed.entries[0];
         jum.assertEquals("entry1 title wrong", "Atom draft-07 snapshot",

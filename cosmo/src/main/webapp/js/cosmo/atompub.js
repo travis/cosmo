@@ -125,8 +125,24 @@ dojo.declare("cosmo.atompub.TextConstruct", cosmo.atompub.AppElement, {
         "type" : [String]
     },
 });
-dojo.declare("cosmo.atompub.Accept", null, {});
-dojo.declare("cosmo.atompub.Categories", null, {});
+
+dojo.declare("cosmo.atompub.DateConstruct", cosmo.atompub.AppElement, {
+    __attributes__: {
+        "type" : [String]
+    },
+});
+
+dojo.declare("cosmo.atompub.Accept", cosmo.atompub.AppElement, {});
+dojo.declare("cosmo.atompub.Categories", cosmo.atompub.AppElement, {
+    __attributes__: {
+        "term": [String],
+        "scheme": [String],
+        "label": [String],
+        "fixed": [String],
+        "scheme": [String],
+        "href": [String]
+    }
+});
 dojo.declare("cosmo.atompub.Title", cosmo.atompub.TextConstruct, {});
 
 dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
@@ -157,15 +173,23 @@ dojo.declare("cosmo.atompub.Generator", cosmo.atompub.AppElement, {
         version: [String]
     }
 });
-dojo.declare("cosmo.atompub.Icon", null, {});
+dojo.declare("cosmo.atompub.Icon", cosmo.atompub.AppElement, {
+    __elements__: {
+        "uri": [cosmo.atompub.Uri]
+    }
+});
 dojo.declare("cosmo.atompub.Id", cosmo.atompub.AppElement, {});
-dojo.declare("cosmo.atompub.Logo", null, {});
+dojo.declare("cosmo.atompub.Logo", cosmo.atompub.AppElement, {
+    __elements__: {
+        "uri": [cosmo.atompub.Uri]
+    }
+});
 dojo.declare("cosmo.atompub.Rights", cosmo.atompub.TextConstruct, {});
 dojo.declare("cosmo.atompub.Subtitle", cosmo.atompub.TextConstruct, {});
-dojo.declare("cosmo.atompub.Updated", null, {});
+dojo.declare("cosmo.atompub.Updated", cosmo.atompub.DateConstruct, {});
 dojo.declare("cosmo.atompub.Name", cosmo.atompub.TextConstruct, {});
-dojo.declare("cosmo.atompub.Uri", null, {});
-dojo.declare("cosmo.atompub.Email", null, {});
+dojo.declare("cosmo.atompub.Uri", cosmo.atompub.AppElement, {});
+dojo.declare("cosmo.atompub.Email", cosmo.atompub.AppElement, {});
 
 dojo.declare("cosmo.atompub.Person",  cosmo.atompub.AppElement, {
     __elements__: {
@@ -174,15 +198,18 @@ dojo.declare("cosmo.atompub.Person",  cosmo.atompub.AppElement, {
         "email": [cosmo.atompub.Email]
     }
 });
+
 dojo.declare("cosmo.atompub.Author",  cosmo.atompub.Person, {});
 dojo.declare("cosmo.atompub.Category", cosmo.atompub.AppElement, {});
-dojo.declare("cosmo.atompub.Contributor", null, {});
+dojo.declare("cosmo.atompub.Contributor", cosmo.atompub.Person, {});
 dojo.declare("cosmo.atompub.Link", cosmo.atompub.AppElement, {
     __attributes__: {
         "href": [String],
-        "hreflang": [String],
+        "rel": [String],
         "type": [String],
-        "rel": [String]
+        "hreflang": [String],
+        "title": [String],
+        "length": [String]
     },
 
     toString: function(){
@@ -199,17 +226,32 @@ dojo.declare("cosmo.atompub.Content", cosmo.atompub.AppElement, {
 
     getParsedContent: function getParsedContent(contentParsers){
         contentParsers = contentParsers || this.contentParsers;
-        var parser = contentParsers[this.type.value];
-        if (!parser) throw new cosmo.atompub.ContentParserNotDefined(this.type.value);
+        var parser = contentParsers[this.type];
+        if (!parser) throw new cosmo.atompub.ContentParserNotDefined(this.type);
         else {
             return parser(this.textContent);
         }
     }
 });
 
-dojo.declare("cosmo.atompub.Published", null, {});
-dojo.declare("cosmo.atompub.Source", null, {});
+dojo.declare("cosmo.atompub.Published", cosmo.atompub.DateConstruct, {});
 dojo.declare("cosmo.atompub.Summary", cosmo.atompub.TextConstruct, {});
+
+dojo.declare("cosmo.atompub.Source", cosmo.atompub.AppElement, {
+    "title": [cosmo.atompub.Title],
+    "updated": [cosmo.atompub.Updated],
+    "rights": [cosmo.atompub.Rights],
+    "id": [cosmo.atompub.Id],
+    "generator": [cosmo.atompub.Generator],
+    "icon": [cosmo.atompub.Icon],
+    "logo": [cosmo.atompub.Logo],
+    "subtitle": [cosmo.atompub.Subtitle],
+    "author": [cosmo.atompub.Author, "authors"],
+    "category": [cosmo.atompub.Category, "categories"],
+    "contributor": [cosmo.atompub.Contributor, "contributors"],
+    "link": [cosmo.atompub.Link, "links"]
+
+});
 
 dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
     __elements__: {
@@ -264,7 +306,7 @@ dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement, {
     getWorkspacesWithTitle: function(title){
         return dojo.lang.filter(this.workspaces, 
                                 function(workspace){
-                                    return workspace.title.value == title
+                                    return workspace.title.text == title
                                 });
     }
 });

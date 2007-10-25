@@ -43,7 +43,7 @@ dojo.declare("cosmo.atompub.ContentParserNotDefined", Error, {
 dojo.declare("cosmo.atompub.AppElement", null, {
     __elements__: {},
     __attributes__: {},
-    textContent: null,
+    text: null,
 
     initializer: function(xml, service){
         this.service = service;
@@ -88,7 +88,6 @@ dojo.declare("cosmo.atompub.AppElement", null, {
     
     _processElement: function processEl(el){
         var name = el.localName || el.tagName;
-        dojo.debug("Processing element: " + name);
         var elementSpecification = this.__elements__[name];
         if (elementSpecification){
             var listName = elementSpecification[1];
@@ -115,24 +114,20 @@ dojo.declare("cosmo.atompub.AppElement", null, {
     },
         
     fromXml: function fromXml(xml){
-        this.textContent = xml.textContent;
+        this.text = xml.textContent;
         dojo.lang.map(xml.childNodes, dojo.lang.hitch(this,  "_processElement"));
         dojo.lang.map(xml.attributes, dojo.lang.hitch(this,  "_processAttribute"));
     }
 });
-dojo.declare("cosmo.atompub.TextElement", null, {
-    initializer: function(xml){
-        this.value = xml.textContent;
-    },
-    
-    toString: function(){
-        return this.value;
-    }
 
+dojo.declare("cosmo.atompub.TextConstruct", cosmo.atompub.AppElement, {
+    __attributes__: {
+        "type" : [String]
+    },
 });
 dojo.declare("cosmo.atompub.Accept", null, {});
 dojo.declare("cosmo.atompub.Categories", null, {});
-dojo.declare("cosmo.atompub.Title", cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Title", cosmo.atompub.TextConstruct, {});
 
 dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
     __attributes__: {
@@ -156,14 +151,19 @@ dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
     
 });
 
-dojo.declare("cosmo.atompub.Generator", null, {});
+dojo.declare("cosmo.atompub.Generator", cosmo.atompub.AppElement, {
+    __attributes__: {
+        uri: [String],
+        version: [String]
+    }
+});
 dojo.declare("cosmo.atompub.Icon", null, {});
-dojo.declare("cosmo.atompub.Id", cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Id", cosmo.atompub.AppElement, {});
 dojo.declare("cosmo.atompub.Logo", null, {});
-dojo.declare("cosmo.atompub.Rights", null, {});
-dojo.declare("cosmo.atompub.Subtitle", null, {});
+dojo.declare("cosmo.atompub.Rights", cosmo.atompub.TextConstruct, {});
+dojo.declare("cosmo.atompub.Subtitle", cosmo.atompub.TextConstruct, {});
 dojo.declare("cosmo.atompub.Updated", null, {});
-dojo.declare("cosmo.atompub.Name", cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Name", cosmo.atompub.TextConstruct, {});
 dojo.declare("cosmo.atompub.Uri", null, {});
 dojo.declare("cosmo.atompub.Email", null, {});
 
@@ -175,11 +175,12 @@ dojo.declare("cosmo.atompub.Person",  cosmo.atompub.AppElement, {
     }
 });
 dojo.declare("cosmo.atompub.Author",  cosmo.atompub.Person, {});
-dojo.declare("cosmo.atompub.Category", cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Category", cosmo.atompub.AppElement, {});
 dojo.declare("cosmo.atompub.Contributor", null, {});
 dojo.declare("cosmo.atompub.Link", cosmo.atompub.AppElement, {
     __attributes__: {
         "href": [String],
+        "hreflang": [String],
         "type": [String],
         "rel": [String]
     },
@@ -208,7 +209,7 @@ dojo.declare("cosmo.atompub.Content", cosmo.atompub.AppElement, {
 
 dojo.declare("cosmo.atompub.Published", null, {});
 dojo.declare("cosmo.atompub.Source", null, {});
-dojo.declare("cosmo.atompub.Summary", cosmo.atompub.TextElement, {});
+dojo.declare("cosmo.atompub.Summary", cosmo.atompub.TextConstruct, {});
 
 dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
     __elements__: {

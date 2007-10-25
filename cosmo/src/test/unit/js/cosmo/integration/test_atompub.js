@@ -30,12 +30,11 @@ cosmotest.integration.test_atompub = {
                 return cosmo.atompub.initializeService("user/" + user.username);
             },
             function(service){
-                console.log(service.toString());
                 ctx.service = service;
-                return service.workspaces[0].collections[0].getFeed();
+                return service.getWorkspacesWithTitle("home")[0].collections[0].getFeed();
             },
             function(feed){
-                console.log(feed.toString());
+                console.log(feed);
             }
         ]);
     }

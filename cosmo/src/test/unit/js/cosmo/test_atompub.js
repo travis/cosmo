@@ -52,7 +52,11 @@ cosmotest.test_atompub = {
     },
 
     test_Feed2: function(){
+        dojo.debug("feed2");
+        console.log(cosmotest.test_atompub.feedDoc2)
+        console.log(cosmotest.test_atompub.feedDoc2.documentElement)
         var feed = new cosmo.atompub.Feed(cosmotest.test_atompub.feedDoc2.documentElement);
+        dojo.debug("parsed");
         jum.assertEquals("title wrong", "dive into mark", feed.title.value);
         jum.assertEquals("title type wrong", "text", feed.title.type);
         jum.assertEquals("subtitle wrong", 'A &lt;em&gt;lot&lt;/em&gt; of effort' +
@@ -73,13 +77,32 @@ cosmotest.test_atompub = {
         jum.assertEquals("generator uri wrong", "http://www.example.com", feed.generator.uri);
         jum.assertEquals("generator version wrong", "1.0", feed.generator.version);
         var entry1 = feed.entries[0];
-        jum.assertEquals("entry1 link wrong", "http://example.org/2003/12/13/atom03",
+        jum.assertEquals("entry1 title wrong", "Atom draft-07 snapshot",
+                         entry1.title.value);
+        jum.assertEquals("entry1 link0 href wrong", "http://example.org/2005/04/02/atom",
                          entry1.links[0].href);
-        jum.assertEquals("entry1 id wrong", "urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a",
+        jum.assertEquals("entry1 link0 rel wrong", "alternate",
+                         entry1.links[0].rel);
+        jum.assertEquals("entry1 link0 type wrong", "text/html",
+                         entry1.links[0].type);
+        jum.assertEquals("entry1 link1 href wrong", "http://example.org/audio/ph34r_my_podcast.mp3",
+                         entry1.links[1].href);
+        jum.assertEquals("entry1 link1 rel wrong", "enclosure",
+                         entry1.links[1].rel);
+        jum.assertEquals("entry1 link1 type wrong", "audio/mpeg",
+                         entry1.links[1].type);
+        jum.assertEquals("entry1 link1 length wrong", "1337",
+                         entry1.links[1].length);
+        jum.assertEquals("entry1 id wrong", "tag:example.org,2003:3.2397",
                          entry1.id.value);
         //TODO: test for updated
-        jum.assertEquals("entry1 summary wrong", "Some text.",
-                         entry1.summary.value);
+        //TODO: test for published
+        jum.assertEquals("author name wrong", "Mark Pilgrim", entry1.authors[0].name.value);
+        jum.assertEquals("author uri wrong", "http://example.org/", entry1.authors[0].uri.value);
+        jum.assertEquals("author email wrong", "f8dy@example.com", entry1.authors[0].email.value);
+        jum.assertEquals("contributor0 name wrong", "Sam Ruby", entry1.contributors[0].name.value);
+        jum.assertEquals("contributor1 name wrong", "Joe Gregorio", entry1.contributors[1].name.value);
+        //TODO: content
     },
 
     serviceDoc: cosmotest.util.toXMLDocument(

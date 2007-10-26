@@ -8,10 +8,29 @@ version of the Chandler Server database to be migragted
 to the most recent version.  It supports Derby and 
 MySQL5 databases.
 
+Disclaimer
+-----------
+The Migration Manager fully supports MySQL databases and
+provides "qualified" support for Derby databases.  This
+means testing has been focused on MySQL, but sanity 
+checks have been run against a Derby migration.  You are
+advised to backup your data before any migration.  In
+the event of a failed migration, report any issues:
+
+Issues are tracked at <http://bugzilla.osafoundation.org/>.
+
+Feel free to ask questions and report problems about data
+migration to cosmo@osafoundation.org. Sign up at
+<http://lists.osafoundation.org/mailman/listinfo/cosmo>. 
+Or join us on IRC at irc.osafoundation.org in the #cosmo channel.
+
 Instructions for Building
 --------------------------
 If you checked out the server source, you must build the
-migration manager before running. To build:
+migration manager before running.  If you downloaded to server
+bundle, skip this step and continue to Instructions for Running.
+
+To build:
 
 1. run mvn package
 2. copy target/cosmo-migration-[version]-jar-with-dependencies.jar

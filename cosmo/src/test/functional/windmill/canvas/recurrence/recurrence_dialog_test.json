@@ -1,24 +1,36 @@
 {"method": "click", "params": {"jsid": "{$calView}"}}
-{"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": "40000"}}
-{"params": {"id": "hourDiv0-900"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"id": "hourDiv0-1030"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"id": "hourDiv0-1300"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"option": "Daily", "id": "recurrenceInterval"}, "version": "0.1", "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getCurrent().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": 40000}}
+{"params": {"id": "hourDiv0-900"},  "method": "doubleClick"}
+{"method": "waits.sleep", "params": {"milliseconds" : 1500}}
+{"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"id": "hourDiv0-1030"},  "method": "doubleClick"}
+{"method": "waits.sleep", "params": {"milliseconds" : 1500}}
+{"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"id": "hourDiv0-1300"},  "method": "doubleClick"}
+{"method": "waits.sleep", "params": {"milliseconds" : 1500}}
+{"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getCurrent().id"},  "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
-{"params": {"option": "Mazatlan", "id": "tzId"}, "version": "0.1", "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"option": "Mazatlan", "id": "tzId"},  "method": "select"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
-{"params": {"option": "Barbados", "id": "tzId"}, "version": "0.1", "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "{$btnsRight1}"}, "version": "0.1", "method": "click"}
-{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"}, "version": "0.1", "method": "extensions.clickLozenge"}
+{"params": {"option": "Barbados", "id": "tzId"},  "method": "select"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
+{"params": {"jsid": "windmill.testWindow.cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
-{"params": {"option": "Miquelon", "id": "tzId"}, "version": "0.1", "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
+{"params": {"option": "Miquelon", "id": "tzId"},  "method": "select"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 2000}}

@@ -1,6 +1,6 @@
-{"params": {"url": "{$baseUrl}\/logout"}, "version": "0.1", "method": "open"}
-{"params": {"url": "\/chandler\/login"}, "version": "0.1", "method": "open"}
-{"params": {"id": "loginDialogUsernameInput"}, "version": "0.1", "method": "click"}
-{"params": {"text": "root", "id": "loginDialogUsernameInput"}, "version": "0.1", "method": "type"}
-{"params": {"text": "cosmo", "id": "loginDialogPasswordInput"}, "version": "0.1", "method": "type"}
-{"params": {"id": "loginSubmitButton"}, "version": "0.1", "method": "click"}
+{"params": {"url": "{$baseUrl}\/logout"},  "method": "open"}
+{"params": {"url": "\/chandler\/login"},  "method": "open"}
+{"params": {"id": "loginDialogUsernameInput"},  "method": "click"}
+{"params": {"text": "root", "id": "loginDialogUsernameInput"},  "method": "type"}
+{"params": {"text": "cosmo", "id": "loginDialogPasswordInput"},  "method": "type"}
+{"params": {"id": "loginSubmitButton"},  "method": "click"}

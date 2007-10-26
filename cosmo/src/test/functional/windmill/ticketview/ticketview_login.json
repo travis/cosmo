@@ -1,15 +1,16 @@
 {"method": "waits.forElement", "params": {"link": "Sign up."}}
-{"params": {"link": "Sign up."}, "version": "0.1", "method": "click"}
-{"params": {"text": "{$random1}", "id": "username"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random1}", "id": "firstName"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random1}", "id": "lastName"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random1}@osafoundation.org", "id": "email"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random1}", "id": "password"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random1}", "id": "confirm"}, "version": "0.1", "method": "type"}
-{"params": {"jsid": "{$btnsRight0}"}, "version": "0.1", "method": "click"}
+{"params": {"link": "Sign up."},  "method": "click"}
+{"method": "waits.forElement", "params": {"id": "modalDialogTitle", "timeout": 40000}}
+{"params": {"text": "{$random1}", "id": "username"},  "method": "type"}
+{"params": {"text": "{$random1}", "id": "firstName"},  "method": "type"}
+{"params": {"text": "{$random1}", "id": "lastName"},  "method": "type"}
+{"params": {"text": "{$random1}@osafoundation.org", "id": "email"},  "method": "type"}
+{"params": {"text": "{$random1}", "id": "password"},  "method": "type"}
+{"params": {"text": "{$random1}", "id": "confirm"},  "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
+{"method": "waits.forElement", "params": {"id": "modalDialogPrompt", "timeout": 40000}}
 {"method": "click", "params": {"jsid" : "{$btnsCenter0}"}}
-{"params": {"id": "loginDialogUsernameInput"}, "version": "0.1", "method": "click"}
-{"params": {"text": "{$random1}", "id": "loginDialogUsernameInput"}, "version": "0.1", "method": "type"}
-{"params": {"text": "{$random1}", "id": "loginDialogPasswordInput"}, "version": "0.1", "method": "type"}
+{"params": {"id": "loginDialogUsernameInput"},  "method": "click"}
+{"params": {"text": "{$random1}", "id": "loginDialogUsernameInput"},  "method": "type"}
+{"params": {"text": "{$random1}", "id": "loginDialogPasswordInput"},  "method": "type"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
-{"params": {"milliseconds": "4000"}, "version": "0.1", "method": "waits.sleep"}

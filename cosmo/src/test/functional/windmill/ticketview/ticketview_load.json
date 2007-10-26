@@ -1,7 +1,10 @@
-{"method": "waits.forElement", "params": {"xpath" : "html/body/div/div/form/span[4]/span[3]/button"}}
-{"params": {"xpath": "html/body/div/div/form/span[4]/span[3]/button"}, "version": "0.1", "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 4000}}
+{"params": {"id": "grantTicketButton"},  "method": "waits.forElement"}
+{"params": {"xpath": "/html/body/div[2]/div/form/span[4]/span/input[2]"}, "method": "click"}
+{"params": {"id": "grantTicketButton"},  "method": "click"}
 {"method": "waits.forElement", "params": {"link" : "[Chandler]"}}
-{"params": {"link": "[Chandler]"}, "version": "0.1", "method": "storeURL"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
-{"params": {"url": "{$[Chandler]}"}, "version": "0.1", "method": "open"}
-{"method": "waits.forElement", "params": {"id" : "_month2_day28"}}
+{"params": {"link": "[Chandler]"},  "method": "storeURL"}
+{"method": "waits.sleep", "params": {"milliseconds" : 2000}}
+{"params": {"url": "{$[Chandler]}"},  "method": "open"}
+{"method": "waits.sleep", "params": {"milliseconds" : 10000}}

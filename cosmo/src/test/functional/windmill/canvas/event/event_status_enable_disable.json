@@ -2,28 +2,28 @@
 {"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": 40000}}
 
 //create new item at 9am
-{"params": {"id": "hourDiv1-900"}, "version": "0.1", "method": "doubleClick"}
-{"params": {"milliseconds": 1500}, "version": "0.1", "method": "waits.sleep"}
+{"params": {"id": "hourDiv1-900"},  "method": "doubleClick"}
+{"params": {"milliseconds": 1500},  "method": "waits.sleep"}
 
 //make the end time == start time, making it a an @time event
-{"params": {"text": "9:00", "id": "endTime"}, "version": "0.1", "method": "type"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
+{"params": {"text": "9:00", "id": "endTime"},  "method": "type"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
 
 //ensure that eventStatus is disabled (as it should be for @time)
-{"params": {"validator": "disabled|true", "id": "eventStatus"}, "version": "0.1", "method": "asserts.assertProperty"}
+{"params": {"validator": "disabled|true", "id": "eventStatus"},  "method": "asserts.assertProperty"}
 
 //make the event all day
-{"params": {"id": "eventAllDay"}, "version": "0.1", "method": "check"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": 3000}, "version": "0.1", "method": "waits.sleep"}
+{"params": {"id": "eventAllDay"},  "method": "check"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"milliseconds": 3000},  "method": "waits.sleep"}
 
 //all day events can have event status
-{"params": {"validator": "disabled|false", "id": "eventStatus"}, "version": "0.1", "method": "asserts.assertProperty"}
+{"params": {"validator": "disabled|false", "id": "eventStatus"},  "method": "asserts.assertProperty"}
 
 //turn off all day checkbox, making it any time
-{"params": {"id": "eventAllDay"}, "version": "0.1", "method": "check"}
-{"params": {"jsid": "{$dvSaveButton}"}, "version": "0.1", "method": "click"}
-{"params": {"milliseconds": 3000}, "version": "0.1", "method": "waits.sleep"}
+{"params": {"id": "eventAllDay"},  "method": "check"}
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"milliseconds": 3000},  "method": "waits.sleep"}
 
 //event status should be disabled for any time events
-{"params": {"validator": "disabled|true", "id": "eventStatus"}, "version": "0.1", "method": "asserts.assertProperty"}
+{"params": {"validator": "disabled|true", "id": "eventStatus"},  "method": "asserts.assertProperty"}

@@ -410,5 +410,15 @@ cosmo.util.html.getFormValue =  function(form, fieldName){
                 return "";
                 break;
         }
-}
+};
+
+cosmo.util.html.setOpacity =  function(node, value) {
+    if (typeof value != 'number') {
+        throw new Error('Opacity value must be a number.'); }
+    node.style.opacity = value;
+    if (document.all) {
+        node.style.filter = 'alpha(opacity=' +
+            (value * 100) + ')';
+    }
+};
 

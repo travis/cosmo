@@ -33,6 +33,7 @@ dojo.require("dojo.widget.*");
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");
 
@@ -234,13 +235,7 @@ dojo.widget.HtmlWidget, {
                 m.style.height = '100%';
                 m.style.zIndex = 1999;
                 m.style.background = '#ffffff';
-                // In IE6 have to use special alpha filter thingie
-                if (document.all) {
-                    m.style.filter = 'alpha(opacity=80)';
-                }
-                else {
-                    m.style.opacity = 0.8;
-                }
+                cosmo.util.html.setOpacity(m, 0.8);
                 this.uiFullMask = m;
                 document.body.appendChild(this.uiFullMask);
             }

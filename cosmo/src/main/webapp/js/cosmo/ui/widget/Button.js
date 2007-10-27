@@ -28,6 +28,7 @@ dojo.require("dojo.event.*");
 dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.util.html");
 
 dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
 
@@ -85,14 +86,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
                 this.handleOnClick = this.handleOnClickOrig;
             }
             this.domNode.className = 'btnElemBase' + suf;
-            this._setOpacity(1.0)
+            cosmo.util.html.setOpacity(this.domNode, 1);
 
         }
         else {
             this.handleOnClickOrig = this.handleOnClick;
             this.handleClick = null;
             this.domNode.className = 'btnElemBase' + suf + ' btnElemDisabled' + suf;
-            this._setOpacity(this.DISABLED_OPACITY);
+            cosmo.util.html.setOpacity(this.domNode, this.DISABLED_OPACITY);
         }
     },
     _attachHandlers: function () {
@@ -118,12 +119,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     _handleOnClick: function() {
         if (this.enabled) {
            this.handleOnClick();
-        }
-    },
-    _setOpacity: function(opac) {
-        this.domNode.style.opacity = opac;
-        if (document.all) {
-            this.domNode.style.filter = "alpha(opacity="+ opac * 100 +")";
         }
     }
   } );

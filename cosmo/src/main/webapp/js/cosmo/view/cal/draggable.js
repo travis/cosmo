@@ -262,7 +262,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         if (!(this.item && this.item.lozenge)) {
             return false;
         }
-        var o = dragState == 'on' ? 60 : 100;
+        var o = dragState == 'on' ? 0.6 : 1;
         this.item.lozenge.setOpacity(o);
     };
 

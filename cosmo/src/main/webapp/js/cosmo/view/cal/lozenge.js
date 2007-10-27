@@ -30,6 +30,7 @@ dojo.provide('cosmo.view.cal.lozenge');
 dojo.require("dojo.date.common");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.util.html");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.cal.canvas");
@@ -207,24 +208,10 @@ cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
  * Cross-browser wrapper for setting CSS opacity
  */
 cosmo.view.cal.lozenge.Lozenge.prototype.setOpacity = function (opac) {
-
-    function setOpac(elem, o) {
-        // =============
-        // opac is a whole number to be used as the percent opacity
-        // =============
-        // IE uses a whole number as a percent (e.g. 75 for 75%)
-        //  Moz/compat uses a fractional value (e.g. 0.75)
-        var nDecOpacity = o/100;
-        if (document.all) {
-            elem.style.filter = 'alpha(opacity=' + o + ')';
-        }
-        elem.style.opacity = nDecOpacity;
-
-    }
-    setOpac(this.domNode, opac);
+    cosmo.util.html.setOpacity(this.domNode, opac);
     if (this.composite()) {
         for (var i = 0; i < this.auxDivList.length; i++) {
-            setOpac(this.auxDivList[i], opac);
+            cosmo.util.html.setOpacity(this.auxDivList[i], opac);
         }
     }
 }

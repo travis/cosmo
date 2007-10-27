@@ -27,6 +27,7 @@ dojo.require("dojo.io.*");
 dojo.require("dojo.event.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.util.html");
 
 cosmo.ui.imagegrid.config = {};
 cosmo.ui.imagegrid.DISABLED_OPACITY = 0.3;
@@ -129,11 +130,8 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
         }
     }
     else {
-        var opac = cosmo.ui.imagegrid.DISABLED_OPACITY;
-        d.style.opacity = opac;
-        if (document.all) {
-            d.style.filter = "alpha(opacity=" + opac * 100 + ")";
-        }
+        cosmo.util.html.setOpacity(d,
+            cosmo.ui.imagegrid.DISABLED_OPACITY);
     }
     return d;
 };

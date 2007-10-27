@@ -18,6 +18,7 @@ dojo.provide("cosmo.view.loading");
 
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.html");
 dojo.require("dojo.lfx.*");
 
 cosmo.view.loading.statusProcessing = false;
@@ -32,7 +33,7 @@ cosmo.view.loading.StatusMessage = function (p) {
 
     this.renderSelf = function () {
         if (!this.hasBeenRendered) {
-            this.setOpacity(0);
+            cosmo.util.html.setOpacity(this.domNode, 0);
             this.domNode.innerHTML = _('App.Status.LoadingCollection');
             this.domNode.style.width = this.width + 'px';
             this.domNode.style.height = this.height + 'px';
@@ -46,21 +47,12 @@ cosmo.view.loading.StatusMessage = function (p) {
         var top = ((this.parent.height - this.height) /  2);
         this.setPosition(left, top);
     };
-    this.setOpacity = function (opac) {
-        var node = self.domNode;
-        if (document.all) {
-            node.style.filter = 'alpha(opacity=' + opac + ')';
-        }
-        else {
-            node.style.opacity = opac/100;
-        }
-    }
     this.show = function () {
         if (cosmo.view.loading.statusProcessing) { return false; }
         cosmo.view.loading.statusProcessing = true;
         this.domNode.style.zIndex = 1000;
-        this.setOpacity(80);
-    }
+        cosmo.util.html.setOpacity(this.domNode, 0.8);
+    };
     this.hide = function () {
         var f = function () {
             cosmo.view.loading.statusProcessing = false;
@@ -68,7 +60,7 @@ cosmo.view.loading.StatusMessage = function (p) {
         };
         dojo.lfx.fadeOut(this.domNode, 1000,
             dojo.lfx.easeOut, f).play();
-    }
+    };
     this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
         var opts = cmd.opts;

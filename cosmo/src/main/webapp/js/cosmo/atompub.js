@@ -31,12 +31,26 @@
 dojo.provide("cosmo.atompub");
 
 dojo.require("cosmo.service.transport.Rest");
+dojo.require("dojo.dom");
 dojo.require("dojo.lang.*");
 
-dojo.declare("cosmo.atompub.ContentParserNotDefined", Error, {
+dojo.declare("cosmo.atompub.ContentDeserializerNotDefined", Error, {
     type: null,
     initializer: function(type){
         this.type = type;
+    },
+    toString: function(){
+        return "Content deserializer not defined for type " + this.type;
+    }
+});
+
+dojo.declare("cosmo.atompub.ContentSerializerNotDefined", Error, {
+    type: null,
+    initializer: function(type){
+        this.type = type;
+    },
+    toString: function(){
+        return "Content serializer not defined for type " + this.type;
     }
 });
 
@@ -44,7 +58,7 @@ dojo.declare("cosmo.atompub.AppElement", null, {
     __elements__: {},
     __attributes__: {},
     text: null,
-
+    xml: null,
     initializer: function(xml, service){
         this.service = service;
         this._prepopulateListElements(this.__elements__);
@@ -54,15 +68,6 @@ dojo.declare("cosmo.atompub.AppElement", null, {
         }
     },
     
-    _prepopulateListElements: function(specificationList){
-        for (var name in specificationList){
-            var listName = specificationList[name][1];
-            if (listName){
-                this[listName] = [];
-            }
-        }
-    },
-
     toString: function (){
         var sList = [];
         var names = this.getElementNames();
@@ -85,7 +90,40 @@ dojo.declare("cosmo.atompub.AppElement", null, {
         }
         return names;
     },
+
+    fromXml: function fromXml(xml){
+        // if first child is text node
+        if (xml.firstChild && (xml.firstChild.nodeType == 3)){
+            this.text = xml.firstChild.data;
+        }
+        this.xml = xml;
+        dojo.lang.map(xml.childNodes, dojo.lang.hitch(this,  "_processElement"));
+        dojo.lang.map(xml.attributes, dojo.lang.hitch(this,  "_processAttribute"));
+    },
     
+    toXmlString: function toXmlString(){
+        var content = this.serializeContent? this.serializeContent() : (this.text || "");
+        var subordinateText =  content +
+            this._elementsToXmlString();
+        return "<" + this.xmlName + this._attributesToXmlString() + 
+            ((subordinateText == "")? "/>": 
+             ">" + subordinateText + "</" + this.xmlName + ">" );
+    },
+
+    toXmlDocumentString: function txds(){
+        return '<?xml version="1.0" encoding=\'utf-8\'?>' +
+            this.toXmlString();
+    },
+
+    _prepopulateListElements: function(specificationList){
+        for (var name in specificationList){
+            var listName = specificationList[name][1];
+            if (listName){
+                this[listName] = [];
+            }
+        }
+    },
+
     _processElement: function processEl(el){
         var name = el.localName || el.tagName;
         var elementSpecification = this.__elements__[name];
@@ -113,10 +151,43 @@ dojo.declare("cosmo.atompub.AppElement", null, {
         else if (name) this[name] = object;
     },
         
-    fromXml: function fromXml(xml){
-        this.text = xml.textContent;
-        dojo.lang.map(xml.childNodes, dojo.lang.hitch(this,  "_processElement"));
-        dojo.lang.map(xml.attributes, dojo.lang.hitch(this,  "_processAttribute"));
+    _attributeToXmlString: function a2xmls(name, value){
+        return " " + name + "=" + '"' + value + '"';
+    },
+
+    _attributesToXmlString: function(){
+        var strings = [];
+        for (var name in this.__attributes__){
+            var elementSpec = this.__attributes__[name];
+            var listName = elementSpec[1];
+            if (listName){
+                strings =
+                    dojo.lang.map(this[listName], this, 
+                                  function(value){
+                                      return this._attributeToXmlString(name, value);
+                                  }).join("");
+            } else if (this[name]){
+                strings.push(this._attributeToXmlString(name, this[name]));
+            }
+        }
+        return strings.join("");
+    },
+
+    _elementsToXmlString: function(){
+        var strings = [];
+        for (var name in this.__elements__){
+            var elementSpec = this.__elements__[name];
+            var listName = elementSpec[1];
+            if (listName){
+                strings.push(dojo.lang.map(this[listName], this, 
+                                     function(el){
+                                         return el? el.toXmlString() : "";
+                                     }).join(""));
+            } else if (this[name]){
+                strings.push(this[name].toXmlString());
+            }
+        }
+        return strings.join("");
     }
 });
 
@@ -124,16 +195,50 @@ dojo.declare("cosmo.atompub.TextConstruct", cosmo.atompub.AppElement, {
     __attributes__: {
         "type" : [String]
     },
+
+    contentDeserializers: {
+        text: function(xml){return xml.textContent},
+        html: function(xml){return xml.textContent},
+        xhtml: function(xml){return xml.firstChild}
+    },
+
+    contentSerializers: {
+        text: function(content){return content.text},
+        html: function(content){return dojo.string.escapeXml(content.text)},
+        xhtml: function(content){return dojo.dom.innerXML(content.xml)}
+    },
+
+    serializeContent: function serializeContent(contentSerializers){
+        contentSerializers = contentSerializers || {};
+        var serializer = contentSerializers[this.type] 
+            || this.contentSerializers[this.type]
+            || this.contentSerializers["text"];
+        return serializer.serialize? serializer.serialize(this) : serializer(this);
+
+    },
+
+    deserializeContent: function deserializeContent(contentDeserializers){
+        contentDeserializers = contentDeserializers || {};
+        var deserializer = contentDeserializers[this.type] || this.contentDeserializers[this.type];
+        if (!deserializer) throw new cosmo.atompub.ContentDeserializerNotDefined(this.type);
+        else {
+            return deserializer.deserialize? deserializer.deserialize(this.xml) : 
+                deserializer(this.xml);
+        }
+    }
 });
 
 dojo.declare("cosmo.atompub.DateConstruct", cosmo.atompub.AppElement, {
     __attributes__: {
         "type" : [String]
-    },
+    }
 });
 
-dojo.declare("cosmo.atompub.Accept", cosmo.atompub.AppElement, {});
+dojo.declare("cosmo.atompub.Accept", cosmo.atompub.AppElement, {
+    xmlName: "accept"
+});
 dojo.declare("cosmo.atompub.Categories", cosmo.atompub.AppElement, {
+    xmlName: "categories",
     __attributes__: {
         "term": [String],
         "scheme": [String],
@@ -143,9 +248,12 @@ dojo.declare("cosmo.atompub.Categories", cosmo.atompub.AppElement, {
         "href": [String]
     }
 });
-dojo.declare("cosmo.atompub.Title", cosmo.atompub.TextConstruct, {});
+dojo.declare("cosmo.atompub.Title", cosmo.atompub.TextConstruct, {
+    xmlName: "title"
+});
 
 dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
+    xmlName: "collection",
     __attributes__: {
         "href": [String]
     },
@@ -168,30 +276,48 @@ dojo.declare("cosmo.atompub.Collection", cosmo.atompub.AppElement, {
 });
 
 dojo.declare("cosmo.atompub.Generator", cosmo.atompub.AppElement, {
+    xmlName: "generator",
     __attributes__: {
         uri: [String],
         version: [String]
     }
 });
 dojo.declare("cosmo.atompub.Icon", cosmo.atompub.AppElement, {
+    xmlName: "icon",
     __elements__: {
         "uri": [cosmo.atompub.Uri]
     }
 });
-dojo.declare("cosmo.atompub.Id", cosmo.atompub.AppElement, {});
+dojo.declare("cosmo.atompub.Id", cosmo.atompub.AppElement, {
+    xmlName: "id"
+});
 dojo.declare("cosmo.atompub.Logo", cosmo.atompub.AppElement, {
+    xmlName: "logo",
     __elements__: {
         "uri": [cosmo.atompub.Uri]
     }
 });
-dojo.declare("cosmo.atompub.Rights", cosmo.atompub.TextConstruct, {});
-dojo.declare("cosmo.atompub.Subtitle", cosmo.atompub.TextConstruct, {});
-dojo.declare("cosmo.atompub.Updated", cosmo.atompub.DateConstruct, {});
-dojo.declare("cosmo.atompub.Name", cosmo.atompub.TextConstruct, {});
-dojo.declare("cosmo.atompub.Uri", cosmo.atompub.AppElement, {});
-dojo.declare("cosmo.atompub.Email", cosmo.atompub.AppElement, {});
+dojo.declare("cosmo.atompub.Rights", cosmo.atompub.TextConstruct, {
+    xmlName: "rights"
+});
+dojo.declare("cosmo.atompub.Subtitle", cosmo.atompub.TextConstruct, {
+    xmlName: "subtitle"
+});
+dojo.declare("cosmo.atompub.Updated", cosmo.atompub.DateConstruct, {
+    xmlName: "updated"
+});
+dojo.declare("cosmo.atompub.Name", cosmo.atompub.TextConstruct, {
+    xmlName: "name"
+});
+dojo.declare("cosmo.atompub.Uri", cosmo.atompub.AppElement, {
+    xmlName: "uri"
+});
+dojo.declare("cosmo.atompub.Email", cosmo.atompub.AppElement, {
+    xmlName: "email"
+});
 
 dojo.declare("cosmo.atompub.Person",  cosmo.atompub.AppElement, {
+    xmlName: "person",
     __elements__: {
         "name": [cosmo.atompub.Name],
         "uri": [cosmo.atompub.Uri],
@@ -199,10 +325,17 @@ dojo.declare("cosmo.atompub.Person",  cosmo.atompub.AppElement, {
     }
 });
 
-dojo.declare("cosmo.atompub.Author",  cosmo.atompub.Person, {});
-dojo.declare("cosmo.atompub.Category", cosmo.atompub.AppElement, {});
-dojo.declare("cosmo.atompub.Contributor", cosmo.atompub.Person, {});
+dojo.declare("cosmo.atompub.Author",  cosmo.atompub.Person, {
+    xmlName: "author"
+});
+dojo.declare("cosmo.atompub.Category", cosmo.atompub.AppElement, {
+    xmlName: "category"
+});
+dojo.declare("cosmo.atompub.Contributor", cosmo.atompub.Person, {
+    xmlName: "contributor"
+});
 dojo.declare("cosmo.atompub.Link", cosmo.atompub.AppElement, {
+    xmlName: "link",
     __attributes__: {
         "href": [String],
         "rel": [String],
@@ -217,27 +350,23 @@ dojo.declare("cosmo.atompub.Link", cosmo.atompub.AppElement, {
     }
 });
 
-dojo.declare("cosmo.atompub.Content", cosmo.atompub.AppElement, {
+dojo.declare("cosmo.atompub.Content", cosmo.atompub.TextConstruct, {
+    xmlName: "content",
     __attributes__: {
-        "type": [String]
-    },
-
-    contentParsers: {},
-
-    getParsedContent: function getParsedContent(contentParsers){
-        contentParsers = contentParsers || this.contentParsers;
-        var parser = contentParsers[this.type];
-        if (!parser) throw new cosmo.atompub.ContentParserNotDefined(this.type);
-        else {
-            return parser(this.textContent);
-        }
+        "type": [String],
+        "src": [String]
     }
 });
 
-dojo.declare("cosmo.atompub.Published", cosmo.atompub.DateConstruct, {});
-dojo.declare("cosmo.atompub.Summary", cosmo.atompub.TextConstruct, {});
+dojo.declare("cosmo.atompub.Published", cosmo.atompub.DateConstruct, {
+    xmlName: "published"
+});
+dojo.declare("cosmo.atompub.Summary", cosmo.atompub.TextConstruct, {
+    xmlName: "summary"
+});
 
 dojo.declare("cosmo.atompub.Source", cosmo.atompub.AppElement, {
+    xmlName: "source",
     "title": [cosmo.atompub.Title],
     "updated": [cosmo.atompub.Updated],
     "rights": [cosmo.atompub.Rights],
@@ -254,6 +383,7 @@ dojo.declare("cosmo.atompub.Source", cosmo.atompub.AppElement, {
 });
 
 dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
+    xmlName: "entry",
     __elements__: {
         "title": [cosmo.atompub.Title],
         "updated": [cosmo.atompub.Updated],
@@ -267,10 +397,16 @@ dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
         "category": [cosmo.atompub.Category, "categories"],
         "contributor": [cosmo.atompub.Contributor, "contributors"],
         "link": [cosmo.atompub.Link, "links"]
+    },
+
+    deserializeContent: function (contentDeserializers){
+        if (this.content) return this.content.deserializeContent(contentDeserializers);
+        else return null;
     }
 });
 
 dojo.declare("cosmo.atompub.Feed", cosmo.atompub.AppElement, {
+    xmlName: "feed",
     __elements__: {
         "title": [cosmo.atompub.Title],
         "generator": [cosmo.atompub.Generator],
@@ -285,10 +421,18 @@ dojo.declare("cosmo.atompub.Feed", cosmo.atompub.AppElement, {
         "contributor": [cosmo.atompub.Contributor, "contributors"],
         "link": [cosmo.atompub.Link, "links"],
         "entry": [cosmo.atompub.Entry, "entries"]
+    },
+    
+    deserializeEntryContents: function(contentDeserializers){
+        return dojo.lang.map(this.entries, this, 
+                             function (entry){
+                                 return entry.deserializeContent(contentDeserializers);
+                             });
     }
 });
 
 dojo.declare("cosmo.atompub.Workspace", cosmo.atompub.AppElement, {
+    xmlName: "workspace",
     __elements__: {
         "title": [cosmo.atompub.Title],
         "collection": [cosmo.atompub.Collection, "collections"]
@@ -296,6 +440,7 @@ dojo.declare("cosmo.atompub.Workspace", cosmo.atompub.AppElement, {
 });
 
 dojo.declare("cosmo.atompub.Service", cosmo.atompub.AppElement, {
+    xmlName: "service",
     __elements__: {
         "workspace": [cosmo.atompub.Workspace, "workspaces"]
     },

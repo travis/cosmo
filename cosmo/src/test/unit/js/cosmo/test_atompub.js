@@ -19,6 +19,7 @@ dojo.provide("cosmotest.test_atompub")
 dojo.require("cosmotest.util");
 
 dojo.require("cosmo.atompub");
+dojo.require("dojo.debug");
 
 cosmotest.test_atompub = {
     test_Service: function(){
@@ -48,13 +49,25 @@ cosmotest.test_atompub = {
         //TODO: test for updated
         jum.assertEquals("entry1 summary wrong", "Some text.",
                          entry1.summary.text);
+        var nullContent = entry1.deserializeContent();
+        jum.assertTrue("entry1 content wrong", nullContent == null); 
+        
+        var contentList = feed.deserializeEntryContents();
+        jum.assertEquals("feed entry contents wrong length", 1, contentList.length);
+        jum.assertEquals("feed content wrong", [null], contentList); 
+
+        var feedDocString = feed.toXmlDocumentString();
+        jum.assertEquals("feed serialization wrong", 
+                         cosmotest.test_atompub.feed1Serialization,
+                         feedDocString);
     },
 
     test_Feed2: function(){
         var feed = new cosmo.atompub.Feed(cosmotest.test_atompub.feedDoc2.documentElement);
+        jum.assertTrue("feed text wrong", feed.text == null);
         jum.assertEquals("title wrong", "dive into mark", feed.title.text);
         jum.assertEquals("title type wrong", "text", feed.title.type);
-        jum.assertEquals("subtitle wrong", 'A <em>lot</em> of effort' +
+        jum.assertEquals("subtitle wrong", 'A <em>lot</em> of effort ' +
                          'went into making this effortless', feed.subtitle.text);
         jum.assertEquals("subtitle type wrong", "html", feed.subtitle.type);
         //TODO: test for updated
@@ -67,7 +80,6 @@ cosmotest.test_atompub = {
         jum.assertEquals("link1 rel wrong", "self", feed.links[1].rel);
         jum.assertEquals("link1 type wrong", "application/atom+xml", feed.links[1].type);
         jum.assertEquals("link1 href wrong", "http://example.org/feed.atom", feed.links[1].href);
-        
         jum.assertEquals("rights wrong", "Copyright (c) 2003, Mark Pilgrim", feed.rights.text);
         jum.assertEquals("generator wrong", "Example Toolkit", feed.generator.text);
         jum.assertEquals("generator uri wrong", "http://www.example.com/", feed.generator.uri);
@@ -98,7 +110,36 @@ cosmotest.test_atompub = {
         jum.assertEquals("author email wrong", "f8dy@example.com", entry1.authors[0].email.text);
         jum.assertEquals("contributor0 name wrong", "Sam Ruby", entry1.contributors[0].name.text);
         jum.assertEquals("contributor1 name wrong", "Joe Gregorio", entry1.contributors[1].name.text);
-        //TODO: content
+        var content = entry1.content;
+        jum.assertEquals("content type wrong", "xhtml", content.type);
+        var xhtml0 = content.deserializeContent();
+
+        var xhtml1 = entry1.deserializeContent();
+        
+        var xhtmlList = feed.deserializeEntryContents();
+        jum.assertEquals("feed entry contents wrong length", 1, xhtmlList.length);
+        var feedDocString = feed.toXmlDocumentString();
+        jum.assertEquals("feed serialization wrong", 
+                         cosmotest.test_atompub.feed2Serialization,
+                         feedDocString);
+    },
+ 
+    test_Entry1: function(){
+        var entry = new cosmo.atompub.Entry(cosmotest.test_atompub.entryDoc1.documentElement);
+        jum.assertEquals("title wrong", "HTML Content", entry.title.text);
+        jum.assertEquals("id wrong", "html-content", entry.id.text);
+        //TODO: updated
+        var content = entry.content;
+        jum.assertEquals("content type wrong", "html", content.type);
+        var html0 = content.deserializeContent();
+        jum.assertEquals("html0 content wrong", "<b>awesome</b>", html0);
+
+        var html1 = entry.deserializeContent();
+        jum.assertEquals("html1 content wrong", "<b>awesome</b>", html1);
+        var entryDocString = entry.toXmlDocumentString();
+        jum.assertEquals("entry serialization wrong", 
+                         cosmotest.test_atompub.entry1Serialization,
+                         entryDocString);
     },
 
     serviceDoc: cosmotest.util.toXMLDocument(
@@ -163,7 +204,7 @@ cosmotest.test_atompub = {
             '<feed xmlns="http://www.w3.org/2005/Atom">' +
             '<title type="text">dive into mark</title>' +
             '<subtitle type="html">' +
-            'A &lt;em&gt;lot&lt;/em&gt; of effort' +
+            'A &lt;em&gt;lot&lt;/em&gt; of effort ' +
             'went into making this effortless' +
             '</subtitle>' +
             '<updated>2005-07-31T12:29:29Z</updated>' +
@@ -203,5 +244,21 @@ cosmotest.test_atompub = {
             '</div>' +
             '</content>' +
             '</entry>' +
-            '</feed>')
+            '</feed>'),
+
+    entryDoc1: cosmotest.util.toXMLDocument(
+        '<?xml version="1.0" encoding="utf-8"?>' +
+            '<entry>' +
+            '<title>HTML Content</title>' +
+            '<id>html-content</id>' +
+            '<updated>2007-10-25T12:29:29Z</updated>' +
+            '<content type="html">' +
+            '&lt;b&gt;awesome&lt;/b&gt;' +
+            '</content>' +
+            '</entry>'),
+
+    feed1Serialization: '<?xml version="1.0" encoding=\'utf-8\'?><feed><title>Example Feed</title><id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id><updated>2003-12-13T18:30:02Z</updated><author> <name>John Doe</name></author><link href="http://example.org/"/><entry><title>Atom-Powered Robots Run Amok</title><updated>2003-12-13T18:30:02Z</updated><summary>Some text.</summary><id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id><link href="http://example.org/2003/12/13/atom03"/></entry></feed>',
+    feed2Serialization: '<?xml version="1.0" encoding=\'utf-8\'?><feed><title type="text">dive into mark</title><generator uri="http://www.example.com/" version="1.0">Example Toolkit</generator><id>tag:example.org,2003:3</id><rights>Copyright (c) 2003, Mark Pilgrim</rights><subtitle type="html">A &lt;em&gt;lot&lt;/em&gt; of effort went into making this effortless</subtitle><updated>2005-07-31T12:29:29Z</updated><link href="http://example.org/" rel="alternate" type="text/html" hreflang="en"/><link href="http://example.org/feed.atom" rel="self" type="application/atom+xml"/><entry><title>Atom draft-07 snapshot</title><updated>2005-07-31T12:29:29Z</updated><content type="xhtml"><content xmlns="http://www.w3.org/2005/Atom" type="xhtml" xml:lang="en" xml:base="http://diveintomark.org/"><div xmlns="http://www.w3.org/1999/xhtml"><p><i>[Update: The Atom draft is finished.]</i></p></div></content></content><published>2003-12-13T08:29:29-04:00</published><id>tag:example.org,2003:3.2397</id><author><name>Mark Pilgrim</name><uri>http://example.org/</uri><email>f8dy@example.com</email></author><contributor><name>Sam Ruby</name></contributor><contributor><name>Joe Gregorio</name></contributor><link href="http://example.org/2005/04/02/atom" rel="alternate" type="text/html"/><link href="http://example.org/audio/ph34r_my_podcast.mp3" rel="enclosure" type="audio/mpeg" length="1337"/></entry></feed>',
+
+    entry1Serialization: '<?xml version="1.0" encoding=\'utf-8\'?><entry><title>HTML Content</title><updated>2007-10-25T12:29:29Z</updated><content type="html">&lt;b&gt;awesome&lt;/b&gt;</content><id>html-content</id></entry>'
 }

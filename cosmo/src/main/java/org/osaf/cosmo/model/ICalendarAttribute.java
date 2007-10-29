@@ -127,4 +127,39 @@ public class ICalendarAttribute extends Attribute implements
         }
         return attr;
     }
+    
+    /**
+     * Convienence method for returning a Calendar value on 
+     * a ICalendarAttribute with a given QName stored on the given item.
+     * @param item item to fetch ICalendarAttribute from
+     * @param qname QName of attribute
+     * @return Date value of ICalendarAttribute
+     */
+    public static Calendar getValue(Item item, QName qname) {
+        ICalendarAttribute attr = (ICalendarAttribute) item.getAttribute(qname);
+        if(attr==null)
+            return null;
+        else
+            return attr.getValue();
+    }
+    
+    /**
+     * Convienence method for setting a Calendar value on a 
+     * ICalendarpAttribute with a given QName stored on the given item.
+     * @param item item to fetch ICalendarpAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on ICalendarpAttribute
+     */
+    public static void setValue(Item item, QName qname, Calendar value) {
+        ICalendarAttribute attr = (ICalendarAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new ICalendarAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
+    }
 }

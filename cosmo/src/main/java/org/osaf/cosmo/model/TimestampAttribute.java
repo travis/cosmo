@@ -67,6 +67,41 @@ public class TimestampAttribute extends Attribute implements
         setValue((Date) value);
     }
     
+    /**
+     * Convienence method for returning a Date value on a TimestampAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch TextAttribute from
+     * @param qname QName of attribute
+     * @return Date value of TextAttribute
+     */
+    public static Date getValue(Item item, QName qname) {
+        TimestampAttribute ta = (TimestampAttribute) item.getAttribute(qname);
+        if(ta==null)
+            return null;
+        else
+            return ta.getValue();
+    }
+    
+    /**
+     * Convienence method for setting a Date value on a TimestampAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch TimestampAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on TextAttribute
+     */
+    public static void setValue(Item item, QName qname, Date value) {
+        TimestampAttribute attr = (TimestampAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new TimestampAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
+    }
+    
     public Attribute copy() {
         TimestampAttribute attr = new TimestampAttribute();
         attr.setQName(getQName().copy());

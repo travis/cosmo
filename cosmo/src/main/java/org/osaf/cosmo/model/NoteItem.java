@@ -63,50 +63,27 @@ public class NoteItem extends ICalendarItem {
     // Property accessors
     @Transient
     public String getBody() {
-        // body stored as TextAttribute on Item
-        TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
-        if(bodyAttr!=null)
-            return bodyAttr.getValue();
-        else
-            return null;
+        return TextAttribute.getValue(this, ATTR_NOTE_BODY);
     }
 
     public void setBody(String body) {
         // body stored as TextAttribute on Item
-        TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
-        if(bodyAttr==null && body!=null) {
-            bodyAttr = new TextAttribute(ATTR_NOTE_BODY,body);
-            addAttribute(bodyAttr);
-            return;
-        }
-        if(body==null)
-            removeAttribute(ATTR_NOTE_BODY);
-        else
-            bodyAttr.setValue(body);
+        TextAttribute.setValue(this, ATTR_NOTE_BODY, body);
+    }
+    
+    public void setBody(Reader body) {
+        // body stored as TextAttribute on Item
+        TextAttribute.setValue(this, ATTR_NOTE_BODY, body);
     }
     
     @Transient
     public Date getReminderTime() {
-        // reminderDate stored as TimestampAttribute on Item
-        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_TIME);
-        if(reminderAttr!=null)
-            return reminderAttr.getValue();
-        else
-            return null;
+        return TimestampAttribute.getValue(this, ATTR_REMINDER_TIME);
     }
 
     public void setReminderTime(Date reminderTime) {
         // reminderDate stored as TimestampAttribute on Item
-        TimestampAttribute reminderAttr = (TimestampAttribute) getAttribute(ATTR_REMINDER_TIME);
-        if(reminderAttr==null && reminderTime!=null) {
-            reminderAttr = new TimestampAttribute(ATTR_REMINDER_TIME, reminderTime);
-            addAttribute(reminderAttr);
-        }
-        
-        if(reminderTime==null)
-            removeAttribute(ATTR_REMINDER_TIME);
-        else
-            reminderAttr.setValue(reminderTime);
+        TimestampAttribute.setValue(this, ATTR_REMINDER_TIME, reminderTime);
     }
     
     /**
@@ -151,20 +128,6 @@ public class NoteItem extends ICalendarItem {
         mergeCalendarProperties(journal);
         
         return calendar;
-    }
-    
-    public void setBody(Reader body) {
-        // body stored as TextAttribute on Item
-        TextAttribute bodyAttr = (TextAttribute) getAttribute(ATTR_NOTE_BODY);
-        if(bodyAttr==null && body!=null) {
-            bodyAttr = new TextAttribute(ATTR_NOTE_BODY,body);
-            addAttribute(bodyAttr);
-            return;
-        }
-        if(body==null)
-            removeAttribute(ATTR_NOTE_BODY);
-        else
-            bodyAttr.setValue(body);
     }
     
     public Item copy() {

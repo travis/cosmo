@@ -88,49 +88,23 @@ public class CalendarCollectionStamp extends Stamp implements
     @Transient
     public String getDescription() {
         // description stored as StringAttribute on Item
-        StringAttribute descAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_DESCRIPTION);
-        if(descAttr!=null)
-            return descAttr.getValue();
-        else
-            return null;
+        return StringAttribute.getValue(getItem(), ATTR_CALENDAR_DESCRIPTION);
     }
 
     public void setDescription(String description) {
         // description stored as StringAttribute on Item
-        StringAttribute descAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_DESCRIPTION);
-        if(descAttr==null && description!=null) {
-            descAttr = new StringAttribute(ATTR_CALENDAR_DESCRIPTION,description);
-            addAttribute(descAttr);
-            return;
-        }
-        if(description==null)
-            removeAttribute(ATTR_CALENDAR_DESCRIPTION);
-        else
-            descAttr.setValue(description);
+        StringAttribute.setValue(getItem(), ATTR_CALENDAR_DESCRIPTION, description);
     }
 
     @Transient
     public String getLanguage() {
         // language stored as StringAttribute on Item
-        StringAttribute langAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_LANGUAGE);
-        if(langAttr!=null)
-            return langAttr.getValue();
-        else
-            return null;
+        return StringAttribute.getValue(getItem(), ATTR_CALENDAR_LANGUAGE);
     }
 
     public void setLanguage(String language) {
         // language stored as StringAttribute on Item
-        StringAttribute langAttr = (StringAttribute) getAttribute(ATTR_CALENDAR_LANGUAGE);
-        if(langAttr==null && language!=null) {
-            langAttr = new StringAttribute(ATTR_CALENDAR_LANGUAGE,language);
-            addAttribute(langAttr);
-            return;
-        }
-        if(language==null)
-            removeAttribute(ATTR_CALENDAR_LANGUAGE);
-        else
-            langAttr.setValue(language);
+        StringAttribute.setValue(getItem(), ATTR_CALENDAR_LANGUAGE, language);
     }
 
     /**
@@ -140,11 +114,7 @@ public class CalendarCollectionStamp extends Stamp implements
     @Transient
     public Calendar getTimezoneCalendar() {
         // calendar stored as ICalendarAttribute on Item
-        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_CALENDAR_TIMEZONE);
-        if(calAttr!=null)
-            return calAttr.getValue();
-        else
-            return null;
+        return ICalendarAttribute.getValue(getItem(), ATTR_CALENDAR_TIMEZONE);
     }
 
     /**
@@ -179,16 +149,7 @@ public class CalendarCollectionStamp extends Stamp implements
      */
     public void setTimezoneCalendar(Calendar timezone) {
         // timezone stored as ICalendarAttribute on Item
-        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_CALENDAR_TIMEZONE);
-        if(calAttr==null && timezone!=null) {
-            calAttr = new ICalendarAttribute(ATTR_CALENDAR_TIMEZONE, timezone);
-            addAttribute(calAttr);
-        }
-        
-        if(timezone==null)
-            removeAttribute(ATTR_CALENDAR_TIMEZONE);
-        else
-            calAttr.setValue(timezone);
+        ICalendarAttribute.setValue(getItem(), ATTR_CALENDAR_TIMEZONE, timezone);
     }
 
     /**

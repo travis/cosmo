@@ -72,11 +72,7 @@ public abstract class ICalendarItem extends ContentItem {
     @Transient
     protected Calendar getCalendar() {
         // calendar stored as ICalendarAttribute on Item
-        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
-        if(calAttr!=null)
-            return calAttr.getValue();
-        else
-            return null;
+        return ICalendarAttribute.getValue(this, ATTR_ICALENDAR);
     }
     
     /**
@@ -86,16 +82,7 @@ public abstract class ICalendarItem extends ContentItem {
      */
     protected void setCalendar(Calendar calendar) {
         // calendar stored as ICalendarAttribute on Item
-        ICalendarAttribute calAttr = (ICalendarAttribute) getAttribute(ATTR_ICALENDAR);
-        if(calAttr==null && calendar!=null) {
-            calAttr = new ICalendarAttribute(ATTR_ICALENDAR, calendar);
-            addAttribute(calAttr);
-        }
-        
-        if(calendar==null)
-            removeAttribute(ATTR_ICALENDAR);
-        else
-            calAttr.setValue(calendar);
+        ICalendarAttribute.setValue(this, ATTR_ICALENDAR, calendar);
     }
     
     @Override

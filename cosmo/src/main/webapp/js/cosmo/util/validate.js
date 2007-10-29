@@ -99,6 +99,20 @@ cosmo.util.validate = new function () {
         return err;
     }
     /**
+     * Makes sure the given text input is less than or equal to the given length
+     * @return String, error message (empty if no err).
+     */
+    this.maxLength = function (s, len) {
+        var err = '';
+        var val = typeof s == 'object' ? s.value : s;
+        // Only bother checking length if a value is present
+        // Requiring a value should be done with 'required' method
+        if (val && (val.length > len)) {
+            err = _('Signup.Error.MaxLength') + ' (' + len + ')';
+        }
+        return err;
+    }
+    /**
      * Makes sure the given text input is not empty
      * @return String, error message (empty if no err).
      */

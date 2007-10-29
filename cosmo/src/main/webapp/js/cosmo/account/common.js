@@ -88,17 +88,21 @@ cosmo.account.getFieldList = function (accountInfo) {
         elemName: 'password',
         elemType: 'password'
     };
+    // Make sure password is between 5 and 16 chars per CMP spec.
+    var validatePasswordLength = function(elem){
+        return cosmo.util.validate.minLength(elem, 5) ||
+            cosmo.util.validate.maxLength(elem, 16);
+    };
     // User editing own account -- blank password means no change
     if (accountInfo) {
-        f.validators = function (elem) {
-            return cosmo.util.validate.minLength(elem, 5); };
-
+        f.validators = validatePasswordLength;
     }
     // Creating a new account -- require password field
     else {
         f.validators = function (elem) {
             return (cosmo.util.validate.required(elem) ||
-            cosmo.util.validate.minLength(elem, 5)); };
+                    validatePasswordLength(elem));
+        };
     }
     f.value = a[f.elemName];
     list.push(f);

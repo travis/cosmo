@@ -54,6 +54,10 @@ dojo.declare("cosmo.atompub.ContentSerializerNotDefined", Error, {
     }
 });
 
+cosmo.atompub.getLinks = function getLinks(rel){
+    return dojo.lang.filter(this.links, function(link){return link.rel == rel});
+};
+
 dojo.declare("cosmo.atompub.AppElement", null, {
     __elements__: {},
     __attributes__: {},
@@ -344,6 +348,15 @@ dojo.declare("cosmo.atompub.Link", cosmo.atompub.AppElement, {
         "title": [String],
         "length": [String]
     },
+    
+    /* Get the resource referred to by this link */
+    getResource: function(processingFunction){
+        var resourceDeferred = this.service.bind({
+            url: this.href
+        });
+        resourceDeferred.addCallback(processingFunction);
+        return resourceDeferred;
+    },
 
     toString: function(){
         return this.rel + ": " + this.href
@@ -367,19 +380,22 @@ dojo.declare("cosmo.atompub.Summary", cosmo.atompub.TextConstruct, {
 
 dojo.declare("cosmo.atompub.Source", cosmo.atompub.AppElement, {
     xmlName: "source",
-    "title": [cosmo.atompub.Title],
-    "updated": [cosmo.atompub.Updated],
-    "rights": [cosmo.atompub.Rights],
-    "id": [cosmo.atompub.Id],
-    "generator": [cosmo.atompub.Generator],
-    "icon": [cosmo.atompub.Icon],
-    "logo": [cosmo.atompub.Logo],
-    "subtitle": [cosmo.atompub.Subtitle],
-    "author": [cosmo.atompub.Author, "authors"],
-    "category": [cosmo.atompub.Category, "categories"],
-    "contributor": [cosmo.atompub.Contributor, "contributors"],
-    "link": [cosmo.atompub.Link, "links"]
+    __elements__: {
+        "title": [cosmo.atompub.Title],
+        "updated": [cosmo.atompub.Updated],
+        "rights": [cosmo.atompub.Rights],
+        "id": [cosmo.atompub.Id],
+        "generator": [cosmo.atompub.Generator],
+        "icon": [cosmo.atompub.Icon],
+        "logo": [cosmo.atompub.Logo],
+        "subtitle": [cosmo.atompub.Subtitle],
+        "author": [cosmo.atompub.Author, "authors"],
+        "category": [cosmo.atompub.Category, "categories"],
+        "contributor": [cosmo.atompub.Contributor, "contributors"],
+        "link": [cosmo.atompub.Link, "links"]
+    },
 
+    getLinks: cosmo.atompub.getLinks
 });
 
 dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
@@ -398,6 +414,8 @@ dojo.declare("cosmo.atompub.Entry", cosmo.atompub.AppElement, {
         "contributor": [cosmo.atompub.Contributor, "contributors"],
         "link": [cosmo.atompub.Link, "links"]
     },
+
+    getLinks: cosmo.atompub.getLinks,
 
     deserializeContent: function (contentDeserializers){
         if (this.content) return this.content.deserializeContent(contentDeserializers);
@@ -422,6 +440,8 @@ dojo.declare("cosmo.atompub.Feed", cosmo.atompub.AppElement, {
         "link": [cosmo.atompub.Link, "links"],
         "entry": [cosmo.atompub.Entry, "entries"]
     },
+
+    getLinks: cosmo.atompub.getLinks,
     
     deserializeEntryContents: function(contentDeserializers){
         return dojo.lang.map(this.entries, this, 

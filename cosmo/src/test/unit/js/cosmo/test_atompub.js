@@ -80,6 +80,8 @@ cosmotest.test_atompub = {
         jum.assertEquals("link1 rel wrong", "self", feed.links[1].rel);
         jum.assertEquals("link1 type wrong", "application/atom+xml", feed.links[1].type);
         jum.assertEquals("link1 href wrong", "http://example.org/feed.atom", feed.links[1].href);
+        jum.assertEquals("getLinks 1 wrong", feed.getLinks('alternate')[0], feed.links[0]); 
+        jum.assertEquals("getLinks 2 wrong", feed.getLinks('self')[0], feed.links[1]); 
         jum.assertEquals("rights wrong", "Copyright (c) 2003, Mark Pilgrim", feed.rights.text);
         jum.assertEquals("generator wrong", "Example Toolkit", feed.generator.text);
         jum.assertEquals("generator uri wrong", "http://www.example.com/", feed.generator.uri);
@@ -103,6 +105,11 @@ cosmotest.test_atompub = {
                          entry1.links[1].length);
         jum.assertEquals("entry1 id wrong", "tag:example.org,2003:3.2397",
                          entry1.id.text);
+        jum.assertEquals("getLinks entry1-1 wrong", 
+                         entry1.getLinks('alternate')[0], entry1.links[0]); 
+        jum.assertEquals("getLinks entry1-2 wrong", 
+                         entry1.getLinks('enclosure')[0], entry1.links[1]); 
+
         //TODO: test for updated
         //TODO: test for published
         jum.assertEquals("author name wrong", "Mark Pilgrim", entry1.authors[0].name.text);
@@ -140,6 +147,27 @@ cosmotest.test_atompub = {
         jum.assertEquals("entry serialization wrong", 
                          cosmotest.test_atompub.entry1Serialization,
                          entryDocString);
+    },
+    test_Entry2: function(){
+        var entry = new cosmo.atompub.Entry(cosmotest.test_atompub.entryDoc2.documentElement);
+        jum.assertEquals("title wrong", "link test", entry.title.text);
+        jum.assertEquals("id wrong", "link-test", entry.id.text);
+        //TODO: updated
+        var content = entry.content;
+        jum.assertEquals("content type wrong", "text", content.type);
+        var text0 = content.deserializeContent();
+        jum.assertEquals("text0 content wrong", "link test", text0);
+        var text1 = entry.deserializeContent();
+        jum.assertEquals("text1 content wrong", "link test", text1);
+        //var entryDocString = entry.toXmlDocumentString();
+        //jum.assertEquals("entry serialization wrong", 
+        //cosmotest.test_atompub.entry1Serialization,
+        //entryDocString);
+        jum.assertEquals("getLinks link 0 wrong", 
+                         entry.getLinks('alternate')[0], entry.links[0]); 
+        jum.assertEquals("getLinks link 1 wrong", 
+                         entry.getLinks('alternate')[1], entry.links[1]); 
+        
     },
 
     serviceDoc: cosmotest.util.toXMLDocument(
@@ -254,6 +282,21 @@ cosmotest.test_atompub = {
             '<updated>2007-10-25T12:29:29Z</updated>' +
             '<content type="html">' +
             '&lt;b&gt;awesome&lt;/b&gt;' +
+            '</content>' +
+            '</entry>'),
+
+    entryDoc2: cosmotest.util.toXMLDocument(
+        '<?xml version="1.0" encoding="utf-8"?>' +
+            '<entry>' +
+            '<title>link test</title>' +
+            '<id>link-test</id>' +
+            '<updated>2007-10-25T12:29:29Z</updated>' +
+            '<link rel="alternate" type="text/html" ' +
+            'href="http://example.org/cosmo/html"/>' +
+            '<link rel="alternate" type="text/eim-json" ' +
+            'href="http://example.org/cosmo/eim-json"/>' +
+            '<content type="text">' +
+            "link test" + 
             '</content>' +
             '</entry>'),
 

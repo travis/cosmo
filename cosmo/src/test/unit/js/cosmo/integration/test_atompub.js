@@ -29,12 +29,19 @@ cosmotest.integration.test_atompub = {
             function(user){
                 return cosmo.atompub.initializeService("user/" + user.username);
             },
+
             function(service){
                 ctx.service = service;
                 return service.getWorkspacesWithTitle("home")[0].collections[0].getFeed();
             },
+
             function(feed){
-                console.log(feed);
+                ctx.feed = feed;
+                return feed.getLinks("self")[0].getResource(function(xml){console.log(xml)});
+            },
+
+            function(linkResource){
+                return ctx.feed.getLinks("alternate")[0].getResource(function(xml){console.log(xml)});
             }
         ]);
     }

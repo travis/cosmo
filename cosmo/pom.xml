@@ -589,7 +589,7 @@
                                   <artifactItem>
                                      <groupId>org.osaf.cosmo</groupId>
                                      <artifactId>olson-tzdata</artifactId>
-                                     <version>2006o-1</version>
+                                     <version>2007h</version>
                                      <type>jar</type>
                                    </artifactItem>
                                 </artifactItems>
@@ -629,7 +629,7 @@
                                   <artifactItem>
                                      <groupId>org.osaf.cosmo</groupId>
                                      <artifactId>olson-tzdata</artifactId>
-                                     <version>2006o-1</version>
+                                     <version>2007h</version>
                                      <type>jar</type>
                                    </artifactItem>
                                 </artifactItems>

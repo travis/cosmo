@@ -82,6 +82,9 @@ public abstract class BaseStampApplicator extends BaseApplicator {
             stamp = createStamp(record);
             if (getItem() != null)
                 getItem().addStamp(stamp);
+        } else {
+            // ensure stamp's timestamp is updated
+            stamp.updateTimestamp();
         }
 
         for (EimRecordField field : record.getFields()) {

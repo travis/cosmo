@@ -56,6 +56,12 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         Assert.assertEquals(eventStamp.getEndDate(), EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T084500").getDate());
         Assert.assertEquals(eventStamp.getStatus(), "CONFIRMED");
         Assert.assertEquals(eventStamp.getRecurrenceRules().get(0).toString(), "FREQ=DAILY;UNTIL=20070306T055959Z");
+    
+        // test modifiedDate gets updated during apply
+        java.util.Date modDate = eventStamp.getModifiedDate();
+        applicator.applyRecord(record);
+        Assert.assertTrue(modDate!=eventStamp.getModifiedDate());
+        
     }
     
     public void testApplyFieldNegativeDur() throws Exception {

@@ -42,5 +42,15 @@ cosmo.service.translators.eim.constants = {
         INTEGER: "integer",
         CLOB: "clob",
         DECIMAL: "decimal"
+    },
+
+    rrule: {
+      SECONDLY: "SECONDLY",
+      MINUTELY: "MINUTELY",
+      HOURLY: "HOURLY",
+      DAILY: "DAILY",
+      MONTHLY:"MONTHLY",
+      WEEKLY:  "WEEKLY",
+      YEARLY: "YEARLY"
     }
 }

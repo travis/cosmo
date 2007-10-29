@@ -40,6 +40,9 @@ public class CollectionItem extends Item {
     // CollectionItem specific attributes
     public static final QName ATTR_EXCLUDE_FREE_BUSY_ROLLUP =
         new QName(CollectionItem.class, "excludeFreeBusyRollup");
+    
+    public static final QName ATTR_HUE =
+        new QName(CollectionItem.class, "hue");
 
     private Set<Item> children = new HashSet<Item>(0);
     
@@ -91,6 +94,15 @@ public class CollectionItem extends Item {
 
     public void setExcludeFreeBusyRollup(boolean flag) {
         setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
+    }
+    
+    @Transient
+    public Long getHue() {
+        return IntegerAttribute.getValue(this, ATTR_HUE);
+    }
+    
+    public void setHue(Long value) {
+        IntegerAttribute.setValue(this, ATTR_HUE, value);
     }
     
     /**

@@ -179,6 +179,9 @@ public class StandardMorseCodeController implements MorseCodeController {
         else
             collection.setDisplayName(uid);
 
+        if(records.getHue()!=null)
+            collection.setHue(records.getHue());
+        
         // stamp it as a calendar
         CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
         collection.addStamp(ccs);
@@ -350,6 +353,9 @@ public class StandardMorseCodeController implements MorseCodeController {
 
         if (records.getName() != null)
             collection.setDisplayName(records.getName());
+        
+        if(records.getHue()!=null)
+            collection.setHue(records.getHue());
 
         Set<Item> children = recordsToItems(records.getRecordSets(),
                                             collection);

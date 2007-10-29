@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <ns0:collection uuid="6b97edbe-bb44-4a72-860c-d4905732e060"
+                hue="1"
                 xmlns:ns0="http://osafoundation.org/eim/0">
   <ns0:recordset uuid="11803e22-e7e4-43da-ae47-851259d8c87b">
     <ns1:record xmlns:ns1="http://osafoundation.org/eim/event/0">

@@ -667,6 +667,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         CollectionItem a = new CollectionItem();
         a.setName("a");
         a.setOwner(user);
+        a.setHue(new Long(1));
 
         a = contentDao.createCollection(root, a);
 
@@ -676,6 +677,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         CollectionItem queryItem = contentDao.findCollectionByUid(a.getUid());
+        Assert.assertEquals(new Long(1), queryItem.getHue());
         helper.verifyItem(a, queryItem);
     }
 

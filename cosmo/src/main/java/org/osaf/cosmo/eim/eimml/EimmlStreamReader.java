@@ -59,6 +59,7 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
     private String documentEncoding;
     private String uuid;
     private String name;
+    private Long hue;
 
     /**
      * Reads the document header and root element, positioning the
@@ -102,6 +103,13 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
      */
     public String getCollectionName() {
         return name;
+    }
+    
+    /**
+     * Returns the hue of the collection, if any is specified.
+     */
+    public Long getCollectionHue() {
+        return hue;
     }
 
     /** */
@@ -178,7 +186,14 @@ public class EimmlStreamReader implements EimmlConstants, XMLStreamConstants {
                 uuid = value;
             } else if (attr.equals(QN_NAME)) {
                 name = ! StringUtils.isBlank(value) ? value : null;
-            } else {
+            } else if (attr.equals(QN_HUE)) {
+                try {
+                    hue = !StringUtils.isBlank(value) ? Long.parseLong(value) : null;
+                } catch (NumberFormatException e) {
+                    throw new EimmlValidationException("Attribute " + ATTR_HUE + " must be an integer");
+                }
+            }
+            else {
                 log.warn("skipped unrecognized collection attribute " + attr);
             }
         }

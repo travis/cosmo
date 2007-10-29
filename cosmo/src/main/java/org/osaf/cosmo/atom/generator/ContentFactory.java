@@ -117,7 +117,7 @@ public class ContentFactory
         try {
             StringWriter out = new StringWriter();
             EimmlStreamWriter writer = new EimmlStreamWriter(out);
-            writer.writeCollection(item.getUid(), null);
+            writer.writeCollection(item.getUid(), null, null);
             writeEimml(writer, item);
             writer.close();
 

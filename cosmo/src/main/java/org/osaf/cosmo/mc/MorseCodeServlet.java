@@ -253,7 +253,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                     new EimmlStreamWriter(resp.getWriter());
 
                 writer.writeStartDocument();
-                writer.writeCollection(records.getUid(), records.getName());
+                writer.writeCollection(records.getUid(), records.getName(), records.getHue());
 
                 if (records.isDeleted()) {
                     writer.writeDeleted();
@@ -351,7 +351,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 EimmlStreamReaderIterator i =
                     new EimmlStreamReaderIterator(reader);
                 PubRecords records =
-                    new PubRecords(i, reader.getCollectionName());
+                    new PubRecords(i, reader.getCollectionName(), reader.getCollectionHue());
 
                 PubCollection pubCollection =
                     controller.updateCollection(cp.getUid(), token, records);
@@ -452,7 +452,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 EimmlStreamReaderIterator i =
                     new EimmlStreamReaderIterator(reader);
                 PubRecords records =
-                    new PubRecords(i, reader.getCollectionName());
+                    new PubRecords(i, reader.getCollectionName(), reader.getCollectionHue());
 
                 
                 Set<Ticket.Type> ticketTypes = null;

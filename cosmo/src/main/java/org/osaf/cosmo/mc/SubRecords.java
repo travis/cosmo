@@ -82,6 +82,11 @@ public class SubRecords {
     public String getName() {
         return collection.getDisplayName();
     }
+    
+    /** */
+    public Long getHue() {
+        return collection.getHue();
+    }
 
     /** */
     public boolean isDeleted() {

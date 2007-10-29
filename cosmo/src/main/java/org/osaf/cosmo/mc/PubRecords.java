@@ -27,12 +27,14 @@ public class PubRecords {
 
     private EimRecordSetIterator iterator;
     private String name;
+    private Long hue;
 
     /** */
     public PubRecords(EimRecordSetIterator iterator,
-                      String name) {
+                      String name, Long hue) {
         this.iterator = iterator;
         this.name = name;
+        this.hue = hue;
     }
 
     /** */
@@ -43,5 +45,10 @@ public class PubRecords {
     /** */
     public String getName() {
         return name;
+    }
+    
+    /** */
+    public Long getHue() {
+        return hue;
     }
 }

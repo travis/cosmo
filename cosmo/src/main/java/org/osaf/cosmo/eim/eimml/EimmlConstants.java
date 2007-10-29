@@ -46,7 +46,11 @@ public interface EimmlConstants {
     /** */
     public static final String ATTR_NAME = "name";
     /** */
+    public static final String ATTR_HUE = "hue";
+    /** */
     public static final QName QN_NAME = new QName(ATTR_NAME);
+    /** */
+    public static final QName QN_HUE = new QName(ATTR_HUE);
     /** */
     public static final String ATTR_UUID = "uuid";
     /** */

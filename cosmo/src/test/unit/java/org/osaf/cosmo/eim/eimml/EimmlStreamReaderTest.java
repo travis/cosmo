@@ -49,6 +49,9 @@ public class EimmlStreamReaderTest extends TestCase
                      reader.getCollectionUuid());
         assertNull("Collection name not null", reader.getCollectionName());
 
+        assertEquals("Collection hue incorrect",
+                new Long(1),reader.getCollectionHue());
+        
         assertTrue("Did not find next recordset", reader.hasNext());
 
         EimRecordSet recordset = reader.nextRecordSet();

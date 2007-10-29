@@ -81,7 +81,8 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
      * Writes the root collection element.
      */
     public void writeCollection(String uuid,
-                                String name)
+                                String name,
+                                Long hue)
         throws EimmlStreamException {
         try {
             xmlWriter.setPrefix(PRE_CORE, NS_CORE);
@@ -93,6 +94,9 @@ public class EimmlStreamWriter implements EimmlConstants, XMLStreamConstants {
 
             if (name != null)
                 xmlWriter.writeAttribute(ATTR_NAME, name);
+            
+            if(hue != null)
+                xmlWriter.writeAttribute(ATTR_HUE, hue.toString());
         } catch (XMLStreamException e) {
             throw new EimmlStreamException("Error writing collection", e);
         }

@@ -1,5 +1,5 @@
-{"method": "waits.forElement", "params": {"id": "loginDialogFormContainer"}}
 {"method": "click", "params": {"link" : "Create a new account"}}
+{"method": "waits.forElement", "params": {"id": "loginDialogFormContainer"}}
 {"params": {"milliseconds": 6000},  "method": "waits.sleep"}
 {"method": "waits.forElement", "params": {"id": "modalDialogTitle", "timeout": 40000}}
 {"params": {"id": "modalDialogTitle"},  "method": "asserts.assertNode"}
@@ -9,6 +9,11 @@
 {"params": {"text": "tester", "id": "firstName"},  "method": "type"}
 {"params": {"text": "tester", "id": "lastName"},  "method": "type"}
 {"method": "type", "params": {"id" : "email", "text": "{$random}@osafoundation.org"}}
+{"params": {"text": "12345678901234567890", "id": "password"},  "method": "type"}
+{"params": {"text": "12345678901234567890", "id": "confirm"},  "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
+{"params": {"milliseconds": 2000},  "method": "waits.sleep"}
+{"params": {"validator": "Maximum number of characters exceeded. (16)", "id": "modalDialogContent"},  "method": "asserts.assertText"}
 {"params": {"text": "testers", "id": "password"},  "method": "type"}
 {"params": {"text": "tester", "id": "confirm"},  "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}

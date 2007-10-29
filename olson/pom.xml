@@ -22,7 +22,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>olson-tzdata</artifactId>
-    <version>2006o-1</version>
+    <version>2007h</version>
     <packaging>jar</packaging>
     <name>olson tzdata</name>
     <dependencies>
@@ -30,7 +30,7 @@
     <build>
         <resources>
             <resource>
-                <directory>2006o-1</directory>
+                <directory>2007h</directory>
                 <targetPath>/olson-tzdata</targetPath>
                 <filtering>false</filtering>
                 <includes>

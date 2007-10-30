@@ -109,7 +109,7 @@ public class DavJournal extends DavCalendarResource {
 
         val = null;
         if (vjournal.getSummary() != null)
-            val = StringUtils.substring(vjournal.getSummary().getValue(), 0, 255);
+            val = StringUtils.substring(vjournal.getSummary().getValue(), 0, 1024);
         if (StringUtils.isBlank(val))
             val = note.getName();
         note.setDisplayName(val);

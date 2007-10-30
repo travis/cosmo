@@ -82,7 +82,7 @@ public abstract class Item extends AuditableObject {
     @Index(name="idx_itemname")
     private String name;
     
-    @Column(name = "displayname", length=255)
+    @Column(name = "displayname", length=1024)
     private String displayName;
     
     @Column(name = "clientcreatedate")

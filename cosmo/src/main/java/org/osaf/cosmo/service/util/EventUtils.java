@@ -230,7 +230,7 @@ public class EventUtils {
         
         // for now displayName is limited to 255 chars
         if(event.getSummary()!=null)
-            noteMod.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
+            noteMod.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,1024));
        
         if(event.getDescription()!=null)
             noteMod.setBody(event.getDescription().getValue());
@@ -244,7 +244,7 @@ public class EventUtils {
         // for now displayName is limited to 255 chars
         if (event.getSummary() != null)
             note.setDisplayName(StringUtils.substring(event.getSummary()
-                    .getValue(), 0, 255));
+                    .getValue(), 0, 1024));
 
         if (event.getDescription() != null)
             note.setBody(event.getDescription().getValue());

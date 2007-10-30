@@ -24,7 +24,7 @@ public interface ContentItemConstants {
     /** */
     public static final String FIELD_TITLE = "title";
     /** */
-    public static final int MAXLEN_TITLE = 256;
+    public static final int MAXLEN_TITLE = 1024;
     /** */
     public static final String FIELD_TRIAGE = "triage";
     /** */

@@ -113,7 +113,7 @@ public class DavTask extends DavCalendarResource {
 
         val = null;
         if (vtodo.getSummary() != null)
-            val = StringUtils.substring(vtodo.getSummary().getValue(), 0, 255);
+            val = StringUtils.substring(vtodo.getSummary().getValue(), 0, 1024);
         if (StringUtils.isBlank(val))
             val = note.getName();
         note.setDisplayName(val);

@@ -26,7 +26,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -54,14 +53,20 @@ public class NoteItem extends ICalendarItem {
     
     private static final long serialVersionUID = -6100568628972081120L;
     
+    @OneToMany(mappedBy = "modifies", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.DELETE} )
+    @BatchSize(size=50)
+    //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<NoteItem> modifications = new HashSet<NoteItem>(0);
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modifiesitemid")
     private NoteItem modifies = null;
     
     public NoteItem() {
     }
 
     // Property accessors
-    @Transient
     public String getBody() {
         return TextAttribute.getValue(this, ATTR_NOTE_BODY);
     }
@@ -76,7 +81,6 @@ public class NoteItem extends ICalendarItem {
         TextAttribute.setValue(this, ATTR_NOTE_BODY, body);
     }
     
-    @Transient
     public Date getReminderTime() {
         return TimestampAttribute.getValue(this, ATTR_REMINDER_TIME);
     }
@@ -90,7 +94,6 @@ public class NoteItem extends ICalendarItem {
      * Return the Calendar object containing a VJOURNAL component.
      * @return calendar
      */
-    @Transient
     @Journal
     public Calendar getJournalCalendar() {
         return getCalendar();
@@ -111,7 +114,6 @@ public class NoteItem extends ICalendarItem {
      * as a VJOURNAL.
      * @return Calendar representation of NoteItem
      */
-    @Transient
     public Calendar getFullCalendar() {
         // Start with existing calendar if present
         Calendar calendar = getJournalCalendar();
@@ -136,10 +138,6 @@ public class NoteItem extends ICalendarItem {
         return copy;
     }
     
-    @OneToMany(mappedBy = "modifies", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.DELETE} )
-    @BatchSize(size=50)
-    //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<NoteItem> getModifications() {
         return modifications;
     }
@@ -148,8 +146,6 @@ public class NoteItem extends ICalendarItem {
         this.modifications = modifications;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modifiesitemid")
     public NoteItem getModifies() {
         return modifies;
     }

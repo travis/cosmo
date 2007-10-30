@@ -28,7 +28,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
@@ -66,7 +65,15 @@ import org.hibernate.annotations.Index;
 public abstract class Attribute extends AuditableObject implements java.io.Serializable {
 
     // Fields
+    @Embedded
+    @AttributeOverrides( {
+            @AttributeOverride(name="namespace", column = @Column(name="namespace", nullable = false, length=255) ),
+            @AttributeOverride(name="localName", column = @Column(name="localname", nullable = false, length=255) )
+    } )
     private QName qname;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "itemid", nullable = false)
     private Item item;
 
     // Constructors
@@ -74,11 +81,6 @@ public abstract class Attribute extends AuditableObject implements java.io.Seria
     public Attribute() {
     }
 
-    @Embedded
-    @AttributeOverrides( {
-            @AttributeOverride(name="namespace", column = @Column(name="namespace", nullable = false, length=255) ),
-            @AttributeOverride(name="localName", column = @Column(name="localname", nullable = false, length=255) )
-    } )
     public QName getQName() {
         return qname;
     }
@@ -91,7 +93,6 @@ public abstract class Attribute extends AuditableObject implements java.io.Seria
      * For backwards compatability.  Return the local name.
      * @return local name of attribute
      */
-    @Transient
     public String getName() {
         if(qname==null)
             return null;
@@ -102,8 +103,6 @@ public abstract class Attribute extends AuditableObject implements java.io.Seria
     /**
      * @return Item attribute belongs to
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemid", nullable = false)
     public Item getItem() {
         return item;
     }
@@ -119,7 +118,6 @@ public abstract class Attribute extends AuditableObject implements java.io.Seria
     /**
      * @return the attribute value
      */
-    @Transient
     public abstract Object getValue();
 
     /**

@@ -38,6 +38,8 @@ public class TimestampAttribute extends Attribute implements
      */
     private static final long serialVersionUID = 5263977785074085449L;
     
+    @Column(name = "intvalue")
+    @Type(type="long_timestamp")
     private Date value;
 
     /** default constructor */
@@ -50,8 +52,6 @@ public class TimestampAttribute extends Attribute implements
     }
 
     // Property accessors
-    @Column(name = "intvalue")
-    @Type(type="long_timestamp")
     public Date getValue() {
         return this.value;
     }

@@ -45,9 +45,21 @@ public class PasswordRecovery extends BaseModelObject {
 
     private static final long DEFAULT_TIMEOUT = 1000*60*60*24*3; // 3 days
     
+    @Column(name = "pwrecoverykey", unique = true, nullable = false, length = 255)
+    @NotNull
+    @Index(name = "idx_pwrecoverykey")
     private String key;
+    
+    @Column(name = "creationdate")
+    @Type(type="timestamp")
     private Date created;
+    
+    @Column(name = "timeout")
+    @Type(type = "long")
     private long timeout;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userid")
     private User user;
     
     public PasswordRecovery(){
@@ -70,9 +82,6 @@ public class PasswordRecovery extends BaseModelObject {
         this.created = new Date();
     }
     
-    @Column(name = "pwrecoverykey", unique = true, nullable = false, length = 255)
-    @NotNull
-    @Index(name = "idx_pwrecoverykey")
     public String getKey() {
         return key;
     }
@@ -83,8 +92,6 @@ public class PasswordRecovery extends BaseModelObject {
     
     /**
      */
-    @Column(name = "timeout")
-    @Type(type = "long")
     public long getTimeout() {
         return timeout;
     }
@@ -95,8 +102,6 @@ public class PasswordRecovery extends BaseModelObject {
 
     /**
      */
-    @Column(name = "creationdate")
-    @Type(type="timestamp")
     public Date getCreated() {
         return created;
     }
@@ -109,8 +114,6 @@ public class PasswordRecovery extends BaseModelObject {
     
     /**
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userid")
     public User getUser() {
         return user;
     }

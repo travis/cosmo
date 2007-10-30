@@ -42,6 +42,13 @@ public class DictionaryAttribute extends Attribute
      */
     private static final long serialVersionUID = 3713980765847199175L;
     
+    @CollectionOfElements
+    @JoinTable(
+            name="dictionary_values",
+            joinColumns = @JoinColumn(name="attributeid")
+    )
+    @MapKey(columns=@Column(name="keyname", length=255))
+    @Column(name="stringvalue", length=2048)
     private Map<String, String> value = new HashMap<String,String>(0);
 
     /** default constructor */
@@ -55,13 +62,6 @@ public class DictionaryAttribute extends Attribute
     }
 
     // Property accessors
-    @CollectionOfElements
-    @JoinTable(
-            name="dictionary_values",
-            joinColumns = @JoinColumn(name="attributeid")
-    )
-    @MapKey(columns=@Column(name="keyname", length=255))
-    @Column(name="stringvalue", length=2048)
     public Map<String, String> getValue() {
         return this.value;
     }

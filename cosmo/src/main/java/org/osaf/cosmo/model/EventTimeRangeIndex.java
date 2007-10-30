@@ -8,9 +8,20 @@ import org.hibernate.annotations.Index;
 @Embeddable
 public class EventTimeRangeIndex {
     
+    @Column(table="event_stamp", name = "startdate", length=16)
+    @Index(name="idx_startdt")
     private String startDate = null;
+    
+    @Column(table="event_stamp", name = "enddate", length=16)
+    @Index(name="idx_enddt")
     private String endDate = null;
+    
+    @Column(table="event_stamp", name = "isfloating")
+    @Index(name="idx_floating")
     private Boolean isFloating = null;
+    
+    @Column(table="event_stamp", name = "isrecurring")
+    @Index(name="idx_recurring")
     private Boolean isRecurring = null;
     
     /**
@@ -24,9 +35,7 @@ public class EventTimeRangeIndex {
      * 20070101T100000Z<br/>
      * @return start date of the event
      */
-    @Column(table="event_stamp", name = "enddate", length=16)
-    @Index(name="idx_enddt")
-    public String getDateEnd() {
+    public String getEndDate() {
         return endDate;
     }
 
@@ -45,7 +54,7 @@ public class EventTimeRangeIndex {
      * Z-TIME-INFINITY<br/>
      * @param endDate end date of the event
      */
-    public void setDateEnd(String endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
     
@@ -61,9 +70,7 @@ public class EventTimeRangeIndex {
      * 
      * @return start date of the event
      */
-    @Column(table="event_stamp", name = "startdate", length=16)
-    @Index(name="idx_startdt")
-    public String getDateStart() {
+    public String getStartDate() {
         return startDate;
     }
 
@@ -78,12 +85,10 @@ public class EventTimeRangeIndex {
      * 20070101T100000Z<br/>
      * @param startDate start date of the event
      */
-    public void setDateStart(String startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    @Column(table="event_stamp", name = "isfloating")
-    @Index(name="idx_floating")
     public Boolean getIsFloating() {
         return isFloating;
     }
@@ -92,8 +97,6 @@ public class EventTimeRangeIndex {
         this.isFloating = isFloating;
     }
     
-    @Column(table="event_stamp", name = "isrecurring")
-    @Index(name="idx_recurring")
     public Boolean getIsRecurring() {
         return isRecurring;
     }

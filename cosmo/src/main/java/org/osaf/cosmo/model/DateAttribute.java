@@ -37,6 +37,8 @@ public class DateAttribute extends Attribute implements
      */
     private static final long serialVersionUID = 5263977785074085449L;
     
+    @Column(name = "datevalue")
+    @Type(type="timestamp")
     private Date value;
 
     /** default constructor */
@@ -49,8 +51,6 @@ public class DateAttribute extends Attribute implements
     }
 
     // Property accessors
-    @Column(name = "datevalue")
-    @Type(type="timestamp")
     public Date getValue() {
         return this.value;
     }

@@ -36,6 +36,9 @@ public class StringAttribute extends Attribute implements
      * 
      */
     private static final long serialVersionUID = 2417093506524504993L;
+    
+    @Column(name="stringvalue", length=VALUE_LEN_MAX)
+    @Length(min=0, max=VALUE_LEN_MAX)
     private String value;
 
     // Constructors
@@ -50,8 +53,6 @@ public class StringAttribute extends Attribute implements
     }
 
     // Property accessors
-    @Column(name="stringvalue", length=VALUE_LEN_MAX)
-    @Length(min=0, max=VALUE_LEN_MAX)
     public String getValue() {
         return this.value;
     }

@@ -19,7 +19,6 @@ import java.io.Reader;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -79,13 +78,11 @@ public class MessageStamp extends Stamp implements
         setItem(item);
     }
     
-    @Transient
     public String getType() {
         return "message";
     }
     
     // Property accessors
-    @Transient
     public String getMessageId() {
         // id stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_ID);
@@ -97,7 +94,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
     
-    @Transient
     public String getHeaders() {
         // headers stored as TextAttribute on Item
         return TextAttribute.getValue(getItem(), ATTR_MESSAGE_HEADERS);
@@ -115,7 +111,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
     
-    @Transient
     public String getFrom() {
         // from stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_FROM);
@@ -127,7 +122,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
 
-    @Transient
     public String getTo() {
         // to stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_TO);
@@ -139,7 +133,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
     
-    @Transient
     public String getBcc() {
         // bcc stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_BCC);
@@ -151,7 +144,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
 
-    @Transient
     public String getCc() {
         // cc stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_CC);
@@ -163,7 +155,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
  
-    @Transient
     public String getOriginators() {
         // originators stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_ORIGINATORS);
@@ -175,7 +166,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
     
-    @Transient
     public String getDateSent() {
         // inReployTo stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_DATE_SENT);
@@ -187,7 +177,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
     
-    @Transient
     public String getInReplyTo() {
         // inReployTo stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_MESSAGE_IN_REPLY_TO);
@@ -199,7 +188,6 @@ public class MessageStamp extends Stamp implements
         updateTimestamp();
     }
 
-    @Transient
     public String getReferences() {
         // references stored as TextAttribute on Item
         return TextAttribute.getValue(getItem(), ATTR_MESSAGE_REFERENCES);

@@ -27,16 +27,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 
 /**
@@ -67,11 +64,33 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
     /** */
     public static final String PRIVILEGE_FREEBUSY = "freebusy";
 
+    @Column(name = "ticketkey", unique = true, nullable = false, length = 255)
+    @NotNull
+    @Index(name = "idx_ticketkey")
     private String key;
+    
+    @Column(name = "tickettimeout", nullable = false, length=255)
     private String timeout;
+    
+    @CollectionOfElements
+    @JoinTable(
+            name="ticket_privilege",
+            joinColumns = @JoinColumn(name="ticketid")
+    )
+    @Fetch(FetchMode.JOIN)
+    @Column(name="privilege", nullable=false, length=255)
     private Set<String> privileges;
+    
+    @Column(name = "creationdate")
+    @org.hibernate.annotations.Type(type="timestamp")
     private Date created;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ownerid")
     private User owner;
+    
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="itemid")
     private Item item;
 
     /**
@@ -87,9 +106,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
         setTypePrivileges(type);
     }
 
-    @Column(name = "ticketkey", unique = true, nullable = false, length = 255)
-    @NotNull
-    @Index(name = "idx_ticketkey")
     public String getKey() {
         return key;
     }
@@ -100,7 +116,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
 
     /**
      */
-    @Column(name = "tickettimeout", nullable = false, length=255)
     public String getTimeout() {
         return timeout;
     }
@@ -119,13 +134,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
 
     /**
      */
-    @CollectionOfElements
-    @JoinTable(
-            name="ticket_privilege",
-            joinColumns = @JoinColumn(name="ticketid")
-    )
-    @Fetch(FetchMode.JOIN)
-    @Column(name="privilege", nullable=false, length=255)
     public Set<String> getPrivileges() {
         return privileges;
     }
@@ -141,7 +149,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
      * with one of the predefined types, or <code>null</code>
      * otherwise.
      */
-    @Transient
     public Ticket.Type getType() {
         if (privileges.contains(PRIVILEGE_READ)) {
             if (privileges.contains(PRIVILEGE_WRITE))
@@ -154,7 +161,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
         return null;
     }
 
-    @Transient
     private void setTypePrivileges(Ticket.Type type) {
         for (String p : type.getPrivileges())
             privileges.add(p);
@@ -162,8 +168,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
 
     /**
      */
-    @Column(name = "creationdate")
-    @org.hibernate.annotations.Type(type="timestamp")
     public Date getCreated() {
         return created;
     }
@@ -174,8 +178,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
         this.created = created;
     }
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ownerid")
     public User getOwner() {
         return owner;
     }
@@ -222,19 +224,16 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
         return false;
     }
 
-    @Transient
     public boolean isReadOnly() {
         Type type = getType();
         return type != null && type.equals(Type.READ_ONLY);
     }
 
-    @Transient
     public boolean isReadWrite() {
         Type type = getType();
         return type != null && type.equals(Type.READ_WRITE);
     }
 
-    @Transient
     public boolean isFreeBusy() {
         Type type = getType();
         return type != null && type.equals(Type.FREE_BUSY);
@@ -278,8 +277,6 @@ public class Ticket extends BaseModelObject implements Comparable<Ticket> {
         return key.compareTo(t.getKey());
     }
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="itemid")
     public Item getItem() {
         return item;
     }

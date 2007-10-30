@@ -45,7 +45,12 @@ import org.hibernate.annotations.Type;
         length=16)
 public abstract class Tombstone extends BaseModelObject {
     
+    @Column(name = "removedate", nullable = false)
+    @Type(type="long_timestamp")
     private Date timestamp = null;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "itemid", nullable = false)
     private Item item = null;
 
     public Tombstone() {
@@ -56,8 +61,6 @@ public abstract class Tombstone extends BaseModelObject {
         this.timestamp = new Date(System.currentTimeMillis());
     }
     
-    @Column(name = "removedate", nullable = false)
-    @Type(type="long_timestamp")
     public Date getTimestamp() {
         return timestamp;
     }
@@ -66,8 +69,6 @@ public abstract class Tombstone extends BaseModelObject {
         this.timestamp = timestamp;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemid", nullable = false)
     public Item getItem() {
         return item;
     }

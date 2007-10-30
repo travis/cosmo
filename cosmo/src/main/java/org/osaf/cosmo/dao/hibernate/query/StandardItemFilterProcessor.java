@@ -155,7 +155,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         
         String alias = "ta" + params.size();
         selectBuf.append(", TextAttribute " + alias);
-        appendWhere(whereBuf, alias + ".item=i and " + alias +".QName=:" + alias + "qname and " + alias + ".value like :" + alias + "value");
+        appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname and " + alias + ".value like :" + alias + "value");
         params.put(alias + "qname", filter.getQname());
         params.put(alias + "value", formatForLike(filter.getValue()));
     }
@@ -192,7 +192,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         if(filter.isMissing())
             toAppend += "not ";
         
-        toAppend += "exists (select a.id from Attribute a where a.item=i and a.QName=:"
+        toAppend += "exists (select a.id from Attribute a where a.item=i and a.qname=:"
                 + param + ")";
         appendWhere(whereBuf, toAppend);
         params.put(param, filter.getQname());
@@ -216,14 +216,14 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         // handle time range
         if(filter.getPeriod()!=null) {
            whereBuf.append(" and ( ");
-           whereBuf.append("(es.timeRangeIndex.isFloating=true and es.timeRangeIndex.dateStart < '" + filter.getFloatEnd() + "'");
-           whereBuf.append(" and es.timeRangeIndex.dateEnd > '" + filter.getFloatStart() + "')");
+           whereBuf.append("(es.timeRangeIndex.isFloating=true and es.timeRangeIndex.startDate < '" + filter.getFloatEnd() + "'");
+           whereBuf.append(" and es.timeRangeIndex.endDate > '" + filter.getFloatStart() + "')");
            
-           whereBuf.append(" or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.dateStart < '" + filter.getUTCEnd() + "'");
-           whereBuf.append(" and es.timeRangeIndex.dateEnd > '" + filter.getUTCStart() + "')");
+           whereBuf.append(" or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.startDate < '" + filter.getUTCEnd() + "'");
+           whereBuf.append(" and es.timeRangeIndex.endDate > '" + filter.getUTCStart() + "')");
            
            // edge case where start==end
-           whereBuf.append(" or (es.timeRangeIndex.dateStart=es.timeRangeIndex.dateEnd and (es.timeRangeIndex.dateStart='" + filter.getFloatStart() + "' or es.timeRangeIndex.dateStart='" + filter.getUTCStart() + "'))");
+           whereBuf.append(" or (es.timeRangeIndex.startDate=es.timeRangeIndex.endDate and (es.timeRangeIndex.startDate='" + filter.getFloatStart() + "' or es.timeRangeIndex.startDate='" + filter.getUTCStart() + "'))");
                    
            whereBuf.append(")");
         }

@@ -23,7 +23,6 @@ import java.io.InputStream;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import org.apache.commons.io.IOUtils;
 import org.hibernate.annotations.Type;
@@ -40,6 +39,8 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
      */
     private static final long serialVersionUID = 6296196539997344427L;
 
+    @Column(name = "binvalue", length=102400000)
+    @Type(type="bytearray_blob")
     private byte[] value;
 
     /** default constructor */
@@ -69,8 +70,6 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
     }
 
     // Property accessors
-    @Column(name = "binvalue", length=102400000)
-    @Type(type="bytearray_blob")
     public byte[] getValue() {
         return this.value;
     }
@@ -89,7 +88,6 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
     /**
      * @return legnth of data
      */
-    @Transient
     public int getLength() {
         if(value!=null)
             return value.length;
@@ -100,7 +98,6 @@ public class BinaryAttribute extends Attribute implements java.io.Serializable {
     /**
      * @return inputstream to data
      */
-    @Transient
     public InputStream getInputStream() {
         if(value!=null)
             return new ByteArrayInputStream(value);

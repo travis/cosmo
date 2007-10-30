@@ -33,6 +33,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @DiscriminatorValue("attribute")
 public class AttributeTombstone extends Tombstone {
     
+    @Embedded
+    @AttributeOverrides( {
+            @AttributeOverride(name="namespace", column = @Column(name="namespace", length=255) ),
+            @AttributeOverride(name="localName", column = @Column(name="localname", length=255) )
+    } )
     private QName qname = null;
 
     public AttributeTombstone() {
@@ -48,11 +53,6 @@ public class AttributeTombstone extends Tombstone {
         this.qname = qname;
     }
     
-    @Embedded
-    @AttributeOverrides( {
-            @AttributeOverride(name="namespace", column = @Column(name="namespace", length=255) ),
-            @AttributeOverride(name="localName", column = @Column(name="localname", length=255) )
-    } )
     public QName getQName() {
         return qname;
     }

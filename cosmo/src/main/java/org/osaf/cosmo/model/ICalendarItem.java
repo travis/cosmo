@@ -18,7 +18,6 @@ package org.osaf.cosmo.model;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 
@@ -33,13 +32,13 @@ public abstract class ICalendarItem extends ContentItem {
     public static final QName ATTR_ICALENDAR = new QName(
             ICalendarItem.class, "icalendar");
     
+    @Column(name="icaluid", length=255)
+    //@Index(name="idx_icaluid")
     private String icalUid = null;
     
     public ICalendarItem() {
     }
     
-    @Column(name="icaluid", length=255)
-    //@Index(name="idx_icaluid")
     public String getIcalUid() {
         return icalUid;
     }
@@ -59,7 +58,6 @@ public abstract class ICalendarItem extends ContentItem {
      * Subclasses can override this to manipulate the calendar
      * object before returning.
      */
-    @Transient
     public Calendar getFullCalendar() {
         return getCalendar();
     }
@@ -69,7 +67,6 @@ public abstract class ICalendarItem extends ContentItem {
      * Used by sublcasses to store specific components.
      * @return calendar
      */
-    @Transient
     protected Calendar getCalendar() {
         // calendar stored as ICalendarAttribute on Item
         return ICalendarAttribute.getValue(this, ATTR_ICALENDAR);

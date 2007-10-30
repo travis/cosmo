@@ -21,7 +21,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
@@ -46,9 +45,22 @@ public class CollectionSubscription extends AuditableObject {
      * 
      */
     private static final long serialVersionUID = 1376628118792909419L;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ownerid", nullable = false)
+    @NotNull
     private User owner;
+    
+    @Column(name = "displayname", nullable = false, length = 255)
+    @NotNull
     private String displayName;
+    
+    @Column(name = "ticketkey", nullable = false, length = 255)
+    @NotNull
     private String ticketKey;
+    
+    @Column(name = "collectionuid", nullable = false, length = 255)
+    @NotNull
     private String collectionUid;
     
     /**
@@ -63,8 +75,6 @@ public class CollectionSubscription extends AuditableObject {
      * shared and then the owner deletes the collection.
      * @return Collection uid
      */
-    @Column(name = "collectionuid", nullable = false, length = 255)
-    @NotNull
     public String getCollectionUid() {
         return collectionUid;
     }
@@ -77,8 +87,6 @@ public class CollectionSubscription extends AuditableObject {
         this.collectionUid = collection.getUid();
     }
 
-    @Column(name = "displayname", nullable = false, length = 255)
-    @NotNull
     public String getDisplayName() {
         return displayName;
     }
@@ -87,9 +95,6 @@ public class CollectionSubscription extends AuditableObject {
         this.displayName = displayName;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ownerid", nullable = false)
-    @NotNull
     public User getOwner() {
         return owner;
     }
@@ -105,8 +110,6 @@ public class CollectionSubscription extends AuditableObject {
      * created for a shared collection, and then removed by the owner.
      * @return
      */
-    @Column(name = "ticketkey", nullable = false, length = 255)
-    @NotNull
     public String getTicketKey() {
         return ticketKey;
     }
@@ -119,7 +122,6 @@ public class CollectionSubscription extends AuditableObject {
         this.ticketKey = ticket.getKey();
     }
 
-    @Transient
     public String calculateEntityTag() {
         // subscription is unique by name for its owner
         String uid = (getOwner() != null && getOwner().getUid() != null) ?

@@ -23,7 +23,6 @@ import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -64,13 +63,12 @@ public class CalendarCollectionStamp extends Stamp implements
     public static final QName ATTR_CALENDAR_LANGUAGE = new QName(
             CalendarCollectionStamp.class, "language");
     
-    private Calendar calendar;
+    private transient Calendar calendar;
     
     /** default constructor */
     public CalendarCollectionStamp() {
     }
     
-    @Transient
     public String getType() {
         return "calendar";
     }
@@ -85,7 +83,6 @@ public class CalendarCollectionStamp extends Stamp implements
         return stamp;
     }
     
-    @Transient
     public String getDescription() {
         // description stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_CALENDAR_DESCRIPTION);
@@ -96,7 +93,6 @@ public class CalendarCollectionStamp extends Stamp implements
         StringAttribute.setValue(getItem(), ATTR_CALENDAR_DESCRIPTION, description);
     }
 
-    @Transient
     public String getLanguage() {
         // language stored as StringAttribute on Item
         return StringAttribute.getValue(getItem(), ATTR_CALENDAR_LANGUAGE);
@@ -111,7 +107,6 @@ public class CalendarCollectionStamp extends Stamp implements
      * @return calendar object representing timezone
      */
     @Timezone
-    @Transient
     public Calendar getTimezoneCalendar() {
         // calendar stored as ICalendarAttribute on Item
         return ICalendarAttribute.getValue(getItem(), ATTR_CALENDAR_TIMEZONE);
@@ -120,7 +115,6 @@ public class CalendarCollectionStamp extends Stamp implements
     /**
      * @return timezone if present
      */
-    @Transient
     public TimeZone getTimezone() {
         Calendar timezone = getTimezoneCalendar();
         if (timezone == null)
@@ -132,7 +126,6 @@ public class CalendarCollectionStamp extends Stamp implements
     /**
      * @return name of timezone if one is set
      */
-    @Transient
     public String getTimezoneName() {
         Calendar timezone = getTimezoneCalendar();
         if (timezone == null)
@@ -158,7 +151,6 @@ public class CalendarCollectionStamp extends Stamp implements
      * the aggregate calendar once; subsequent recalls will return the
      * same calendar unless it is dumped by another method.
      */
-    @Transient
     public Calendar getCalendar()
         throws IOException, ParserException {
         if (calendar == null) {
@@ -215,7 +207,6 @@ public class CalendarCollectionStamp extends Stamp implements
      * Return a set of all EventStamps for the collection's children.
      * @return set of EventStamps contained in children
      */
-    @Transient
     public Set<EventStamp> getEventStamps() {
         Set<EventStamp> events = new HashSet<EventStamp>();
         for (Iterator<Item> i= ((CollectionItem) getItem()).getChildren().iterator(); i.hasNext();) {

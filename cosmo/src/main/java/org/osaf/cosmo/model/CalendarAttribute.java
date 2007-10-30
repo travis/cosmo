@@ -34,6 +34,9 @@ import org.osaf.cosmo.util.DateUtil;
 public class CalendarAttribute extends Attribute implements
         java.io.Serializable {
 
+    @Columns(columns = { 
+            @Column(name = "datevalue"), @Column(name = "tzvalue", length=32) })
+    @Type(type="composite_calendar")
     private Calendar value;
 
     /** default constructor */
@@ -59,9 +62,6 @@ public class CalendarAttribute extends Attribute implements
     }
 
     // Property accessors
-    @Columns(columns = { 
-            @Column(name = "datevalue"), @Column(name = "tzvalue", length=32) })
-    @Type(type="composite_calendar")
     public Calendar getValue() {
         return this.value;
     }

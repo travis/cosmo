@@ -43,14 +43,19 @@ public class TriageStatus {
     /** */
     public static final int CODE_DONE = 300;
 
+    @Column(name = "triagestatuscode")
     private Integer code = null;
+    
+    @Column(name = "triagestatusrank", precision = 12, scale = 2)
+    @Type(type="org.hibernate.type.BigDecimalType")
     private BigDecimal rank = null;
+    
+    @Column(name = "isautotriage")
     private Boolean autoTriage = null;
     
     public TriageStatus() {
     }
    
-    @Column(name = "triagestatuscode")
     public Integer getCode() {
         return code;
     }
@@ -59,8 +64,6 @@ public class TriageStatus {
         this.code = code;
     }
 
-    @Column(name = "triagestatusrank", precision = 12, scale = 2)
-    @Type(type="org.hibernate.type.BigDecimalType")
     public BigDecimal getRank() {
         return rank;
     }
@@ -69,7 +72,6 @@ public class TriageStatus {
         this.rank = rank;
     }
 
-    @Column(name = "isautotriage")
     public Boolean getAutoTriage() {
         return autoTriage;
     }

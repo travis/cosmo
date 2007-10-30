@@ -37,7 +37,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.BatchSize;
@@ -49,7 +48,6 @@ import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
-
 import org.w3c.dom.Element;
 
 /**
@@ -72,21 +70,74 @@ public abstract class Item extends AuditableObject {
     public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
     public static final long MAX_STRING_ATTR_SIZE = 1 * 1024;
 
+    @Column(name = "uid", nullable = false, unique=true, length=255)
+    @NotNull
+    @Length(min=1, max=255)
+    @Index(name="idx_itemuid")
     private String uid;
+    
+    @Column(name = "itemname", nullable = false, length=255)
+    @NotNull
+    @Length(min=1, max=255)
+    @Index(name="idx_itemname")
     private String name;
+    
+    @Column(name = "displayname", length=255)
     private String displayName;
+    
+    @Column(name = "clientcreatedate")
+    @Type(type="long_timestamp")
     private Date clientCreationDate;
+    
+    @Column(name = "clientmodifieddate")
+    @Type(type="long_timestamp")
     private Date clientModifiedDate;
+    
+    @Version
+    @Column(name="version", nullable = false)
     private Integer version;
-    private Boolean isActive = Boolean.TRUE;
     
+    private transient Boolean isActive = Boolean.TRUE;
+    
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    // turns out this creates a query that is unoptimized for MySQL
+    //@Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size=50)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Map<QName, Attribute> attributes = new HashMap<QName, Attribute>(0);
-    private Set<Ticket> tickets = new HashSet<Ticket>(0);
-    private Set<Stamp> stamps = new HashSet<Stamp>(0);
-    private Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
-    private Map<String, Stamp> stampMap = null;
     
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<Ticket> tickets = new HashSet<Ticket>(0);
+    
+    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
+    // turns out this creates a query that is unoptimized for MySQL
+    //@Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size=50)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<Stamp> stamps = new HashSet<Stamp>(0);
+    
+    @OneToMany(mappedBy="item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    private Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
+    
+    private transient Map<String, Stamp> stampMap = null;
+    
+    @ManyToMany(fetch=FetchType.LAZY) 
+    @JoinTable(
+        name="collection_item",
+        joinColumns={@JoinColumn(name="itemid")},
+        inverseJoinColumns={@JoinColumn(name="collectionid")}
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<CollectionItem> parents = new HashSet<CollectionItem>(0);
+    
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="ownerid", nullable = false)
+    @NotNull
     private User owner;
   
     
@@ -96,26 +147,14 @@ public abstract class Item extends AuditableObject {
      * only retrieve active stamps.
      * @return
      */
-    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
-    // turns out this creates a query that is unoptimized for MySQL
-    //@Fetch(FetchMode.SUBSELECT)
-    @BatchSize(size=50)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<Stamp> getStamps() {
         return stamps;
-    }
-
-    // should always use addStamp()
-    private void setStamps(Set<Stamp> stamps) {
-        this.stamps = stamps;
     }
     
     /**
      * @return Map of Stamps indexed by Stamp type.  Only
      *         includes active stamps.
      */
-    @Transient
     public Map<String, Stamp> getStampMap() {
         if(stampMap==null) {
             stampMap = new HashMap<String, Stamp>();
@@ -189,12 +228,6 @@ public abstract class Item extends AuditableObject {
         return null;
     }
 
-    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
-    // turns out this creates a query that is unoptimized for MySQL
-    //@Fetch(FetchMode.SUBSELECT)
-    @BatchSize(size=50)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Map<QName, Attribute> getAttributes() {
         return attributes;
     }
@@ -260,7 +293,6 @@ public abstract class Item extends AuditableObject {
      * @param name local name of attribute
      * @return attribute in default namespace with given name
      */
-    @Transient
     public Attribute getAttribute(String name) {
         return getAttribute(new QName(name));
     }
@@ -270,7 +302,6 @@ public abstract class Item extends AuditableObject {
      * @param qname qualified name of attribute to retrieve
      * @return attribute with qualified name.
      */
-    @Transient
     public Attribute getAttribute(QName qname) {
         return attributes.get(qname);
     }
@@ -280,7 +311,6 @@ public abstract class Item extends AuditableObject {
      * @param name local name of attribute
      * @return attribute value
      */
-    @Transient
     public Object getAttributeValue(String name) {
        return getAttributeValue(new QName(name));
     }
@@ -290,7 +320,6 @@ public abstract class Item extends AuditableObject {
      * @param qname qualified name of attribute
      * @return attribute value
      */
-    @Transient
     public Object getAttributeValue(QName qname) {
         Attribute attr = attributes.get(qname);
         if (attr == null)
@@ -509,14 +538,7 @@ public abstract class Item extends AuditableObject {
         validateAttribute(attribute, attribute.getValue());
     }
     
-    private void setAttributes(Map<QName, Attribute> attributes) {
-        // attributes not validated, as this method is only used by
-        // hibernate to set attributes loaded from the db
-        this.attributes = attributes;
-    }
 
-    @Column(name = "clientcreatedate")
-    @Type(type="long_timestamp")
     public Date getClientCreationDate() {
         return clientCreationDate;
     }
@@ -525,8 +547,6 @@ public abstract class Item extends AuditableObject {
         this.clientCreationDate = clientCreationDate;
     }
     
-    @Column(name = "clientmodifieddate")
-    @Type(type="long_timestamp")
     public Date getClientModifiedDate() {
         return clientModifiedDate;
     }
@@ -535,10 +555,6 @@ public abstract class Item extends AuditableObject {
         this.clientModifiedDate = clientModifiedDate;
     }
     
-    @Column(name = "itemname", nullable = false, length=255)
-    @NotNull
-    @Length(min=1, max=255)
-    @Index(name="idx_itemname")
     public String getName() {
         return name;
     }
@@ -550,7 +566,6 @@ public abstract class Item extends AuditableObject {
     /**
      * @return Item's human readable name
      */
-    @Column(name = "displayname", length=255)
     public String getDisplayName() {
         return displayName;
     }
@@ -562,9 +577,6 @@ public abstract class Item extends AuditableObject {
         this.displayName = displayName;
     }
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="ownerid", nullable = false)
-    @NotNull
     public User getOwner() {
         return owner;
     }
@@ -573,10 +585,6 @@ public abstract class Item extends AuditableObject {
         this.owner = owner;
     }
 
-    @Column(name = "uid", nullable = false, unique=true, length=255)
-    @NotNull
-    @Length(min=1, max=255)
-    @Index(name="idx_itemuid")
     public String getUid() {
         return uid;
     }
@@ -585,8 +593,6 @@ public abstract class Item extends AuditableObject {
         this.uid = uid;
     }
 
-    @Version
-    @Column(name="version", nullable = false)
     public Integer getVersion() {
         return version;
     }
@@ -596,13 +602,6 @@ public abstract class Item extends AuditableObject {
         this.version = version;
     }
 
-    @ManyToMany(fetch=FetchType.LAZY) 
-    @JoinTable(
-        name="collection_item",
-        joinColumns={@JoinColumn(name="itemid")},
-        inverseJoinColumns={@JoinColumn(name="collectionid")}
-    )
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<CollectionItem> getParents() {
         return parents;
     }
@@ -611,7 +610,6 @@ public abstract class Item extends AuditableObject {
         this.parents = parents;
     }
     
-    @Transient
     public CollectionItem getParent() {
         if(parents.size()==0)
             return null;
@@ -619,7 +617,6 @@ public abstract class Item extends AuditableObject {
         return parents.iterator().next();
     }
 
-    @Transient
     public Boolean getIsActive() {
         return isActive;
     }
@@ -628,26 +625,12 @@ public abstract class Item extends AuditableObject {
         this.isActive = isActive;
     }
 
-    @OneToMany(mappedBy = "item", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<Ticket> getTickets() {
         return tickets;
     }
 
-    // Used by Hibernate
-    private void setTickets(Set<Ticket> tickets) {
-        this.tickets = tickets;
-    }
-
-    @OneToMany(mappedBy="item", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
     public Set<Tombstone> getTombstones() {
         return tombstones;
-    }
-
-    private void setTombstones(Set<Tombstone> tombstones) {
-        this.tombstones = tombstones;
     }
 
     public void addTombstone(Tombstone tombstone) {

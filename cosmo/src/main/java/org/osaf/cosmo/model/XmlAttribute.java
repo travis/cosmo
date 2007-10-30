@@ -35,6 +35,8 @@ public class XmlAttribute extends Attribute
     implements java.io.Serializable {
     private static final Log log = LogFactory.getLog(XmlAttribute.class);
 
+    @Column(name = "textvalue")
+    @Type(type="xml_clob")
     private Element value;
 
     public XmlAttribute() {
@@ -46,8 +48,6 @@ public class XmlAttribute extends Attribute
         this.value = value;
     }
 
-    @Column(name = "textvalue")
-    @Type(type="xml_clob")
     public Element getValue() {
         return this.value;
     }

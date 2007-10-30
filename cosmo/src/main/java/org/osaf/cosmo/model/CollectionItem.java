@@ -23,7 +23,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
-import javax.persistence.Transient;
 
 /**
  * Extends {@link Item} to represent a collection of items
@@ -44,6 +43,7 @@ public class CollectionItem extends Item {
     public static final QName ATTR_HUE =
         new QName(CollectionItem.class, "hue");
 
+    @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY)
     private Set<Item> children = new HashSet<Item>(0);
     
     public CollectionItem() {
@@ -53,7 +53,6 @@ public class CollectionItem extends Item {
      * Return active children items (those with isActive=true).
      * @return active children items
      */
-    @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY)
     public Set<Item> getChildren() {
         return children;
     }
@@ -83,7 +82,6 @@ public class CollectionItem extends Item {
         return null;
     }
 
-    @Transient
     public boolean isExcludeFreeBusyRollup() {
         Boolean val =
             (Boolean) getAttributeValue(ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
@@ -96,7 +94,6 @@ public class CollectionItem extends Item {
         setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
     }
     
-    @Transient
     public Long getHue() {
         return IntegerAttribute.getValue(this, ATTR_HUE);
     }

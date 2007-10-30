@@ -25,7 +25,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
@@ -83,17 +82,18 @@ public abstract class BaseEventStamp extends Stamp
     
     protected static final String VALUE_MISSING = "MISSING";
     
+    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
+    @Type(type="calendar_clob")
+    @NotNull
     private Calendar eventCalendar = null;
+    
+    @Embedded
     private EventTimeRangeIndex timeRangeIndex = null;
     
-    @Transient
     public abstract VEvent getEvent();
     
     public abstract void setCalendar(Calendar calendar);
     
-    @Column(table="event_stamp", name = "icaldata", length=102400000, nullable = false)
-    @Type(type="calendar_clob")
-    @NotNull
     public Calendar getEventCalendar() {
         return eventCalendar;
     }
@@ -102,7 +102,6 @@ public abstract class BaseEventStamp extends Stamp
         this.eventCalendar = calendar;
     }
     
-    @Embedded
     public EventTimeRangeIndex getTimeRangeIndex() {
         return timeRangeIndex;
     }
@@ -126,7 +125,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a copy of the the iCalendar UID property value of the
      * event .
      */
-    @Transient
     public String getIcalUid() {
         return getEvent().getUid().getValue();
     }
@@ -136,7 +134,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param uid uid of VEVENT
      */
-    @Transient
     public void setIcalUid(String uid) {
         ICalendarUtils.setUid(uid, getEvent());
     }
@@ -150,7 +147,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param text a text string
      */
-    @Transient
     public void setSummary(String text) {
         ICalendarUtils.setSummary(text, getEvent());
     }
@@ -160,7 +156,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param text a text string
      */
-    @Transient
     public void setDescription(String text) {
         ICalendarUtils.setDescription(text, getEvent());
     }
@@ -169,7 +164,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a copy of the the iCalendar DTSTART property value of
      * the event (never null).
      */
-    @Transient
     public Date getStartDate() {
         VEvent event = getEvent();
         if(event==null)
@@ -186,7 +180,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param date a <code>Date</code>
      */
-    @Transient
     public void setStartDate(Date date) {
         DtStart dtStart = getEvent().getStartDate();
         if (dtStart != null)
@@ -203,7 +196,6 @@ public abstract class BaseEventStamp extends Stamp
      * iCalendar DTEND property value or the the iCalendar DTSTART +
      * DURATION.
      */
-    @Transient
     public Date getEndDate() {
         VEvent event = getEvent();
         if(event==null)
@@ -236,7 +228,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param date a <code>Date</code>
      */
-    @Transient
     public void setEndDate(Date date) {
         DtEnd dtEnd = getEvent().getEndDate();
         if (dtEnd != null && date != null)
@@ -257,7 +248,6 @@ public abstract class BaseEventStamp extends Stamp
         setDatePropertyValue(dtEnd, date);
     }
 
-    @Transient
     protected void setDatePropertyValue(DateProperty prop,
                                         Date date) {
         if (prop == null)
@@ -270,7 +260,6 @@ public abstract class BaseEventStamp extends Stamp
         prop.getParameters().add(value);
     }
     
-    @Transient
     protected void setDateListPropertyValue(DateListProperty prop) {
         if (prop == null)
             return;
@@ -297,7 +286,6 @@ public abstract class BaseEventStamp extends Stamp
      * iCalendar DURATION property value or the the iCalendar DTEND -
      * DTSTART.
      */
-    @Transient
     public Dur getDuration() {
         return ICalendarUtils.getDuration(getEvent());
     }
@@ -307,7 +295,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param dur a <code>Dur</code>
      */
-    @Transient
     public void setDuration(Dur dur) {
         ICalendarUtils.setDuration(getEvent(), dur);
     }
@@ -316,7 +303,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a copy of the the iCalendar LOCATION property value of
      * the event (can be null).
      */
-    @Transient
     public String getLocation() {
         Property p = getEvent().getProperties().
             getProperty(Property.LOCATION);
@@ -330,7 +316,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param text a text string
      */
-    @Transient
     public void setLocation(String text) {
         
         Location location = (Location)
@@ -352,7 +337,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a list of copies of the iCalendar RRULE property values
      * of the event (can be empty).
      */
-    @Transient
     public List<Recur> getRecurrenceRules() {
         ArrayList<Recur> l = new ArrayList<Recur>();
         VEvent event = getEvent();
@@ -370,7 +354,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param recurs a <code>List</code> of <code>Recur</code>s
      */
-    @Transient
     public void setRecurrenceRules(List<Recur> recurs) {
         if (recurs == null)
             return;
@@ -388,7 +371,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param recur a <code>Recur</code>
      */
-    @Transient
     public void setRecurrenceRule(Recur recur) {
         if (recur == null)
             return;
@@ -401,7 +383,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a list of copies of the iCalendar EXRULE property values
      * of the event (can be empty).
      */
-    @Transient
     public List<Recur> getExceptionRules() {
         ArrayList<Recur> l = new ArrayList<Recur>();
         for (ExRule exrule : (List<ExRule>) getEvent().getProperties().
@@ -416,7 +397,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param recurs a <code>List</code> of <code>Recur</code>s
      */
-    @Transient
     public void setExceptionRules(List<Recur> recurs) {
         if (recurs == null)
             return;
@@ -431,7 +411,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a list of copies of the iCalendar RDATE property values
      * of the event (can be empty).
      */
-    @Transient
     public DateList getRecurrenceDates() {
         
         DateList l = null;
@@ -460,7 +439,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param dates a <code>DateList</code>
      */
-    @Transient
     public void setRecurrenceDates(DateList dates) {
         if (dates == null)
             return;
@@ -480,7 +458,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a list of copies of the values of all iCalendar EXDATE
      * properties of the event (can be empty).
      */
-    @Transient
     public DateList getExceptionDates() {
         DateList l = null;
         for (ExDate exdate : (List<ExDate>) getEvent().getProperties().
@@ -501,7 +478,6 @@ public abstract class BaseEventStamp extends Stamp
      * Return the first display alarm on the event
      * @return first display alarm on event
      */
-    @Transient
     public VAlarm getDisplayAlarm() {
         VEvent event = getEvent();
        
@@ -511,7 +487,6 @@ public abstract class BaseEventStamp extends Stamp
         return getDisplayAlarm(event);
     }
     
-    @Transient
     protected VAlarm getDisplayAlarm(VEvent event) {
         for(Iterator it = event.getAlarms().iterator();it.hasNext();) {
             VAlarm alarm = (VAlarm) it.next();
@@ -542,7 +517,6 @@ public abstract class BaseEventStamp extends Stamp
      * Return the description of the first display alarm on the event.
      * @return alarm description
      */
-    @Transient
     public String getDisplayAlarmDescription() {
         VAlarm alarm = getDisplayAlarm();
         if(alarm==null)
@@ -581,7 +555,6 @@ public abstract class BaseEventStamp extends Stamp
      * Return the Trigger of the first display alarm on the event
      * @return trigger of the first display alarm
      */
-    @Transient
     public Trigger getDisplayAlarmTrigger() {
         VAlarm alarm = getDisplayAlarm();
         if(alarm==null)
@@ -635,7 +608,6 @@ public abstract class BaseEventStamp extends Stamp
      * Return the duration of the first display alarm on the event
      * @return duration of the first display alarm
      */
-    @Transient
     public Dur getDisplayAlarmDuration() {
         VAlarm alarm = getDisplayAlarm();
         if(alarm==null)
@@ -677,7 +649,6 @@ public abstract class BaseEventStamp extends Stamp
      * Return the repeat count on the first display alarm on the event
      * @return repeat count of the first display alarm on the event
      */
-    @Transient
     public Integer getDisplayAlarmRepeat() {
         VAlarm alarm = getDisplayAlarm();
         if(alarm==null)
@@ -720,7 +691,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param dates a <code>DateList</code>
      */
-    @Transient
     public void setExceptionDates(DateList dates) {
         if (dates == null)
             return;
@@ -740,7 +710,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a copy of the the iCalendar RECURRENCE_ID property
      * value of the event (can be null). 
      */
-    @Transient
     public Date getRecurrenceId() {
         RecurrenceId rid = getEvent().getRecurrenceId();
         if (rid == null)
@@ -753,7 +722,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param date a <code>Date</code>
      */
-    @Transient
     public void setRecurrenceId(Date date) {
         RecurrenceId recurrenceId = (RecurrenceId)
             getEvent().getProperties().
@@ -776,7 +744,6 @@ public abstract class BaseEventStamp extends Stamp
      * Returns a copy of the the iCalendar STATUS property value of
      * the event (can be null).
      */
-    @Transient
     public String getStatus() {
         Property p = getEvent().getProperties().
             getProperty(Property.STATUS);
@@ -790,7 +757,6 @@ public abstract class BaseEventStamp extends Stamp
      *
      * @param text a text string
      */
-    @Transient
     public void setStatus(String text) {
         // ical4j Status value is immutable, so if there's any change
         // at all, we have to remove the old status and add a new
@@ -809,7 +775,6 @@ public abstract class BaseEventStamp extends Stamp
      * Is the event marked as anytime.
      * @return true if the event is an anytime event
      */
-    @Transient
     public Boolean isAnyTime() {
         DtStart dtStart = getEvent().getStartDate();
         if (dtStart == null)
@@ -823,7 +788,6 @@ public abstract class BaseEventStamp extends Stamp
         return new Boolean(VALUE_TRUE.equals(parameter.getValue()));
     }
     
-    @Transient
     public Boolean getAnyTime() {
         return isAnyTime();
     }
@@ -853,7 +817,6 @@ public abstract class BaseEventStamp extends Stamp
         }
     }
     
-    @Transient
     protected Parameter getAnyTimeXParam() {
         return new XParameter(PARAM_X_OSAF_ANYTIME, VALUE_TRUE);
     }
@@ -891,7 +854,6 @@ public abstract class BaseEventStamp extends Stamp
      * Determine if an event is recurring
      * @return true if the underlying event is a recurring event
      */
-    @Transient
     public boolean isRecurring() {
        if(getRecurrenceRules().size()>0)
            return true;

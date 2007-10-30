@@ -34,15 +34,20 @@ public abstract class AuditableObject extends BaseModelObject {
     private static final ThreadLocal<MessageDigest> etagDigestLocal = new ThreadLocal<MessageDigest>();
     private static final Base64 etagEncoder = new Base64();
     
+    @Column(name = "createdate")
+    @Type(type="long_timestamp")
     private Date creationDate;
+    
+    @Column(name = "modifydate")
+    @Type(type="long_timestamp")
     private Date modifiedDate;
+    
+    @Column(name="etag")
     private String etag = "";
     
     /**
      * @return date object was created
      */
-    @Column(name = "createdate")
-    @Type(type="long_timestamp")
     public Date getCreationDate() {
         return creationDate;
     }
@@ -58,8 +63,6 @@ public abstract class AuditableObject extends BaseModelObject {
     /**
      * @return date object was last updated
      */
-    @Column(name = "modifydate")
-    @Type(type="long_timestamp")
     public Date getModifiedDate() {
         return modifiedDate;
     }
@@ -86,7 +89,6 @@ public abstract class AuditableObject extends BaseModelObject {
      * equals method is not available.
      * </p>
      */
-    @Column(name="etag")
     public String getEntityTag() {
         return etag;
     }

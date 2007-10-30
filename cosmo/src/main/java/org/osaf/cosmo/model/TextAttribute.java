@@ -23,12 +23,10 @@ import java.io.StringWriter;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.hibernate.annotations.Type;
 
 
@@ -47,6 +45,9 @@ public class TextAttribute extends Attribute implements
      * 
      */
     private static final long serialVersionUID = 2417093506524504993L;
+    
+    @Column(name="textvalue", length=102400000)
+    @Type(type="text")
     private String value;
 
     // Constructors
@@ -71,8 +72,6 @@ public class TextAttribute extends Attribute implements
     }
 
     // Property accessors
-    @Column(name="textvalue", length=102400000)
-    @Type(type="text")
     public String getValue() {
         return this.value;
     }
@@ -84,7 +83,6 @@ public class TextAttribute extends Attribute implements
     /**
      * @return reader to value
      */
-    @Transient
     public Reader getReader() {
         if(value!=null)
             return new StringReader(value);
@@ -95,7 +93,6 @@ public class TextAttribute extends Attribute implements
     /**
      * @return length of text
      */
-    @Transient
     public int getLength() {
         if(value!=null)
             return value.length();

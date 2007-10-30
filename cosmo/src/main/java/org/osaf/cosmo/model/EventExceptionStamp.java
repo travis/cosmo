@@ -17,7 +17,6 @@ package org.osaf.cosmo.model;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -57,20 +56,17 @@ public class EventExceptionStamp extends BaseEventStamp implements
         setItem(item);
     }
     
-    @Transient
     public String getType() {
         return "eventexception";
     }
     
     /** Used by the hibernate validator **/
-    @Transient
     @EventException
     private Calendar getValidationCalendar() {
         return getEventCalendar();
     }
     
     @Override
-    @Transient
     public VEvent getEvent() {
         return getExceptionEvent();
     }
@@ -85,7 +81,6 @@ public class EventExceptionStamp extends BaseEventStamp implements
      * icalendar object. Changes to the exception event will be persisted
      * when the stamp is saved.
      */
-    @Transient
     public VEvent getExceptionEvent() {
         return (VEvent) getEventCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);
@@ -137,7 +132,6 @@ public class EventExceptionStamp extends BaseEventStamp implements
      *         from the master event.
      */
     @Override
-    @Transient
     public Boolean isAnyTime() {
         DtStart dtStart = getEvent().getStartDate();
         if (dtStart == null)
@@ -163,7 +157,6 @@ public class EventExceptionStamp extends BaseEventStamp implements
      * for now we are representing "missing" values using null.
      */
     @Override
-    @Transient
     public Trigger getDisplayAlarmTrigger() {
         Trigger trigger =  super.getDisplayAlarmTrigger();
         if(trigger!=null && isMissing(trigger))
@@ -209,7 +202,6 @@ public class EventExceptionStamp extends BaseEventStamp implements
         }
     }
     
-    @Transient
     private Parameter getInheritedAnyTimeXParam() {
         return new XParameter(PARAM_X_OSAF_ANYTIME, VALUE_MISSING);
     }
@@ -219,7 +211,6 @@ public class EventExceptionStamp extends BaseEventStamp implements
      * Get the EventStamp from the parent NoteItem
      * @return EventStamp of parent NoteItem
      */
-    @Transient
     public EventStamp getMasterStamp() {
         NoteItem note = (NoteItem) getItem();
         return EventStamp.getStamp(note.getModifies());

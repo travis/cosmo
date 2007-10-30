@@ -99,15 +99,15 @@ public class EventStampIndexItemListener extends EmptyItemListener {
         }
         
         EventTimeRangeIndex timeRangeIndex = new EventTimeRangeIndex();
-        timeRangeIndex.setDateStart(fromDateToStringNoTimezone(startDate));
+        timeRangeIndex.setStartDate(fromDateToStringNoTimezone(startDate));
         
         
         // A null endDate equates to infinity, which is represented by
         // a String that will always come after any date when compared.
         if(endDate!=null)
-            timeRangeIndex.setDateEnd(fromDateToStringNoTimezone(endDate));
+            timeRangeIndex.setEndDate(fromDateToStringNoTimezone(endDate));
         else
-            timeRangeIndex.setDateEnd(EventStamp.TIME_INFINITY);
+            timeRangeIndex.setEndDate(EventStamp.TIME_INFINITY);
         
         timeRangeIndex.setIsFloating(isFloating);
         timeRangeIndex.setIsRecurring(isRecurring);

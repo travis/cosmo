@@ -36,6 +36,8 @@ import org.osaf.cosmo.calendar.util.CalendarUtils;
 public class ICalendarAttribute extends Attribute implements
         java.io.Serializable {
 
+    @Column(name = "textvalue", length=102400000)
+    @Type(type="calendar_clob")
     private Calendar value;
 
     /** default constructor */
@@ -60,8 +62,6 @@ public class ICalendarAttribute extends Attribute implements
         setValue(value);
     }
 
-    @Column(name = "textvalue", length=102400000)
-    @Type(type="calendar_clob")
     public Calendar getValue() {
         return this.value;
     }

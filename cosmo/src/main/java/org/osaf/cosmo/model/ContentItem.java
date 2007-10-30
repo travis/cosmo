@@ -33,16 +33,24 @@ public abstract class ContentItem extends Item {
      */
     private static final long serialVersionUID = 4904755977871771389L;
     
+    @Column(name = "lastmodifiedby", length=255)
     private String lastModifiedBy = null;
+    
+    @Column(name = "lastmodification")
     private Integer lastModification = null;
+    
+    @Embedded
     private TriageStatus triageStatus = new TriageStatus();
+    
+    @Column(name = "sent")
     private Boolean sent = null;
+    
+    @Column(name = "needsreply")
     private Boolean needsReply = null;
     
     public ContentItem() {
     }
     
-    @Column(name = "lastmodifiedby", length=255)
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -51,7 +59,6 @@ public abstract class ContentItem extends Item {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    @Column(name = "lastmodification")
     public Integer getLastModification() {
         return lastModification;
     }
@@ -60,7 +67,6 @@ public abstract class ContentItem extends Item {
         this.lastModification = lastModification;
     }
 
-    @Embedded
     public TriageStatus getTriageStatus() {
         return triageStatus;
     }
@@ -69,7 +75,6 @@ public abstract class ContentItem extends Item {
         triageStatus = ts;
     }
 
-    @Column(name = "sent")
     public Boolean getSent() {
         return sent;
     }
@@ -78,7 +83,6 @@ public abstract class ContentItem extends Item {
         this.sent = sent;
     }
 
-    @Column(name = "needsreply")
     public Boolean getNeedsReply() {
         return needsReply;
     }

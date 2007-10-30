@@ -16,7 +16,6 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.Assert;

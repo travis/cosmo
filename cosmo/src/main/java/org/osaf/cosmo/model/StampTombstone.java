@@ -30,6 +30,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @DiscriminatorValue("stamp")
 public class StampTombstone extends Tombstone {
     
+    @Column(name="stamptype", length=255)
     private String stampType = null;
 
     public StampTombstone() {
@@ -40,7 +41,6 @@ public class StampTombstone extends Tombstone {
         stampType = stamp.getType();
     }
     
-    @Column(name="stamptype", length=255)
     public String getStampType() {
         return this.stampType;
     }

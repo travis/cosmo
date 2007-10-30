@@ -21,7 +21,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
@@ -38,8 +37,18 @@ import org.hibernate.validator.NotNull;
 public class Preference extends AuditableObject {
 
     private static final long serialVersionUID = 1376628118792909420L;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userid", nullable = false)
+    @NotNull
     private User user;
+    
+    @Column(name = "preferencename", nullable = false, length = 255)
+    @NotNull
     private String key;
+    
+    @Column(name = "preferencevalue", nullable = false, length = 255)
+    @NotNull
     private String value;
     
     public Preference() {
@@ -51,8 +60,6 @@ public class Preference extends AuditableObject {
         this.value = value;
     }
 
-    @Column(name = "preferencename", nullable = false, length = 255)
-    @NotNull
     public String getKey() {
         return key;
     }
@@ -61,8 +68,6 @@ public class Preference extends AuditableObject {
         this.key = key;
     }
 
-    @Column(name = "preferencevalue", nullable = false, length = 255)
-    @NotNull
     public String getValue() {
         return value;
     }
@@ -71,9 +76,6 @@ public class Preference extends AuditableObject {
         this.value = value;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userid", nullable = false)
-    @NotNull
     public User getUser() {
         return user;
     }
@@ -82,7 +84,6 @@ public class Preference extends AuditableObject {
         this.user = user;
     }
     
-    @Transient
     public String calculateEntityTag() {
         // preference is unique by name for its user
         String uid = (getUser() != null && getUser().getUid() != null) ?

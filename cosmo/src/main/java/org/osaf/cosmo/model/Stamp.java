@@ -26,7 +26,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
@@ -55,9 +54,11 @@ public abstract class Stamp extends AuditableObject implements
         java.io.Serializable {
 
     // Fields
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
+    @JoinColumn(name = "itemid", nullable = false)
     private Item item;
-    private boolean dirty = false;
-
+    
     // Constructors
     /** default constructor */
     public Stamp() {
@@ -66,9 +67,6 @@ public abstract class Stamp extends AuditableObject implements
     /**
      * @return Item attribute belongs to
      */
-    @ManyToOne(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SELECT)
-    @JoinColumn(name = "itemid", nullable = false)
     public Item getItem() {
         return item;
     }
@@ -111,7 +109,6 @@ public abstract class Stamp extends AuditableObject implements
     /**
      * @return Stamp type
      */
-    @Transient
     public abstract String getType();
 
    

@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -71,25 +70,21 @@ public class EventStamp extends BaseEventStamp implements
         setItem(item);
     }
     
-    @Transient
     public String getType() {
         return "event";
     }
 
     @Override
-    @Transient
     public VEvent getEvent() {
         return getMasterEvent();
     }
 
     /** Used by the hibernate validator **/
-    @Transient
     @Event
     private Calendar getValidationCalendar() {
         return getEventCalendar();
     }
     
-    @Transient
     public Calendar getCalendar() {
         Calendar masterCal = CalendarUtils.copyCalendar(getEventCalendar());
         if (masterCal == null)
@@ -224,7 +219,6 @@ public class EventStamp extends BaseEventStamp implements
      * Returns a list of exception components for a recurring event.
      * If the event is not recurring, the list will be empty.
      */
-    @Transient
     public List<Component> getExceptions() {
         ArrayList<Component> exceptions = new ArrayList<Component>();
         
@@ -244,7 +238,6 @@ public class EventStamp extends BaseEventStamp implements
      * icalendar object. Changes to the master event will be persisted
      * when the stamp is saved.
      */
-    @Transient
     public VEvent getMasterEvent() {
         if(getEventCalendar()==null)
             return null;

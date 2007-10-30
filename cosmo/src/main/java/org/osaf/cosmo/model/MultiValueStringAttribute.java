@@ -39,6 +39,13 @@ public class MultiValueStringAttribute extends Attribute
      * 
      */
     private static final long serialVersionUID = 8518583717902318228L;
+    
+    @CollectionOfElements
+    @JoinTable(
+            name="multistring_values",
+            joinColumns = @JoinColumn(name="attributeid")
+    )
+    @Column(name="stringvalue", length=2048)
     private Set<String> value = new HashSet<String>(0);
 
     /** default constructor */
@@ -52,12 +59,6 @@ public class MultiValueStringAttribute extends Attribute
     }
 
     // Property accessors
-    @CollectionOfElements
-    @JoinTable(
-            name="multistring_values",
-            joinColumns = @JoinColumn(name="attributeid")
-    )
-    @Column(name="stringvalue", length=2048)
     public Set<String> getValue() {
         return this.value;
     }

@@ -31,6 +31,7 @@ public class IntegerAttribute extends Attribute implements java.io.Serializable 
      */
     private static final long serialVersionUID = -7110319771835652090L;
 
+    @Column(name = "intvalue")
     private Long value;
 
     /** default constructor */
@@ -43,7 +44,6 @@ public class IntegerAttribute extends Attribute implements java.io.Serializable 
     }
 
     // Property accessors
-    @Column(name = "intvalue")
     public Long getValue() {
         return this.value;
     }

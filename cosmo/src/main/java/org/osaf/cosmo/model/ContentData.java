@@ -43,6 +43,9 @@ public class ContentData extends BaseModelObject {
      * 
      */
     private static final long serialVersionUID = -5014854905531456753L;
+    
+    @Column(name = "content", length=102400000)
+    @Type(type="bufferedcontent_blob")
     private BufferedContent content = null;
    
     /**
@@ -58,7 +61,6 @@ public class ContentData extends BaseModelObject {
      * calls to this method will return new instances
      * of InputStream.
      */
-    @Transient
     public InputStream getContentInputStream() {
         if(content==null)
             return null;
@@ -79,7 +81,6 @@ public class ContentData extends BaseModelObject {
     /**
      * @return the size of the data read, or -1 for no data present
      */
-    @Transient
     public long getSize() {
         if(content != null)
             return content.getLength();
@@ -87,8 +88,6 @@ public class ContentData extends BaseModelObject {
             return -1;
     }
 
-    @Column(name = "content", length=102400000)
-    @Type(type="bufferedcontent_blob")
     private BufferedContent getContent() {
         return content;
     }

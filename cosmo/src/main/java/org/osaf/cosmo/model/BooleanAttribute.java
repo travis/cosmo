@@ -30,6 +30,8 @@ public class BooleanAttribute extends Attribute implements java.io.Serializable 
      * 
      */
     private static final long serialVersionUID = -8393344132524216261L;
+    
+    @Column(name = "booleanvalue")
     private Boolean value;
 
     /** default constructor */
@@ -42,7 +44,6 @@ public class BooleanAttribute extends Attribute implements java.io.Serializable 
     }
 
     // Property accessors
-    @Column(name = "booleanvalue")
     public Boolean getValue() {
         return this.value;
     }

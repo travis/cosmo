@@ -33,6 +33,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 @MappedSuperclass
 public abstract class BaseModelObject implements Serializable {
 
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id = new Long(-1);
     
     /**
@@ -42,7 +43,6 @@ public abstract class BaseModelObject implements Serializable {
                 ToStringStyle.MULTI_LINE_STYLE);
     }
 
-    @Id @GeneratedValue(strategy=GenerationType.AUTO)
     public Long getId() {
         return id;
     }

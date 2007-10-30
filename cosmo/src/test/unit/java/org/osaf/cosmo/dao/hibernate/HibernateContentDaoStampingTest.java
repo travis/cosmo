@@ -117,8 +117,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         
         event = (EventStamp) queryItem.getStamp(EventStamp.class);
-        Assert.assertEquals("20050817T115000", event.getTimeRangeIndex().getDateStart());
-        Assert.assertEquals("20050817T131500",event.getTimeRangeIndex().getDateEnd());
+        Assert.assertEquals("20050817T115000", event.getTimeRangeIndex().getStartDate());
+        Assert.assertEquals("20050817T131500",event.getTimeRangeIndex().getEndDate());
         Assert.assertTrue(event.getTimeRangeIndex().getIsFloating().booleanValue());
         
         event.setStartDate(new Date("20070101"));
@@ -130,8 +130,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         queryItem = contentDao.findContentByUid(newItem.getUid());
         
         event = (EventStamp) queryItem.getStamp(EventStamp.class);
-        Assert.assertEquals("20070101", event.getTimeRangeIndex().getDateStart());
-        Assert.assertEquals("20070101",event.getTimeRangeIndex().getDateEnd());
+        Assert.assertEquals("20070101", event.getTimeRangeIndex().getStartDate());
+        Assert.assertEquals("20070101",event.getTimeRangeIndex().getEndDate());
         Assert.assertTrue(event.getTimeRangeIndex().getIsFloating().booleanValue());
     }
     

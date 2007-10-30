@@ -30,6 +30,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 @DiscriminatorValue("item")
 public class ItemTombstone extends Tombstone {
     
+    @Column(name="itemuid", length=255)
     private String itemUid = null;
 
     public ItemTombstone() {
@@ -40,7 +41,6 @@ public class ItemTombstone extends Tombstone {
         itemUid = item.getUid();
     }
     
-    @Column(name="itemuid", length=255)
     public String getItemUid() {
         return this.itemUid;
     }

@@ -17,7 +17,6 @@ package org.osaf.cosmo.model;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -51,7 +50,6 @@ public class TaskStamp extends Stamp implements
     public TaskStamp() {
     }
 
-    @Transient
     public String getType() {
         return "task";
     }
@@ -60,7 +58,6 @@ public class TaskStamp extends Stamp implements
      * Return the Calendar object containing a VTODO component.
      * @return calendar
      */
-    @Transient
     @Task
     public Calendar getTaskCalendar() {
         // calendar stored as ICalendarAttribute on Item
@@ -96,7 +93,6 @@ public class TaskStamp extends Stamp implements
      * as a VOTODO.
      * @return Calendar representation of task
      */
-    @Transient
     public Calendar getCalendar() {
         // Start with existing calendar if present
         Calendar calendar = getTaskCalendar();

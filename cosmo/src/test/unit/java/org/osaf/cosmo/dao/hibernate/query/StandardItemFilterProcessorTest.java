@@ -108,7 +108,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setTriageStatus(TriageStatus.CODE_DONE);
         
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2 where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and i.triageStatus.code=:triageStatus and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2 where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.qname=:ta2qname and ta2.value like :ta2value and i.triageStatus.code=:triageStatus and i.icalUid=:icaluid", query.getQueryString());
         
         filter = new NoteItemFilter();
         filter.setIsModification(true);
@@ -145,11 +145,11 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setBody("body");
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and es.item=i and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.qname=:ta2qname and ta2.value like :ta2value and es.item=i and i.icalUid=:icaluid", query.getQueryString());
     
         eventFilter.setIsRecurring(true);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.QName=:ta2qname and ta2.value like :ta2value and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.qname=:ta2qname and ta2.value like :ta2value and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:icaluid", query.getQueryString());
     }
     
     public void testEventStampTimeRangeQuery() throws Exception {
@@ -163,7 +163,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setParent(parent);
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and es.item=i and ( (es.timeRangeIndex.isFloating=true and es.timeRangeIndex.dateStart < '20070201T040000' and es.timeRangeIndex.dateEnd > '20070101T040000') or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.dateStart < '20070201T100000Z' and es.timeRangeIndex.dateEnd > '20070101T100000Z') or (es.timeRangeIndex.dateStart=es.timeRangeIndex.dateEnd and (es.timeRangeIndex.dateStart='20070101T040000' or es.timeRangeIndex.dateStart='20070101T100000Z')))", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and es.item=i and ( (es.timeRangeIndex.isFloating=true and es.timeRangeIndex.startDate < '20070201T040000' and es.timeRangeIndex.endDate > '20070101T040000') or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.startDate < '20070201T100000Z' and es.timeRangeIndex.endDate > '20070101T100000Z') or (es.timeRangeIndex.startDate=es.timeRangeIndex.endDate and (es.timeRangeIndex.startDate='20070101T040000' or es.timeRangeIndex.startDate='20070101T100000Z')))", query.getQueryString());
     }
     
     public void testBasicStampQuery() throws Exception {
@@ -184,10 +184,10 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         missingFilter.setQname(new QName("ns","name"));
         filter.getAttributeFilters().add(missingFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i where exists (select a.id from Attribute a where a.item=i and a.QName=:param0)", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i where exists (select a.id from Attribute a where a.item=i and a.qname=:param0)", query.getQueryString());
         missingFilter.setMissing(true);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i where not exists (select a.id from Attribute a where a.item=i and a.QName=:param0)", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i where not exists (select a.id from Attribute a where a.item=i and a.qname=:param0)", query.getQueryString());
     }
 
 }

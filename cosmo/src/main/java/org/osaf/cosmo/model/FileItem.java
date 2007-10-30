@@ -26,7 +26,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Transient;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -50,10 +49,21 @@ public class FileItem extends ContentItem {
     // size
     public static final long MAX_CONTENT_SIZE = 10 * 1024 * 1024;
 
+    @Column(name = "contentType", length=64)
     private String contentType = null;
+    
+    @Column(name = "contentLanguage", length=32)
     private String contentLanguage = null;
+    
+    @Column(name = "contentEncoding", length=32)
     private String contentEncoding = null;
+    
+    @Column(name = "contentLength")
     private Long contentLength = null;
+    
+    @OneToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="contentdataid")
+    @Cascade( {CascadeType.ALL }) 
     private ContentData contentData = null;
     
     public FileItem() {
@@ -63,7 +73,6 @@ public class FileItem extends ContentItem {
     /**
      * Get content data as byte[]
      */
-    @Transient
     public byte[] getContent() {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -116,7 +125,6 @@ public class FileItem extends ContentItem {
         setContentLength(contentData.getSize());
     }
 
-    @Transient
     public InputStream getContentInputStream() {
         if(contentData==null)
             return null;
@@ -124,7 +132,6 @@ public class FileItem extends ContentItem {
             return contentData.getContentInputStream();
     }
 
-    @Column(name = "contentEncoding", length=32)
     public String getContentEncoding() {
         return contentEncoding;
     }
@@ -133,7 +140,6 @@ public class FileItem extends ContentItem {
         this.contentEncoding = contentEncoding;
     }
 
-    @Column(name = "contentLanguage", length=32)
     public String getContentLanguage() {
         return contentLanguage;
     }
@@ -142,7 +148,6 @@ public class FileItem extends ContentItem {
         this.contentLanguage = contentLanguage;
     }
 
-    @Column(name = "contentLength")
     public Long getContentLength() {
         return contentLength;
     }
@@ -153,7 +158,6 @@ public class FileItem extends ContentItem {
     }
 
 
-    @Column(name = "contentType", length=64)
     public String getContentType() {
         return contentType;
     }
@@ -201,18 +205,5 @@ public class FileItem extends ContentItem {
                 getContentType()).append("contentEncoding",
                 getContentEncoding()).append("contentLanguage",
                 getContentLanguage()).toString();
-    }
-
-    // For hibernate use only
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="contentdataid")
-    @Cascade( {CascadeType.ALL }) 
-    private ContentData getContentData() {
-        return contentData;
-    }
-
-    // For hibernate use only
-    private void setContentData(ContentData contentFile) {
-        this.contentData = contentFile;
     }
 }

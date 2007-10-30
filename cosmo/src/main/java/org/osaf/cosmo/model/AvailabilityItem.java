@@ -17,7 +17,6 @@ package org.osaf.cosmo.model;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 
@@ -45,7 +44,6 @@ public class AvailabilityItem extends ICalendarItem {
      * Return the Calendar object containing a VAVAILABILITY component.
      * @return calendar
      */
-    @Transient
     @Availability
     public Calendar getAvailabilityCalendar() {
         return getCalendar();

@@ -46,8 +46,8 @@ public class EventStampIndexItemListenerTest extends TestCase {
         
         handler.onCreateItem(master);
         
-        Assert.assertEquals("20070212T074500", eventStamp.getTimeRangeIndex().getDateStart());
-        Assert.assertEquals("20070212T094500", eventStamp.getTimeRangeIndex().getDateEnd());
+        Assert.assertEquals("20070212T074500", eventStamp.getTimeRangeIndex().getStartDate());
+        Assert.assertEquals("20070212T094500", eventStamp.getTimeRangeIndex().getEndDate());
         Assert.assertTrue(eventStamp.getTimeRangeIndex().getIsFloating().booleanValue());
         
         TimeZone ctz = registry.getTimeZone("America/Chicago");
@@ -63,8 +63,8 @@ public class EventStampIndexItemListenerTest extends TestCase {
         eventStamp.setRecurrenceRules(recurs);
         
         handler.onUpdateItem(master);
-        Assert.assertEquals("20070212T134500Z", eventStamp.getTimeRangeIndex().getDateStart());
-        Assert.assertEquals(EventStamp.TIME_INFINITY, eventStamp.getTimeRangeIndex().getDateEnd());
+        Assert.assertEquals("20070212T134500Z", eventStamp.getTimeRangeIndex().getStartDate());
+        Assert.assertEquals(EventStamp.TIME_INFINITY, eventStamp.getTimeRangeIndex().getEndDate());
         Assert.assertFalse(eventStamp.getTimeRangeIndex().getIsFloating().booleanValue());
     }
     

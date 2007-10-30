@@ -17,7 +17,6 @@ package org.osaf.cosmo.model;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 import net.fortuna.ical4j.model.Calendar;
 
@@ -45,7 +44,6 @@ public class FreeBusyItem extends ICalendarItem {
      * Return the Calendar object containing a VFREEBUSY component.
      * @return calendar
      */
-    @Transient
     @FreeBusy
     public Calendar getFreeBusyCalendar() {
         return getCalendar();

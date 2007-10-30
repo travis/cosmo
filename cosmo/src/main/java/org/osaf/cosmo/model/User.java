@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -26,7 +25,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.Cache;
@@ -137,21 +135,63 @@ public class User extends AuditableObject {
     public static final String ACTIVATED_URL_STRING = "activated";
     public static final String LOCKED_URL_STRING = "locked";
 
+    @Column(name = "uid", nullable=false, unique=true, length=255)
+    @NotNull
+    @Length(min=1, max=255)
+    @Index(name="idx_useruid")
     private String uid;
+    
+    @Column(name = "username", nullable=false, unique=true)
+    @Index(name="idx_username")
+    @NotNull
+    @Length(min=USERNAME_LEN_MIN, max=USERNAME_LEN_MAX)
+    @org.hibernate.validator.Pattern(regex="^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$")
     private String username;
-    private String oldUsername;
+    
+    private transient String oldUsername;
+    
+    @Column(name = "password")
+    @NotNull
     private String password;
+    
+    @Column(name = "firstname")
+    @Length(min=FIRSTNAME_LEN_MIN, max=FIRSTNAME_LEN_MAX)
     private String firstName;
+    
+    @Column(name = "lastname")
+    @Length(min=LASTNAME_LEN_MIN, max=LASTNAME_LEN_MAX)
     private String lastName;
+    
+    @Column(name = "email", nullable=false, unique=true)
+    @Index(name="idx_useremail")
+    @NotNull
+    @Length(min=EMAIL_LEN_MIN, max=EMAIL_LEN_MAX)
+    @Email
     private String email;
-    private String oldEmail;
+    
+    private transient String oldEmail;
+    
+    @Column(name = "activationid", nullable=true, length=255)
+    @Length(min=1, max=255)
+    @Index(name="idx_activationid")
     private String activationId;
+    
+    @Column(name = "admin")
     private Boolean admin;
-    private Boolean oldAdmin;
+    
+    private transient Boolean oldAdmin;
+    
+    @Column(name = "locked")
     private Boolean locked;
-    private Date dateCreated;
-    private Date dateModified;
+    
+    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<Preference> preferences = new HashSet<Preference>(0);
+    
+    @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<CollectionSubscription> subscriptions = 
         new HashSet<CollectionSubscription>(0);
 
@@ -164,10 +204,6 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Column(name = "uid", nullable=false, unique=true, length=255)
-    @NotNull
-    @Length(min=1, max=255)
-    @Index(name="idx_useruid")
     public String getUid() {
         return uid;
     }
@@ -181,11 +217,6 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Column(name = "username", nullable=false, unique=true)
-    @Index(name="idx_username")
-    @NotNull
-    @Length(min=USERNAME_LEN_MIN, max=USERNAME_LEN_MAX)
-    @org.hibernate.validator.Pattern(regex="^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$")
     public String getUsername() {
         return username;
     }
@@ -199,22 +230,18 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Transient
     public String getOldUsername() {
         return oldUsername != null ? oldUsername : username;
     }
 
     /**
      */
-    @Transient
     public boolean isUsernameChanged() {
         return oldUsername != null && ! oldUsername.equals(username);
     }
 
     /**
      */
-    @Column(name = "password")
-    @NotNull
     public String getPassword() {
         return password;
     }
@@ -227,8 +254,6 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Column(name = "firstname")
-    @Length(min=FIRSTNAME_LEN_MIN, max=FIRSTNAME_LEN_MAX)
     public String getFirstName() {
         return firstName;
     }
@@ -241,8 +266,6 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Column(name = "lastname")
-    @Length(min=LASTNAME_LEN_MIN, max=LASTNAME_LEN_MAX)
     public String getLastName() {
         return lastName;
     }
@@ -255,11 +278,6 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Column(name = "email", nullable=false, unique=true)
-    @Index(name="idx_useremail")
-    @NotNull
-    @Length(min=EMAIL_LEN_MIN, max=EMAIL_LEN_MAX)
-    @Email
     public String getEmail() {
         return email;
     }
@@ -273,33 +291,28 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Transient
     public String getOldEmail() {
         return oldEmail;
     }
 
     /**
      */
-    @Transient
     public boolean isEmailChanged() {
         return oldEmail != null && ! oldEmail.equals(email);
     }
 
     /**
      */
-    @Column(name = "admin")
     public Boolean getAdmin() {
         return admin;
     }
     
-    @Transient
     public Boolean getOldAdmin() {
         return oldAdmin;
     }
 
     /**
      */
-    @Transient
     public boolean isAdminChanged() {
         return oldAdmin != null && ! oldAdmin.equals(admin);
     }
@@ -313,9 +326,6 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Column(name = "activationid", nullable=true, length=255)
-    @Length(min=1, max=255)
-    @Index(name="idx_activationid")
     public String getActivationId() {
         return activationId;
     }
@@ -328,14 +338,12 @@ public class User extends AuditableObject {
 
     /**
      */
-    @Transient
     public boolean isOverlord() {
         return username != null && username.equals(USERNAME_OVERLORD);
     }
 
     /**
      */
-    @Transient
     public boolean isActivated() {
         return this.activationId == null;
     }
@@ -344,12 +352,10 @@ public class User extends AuditableObject {
      *
      *
      */
-    @Transient
     public void activate(){
        this.activationId = null;
     }
 
-    @Column(name = "locked")
     public Boolean isLocked() {
         return locked;
     }
@@ -391,8 +397,6 @@ public class User extends AuditableObject {
             append("admin", admin).
             append("activationId", activationId).
             append("locked", locked).
-            append("dateCreated", dateCreated).
-            append("dateModified", dateModified).
             toString();
     }
 
@@ -485,16 +489,8 @@ public class User extends AuditableObject {
         }
     }
 
-    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<Preference> getPreferences() {
         return preferences;
-    }
-
-    // Used by hibernate
-    private void setPreferences(Set<Preference> preferences) {
-        this.preferences = preferences;
     }
 
     public void addPreference(Preference preference) {
@@ -502,7 +498,6 @@ public class User extends AuditableObject {
         preferences.add(preference);
     }
 
-    @Transient
     public Preference getPreference(String key) {
         for (Preference pref : preferences) {
             if (pref.getKey().equals(key))
@@ -520,17 +515,8 @@ public class User extends AuditableObject {
             preferences.remove(preference);
     }
     
-    @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<CollectionSubscription> getCollectionSubscriptions() {
         return subscriptions;
-    }
-
-    // Used by hibernate
-    private void setCollectionSubscriptions(
-            Set<CollectionSubscription> subscriptions) {
-        this.subscriptions = subscriptions;
     }
 
     public void addSubscription(CollectionSubscription subscription) {
@@ -543,7 +529,6 @@ public class User extends AuditableObject {
      * @param displayname display name of subscription to return
      * @return subscription with specified display name
      */
-    @Transient
     public CollectionSubscription getSubscription(String displayname) {
 
         for (CollectionSubscription sub : subscriptions) {
@@ -561,7 +546,6 @@ public class User extends AuditableObject {
      * @param ticketKey ticketKey of subscription to return
      * @return subscription with specified collectionUid and ticketKey
      */
-    @Transient
     public CollectionSubscription getSubscription(String collectionUid, String ticketKey){
         for (CollectionSubscription sub : subscriptions) {
             if (sub.getCollectionUid().equals(collectionUid)
@@ -600,7 +584,6 @@ public class User extends AuditableObject {
     /**
      * Return true if this user is subscribed to <code>collection</code>
      */
-    @Transient
     public boolean isSubscribedTo(CollectionItem collection){
         for (CollectionSubscription sub : subscriptions){
             if (collection.getUid().equals(sub.getCollectionUid())) return true;
@@ -609,7 +592,6 @@ public class User extends AuditableObject {
     }
 
     
-    @Transient
     public String calculateEntityTag() {
         String username = getUsername() != null ? getUsername() : "-";
         String modTime = getModifiedDate() != null ?

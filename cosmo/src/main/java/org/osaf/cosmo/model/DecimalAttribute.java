@@ -34,6 +34,9 @@ public class DecimalAttribute extends Attribute implements java.io.Serializable 
      * 
      */
     private static final long serialVersionUID = 7830581788843520989L;
+    
+    @Column(name = "decvalue", precision = 19, scale = 6)
+    @Type(type="org.hibernate.type.BigDecimalType")
     private BigDecimal value;
 
     /** default constructor */
@@ -46,8 +49,6 @@ public class DecimalAttribute extends Attribute implements java.io.Serializable 
     }
 
     // Property accessors
-    @Column(name = "decvalue", precision = 19, scale = 6)
-    @Type(type="org.hibernate.type.BigDecimalType")
     public BigDecimal getValue() {
         return this.value;
     }

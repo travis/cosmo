@@ -16,6 +16,8 @@
 package org.osaf.cosmo.migrate.mock;
 
 import java.sql.Connection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.osaf.cosmo.migrate.Migration;
 
@@ -29,6 +31,8 @@ public class MockMigration implements Migration {
 
     private String fromVersion = null;
     private String toVersion = null;
+    private Set<String> dialects = new HashSet<String>();
+    
     public boolean migrateCalled = false;
     
     public void setFromVersion(String fromVersion) {
@@ -49,6 +53,18 @@ public class MockMigration implements Migration {
 
     public void migrate(Connection conn, String dialect) throws Exception {
         migrateCalled = true;
+    }
+
+    public Set<String> getSupportedDialects() {
+        return dialects;
+    }
+
+    public void setSupportedDialects(Set<String> dialects) {
+        this.dialects = dialects;
+    }
+    
+    public void addSupportedDialect(String dialect) {
+        dialects.add(dialect);
     }
 
 }

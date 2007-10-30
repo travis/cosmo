@@ -52,8 +52,8 @@ public class ZeroPointEightToZeroPointNineMigration extends AbstractMigration {
 
     
     @Override
-    public List<String> getSupportedDialects() {
-        ArrayList<String> dialects = new ArrayList<String>();
+    public Set<String> getSupportedDialects() {
+        HashSet<String> dialects = new HashSet<String>();
         dialects.add("Derby");
         dialects.add("MySQL5");
         return dialects;

@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -119,7 +120,7 @@ public abstract class AbstractMigration implements Migration {
     /**
      * @return supported dialects
      */
-    public abstract List<String> getSupportedDialects();
+    public abstract Set<String> getSupportedDialects();
     
     protected void migrateSchemaCleanup(Connection conn, String dialect) throws Exception {
         

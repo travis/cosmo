@@ -19,10 +19,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -77,8 +77,8 @@ public class ZeroPointSixZeroOneToZeroPointSixOneMigration extends AbstractMigra
 
     
     @Override
-    public List<String> getSupportedDialects() {
-        ArrayList<String> dialects = new ArrayList<String>();
+    public Set<String> getSupportedDialects() {
+        HashSet<String> dialects = new HashSet<String>();
         dialects.add("Derby");
         dialects.add("MySQL5");
         return dialects;

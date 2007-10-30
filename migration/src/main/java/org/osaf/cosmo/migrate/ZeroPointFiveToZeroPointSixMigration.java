@@ -21,8 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
@@ -59,8 +59,8 @@ public class ZeroPointFiveToZeroPointSixMigration extends AbstractMigration {
     }
     
     @Override
-    public List<String> getSupportedDialects() {
-        ArrayList<String> dialects = new ArrayList<String>();
+    public Set<String> getSupportedDialects() {
+        HashSet<String> dialects = new HashSet<String>();
         dialects.add("Derby");
         dialects.add("MySQL5");
         return dialects;

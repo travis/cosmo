@@ -16,6 +16,7 @@
 package org.osaf.cosmo.migrate;
 
 import java.sql.Connection;
+import java.util.Set;
 
 /**
  * Interface that describes a Cosmo database migration.
@@ -34,6 +35,12 @@ public interface Migration {
      * @return schema version that migration results in.
      */
     public String getToVersion();
+    
+    
+    /**
+     * @return set of supported db dialects
+     */
+    public Set<String> getSupportedDialects();
     
     
     /**

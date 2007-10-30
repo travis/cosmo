@@ -131,7 +131,8 @@ public class MigrationManager {
     
     private Migration getMigration(String from) {
         for(Migration m: migrations)
-            if(m.getFromVersion().equals(from))
+            if(m.getFromVersion().equals(from) &&
+               m.getSupportedDialects().contains(dialect) )
                 return m;
         
         return null;

@@ -16,7 +16,7 @@
 package org.osaf.cosmo.migrate;
 
 import java.sql.Connection;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Migration implementation that relies on SQL scripts that
@@ -32,10 +32,10 @@ import java.util.List;
 public class BasicSqlScriptMigration extends AbstractMigration {
 
     
-    List<String> supportedDialects = null;
+    Set<String> supportedDialects = null;
     
     @Override
-    public List<String> getSupportedDialects() {
+    public Set<String> getSupportedDialects() {
         return supportedDialects;
     }
 
@@ -45,7 +45,7 @@ public class BasicSqlScriptMigration extends AbstractMigration {
         // Do nothing
     }
 
-    public void setSupportedDialects(List<String> supportedDialects) {
+    public void setSupportedDialects(Set<String> supportedDialects) {
         this.supportedDialects = supportedDialects;
     }
 

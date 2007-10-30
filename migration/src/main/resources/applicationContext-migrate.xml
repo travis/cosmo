@@ -49,10 +49,10 @@
             <value>0.6.0.1</value>
         </property>
         <property name="supportedDialects">
-            <list>
+            <set>
                 <value>Derby</value>
                 <value>MySQL5</value>
-            </list>
+            </set>
         </property>
     </bean>
 
@@ -70,6 +70,22 @@
     
     <bean id="zeroPointEightToZeroPointNine"
          class="org.osaf.cosmo.migrate.ZeroPointEightToZeroPointNineMigration">
+    </bean>
+    
+    <bean id="zeroPointNineToZeroPointTen"
+        class="org.osaf.cosmo.migrate.BasicSqlScriptMigration">
+        <property name="fromVersion">
+            <value>130</value>
+        </property>
+        <property name="toVersion">
+            <value>140</value>
+        </property>
+        <property name="supportedDialects">
+            <set>
+                <value>Derby</value>
+                <value>MySQL5</value>
+            </set>
+        </property>
     </bean>
 
     <bean id="propertyPlaceHolderConfigurer"
@@ -91,6 +107,7 @@
                 <ref local="zeroPointSixOneToZeroPointSeven"/>
                 <ref local="zeroPointSevenToZeroPointEight"/>
                 <ref local="zeroPointEightToZeroPointNine"/>
+                <ref local="zeroPointNineToZeroPointTen"/>
             </list>
         </property>
     </bean>

@@ -18,10 +18,8 @@ import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -67,8 +65,8 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
 
     
     @Override
-    public List<String> getSupportedDialects() {
-        ArrayList<String> dialects = new ArrayList<String>();
+    public Set<String> getSupportedDialects() {
+        HashSet<String> dialects = new HashSet<String>();
         dialects.add("Derby");
         dialects.add("MySQL5");
         return dialects;

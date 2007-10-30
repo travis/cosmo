@@ -24,6 +24,9 @@ import org.osaf.cosmo.cmp.CmpConstants;
 import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.cmp.UserResource;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionSubscription;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -164,6 +167,42 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         }
     }
 
+    /**
+     */
+    public void testSignupWithSubscription() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        User u2 = testHelper.makeDummyUser();
+        
+        CollectionItem collection =
+            testHelper.makeDummyCollection(u2);
+        Ticket t1 = 
+            testHelper.makeDummyTicket(u2);
+        contentService.createTicket(collection, t1);
+        
+        CollectionSubscription s1 = testHelper.makeDummySubscription(collection, t1);
+
+        MockHttpServletRequest request = createMockRequest("PUT", "/signup");
+        sendXmlRequest(request, new UserContent(u1, s1));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("incorrect status", MockHttpServletResponse.SC_CREATED,
+                     response.getStatus());
+
+        User u3 = userService.getUser(u1.getUsername());
+        CollectionSubscription s2 = u3.getSubscription(s1.getDisplayName());
+        assertTrue("subscription missing",  s2 != null);
+        assertEquals("subscription display name wrong", 
+                s1.getDisplayName(), s2.getDisplayName());
+        assertEquals("subscription ticket key wrong", 
+                s1.getTicketKey(), s2.getTicketKey());
+        assertEquals("subscription collection uid wrong", 
+                s1.getCollectionUid(), s2.getCollectionUid());
+        Ticket t2 = contentService.getTicket(collection, s2.getTicketKey());
+        assertTrue("ticket missing from collection",  t2 != null);
+        assertEquals("ticket wrong", t1, t2);
+    }
 
     /**
      */

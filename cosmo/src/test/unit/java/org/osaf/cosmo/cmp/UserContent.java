@@ -23,6 +23,7 @@ import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.cmp.UserResource;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.CollectionSubscription;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,11 +37,17 @@ public class UserContent implements XmlSerializable {
     private static final Log log = LogFactory.getLog(UserContent.class);
 
     private User user;
+    private CollectionSubscription subscription;
 
     /**
      */
     public UserContent(User user) {
         this.user = user;
+    }
+
+    public UserContent(User user, CollectionSubscription sub) {
+        this.user = user;
+        this.subscription = sub;
     }
 
     /**
@@ -92,7 +99,7 @@ public class UserContent implements XmlSerializable {
         if (user.getAdmin() != null) {
             Element admin =
                 DomUtil.createElement(doc, UserResource.EL_ADMINISTRATOR,
-                                      UserResource.NS_CMP);
+                        UserResource.NS_CMP);
             DomUtil.setText(admin, user.getAdmin().toString());
             e.appendChild(admin);
         }
@@ -100,9 +107,22 @@ public class UserContent implements XmlSerializable {
         if (user.isLocked() != null) {
             Element locked =
                 DomUtil.createElement(doc, UserResource.EL_LOCKED,
-                                      UserResource.NS_CMP);
+                        UserResource.NS_CMP);
             DomUtil.setText(locked, user.isLocked().toString());
             e.appendChild(locked);
+        }
+
+        if (subscription != null){
+            Element sub = 
+                DomUtil.createElement(doc, 
+                        UserResource.EL_SUBSCRIPTION,
+                        UserResource.NS_CMP);
+            sub.setAttribute(UserResource.ATTR_SUBSCRIPTION_NAME, 
+                    subscription.getDisplayName());
+            sub.setAttribute(UserResource.ATTR_SUBSCRIPTION_TICKET,
+                    subscription.getTicketKey());
+            DomUtil.setText(sub, subscription.getCollectionUid());
+            e.appendChild(sub);
         }
 
         return e;

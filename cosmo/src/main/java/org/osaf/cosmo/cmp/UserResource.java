@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
+import org.osaf.cosmo.atom.processor.ValidationException;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.DateUtil;
 
@@ -70,7 +72,18 @@ public class UserResource implements CmpResource, OutputsXml {
     /**
      */
     public static final String EL_UNACTIVATED = "unactivated";
+    /**
+     */
     public static final String EL_LOCKED = "locked";
+    /**
+     */
+    public static final String EL_SUBSCRIPTION = "subscription";
+    /**
+     */
+    public static final String ATTR_SUBSCRIPTION_TICKET = "ticket";
+    /**
+     */
+    public static final String ATTR_SUBSCRIPTION_NAME = "name";
 
     private User user;
     private String urlBase;
@@ -292,6 +305,25 @@ public class UserResource implements CmpResource, OutputsXml {
                 if (user.isOverlord())
                     throw new CmpException("root user cannot be locked");
                 user.setLocked(Boolean.parseBoolean(DomUtil.getTextTrim(e)));
+            }
+            else if (DomUtil.matches(e, EL_SUBSCRIPTION, NS_CMP)){
+                String uuid = DomUtil.getTextTrim(e);
+                String ticketKey = e.getAttribute(ATTR_SUBSCRIPTION_TICKET);
+                String displayName = e.getAttribute(ATTR_SUBSCRIPTION_NAME);
+                if (displayName == null)
+                    throw new CmpException("Subscription requires a display name");
+                if (uuid == null)
+                    throw new CmpException("Subscription requires a collection uuid");
+                if (ticketKey == null)
+                    throw new CmpException("Subscription requires a ticket key");
+                if (user.getSubscription(displayName) != null)
+                    throw new CmpException("Subscription with this name already exists");
+                CollectionSubscription subscription = 
+                    new CollectionSubscription();
+                subscription.setDisplayName(displayName);
+                subscription.setCollectionUid(uuid);
+                subscription.setTicketKey(ticketKey);
+                user.addSubscription(subscription);
             }
             else {
                 throw new CmpException("unknown user attribute element " +

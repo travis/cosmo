@@ -470,9 +470,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         _subscriptionToXML: function (/*Object*/ subscription){
             if (!(subscription.name && subscription.ticket && subscription.uuid)){
-                throw new cosmo.cmp.SubscriptionInfoMissingException(subscription.name, 
-                                                           subscription.ticket,
-                                                           subscription.uuid);
+                throw new cosmo.cmp.SubscriptionInfoMissingException(
+                    subscription.name, subscription.ticket, subscription.uuid);
             }
             return '<subscription name="' + subscription.name + 
                 '" ticket="' + subscription.ticket + '">' + 

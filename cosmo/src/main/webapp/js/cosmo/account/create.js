@@ -39,6 +39,8 @@ cosmo.account.create = new function () {
     this.formType = cosmo.account.formTypes.CREATE;
     // The field that has focus
     this.focusedField = null;
+    // A subscription to add to the signup request
+    this.subscription = null;
 
     // Public methods
     // =============================
@@ -46,9 +48,10 @@ cosmo.account.create = new function () {
      * Sets up the dialog box with the table of form elements
      * and appropriate buttons for creating a new account.
      */
-    this.showForm = function () {
+    this.showForm = function (subscription) {
         var o = {};
         var b = null;
+        this.subscription = subscription;
 
         o.width = 540;
         o.height = 480;
@@ -90,15 +93,22 @@ cosmo.account.create = new function () {
         }
         else {
             var hand = { load: handleCreateResult, error: handleCreateResult };
-            var user = {};
-            // Create a hash from the form field values
-            for (var i = 0; i < fieldList.length; i++) {
-                f = fieldList[i];
-                user[f.elemName] = form[f.elemName].value;
-            }
+            var user = this.formToUserHash(this.subscription);
             // Hand off to CMP
             cosmo.cmp.signup(user, hand);
         }
+    };
+
+    this.formToUserHash = function(subscription){
+        var user = {
+            subscription: subscription
+        };
+        // Create a hash from the form field values
+        for (var i = 0; i < fieldList.length; i++) {
+            f = fieldList[i];
+            user[f.elemName] = form[f.elemName].value;
+        }
+        return user;
     };
     /**
      * Set up and display the table of settings needed to

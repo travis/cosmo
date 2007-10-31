@@ -9,7 +9,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.convenience");
-
+dojo.require("cosmo.account.login");
 
 dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
     {
@@ -17,8 +17,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
 
         // Props from template or set in constructor
         authAction: null,
-        //authProc: "",
-        authProc: cosmo.env.getAuthProc(),
         usernameLabel: _("Login.Username"),
         passwordLabel: _("Login.Password"),
 
@@ -32,16 +30,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         _showPrompt: function (str, type) {
             cosmo.app.modalDialog.setPrompt(str, type);
         },
-        _handleAuthResp: function (type, data, obj) {
-            var str = data;
-            // Transport error
-            if (type == 'error') {
-                cosmo.app.hideDialog();
-                cosmo.app.showErr(data.message);
-                return false;
-            }
-            // Request succeeded
-            else {
+
+        _handleAuthSuccess: function(type, str, obj){
                 // Auth failed -- bad password? Reset for retry
                 if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
                     this._showErr(_('Login.Error.AuthFailed'));
@@ -55,8 +45,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
 
                     this.attemptAuthAction(this.authAction.attemptParams);
                 }
-            }
         },
+
+        _handleAuthError: function(type, str, obj){
+            cosmo.app.hideDialog();
+            cosmo.app.showErr(data.message);
+            return false;
+        },
+
         _attemptOrHandle: function (type, args) {
             var res = null;
             var f = this.authAction[type + 'Func'];
@@ -114,17 +110,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                 else {
                     this._showPrompt(_('Login.Prompt.Processing'));
                 }
-
-                postData = { 'j_username': un, 'j_password': pw };
-
-                var self = this;
-                dojo.io.bind({
-                    url: self.authProc,
-                    method: 'POST',
-                    content: postData,
-                    load: function(type, data, obj) { self._handleAuthResp(type, data, obj); },
-                    error: function(type, data, obj) { self._handleAuthResp(type, data, obj); }
-                });
+                cosmo.account.login.doLogin(
+                    un, pw, {load: dojo.lang.hitch(this, "_handleAuthSuccess"),
+                             error: dojo.lang.hitch(this, "_handleAuthError")}
+                );
             }
             return false;
         },

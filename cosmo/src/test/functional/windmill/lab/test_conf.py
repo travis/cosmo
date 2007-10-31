@@ -5,6 +5,9 @@ test_list = [
 'setup/create_user_test.json',
 '../setup/login_with_user.json',
 
+#Event, canvas refresh test
+'../canvas/event/refresh.json',
+
 #mini-cal tests
 '../minical/mini_cal.json',
 

@@ -1,0 +1,21 @@
+{"params": {"jsid": "{$listView}"}, "method": "click"}
+{"params": {"timeout": 40000, "id": "listViewQuickItemEntry"}, "method": "waits.forElement"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"jsid": "{$calView}"}, "method": "click"}
+{"params": {"timeout": 40000, "id": "hourDiv1-1200"}, "method": "waits.forElement"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getCurrent().id"}, "method": "extensions.clickLozenge"}
+{"params": {"milliseconds": 3000}, "method": "waits.sleep"}
+{"params": {"jsid": "{$dvRemoveButton}"}, "method": "click"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"id": "hourDiv3-1200"}, "method": "doubleClick"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"text": "refresh", "id": "noteTitle"}, "method": "type"}
+{"params": {"jsid": "{$dvSaveButton}"}, "method": "click"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"jsid": "{$listView}"}, "method": "click"}
+{"params": {"timeout": 40000, "id": "listViewQuickItemEntry"}, "method": "waits.forElement"}
+{"params": {"jsid": "{$calView}"}, "method": "click"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getCurrent().id"}, "method": "extensions.clickLozenge"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"validator": "refresh", "id": "noteTitle"}, "method": "asserts.assertValue"}

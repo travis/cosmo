@@ -18,6 +18,8 @@ package org.osaf.cosmo.atom.provider;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -571,11 +573,14 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     private String readUuid(RequestContext request)
         throws IOException {
         BufferedReader in = (BufferedReader) request.getReader();
-        for (String pair : in.readLine().split("\\&")) {
-            String[] fields = pair.split("=");
-            if (fields[0].equals("uuid"))
-                return fields[1];
-        }
+        try {
+            for (String pair : in.readLine().split("\\&")) {
+                String[] fields = pair.split("=");
+                String name = URLDecoder.decode(fields[0], "UTF-8");
+                if (name.equals("uuid"))
+                    return URLDecoder.decode(fields[1], "UTF-8");
+            }
+        } catch (UnsupportedEncodingException e) {}
         return null;
     }
 

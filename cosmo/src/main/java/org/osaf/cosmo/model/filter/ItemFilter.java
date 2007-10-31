@@ -18,7 +18,6 @@ package org.osaf.cosmo.model.filter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.QName;
@@ -34,19 +33,16 @@ import org.osaf.cosmo.model.QName;
  * must match the item for the item to match the ItemFilter.
  */
 public class ItemFilter {
-    
-    public static final String ORDER_ASC = "asc";
-    public static final String ORDER_DESC = "desc";
-    
-    String displayName = null;
+   
+    FilterCriteria displayName = null;
     CollectionItem parent = null;
-    String uid = null;
+    FilterCriteria uid = null;
     Integer maxResults = null;
     
-    List<AttributeFilter> attributeFilters = new ArrayList<AttributeFilter>();
-    List<StampFilter> stampFilters = new ArrayList<StampFilter>();
+    ArrayList<AttributeFilter> attributeFilters = new ArrayList<AttributeFilter>();
+    ArrayList<StampFilter> stampFilters = new ArrayList<StampFilter>();
     HashMap<String, String> filterProperties = new HashMap<String, String>(); 
-    HashMap<String, String> orderByMap = new HashMap<String, String>();
+    ArrayList<FilterOrder> order = new ArrayList<FilterOrder>();
     
     public ItemFilter() {
     }
@@ -60,9 +56,6 @@ public class ItemFilter {
         return attributeFilters;
     }
 
-    public void setAttributeFilters(List<AttributeFilter> attributeFilters) {
-        this.attributeFilters = attributeFilters;
-    }
     
     /**
      * Return an AttributeFilter that matches a specific QName
@@ -99,11 +92,7 @@ public class ItemFilter {
         return stampFilters;
     }
 
-    public void setStampFilters(List<StampFilter> stampFilters) {
-        this.stampFilters = stampFilters;
-    }
-
-    public String getDisplayName() {
+    public FilterCriteria getDisplayName() {
         return displayName;
     }
 
@@ -111,7 +100,7 @@ public class ItemFilter {
      * Match items by item displayName
      * @param displayName displayName to match
      */
-    public void setDisplayName(String displayName) {
+    public void setDisplayName(FilterCriteria displayName) {
         this.displayName = displayName;
     }
 
@@ -127,7 +116,7 @@ public class ItemFilter {
         this.parent = parent;
     }
 
-    public String getUid() {
+    public FilterCriteria getUid() {
         return uid;
     }
 
@@ -135,7 +124,7 @@ public class ItemFilter {
      * Match item by uid
      * @param uid uid to match
      */
-    public void setUid(String uid) {
+    public void setUid(FilterCriteria uid) {
         this.uid = uid;
     }
     
@@ -159,19 +148,21 @@ public class ItemFilter {
     }
     
     /**
-     * Add a property to order results by.  For now, this is only 
+     * <p>
+     * Add an item property to order results by.  For now, this is only 
      * really useful when used with setMaxResults(), where you
      * only want to return the top X items, where the items are
      * in a certain order before the top X are chosen.
-     * @param property property to order (ex. ContentItem.triageStatus.rank)
-     * @param order either "asc" or "desc"
+     * </p>
+     *
+     * @param fo
      */
-    public void addOrderBy(String property, String order) {
-        orderByMap.put(property, order);
+    public void addOrderBy(FilterOrder fo) {
+        order.add(fo);
     }
     
-    public Map<String, String> getOrderByMap() {
-        return orderByMap;
+    public List<FilterOrder> getOrders() {
+        return order;
     }
 
     public Integer getMaxResults() {

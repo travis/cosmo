@@ -15,32 +15,13 @@
  */
 package org.osaf.cosmo.model.filter;
 
-import org.osaf.cosmo.model.QName;
-
 /**
- * Filter that matches Items with a TextAttribute.
- *
+ * FilterExpression that matches null values
  */
-public class TextAttributeFilter extends AttributeFilter {
-    
-    FilterCriteria value = null;
-    
-    public TextAttributeFilter() {
-    }
-    
-    public TextAttributeFilter(QName qname) {
-        this.setQname(qname);
+public class NullExpression extends FilterExpression {
+
+    public NullExpression() {
+        super(null);
     }
 
-    public FilterCriteria getValue() {
-        return value;
-    }
-
-    /**
-     * Match a TextAttribute with a string
-     * @param value
-     */
-    public void setValue(FilterCriteria value) {
-        this.value = value;
-    }
 }

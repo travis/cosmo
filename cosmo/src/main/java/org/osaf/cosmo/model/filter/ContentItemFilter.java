@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.model.filter;
 
+import org.osaf.cosmo.model.filter.FilterOrder.Order;
+
 
 /**
  * Adds ContentItem specific criteria to ItemFilter.
@@ -22,14 +24,17 @@ package org.osaf.cosmo.model.filter;
  */
 public class ContentItemFilter extends ItemFilter {
    
-    public static final String ORDER_BY_TRIAGE_STATUS_RANK = "ContentItem.triageStatus.rank";
+    public static final FilterOrder ORDER_BY_TRIAGE_STATUS_RANK_ASC = new FilterOrder(
+            "triageStatus.rank", Order.ASC);
+    public static final FilterOrder ORDER_BY_TRIAGE_STATUS_RANK_DESC = new FilterOrder(
+            "triageStatus.rank", Order.DESC);
     
-    private Integer triageStatus = null;
+    private FilterCriteria triageStatusCode = null;
     
     public ContentItemFilter() {}
 
-    public Integer getTriageStatus() {
-        return triageStatus;
+    public FilterCriteria getTriageStatusCode() {
+        return triageStatusCode;
     }
 
     /**
@@ -40,10 +45,9 @@ public class ContentItemFilter extends ItemFilter {
      *  TriageStatus.CODE_NOW<br/>
      *  TriageStatus.CODE_LATER</code>
      *  <p>
-     *  A value of -1 means match items with no triageStatus.
      * @param triageStatus
      */
-    public void setTriageStatus(Integer triageStatus) {
-        this.triageStatus = triageStatus;
+    public void setTriageStatusCode(FilterCriteria triageStatusCode) {
+        this.triageStatusCode = triageStatusCode;
     }
 }

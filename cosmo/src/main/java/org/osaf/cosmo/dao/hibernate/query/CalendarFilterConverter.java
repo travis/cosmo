@@ -31,6 +31,7 @@ import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.Restrictions;
 import org.osaf.cosmo.model.filter.StampFilter;
 
 /**
@@ -165,13 +166,17 @@ public class CalendarFilterConverter {
         if(textMatch==null)
             throw new IllegalArgumentException("unsupported filter: must contain text match filter");
         
-        if(textMatch.isNegateCondition())
-            throw new IllegalArgumentException("unsupported negate condition for prop-filter");
-        
-        if(textMatch.isCaseless())
-            throw new IllegalArgumentException("unsupported isCaseless condition for prop-filter");
-        
-        itemFilter.setIcalUid(textMatch.getValue());
+        if(textMatch.isCaseless()) {
+            if(textMatch.isNegateCondition())
+                itemFilter.setIcalUid(Restrictions.nilike(textMatch.getValue()));
+            else
+                itemFilter.setIcalUid(Restrictions.ilike(textMatch.getValue()));
+        } else {
+            if(textMatch.isNegateCondition())
+                itemFilter.setIcalUid(Restrictions.nlike(textMatch.getValue()));
+            else
+                itemFilter.setIcalUid(Restrictions.like(textMatch.getValue()));
+        }
     }
     
     private void handleDescriptionPropFilter(PropertyFilter propFilter, NoteItemFilter itemFilter) {
@@ -185,13 +190,17 @@ public class CalendarFilterConverter {
         if(textMatch==null)
             throw new IllegalArgumentException("unsupported filter: must contain text match filter");
         
-        if(textMatch.isNegateCondition())
-            throw new IllegalArgumentException("unsupported negate condition for prop-filter");
-        
-        if(textMatch.isCaseless())
-            throw new IllegalArgumentException("unsupported isCaseless condition for prop-filter");
-        
-        itemFilter.setBody(textMatch.getValue());
+        if(textMatch.isCaseless()) {
+            if(textMatch.isNegateCondition())
+                itemFilter.setBody(Restrictions.nilike(textMatch.getValue()));
+            else
+                itemFilter.setBody(Restrictions.ilike(textMatch.getValue()));
+        } else {
+            if(textMatch.isNegateCondition())
+                itemFilter.setBody(Restrictions.nlike(textMatch.getValue()));
+            else
+                itemFilter.setBody(Restrictions.like(textMatch.getValue()));
+        }
     }
     
     private void handleSummaryPropFilter(PropertyFilter propFilter, NoteItemFilter itemFilter) {
@@ -205,13 +214,17 @@ public class CalendarFilterConverter {
         if(textMatch==null)
             throw new IllegalArgumentException("unsupported filter: must contain text match filter");
         
-        if(textMatch.isNegateCondition())
-            throw new IllegalArgumentException("unsupported negate condition for prop-filter");
-        
-        if(textMatch.isCaseless())
-            throw new IllegalArgumentException("unsupported isCaseless condition for prop-filter");
-        
-        itemFilter.setDisplayName(textMatch.getValue());
+        if(textMatch.isCaseless()) {
+            if(textMatch.isNegateCondition())
+                itemFilter.setDisplayName(Restrictions.nilike(textMatch.getValue()));
+            else
+                itemFilter.setDisplayName(Restrictions.ilike(textMatch.getValue()));
+        } else {
+            if(textMatch.isNegateCondition())
+                itemFilter.setDisplayName(Restrictions.nlike(textMatch.getValue()));
+            else
+                itemFilter.setDisplayName(Restrictions.like(textMatch.getValue()));
+        }
     }
         
 }

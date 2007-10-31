@@ -15,32 +15,39 @@
  */
 package org.osaf.cosmo.model.filter;
 
-import org.osaf.cosmo.model.QName;
-
 /**
- * Filter that matches Items with a TextAttribute.
- *
+ * Represents an ordering of an item property.
  */
-public class TextAttributeFilter extends AttributeFilter {
+public class FilterOrder {
     
-    FilterCriteria value = null;
+    public enum Order { ASC, DESC }
     
-    public TextAttributeFilter() {
-    }
+    private String name = null;
+    private Order order = Order.ASC;
     
-    public TextAttributeFilter(QName qname) {
-        this.setQname(qname);
+    public FilterOrder(String name) {
+        super();
+        this.name = name;
     }
 
-    public FilterCriteria getValue() {
-        return value;
+    public FilterOrder(String name, Order order) {
+        super();
+        this.name = name;
+        this.order = order;
     }
-
-    /**
-     * Match a TextAttribute with a string
-     * @param value
-     */
-    public void setValue(FilterCriteria value) {
-        this.value = value;
+    
+    public String getName() {
+        return name;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public Order getOrder() {
+        return order;
+    }
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+    
+    
 }

@@ -35,6 +35,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.Restrictions;
 import org.osaf.cosmo.model.filter.StampFilter;
 
 /**
@@ -105,7 +106,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
 
     public void testFilterByUid() throws Exception {
         ItemFilter filter = new ItemFilter();
-        filter.setUid(CALENDAR_UID_1);
+        filter.setUid(Restrictions.eq(CALENDAR_UID_1));
         Set<Item> results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         verifyItemInSet(results, CALENDAR_UID_1);
@@ -116,25 +117,25 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         Set<Item> results = contentDao.findItems(filter);
         Assert.assertEquals(11, results.size());
         
-        filter.setIcalUid("icaluid1");
+        filter.setIcalUid(Restrictions.eq("icaluid1"));
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         
         filter.setIcalUid(null);
         
-        filter.setDisplayName("find me not");
+        filter.setDisplayName(Restrictions.eq("find me not"));
         results = contentDao.findItems(filter);
         Assert.assertEquals(0, results.size());
         
-        filter.setDisplayName("find me");
+        filter.setDisplayName(Restrictions.eq("find me"));
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         
-        filter.setBody("find me not");
+        filter.setBody(Restrictions.like("find me not"));
         results = contentDao.findItems(filter);
         Assert.assertEquals(0, results.size());
         
-        filter.setBody("find me");
+        filter.setBody(Restrictions.like("find me"));
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         
@@ -159,18 +160,18 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         
         // find triageStatus==DONE only, which should match one
         filter = new NoteItemFilter();
-        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
         results = contentDao.findItems(filter);
         Assert.assertEquals(1, results.size());
         
         // find triageStatus==LATER only, which should match none
-        filter.setTriageStatus(TriageStatus.CODE_LATER);
+        filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_LATER));
         results = contentDao.findItems(filter);
         Assert.assertEquals(0, results.size());
         
         //find notes without triage
         filter = new NoteItemFilter();
-        filter.setTriageStatus(-1);
+        filter.setTriageStatusCode(Restrictions.isNull());
         results = contentDao.findItems(filter);
         Assert.assertEquals(9, results.size());
         

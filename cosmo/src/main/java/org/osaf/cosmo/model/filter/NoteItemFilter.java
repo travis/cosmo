@@ -22,7 +22,8 @@ import org.osaf.cosmo.model.NoteItem;
  * Matches only NoteItem instances.
  */
 public class NoteItemFilter extends ContentItemFilter {
-    private String icalUid = null;
+    private FilterCriteria icalUid = null;
+    private FilterCriteria body = null;
     
     private Boolean hasModifications = null;
     private Boolean isModification = null;
@@ -35,28 +36,23 @@ public class NoteItemFilter extends ContentItemFilter {
      * Match notes with a body that matches a given String.
      * @param body body string to match
      */
-    public void setBody(String body) {
-        TextAttributeFilter filter = (TextAttributeFilter) getAttributeFilter(NoteItem.ATTR_NOTE_BODY);
-        if(filter==null) {
-            filter = new TextAttributeFilter(NoteItem.ATTR_NOTE_BODY);
-            getAttributeFilters().add(filter);
-        }
-        if(body==null)
-            getAttributeFilters().remove(filter);
-        else
-            filter.setValue(body);
+    public void setBody(FilterCriteria body) {
+        this.body = body;
     }
 
-    public String getIcalUid() {
+    public FilterCriteria getBody() {
+        return body;
+    }
+
+    public FilterCriteria getIcalUid() {
         return icalUid;
     }
-
     
     /**
      * Match notes with an specific icalUid
      * @param icalUid
      */
-    public void setIcalUid(String icalUid) {
+    public void setIcalUid(FilterCriteria icalUid) {
         this.icalUid = icalUid;
     }
 

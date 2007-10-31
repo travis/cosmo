@@ -33,6 +33,7 @@ import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.Restrictions;
 import org.osaf.cosmo.model.filter.StampFilter;
 
 
@@ -51,16 +52,41 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
 
     public void testUidQuery() throws Exception {
         ItemFilter filter = new ItemFilter();
-        filter.setUid("abc");
+        filter.setUid(Restrictions.eq("abc"));
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from Item i where i.uid=:uid", query.getQueryString());
+        Assert.assertEquals("select i from Item i where i.uid=:param0", query.getQueryString());
     }
     
     public void testDisplayNameQuery() throws Exception {
         ItemFilter filter = new ItemFilter();
-        filter.setDisplayName("test");
+        filter.setDisplayName(Restrictions.eq("test"));
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from Item i where i.displayName like :displayName", query.getQueryString());
+        Assert.assertEquals("select i from Item i where i.displayName=:param0", query.getQueryString());
+    
+        filter.setDisplayName(Restrictions.neq("test"));
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from Item i where i.displayName!=:param0", query.getQueryString());
+    
+        filter.setDisplayName(Restrictions.like("test"));
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from Item i where i.displayName like :param0", query.getQueryString());
+        
+        filter.setDisplayName(Restrictions.nlike("test"));
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from Item i where i.displayName not like :param0", query.getQueryString());
+    
+        filter.setDisplayName(Restrictions.isNull());
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from Item i where i.displayName is null", query.getQueryString());
+    
+        filter.setDisplayName(Restrictions.ilike("test"));
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from Item i where lower(i.displayName) like :param0", query.getQueryString());
+    
+        filter.setDisplayName(Restrictions.nilike("test"));
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from Item i where lower(i.displayName) not like :param0", query.getQueryString());
+    
     }
     
     public void testParentQuery() throws Exception {
@@ -75,40 +101,40 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         ItemFilter filter = new ItemFilter();
         CollectionItem parent = new CollectionItem();
         filter.setParent(parent);
-        filter.setDisplayName("test");
+        filter.setDisplayName(Restrictions.eq("test"));
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from Item i join i.parents parent where parent=:parent and i.displayName like :displayName", query.getQueryString());
+        Assert.assertEquals("select i from Item i join i.parents parent where parent=:parent and i.displayName=:param1", query.getQueryString());
     }
     
     public void testContentItemQuery() throws Exception {
         ContentItemFilter filter = new ContentItemFilter();
         CollectionItem parent = new CollectionItem();
         filter.setParent(parent);
-        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:triageStatus", query.getQueryString());
+        Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:param1", query.getQueryString());
     
-        filter.setTriageStatus(-1);
+        filter.setTriageStatusCode(Restrictions.isNull());
         query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code is null", query.getQueryString());
         
-        filter.setTriageStatus(TriageStatus.CODE_DONE);
-        filter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK, ItemFilter.ORDER_ASC);
+        filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
+        filter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK_ASC);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:triageStatus order by i.triageStatus.rank", query.getQueryString());
+        Assert.assertEquals("select i from ContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:param1 order by i.triageStatus.rank", query.getQueryString());
     }
     
     public void testNoteItemQuery() throws Exception {
         NoteItemFilter filter = new NoteItemFilter();
         CollectionItem parent = new CollectionItem();
         filter.setParent(parent);
-        filter.setDisplayName("test");
-        filter.setIcalUid("icaluid");
-        filter.setBody("body");
-        filter.setTriageStatus(TriageStatus.CODE_DONE);
+        filter.setDisplayName(Restrictions.eq("test"));
+        filter.setIcalUid(Restrictions.eq("icaluid"));
+        filter.setBody(Restrictions.eq("body"));
+        filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
         
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2 where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.qname=:ta2qname and ta2.value like :ta2value and i.triageStatus.code=:triageStatus and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta4 where parent=:parent and i.displayName=:param1 and i.triageStatus.code=:param2 and i.icalUid=:param3 and ta4.item=i and ta4.qname=:ta4qname and ta4.value=:param5", query.getQueryString());
         
         filter = new NoteItemFilter();
         filter.setIsModification(true);
@@ -140,16 +166,16 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         EventStampFilter eventFilter = new EventStampFilter();
         CollectionItem parent = new CollectionItem();
         filter.setParent(parent);
-        filter.setDisplayName("test");
-        filter.setIcalUid("icaluid");
-        filter.setBody("body");
+        filter.setDisplayName(Restrictions.eq("test"));
+        filter.setIcalUid(Restrictions.eq("icaluid"));
+        //filter.setBody("body");
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.qname=:ta2qname and ta2.value like :ta2value and es.item=i and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and i.displayName=:param1 and es.item=i and i.icalUid=:param2", query.getQueryString());
     
         eventFilter.setIsRecurring(true);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from NoteItem i join i.parents parent, TextAttribute ta2, BaseEventStamp es where parent=:parent and i.displayName like :displayName and ta2.item=i and ta2.qname=:ta2qname and ta2.value like :ta2value and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:icaluid", query.getQueryString());
+        Assert.assertEquals("select i from NoteItem i join i.parents parent, BaseEventStamp es where parent=:parent and i.displayName=:param1 and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:param2", query.getQueryString());
     }
     
     public void testEventStampTimeRangeQuery() throws Exception {

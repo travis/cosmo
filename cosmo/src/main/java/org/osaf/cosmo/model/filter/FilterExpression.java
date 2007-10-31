@@ -15,32 +15,30 @@
  */
 package org.osaf.cosmo.model.filter;
 
-import org.osaf.cosmo.model.QName;
-
 /**
- * Filter that matches Items with a TextAttribute.
- *
+ * Abstract simple expression criteria.
  */
-public class TextAttributeFilter extends AttributeFilter {
+public abstract class FilterExpression implements FilterCriteria {
     
-    FilterCriteria value = null;
+    private Object value = null;
+    private boolean negated = false;
     
-    public TextAttributeFilter() {
-    }
-    
-    public TextAttributeFilter(QName qname) {
-        this.setQname(qname);
-    }
-
-    public FilterCriteria getValue() {
-        return value;
-    }
-
-    /**
-     * Match a TextAttribute with a string
-     * @param value
-     */
-    public void setValue(FilterCriteria value) {
+    public FilterExpression(Object value) {
+        super();
         this.value = value;
     }
+    public boolean isNegated() {
+        return negated;
+    }
+    public void setNegated(boolean negated) {
+        this.negated = negated;
+    }
+    public Object getValue() {
+        return value;
+    }
+    public void setValue(Object value) {
+        this.value = value;
+    }
+    
+    
 }

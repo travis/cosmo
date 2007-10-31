@@ -27,14 +27,15 @@ import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TaskStamp;
-import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
+import org.osaf.cosmo.model.filter.FilterCriteria;
+import org.osaf.cosmo.model.filter.FilterExpression;
+import org.osaf.cosmo.model.filter.ILikeExpression;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.LikeExpression;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.filter.StampFilter;
-import org.osaf.cosmo.model.filter.TextAttributeFilter;
 
 
 /**
@@ -83,7 +84,7 @@ public class CalendarFilterConverterTest extends TestCase {
         descFilter.setName("DESCRIPTION");
         TextMatchFilter descMatch = new TextMatchFilter();
         descMatch.setValue("desc");
-        descMatch.setCaseless(false);
+        descMatch.setCaseless(true);
         descFilter.setTextMatchFilter(descMatch);
         eventComp.getPropFilters().add(descFilter);
         
@@ -92,15 +93,13 @@ public class CalendarFilterConverterTest extends TestCase {
         Assert.assertTrue(itemFilter instanceof NoteItemFilter);
         NoteItemFilter noteFilter = (NoteItemFilter) itemFilter;
         Assert.assertEquals(calendar.getUid(), noteFilter.getParent().getUid());
-        Assert.assertEquals("summary", noteFilter.getDisplayName());
-        Assert.assertEquals("uid", noteFilter.getIcalUid());
-        Assert.assertEquals(1, noteFilter.getAttributeFilters().size());
-        
-        AttributeFilter af = noteFilter.getAttributeFilter(NoteItem.ATTR_NOTE_BODY);
-        Assert.assertNotNull(af);
-        Assert.assertTrue(af instanceof TextAttributeFilter);
-        Assert.assertTrue(((TextAttributeFilter) af).getValue().equals("desc"));
-        
+        Assert.assertTrue(noteFilter.getDisplayName() instanceof LikeExpression);
+        verifyFilterExpressionValue(noteFilter.getDisplayName(), "summary");
+        Assert.assertTrue(noteFilter.getIcalUid() instanceof LikeExpression);
+        verifyFilterExpressionValue(noteFilter.getIcalUid(), "uid");
+        Assert.assertTrue(noteFilter.getBody() instanceof ILikeExpression);
+        verifyFilterExpressionValue(noteFilter.getBody(), "desc");
+       
         EventStampFilter sf = (EventStampFilter) noteFilter.getStampFilter(EventStampFilter.class);
         Assert.assertNotNull(sf);
         Assert.assertNotNull(sf.getPeriod());
@@ -140,6 +139,11 @@ public class CalendarFilterConverterTest extends TestCase {
         sf = noteFilter.getStampFilters().get(1);
         Assert.assertEquals(EventStamp.class, sf.getStampClass());
         Assert.assertEquals(true, sf.isMissing());
+    }
+    
+    private void verifyFilterExpressionValue(FilterCriteria fc, Object value) {
+        FilterExpression fe = (FilterExpression) fc;
+        Assert.assertTrue(fe.getValue().equals(value));
     }
 
 }

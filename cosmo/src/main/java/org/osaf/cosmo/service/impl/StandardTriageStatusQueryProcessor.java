@@ -47,6 +47,7 @@ import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.Restrictions;
 import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 import org.osaf.cosmo.service.triage.TriageStatusQueryProcessor;
 
@@ -366,9 +367,8 @@ public class StandardTriageStatusQueryProcessor implements
         // be thrown away during the limit/sorting phase so no need to pull
         // more than maxDone items as long as they are sorted by rank.
         doneFilter.setMaxResults(maxDone);
-        doneFilter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK,
-                              ItemFilter.ORDER_ASC);
-
+        doneFilter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK_ASC);
+        
         // filter for recurring events
         NoteItemFilter eventFilter =
             getRecurringEventFilter(collection,
@@ -552,7 +552,10 @@ public class StandardTriageStatusQueryProcessor implements
     private NoteItemFilter getTriageStatusFilter(CollectionItem collection, int code) {
         NoteItemFilter triageStatusFilter = new NoteItemFilter();
         triageStatusFilter.setParent(collection);
-        triageStatusFilter.setTriageStatus(code);
+        if(code==-1)
+            triageStatusFilter.setTriageStatusCode(Restrictions.isNull());
+        else
+            triageStatusFilter.setTriageStatusCode(Restrictions.eq(new Integer(code)));
         return triageStatusFilter;
     }
     

@@ -38,11 +38,19 @@ import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
+import org.osaf.cosmo.model.filter.EqualsExpression;
 import org.osaf.cosmo.model.filter.EventStampFilter;
+import org.osaf.cosmo.model.filter.FilterCriteria;
+import org.osaf.cosmo.model.filter.FilterExpression;
+import org.osaf.cosmo.model.filter.FilterOrder;
+import org.osaf.cosmo.model.filter.ILikeExpression;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.LikeExpression;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
+import org.osaf.cosmo.model.filter.NullExpression;
 import org.osaf.cosmo.model.filter.StampFilter;
 import org.osaf.cosmo.model.filter.TextAttributeFilter;
+import org.osaf.cosmo.model.filter.FilterOrder.Order;
 
 /**
  * Standard Implementation of <code>ItemFilterProcessor</code>.
@@ -91,6 +99,19 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             handleItemFilter(selectBuf, whereBuf, params, filter);
         
         selectBuf.append(whereBuf);
+        
+        for(FilterOrder fo: filter.getOrders()) {
+            if(orderBuf.length()==0)
+                orderBuf.append(" order by ");
+            else
+                orderBuf.append(", ");
+            
+            orderBuf.append("i." + fo.getName());
+            
+            if(fo.getOrder().equals(Order.DESC))
+                orderBuf.append(" desc");
+        }
+        
         selectBuf.append(orderBuf);
         
         if(log.isDebugEnabled()) {
@@ -116,10 +137,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             selectBuf.append("select i from Item i");
         
         // filter on uid
-        if(filter.getUid()!=null) {
-            appendWhere(whereBuf, "i.uid=:uid");
-            params.put("uid", filter.getUid());
-        }
+        if(filter.getUid()!=null)
+            formatExpression(whereBuf, params, "i.uid", filter.getUid());
+            
         
         // filter on parent
         if(filter.getParent()!=null) {
@@ -128,10 +148,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             params.put("parent", filter.getParent());
         }
         
-        if(filter.getDisplayName()!=null) {
-            appendWhere(whereBuf, "i.displayName like :displayName");
-            params.put("displayName", formatForLike(filter.getDisplayName()));
-        }
+        if(filter.getDisplayName()!=null)
+            formatExpression(whereBuf, params, "i.displayName", filter.getDisplayName());
+        
         
         handleAttributeFilters(selectBuf, whereBuf, params, filter);
         handleStampFilters(selectBuf, whereBuf, params, filter);
@@ -155,9 +174,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         
         String alias = "ta" + params.size();
         selectBuf.append(", TextAttribute " + alias);
-        appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname and " + alias + ".value like :" + alias + "value");
+        appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname");
         params.put(alias + "qname", filter.getQname());
-        params.put(alias + "value", formatForLike(filter.getValue()));
+        formatExpression(whereBuf, params, alias + ".value", filter.getValue());
     }
     
     private void handleStampFilters(StringBuffer selectBuf,
@@ -237,9 +256,16 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         handleContentItemFilter(selectBuf, whereBuf, orderBuf, params, filter);
         
         // filter by icaluid
-        if(filter.getIcalUid()!=null) {
-            appendWhere(whereBuf, "i.icalUid=:icaluid");
-            params.put("icaluid", filter.getIcalUid());
+        if(filter.getIcalUid()!=null)
+            formatExpression(whereBuf, params, "i.icalUid", filter.getIcalUid());
+        
+        // filter by body
+        if(filter.getBody()!=null) {
+            String alias = "ta" + params.size();
+            selectBuf.append(", TextAttribute " + alias);
+            appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname");
+            params.put(alias + "qname", NoteItem.ATTR_NOTE_BODY);
+            formatExpression(whereBuf, params, alias + ".value", filter.getBody());
         }
         
         //filter by master NoteItem
@@ -274,25 +300,8 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         }
         
         // handle triageStatus filter
-        if(filter.getTriageStatus()!=null) {
-            // status code of "-1" means no triage status for now
-            if(filter.getTriageStatus()==-1) {
-                appendWhere(whereBuf,"i.triageStatus.code is null");
-            } else {
-                appendWhere(whereBuf,"i.triageStatus.code=:triageStatus");
-                params.put("triageStatus", filter.getTriageStatus());
-            }
-        }
-        
-        // look for triageStatusRank order
-        String order = filter.getOrderByMap().get(
-                ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK);
-        if (order != null) {
-            if (ItemFilter.ORDER_ASC.equals(order))
-                appendOrder(orderBuf, "i.triageStatus.rank");
-            else
-                appendOrder(orderBuf, "i.triageStatus.rank desc");
-        }
+        if(filter.getTriageStatusCode()!=null)
+            formatExpression(whereBuf, params, "i.triageStatus.code", filter.getTriageStatusCode());
     }
     
     
@@ -381,7 +390,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     private Collection<ContentItem> processMasterNote(NoteItem note,
             EventStampFilter filter, boolean includeMasterInResults,
             boolean doTimeRangeSecondPass) {
-        EventStamp eventStamp = EventStamp.getStamp(note);
+        EventStamp eventStamp = (EventStamp) note.getStamp(EventStamp.class);
         ArrayList<ContentItem> results = new ArrayList<ContentItem>();
 
         // If the event is not recurring or the filter is configured
@@ -420,6 +429,55 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         }
 
         return results;
+    }
+    
+    private void formatExpression(StringBuffer whereBuf,
+            HashMap<String, Object> params, String propName,
+            FilterCriteria fc) {
+
+        StringBuffer expBuf = new StringBuffer();
+        
+        FilterExpression exp = (FilterExpression) fc;
+        
+        if (exp instanceof NullExpression) {
+            expBuf.append(propName);
+            if (exp.isNegated())
+                expBuf.append(" is not null");
+            else
+                expBuf.append(" is null");
+        } else {
+            String param = "param" + params.size();
+            if (exp instanceof EqualsExpression) {
+                expBuf.append(propName);
+                if (exp.isNegated())
+                    expBuf.append("!=");
+                else
+                    expBuf.append("=");
+
+                params.put(param, exp.getValue());
+
+            } else if (exp instanceof LikeExpression) {
+                expBuf.append(propName);
+                if (exp.isNegated())
+                    expBuf.append(" not like ");
+                else
+                    expBuf.append(" like ");
+
+                params.put(param, formatForLike(exp.getValue().toString()));
+            } else if (exp instanceof ILikeExpression) {
+                expBuf.append("lower(" + propName + ")");
+                if (exp.isNegated())
+                    expBuf.append(" not like ");
+                else
+                    expBuf.append(" like ");
+
+                params.put(param, formatForLike(exp.getValue().toString().toLowerCase()));
+            }
+
+            expBuf.append(":" + param);
+        }
+        
+        appendWhere(whereBuf, expBuf.toString());
     }
 
 }

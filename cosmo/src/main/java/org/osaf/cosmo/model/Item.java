@@ -16,6 +16,7 @@
 package org.osaf.cosmo.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 import org.w3c.dom.Element;
+
 
 /**
  * Abstract base class for an item on server.  All
@@ -142,18 +144,16 @@ public abstract class Item extends AuditableObject {
   
     
     /**
-     * Return all stamps associated with Item.  This set includes
-     * both active and inactive stamps.  Use getActiveStamps() to 
-     * only retrieve active stamps.
-     * @return
+     * Return all stamps associated with Item.  Use
+     * addStamp() and removeStamp() to manipulate set.
+     * @return set of stamps associated with Item
      */
     public Set<Stamp> getStamps() {
-        return stamps;
+        return Collections.unmodifiableSet(stamps);
     }
     
     /**
-     * @return Map of Stamps indexed by Stamp type.  Only
-     *         includes active stamps.
+     * @return Map of Stamps indexed by Stamp type.
      */
     public Map<String, Stamp> getStampMap() {
         if(stampMap==null) {
@@ -186,8 +186,7 @@ public abstract class Item extends AuditableObject {
     }
     
     /**
-     * Remove stamp from Item.  Stamp is not removed from database.  
-     * Instead, the stamp is set to "inactive".
+     * Remove stamp from Item.
      * @param stamp stamp to remove
      */
     public void removeStamp(Stamp stamp) {
@@ -197,11 +196,12 @@ public abstract class Item extends AuditableObject {
         
         stamps.remove(stamp);
         
+        // add tombstone for tracking purposes
         tombstones.add(new StampTombstone(this, stamp));
     }
     
     /**
-     * Get the stamp that coresponds to the specified type
+     * Get the stamp that corresponds to the specified type
      * @param type stamp type to return
      * @return stamp
      */
@@ -215,7 +215,7 @@ public abstract class Item extends AuditableObject {
     }
     
     /**
-     * Get the stamp that coresponds to the specified class
+     * Get the stamp that corresponds to the specified class
      * @param clazz class of stamp to return
      * @return stamp
      */
@@ -228,13 +228,22 @@ public abstract class Item extends AuditableObject {
         return null;
     }
 
+    /**
+     * Get all Attributes of Item.  Use addAttribute() and 
+     * removeAttribute() to manipulate map.
+     * @return
+     */
     public Map<QName, Attribute> getAttributes() {
-        return attributes;
+        return Collections.unmodifiableMap(attributes);
     }
     
     public void addTicket(Ticket ticket) {
         ticket.setItem(this);
         tickets.add(ticket);
+    }
+    
+    public void removeTicket(Ticket ticket) {
+        tickets.remove(ticket);
     }
 
     public void addAttribute(Attribute attribute) {
@@ -597,19 +606,14 @@ public abstract class Item extends AuditableObject {
         return version;
     }
 
-    // used by hibernate
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
     public Set<CollectionItem> getParents() {
         return parents;
     }
 
-    public void setParents(Set<CollectionItem> parents) {
-        this.parents = parents;
-    }
-    
+    /**
+     * Return a single parent.
+     * @deprecated
+     */
     public CollectionItem getParent() {
         if(parents.size()==0)
             return null;
@@ -625,6 +629,10 @@ public abstract class Item extends AuditableObject {
         this.isActive = isActive;
     }
 
+    /**
+     * Get all Tickets on Item.  
+     * @return set of tickets
+     */
     public Set<Ticket> getTickets() {
         return tickets;
     }
@@ -678,11 +686,11 @@ public abstract class Item extends AuditableObject {
         item.setDisplayName(getDisplayName());
         
         // copy attributes
-        for(Entry<QName, Attribute> entry: getAttributes().entrySet())
+        for(Entry<QName, Attribute> entry: attributes.entrySet())
             item.addAttribute(entry.getValue().copy());
         
         // copy stamps
-        for(Stamp stamp: getStamps())
+        for(Stamp stamp: stamps)
             item.addStamp(stamp.copy());
     }
 }

@@ -528,7 +528,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         queryItem.setName("test2");
         queryItem.setDisplayName("this is a test item2");
-        queryItem.getAttributes().remove("customattribute");
+        queryItem.removeAttribute("customattribute");
         queryItem.setContentLanguage("es");
         queryItem.setContent(helper.getBytes(baseDir + "/testdata2.txt"));
 

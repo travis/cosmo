@@ -24,6 +24,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         usernameInput: null,
         passwordInput: null,
 
+        // Auth deferred; fires callback on auth success
+        //    fires errback on auth fail if noRetry is true
         deferred: null,
         noRetry: false,
 
@@ -136,6 +138,26 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             this.domNode.appendChild(recoverPasswordDiv);
             recoverPasswordDiv.innerHTML = [_("Login.Forgot"), "<a href=", cosmo.env.getFullUrl("ForgotPassword"), 
                                             " target=\"_blank\"> ", _("Login.ClickHere"), "</a>"].join("");
+
+            // Sign up link
+            var signupLinkDiv = _createElem("div");
+            signupLinkDiv.className = "authBoxSignupLink";
+            signupLinkDiv.appendChild(_createText(_("AuthBox.CreateAccount")));
+
+            var signupLink = _createElem("a");
+            signupLink.href = cosmo.env.getFullUrl("Signup");
+            signupLink.appendChild(_createText(_("AuthBox.CreateClickHere")));
+            dojo.debug("fuz");
+            dojo.event.connect(signupLink, "onclick",  
+                               function(){
+                                   
+                               }
+                              );
+            signupLinkDiv.appendChild(signupLink);
+            this.domNode.appendChild(signupLinkDiv);
+            
+            
+
         },
         
         initializer: function(){

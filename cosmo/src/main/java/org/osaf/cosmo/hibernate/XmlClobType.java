@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import javax.transaction.TransactionManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -63,7 +64,11 @@ public class XmlClobType extends ClobStringType {
         try {
             return DomReader.read(reader);
         } catch (Exception e) {
-            log.error("Error deserializing XML clob", e);
+            try {
+                log.error("Error deserializing XML clob '" + IOUtils.toString(reader) + "'", e);
+            } catch (Exception e2) {
+                log.error("Error reading XML clob", e);
+            }
             // don't throw an exception, because otherwise this item will
             // be able to be loaded (thus, it won't be able to be deleted)
             return null;

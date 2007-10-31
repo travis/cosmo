@@ -199,7 +199,12 @@ cosmo.app = new function () {
         // disappearing cursor, etc.
         cosmo.topics.publish(cosmo.topics.ModalDialogToggle, { isDisplayed: true });
         self.modalDialog.show();
+        if (props) return props.deferred;
     };
+
+    /**
+      * Convenience function for popping a modal dialog and getting a value.
+      */
     this.getValue = function (valuePrompt, defaultValue, retryConditions){
         var valueInput = _createElem("input");
         valueInput.value = defaultValue || "";

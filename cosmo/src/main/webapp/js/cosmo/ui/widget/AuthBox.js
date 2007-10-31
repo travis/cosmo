@@ -24,6 +24,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         usernameInput: null,
         passwordInput: null,
 
+        deferred: null,
+        noRetry: false,
+
         _showErr: function (str) {
             this._showPrompt(str, 'error');
         },
@@ -31,65 +34,24 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             cosmo.app.modalDialog.setPrompt(str, type);
         },
 
-        _handleAuthSuccess: function(type, str, obj){
-                // Auth failed -- bad password? Reset for retry
-                if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
-                    this._showErr(_('Login.Error.AuthFailed'));
-                    this.passwordInput.value = '';
-                }
-                // Auth successful -- try to do whatever action
-                // was contingent on the auth
-                else {
-                    cosmo.util.auth.setCred(this.usernameInput.value,
-                                            this.passwordInput.value);
-
-                    this.attemptAuthAction(this.authAction.attemptParams);
-                }
+        _authSuccessCB: function(type, data, obj){
+            this.deferred.callback(data);
         },
 
-        _handleAuthError: function(type, str, obj){
-            cosmo.app.hideDialog();
-            cosmo.app.showErr(data.message);
+        _authErrorCB: function(type, str, obj){
+            this._handleError(str);
             return false;
         },
 
-        _attemptOrHandle: function (type, args) {
-            var res = null;
-            var f = this.authAction[type + 'Func'];
-            var a = args || []; // Can't pass args to IE6 if it's undefined
-            var context = null;
-            // If this is just a plain ol' function, execute in window context
-            if (this.authAction.execInline) {
-                context = window;
+        _handleError: function(msg){
+            this._showErr(msg);
+            if (!this.noRetry){
+                this.passwordInput.value = '';
+            } else {
+                this.deferred.errback(msg);
             }
-            // If execution context got passed in, apply the method
-            // to that object
-            else if (this.authAction.execContext) {
-                context = this.authAction.execContext;
-            }
-            // No execution context -- execute the method in the
-            // context of the AuthBox itself
-            else {
-                context = this;
-            }
-            res = f.apply(context, a);
-            return res;
         },
-        attemptAuthAction: function (args) {
-            // If an informational prompt for the action was
-            // specified, display it
-            if (this.authAction.attemptPrompt) {
-                this._showPrompt(this.authAction.attemptPrompt);
-            }
-            // Take whatever action was specified in the authAction obj
-            return this._attemptOrHandle('attempt', args);
-        },
-        handleAuthActionResp: function () {
-            var args = Array.prototype.slice.apply(arguments);
-            // Take whatever response (if any) to the action was specified
-            // in the authAction obj
-            return this._attemptOrHandle('success', args);
-        },
+
         doAuth: function () {
             var un = this.usernameInput.value;
             var pw = this.passwordInput.value;
@@ -111,12 +73,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                     this._showPrompt(_('Login.Prompt.Processing'));
                 }
                 cosmo.account.login.doLogin(
-                    un, pw, {load: dojo.lang.hitch(this, "_handleAuthSuccess"),
-                             error: dojo.lang.hitch(this, "_handleAuthError")}
+                    un, pw, {load: dojo.lang.hitch(this, "_authSuccessCB"),
+                             error: dojo.lang.hitch(this, "_authErrorCB")}
                 );
             }
             return false;
         },
+
         fillInTemplate: function () {
             var table = _createElem('table');
             var tbody = _createElem('tbody');
@@ -171,9 +134,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             var recoverPasswordDiv = _createElem("div");
             recoverPasswordDiv.className = "authBoxRecoverPassword";
             this.domNode.appendChild(recoverPasswordDiv);
-            
             recoverPasswordDiv.innerHTML = [_("Login.Forgot"), "<a href=", cosmo.env.getFullUrl("ForgotPassword"), 
                                             " target=\"_blank\"> ", _("Login.ClickHere"), "</a>"].join("");
+        },
+        
+        initializer: function(){
+            this.deferred = new dojo.Deferred();
         },
 
         postCreate: function () {
@@ -199,28 +165,13 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
         handleOnClick: function () { c.doAuth.apply(c) },
         small: true }, s, 'last');
     s.removeChild(submitButton.domNode);
-    return { prompt: initPrompt,
-        content: c,
-        height: 200,
-        width: 360,
-        btnsLeft: [cancelButton],
-        btnsRight: [submitButton],
-        defaultAction: function () { c.doAuth.apply(c) } };
-};
 
-cosmo.ui.widget.AuthBox.getSuccessProperties = function ( /* String */ message) {
-    var s = document.createElement('span');
-    var closeButton = dojo.widget.createWidget("cosmo:Button", {
-        text: _("App.Button.Close"),
-        width: '60px',
-        handleOnClick: cosmo.app.hideDialog,
-        small: true }, s, 'last');
-    s.removeChild(closeButton.domNode);
-    return { prompt: '',
-        content: message,
-        height: 200,
-        width: 360,
-        btnsCenter: [closeButton],
-        defaultAction: cosmo.app.hideDialog };
+    return {prompt: initPrompt,
+            content: c,
+            height: 200,
+            width: 360,
+            btnsLeft: [cancelButton],
+            btnsRight: [submitButton],
+            deferred: c.deferred,
+            defaultAction: function () { c.doAuth.apply(c) } };
 };
-

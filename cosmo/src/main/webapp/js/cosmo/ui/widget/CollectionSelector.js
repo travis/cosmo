@@ -193,39 +193,34 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                     location = cosmo.env.getBaseUrl() + '/pim/collection/' + curr.getUid();
                 }
 
-                // Set up the authAction obj for the AuthBox
-                // Passed to cosmo.ui.widget.AuthBox.getInitProperties
-                var authAction = {
-                    execInline: false,
-                    authInitPrompt: self.strings.collectionAddAuthPrompt,
-                    authProcessingPrompt: null, // Use the default
-                    // Action to take after successful auth -- try to add the
-                    // collection subscription
-                    attemptFunc: function () {
-                        // Hide the auth dialog, as we will be opening a new one
-                        // to get the subscription name.
-                        cosmo.app.hideDialog();
-                        var deferred = subscribeFunction();
-
-                        deferred.addCallback(redirectFunction);
-                        deferred.addErrback(dojo.lang.hitch(this, function (err) {
-                            cosmo.app.hideDialog();
-                            cosmo.app.showErr(self.strings.collectionAddError, err.message);
-                            return false;
-                        }));
-                    },
-                    attemptPrompt: self.strings.attemptPrompt,
-                    successPrompt: self.strings.successPrompt
-                };
-
                 // Called by clicking on the "Add to my account...: link
                 var clickFunction = function () {
                     if (!cosmo.util.auth.currentlyAuthenticated()) {
-                        var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties(authAction);
-                        cosmo.app.showDialog(authBoxProps);
+                        var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties({
+                            authInitPrompt: self.strings.collectionAddAuthPrompt,
+                            authProcessingPrompt: null, // Use the default
+                            attemptPrompt: self.strings.attemptPrompt,
+                            successPrompt: self.strings.successPrompt
+                        });
+                        // If authDeferred callback fires, user is authenticated
+                        // If authDeferred errback fires, there was an error authenticating
+                        var authDeferred = cosmo.app.showDialog(authBoxProps);
                         cosmo.app.modalDialog.content.usernameInput.focus();
-                    }
-                    else {
+                        
+                        authDeferred.addCallback(function () {
+                            // Hide the auth dialog, as we will be opening a new one
+                            // to get the subscription name.
+                            cosmo.app.hideDialog();
+                            var deferred = subscribeFunction();
+                            
+                            deferred.addCallback(redirectFunction);
+                            deferred.addErrback(dojo.lang.hitch(this, function (err) {
+                                cosmo.app.hideDialog();
+                                cosmo.app.showErr(self.strings.collectionAddError, err.message);
+                                return false;
+                            }));
+                        });
+                    } else {
                         var deferred = subscribeFunction();
                         if (deferred == null) {
                             return;

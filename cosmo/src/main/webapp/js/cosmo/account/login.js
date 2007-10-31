@@ -18,14 +18,24 @@ dojo.provide('cosmo.account.login');
 
 dojo.require("dojo.io.*");
 dojo.require("cosmo.env");
+dojo.require("cosmo.util.auth");
+dojo.require("cosmo.convenience");
 
 cosmo.account.login.doLogin = function(un, pw, handlers){
     var postData = { 'j_username': un, 'j_password': pw };
+    var _authSuccessCB = function(type, data, obj){
+        if (data == cosmo.env.getBaseUrl() + "/loginfailed"){
+            handlers.error(type, _('Login.Error.AuthFailed'), obj);
+        } else {
+            cosmo.util.auth.setCred(un, pw);
+            handlers.load(type, data, obj);
+        }
+    }
     dojo.io.bind({
         url: cosmo.env.getFullUrl("Auth"),
         method: 'POST',
         content: postData,
-        load: handlers.load,
+        load: _authSuccessCB,
         error: handlers.error
     });
 };

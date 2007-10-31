@@ -208,6 +208,7 @@ cosmo.env.getImageUrl = function(image){
 
 cosmo.env.urls = {
     "Login": "/login",
+    "Signup": "/signup",
     "ForgotPassword": "/account/password/recover",
     "Logout": "/logout",
     "Redirect": "/logout",

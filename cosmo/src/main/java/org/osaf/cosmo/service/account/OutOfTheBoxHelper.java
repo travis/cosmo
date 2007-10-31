@@ -91,9 +91,12 @@ public class OutOfTheBoxHelper {
 
         String name = _("Ootb.Collection.Name", locale, user.getFirstName(), 
                         user.getLastName(), user.getUsername());
+        String displayName = _("Ootb.Collection.DisplayName",
+                               locale, user.getFirstName(), 
+                               user.getLastName(), user.getUsername());
 
         collection.setName(name);
-        collection.setDisplayName(collection.getName());
+        collection.setDisplayName(displayName);
         collection.setOwner(user);
 
         CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);

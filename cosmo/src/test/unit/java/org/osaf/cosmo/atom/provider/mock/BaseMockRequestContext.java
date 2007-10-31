@@ -56,21 +56,45 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         return (MockHttpServletRequest) getRequest();
     }
 
+    public void setContent(String content,
+                           String mediaType)
+        throws IOException {
+        if (content != null) {
+            byte[] bytes = content.getBytes("UTF-8");
+            getMockRequest().setContent(bytes);
+            getMockRequest().addHeader("Content-Length", bytes.length);
+        }
+        getMockRequest().setContentType(mediaType);
+        getMockRequest().addHeader("Content-Type", mediaType);
+    }
+
     public void setContent(Entry entry)
         throws IOException {
         String xml = context.getAbdera().getWriter().write(entry).toString();
-        getMockRequest().setContent(xml.getBytes());
-        getMockRequest().setContentType(ATOM_MEDIA_TYPE);
-        getMockRequest().addHeader("Content-Type", ATOM_MEDIA_TYPE);
-        getMockRequest().addHeader("Content-Length", xml.getBytes().length);
+        setContent(xml, ATOM_MEDIA_TYPE);
     }
 
-    public void setPropertiesAsEntry(Properties props)
+    public void setContentAsText(String content)
+        throws IOException {
+        setContent(content, "text/plain");
+    }
+
+    public void setContentAsEntry(String content)
         throws IOException {
         Entry entry = context.getAbdera().getFactory().newEntry();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        props.store(out, null);
-        entry.setContent(out.toString());
+        entry.setContent(content);
+        setContent(entry);
+    }
+
+    public void setContentAsXhtml(String content)
+        throws IOException {
+        setContent(content, "application/xhtml+xml");
+    }
+
+    public void setXhtmlContentAsEntry(String content)
+        throws IOException {
+        Entry entry = context.getAbdera().getFactory().newEntry();
+        entry.setContentAsXhtml(content);
         setContent(entry);
     }
 
@@ -81,36 +105,12 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         setContentAsText(out.toString());
     }
 
-    public void setContentAsEntry(String content)
+    public void setPropertiesAsEntry(Properties props)
         throws IOException {
         Entry entry = context.getAbdera().getFactory().newEntry();
-        entry.setContent(content);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        props.store(out, null);
+        entry.setContent(out.toString());
         setContent(entry);
-    }
-
-    public void setXhtmlContentAsEntry(String content)
-        throws IOException {
-        Entry entry = context.getAbdera().getFactory().newEntry();
-        entry.setContentAsXhtml(content);
-        setContent(entry);
-    }
-
-    public void setContentAsText(String content)
-        throws IOException {
-        getMockRequest().setContent(content.getBytes());
-        getMockRequest().setContentType("text/plain");
-        getMockRequest().addHeader("Content-Type", "text/plain");
-        getMockRequest().addHeader("Content-Length",
-                                   content.getBytes().length);
-    }
-
-    public void setContentAsXhtml(String content)
-        throws IOException {
-        if (content != null)
-            getMockRequest().setContent(content.getBytes());
-        getMockRequest().setContentType("application/xhtml+xml");
-        getMockRequest().addHeader("Content-Type", "application/xhtml+xml");
-        getMockRequest().addHeader("Content-Length",
-                                   content.getBytes().length);
     }
 }

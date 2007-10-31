@@ -353,6 +353,7 @@ public class MockItemDao implements ItemDao {
     }
     
     public void addItemToCollection(Item item, CollectionItem collection) {
+        collection.getChildren().add(item);
         item.getParents().add(collection);
     }
     

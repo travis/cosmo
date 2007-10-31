@@ -15,11 +15,14 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+
+import javax.activation.MimeType;
 
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
@@ -33,6 +36,8 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
+import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.util.MimeTypeHelper;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -77,6 +82,29 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         new String[] { "GET", "HEAD", "POST", "PUT", "OPTIONS" };
     private static final String[] ALLOWED_ENTRY_METHODS =
         new String[] { "GET", "HEAD", "PUT", "OPTIONS" };
+
+    /**
+     * Supports additional API methods:
+     * <ul>
+     * <li> POST to a collection - if the content type is
+     * <code>application/x-www-form-urlencoded</code>, the request is
+     * delegated to the method {@link #addItemToCollection(RequestContext)}.
+     * </li>
+     * </ul>
+     */
+    public ResponseContext request(RequestContext request) {
+        String method = request.getMethod();
+        TargetType type = request.getTarget().getType();
+
+        if (method.equals("POST")) {
+            if (type == TargetType.TYPE_COLLECTION) {
+                if (isAddItemToCollectionRequest(request))
+                    return addItemToCollection(request);
+            }
+        }
+
+        return super.request(request);
+    }
 
     public ResponseContext createEntry(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
@@ -391,6 +419,39 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
     // our methods
 
+    public ResponseContext addItemToCollection(RequestContext request) {
+        CollectionTarget target = (CollectionTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
+        if (log.isDebugEnabled())
+            log.debug("adding item to collection " + collection.getUid());
+
+        ResponseContext frc = checkAddItemToCollectionPreconditions(request);
+        if (frc != null)
+            return frc;
+
+        try {
+            String uuid = readUuid(request);
+            if (uuid == null)
+                return badrequest(getAbdera(), request, "Uuid must be provided");
+
+            Item item = contentService.findItemByUid(uuid);
+            if (item == null)
+                return badrequest(getAbdera(), request, "Item with uuid " + uuid + " not found");
+            if (! (item instanceof NoteItem))
+                return badrequest(getAbdera(), request, "Item with uuid " + uuid + " is not a note");
+
+            contentService.addItemToCollection(item, collection);
+
+            return createResponseContext(204);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (CollectionLockedException e) {
+            return locked(getAbdera(), request);
+        }
+    }
+
     public ProcessorFactory getProcessorFactory() {
         return processorFactory;
     }
@@ -490,6 +551,32 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         itemFilter.getStampFilters().add(eventFilter);
 
         return itemFilter;
+    }
+
+    private boolean isAddItemToCollectionRequest(RequestContext request) {
+        MimeType ct = request.getContentType();
+        if (ct == null)
+            return false;
+        return MimeTypeHelper.isMatch(MEDIA_TYPE_URLENCODED, ct.toString());
+    }
+
+    private ResponseContext checkAddItemToCollectionPreconditions(RequestContext request) {
+        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(getAbdera(), request);
+
+        return null;
+    }
+
+    private String readUuid(RequestContext request)
+        throws IOException {
+        BufferedReader in = (BufferedReader) request.getReader();
+        for (String pair : in.readLine().split("\\&")) {
+            String[] fields = pair.split("=");
+            if (fields[0].equals("uuid"))
+                return fields[1];
+        }
+        return null;
     }
 
     private NoteItem processEntryUpdate(ContentProcessor processor,
@@ -634,5 +721,4 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         
         return true;
     }
-    
 }

@@ -45,7 +45,7 @@ public class CosmoInterceptor extends EmptyInterceptor {
         for ( int i=0; i < propertyNames.length; i++ ) {
             if ( "modifiedDate".equals( propertyNames[i] ) ) {
                 currentState[i] = new Date(System.currentTimeMillis());
-            } else if("entityTag".equals( propertyNames[i] )) {
+            } else if("etag".equals( propertyNames[i] )) {
                 currentState[i] = ao.calculateEntityTag();
             }
         }
@@ -69,7 +69,7 @@ public class CosmoInterceptor extends EmptyInterceptor {
             if ( "creationDate".equals(propertyNames[i]) ||
                   "modifiedDate".equals(propertyNames[i]) ) {
                 state[i] = curDate;
-            } else if("entityTag".equals( propertyNames[i] )) {
+            } else if("etag".equals( propertyNames[i] )) {
                 state[i] = ao.calculateEntityTag();
             }
         }

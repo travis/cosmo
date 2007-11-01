@@ -38,7 +38,7 @@ public class NoteItemTest extends TestCase {
         
         String etag1 = master.calculateEntityTag();
         
-        master.getModifications().add(mod);
+        master.addModification(mod);
         
         String etag2 = master.calculateEntityTag();
         
@@ -56,7 +56,7 @@ public class NoteItemTest extends TestCase {
         // etag shouldn't change between calls
         Assert.assertTrue(etag2.equals(master.calculateEntityTag()));
         
-        master.getModifications().clear();
+        master.removeAllModifications();
         
         etag1 = etag2;
         etag2 = master.calculateEntityTag();

@@ -16,10 +16,12 @@
 package org.osaf.cosmo.model;
 
 import java.io.Reader;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,6 +34,8 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VJournal;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.osaf.cosmo.calendar.ICalendarUtils;
@@ -53,15 +57,21 @@ public class NoteItem extends ICalendarItem {
     
     private static final long serialVersionUID = -6100568628972081120L;
     
+    private static final Set<NoteItem> EMPTY_MODS = Collections
+            .unmodifiableSet(new HashSet<NoteItem>(0));
+
     @OneToMany(mappedBy = "modifies", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.DELETE} )
-    @BatchSize(size=50)
-    //@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    //@BatchSize(size=50)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<NoteItem> modifications = new HashSet<NoteItem>(0);
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modifiesitemid")
     private NoteItem modifies = null;
+    
+    @Column(name= "hasmodifications")
+    private boolean hasModifications = false;
     
     public NoteItem() {
     }
@@ -139,11 +149,26 @@ public class NoteItem extends ICalendarItem {
     }
     
     public Set<NoteItem> getModifications() {
-        return modifications;
+        if(hasModifications)
+            return Collections.unmodifiableSet(modifications);
+        else
+            return EMPTY_MODS;
     }
-
-    public void setModifications(Set<NoteItem> modifications) {
-        this.modifications = modifications;
+    
+    public void addModification(NoteItem mod) {
+        modifications.add(mod);
+        hasModifications = true;
+    }
+    
+    public boolean removeModification(NoteItem mod) {
+        boolean removed = modifications.remove(mod);
+        hasModifications = modifications.size()!=0;
+        return removed;
+    }
+    
+    public void removeAllModifications() {
+        modifications.clear();
+        hasModifications = false;
     }
 
     public NoteItem getModifies() {
@@ -164,7 +189,7 @@ public class NoteItem extends ICalendarItem {
         
         // etag is constructed from self plus modifications
         if(modifies==null) {
-            for(NoteItem mod: modifications) {
+            for(NoteItem mod: getModifications()) {
                 uid = mod.getUid() != null ? mod.getUid() : "-";
                 modTime = mod.getModifiedDate() != null ?
                         new Long(mod.getModifiedDate().getTime()).toString() : "-";

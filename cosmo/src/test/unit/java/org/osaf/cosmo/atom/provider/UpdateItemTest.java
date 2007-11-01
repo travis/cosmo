@@ -157,7 +157,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
                                               String recurrenceId)
         throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        master.getModifications().add(item);
+        master.addModification(item);
         item.setModifies(master);
 
         EventExceptionStamp stamp = new EventExceptionStamp();

@@ -154,7 +154,7 @@ public class MockDaoStorage {
         if(item instanceof NoteItem) {
             NoteItem note = (NoteItem) item;
             if(note.getModifies()!=null)
-                note.getModifies().getModifications().add(note);
+                note.getModifies().addModification(note);
         }
         
         itemsByUid.put(item.getUid(), item);

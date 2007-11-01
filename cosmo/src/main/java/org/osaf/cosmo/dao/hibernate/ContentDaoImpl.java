@@ -440,26 +440,33 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     }
 
     private void removeContentRecursive(ContentItem content) {
-        // Add a tombstone to each parent collection to track
-        // when the removal occurred.
-        for(CollectionItem parent : content.getParents()) {
-            parent.addTombstone(new ItemTombstone(parent, content));
-            getSession().update(parent);
-        }
+        removeContentCommon(content);
         
         // Remove modifications
         if(content instanceof NoteItem) {
             NoteItem note = (NoteItem) content;
             if(note.getModifies()!=null) {
-                // ensure master is dirty so that etag gets updated
+                // remove mod from master's collection
+                note.getModifies().removeModification(note);
                 note.getModifies().updateTimestamp();
-            } else {   
+            } else {  
+                // mods will be removed by Hibernate cascading rules, but we
+                // need to add tombstones for mods
                 for(NoteItem mod: note.getModifications())
-                    removeContentRecursive(mod);
+                    removeContentCommon(mod);
             }
         }
             
         getSession().delete(content);
+    }
+    
+    private void removeContentCommon(ContentItem content) {
+        // Add a tombstone to each parent collection to track
+        // when the removal occurred.
+        for (CollectionItem parent : content.getParents()) {
+            parent.addTombstone(new ItemTombstone(parent,content));
+            getSession().update(parent);
+        }
     }
     
     private void removeCollectionRecursive(CollectionItem collection) {
@@ -483,21 +490,6 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     }
     
     
-    /**
-     * Remove NoteItem from a collection.  This includes removing any modificaions.
-     */
-    public void removeNoteItemFromCollection(NoteItem note, CollectionItem collection) {
-        try {
-            if(note.getModifies()!=null)
-                removeContentRecursive(note);
-            else
-                removeNoteItemFromCollectionInternal(note, collection);
-            getSession().flush();
-        } catch (HibernateException e) {
-            throw convertHibernateAccessException(e);
-        } 
-    }
-    
     private void removeNoteItemFromCollectionInternal(NoteItem note, CollectionItem collection) {
         getSession().update(collection);
         getSession().update(note);
@@ -515,7 +507,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // If the item belongs to no collection, then it should
         // be purged.
         if(note.getParents().size()==0)
-            getSession().delete(note);
+            removeItemInternal(note);
         
     }
     
@@ -566,6 +558,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
            
             // ensure master is dirty so that etag gets updated
             note.getModifies().updateTimestamp();
+            note.getModifies().addModification(note);
             
             if(!note.getModifies().getParents().contains(parent))
                 throw new IllegalArgumentException("note modification cannot be added to collection that parent note is not in");
@@ -624,6 +617,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             // ensure master is dirty so that etag gets updated
             note.getModifies().updateTimestamp();
+            note.getModifies().addModification(note);
             
             if (!note.getModifies().getParents().equals(parents))
                 throw new IllegalArgumentException(

@@ -136,7 +136,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             if(item instanceof HomeCollectionItem)
                 throw new IllegalArgumentException("cannot remove root item");
 
-            getSession().delete(item);
+            removeItemInternal(item);
             getSession().flush();
             
         } catch(ObjectNotFoundException onfe) {
@@ -726,7 +726,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         // If the item belongs to no collection, then it should
         // be purged.
         if(item.getParents().size()==0)
-            getSession().delete(item);
+            removeItemInternal(item);
     }
     
     protected void addItemToCollectionInternal(Item item, CollectionItem collection) {
@@ -735,6 +735,10 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         getSession().update(collection);
         collection.removeTombstone(item);
         item.getParents().add(collection);  
+    }
+    
+    protected void removeItemInternal(Item item) {
+        getSession().delete(item);
     }
     
 }

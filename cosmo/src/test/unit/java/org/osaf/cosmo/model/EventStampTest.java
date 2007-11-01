@@ -112,7 +112,7 @@ public class EventStampTest extends TestCase {
         mod.setDisplayName("modDisplayName");
         mod.setBody("modBody");
         mod.setModifies(master);
-        master.getModifications().add(mod);
+        master.addModification(mod);
         EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
         mod.addStamp(exceptionStamp);
         exceptionStamp.createCalendar();
@@ -159,7 +159,7 @@ public class EventStampTest extends TestCase {
         mod.setDisplayName("modDisplayName");
         mod.setBody("modBody");
         mod.setModifies(master);
-        master.getModifications().add(mod);
+        master.addModification(mod);
         EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
         mod.addStamp(exceptionStamp);
         exceptionStamp.createCalendar();
@@ -217,7 +217,7 @@ public class EventStampTest extends TestCase {
         
         NoteItem mod = new NoteItem();
         mod.setModifies(master);
-        master.getModifications().add(mod);
+        master.addModification(mod);
         EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
         mod.addStamp(exceptionStamp);
         exceptionStamp.createCalendar();

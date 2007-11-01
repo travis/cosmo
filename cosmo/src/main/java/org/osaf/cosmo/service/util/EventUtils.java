@@ -109,11 +109,8 @@ public class EventUtils {
         for(Iterator<NoteItem> it = note.getModifications().iterator(); it.hasNext();) {
             NoteItem mod = it.next();
             itemsToUpdate.add(mod);
-            // remove deleted modifications from parent
-            if(mod.getIsActive()==Boolean.FALSE)
-                it.remove();
         }
-            
+      
         service.updateContentItems(note.getParents(), itemsToUpdate);
     }
     
@@ -220,7 +217,7 @@ public class EventUtils {
         noteMod.setSent(Boolean.FALSE);
         noteMod.setNeedsReply(Boolean.FALSE);
         noteMod.setModifies(masterNote);
-        masterNote.getModifications().add(noteMod);
+        masterNote.addModification(noteMod);
     }
 
     private static void updateNoteModification(NoteItem noteMod, VEvent event) {

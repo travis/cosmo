@@ -224,7 +224,7 @@ public class ThisAndFutureHelperTest extends TestCase {
                 NoteItem mod = new NoteItem();
                 mod.setUid(new ModificationUid(master,event.getRecurrenceId().getDate()).toString());
                 mod.setModifies(master);
-                master.getModifications().add(mod);
+                master.addModification(mod);
                 EventExceptionStamp ees = new EventExceptionStamp(mod);
                 mod.addStamp(ees);
                 ees.createCalendar();

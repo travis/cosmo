@@ -257,7 +257,7 @@ public class MockItemDao implements ItemDao {
         if(item instanceof NoteItem) {
             NoteItem note = (NoteItem) item;
             if(note.getModifies()!=null)
-                note.getModifies().getModifications().remove(note);
+                note.getModifies().removeModification(note);
         }
 
         storage.removeItemByUid(item.getUid());

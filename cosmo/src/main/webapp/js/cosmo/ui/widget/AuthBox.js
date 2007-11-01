@@ -19,6 +19,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         authAction: null,
         usernameLabel: _("Login.Username"),
         passwordLabel: _("Login.Password"),
+        // Clients can pass a subscription
+        // that will be passed to the signup
+        // dialog if users decide to create a new 
+        // account instead of log in.
+        subscription: null,
 
         // Attach points
         usernameInput: null,
@@ -145,19 +150,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             signupLinkDiv.appendChild(_createText(_("AuthBox.CreateAccount")));
 
             var signupLink = _createElem("a");
-            signupLink.href = cosmo.env.getFullUrl("Signup");
             signupLink.appendChild(_createText(_("AuthBox.CreateClickHere")));
-            dojo.debug("fuz");
             dojo.event.connect(signupLink, "onclick",  
-                               function(){
-                                   
-                               }
+                               dojo.lang.hitch(this, function(){
+                                   cosmo.account.create.showForm(this.subscription);
+                                   return false;
+                               })
                               );
             signupLinkDiv.appendChild(signupLink);
             this.domNode.appendChild(signupLinkDiv);
-            
-            
-
         },
         
         initializer: function(){
@@ -173,7 +174,9 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
     var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')
     var s = document.createElement('span');
     var c = dojo.widget.createWidget("cosmo:AuthBox", {
-        'authAction': authAction }, s, 'last');
+        'authAction': authAction, 
+        'subscription': authAction.subscription }, 
+                                     s, 'last');
     s.removeChild(c.domNode);
     var cancelButton = dojo.widget.createWidget("cosmo:Button", {
         text: _("App.Button.Cancel"),

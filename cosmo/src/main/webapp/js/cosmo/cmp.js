@@ -469,13 +469,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         _subscriptionToXML: function (/*Object*/ subscription){
-            if (!(subscription.name && subscription.ticket && subscription.uuid)){
+            var name = subscription.getDisplayName();
+            var ticket = subscription.getTicketKey();
+            var uuid = subscription.getUid();
+            if (!(name && ticket && uuid)){
                 throw new cosmo.cmp.SubscriptionInfoMissingException(
-                    subscription.name, subscription.ticket, subscription.uuid);
+                    name, ticket, uuid);
             }
-            return '<subscription name="' + subscription.name + 
-                '" ticket="' + subscription.ticket + '">' + 
-                subscription.uuid + '</subscription>';
+            return '<subscription name="' + name + 
+                '" ticket="' + ticket + '">' + 
+                uuid + '</subscription>';
         },
 
         recoverPassword: function(username, email, handlerDict, sync){

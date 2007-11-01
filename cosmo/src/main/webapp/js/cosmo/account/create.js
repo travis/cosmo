@@ -63,12 +63,14 @@ cosmo.account.create = new function () {
         o.content = form;
 
         b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+                                         id: "signupCancel",
             handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
         o.btnsLeft = [b];
         // Have to set empty center set of buttons -- showForm will be called
         // without buttons getting cleared by 'hide.'
         o.btnsCenter = [];
         b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
+                                         id: "signupSubmit",
             handleOnClick: function () { self.submitCreate(); } });
         o.btnsRight = [b];
         o.defaultAction = function () { self.submitCreate(); };
@@ -129,7 +131,7 @@ cosmo.account.create = new function () {
         var prompt = _('Signup.Prompt.Success');
         var d = cosmo.app.modalDialog;
         var btnsCenter = [dojo.widget.createWidget("cosmo:Button",
-            { text:_('App.Button.Close'), width:74,
+            { text:_('App.Button.Close'), width:74, id: "signupClose",
             handleOnClick: function () { cosmo.app.hideDialog(); } })];
 
         // Update dialog in place

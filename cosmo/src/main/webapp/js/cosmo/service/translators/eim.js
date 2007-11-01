@@ -1100,7 +1100,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         var tzId = dateParams['tzid'] || null;
         var jsDate = dojo.date.fromIso8601(dateParts[1]);
-        var date = new cosmo.datetime.Date();
+        var date = new cosmo.datetime.Date(2000,0,1);
         date.tzId = tzId;
 
         date.setYear(jsDate.getFullYear());

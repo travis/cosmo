@@ -6,5 +6,7 @@
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"params": {"link": "[Chandler]"},  "method": "storeURL"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
+{"params": {"link": "Log out"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"params": {"url": "{$[Chandler]}"},  "method": "open"}
 {"method": "waits.sleep", "params": {"milliseconds" : 10000}}

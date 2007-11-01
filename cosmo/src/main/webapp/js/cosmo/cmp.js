@@ -42,6 +42,7 @@ cosmo.ROLE_ADMINISTRATOR = "administrator"
 cosmo.ROLE_ANONYMOUS = "anonymous"
 cosmo.ROLE_AUTHENTICATED = "authenticated"
 
+
 dojo.declare("cosmo.cmp.Cmp", null,
     {
         /**
@@ -445,22 +446,39 @@ dojo.declare("cosmo.cmp.Cmp", null,
         getSignupXML: function(/*Object*/ userHash,
                                /*Object*/ handlerDict,
                                /*boolean?*/ sync) {
-            var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
-                            '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
-                            '<username>' + userHash.username + '</username>' +
-                            '<password>' + userHash.password + '</password>' +
-                            '<firstName>' + userHash.firstName + '</firstName>' +
-                            '<lastName>' + userHash.lastName + '</lastName>' +
-                            '<email>' + userHash.email + '</email>' +
-                            '</user>';
 
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/signup";
             requestDict.method = "POST";
             requestDict.headers['X-Http-Method-Override'] = "PUT";
-            requestDict.postContent = request_content;
+            requestDict.postContent = this.userHashToXML(userHash);
 
             dojo.io.bind(requestDict);
+        },
+
+        userHashToXML: function(/*Object*/ userHash){
+            return '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
+                '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
+                '<username>' + userHash.username + '</username>' +
+                '<password>' + userHash.password + '</password>' +
+                '<firstName>' + userHash.firstName + '</firstName>' +
+                '<lastName>' + userHash.lastName + '</lastName>' +
+                '<email>' + userHash.email + '</email>' +
+                (userHash.subscription? this._subscriptionToXML(userHash.subscription) : "") +
+                '</user>';
+        },
+
+        _subscriptionToXML: function (/*Object*/ subscription){
+            var name = subscription.name;
+            var ticket = subscription.ticket;
+            var uuid = subscription.uuid;
+            if (!(name && ticket && uuid)){
+                throw new cosmo.cmp.SubscriptionInfoMissingException(
+                    name, ticket, uuid);
+            }
+            return '<subscription name="' + name + 
+                '" ticket="' + ticket + '">' + 
+                uuid + '</subscription>';
         },
 
         recoverPassword: function(username, email, handlerDict, sync){
@@ -548,9 +566,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             if (handlerDict.load){
                 var old_load = handlerDict.load;
                 handlerDict.load = function(type, data, evt){
-
                     var parsedCMPXML = xmlParseFunc.apply(self, [evt.responseXML])
-
                     old_load(type, parsedCMPXML, evt);
                 }
             }
@@ -651,3 +667,18 @@ dojo.declare("cosmo.cmp.Cmp", null,
 );
 
 cosmo.cmp = new cosmo.cmp.Cmp();
+
+dojo.declare("cosmo.cmp.SubscriptionInfoMissingException", Error, function(){}, {
+    name: null,
+    ticket: null,
+    uuid: null,
+    initializer: function(name, ticket, uuid){
+        this.name = name;
+        this.ticket = ticket;
+        this.uuid = uuid;
+    },
+    toString: function(){
+        return "Subscription must have name, ticket and uuid.\nname: " + this.name +
+            "\nticket: " + this.ticket + "\nuuid: " + this.uuid;
+    }
+});

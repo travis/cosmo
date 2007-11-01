@@ -19,11 +19,18 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
         authAction: null,
         usernameLabel: _("Login.Username"),
         passwordLabel: _("Login.Password"),
+        // Clients can pass a subscription
+        // that will be passed to the signup
+        // dialog if users decide to create a new 
+        // account instead of log in.
+        subscription: null,
 
         // Attach points
         usernameInput: null,
         passwordInput: null,
 
+        // Auth deferred; fires callback on auth success
+        //    fires errback on auth fail if noRetry is true
         deferred: null,
         noRetry: false,
 
@@ -136,6 +143,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             this.domNode.appendChild(recoverPasswordDiv);
             recoverPasswordDiv.innerHTML = [_("Login.Forgot"), "<a href=", cosmo.env.getFullUrl("ForgotPassword"), 
                                             " target=\"_blank\"> ", _("Login.ClickHere"), "</a>"].join("");
+
+            // Sign up link
+            var signupLinkDiv = _createElem("div");
+            signupLinkDiv.className = "authBoxSignupLink";
+            signupLinkDiv.appendChild(_createText(_("AuthBox.CreateAccount")));
+
+            var signupLink = _createElem("a");
+            signupLink.appendChild(_createText(_("AuthBox.CreateClickHere")));
+            dojo.event.connect(signupLink, "onclick",  
+                               dojo.lang.hitch(this, function(){
+                                   cosmo.account.create.showForm(this.subscription);
+                                   return false;
+                               })
+                              );
+            signupLinkDiv.appendChild(signupLink);
+            this.domNode.appendChild(signupLinkDiv);
         },
         
         initializer: function(){
@@ -151,7 +174,9 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
     var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')
     var s = document.createElement('span');
     var c = dojo.widget.createWidget("cosmo:AuthBox", {
-        'authAction': authAction }, s, 'last');
+        'authAction': authAction, 
+        'subscription': authAction.subscription }, 
+                                     s, 'last');
     s.removeChild(c.domNode);
     var cancelButton = dojo.widget.createWidget("cosmo:Button", {
         text: _("App.Button.Cancel"),

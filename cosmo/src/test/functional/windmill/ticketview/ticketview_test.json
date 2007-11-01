@@ -2,4 +2,14 @@
 {"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": 40000}}
 {"params": {"jsid": "{$calView}"}, "method": "click"}
 {"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": 40000}}
-{"params": {"link": "Log out"}, "method": "click"}
+{"params": {"link": "Add to my account..."}, "method": "click"}
+{"params": {"link": "Sign up."}, "method": "click"}
+{"params": {"text": "{$random2}", "id": "username"}, "method": "type"}
+{"params": {"text": "signup", "id": "firstName"}, "method": "type"}
+{"params": {"text": "signup", "id": "lastName"}, "method": "type"}
+{"params": {"text": "{$random2}@example.com", "id": "email"}, "method": "type"}
+{"params": {"text": "signup", "id": "password"}, "method": "type"}
+{"params": {"text": "signup", "id": "confirm"}, "method": "type"}
+{"params": {"id": "signupSubmit"}, "method": "click"}
+{"method": "waits.forElement", "params": {"id": "signupClose", "timeout": 40000}}
+{"params": {"id": "signupClose"}, "method": "click"}

@@ -28,8 +28,9 @@ cosmo.account.create = new function () {
 
     var self = this; // Stash a copy of this
     var form = null; // The form containing the signup fields
-    var fieldList = cosmo.account.getFieldList();
     var f = null; // Temp var
+
+    this.fieldList = null;
 
     dojo.lang.mixin(this, cosmo.account.accountBase);
 
@@ -39,6 +40,8 @@ cosmo.account.create = new function () {
     this.formType = cosmo.account.formTypes.CREATE;
     // The field that has focus
     this.focusedField = null;
+    // A subscription to add to the signup request
+    this.subscription = null;
 
     // Public methods
     // =============================
@@ -46,24 +49,28 @@ cosmo.account.create = new function () {
      * Sets up the dialog box with the table of form elements
      * and appropriate buttons for creating a new account.
      */
-    this.showForm = function () {
+    this.showForm = function (subscription) {
         var o = {};
         var b = null;
+        this.subscription = subscription;
+        this.fieldList = cosmo.account.getFieldList(null, subscription);
 
         o.width = 540;
         o.height = 480;
         o.title = 'Create an Account';
         o.prompt = _('Signup.Prompt.AllFieldsRequired');
-        form = cosmo.account.getFormTable(fieldList, this);
+        form = cosmo.account.getFormTable(this.fieldList, this);
         o.content = form;
 
         b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+                                         id: "signupCancel",
             handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
         o.btnsLeft = [b];
         // Have to set empty center set of buttons -- showForm will be called
         // without buttons getting cleared by 'hide.'
         o.btnsCenter = [];
         b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
+                                         id: "signupSubmit",
             handleOnClick: function () { self.submitCreate(); } });
         o.btnsRight = [b];
         o.defaultAction = function () { self.submitCreate(); };
@@ -83,22 +90,35 @@ cosmo.account.create = new function () {
 
         // Validate the form input using each field's
         // attached validators
-        var err = cosmo.account.validateForm(form, fieldList);
+        var err = cosmo.account.validateForm(form, this.fieldList);
 
         if (err) {
             cosmo.app.modalDialog.setPrompt(err);
         }
         else {
             var hand = { load: handleCreateResult, error: handleCreateResult };
-            var user = {};
-            // Create a hash from the form field values
-            for (var i = 0; i < fieldList.length; i++) {
-                f = fieldList[i];
-                user[f.elemName] = form[f.elemName].value;
-            }
+            var user = this.formToUserHash();
             // Hand off to CMP
             cosmo.cmp.signup(user, hand);
         }
+    };
+
+    this.formToUserHash = function(){
+        var user = {
+            username: form.username.value,
+            firstName: form.firstName.value,
+            lastName: form.lastName.value,
+            email: form.email.value,
+            password: form.password.value
+        };
+        if (form.subscriptionName || form.subscriptionTicket || form.subscriptionUuid){
+            user.subscription = {
+                name: form.subscriptionName.value,
+                ticket: form.subscriptionTicket.value,
+                uuid: form.subscriptionUuid.value
+            }
+        }
+        return user;
     };
     /**
      * Set up and display the table of settings needed to
@@ -111,7 +131,7 @@ cosmo.account.create = new function () {
         var prompt = _('Signup.Prompt.Success');
         var d = cosmo.app.modalDialog;
         var btnsCenter = [dojo.widget.createWidget("cosmo:Button",
-            { text:_('App.Button.Close'), width:74,
+            { text:_('App.Button.Close'), width:74, id: "signupClose",
             handleOnClick: function () { cosmo.app.hideDialog(); } })];
 
         // Update dialog in place

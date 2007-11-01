@@ -38,7 +38,7 @@ cosmo.account.accountBase = new function () {
     };
 };
 
-cosmo.account.getFieldList = function (accountInfo) {
+cosmo.account.getFieldList = function (accountInfo, subscription) {
     var list = [];
     var f = {};
     var a = accountInfo || {}; // If account info passed, set input values
@@ -136,6 +136,38 @@ cosmo.account.getFieldList = function (accountInfo) {
         f.value = a[f.elemName];
         list.push(f);
     }
+    
+    if (subscription){
+        f = {label: _('Signup.Form.Subscription.Name'),
+             elemName: 'subscriptionName',
+             elemType: 'text'
+        };
+        f.validators = function (elem) {
+            return cosmo.util.validate.required(elem); };
+        f.value = subscription.getDisplayName();
+        list.push(f);
+
+        f = {label: _('Signup.Form.Subscription.Ticket'),
+             elemName: 'subscriptionTicket',
+             elemType: 'text',
+             disabled: true
+              
+        };
+        f.validators = function (elem) {
+            return cosmo.util.validate.required(elem); };
+        f.value = subscription.getTicketKey();
+        list.push(f);
+
+        f = {label: _('Signup.Form.Subscription.Uuid'),
+             elemName: 'subscriptionUuid',
+             elemType: 'text',
+             disabled: true
+        };
+        f.validators = function (elem) {
+            return cosmo.util.validate.required(elem); };
+        f.value = subscription.getUid();
+        list.push(f);
+    }
 
     return list;
 };
@@ -223,16 +255,17 @@ cosmo.account.getFormTable = function (fieldList, callingContext) {
 };
 
 cosmo.account.fieldToElement = function (field){
-        // Form field cell
-        td = _createElem('td');
-        td.id = field.elemName + 'ElemCell';
-        // Form field
-        elem = _createElem('input');
-        elem.type = field.elemType;
-        elem.name = field.elemName;
-        elem.id = field.elemName;
-        elem.value = field.value || '';
-        return elem;
+    // Form field cell
+    td = _createElem('td');
+    td.id = field.elemName + 'ElemCell';
+    // Form field
+    elem = _createElem('input');
+    elem.type = field.elemType;
+    elem.name = field.elemName;
+    elem.id = field.elemName;
+    elem.value = field.value || '';
+    elem.disabled = field.disabled || false;
+    return elem;
 };
 
 cosmo.account.createTosInput = function (tosField){

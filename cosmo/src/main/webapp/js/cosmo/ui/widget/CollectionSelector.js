@@ -200,7 +200,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             authInitPrompt: self.strings.collectionAddAuthPrompt,
                             authProcessingPrompt: null, // Use the default
                             attemptPrompt: self.strings.attemptPrompt,
-                            successPrompt: self.strings.successPrompt
+                            successPrompt: self.strings.successPrompt,
+                            subscription: new cosmo.model.Subscription({
+                                displayName: curr.getDisplayName(),
+                                uid: curr.getUid(),
+                                ticketKey: passedKey
+                            })
                         });
                         // If authDeferred callback fires, user is authenticated
                         // If authDeferred errback fires, there was an error authenticating

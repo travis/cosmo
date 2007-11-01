@@ -28,8 +28,9 @@ cosmo.account.create = new function () {
 
     var self = this; // Stash a copy of this
     var form = null; // The form containing the signup fields
-    var fieldList = cosmo.account.getFieldList();
     var f = null; // Temp var
+
+    this.fieldList = null;
 
     dojo.lang.mixin(this, cosmo.account.accountBase);
 
@@ -52,12 +53,13 @@ cosmo.account.create = new function () {
         var o = {};
         var b = null;
         this.subscription = subscription;
+        this.fieldList = cosmo.account.getFieldList(null, subscription);
 
         o.width = 540;
         o.height = 480;
         o.title = 'Create an Account';
         o.prompt = _('Signup.Prompt.AllFieldsRequired');
-        form = cosmo.account.getFormTable(fieldList, this);
+        form = cosmo.account.getFormTable(this.fieldList, this);
         o.content = form;
 
         b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
@@ -86,27 +88,33 @@ cosmo.account.create = new function () {
 
         // Validate the form input using each field's
         // attached validators
-        var err = cosmo.account.validateForm(form, fieldList);
+        var err = cosmo.account.validateForm(form, this.fieldList);
 
         if (err) {
             cosmo.app.modalDialog.setPrompt(err);
         }
         else {
             var hand = { load: handleCreateResult, error: handleCreateResult };
-            var user = this.formToUserHash(this.subscription);
+            var user = this.formToUserHash();
             // Hand off to CMP
             cosmo.cmp.signup(user, hand);
         }
     };
 
-    this.formToUserHash = function(subscription){
+    this.formToUserHash = function(){
         var user = {
-            subscription: subscription
+            username: form.username.value,
+            firstName: form.firstName.value,
+            lastName: form.lastName.value,
+            email: form.email.value,
+            password: form.password.value
         };
-        // Create a hash from the form field values
-        for (var i = 0; i < fieldList.length; i++) {
-            f = fieldList[i];
-            user[f.elemName] = form[f.elemName].value;
+        if (form.subscriptionName || form.subscriptionTicket || form.subscriptionUuid){
+            user.subscription = {
+                name: form.subscriptionName.value,
+                ticket: form.subscriptionTicket.value,
+                uuid: form.subscriptionUuid.value
+            }
         }
         return user;
     };

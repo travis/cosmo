@@ -469,9 +469,9 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         _subscriptionToXML: function (/*Object*/ subscription){
-            var name = subscription.getDisplayName();
-            var ticket = subscription.getTicketKey();
-            var uuid = subscription.getUid();
+            var name = subscription.name;
+            var ticket = subscription.ticket;
+            var uuid = subscription.uuid;
             if (!(name && ticket && uuid)){
                 throw new cosmo.cmp.SubscriptionInfoMissingException(
                     name, ticket, uuid);

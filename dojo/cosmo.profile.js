@@ -9,7 +9,7 @@ var dependencies = [
 ];
 
 dependencies.layers = [
-/*	{
+	{
 		name: "src/cosmo-login.js",
 		resourceName: "dojo.cosmo-login",
 		layerDependencies: [
@@ -18,7 +18,7 @@ dependencies.layers = [
 		dependencies: [
 			"dojo.cosmo-login"
 		]
-	},*/
+	},
     {
 		name: "src/cosmo-pim.js",
 		resourceName: "dojo.cosmo-pim",

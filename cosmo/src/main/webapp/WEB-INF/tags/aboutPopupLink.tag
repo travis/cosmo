@@ -21,8 +21,9 @@
 <fmt:setBundle basename="PimMessageResources"/>
 <fmt:message key="About.Width" var="width"/>
 <fmt:message key="About.Height" var="height"/>
-<script type="text/javascript" src="${staticBaseUrl}/cosmo.js">
+<script type="text/javascript">
+dojo.require("cosmo.util.popup");
 </script>
-<a href="javascript:popup('${staticBaseUrl}/help/about','thePopupWin','width=${width},height=${height},location=0,menubar=0,resizable=1,scrollbars=0,status=0,titlebar=1,toolbar=0');">
+<a href="javascript:cosmo.util.popup.open('${staticBaseUrl}/help/about', ${width}, ${height});">
 <fmt:message key="Main.About"/>
 </a>

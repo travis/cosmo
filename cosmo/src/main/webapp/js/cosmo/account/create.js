@@ -23,6 +23,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.account.common");
+dojo.require("cosmo.app");
 
 cosmo.account.create = new function () {
 

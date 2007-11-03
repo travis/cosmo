@@ -36,7 +36,7 @@
       
     </title>
     <cosmo:staticbaseurl var="staticBaseUrl"/>
-    <cosmo:dojoBoilerplate/>
+    <cosmo:dojoBoilerplate dojoLayers="cosmo-login"/>
     <cosmo:stylesheets stylesheets="login"/>
     <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
 

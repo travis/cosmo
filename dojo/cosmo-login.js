@@ -1,2 +1,2 @@
-dojo.require("dojo.cosmo-login");
+dojo.provide("dojo.cosmo-login");
 dojo.require("cosmo.login");

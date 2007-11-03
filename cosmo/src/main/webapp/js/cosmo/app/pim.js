@@ -24,6 +24,7 @@ dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.util.i18n");
 dojo.require('cosmo.convenience');
 // --
+dojo.require("dojo.lang");
 
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");

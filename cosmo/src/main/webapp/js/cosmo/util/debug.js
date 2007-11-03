@@ -23,12 +23,12 @@ dojo.provide("cosmo.util.debug");
 
 //TODO better place for this?
 cosmo.util.debug.aliasToDeprecatedFuncion = function (currentFunction, deprecatedName, version){
-    var func = function (){
+    var f = function (){
         dojo.deprecated(deprecatedName, null, version);
         return currentFunction.apply(this, arguments);
     }
     var p = currentFunction.prototype; // to help dojo builder
-    eval("window." + deprecatedName +  " = func");
+    eval("window." + deprecatedName +  " = f");
     eval("window." + deprecatedName + ".prototype = p");
 };
 

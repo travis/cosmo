@@ -118,14 +118,7 @@ public class DavPrivilege
     public Element toXml(Document document) {
         if (isAbstract)
             return null;
-        Element root =
-            DomUtil.createElement(document, qname.getLocalPart(), ns(qname));
-        for (DavPrivilege subPrivilege : subPrivileges) {
-            if (subPrivilege.isAbstract())
-                continue;
-            root.appendChild(subPrivilege.toXml(document));
-        }
-        return root;
+        return DomUtil.createElement(document, qname.getLocalPart(), ns(qname));
     }
 
     // Comparable methods

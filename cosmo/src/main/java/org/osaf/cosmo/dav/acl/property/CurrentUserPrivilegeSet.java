@@ -57,8 +57,21 @@ public class CurrentUserPrivilegeSet extends StandardDavProperty
         Element e = getName().toXml(document);
 
         for (DavPrivilege privilege : getPrivileges())
-            e.appendChild(privilege.toXml(document));
+            e.appendChild(privilegeXml(document, privilege));
 
         return e;
+    }
+
+    public Element privilegeXml(Document document,
+                                DavPrivilege privilege) {
+        Element p = privilege.toXml(document);
+
+        for (DavPrivilege subPrivilege : privilege.getSubPrivileges()) {
+            if (subPrivilege.isAbstract())
+                continue;
+            p.appendChild(privilegeXml(document, subPrivilege));
+        }
+
+        return p;
     }
 }

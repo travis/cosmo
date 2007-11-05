@@ -52,7 +52,9 @@ import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavAcl;
 import org.osaf.cosmo.dav.acl.DavPrivilege;
+import org.osaf.cosmo.dav.acl.property.Acl;
 import org.osaf.cosmo.dav.acl.property.CurrentUserPrivilegeSet;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.dav.property.SupportedReportSet;
@@ -68,6 +70,7 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
  * </p>
  * <ul>
  * <li> DAV:supported-report-set </li>
+ * <li> DAV:acl </li>
  * <li> DAV:current-user-privilege-set </li>
  * </ul>
  * <p>
@@ -87,6 +90,7 @@ public abstract class DavResourceBase
 
     static {
         registerLiveProperty(SUPPORTEDREPORTSET);
+        registerLiveProperty(ACL);
         registerLiveProperty(CURRENTUSERPRIVILEGESET);
     }
 
@@ -339,6 +343,11 @@ public abstract class DavResourceBase
     }
 
     /**
+     * Returns the resource's access control list.
+     */
+    protected abstract DavAcl getAcl();
+
+    /**
      * <p>
      * Returns the set of privileges granted on the resource to the current
      * principal.
@@ -409,6 +418,7 @@ public abstract class DavResourceBase
             return;
 
         properties.add(new SupportedReportSet(getReportTypes()));
+        properties.add(new Acl(getAcl()));
         properties.add(new CurrentUserPrivilegeSet(getCurrentPrincipalPrivileges()));
 
         loadLiveProperties(properties);

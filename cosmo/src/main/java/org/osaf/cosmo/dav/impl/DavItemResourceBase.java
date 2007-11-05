@@ -40,6 +40,7 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.DavResourceLocatorFactory;
 import org.osaf.cosmo.dav.ExistsException;
 import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.LockedException;
@@ -47,6 +48,8 @@ import org.osaf.cosmo.dav.NotFoundException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.acl.AclConstants;
+import org.osaf.cosmo.dav.acl.DavAce;
+import org.osaf.cosmo.dav.acl.DavAcl;
 import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.property.Owner;
 import org.osaf.cosmo.dav.acl.property.PrincipalCollectionSet;
@@ -106,6 +109,7 @@ public abstract class DavItemResourceBase extends DavResourceBase
 
     private Item item;
     private DavCollection parent;
+    private DavAcl acl;
 
     static {
         registerLiveProperty(DavPropertyName.CREATIONDATE);
@@ -126,6 +130,7 @@ public abstract class DavItemResourceBase extends DavResourceBase
         throws DavException {
         super(locator, factory);
         this.item = item;
+        this.acl = makeAcl();
     }
 
     // DavResource methods
@@ -383,6 +388,76 @@ public abstract class DavItemResourceBase extends DavResourceBase
         msr.add(failed, error.getErrorCode());
 
         return msr;
+    }
+
+    /**
+     * Returns the resource's access control list. The list contains the
+     * following ACEs:
+     *
+     * <ol>
+     * <li> <code>DAV:unauthenticated</code>: deny <code>DAV:all</code> </li>
+     * <li> <code>DAV:owner</code>: allow <code>DAV:all</code> </li>
+     * <li> owner of each parent collection: allow <code>DAV:all</code> </li>
+     * <li> <code>DAV:all</code>: allow
+     * <code>DAV:read-current-user-privilege-set</code> </li>
+     * <li> <code>DAV:all</code>: deny <code>DAV:all</code> </li>
+     * </ol>
+     *
+     * <p>
+     * TODO: Include administrative users in the ACL, probably with a group
+     * principal.<br/>
+     * TODO: Include tickets, both those granted on the resource itself and
+     * those inherited from ancestor resources.<br/>
+     * </p>
+     */
+    protected DavAcl getAcl() {
+        return acl;
+    }
+
+    private DavAcl makeAcl() {
+        DavAcl acl = new DavAcl();
+
+        DavAce unauthenticated = new DavAce.UnauthenticatedAce();
+        unauthenticated.setDenied(true);
+        unauthenticated.getPrivileges().add(DavPrivilege.ALL);
+        unauthenticated.setProtected(true);
+        acl.getAces().add(unauthenticated);
+
+        DavAce owner = new DavAce.PropertyAce(OWNER);
+        owner.getPrivileges().add(DavPrivilege.ALL);
+        owner.setProtected(true);
+        acl.getAces().add(owner);
+
+        for (CollectionItem parent : item.getParents()) {
+            if (parent.getOwner().equals(item.getOwner()))
+                continue;
+            try {
+                DavResourceLocatorFactory f = getResourceLocator().getFactory();
+                DavResourceLocator l =
+                    f.createPrincipalLocator(getResourceLocator().getContext(),
+                                            parent.getOwner());
+                DavAce parentOwner = new DavAce.PropertyAce(OWNER);
+                parentOwner.getPrivileges().add(DavPrivilege.ALL);
+                parentOwner.setProtected(true);
+                parentOwner.setInherited(l.getHref(false));
+                acl.getAces().add(parentOwner);
+            } catch (DavException e) {
+                log.warn("Could not create principal locator for parent collection owner '" + parent.getOwner().getUsername() + "' - skipping ACE");
+            }
+        }
+
+        DavAce allAllow = new DavAce.AllAce();
+        allAllow.getPrivileges().add(DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET);
+        allAllow.setProtected(true);
+        acl.getAces().add(allAllow);
+
+        DavAce allDeny = new DavAce.AllAce();
+        allDeny.setDenied(true);
+        allDeny.getPrivileges().add(DavPrivilege.ALL);
+        allDeny.setProtected(true);
+        acl.getAces().add(allDeny);
+
+        return acl;
     }
 
     /**

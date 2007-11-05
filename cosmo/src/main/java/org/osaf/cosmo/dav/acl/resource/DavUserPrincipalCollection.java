@@ -52,6 +52,8 @@ import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.dav.acl.DavAce;
+import org.osaf.cosmo.dav.acl.DavAcl;
 import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.report.PrincipalMatchReport;
 import org.osaf.cosmo.dav.acl.report.PrincipalPropertySearchReport;
@@ -84,6 +86,7 @@ public class DavUserPrincipalCollection extends DavResourceBase
         new HashSet<ReportType>();
 
     private ArrayList<DavUserPrincipal> members;
+    private DavAcl acl;
 
     static {
         registerLiveProperty(DavPropertyName.DISPLAYNAME);
@@ -102,6 +105,7 @@ public class DavUserPrincipalCollection extends DavResourceBase
         throws DavException {
         super(locator, factory);
         members = new ArrayList<DavUserPrincipal>();
+        acl = makeAcl();
     }
 
     // Jackrabbit DavResource
@@ -213,6 +217,45 @@ public class DavUserPrincipalCollection extends DavResourceBase
 
     public Set<ReportType> getReportTypes() {
         return REPORT_TYPES;
+    }
+
+    /**
+     * Returns the resource's access control list. The list contains the
+     * following ACEs:
+     *
+     * <ol>
+     * <li> <code>DAV:unauthenticated</code>: deny <code>DAV:all</code> </li>
+     * <li> <code>DAV:all</code>: allow
+     * <code>DAV:read, DAV:read-current-user-privilege-set</code> </li>
+     * <li> <code>DAV:all</code>: deny <code>DAV:all</code> </li>
+     * </ol>
+     */
+    protected DavAcl getAcl() {
+        return acl;
+    }
+
+    private DavAcl makeAcl() {
+        DavAcl acl = new DavAcl();
+
+        DavAce unauthenticated = new DavAce.UnauthenticatedAce();
+        unauthenticated.setDenied(true);
+        unauthenticated.getPrivileges().add(DavPrivilege.ALL);
+        unauthenticated.setProtected(true);
+        acl.getAces().add(unauthenticated);
+
+        DavAce allAllow = new DavAce.AllAce();
+        allAllow.getPrivileges().add(DavPrivilege.READ);
+        allAllow.getPrivileges().add(DavPrivilege.READ_CURRENT_USER_PRIVILEGE_SET);
+        allAllow.setProtected(true);
+        acl.getAces().add(allAllow);
+
+        DavAce allDeny = new DavAce.AllAce();
+        allDeny.setDenied(true);
+        allDeny.getPrivileges().add(DavPrivilege.ALL);
+        allDeny.setProtected(true);
+        acl.getAces().add(allDeny);
+
+        return acl;
     }
 
     /**

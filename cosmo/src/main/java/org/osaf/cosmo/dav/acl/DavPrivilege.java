@@ -81,7 +81,10 @@ public class DavPrivilege
         new DavPrivilege(qn(NAMESPACE_CALDAV, "read-free-busy"));
 
     public static final DavPrivilege ALL =
-        new DavPrivilege(qn("all"), new DavPrivilege[] { READ, WRITE });
+        new DavPrivilege(qn("all"),
+                         new DavPrivilege[] { READ, WRITE,
+                                              READ_CURRENT_USER_PRIVILEGE_SET,
+                                              READ_FREE_BUSY });
 
     private QName qname;
     private boolean isAbstract;

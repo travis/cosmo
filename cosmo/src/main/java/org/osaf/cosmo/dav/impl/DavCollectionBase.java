@@ -156,7 +156,7 @@ public class DavCollectionBase extends DavItemResourceBase
         throws org.apache.jackrabbit.webdav.DavException {
         if (log.isDebugEnabled())
             log.debug("removing resource '" + member.getDisplayName() +
-                      "' from '" + getDisplayName() + ";");
+                      "' from '" + getDisplayName() + "'");
 
         CollectionItem collection = (CollectionItem) getItem();
         Item item = ((DavItemResource)member).getItem();

@@ -55,6 +55,7 @@
          /cmp/activate/*=ROLE_ROOT
          /cmp/account/password/reset/*=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
          /cmp/account/password/recover=ROLE_ANONYMOUS, ROLE_ROOT, ROLE_USER
+         /cmp/account/activation/send=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /cmp/account=ROLE_USER
          /**=ROLE_ROOT
        </value>

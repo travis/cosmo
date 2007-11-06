@@ -342,6 +342,11 @@ public class CmpServlet extends HttpServlet {
             return;
         }
 
+        if (req.getPathInfo().startsWith("/account/activation/send")){
+            processSendActivation(req, resp);
+            return;
+        }
+
         if (req.getPathInfo().startsWith(URL_PASSWORD_RESET)){
             processResetPassword(req, resp);
             return;
@@ -995,16 +1000,7 @@ public class CmpServlet extends HttpServlet {
             final HttpServletResponse resp) 
         throws IOException, ServletException {
         
-        String username = req.getParameter("username");
-        String email = req.getParameter("email");
-        
-        User user = null;
-        
-        if (username != null){
-            user = this.userService.getUser(username);
-        } else if (email != null){
-            user = this.userService.getUserByEmail(email);
-        }
+        User user = getUserFromParameter(req);
         
         if (user != null) {
             
@@ -1025,10 +1021,8 @@ public class CmpServlet extends HttpServlet {
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
-        
-            
     }
-    
+
     private void processResetPassword(HttpServletRequest req,
                                       HttpServletResponse resp) 
         throws ServletException, IOException{
@@ -1061,6 +1055,36 @@ public class CmpServlet extends HttpServlet {
         }
     }
 
+    /*
+     * Delegated to by {@link #doPost} to handle activation email 
+     * resend requests
+     * 
+     */
+    private void processSendActivation(final HttpServletRequest req, 
+            final HttpServletResponse resp) 
+        throws IOException, ServletException {
+        
+        User user = getUserFromParameter(req);
+        
+        if (user != null && user.getActivationId() != null) {
+            accountActivator.sendActivationMessage(user, createActivationContext(req));
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private User getUserFromParameter(HttpServletRequest req){
+        String username = req.getParameter("username");
+        String email = req.getParameter("email");
+        
+        if (username != null){
+            return this.userService.getUser(username);
+        } else if (email != null){
+            return this.userService.getUserByEmail(email);
+        } else return null;
+    }
+    
     private void handleInvalidStateException(HttpServletResponse resp,
                                              InvalidStateException ise)
         throws IOException {
@@ -1219,6 +1243,10 @@ public class CmpServlet extends HttpServlet {
     }
 
     private ActivationListener createActivationListener(HttpServletRequest req) {
+        return new ActivationListener(accountActivator, createActivationContext(req));
+    }
+
+    private ActivationContext createActivationContext(HttpServletRequest req) {
         ActivationContext activationContext = new ActivationContext();
         String urlBase = getUrlBase(req);
         activationContext.setLocale(req.getLocale());
@@ -1229,7 +1257,7 @@ public class CmpServlet extends HttpServlet {
         activationContext.
             setSender(userService.getUser(User.USERNAME_OVERLORD));
 
-        return new ActivationListener(accountActivator, activationContext);
+        return activationContext;
     }
 
     private OutOfTheBoxListener createOotbListener(HttpServletRequest req) {

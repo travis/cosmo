@@ -100,7 +100,7 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         request =
             createMockRequest("POST", "/account/password/recover");
         request.setContentType("application/x-www-form-urlencoded");
-        request.addParameter("username", u1.getUsername());
+        request.addParameter("email", u1.getEmail());
                 
         response = new MockHttpServletResponse();
         servlet.service(request, response);
@@ -111,6 +111,48 @@ public class CmpPostTest extends BaseCmpServletTestCase {
         // test with nothing
         request =
             createMockRequest("POST", "/account/password/recover");
+        request.setContentType("application/x-www-form-urlencoded");
+                        
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_NOT_FOUND, 
+                response.getStatus());
+
+    }
+
+    public void testSendActivation() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        userService.createUser(u1);
+        u1.setActivationId("activationid");
+        // test with username
+        MockHttpServletRequest request =
+            createMockRequest("POST", "/account/activation/send");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.addParameter("username", u1.getUsername());
+                
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_NO_CONTENT, 
+                response.getStatus());
+        
+        // test with email
+        u1.setActivationId("activationid");
+        request =
+            createMockRequest("POST", "/account/activation/send");
+        request.setContentType("application/x-www-form-urlencoded");
+        request.addParameter("email", u1.getEmail());
+                
+        response = new MockHttpServletResponse();
+        servlet.service(request, response);
+        
+        assertEquals(MockHttpServletResponse.SC_NO_CONTENT, 
+                response.getStatus());
+
+        // test with nothing
+        request =
+            createMockRequest("POST", "/account/activation/send");
         request.setContentType("application/x-www-form-urlencoded");
                         
         response = new MockHttpServletResponse();

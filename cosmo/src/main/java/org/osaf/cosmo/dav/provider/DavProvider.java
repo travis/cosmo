@@ -95,4 +95,9 @@ public interface DavProvider {
                           DavResponse response,
                           DavResource resource)
         throws DavException, IOException;
+
+    public void acl(DavRequest request,
+                    DavResponse response,
+                    DavResource resource)
+        throws DavException, IOException;
 }

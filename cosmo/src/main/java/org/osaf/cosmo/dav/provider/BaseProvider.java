@@ -52,6 +52,7 @@ import org.osaf.cosmo.dav.acl.AclEvaluator;
 import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.NeedsPrivilegesException;
 import org.osaf.cosmo.dav.acl.TicketAclEvaluator;
+import org.osaf.cosmo.dav.acl.UnsupportedPrivilegeException;
 import org.osaf.cosmo.dav.acl.UserAclEvaluator;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
@@ -285,6 +286,19 @@ public abstract class BaseProvider
         dir.removeTicket(ticket);
 
         response.setStatus(204);
+    }
+
+    public void acl(DavRequest request,
+                    DavResponse response,
+                    DavResource resource)
+        throws DavException, IOException {
+        if (! resource.exists())
+            throw new NotFoundException();
+
+        if (log.isDebugEnabled())
+            log.debug("ACL for " + resource.getResourcePath());
+
+        throw new UnsupportedPrivilegeException("No unprotected ACEs are supported on this resource");
     }
 
     // our methods

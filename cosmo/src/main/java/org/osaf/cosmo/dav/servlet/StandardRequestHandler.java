@@ -176,6 +176,8 @@ public class StandardRequestHandler implements HttpRequestHandler {
             provider.mkticket(request, response, resource);
         else if (request.getMethod().equals("DELTICKET"))
             provider.delticket(request, response, resource);
+        else if (request.getMethod().equals("ACL"))
+            provider.acl(request, response, resource);
         else {
             if (resource.isCollection()) {
                 if (request.getMethod().equals("MKCOL"))

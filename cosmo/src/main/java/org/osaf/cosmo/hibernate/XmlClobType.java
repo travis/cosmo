@@ -60,17 +60,23 @@ public class XmlClobType extends ClobStringType {
         Reader reader = lobHandler.getClobAsCharacterStream(resultSet, columns[0]);
         if (reader == null)
             return null;
-        
+
+        // don't throw an exception if the clob can't be parsed, because
+        // otherwise this item will not be able to be loaded (thus, it won't be
+        // able to be deleted)
+
+        String clob = null;
         try {
-            return DomReader.read(reader);
+            clob = IOUtils.toString(reader);
         } catch (Exception e) {
-            try {
-                log.error("Error deserializing XML clob '" + IOUtils.toString(reader) + "'", e);
-            } catch (Exception e2) {
-                log.error("Error reading XML clob", e);
-            }
-            // don't throw an exception, because otherwise this item will
-            // be able to be loaded (thus, it won't be able to be deleted)
+            log.error("Error reading XML clob", e);
+            return null;
+        }
+
+        try {
+            return DomReader.read(clob);
+        } catch (Exception e) {
+            log.error("Error deserializing XML clob '" + clob + "'", e);
             return null;
         } finally {
             if (reader != null)

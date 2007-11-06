@@ -41,6 +41,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         _this, 'handlePub_app');
 
     // Private vars
+    this._scrollTop = 0;
     this._selectedIndex = null;
     this._doRolloverEffect =  function(e, isOver) {
         // Safari 2 sucks -- DOM-event/DOM-node contention problems
@@ -99,6 +100,11 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         this.render();
     };
     this.renderSelf = function () {
+        // Preserve scrolled state
+        var origContainer = $('collectionSelectorContainer');
+        if (origContainer) {
+            this._scrollTop = origContainer.scrollTop;
+        }
         var _this = this;
         var collections = cosmo.app.pim.collections;
         var currColl = cosmo.app.pim.currentCollection;
@@ -166,9 +172,9 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         this.clearAll();
         collections.each(displayColl);
         table.appendChild(tbody);
-        form.appendChild(table);
-        container.appendChild(form);
+        this.domNode.style.width = LEFT_SIDEBAR_WIDTH + 'px';
         container.style.height = COLLECTION_SELECTOR_HEIGHT + 'px';
+        container.appendChild(table);
 
         // Attach event listeners -- event will be delagated
         // to clicked cell or checkbox
@@ -179,7 +185,36 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         dojo.event.connect(container, 'onclick',
             this, 'handleClick');
 
-        this.domNode.appendChild(container);
+        this.domNode.appendChild(form);
+        form.appendChild(container);
+        // Fix various IE brokennesses in width/scrollbar
+        // interaction
+        if (document.all) {
+            // IE7 -- make sure scrollbar appears
+            // It doesn't show until some DOM events hit it, even
+            // though content is clearly taller than the fixed
+            // height of the container
+            if (table.clientHeight > container.clientHeight) {
+                container.style.overflowY = 'scroll';
+            }
+            // Now fix scrollbar positioning bugs
+            var currWidth = parseInt(this.domNode.style.width);
+            // IE6 -- puts the scrollbar outside the container
+            // after content has been rendered
+            var wDiff = this.domNode.offsetWidth - LEFT_SIDEBAR_WIDTH;
+            if (wDiff > 0) {
+                this.domNode.style.width = (currWidth - wDiff) + 'px';
+            }
+            // IE7 -- puts the scrollbar correctly inside
+            // the container, but overlays the content inside
+            var wDiff = LEFT_SIDEBAR_WIDTH - container.clientWidth;
+            if (wDiff > 0) {
+                table.style.width = (currWidth - wDiff) + 'px';
+            }
+        }
+        // Preserve scrolled state on re-render
+        container.scrollTop = this._scrollTop;
+
     };
     this.handleMouseOver = function (e) {
         this._doRolloverEffect(e, true);

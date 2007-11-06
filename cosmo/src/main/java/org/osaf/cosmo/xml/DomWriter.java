@@ -95,9 +95,10 @@ public class DomWriter {
         String ns = e.getNamespaceURI();
         if (ns != null) {
             String prefix = e.getPrefix();
-            if (prefix != null)
+            if (prefix != null) {
                 writer.writeStartElement(prefix, local, ns);
-            else {
+                writer.writeNamespace(prefix, ns);
+            } else {
                 writer.setDefaultNamespace(ns);
                 writer.writeStartElement(ns, local);
                 writer.writeDefaultNamespace(ns);

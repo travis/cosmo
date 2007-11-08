@@ -135,7 +135,6 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
 
     // Default to the app's currentCollection if one isn't passed
     var collection = opts.collection || cosmo.app.pim.currentCollection;
-    if (!collection) return;
 
     start = opts.viewStart;
     end = opts.viewEnd;
@@ -180,7 +179,7 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
     cosmo.app.pim.collections.each(loadEach);
 
     var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
-
+    
     dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
         data: itemRegistry, opts: opts });
     return true;
@@ -209,21 +208,23 @@ cosmo.view.cal.createEventRegistry = function(arr, collId) {
 };
 cosmo.view.cal.createItemRegistryFromCollections = function () {
     var itemReg = new cosmo.util.hash.Hash();
-    var collectionReg = cosmo.view.cal.collectionItemRegistries;
-    var currCollId = '';
-    var selCollId = cosmo.app.pim.currentCollection.getUid();
-    // Do something sensible with duplicate items when
-    // building the consolidated itemRegistry
-    var fillInItem = function (id, item) {
-          // Always use the items from the selected collection
-          if (currCollId == selCollId) {
-              item.primaryCollectionId = currCollId;
-          }
-          itemReg.setItem(id, item);
-    };
-    for (var collId in collectionReg) {
-        currCollId = collId;
-        collectionReg[currCollId].each(fillInItem);
+    if (cosmo.app.pim.currentCollection){
+        var collectionReg = cosmo.view.cal.collectionItemRegistries;
+        var currCollId = '';
+        var selCollId = cosmo.app.pim.currentCollection.getUid();
+        // Do something sensible with duplicate items when
+        // building the consolidated itemRegistry
+        var fillInItem = function (id, item) {
+            // Always use the items from the selected collection
+            if (currCollId == selCollId) {
+                item.primaryCollectionId = currCollId;
+            }
+            itemReg.setItem(id, item);
+        };
+        for (var collId in collectionReg) {
+            currCollId = collId;
+            collectionReg[currCollId].each(fillInItem);
+        }
     }
     return itemReg;
 };

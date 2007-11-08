@@ -124,12 +124,13 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // ===============================
         this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
 
+        // Display the default view
+        this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
+        dojo.debug("clank");
         if (!cosmo.app.pim.currentCollection) {
             cosmo.app.hideMask();
             cosmo.app.showErr(_("Error.NoCollections"));
         } else {
-            // Display the default view
-            this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
 
             // Show errors for deleted subscriptions -- deletedSubscriptions
             // is a private var populated in the loadCollections method
@@ -328,7 +329,9 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         else {
             this.currentCollection = collections[0];
         }
-        this.currentCollection.doDisplay = true;
+        if (this.currentCollection){
+            this.currentCollection.doDisplay = true;
+        }
 
     };
 

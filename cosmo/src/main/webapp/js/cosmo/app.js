@@ -210,6 +210,7 @@ cosmo.app = new function () {
         var valueInput = _createElem("input");
         valueInput.value = defaultValue || "";
         valueInput.type = "text";
+        valueInput.id = "getValueInput";
         retryConditions = retryConditions || [];
         var deferred = new dojo.Deferred();
         var submitFunc = dojo.lang.hitch(this, function () { 
@@ -282,11 +283,11 @@ cosmo.app = new function () {
         var deferred = new dojo.Deferred();
         var yesFunc = dojo.lang.hitch(this, function () { 
             this.hideDialog();
-            deferred.callback();
+            deferred.callback(true);
         })
         var noFunc = dojo.lang.hitch(this, function () { 
             this.hideDialog();
-            deferred.errback();
+            deferred.callback(false);
         })
         var yesButton = new cosmo.ui.button.Button(
                               { text:_('App.Button.Yes'), 

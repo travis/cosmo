@@ -196,16 +196,20 @@ dojo.widget.HtmlWidget, function(){
                     return e;
                 });
             confirmDeferred.addCallback(
-                function(){
-                    cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
-                    var deleteDeferred = 
-                        cosmo.app.pim.serv.deleteCollection(collectionToDelete);
-                    deleteDeferred.addCallback(function(){
-                        cosmo.app.pim.collections.removeItem(collectionToDelete.getUid());
-                        cosmo.topics.publish(cosmo.topics.CollectionDeletedMessage, 
-                                             [collectionToDelete]);
+                function(confirmed){
+                    if (confirmed){
+                        cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
+                        var deleteDeferred = 
+                            cosmo.app.pim.serv.deleteCollection(collectionToDelete);
+                        deleteDeferred.addCallback(function(){
+                            cosmo.app.pim.collections.removeItem(collectionToDelete.getUid());
+                            cosmo.topics.publish(cosmo.topics.CollectionDeletedMessage, 
+                                                 [collectionToDelete]);
+                            cosmo.app.hideDialog();
+                        });
+                    } else {
                         cosmo.app.hideDialog();
-                    });
+                    }
                 }
             );
 

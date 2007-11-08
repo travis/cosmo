@@ -624,13 +624,14 @@ cosmo.view.cal.canvas = new function () {
         if (!p){
             return;
         }
-        
+
         if (typeof p == 'string') {
             sel = this.view.itemRegistry.getItem(p);
         }
         else {
             sel = p;
         }
+        // Selected item is in the currently selected collection
         if (sel.isInSelectedCollection()) {
             // Deselect previously selected event if any
             var origSel = self.getSelectedItem();
@@ -639,7 +640,22 @@ cosmo.view.cal.canvas = new function () {
                 origSel.lozenge.setDeselected();
             }
         }
+        // Selected item is in one of the background collections
+        // in the overlay -- change this to the selected collection,
+        // and foreground its lozenges
         else {
+            // Remove the originally selected collection from
+            // the display unless it's explicitly overlaid
+            // FIXME: similar logic exists in handleClick of
+            // cosmo.ui.selector. This should be refactored
+            // into a method of some kind of abstracted UI-only
+            // collection object
+            var currColl = cosmo.app.pim.currentCollection;
+            var ch = $('collectionSelectorItemCheck_' + currColl.getUid());
+            if (!ch || (ch && !ch.checked)) {
+                currColl.doDisplay = false;
+            }
+            // Re-render the view, with the newly selected collection
             var collId = sel.primaryCollectionId ?
                 sel.primaryCollectionId : sel.collectionIds[0];
             var coll = cosmo.app.pim.collections.getItem(collId);
@@ -960,7 +976,7 @@ cosmo.view.cal.canvas = new function () {
 
             cosmo.view.cal.removeRecurrenceGroupFromItsCollectionRegistries(
                 collectionIds, idsToRemove);
-            
+
             //now we have to expand out the item for the viewing range
             var expandDeferred1 = cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)

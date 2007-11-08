@@ -287,10 +287,17 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                             cosmo.app.pim.collections.getItem(id)));
                     return true;
                 }
+                // Selector
                 if (targ.id.indexOf(prefix + 'Sel_') > -1) {
                     var id = targ.id.replace(prefix + 'Sel_', '');
                     newCurrColl = collections.getItem(id);
                     if (id != currId) {
+                        // Turn off display for the originally selected
+                        // collection if it isn't explicitly checked for overlay
+                        // FIXME: similar logic exists in setSelectedCalItem of
+                        // cosmo.view.cal.canvas. This should be refactored
+                        // into a method of some kind of abstracted UI-only
+                        // collection object
                         var ch = $(prefix + 'Check_' + currId);
                         if (!ch || (ch && !ch.checked)) {
                             currColl.doDisplay = false;
@@ -299,6 +306,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                         cosmo.view.cal.displayCollections(newCurrColl);
                     }
                 }
+                // Overlays
                 else if (targ.id.indexOf(prefix + 'Check_') > -1) {
                     var id = targ.id.replace(prefix + 'Check_', '');
                     var d = targ.checked;

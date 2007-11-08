@@ -37,6 +37,8 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     dojo.event.topic.subscribe('/calEvent', _this, 'handlePub_calEvent');
     dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
         _this, 'handlePub_app');
+    dojo.event.topic.subscribe(cosmo.topics.CollectionDeletedMessage.topicName,
+        _this, 'handleCollectionDeleted');
     dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
         _this, 'handlePub_app');
 
@@ -98,6 +100,11 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     // Interface methods
     this.handlePub_app = function (cmd) {
         this.render();
+    };
+
+    // Function to handle collection deleted event.
+    this.handleCollectionDeleted = function(collection){
+        this.render()
     };
     this.renderSelf = function () {
         // Preserve scrolled state

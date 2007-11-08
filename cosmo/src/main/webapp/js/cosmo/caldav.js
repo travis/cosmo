@@ -15,5 +15,6 @@
 dojo.provide("cosmo.caldav");
 
 cosmo.caldav = {
-    METHOD_MKCALENDAR: "MKCALENDAR"
+    METHOD_MKCALENDAR: "MKCALENDAR",
+    METHOD_DELETE: "DELETE"
 };

@@ -272,6 +272,43 @@ cosmo.app = new function () {
         self.showDialog(dialogProps);
         return deferred;
     };
+
+    /**
+     *  kwArgs: 
+     *    cancelDefault: make default action "No"
+     */
+    this.confirm = function (message, kwArgs){
+        kwArgs = kwArgs || {};
+        var deferred = new dojo.Deferred();
+        var yesFunc = dojo.lang.hitch(this, function () { 
+            this.hideDialog();
+            deferred.callback();
+        })
+        var noFunc = dojo.lang.hitch(this, function () { 
+            this.hideDialog();
+            deferred.errback();
+        })
+        var yesButton = new cosmo.ui.button.Button(
+                              { text:_('App.Button.Yes'), 
+                                width:74,
+                                handleOnClick: yesFunc
+                              });
+        var noButton = new cosmo.ui.button.Button(
+                              { text:_('App.Button.No'), 
+                                width:74,
+                                handleOnClick: noFunc
+                              });
+        var dialogProps = {
+            "btnsRight": [yesButton],
+            "btnsLeft": [noButton],
+            "prompt": message,
+            "width" : 300,
+            "height" : 100,
+            "defaultAction" : kwArgs.cancelDefault? noFunc : yesFunc
+        };
+        self.showDialog(dialogProps);
+        return deferred;
+    };
     /**
      * Dismiss the faux modal dialog box -- check for queued error
      * messages to display if needed

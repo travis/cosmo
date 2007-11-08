@@ -255,6 +255,15 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
                 "/" + encodeURIComponent(name)
         });
     },
+
+    // Also hacky, TODO: point to Atom for 0.10
+    deleteCollection: function (collection, kwArgs){
+        var name = collection.getDisplayName();
+        return this._transport.bind({
+            method: cosmo.caldav.METHOD_DELETE,
+            url: collection.getUrl("dav")
+        });
+    },
     
     getPreference: function (key, kwArgs){
        var deferred = this._transport.getPreference(key, kwArgs);

@@ -80,8 +80,9 @@ dojo.widget.HtmlWidget, function(){
             clickHere:_("Main.CollectionDetails.ClickHere"),
             helpLink:_("Main.CollectionDetails.HelpLink"),
             chandlerPlug: _('Main.CollectionDetails.ChandlerPlug',
-                '<a href="'+ _('Main.CollectionDetails.ChandlerPlugDownload') +'">',
-                '</a>')
+                            '<a href="'+ _('Main.CollectionDetails.ChandlerPlugDownload') +'">',
+                            '</a>'),
+            deleteCollectionButton: _('Main.CollectionDetails.Delete')
         },
 
         clientsToProtocols: {
@@ -180,6 +181,44 @@ dojo.widget.HtmlWidget, function(){
               this.saveDisplayName();
               cosmo.app.hideDialog();
         },
+
+        _handleDelete: function () {
+            cosmo.app.hideDialog();
+            var collectionToDelete = this.collection;
+            var confirmDeferred = cosmo.app.confirm(
+                _("Main.DeleteCollection.Confirm", collectionToDelete.getDisplayName()),
+                {cancelDefault: true}
+            );
+            // This errback will fire if the user selects "no".
+            confirmDeferred.addErrback(
+                function(e){
+                    cosmo.app.hideDialog();
+                    return e;
+                });
+            confirmDeferred.addCallback(
+                function(){
+                    cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
+                    var deleteDeferred = 
+                        cosmo.app.pim.serv.deleteCollection(collectionToDelete);
+                    deleteDeferred.addCallback(function(){
+                        cosmo.app.pim.collections.removeItem(collectionToDelete.getUid());
+                        cosmo.topics.publish(cosmo.topics.CollectionDeletedMessage, 
+                                             [collectionToDelete]);
+                        cosmo.app.hideDialog();
+                    });
+                }
+            );
+
+            // Errback to catch any other errors.
+            confirmDeferred.addErrback(function(e){
+                cosmo.app.showErr(
+                    _("Main.DeleteCollection.Failed", 
+                      collectionToDelete.getDisplayName()), 
+                    e.message, e);
+            });
+            return confirmDeferred;
+        },
+
         //handles when the user selects a client
         _handleClientChanged: function(){
             var client = this._getClientChoice();

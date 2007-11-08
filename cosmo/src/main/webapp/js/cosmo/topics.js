@@ -81,6 +81,20 @@ cosmo.topics.declareMessage("cosmo.topics.CollectionUpdatedMessage",
     }
 );
 
+cosmo.topics.declareMessage("cosmo.topics.CollectionDeletedMessage",
+    // summary: Published after successful deletion of a collection
+    //          has occured
+    "COLLECTION_DELETED", null,
+    //initializer
+    function (/*cosmo.model.Collection*/ collection){
+        this.collection = collection;
+    },
+    //props
+    {
+        collection: null
+    }
+);
+
 cosmo.topics.declareMessage("cosmo.topics.SubscriptionUpdatedMessage",
     // summary: Published after successful updating of a subscription to the server
     //          has occured

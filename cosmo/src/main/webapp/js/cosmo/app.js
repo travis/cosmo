@@ -205,7 +205,8 @@ cosmo.app = new function () {
     /**
       * Convenience function for popping a modal dialog and getting a value.
       */
-    this.getValue = function (valuePrompt, defaultValue, retryConditions){
+    this.getValue = function (valuePrompt, defaultValue, retryConditions, kwArgs){
+        kwArgs = kwArgs || {};
         var valueInput = _createElem("input");
         valueInput.value = defaultValue || "";
         valueInput.type = "text";
@@ -236,6 +237,17 @@ cosmo.app = new function () {
             "height" : 100,
             "defaultAction" : submitFunc
         };
+        if (kwArgs.showCancel){
+            dialogProps.btnsLeft = [
+                new cosmo.ui.button.Button(
+                    { text: _('App.Button.Cancel'),
+                      id: "getValueCancel",
+                      width: 74,
+                      handleOnClick: dojo.lang.hitch(this, "hideDialog")
+                    }
+                )
+            ]
+        }
         self.showDialog(dialogProps);
         return deferred;
     };

@@ -232,7 +232,8 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                                 return _("Main.NewCollection.NameInUse");
                             }
                         }
-                    }]
+                    }],
+                    {showCancel: true}
                     );
             collectionNameDeferred.addCallback(function(name){
                 cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));

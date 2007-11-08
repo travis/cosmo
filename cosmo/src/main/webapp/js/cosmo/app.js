@@ -224,6 +224,7 @@ cosmo.app = new function () {
                                     }) 
         var button = new cosmo.ui.button.Button(
                               { text:_('App.Button.Submit'), 
+                                id: "getValueSubmit",
                                 width:74,
                                 handleOnClick: submitFunc
                               });

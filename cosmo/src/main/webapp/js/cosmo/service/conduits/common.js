@@ -26,6 +26,9 @@
  */
 dojo.provide("cosmo.service.conduits.common");
 
+//TODO: remove once we move create/delete into Atom
+dojo.require("cosmo.caldav");
+
 dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     _transport: null,
@@ -241,6 +244,16 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             this._translator.subscriptionToAtomEntry(subscription), 
             kwArgs);
             
+    },
+
+    // This is hacky, TODO: point to Atom for 0.10
+    createCollection: function (name, kwArgs){
+        return this._transport.bind({
+            method: cosmo.caldav.METHOD_MKCALENDAR,
+            url: cosmo.env.getFullUrl("Dav") + 
+                "/" + encodeURIComponent(cosmo.util.auth.getUsername()) + 
+                "/" + encodeURIComponent(name)
+        });
     },
     
     getPreference: function (key, kwArgs){

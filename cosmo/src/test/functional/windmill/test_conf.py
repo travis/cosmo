@@ -36,6 +36,9 @@ test_list = [
 'dashboard/dash_now_later_done.json',
 'dashboard/dash_quick_create.json',
 
+#create collection
+'create_collection.json',
+
 #tear down
 'teardown/logout.json'
 ]

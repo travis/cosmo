@@ -215,6 +215,45 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         // Preserve scrolled state on re-render
         container.scrollTop = this._scrollTop;
 
+        var d = _createElem("div");
+        d.id = "newCollectionDiv";
+        var a = _createElem("a");
+        a.id = "newCollectionLink";
+        a.appendChild(_createText(_("Main.NewCollection")));
+
+        dojo.event.connect(a, "onclick", function(){
+            var collectionNameDeferred = 
+                cosmo.app.getValue(
+                    _("Main.NewCollection.NamePrompt"),
+                    _("Main.NewCollection.DefaultName"),
+                    [function(name){
+                        for (var i = 0; i < collections.length; i++){
+                            if (name == collections.getAtPos(i).getDisplayName()){
+                                return _("Main.NewCollection.NameInUse");
+                            }
+                        }
+                    }]
+                    );
+            collectionNameDeferred.addCallback(function(name){
+                cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
+                var createDeferred = cosmo.app.pim.serv.createCollection(name);
+                createDeferred.addCallback(function(result){
+                    //TODO: This is bad. Giant waste of bandwidth.
+                    // We can fix this by returning a collection from a create request.
+                    // On the plus side, most of the collections should be cached since
+                    // we already had them loaded.
+                    cosmo.app.pim.reloadCollections();
+                });
+                createDeferred.addBoth(function(){
+                    cosmo.app.hideDialog();
+                });
+                
+            });
+        });
+
+        d.appendChild(a);
+        container.appendChild(d);
+
     };
     this.handleMouseOver = function (e) {
         this._doRolloverEffect(e, true);

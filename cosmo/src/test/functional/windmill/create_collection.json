@@ -1,0 +1,6 @@
+{"params": {"id": "newCollectionLink"}, "method": "click"}
+{"params": {"xpath": "\/html\/body[@id='body']\/div[@id='modalDialog']\/table\/tbody\/tr[2]\/td[@id='dialogCenterContent']\/div[@id='modalDialogContent']\/input"}, "method": "click"}
+{"params": {"xpath": "\/html\/body[@id='body']\/div[@id='modalDialog']\/table\/tbody\/tr[2]\/td[@id='dialogCenterContent']\/div[@id='modalDialogContent']\/input"}, "method": "click"}
+{"params": {"xpath": "\/html\/body[@id='body']\/div[@id='modalDialog']\/table\/tbody\/tr[2]\/td[@id='dialogCenterContent']\/div[@id='modalDialogContent']\/input"}, "method": "doubleClick"}
+{"params": {"xpath": "html\/body[@id='body']\/div[@id='modalDialog']\/table\/tbody\/tr[2]\/td[@id='dialogCenterContent']\/div[@id='modalDialogContent']\/input", "text": "Testoratrix"}, "method": "type"}
+{"params": {"id": "getValueSubmit"}, "method": "click"}

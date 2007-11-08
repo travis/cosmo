@@ -605,3 +605,9 @@
 .miniSelected {
     background: #deeeff;
 }
+div#newCollectionDiv {
+    width: 100%;
+}
+a#newCollectionLink {
+    padding-left: 5px;
+}

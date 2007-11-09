@@ -71,7 +71,6 @@ public abstract class BaseProvider extends AbstractProvider
         // XXX
         return 25;
     }
-
     
     /**
      * <p>
@@ -91,6 +90,9 @@ public abstract class BaseProvider extends AbstractProvider
             if (method.equals("PUT")) {
                 if (type == TargetType.TYPE_COLLECTION)
                     return updateCollection(request);
+            } else if (method.equals("DELETE")) {
+                if (type == TargetType.TYPE_COLLECTION)
+                    return deleteCollection(request);
             }
 
             return super.request(request);
@@ -107,7 +109,7 @@ public abstract class BaseProvider extends AbstractProvider
 
     public String[] getAllowedMethods(TargetType type) {
         if (type != null && type == TargetType.TYPE_COLLECTION)
-            return new String[] { "GET", "POST", "PUT", "HEAD", "OPTIONS" };
+            return new String[] {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS" };
         return super.getAllowedMethods(type);
     }
 

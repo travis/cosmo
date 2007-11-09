@@ -106,6 +106,10 @@ public class UserProvider extends BaseProvider {
         throw new UnsupportedOperationException();
     }
 
+    public ResponseContext deleteCollection(RequestContext request) {
+        throw new UnsupportedOperationException();
+    }
+
     // our methods
 
     protected ServiceGenerator createServiceGenerator(ServiceLocator locator) {

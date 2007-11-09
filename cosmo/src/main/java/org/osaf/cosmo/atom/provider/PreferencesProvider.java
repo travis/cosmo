@@ -235,6 +235,10 @@ public class PreferencesProvider extends BaseProvider
         return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
     }
 
+    public ResponseContext deleteCollection(RequestContext request) {
+        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    }
+
     // our methods
 
     public UserService getUserService() {

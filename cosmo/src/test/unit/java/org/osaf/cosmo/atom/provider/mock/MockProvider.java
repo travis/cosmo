@@ -145,6 +145,10 @@ public class MockProvider implements ExtendedProvider {
         return new EmptyResponseContext(204);
     }
 
+    public ResponseContext deleteCollection(RequestContext request) {
+        return null;
+    }
+
     // our methods
 
     public boolean isUpdated(CollectionItem collection) {

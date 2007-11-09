@@ -81,7 +81,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
     // Provider methods
     private static final String[] ALLOWED_COLL_METHODS =
-        new String[] { "GET", "HEAD", "POST", "PUT", "OPTIONS" };
+        new String[] { "GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS" };
     private static final String[] ALLOWED_ENTRY_METHODS =
         new String[] { "GET", "HEAD", "PUT", "OPTIONS" };
 
@@ -414,6 +414,25 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             if (e.getCause() != null)
                 msg += ": " + e.getCause().getMessage();
             return badrequest(getAbdera(), request, msg);
+        } catch (CollectionLockedException e) {
+            return locked(getAbdera(), request);
+        }
+    }
+
+    public ResponseContext deleteCollection(RequestContext request) {
+        CollectionTarget target = (CollectionTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
+
+        if (collection instanceof HomeCollectionItem)
+            return unauthorized(getAbdera(), request, "Home collection is not deleteable");
+
+        if (log.isDebugEnabled())
+            log.debug("deleting collection " + collection.getUid());
+
+        try {
+            contentService.removeCollection(collection);
+
+            return deleted();
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
         }

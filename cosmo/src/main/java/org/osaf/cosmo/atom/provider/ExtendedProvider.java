@@ -41,4 +41,12 @@ public interface ExtendedProvider extends Provider {
      * </p>
      */
     public ResponseContext updateCollection(RequestContext request);
+
+    /**
+     * Deletes the targeted collection.
+     * <p>
+     * Returns <code>204 No Content</code> on success.
+     *</p>
+     */
+    public ResponseContext deleteCollection(RequestContext request);
 }

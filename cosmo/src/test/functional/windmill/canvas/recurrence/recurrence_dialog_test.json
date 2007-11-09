@@ -32,5 +32,4 @@
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Miquelon", "id": "tzId"},  "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
-{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}

@@ -29,7 +29,9 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testWindow.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv1-900"}}}
+{"method": "waits.sleep", "params": {"milliseconds" : 1000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testWindow.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv5-1300"}}}
+{"method": "waits.sleep", "params": {"milliseconds" : 1000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testWindow.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv0-1130"}}}
 {"method": "click", "params": {"id" : "viewNavCenterRight"}}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
@@ -61,5 +63,7 @@
 {"method": "doubleClick", "params": {"id" : "hourDiv1-1200"}}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testWindow.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv1-900"}}}
+{"method": "waits.sleep", "params": {"milliseconds" : 1000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testWindow.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv5-1300"}}}
+{"method": "waits.sleep", "params": {"milliseconds" : 1000}}
 {"method": "extensions.cosmoDragDrop", "params": {"dragged" : {"jsid": "windmill.testWindow.cosmo.view.cal.canvasInstance.getSelectedItemId()", "pfx": "eventDivContent__"}, "destination": {"id": "hourDiv0-1130"}}}

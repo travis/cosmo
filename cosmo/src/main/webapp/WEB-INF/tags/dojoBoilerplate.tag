@@ -62,19 +62,21 @@
 
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
+<script type="text/javascript">
+(function dojoBoostrap(){
+    dojo.require("dojo.widget.*");
+    dojo.require("dojo.debug.console");
+    dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
+    dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
+})();
+</script>
 <c:forEach var="layerName" items="${dojoLayers}">
 <script type="text/javascript" src="${dojoPath}/src/${layerName}.js"></script>
 </c:forEach>
 
 <script type="text/javascript">
+
 function bootstrap(){
-
-    dojo.require("dojo.widget.*");
-    dojo.require("dojo.debug.console");
-
-    dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
-    dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
-
     dojo.require("cosmo.env");
     cosmo.env.setVersion("${PRODUCT_VERSION}");
     dojo.require("cosmo.ui.conf");

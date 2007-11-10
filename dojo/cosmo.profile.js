@@ -5,7 +5,8 @@
 // the variable "hostenvType" (defaults to "browser").
 var dependencies = [
     "dojo.lang.*",
-    "dojo.debug.console"
+    "dojo.debug.console",
+    "dojo.widget.*"
 ];
 
 dependencies.layers = [

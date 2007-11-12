@@ -498,7 +498,7 @@
                       <!-- TODO: META-INF shouldn't be required, seems to be an issue with the current war plugin -->
                       <include>META-INF</include>
                       <include>WEB-INF/classes</include>
-                      <include>js/lib-${pom.version}</include>
+                      <include>js/lib</include>
                       <!-- Classes and Resources from other wars -->
                       <include>WEB-INF/lib</include>
                       <!-- Dependencies from other wars -->

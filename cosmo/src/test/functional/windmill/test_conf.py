@@ -10,6 +10,7 @@ test_list = [
 
 #collections tests
 'collections/collection_add_remove.json',
+'collections/collection_create_overlay.json',
 
 #mini-cal tests
 'minical/mini_cal.json',
@@ -39,9 +40,6 @@ test_list = [
 'dashboard/dash_now_later_done.json',
 'dashboard/dash_quick_create.json',
 'dashboard/dash_paging.json',
-
-#create collection
-'create_collection.json',
 
 #tear down
 'teardown/logout.json'

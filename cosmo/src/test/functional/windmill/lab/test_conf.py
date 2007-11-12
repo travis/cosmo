@@ -10,6 +10,7 @@ test_list = [
 
 #collections tests
 '../collections/collection_add_remove.json',
+'../collections/collection_create_overlay.json',
 
 #mini-cal tests
 '../minical/mini_cal.json',

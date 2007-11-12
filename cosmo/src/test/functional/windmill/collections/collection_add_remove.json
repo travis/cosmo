@@ -2,7 +2,7 @@
 {"params": {"id": "getValueInput"}, "method": "click"}
 {"params": {"text": "zeus", "id": "getValueInput"}, "method": "type"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}
-{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"milliseconds": 5000}, "method": "waits.sleep"}
 {"params": {"validator": "zeus", "id": "collectionSelectorContainer"}, "method": "asserts.assertText"}
 {"params": {"jsid": "cosmo.app.pim.collections.getLast().getUid()"}, "method": "extensions.clickClDialog"}
 {"params": {"id": "dialogCenterContent"}, "method": "asserts.assertNode"}

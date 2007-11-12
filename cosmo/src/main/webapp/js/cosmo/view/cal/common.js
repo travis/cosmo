@@ -291,19 +291,27 @@ cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry =
     cosmo.view.cal.collectionItemRegistries[collId] = newRegistry;
 };
 cosmo.view.cal.displayCollections = function (c) {
-    var newCollection = c || null;
-    var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+   var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+   loading.show();
+
+   var newCollection = c || null;
+
     // Publish this through a setTimeout call to
     // avoid hanging the UI thread
     if (newCollection) {
         cosmo.app.pim.currentCollection = newCollection;
     }
-    var f = function () { dojo.event.topic.publish('/calEvent', {
-        action: 'loadCollection', opts: { loadType: 'changeCollection',
-        collection: newCollection }, data: {}
-    }); };
-    loading.show();
-    setTimeout(f, 0);
+    var f = function () { 
+        dojo.event.topic.publish('/calEvent', {
+            action: 'loadCollection',
+            opts: { loadType: 'changeCollection',
+                    collection: newCollection }, data: {}
+        }); 
+    };
+
+    //wrap in setTimeout so that the "loading..."
+    //notification appears
+    setTimeout(f, 35);
 };
 
 /**

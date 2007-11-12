@@ -63,7 +63,7 @@
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <script type="text/javascript">
-(function dojoBoostrap(){
+(function (){
     dojo.require("dojo.widget.*");
     dojo.require("dojo.debug.console");
     dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);

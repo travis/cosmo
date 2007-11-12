@@ -72,14 +72,15 @@ Timer = function (functionName) {
    var now = new Date();
    this.startTime = now.getTime();
    this.endTime = 0;
-   log.debug("Start function '" + functionName + "'");
+   dojo.debug("Start function '" + functionName + "'");
 };
 
-Timer.prototype.end = function (){
+Timer.prototype.end = function (message){
+    message = message || this.functionName;
     var now = new Date();
     this.endTime = now.getTime();
     var elapsedTime = this.endTime - this.startTime;
-    log.debug("End function '" + this.functionName + "'; elapsedTime: "
+    dojo.debug("End function '" + message + "'; elapsedTime: "
         + elapsedTime + "ms");
 };
 

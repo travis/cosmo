@@ -219,7 +219,8 @@ cosmo.env.urls = {
     "TermsOfService": "/help/tos",
     "PrivacyPolicy": "/help/privacy",
     "About": "/help/about",
-    "Dav": "/dav"
+    "Dav": "/dav",
+    "Cmp": "/cmp"
 }
 
 cosmo.env.getFullUrl = function (urlKey) {

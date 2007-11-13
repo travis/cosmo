@@ -481,7 +481,17 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 uuid + '</subscription>';
         },
 
+        sendActivation: function(username, email, handlerDict, sync){
+            this._recover(cosmo.env.getFullUrl("Cmp") + "/account/activation/send", 
+                         username, email, handlerDict, sync)
+        },
+
         recoverPassword: function(username, email, handlerDict, sync){
+            this._recover(cosmo.env.getFullUrl("Cmp") + "/account/password/recover", 
+                         username, email, handlerDict, sync)
+        },
+
+        _recover: function(url, username, email, handlerDict, sync){
             // Safari and IE don't understand 204s. Boo.
             if (navigator.userAgent.indexOf('Safari') > -1 ||
                 document.all){
@@ -494,7 +504,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 email? "email=" + email : "";
 
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account/password/recover";
+            requestDict.url = url;
             requestDict.method = "POST";
             requestDict.contentType = "application/x-www-form-urlencoded";
             requestDict.postContent = requestContent;

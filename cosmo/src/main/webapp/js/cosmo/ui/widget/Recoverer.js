@@ -15,7 +15,7 @@
 */
 
 /**
- * @fileoverview PasswordRecoverer - a widget takes a username and/or email address and
+ * @fileoverview Recoverer - a widget takes a username and/or email address and
  *                                  asks the server to send a password recovery email to
  *                                  the corresponding user.
  *
@@ -23,7 +23,7 @@
  * @license Apache License 2.0
  */
 
-dojo.provide("cosmo.ui.widget.PasswordRecoverer");
+dojo.provide("cosmo.ui.widget.Recoverer");
 
 dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
@@ -35,20 +35,22 @@ dojo.require("cosmo.util.i18n");
 
 dojo.require("cosmo.convenience");
 
-dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWidget,
+dojo.widget.defineWidget("cosmo.ui.widget.Recoverer", dojo.widget.HtmlWidget,
     function(){
 
     },
     {
 
         templatePath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/PasswordRecoverer/PasswordRecoverer.html"),
+            "../../cosmo/ui/widget/templates/Recoverer/Recoverer.html"),
         templateCssPath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/PasswordRecoverer/PasswordRecoverer.css"),
+            "../../cosmo/ui/widget/templates/Recoverer/Recoverer.css"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
-        i18nPrefix: "Account.PasswordRecover",
+        i18nPrefix: "",
+        recoverFunctionModule: "",
+        recoverFunctionName: "",
 
         //attach points
         tableContainer: null,
@@ -63,6 +65,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWi
         sendButtonContainer: null,
         sendButton: null,
 
+        recoverFunction: function(){},
+
         setError: function(message){
             this.errorBox.innerHTML = message;
         },
@@ -71,19 +75,19 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWi
             this.infoBox.innerHTML = message;
         },
 
-        recoverPassword: function(){
+        recover: function(){
             var self = this;
             this.setError("");
-            cosmo.cmp.recoverPassword(this.usernameInput.value, this.emailInput.value,
+            this.recoverFunction(this.usernameInput.value, this.emailInput.value,
                 {error: function(type, data, xhr){
                     if (xhr.status == "404"){
-                       self.setError(_(self.i18nPrefix + ".Error.404"));
+                       self.setError(_(self.i18nPrefix + "Error.404"));
                     } else {
                        self.setError(xhr.message);
                     }
                 },
                  load: function(type, data, xhr){
-                    self.setInfo(_(self.i18nPrefix + ".Success"));
+                    self.setInfo(_(self.i18nPrefix + "Success"));
                     self.tableContainer.style.visibility = "hidden";
                 }
                 });
@@ -91,11 +95,17 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordRecoverer", dojo.widget.HtmlWi
 
         fillInTemplate: function(){
             if (this.displayDefaultInfo){
-                this.setInfo(_(this.i18nPrefix + ".InitialInfo"));
+                this.setInfo(_(this.i18nPrefix + "InitialInfo"));
             }
 
-            this.usernameLabel.innerHTML = _(this.i18nPrefix + ".Username");
-            this.emailLabel.innerHTML = _(this.i18nPrefix + ".Email");
+            this.usernameLabel.innerHTML = _(this.i18nPrefix + "Username");
+            this.emailLabel.innerHTML = _(this.i18nPrefix + "Email");
+        },
+
+        postMixInProperties: function(){
+            dojo.require(this.recoverFunctionModule);
+            var module = dojo.evalObjPath(this.recoverFunctionModule) || dj_global;
+            this.recoverFunction = dojo.lang.hitch(module, this.recoverFunctionName);
         }
     }
 );

@@ -18,25 +18,6 @@
  */
 --%>
 
-<%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<fmt:setBundle basename="MessageResources"/>
-<cosmo:standardLayout prefix="Account.PasswordRecover." showNav="false">
-<cosmo:staticbaseurl var="staticBaseUrl"/>
-<script type="text/javascript">
-dojo.require("cosmo.ui.widget.PasswordRecoverer");
-</script>
-
-<style type="text/css">
-#passwordRecoverer{
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-}
-</style>
-
-<div dojoType="cosmo:PasswordRecoverer" widgetId="passwordRecoverer" displayDefaultInfo="true">
-
-</div>
-
-</cosmo:standardLayout>
+<cosmo:recover prefix="Account.RecoverPassword." recoverFunctionModule="cosmo.cmp"
+               recoverFunctionName="recoverPassword"/>

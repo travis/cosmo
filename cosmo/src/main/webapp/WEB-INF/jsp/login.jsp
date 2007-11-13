@@ -89,7 +89,14 @@
         <fmt:message key="Login.ForgotClickHere"/>
         </a>
       </div>
-      
+      <c:if test="${cosmoui:getConfigProperty('cosmo.service.account.requireActivation')}">      
+      <div style="padding-top:4px; text-align:center;">
+        <fmt:message key="Login.LostActivation"/>
+        <a href="${staticBaseUrl}/account/activation/recover">
+        <fmt:message key="Login.LostActivationClickHere"/>
+        </a>
+      </div>
+      </c:if>
       <div style="padding-top:36px; text-align:center;">
           <cosmo:aboutPopupLink/>
       </div>

@@ -753,6 +753,7 @@
          /account/activate/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/password/reset/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/password/recover=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
+         /account/activation/recover=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /login=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /signup=ROLE_ANONYMOUS
          /welcome=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT

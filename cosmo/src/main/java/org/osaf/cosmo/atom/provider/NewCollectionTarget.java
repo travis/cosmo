@@ -33,12 +33,12 @@ public class NewCollectionTarget extends AbstractTarget {
 
     /**
      * Constructs a <code>NewCollectionTarget</code> of type
-     * {@link TargetType.TYPE_COLLECTION}.
+     * {@link TargetType.TYPE_SERVICE}.
      */
     public NewCollectionTarget(RequestContext request,
                                User user,
                                HomeCollectionItem home) {
-        this(TargetType.TYPE_COLLECTION, request, user, home);
+        this(TargetType.TYPE_SERVICE, request, user, home);
     }
 
     public NewCollectionTarget(TargetType type,

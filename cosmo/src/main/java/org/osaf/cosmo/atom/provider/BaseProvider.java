@@ -86,9 +86,12 @@ public abstract class BaseProvider extends AbstractProvider
         String method = request.getMethod();
         TargetType type = request.getTarget().getType();
 
+        if (log.isDebugEnabled())
+            log.debug("servicing request for method " + method + " against target type " + type.name());
+
         try {
             if (method.equals("POST")) {
-                if (type == TargetType.TYPE_COLLECTION)
+                if (type == TargetType.TYPE_SERVICE)
                     return createCollection(request);
             } else if (method.equals("PUT")) {
                 if (type == TargetType.TYPE_COLLECTION)
@@ -113,6 +116,8 @@ public abstract class BaseProvider extends AbstractProvider
     public String[] getAllowedMethods(TargetType type) {
         if (type != null && type == TargetType.TYPE_COLLECTION)
             return new String[] {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS" };
+        if (type != null && type == TargetType.TYPE_SERVICE)
+            return new String[] { "GET", "POST", "HEAD", "OPTIONS" };
         return super.getAllowedMethods(type);
     }
 

@@ -266,7 +266,7 @@ module Cosmo
       length = rand(255) if length.nil?
       chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
       random_string = ""
-      1.upto(length) { |i| random_string << chars[rand(chars.size)] }
+      0.upto(length) { |i| random_string << chars[rand(chars.size)] }
       return random_string
     end 
   end
@@ -279,6 +279,10 @@ module Cosmo
       @user = user
       @pass = pass
       @context = context
+    end
+    
+    def init_req(req)
+      req['User-Agent'] = 'Cosmo Stress HTTP Client 1.0'
     end
     
     # Time the execution of a block of code

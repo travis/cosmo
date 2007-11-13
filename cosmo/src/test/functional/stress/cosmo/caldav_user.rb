@@ -175,9 +175,6 @@ module Cosmo
          <D:prop>
            <D:displayname>Someone's Events</D:displayname>
            <C:calendar-description xml:lang="en">Calendar restricted to events.</C:calendar-description>
-           <C:supported-calendar-component-set>
-             <C:comp name="VEVENT"/>
-           </C:supported-calendar-component-set>
            <C:calendar-timezone><![CDATA[BEGIN:VCALENDAR
 PRODID:-//Example Corp.//CalDAV Client//EN
 VERSION:2.0

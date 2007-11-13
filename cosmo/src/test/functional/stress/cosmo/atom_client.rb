@@ -46,6 +46,7 @@ module Cosmo
         
         strRequest << "?start=#{startRange}&end=#{endRange}" if !startRange.nil?
         req = Net::HTTP::Get.new(strRequest)
+        init_req(req)
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password
@@ -68,6 +69,7 @@ module Cosmo
         end
         
         req = Net::HTTP::Get.new(strRequest)
+        init_req(req)
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password
@@ -86,6 +88,7 @@ module Cosmo
         strRequest = "#{@context}#{COL_PATH}collection/#{collection}"
        
         req = Net::HTTP::Post.new(strRequest)
+        init_req(req)
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password
@@ -105,6 +108,7 @@ module Cosmo
         strRequest = "#{@context}#{COL_PATH}item/#{item}"
        
         req = Net::HTTP::Put.new(strRequest)
+        init_req(req)
         http.read_timeout=600
         # we make an HTTP basic auth by passing the
         # username and password

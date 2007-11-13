@@ -4,8 +4,14 @@
 alter table item alter column displayname set data type varchar(1024)
 alter table item add column hasmodifications smallint
 
+# get list of all items with modifications
+create table tmp_item (id bigint)
+insert into tmp_item (select distinct modifiesitemid from item)
+
+# update hasmodifications for all items
 update item set hasmodifications=0
-update item set hasmodifications=1 where id in (select distinct modifiesitemid from item)
+update item set hasmodifications=1 where id in (select id from tmp_item)
+drop table tmp_item
 
 # fix bad VALARM TRIGGERS allowed in previous versions
 # have to cheat here since derby doesn't support clobs in functions

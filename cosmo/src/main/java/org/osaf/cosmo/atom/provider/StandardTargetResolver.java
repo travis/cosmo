@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
@@ -112,8 +113,11 @@ public class StandardTargetResolver
             return createPreferenceTarget(context, match);
 
         match = TEMPLATE_SERVICE.match(uri);
-        if (match != null)
+        if (match != null) {
+            if (context.getMethod().equals("POST"))
+                return createNewCollectionTarget(context, match);
             return createServiceTarget(context, match);
+        }
 
         return null;
     }
@@ -245,6 +249,17 @@ public class StandardTargetResolver
         if (pref == null)
             return null;
         return new PreferenceTarget(context, user, pref);
+    }
+
+    /**
+     */
+    protected Target createNewCollectionTarget(RequestContext context,
+                                               UriTemplate.Match match) {
+        User user = userService.getUser(match.get("username"));
+        if (user == null)
+            return null;
+        HomeCollectionItem home = contentService.getRootItem(user);
+        return new NewCollectionTarget(context, user, home);
     }
 
     /**

@@ -59,10 +59,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-        assertNotNull("Null etag", res.getEntityTag());
-        assertEquals("Display name not updated", collection.getDisplayName(),
-                     "");
+        assertEquals("Incorrect response status", 400, res.getStatus());
     }
 
     public void testUpdateCollectionEmptyName() throws Exception {
@@ -74,10 +71,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
 
         ResponseContext res = provider.updateCollection(req);
         assertNotNull("Null response context", res);
-        assertEquals("Incorrect response status", 204, res.getStatus());
-        assertNotNull("Null etag", res.getEntityTag());
-        assertEquals("Display name not updated", collection.getDisplayName(),
-                     "");
+        assertEquals("Incorrect response status", 400, res.getStatus());
     }
 
     public RequestContext createRequestContext(CollectionItem collection,

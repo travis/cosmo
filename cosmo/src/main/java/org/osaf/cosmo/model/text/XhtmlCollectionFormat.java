@@ -69,8 +69,20 @@ public class XhtmlCollectionFormat extends BaseXhtmlFormat
 
                     String name = reader.getElementText();
                     if (StringUtils.isBlank(name))
-                        name = "";
+                        throw new ParseException("Empty name not allowed", reader.getLocation().getCharacterOffset());
                     collection.setDisplayName(name);
+
+                    continue;
+                }
+
+                if (inCollection && hasClass(reader, "uuid")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found uuid element");
+
+                    String uuid = reader.getElementText();
+                    if (StringUtils.isBlank(uuid))
+                        throw new ParseException("Empty uuid not allowed", reader.getLocation().getCharacterOffset());
+                    collection.setUid(uuid);
 
                     continue;
                 }
@@ -99,6 +111,15 @@ public class XhtmlCollectionFormat extends BaseXhtmlFormat
                 writer.writeAttribute("class", "name");
                 writer.writeCharacters(collection.getDisplayName());
                 writer.writeEndElement();
+            }
+
+            if (collection.getUid() != null) {
+                writer.writeCharacters(" (uuid ");
+                writer.writeStartElement("span");
+                writer.writeAttribute("class", "uuid");
+                writer.writeCharacters(collection.getUid());
+                writer.writeEndElement();
+                writer.writeCharacters(")");
             }
 
             writer.writeEndElement();

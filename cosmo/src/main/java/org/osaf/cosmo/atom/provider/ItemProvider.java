@@ -39,6 +39,8 @@ import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.AbstractResponseContext;
+import org.apache.abdera.util.EntityTag;
 import org.apache.abdera.util.MimeTypeHelper;
 
 import org.apache.commons.io.IOUtils;
@@ -57,6 +59,7 @@ import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.BaseEventStamp;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
@@ -67,6 +70,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.UidInUseException;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
@@ -376,7 +380,52 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     // ExtendedProvider methods
   
     public ResponseContext createCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+        NewCollectionTarget target = (NewCollectionTarget) request.getTarget();
+        User user = target.getUser();
+        HomeCollectionItem home = target.getHomeCollection();
+
+        if (log.isDebugEnabled())
+            log.debug("creating collection in home collection of user '" + user.getUsername() + "'");
+
+        ResponseContext frc = checkCollectionWritePreconditions(request);
+        if (frc != null)
+            return frc;
+
+        try {
+            CollectionItem content = readCollection(request);
+
+            CollectionItem collection = new CollectionItem();
+            collection.setUid(content.getUid());
+            String name = content.getDisplayName().replaceAll("[\\/\\?\\#\\=\\;]", "_");
+            collection.setName(name);
+            collection.setDisplayName(content.getDisplayName());
+            collection.setOwner(user);
+
+            CalendarCollectionStamp stamp =
+                new CalendarCollectionStamp(collection);
+            stamp.setDescription(collection.getDisplayName());
+            // XXX set the calendar language from Content-Language
+            collection.addStamp(stamp);
+
+            collection = contentService.createCollection(home, collection);
+
+            ServiceLocator locator = createServiceLocator(request);
+
+            return created(collection, locator);
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return servererror(getAbdera(), request, reason, e);
+        } catch (ValidationException e) {
+            String msg = "Invalid request content: " + e.getMessage();
+            if (e.getCause() != null)
+                msg += ": " + e.getCause().getMessage();
+            return badrequest(getAbdera(), request, msg);
+        } catch (UidInUseException e) {
+            return conflict(getAbdera(), request, "Uid already in use");
+        } catch (CollectionLockedException e) {
+            return locked(getAbdera(), request);
+        }
     }
 
     public ResponseContext updateCollection(RequestContext request) {
@@ -710,13 +759,15 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     private CollectionItem readCollection(RequestContext request)
         throws IOException, ValidationException {
         try {
-            XhtmlCollectionFormat formatter = new XhtmlCollectionFormat();
             Reader in = request.getReader();
             if (in == null)
                 throw new ValidationException("An entity-body must be provided");
+
+            XhtmlCollectionFormat formatter = new XhtmlCollectionFormat();
             CollectionItem collection = formatter.parse(IOUtils.toString(in));
             if (collection.getDisplayName() == null)
-                collection.setDisplayName("");
+                throw new ValidationException("Display name is required");
+
             return collection;
         } catch (java.text.ParseException e) {
             throw new ValidationException("Error parsing XHTML content", e);
@@ -744,5 +795,21 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return false;
         
         return true;
+    }
+
+    private ResponseContext created(CollectionItem collection,
+                                    ServiceLocator locator) {
+        AbstractResponseContext rc = createResponseContext(201, "Created");
+
+        rc.setEntityTag(new EntityTag(collection.getEntityTag()));
+        rc.setLastModified(collection.getModifiedDate());
+
+        String location =
+            locator.getAtomCollectionUrl(collection.getUid(), true);
+        rc.setLocation(location);
+        // don't set Content-Location since no content is included in the
+        // response
+
+        return rc;
     }
 }

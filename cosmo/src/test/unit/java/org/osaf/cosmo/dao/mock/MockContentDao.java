@@ -72,6 +72,8 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new IllegalArgumentException("parent cannot be null");
         if (collection == null)
             throw new IllegalArgumentException("collection cannot be null");
+        if (getStorage().getItemByUid(collection.getUid()) != null)
+            throw new UidInUseException(collection.getUid());
 
         collection.getParents().add(parent);
 

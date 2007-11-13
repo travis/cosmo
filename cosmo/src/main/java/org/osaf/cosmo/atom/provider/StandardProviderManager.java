@@ -42,7 +42,8 @@ public class StandardProviderManager
             return expandedItemProvider;
         if (target instanceof DetachedItemTarget)
             return detachedItemProvider;
-        if (target instanceof BaseItemTarget)
+        if (target instanceof BaseItemTarget ||
+            target instanceof NewCollectionTarget)
             return itemProvider;
         if (target instanceof SubscriptionsTarget ||
             target instanceof SubscriptionTarget)

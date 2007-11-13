@@ -87,7 +87,10 @@ public abstract class BaseProvider extends AbstractProvider
         TargetType type = request.getTarget().getType();
 
         try {
-            if (method.equals("PUT")) {
+            if (method.equals("POST")) {
+                if (type == TargetType.TYPE_COLLECTION)
+                    return createCollection(request);
+            } else if (method.equals("PUT")) {
                 if (type == TargetType.TYPE_COLLECTION)
                     return updateCollection(request);
             } else if (method.equals("DELETE")) {

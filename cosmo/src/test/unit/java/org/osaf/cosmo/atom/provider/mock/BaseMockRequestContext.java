@@ -98,11 +98,17 @@ public class BaseMockRequestContext extends HttpServletRequestContext
         setContent(entry);
     }
 
-    public void setPropertiesAsText(Properties props)
+    public void setProperties(Properties props,
+                              String mediaType)
         throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         props.store(out, null);
-        setContentAsText(out.toString());
+        setContent(out.toString(), mediaType);
+    }
+
+    public void setPropertiesAsText(Properties props)
+        throws IOException {
+        setProperties(props, "text/plain");
     }
 
     public void setPropertiesAsEntry(Properties props)

@@ -216,15 +216,24 @@ public abstract class BaseProvider extends AbstractProvider
         return null;
     }
 
-    protected ResponseContext
-        checkEntryWritePreconditions(RequestContext request) {
+    protected ResponseContext checkEntryWritePreconditions(RequestContext request) {
+        return checkEntryWritePreconditions(request, true);
+    }
+
+    protected ResponseContext checkEntryWritePreconditions(RequestContext request,
+                                                           boolean requireAtomContent) {
         int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
         if (contentLength <= 0)
             return lengthrequired(getAbdera(), request);
 
         MimeType ct = request.getContentType();
-        if (ct == null ||
-            ! MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, ct.toString()))
+        if (ct == null)
+            return badrequest(getAbdera(), request, "Content-Type required");
+
+        if (! requireAtomContent)
+            return null;
+
+        if (! MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, ct.toString()))
             return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
 
         try {
@@ -239,8 +248,7 @@ public abstract class BaseProvider extends AbstractProvider
         return null;
     }
 
-    protected ResponseContext
-        checkMediaWritePreconditions(RequestContext request) {
+    protected ResponseContext checkMediaWritePreconditions(RequestContext request) {
         int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
         if (contentLength <= 0)
             return lengthrequired(getAbdera(), request);

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider;
 
+import net.fortuna.ical4j.model.component.VEvent;
+
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.RequestContext;
@@ -45,9 +47,28 @@ public class CreateItemTest extends BaseItemProviderTestCase
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
         assertNotNull("Null last modified", res.getLastModified());
-        assertNotNull("Null Location header", res.getHeader("Location"));
-        assertNotNull("Null Content-Location header",
-                      res.getHeader("Content-Location"));
+        assertNotNull("Null Location header", res.getLocation());
+        assertNotNull("Null Content-Location header", res.getContentLocation());
+    }
+
+    public void testCreateMediaEvent() throws Exception {
+        CollectionItem collection = helper.makeAndStoreDummyCollection();
+
+        helper.forgetProjections();
+        helper.forgetContentTypes();
+        helper.rememberContentType("application/xhtml+xml");
+
+        VEvent event = helper.makeDummyEvent();
+        RequestContext req = createRequestContext(collection, event);
+
+        ResponseContext res = provider.createEntry(req);
+        log.error(helper.getContent(res));
+        assertNotNull("Null response context", res);
+        assertEquals("Incorrect response status", 201, res.getStatus());
+        assertNotNull("Null etag", res.getEntityTag());
+        assertNotNull("Null last modified", res.getLastModified());
+        assertNotNull("Null Location header", res.getLocation());
+        assertNotNull("Null Content-Location header", res.getContentLocation());
     }
 
     public void testUnsupportedContentType() throws Exception {
@@ -133,6 +154,16 @@ public class CreateItemTest extends BaseItemProviderTestCase
             new MockCollectionRequestContext(helper.getServiceContext(),
                                              collection, "POST");
         rc.setPropertiesAsEntry(serialize(item));
+        return rc;
+    }
+
+    private RequestContext createRequestContext(CollectionItem collection,
+                                                VEvent event)
+        throws Exception {
+        MockCollectionRequestContext rc =
+            new MockCollectionRequestContext(helper.getServiceContext(),
+                                             collection, "POST");
+        rc.setProperties(serialize(event), "application/xhtml+xml");
         return rc;
     }
 }

@@ -17,6 +17,8 @@ package org.osaf.cosmo.atom.provider;
 
 import java.util.Properties;
 
+import net.fortuna.ical4j.model.component.VEvent;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -62,5 +64,18 @@ public abstract class BaseItemProviderTestCase extends BaseProviderTestCase {
 
         XhtmlCollectionFormat format = new XhtmlCollectionFormat();
         return format.format(collection);
+    }
+
+    protected Properties serialize(VEvent event) {
+        if (event == null)
+            return null;
+
+        Properties props = new Properties();
+
+        props.setProperty("uid", event.getUid().getValue());
+        props.setProperty("name", event.getSummary().getValue());
+        props.setProperty("startDate", event.getStartDate().getValue());
+
+        return props;
     }
 }

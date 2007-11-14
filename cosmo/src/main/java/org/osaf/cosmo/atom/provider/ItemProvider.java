@@ -40,6 +40,7 @@ import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.TargetType;
 import org.apache.abdera.protocol.server.impl.AbstractResponseContext;
+import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
 import org.apache.abdera.util.MimeTypeHelper;
 
@@ -118,16 +119,30 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         if (log.isDebugEnabled())
             log.debug("creating entry in collection " + collection.getUid());
 
-        ResponseContext frc = checkEntryWritePreconditions(request);
+        ResponseContext frc = checkEntryWritePreconditions(request, false);
         if (frc != null)
             return frc;
 
         try {
-            // XXX: does abdera automatically resolve external content?
-            Entry entry = (Entry) request.getDocument().getRoot();
-            ContentProcessor processor = createContentProcessor(entry);
-            NoteItem item =
-                processor.processCreation(entry.getContent(), collection);
+            String mediaType = request.getContentType().toString();
+
+            Entry entry = null;
+            ContentProcessor processor = null;
+            NoteItem item = null;
+            if (MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, mediaType)) {
+                // XXX: does abdera automatically resolve external content?
+                entry = (Entry) request.getDocument().getRoot();
+                processor = createContentProcessor(entry);
+                item = processor.processCreation(entry.getContent(), collection);
+            } else {
+                try {
+                    processor = createContentProcessor(mediaType);
+                } catch (UnsupportedContentTypeException e) {
+                    return notsupported(getAbdera(), request, "Content-type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
+                }
+                item = processor.processCreation(request.getReader(), collection);
+            }
+
             item = (NoteItem) contentService.createContent(collection, item);
 
             ItemTarget itemTarget =

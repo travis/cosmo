@@ -291,4 +291,24 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
     }
 };
 
+cosmo.view.displayViewFromCollections = function (c) {
+    var newCollection = c || null;
+    var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+    // Publish this through a setTimeout call to
+    // avoid hanging the UI thread
+    if (newCollection) {
+        cosmo.app.pim.currentCollection = newCollection;
+    }
+    var f = function () { dojo.event.topic.publish('/calEvent', {
+        action: 'loadCollection', opts: { loadType: 'changeCollection',
+        collection: newCollection }, data: {}
+    }); };
+    loading.show();
+    // Wrap in setTimeout so we don't lock up the UI
+    // thread during the publish operation --
+    // Make the timeout value a bit higher to
+    // ensure that the 'loading' status message appears
+    setTimeout(f, 35);
+};
+
 

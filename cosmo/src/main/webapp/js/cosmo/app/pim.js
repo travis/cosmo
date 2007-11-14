@@ -363,21 +363,60 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         this.allDayArea = null;
     };
 
-    this.reloadCollections = function(){
-        //first get a handle on the currenct collection so we don't lose it.
+    this.reloadCollections = function (removedCollection) {
         var currentCollection = this.currentCollection;
-        this.loadCollections({ticketKey: this.ticketKey});
-
-        if (this.currentCollection) {
-            if (!this.collections.getItem(currentCollection.getUid())){
-                cosmo.app.showErr(_("Main.Error.CollectionRemoved",
-                    currentCollection.getDisplayName()));
-                this.currentCollection = this.collections.getAtPos(0);
+       
+        // Don't bother saving state and reloading from
+        // the server if it's a removal
+        if (!removedCollection) {
+            var state = {};
+            var saveState = function (id, coll) {
+                state[id] = {
+                    isDisplayed: coll.isDisplayed,
+                    isOverlaid: coll.isOverlaid,
+                    doDisplay: coll.doDisplay };
+            };
+            // Preserve selected/overlaid state
+            this.collections.each(saveState);
+            // Reload collections from the server
+            this.loadCollections({ ticketKey: this.ticketKey });
+            // Restore any saved state
+            for (var p in state) {
+                var savedProps = state[p];
+                var loadedColl = this.collections.getItem(p);
+                if (loadedColl) {
+                    for (q in savedProps) {
+                        loadedColl[q] = savedProps[q];
+                    }
+                }
             }
+        }
 
-            dojo.event.topic.publish('/calEvent', { action: 'loadCollection',
-                opts: { loadType: 'changeCollection',
-                collection: this.currentCollection }, data: {}})
+        // If we had an originally selected collection
+        if (currentCollection) {
+            var selCollId = currentCollection.getUid();
+            var newSel = this.collections.getItem(selCollId);
+            // If the originally selected collection is in
+            // the new set, point to the one in the new set
+            if (newSel) {
+                this.currentCollection = newSel;
+                newSel.doDisplay = true;
+            }
+            // If the originally selected collection is gone,
+            // and was not the one removed by the user,
+            // show the user a nice error message
+            else {
+                if (currentCollection != removedCollection) {
+                    cosmo.app.showErr(_("Main.Error.CollectionRemoved",
+                        currentCollection.getDisplayName()));
+                }
+                // Default new selection is the first collection
+                // in the list
+                this.currentCollection = this.collections.getAtPos(0);
+                this.currentCollection.doDisplay = true;
+            }
+            cosmo.view.displayViewFromCollections(
+                this.currentCollection);
         }
     }
 }, cosmo.app.pim);

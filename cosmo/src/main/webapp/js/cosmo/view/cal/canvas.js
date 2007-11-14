@@ -659,7 +659,7 @@ cosmo.view.cal.canvas = new function () {
             var collId = sel.primaryCollectionId ?
                 sel.primaryCollectionId : sel.collectionIds[0];
             var coll = cosmo.app.pim.collections.getItem(collId);
-            cosmo.view.cal.displayCollections(coll);
+            cosmo.view.displayViewFromCollections(coll);
         }
         // Pass the item or id, set as the selected item
         // for the current collection

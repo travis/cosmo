@@ -211,6 +211,7 @@ cosmo.app = new function () {
         valueInput.value = defaultValue || "";
         valueInput.type = "text";
         valueInput.id = "getValueInput";
+        valueInput.className = "inputText";
         retryConditions = retryConditions || [];
         var deferred = new dojo.Deferred();
         var submitFunc = dojo.lang.hitch(this, function () { 
@@ -224,8 +225,9 @@ cosmo.app = new function () {
                                     }
                                     deferred.callback(valueInput.value);
                                     }) 
+        var buttonText = kwArgs.defaultActionButtonText || _('App.Button.Submit'); 
         var button = new cosmo.ui.button.Button(
-                              { text:_('App.Button.Submit'), 
+                              { text: buttonText, 
                                 id: "getValueSubmit",
                                 width:74,
                                 handleOnClick: submitFunc
@@ -234,9 +236,9 @@ cosmo.app = new function () {
             "btnsRight": [button],
             "content": valueInput,
             "prompt": valuePrompt,
-            "width" : 250,
-            "height" : 100,
-            "defaultAction" : submitFunc
+            "width": 250,
+            "height": 100,
+            "defaultAction": submitFunc
         };
         if (kwArgs.showCancel){
             dialogProps.btnsLeft = [
@@ -250,6 +252,9 @@ cosmo.app = new function () {
             ]
         }
         self.showDialog(dialogProps);
+        if (typeof valueInput.select == 'function') {
+            valueInput.select();
+        }
         return deferred;
     };
     this.showAndWait = function (message, returnValue){

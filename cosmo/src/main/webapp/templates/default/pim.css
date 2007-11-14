@@ -528,6 +528,10 @@
     border-top: 1px solid white;
     cursor: pointer;
 }
+#newCollectionDiv {
+    width: 100%;
+    padding: 3px;
+}
 
 /* Minical styles
  * --------------------- */
@@ -604,10 +608,4 @@
 }
 .miniSelected {
     background: #deeeff;
-}
-div#newCollectionDiv {
-    width: 100%;
-}
-a#newCollectionLink {
-    padding-left: 5px;
 }

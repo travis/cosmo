@@ -175,6 +175,7 @@ cosmo.ui.navbar.Bar = function (p) {
                     _view.canvas.init();
                 }
                 // Only switch views if the data for the view loads successfully
+                // or if we're not gettting data from the server
                 if (noLoad || _view.triggerLoadEvents()) {
                     self.listCanvas.domNode.style.display = 'none';
                     self.calCanvas.domNode.style.display = 'block';

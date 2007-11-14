@@ -151,7 +151,7 @@ dojo.widget.HtmlWidget, function(){
                     dojo.event.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
                 }
             }
-            
+
         },
 
         saveDisplayName: function(){
@@ -199,12 +199,22 @@ dojo.widget.HtmlWidget, function(){
                 function(confirmed){
                     if (confirmed){
                         cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
-                        var deleteDeferred = 
+                        var deleteDeferred =
                             cosmo.app.pim.serv.deleteCollection(collectionToDelete);
-                        deleteDeferred.addCallback(function(){
-                            cosmo.app.pim.collections.removeItem(collectionToDelete.getUid());
-                            cosmo.topics.publish(cosmo.topics.CollectionDeletedMessage, 
-                                                 [collectionToDelete]);
+                        deleteDeferred.addCallback(function () {
+                            // FIXME: Need to reorg the collections-related code
+                            // to behave similarly to CalItem/ListItem Items
+                            // with add/remove, update view (the collection selector), etc.
+                            var deleteId = collectionToDelete.getUid();
+                            // Remove the collection from the list of collections
+                            cosmo.app.pim.collections.removeItem(deleteId);
+                            // Remove the collection's entry in the list of renderable
+                            // collections for the cal canvas overlay
+                            delete cosmo.view.cal.collectionItemRegistries[deleteId];
+
+                            // Re-render collections, update selected collection
+                            // if necessary, and update the view
+                            cosmo.app.pim.reloadCollections(collectionToDelete);
                             cosmo.app.hideDialog();
                         });
                     } else {
@@ -216,8 +226,8 @@ dojo.widget.HtmlWidget, function(){
             // Errback to catch any other errors.
             confirmDeferred.addErrback(function(e){
                 cosmo.app.showErr(
-                    _("Main.DeleteCollection.Failed", 
-                      collectionToDelete.getDisplayName()), 
+                    _("Main.DeleteCollection.Failed",
+                      collectionToDelete.getDisplayName()),
                     e.message, e);
             });
             return confirmDeferred;

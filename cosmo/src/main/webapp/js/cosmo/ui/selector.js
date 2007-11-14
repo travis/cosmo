@@ -37,8 +37,6 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     dojo.event.topic.subscribe('/calEvent', _this, 'handlePub_calEvent');
     dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
         _this, 'handlePub_app');
-    dojo.event.topic.subscribe(cosmo.topics.CollectionDeletedMessage.topicName,
-        _this, 'handleCollectionDeleted');
     dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
         _this, 'handlePub_app');
 
@@ -89,6 +87,9 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
         switch (act) {
+            // FIXME: Piggybacking rendering on view changes -- used here
+            // so the overlay checkboxes can appear/disapper. This also
+            // triggers initial render when app loads
             case 'eventsLoadSuccess':
                 this.render();
                 break;
@@ -102,10 +103,6 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         this.render();
     };
 
-    // Function to handle collection deleted event.
-    this.handleCollectionDeleted = function(collection){
-        this.render()
-    };
     this.renderSelf = function () {
         // Preserve scrolled state
         var origContainer = $('collectionSelectorContainer');
@@ -229,7 +226,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         a.appendChild(_createText(_("Main.NewCollection")));
 
         dojo.event.connect(a, "onclick", function(){
-            var collectionNameDeferred = 
+            var collectionNameDeferred =
                 cosmo.app.getValue(
                     _("Main.NewCollection.NamePrompt"),
                     _("Main.NewCollection.DefaultName"),
@@ -240,7 +237,8 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                             }
                         }
                     }],
-                    {showCancel: true}
+                    { defaultActionButtonText: _('App.Button.Save'),
+                        showCancel: true }
                     );
             collectionNameDeferred.addCallback(function(name){
                 cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
@@ -255,12 +253,12 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 createDeferred.addBoth(function(){
                     cosmo.app.hideDialog();
                 });
-                
+
             });
         });
 
         d.appendChild(a);
-        container.appendChild(d);
+        this.domNode.appendChild(d);
 
     };
     this.handleMouseOver = function (e) {
@@ -303,7 +301,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                             currColl.doDisplay = false;
                         }
                         newCurrColl.doDisplay = true;
-                        cosmo.view.cal.displayCollections(newCurrColl);
+                        cosmo.view.displayViewFromCollections(newCurrColl);
                     }
                 }
                 // Overlays
@@ -314,7 +312,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     newCurrColl.doDisplay = d;
                     newCurrColl.isOverlaid = d;
                     if (id == currId) { return false; }
-                    cosmo.view.cal.displayCollections();
+                    cosmo.view.displayViewFromCollections();
                 }
             }
         }

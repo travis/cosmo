@@ -19,6 +19,7 @@ import java.io.Reader;
 
 import junit.framework.TestCase;
 
+import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.logging.Log;
@@ -38,11 +39,12 @@ public class HCalendarProcessorTest extends TestCase {
         Reader content = helper.getReader("hcalendar/example2.xhtml");
 
         HCalendarProcessor processor = new HCalendarProcessor();
-        try {
-            VEvent event = (VEvent) processor.readCalendarComponent(content);
-            fail("Stub parser returned an event");
-        } catch (ValidationException e) {}
-//        assertNotNull("Null event", event);
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+        System.out.println("event:\n" + event.toString());
     }
 
     protected void setUp() {

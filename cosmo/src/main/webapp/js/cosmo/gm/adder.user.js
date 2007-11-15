@@ -30,19 +30,42 @@ function getEventNodes(){
 
 function addSelect(node) {
     var span = document.createElement('span');
-    var image = document.createElement('img');
-    image.src = imgData;
-    image.border = 0;
+    var image = createCosmoIcon();
     span.appendChild(image);
     node.appendChild(span);
     span.appendChild(createSelect(node));
 };
 
+function createCosmoIcon(){
+    var image = document.createElement('img');
+    image.src = imgData;
+    image.border = 0;
+    return image;
+}
+
+function addAddAllLink(){
+    var addAllDiv = document.createElement("div");
+    var image = createCosmoIcon();
+    addAllDiv.appendChild(image);
+    addAllDiv.appendChild(createSelect());
+    document.body.appendChild(document.createElement("br"))
+    document.body.appendChild(addAllDiv);
+}
+
+// summary: creates a select box to put on a given node
+// description: Uses the COLLECTIONS variable to populate the select box.
+//              Adds an "onchange" so that when the select item is changed
+//              the node/vevent is posted to the selected collection.
+//
+//              If no node is given, a similar select box is created, the difference
+//              being that the onchange will cause ALL events on the page to be posted
+//              to the specified URL.
 function createSelect(node){
     var sel = document.createElement('select');
     var option = document.createElement("option");
     option.value = null;
-    option.appendChild(document.createTextNode("Add To Chandler Server..."));
+    option.appendChild(document.createTextNode(node ? "Add To Chandler Server..." 
+                                               : "Add All Events To Chandler Server"));
     sel.appendChild(option);
     for (var x = 0; x < COLLECTIONS.length; x++){
         var option = document.createElement("option");
@@ -52,17 +75,25 @@ function createSelect(node){
     }
     var onChangeFunction = function(){
         var url = sel.options.item(sel.selectedIndex).value;
-        addEvent(node, url);
+        if (node){
+            addEvent(node, url);
+        } else {
+            addAllEvents(url);
+        }
         sel.selectedIndex = 0;
     }
     sel.addEventListener("change", onChangeFunction, true);
 
     return sel;
 }
+
 var nodes = getEventNodes();
 if (nodes){
     for (var x = 0; x < nodes.length; x++){
         addSelect(nodes[x]);
+    }
+    if (nodes.length > 0){
+        addAddAllLink();
     }
 }
 
@@ -93,6 +124,10 @@ function addEvent(xml, url){
             ].join("\n"))
         }
     });
+}
+
+function addAllEvents(){
+    alert("not implemented yet!")
 }
 
 function hCalToBase64(xml){
@@ -164,6 +199,4 @@ function _utf8_encode(string) {
         }  
          }  
          return utftext;  
-} 
-
-
+}

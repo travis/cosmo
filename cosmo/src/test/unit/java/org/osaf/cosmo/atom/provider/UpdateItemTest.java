@@ -44,7 +44,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("this is a new name");
+        copy.setDisplayName("this is a new name");
         RequestContext req = createRequestContext(item, copy);
 
         ResponseContext res = provider.updateEntry(req);
@@ -58,7 +58,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("this is a new name");
+        copy.setDisplayName("this is a new name");
         RequestContext req = createRequestContext(item, copy);
         helper.forgetContentTypes();
 
@@ -71,7 +71,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("this is a new name");
+        copy.setDisplayName("this is a new name");
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorValidationError();
 
@@ -84,7 +84,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("this is a new name");
+        copy.setDisplayName("this is a new name");
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorFailure();
 

@@ -119,8 +119,7 @@ public class OutOfTheBoxHelper {
                       user.getLastName(), user.getUsername());
 
         item.setUid(contentDao.generateUid());
-        item.setName(name);
-        item.setDisplayName(item.getName());
+        item.setDisplayName(name);
         item.setOwner(user);
         item.setClientCreationDate(Calendar.getInstance(tz, locale).getTime());
         item.setClientModifiedDate(item.getClientCreationDate());
@@ -172,8 +171,7 @@ public class OutOfTheBoxHelper {
         triage.setCode(TriageStatus.CODE_LATER);
 
         item.setUid(contentDao.generateUid());
-        item.setName(name);
-        item.setDisplayName(item.getName());
+        item.setDisplayName(name);
         item.setOwner(user);
         item.setClientCreationDate(Calendar.getInstance(tz, locale).getTime());
         item.setClientModifiedDate(item.getClientCreationDate());
@@ -218,8 +216,7 @@ public class OutOfTheBoxHelper {
         triage.setCode(TriageStatus.CODE_DONE);
 
         item.setUid(contentDao.generateUid());
-        item.setName(name);
-        item.setDisplayName(item.getName());
+        item.setDisplayName(name);
         item.setOwner(user);
         item.setClientCreationDate(Calendar.getInstance(tz, locale).getTime());
         item.setClientModifiedDate(item.getClientCreationDate());

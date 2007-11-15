@@ -161,21 +161,6 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         } catch (IcalUidInUseException e) {}
     
     }
-  
-    public void testContentDaoInvalidContentNullName() throws Exception {
-      
-        User user = getUser(userDao, "testuser");
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
-
-        ContentItem item = generateTestContent();
-        item.setName(null);
-
-        try {
-            contentDao.createContent(root, item);
-            Assert.fail("able to create invalid content.");
-        } catch (DataIntegrityViolationException e) {
-        }
-    }
 
     public void testContentDaoInvalidContentEmptyName() throws Exception {
         

@@ -68,8 +68,6 @@ public class MockContentProcessor extends BaseContentProcessor {
         NoteItem item = new NoteItem();
         item.setOwner(collection.getOwner());
         setItemProperties(content, item);
-        if (item.getName() == null)
-            item.setName(item.getUid());
 
         return item;
     }

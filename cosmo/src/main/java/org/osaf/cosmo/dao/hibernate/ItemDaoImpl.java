@@ -600,6 +600,8 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected void setBaseItemProps(Item item) {
         if (item.getUid() == null)
             item.setUid(idGenerator.nextIdentifier().toString());
+        if (item.getName() == null)
+            item.setName(item.getUid());
         for (Ticket ticket : item.getTickets()) {
             if (ticket.getOwner() == null)
                 ticket.setOwner(item.getOwner());

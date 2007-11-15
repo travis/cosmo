@@ -114,7 +114,7 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
 
     private void applyEvent(NoteItem item,
                             VEvent event) {
-        item.setName(event.getSummary().getValue());
+        item.setDisplayName(event.getSummary().getValue());
 
         if (event.getUid() != null)
             item.setIcalUid(event.getUid().getValue());

@@ -110,7 +110,6 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
         throws ValidationException {
         NoteItem child = new NoteItem();
 
-        child.setName(recordset.getUuid());
         child.setUid(recordset.getUuid());
         child.setIcalUid(child.getUid());
         child.setOwner(collection.getOwner());

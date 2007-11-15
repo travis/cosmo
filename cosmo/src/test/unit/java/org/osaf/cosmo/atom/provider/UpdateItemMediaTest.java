@@ -34,7 +34,6 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("item copy");
         RequestContext req = createRequestContext(item, copy);
         log.error("content-type: " + req.getContentType());
 
@@ -50,7 +49,6 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("item copy");
         RequestContext req = createRequestContext(item, copy);
         helper.forgetContentTypes();
 
@@ -63,7 +61,6 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("item copy");
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorValidationError();
 
@@ -76,7 +73,6 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         NoteItem item = helper.makeAndStoreDummyItem();
         NoteItem copy = (NoteItem) item.copy();
         copy.setUid(item.getUid());
-        copy.setName("item copy");
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorFailure();
 

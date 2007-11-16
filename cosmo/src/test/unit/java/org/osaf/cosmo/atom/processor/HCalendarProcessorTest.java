@@ -35,6 +35,18 @@ public class HCalendarProcessorTest extends TestCase {
 
     protected TestHelper helper;
 
+    public void testExample1() throws Exception {
+        Reader content = helper.getReader("hcalendar/example1.xhtml");
+
+        HCalendarProcessor processor = new HCalendarProcessor();
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+        System.out.println("Example 1:\n" + event.toString());
+    }
+
     public void testExample2() throws Exception {
         Reader content = helper.getReader("hcalendar/example2.xhtml");
 
@@ -44,7 +56,7 @@ public class HCalendarProcessorTest extends TestCase {
         assertTrue("Component not a VEVENT", component instanceof VEvent);
 
         VEvent event = (VEvent) component;
-        System.out.println("event:\n" + event.toString());
+        System.out.println("Example 2:\n" + event.toString());
     }
 
     protected void setUp() {

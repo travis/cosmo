@@ -114,6 +114,22 @@ public class HCalendarProcessorTest extends TestCase {
         assertEquals("Incorrect URL", "URL:http://www.laughingsquid.com/squidlist/calendar/12377/2006/1/25", event.getUrl().toString().trim());
     }
 
+    public void testLang() throws Exception {
+        Reader content = helper.getReader("hcalendar/hcalendar-calendar-lang-sub-lang.html");
+
+        HCalendarProcessor processor = new HCalendarProcessor();
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+        assertEquals("Incorrect DTSTART", "DTSTART;VALUE=DATE:20051005", event.getStartDate().toString().trim());
+        assertEquals("Incorrect DTEND", "DTEND;VALUE=DATE:20051008", event.getEndDate().toString().trim());
+        assertEquals("Incorrect SUMMARY", "SUMMARY:Web 2.0 Conference", event.getSummary().toString().trim());
+        assertEquals("Incorrect LOCATION", "LOCATION;LANGUAGE=de:Serrano Hotel\\, San Francisco\\, CA", event.getLocation().toString().trim());
+        assertEquals("Incorrect URL", "URL:http://www.web2con.com/", event.getUrl().toString().trim());
+    }
+
     protected void setUp() {
         helper = new TestHelper();
     }

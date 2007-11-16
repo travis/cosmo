@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathException;
@@ -80,13 +81,12 @@ import org.xml.sax.SAXParseException;
  * This parser recognizes the following properties:
  * </p>
  * <ul>
- * <li> "dtstart" (required) </li>
+ * <li> "dtstart"</li>
  * <li> "dtend" </li>
  * <li> "duration" </li>
- * <li> "summary" (required) </li>
+ * <li> "summary"</li>
  * <li> "uid" </li>
  * <li> "dtstamp" </li>
- * <li> "method" </li>
  * <li> "category" </li>
  * <li> "location" </li>
  * <li> "url" </li>
@@ -140,7 +140,6 @@ public class HCalendarParser implements CalendarParser {
     private static final XPathExpression XPATH_SUMMARY;
     private static final XPathExpression XPATH_UID;
     private static final XPathExpression XPATH_DTSTAMP;
-    private static final XPathExpression XPATH_METHOD;
     private static final XPathExpression XPATH_CATEGORY;
     private static final XPathExpression XPATH_LOCATION;
     private static final XPathExpression XPATH_URL;
@@ -169,7 +168,6 @@ public class HCalendarParser implements CalendarParser {
         XPATH_SUMMARY = _compileExpression(".//*[contains(@class, 'summary')]");
         XPATH_UID = _compileExpression(".//*[contains(@class, 'uid')]");
         XPATH_DTSTAMP = _compileExpression(".//*[contains(@class, 'dtstamp')]");
-        XPATH_METHOD = _compileExpression(".//*[contains(@class, 'method')]");
         XPATH_CATEGORY = _compileExpression(".//*[contains(@class, 'category')]");
         XPATH_LOCATION = _compileExpression(".//*[contains(@class, 'location')]");
         XPATH_URL = _compileExpression(".//*[contains(@class, 'url')]");
@@ -313,13 +311,12 @@ public class HCalendarParser implements CalendarParser {
 
         handler.startComponent(name);
 
-        buildProperty(findElement(XPATH_DTSTART, element), Property.DTSTART, handler, true);
+        buildProperty(findElement(XPATH_DTSTART, element), Property.DTSTART, handler);
         buildProperty(findElement(XPATH_DTEND, element), Property.DTEND, handler);
         buildProperty(findElement(XPATH_DURATION, element), Property.DURATION, handler);
-        buildProperty(findElement(XPATH_SUMMARY, element), Property.SUMMARY, handler, true);
+        buildProperty(findElement(XPATH_SUMMARY, element), Property.SUMMARY, handler);
         buildProperty(findElement(XPATH_UID, element), Property.UID, handler);
         buildProperty(findElement(XPATH_DTSTAMP, element), Property.DTSTAMP, handler);
-        buildProperty(findElement(XPATH_METHOD, element), Property.METHOD, handler);
         for (Element category : findElements(XPATH_CATEGORY, element))
             buildProperty(category, Property.CATEGORIES, handler);
         buildProperty(findElement(XPATH_LOCATION, element), Property.LOCATION, handler);
@@ -340,21 +337,10 @@ public class HCalendarParser implements CalendarParser {
                                String propName,
                                ContentHandler handler)
         throws ParserException {
-        buildProperty(element, propName, handler, false);
-    }
+        if (element == null)
+            return;
 
-    private void buildProperty(Element element,
-                               String propName,
-                               ContentHandler handler,
-                               boolean required)
-        throws ParserException {
         String elementName = _elementName(propName);
-
-        if (element == null) {
-            if (! required)
-                return;
-            throw new ParserException("Property element '" + elementName + "' required", -1);
-        }
 
         if (log.isDebugEnabled())
             log.debug("Building property " + propName);
@@ -412,7 +398,13 @@ public class HCalendarParser implements CalendarParser {
             }
         }
 
-        // XXX: does hCalendar provide for parameters?
+        if (isTextProperty(propName)) {
+            String lang = element.getAttributeNS(XMLConstants.XML_NS_URI, "lang");
+            if (! StringUtils.isBlank(lang))
+                try { handler.parameter(Parameter.LANGUAGE, lang); } catch (Exception e) {}
+        }
+
+        // XXX: other parameters?
 
         try {
             handler.propertyValue(value);
@@ -445,7 +437,18 @@ public class HCalendarParser implements CalendarParser {
     }
 
     private static boolean isUrlProperty(String name) {
-        return (name.equals(Property.URL));
+        return (name.equals(Property.URL) ||
+                name.equals(Property.LAST_MODIFIED));
+    }
+
+    private static boolean isTextProperty(String name) {
+        return (name.equals(Property.SUMMARY) ||
+                name.equals(Property.LOCATION) ||
+                name.equals(Property.CATEGORIES) ||
+                name.equals(Property.DESCRIPTION) ||
+                name.equals(Property.ATTENDEE) ||
+                name.equals(Property.CONTACT) ||
+                name.equals(Property.ORGANIZER));
     }
 
     private static Date _icalDate(String original)

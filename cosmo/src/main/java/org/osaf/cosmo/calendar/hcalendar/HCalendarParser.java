@@ -340,39 +340,40 @@ public class HCalendarParser implements CalendarParser {
         if (element == null)
             return;
 
-        String elementName = _elementName(propName);
+        String className = _className(propName);
+        String elementName = element.getLocalName().toLowerCase();
 
         if (log.isDebugEnabled())
             log.debug("Building property " + propName);
 
         String value = null;
-        if (element.getLocalName().equals("abbr")) {
+        if (elementName.equals("abbr")) {
             // "If an <abbr> element is used for a property, then the 'title'
             // attribute of the <abbr> element is the value of the property,
             // instead of the contents of the element, which instead provide a
             // human presentable version of the value."
             value = element.getAttribute("title");
             if (StringUtils.isBlank(value))
-                throw new ParserException("Abbr element '" + elementName + "' requires a non-empty title", -1);
+                throw new ParserException("Abbr element '" + className + "' requires a non-empty title", -1);
             if (log.isDebugEnabled())
                 log.debug("Setting value '" + value + "' from title attribute");
-        } else if (element.getLocalName().equals("a") && isUrlProperty(propName)) {
+        } else if (elementName.equals("a") && isUrlProperty(propName)) {
             value = element.getAttribute("href");
             if (StringUtils.isBlank(value))
-                throw new ParserException("A element '" + elementName + "' requires a non-empty href", -1);
+                throw new ParserException("A element '" + className + "' requires a non-empty href", -1);
             if (log.isDebugEnabled())
                 log.debug("Setting value '" + value + "' from href attribute");
-        } else if (element.getLocalName().equals("img")) {
+        } else if (elementName.equals("img")) {
             if (isUrlProperty(propName)) {
                 value = element.getAttribute("src");
                 if (StringUtils.isBlank(value))
-                    throw new ParserException("Img element '" + elementName + "' requires a non-empty src", -1);
+                    throw new ParserException("Img element '" + className + "' requires a non-empty src", -1);
                  if (log.isDebugEnabled())
                      log.debug("Setting value '" + value + "' from src attribute");
             } else {
                 value = element.getAttribute("alt");
                 if (StringUtils.isBlank(value))
-                    throw new ParserException("Img element '" + elementName + "' requires a non-empty alt", -1);
+                    throw new ParserException("Img element '" + className + "' requires a non-empty alt", -1);
                 if (log.isDebugEnabled())
                     log.debug("Setting value '" + value + "' from alt attribute");
             }
@@ -394,7 +395,7 @@ public class HCalendarParser implements CalendarParser {
                 if (! (date instanceof DateTime))
                     try { handler.parameter(Parameter.VALUE, Value.DATE.getValue()); } catch (Exception e) {}
             } catch (ParseException e) {
-                throw new ParserException("Malformed date value for element '" + elementName + "'", -1, e);
+                throw new ParserException("Malformed date value for element '" + className + "'", -1, e);
             }
         }
 
@@ -409,11 +410,11 @@ public class HCalendarParser implements CalendarParser {
         try {
             handler.propertyValue(value);
         } catch (URISyntaxException e) {
-            throw new ParserException("Malformed URI value for element '" + elementName + "'", -1, e);
+            throw new ParserException("Malformed URI value for element '" + className + "'", -1, e);
         } catch (ParseException e) {
-            throw new ParserException("Malformed value for element '" + elementName + "'", -1, e);
+            throw new ParserException("Malformed value for element '" + className + "'", -1, e);
         } catch (IOException e) {
-            throw new RuntimeException("Unknown error setting property value for element '" + elementName + "'", e);
+            throw new RuntimeException("Unknown error setting property value for element '" + className + "'", e);
         }
 
         handler.endProperty(propName);
@@ -426,7 +427,7 @@ public class HCalendarParser implements CalendarParser {
         return element.getAttribute("class").toUpperCase();
     }
 
-    private static String _elementName(String propName) {
+    private static String _className(String propName) {
         return propName.toLowerCase();
     }
 
@@ -476,6 +477,9 @@ public class HCalendarParser implements CalendarParser {
         // ways. we have to normalize those to match our pattern.
 
         String normalized = null;
+
+        if (log.isDebugEnabled())
+            log.debug("normalizing date-time " + original);
 
         // 2002-10-09T19:00:00Z
         if (original.charAt(original.length()-1) == 'Z') {

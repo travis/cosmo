@@ -48,6 +48,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         assertNotNull("Null etag", res.getEntityTag());
         assertNotNull("Null last modified", res.getLastModified());
         assertNotNull("Null Location header", res.getLocation());
+        assertNotNull("Null Content-Location header", res.getContentLocation());
     }
 
     public void testCreateMediaEvent() throws Exception {

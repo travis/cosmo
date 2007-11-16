@@ -38,6 +38,7 @@ import javax.xml.xpath.XPathFactory;
 import net.fortuna.ical4j.data.CalendarParser;
 import net.fortuna.ical4j.data.ContentHandler;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
@@ -287,6 +288,9 @@ public class HCalendarParser implements CalendarParser {
         // vcalendar element. In this case, we should probably only process
         // that element and log a warning about skipping the others.
 
+        if (log.isDebugEnabled())
+            log.debug("Building calendar");
+
         handler.startCalendar();
 
         // no PRODID, as the using application should set that itself
@@ -296,7 +300,7 @@ public class HCalendarParser implements CalendarParser {
         handler.endProperty(Property.VERSION);
 
         for (Element vevent : findElements(XPATH_VEVENTS, d))
-            buildComponent(vevent, handler);
+            buildEvent(vevent, handler);
 
         // XXX: support other "first class components": vjournal, vtodo,
         // vfreebusy, vavailability, vvenue
@@ -304,12 +308,13 @@ public class HCalendarParser implements CalendarParser {
         handler.endCalendar();
     }
 
-    private void buildComponent(Element element,
-                                ContentHandler handler)
+    private void buildEvent(Element element,
+                            ContentHandler handler)
         throws ParserException {
-        String name = _icalName(element);
+        if (log.isDebugEnabled())
+            log.debug("Building event");
 
-        handler.startComponent(name);
+        handler.startComponent(Component.VEVENT);
 
         buildProperty(findElement(XPATH_DTSTART, element), Property.DTSTART, handler);
         buildProperty(findElement(XPATH_DTEND, element), Property.DTEND, handler);
@@ -330,7 +335,7 @@ public class HCalendarParser implements CalendarParser {
         buildProperty(findElement(XPATH_CONTACT, element), Property.CONTACT, handler);
         buildProperty(findElement(XPATH_ORGANIZER, element), Property.ORGANIZER, handler);
 
-        handler.endComponent(name);
+        handler.endComponent(Component.VEVENT);
     }
 
     private void buildProperty(Element element,
@@ -340,11 +345,11 @@ public class HCalendarParser implements CalendarParser {
         if (element == null)
             return;
 
-        String className = _className(propName);
-        String elementName = element.getLocalName().toLowerCase();
-
         if (log.isDebugEnabled())
             log.debug("Building property " + propName);
+
+        String className = _className(propName);
+        String elementName = element.getLocalName().toLowerCase();
 
         String value = null;
         if (elementName.equals("abbr")) {
@@ -357,6 +362,17 @@ public class HCalendarParser implements CalendarParser {
                 throw new ParserException("Abbr element '" + className + "' requires a non-empty title", -1);
             if (log.isDebugEnabled())
                 log.debug("Setting value '" + value + "' from title attribute");
+        } else if (isHeaderElement(elementName)) {
+            // try title first. if that's not set, fall back to text content.
+            value = element.getAttribute("title");
+            if (! StringUtils.isBlank(value)) {
+                if (log.isDebugEnabled())
+                    log.debug("Setting value '" + value + "' from title attribute");
+            } else {
+                value = getTextContent(element);
+                if (log.isDebugEnabled())
+                    log.debug("Setting value '" + value + "' from text content");
+            }
         } else if (elementName.equals("a") && isUrlProperty(propName)) {
             value = element.getAttribute("href");
             if (StringUtils.isBlank(value))
@@ -379,8 +395,16 @@ public class HCalendarParser implements CalendarParser {
             }
         } else {
             value = getTextContent(element);
+            if (! StringUtils.isBlank(value)) {
+                if (log.isDebugEnabled())
+                    log.debug("Setting value '" + value + "' from text content");
+            }
+        }
+
+        if (StringUtils.isBlank(value)) {
             if (log.isDebugEnabled())
-                log.debug("Setting value '" + value + "' from text content");
+                log.debug("Skipping property with empty value");
+            return;
         }
 
         handler.startProperty(propName);
@@ -429,6 +453,11 @@ public class HCalendarParser implements CalendarParser {
 
     private static String _className(String propName) {
         return propName.toLowerCase();
+    }
+
+    private static boolean isHeaderElement(String name) {
+        return (name.equals("h1") || name.equals("h2") || name.equals("h3") ||
+                name.equals("h4") || name.equals("h5") || name.equals("h6"));
     }
 
     private static boolean isDateProperty(String name) {

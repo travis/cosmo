@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.processor;
 
 import java.io.Reader;
 
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -129,8 +130,9 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
             throw new ValidationException("Event summary is required");
         if (event.getStartDate() == null)
             throw new ValidationException("Event start date is required");
-        if (event.getEndDate() == null)
-            throw new ValidationException("Event end date is required");
+
+        if (event.getEndDate() == null && event.getDuration() == null)
+            ICalendarUtils.setDuration(event, new Dur(0, 0, 0, 0));
 
         item.setDisplayName(event.getSummary().getValue());
 
@@ -140,6 +142,9 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
             else
                 item.setIcalUid(item.getUid());
         }
+
+        if (event.getDescription() != null)
+            item.setBody(event.getDescription().getValue());
 
         java.util.Calendar now = java.util.Calendar.getInstance();
         if (event.getStartDate().getDate().before(now.getTime()))

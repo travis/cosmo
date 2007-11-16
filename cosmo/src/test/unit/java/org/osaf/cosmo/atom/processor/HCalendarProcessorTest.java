@@ -130,6 +130,17 @@ public class HCalendarProcessorTest extends TestCase {
         assertEquals("Incorrect URL", "URL:http://www.web2con.com/", event.getUrl().toString().trim());
     }
 
+    public void testEventful() throws Exception {
+        Reader content = helper.getReader("hcalendar/eventful-1.html");
+
+        HCalendarProcessor processor = new HCalendarProcessor();
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+    }
+
     protected void setUp() {
         helper = new TestHelper();
     }

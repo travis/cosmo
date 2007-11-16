@@ -86,6 +86,20 @@ public class HCalendarProcessorTest extends TestCase {
         assertEquals("Incorrect URL", "URL:http://conferences.oreillynet.com/et2006/", event.getUrl().toString().trim());
     }
 
+    public void testEntity() throws Exception {
+        Reader content = helper.getReader("hcalendar/10-component-vevent-entity.html");
+
+        HCalendarProcessor processor = new HCalendarProcessor();
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+        assertEquals("Incorrect DTSTART", "DTSTART;VALUE=DATE:20060306", event.getStartDate().toString().trim());
+        assertEquals("Incorrect SUMMARY", "SUMMARY:Cricket & Tennis Centre", event.getSummary().toString().trim());
+        assertEquals("Incorrect DESCRIPTION", "DESCRIPTION:Melbourne's Cricket & Tennis Centres are in the heart of the city", event.getDescription().toString().trim());
+    }
+
     protected void setUp() {
         helper = new TestHelper();
     }

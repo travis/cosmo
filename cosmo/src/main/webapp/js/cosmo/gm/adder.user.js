@@ -131,72 +131,10 @@ function addAllEvents(){
 }
 
 function hCalToBase64(xml){
-    return toBase64((new XMLSerializer()).serializeToString(filterHCal(xml)));
+    return (new XMLSerializer()).serializeToString(filterHCal(xml));
 }
 
 function filterHCal(xml){
     return xml;
 }
 
-var base64Alphabet =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-    'abcdefghijklmnopqrstuvwxyz' +
-    '0123456789+/=';
-
-function toBase64(string){
-    string = _utf8_encode(string);
-    var i = 0;
-    var char1, char2, char3;
-    var enc1, enc2, enc3, enc4;
-
-    var out = '';
-
-    var alpha = base64Alphabet;
-
-    do {
-        char1 = string.charCodeAt(i++);
-        char2 = string.charCodeAt(i++);
-        char3 = string.charCodeAt(i++);
-
-        enc1  = char1 >> 2;
-        enc2 = ((char1 & 3) << 4) | char2 >> 4;
-        enc3 = ((char2 & 15) << 2) | char3 >> 6;
-        enc4 = char3 & 63;
-
-        if (isNaN(char2)){
-            enc3 = enc4 = 64;
-        } else if (isNaN(char3)){
-            enc4 = 64;
-        }
-
-        out = out +
-              alpha.charAt(enc1) +
-              alpha.charAt(enc2) +
-              alpha.charAt(enc3) +
-              alpha.charAt(enc4);
-    } while (i < string.length);
-
-    return out;
-
-}
-
-function _utf8_encode(string) {  
-    string = string.replace(/\r\n/g,"\n");  
-    var utftext = "";  
-         for (var n = 0; n < string.length; n++) {  
-             var c = string.charCodeAt(n);  
-             if (c < 128) {  
-            utftext += String.fromCharCode(c);  
-        }  
-        else if((c > 127) && (c < 2048)) {  
-            utftext += String.fromCharCode((c >> 6) | 192);  
-            utftext += String.fromCharCode((c & 63) | 128);  
-        }  
-        else {  
-            utftext += String.fromCharCode((c >> 12) | 224);  
-            utftext += String.fromCharCode(((c >> 6) & 63) | 128);  
-            utftext += String.fromCharCode((c & 63) | 128);  
-        }  
-         }  
-         return utftext;  
-}

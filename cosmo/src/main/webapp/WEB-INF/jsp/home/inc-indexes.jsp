@@ -49,10 +49,10 @@
     </tr>
     <tr>
       <td class="smTableData" width="50%">
-        <c:out value="${index.dateStart}"/>
+        <c:out value="${index.startDate}"/>
       </td>
       <td class="smTableData" width="50%">
-        <c:out value="${index.dateEnd}"/>
+        <c:out value="${index.endDate}"/>
       </td>
       <td class="smTableData" width="50%">
         <c:out value="${index.isFloating}"/>

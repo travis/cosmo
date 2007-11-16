@@ -215,6 +215,9 @@ dojo.declare("cosmo.model.Delta", null, {
             return {occurrence:true};
         }
         
+        if (this._hasSeriesOnlyStampChange()){
+            return {master:true};
+        }
         var eventStampDeleted = this._deletedStamps["event"];
 
         //if the eventStamp has been deleted, change can only apply to master. 
@@ -455,9 +458,7 @@ dojo.declare("cosmo.model.Delta", null, {
     },
     
    _applyProperties: function(original,changes, type){
-        dojo.debug("_applyProperties() ");
         for (var propName in changes){
-           dojo.debug("_applyProperties(): propName:  " + propName);
            var changeValue = changes[propName];
            original.applyChange(propName, changeValue, type);
         }
@@ -466,7 +467,6 @@ dojo.declare("cosmo.model.Delta", null, {
     _applyPropertiesToEventStamp: function(original, changes, type){
         //start date must be applied first so that duration can be calculated
         //properly
-        dojo.debug("_applyPropertiesToEventStamp() ");
         changes = dojo.lang.shallowCopy(changes, false);
         if (changes["startDate"]){
            var changeValue = changes["startDate"];
@@ -519,6 +519,17 @@ dojo.declare("cosmo.model.Delta", null, {
         var bound = this._ranges[frequency][1];
         var diff = cosmo.datetime.Date.diff(unit, originalDate, changedDate);
         return diff >= bound || diff <= (bound * -1)
+    },
+
+    _hasSeriesOnlyStampChange: function(){
+        var result = false;
+        dojo.lang.map([this._addedStamps, this._deletedStamps, this._stampProps],
+                      function(list){
+                          for (var stampName in list){
+                              if (cosmo.model.getStampMetaData(stampName).seriesOnly){
+                                  result = true;
+                              }}});
+        return result;
     },
     
     _ranges: {

@@ -48,9 +48,9 @@ cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, prope
     return newCtr;
 }
 
-cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, attributesArray, otherDeclarations, occurrenceDeclarations){
+cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, attributesArray, otherDeclarations, occurrenceDeclarations, seriesOnly){
     var newCtr = dojo.declare(ctrName, cosmo.model.BaseStamp, otherDeclarations);
-    var meta = new cosmo.model.StampMetaData(stampName, namespace, attributesArray);
+    var meta = new cosmo.model.StampMetaData(stampName, namespace, attributesArray, seriesOnly);
     newCtr.prototype.stampMetaData = meta;
     var propertiesArray = [];
     for (var x = 0; x < attributesArray.length; x++){
@@ -426,6 +426,9 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     },
 
     getStamp: function (/*String*/ stampName, /*Boolean*/createIfDoesntExist){
+           if (cosmo.model.getStampMetaData(stampName).seriesOnly){
+               return this.getMaster().getStamp(stampName, createIfDoesntExist);
+           }
            var modification = this.getMaster().getModification(this.recurrenceId);
            var ctr = cosmo.model._stampRegistry[stampName]["occurrenceConstructor"];
            var deleted = modification && modification.getDeletedStamps()[stampName];
@@ -628,11 +631,15 @@ dojo.declare("cosmo.model.StampMetaData", null,{
     stampName: null,
     namespace: null,
     attributes: null,
+
+    //if this stamp only can apply to the entire series, this is true
+    seriesOnly: false,
     
-    initializer: function(stampName, namespace,stampAttributesArray){
+    initializer: function(stampName, namespace,stampAttributesArray, seriesOnly){
         this.attributes = [];
         this.stampName = stampName || null;
         this.namespace = namespace;
+        this.seriesOnly = seriesOnly || false;
         if (!stampAttributesArray){
             return;
         } else {
@@ -715,7 +722,7 @@ cosmo.model.declareStamp("cosmo.model.MailStamp", "mail", "http://osafoundation.
         initializer: function(kwArgs){
             this.initializeProperties(kwArgs);
         }
-    });
+    },{},true);
 
 cosmo.model.declare("cosmo.model.ModifiedBy", null, 
     //declare the dynamically generated properties

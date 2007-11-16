@@ -55,16 +55,6 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
     },
 
     test_getApplicableChangeTypes: function(){
-        function setEquals(set1, set2){
-             var types = ["occurrence", "master", "occurrenceAndFuture"]
-             for (var x = 0; x < types.length; x++ ){
-                 var type = types[x];
-                 if (!!set1[type] != !!set2[type]){
-                     return false;
-                 }
-             }
-             return true;
-        }
         
         var note = getSimpleEventNote();
         var stamp = note.getEventStamp();
@@ -284,6 +274,14 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
 
    },
    
+    test_seriesOnlyDelta: function(){
+        var note = new cosmo.model.Note();
+        var delta = new cosmo.model.Delta(note);
+        delta.addStampProperty("mail", "blah");
+        delta.deltafy();
+        var changes = delta.getApplicableChangeTypes();
+        jum.assertTrue("Master only for series only stamp", setEquals(changes, {master:true}))
+    },
  
   //TODO - test editing end date on master, from an occurrence delta
    
@@ -300,7 +298,7 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
    }
 });
 
-    
+
 function getSimpleEventNote(){
     var note = new cosmo.model.Note({
         body: "body",
@@ -311,3 +309,15 @@ function getSimpleEventNote(){
     var eventStamp = note.getEventStamp(true);
     return note;
 }
+
+function setEquals(set1, set2){
+     var types = ["occurrence", "master", "occurrenceAndFuture"]
+     for (var x = 0; x < types.length; x++ ){
+         var type = types[x];
+         if (!!set1[type] != !!set2[type]){
+             return false;
+         }
+     }
+     return true;
+}
+        

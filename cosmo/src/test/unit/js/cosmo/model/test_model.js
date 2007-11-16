@@ -38,6 +38,24 @@ test_declareStamp : function(){
     assertEquals(attr.type[1], Number);
 },
 
+test_declareSeriesOnlyStamp: function(){
+    cosmo.model.declareStamp("SeriesOnlyStamp", "seriesOnlyStamp", "namespace",
+                             [["testString", String, {}]],
+                             {
+                                 initializer: function(kwArgs){
+                                     this.initializeProperties(kwArgs);
+                                 }},null,true);
+
+    var note = new cosmo.model.Note();
+    var occ = note.getNoteOccurrence( new cosmo.datetime.Date(2000,0,1));
+    var stamp = occ.getStamp("seriesOnlyStamp", true);
+    jum.assertTrue("stamp exists!", stamp != null);
+    stamp.setTestString("seriesonly");
+    
+    stamp = note.getStamp("seriesOnlyStamp");
+    jum.assertEquals("note stamp is the same as occ stamp", stamp.getTestString(), "seriesonly");
+},
+
 test_addGetRemoveStamp : function(){
     var note = new cosmo.model.Note();
     var stamp = note.getStamp("event", true);

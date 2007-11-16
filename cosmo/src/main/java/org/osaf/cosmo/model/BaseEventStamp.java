@@ -135,6 +135,8 @@ public abstract class BaseEventStamp extends Stamp
      * @param uid uid of VEVENT
      */
     public void setIcalUid(String uid) {
+        if (getEvent() == null)
+            throw new IllegalStateException("no event");
         ICalendarUtils.setUid(uid, getEvent());
     }
 

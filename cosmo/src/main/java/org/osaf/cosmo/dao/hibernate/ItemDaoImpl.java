@@ -35,7 +35,9 @@ import org.hibernate.validator.InvalidValue;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ItemTombstone;
@@ -602,6 +604,15 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             item.setUid(idGenerator.nextIdentifier().toString());
         if (item.getName() == null)
             item.setName(item.getUid());
+        if (item instanceof ICalendarItem) {
+            ICalendarItem ical = (ICalendarItem) item;
+            if (ical.getIcalUid() == null) {
+                ical.setIcalUid(item.getUid());
+                EventStamp es = EventStamp.getStamp(ical);
+                if (es != null)
+                    es.setIcalUid(ical.getIcalUid());
+            }
+        }
         for (Ticket ticket : item.getTickets()) {
             if (ticket.getOwner() == null)
                 ticket.setOwner(item.getOwner());

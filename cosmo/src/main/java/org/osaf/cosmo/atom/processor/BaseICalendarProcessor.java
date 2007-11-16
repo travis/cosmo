@@ -25,8 +25,10 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.TriageStatus;
 
 /**
  * A base class for implementations of {@link ContentProcessor} that
@@ -99,6 +101,14 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
         item.getParents().add(collection);
         collection.getChildren().add(item);
 
+        item.setClientCreationDate(java.util.Calendar.getInstance().getTime());
+        item.setClientModifiedDate(item.getClientCreationDate());
+        item.setTriageStatus(TriageStatus.createInitialized());
+        item.setLastModifiedBy(item.getOwner().getUsername());
+        item.setLastModification(ContentItem.Action.CREATED);
+        item.setSent(Boolean.FALSE);
+        item.setNeedsReply(Boolean.FALSE);
+
         return item;
     }
 
@@ -113,11 +123,33 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
     }
 
     private void applyEvent(NoteItem item,
-                            VEvent event) {
+                            VEvent event)
+        throws ValidationException {
+        if (event.getSummary() == null)
+            throw new ValidationException("Event summary is required");
+        if (event.getStartDate() == null)
+            throw new ValidationException("Event start date is required");
+        if (event.getEndDate() == null)
+            throw new ValidationException("Event end date is required");
+
         item.setDisplayName(event.getSummary().getValue());
 
-        if (event.getUid() != null)
-            item.setIcalUid(event.getUid().getValue());
+        if (item.getIcalUid() == null) {
+            if (event.getUid() != null)
+                item.setIcalUid(event.getUid().getValue());
+            else
+                item.setIcalUid(item.getUid());
+        }
+
+        java.util.Calendar now = java.util.Calendar.getInstance();
+        if (event.getStartDate().getDate().before(now.getTime()))
+            item.getTriageStatus().setCode(TriageStatus.CODE_DONE);
+        else {
+            java.util.Calendar later = java.util.Calendar.getInstance();
+            later.add(java.util.Calendar.DAY_OF_MONTH, 2);
+            if (event.getStartDate().getDate().after(later.getTime()))
+                item.getTriageStatus().setCode(TriageStatus.CODE_LATER);
+        }
 
         EventStamp es = EventStamp.getStamp(item);
         if (es == null) {

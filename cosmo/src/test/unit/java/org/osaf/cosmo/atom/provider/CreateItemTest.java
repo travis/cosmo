@@ -56,7 +56,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
 
         helper.forgetProjections();
         helper.forgetContentTypes();
-        helper.rememberContentType("application/xhtml+xml");
+        helper.rememberContentType(MEDIA_TYPE_XHTML);
 
         VEvent event = helper.makeDummyEvent();
         RequestContext req = createRequestContext(collection, event);
@@ -163,7 +163,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         MockCollectionRequestContext rc =
             new MockCollectionRequestContext(helper.getServiceContext(),
                                              collection, "POST");
-        rc.setProperties(serialize(event), "application/xhtml+xml");
+        rc.setProperties(serialize(event), MEDIA_TYPE_XHTML);
         return rc;
     }
 }

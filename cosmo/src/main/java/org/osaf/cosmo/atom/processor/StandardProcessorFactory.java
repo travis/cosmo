@@ -18,6 +18,7 @@ package org.osaf.cosmo.atom.processor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.eim.json.JsonConstants;
 
@@ -27,12 +28,13 @@ import org.osaf.cosmo.eim.json.JsonConstants;
  * @see ContentProcessor
  */
 public class StandardProcessorFactory
-    implements ProcessorFactory, JsonConstants, EimmlConstants {
+    implements ProcessorFactory, AtomConstants, JsonConstants, EimmlConstants {
     private static final Log log =
         LogFactory.getLog(StandardProcessorFactory.class);
     private static final String[] CONTENT_TYPES = {
         MEDIA_TYPE_EIM_JSON,
-        MEDIA_TYPE_EIMML
+        MEDIA_TYPE_EIMML,
+        MEDIA_TYPE_XHTML
     };
 
     // ProcessorFactory methods
@@ -52,6 +54,8 @@ public class StandardProcessorFactory
      * <dd>{@link JsonProcessor}</dd>
      * <dt>{@link EimmlConstants#MEDIA_TYPE_EIMML}</dt>
      * <dd>{@link EimmlProcessor}</dd>
+     * <dt>{@link AtomConstants#MEDIA_TYPE_XHTML}</dt>
+     * <dd>{@link HCalendarProcessor}</dt>
      * </dl>
      * <p>
      *
@@ -67,6 +71,8 @@ public class StandardProcessorFactory
                 return new JsonProcessor();
             if (type.equals(MEDIA_TYPE_EIMML))
                 return new EimmlProcessor();
+            if (type.equals(MEDIA_TYPE_XHTML))
+                return new HCalendarProcessor();
         }
         throw new UnsupportedContentTypeException(type);
     }

@@ -82,12 +82,21 @@ import org.xml.sax.SAXParseException;
  * <ul>
  * <li> "dtstart" (required) </li>
  * <li> "dtend" </li>
+ * <li> "duration" </li>
  * <li> "summary" (required) </li>
  * <li> "uid" </li>
  * <li> "dtstamp" </li>
+ * <li> "method" </li>
+ * <li> "category" </li>
  * <li> "location" </li>
  * <li> "url" </li>
  * <li> "description" </li>
+ * <li> "last-modified" </li>
+ * <li> "status" </li>
+ * <li> "class" </li>
+ * <li> "attendee" </li>
+ * <li> "contact" </li>
+ * <li> "organizer" </li>
  * </ul>
  * <p>
  * hCalendar allows for some properties to be represented by nested
@@ -126,12 +135,21 @@ public class HCalendarParser implements CalendarParser {
     private static final XPathExpression XPATH_VEVENTS;
     private static final XPathExpression XPATH_DTSTART;
     private static final XPathExpression XPATH_DTEND;
+    private static final XPathExpression XPATH_DURATION;
     private static final XPathExpression XPATH_SUMMARY;
     private static final XPathExpression XPATH_UID;
     private static final XPathExpression XPATH_DTSTAMP;
+    private static final XPathExpression XPATH_METHOD;
+    private static final XPathExpression XPATH_CATEGORY;
     private static final XPathExpression XPATH_LOCATION;
     private static final XPathExpression XPATH_URL;
     private static final XPathExpression XPATH_DESCRIPTION;
+    private static final XPathExpression XPATH_LAST_MODIFIED;
+    private static final XPathExpression XPATH_STATUS;
+    private static final XPathExpression XPATH_CLASS;
+    private static final XPathExpression XPATH_ATTENDEE;
+    private static final XPathExpression XPATH_CONTACT;
+    private static final XPathExpression XPATH_ORGANIZER;
     private static final String HCAL_DATE_PATTERN = "yyyy-MM-dd";
     private static final SimpleDateFormat HCAL_DATE_FORMAT =
         new SimpleDateFormat(HCAL_DATE_PATTERN);
@@ -145,12 +163,21 @@ public class HCalendarParser implements CalendarParser {
         XPATH_VEVENTS = _compileExpression("//*[@class='vevent']");
         XPATH_DTSTART = _compileExpression(".//*[@class='dtstart']");
         XPATH_DTEND = _compileExpression(".//*[@class='dtend']");
+        XPATH_DURATION = _compileExpression(".//*[@class='duration']");
         XPATH_SUMMARY = _compileExpression(".//*[@class='summary']");
         XPATH_UID = _compileExpression(".//*[@class='uid']");
         XPATH_DTSTAMP = _compileExpression(".//*[@class='dtstamp']");
+        XPATH_METHOD = _compileExpression(".//*[@class='method']");
+        XPATH_CATEGORY = _compileExpression(".//*[@class='category']");
         XPATH_LOCATION = _compileExpression(".//*[@class='location']");
         XPATH_URL = _compileExpression(".//*[@class='url']");
         XPATH_DESCRIPTION = _compileExpression(".//*[@class='description']");
+        XPATH_LAST_MODIFIED = _compileExpression(".//*[@class='last-modified']");
+        XPATH_STATUS = _compileExpression(".//*[@class='status']");
+        XPATH_CLASS = _compileExpression(".//*[@class='class']");
+        XPATH_ATTENDEE = _compileExpression(".//*[@class='attendee']");
+        XPATH_CONTACT = _compileExpression(".//*[@class='contact']");
+        XPATH_ORGANIZER = _compileExpression(".//*[@class='organizer']");
     }
 
     private static XPathExpression _compileExpression(String expr) {
@@ -290,15 +317,23 @@ public class HCalendarParser implements CalendarParser {
 
         buildProperty(findElement(XPATH_DTSTART, element), Property.DTSTART, handler, true);
         buildProperty(findElement(XPATH_DTEND, element), Property.DTEND, handler);
+        buildProperty(findElement(XPATH_DURATION, element), Property.DURATION, handler);
         buildProperty(findElement(XPATH_SUMMARY, element), Property.SUMMARY, handler, true);
         buildProperty(findElement(XPATH_UID, element), Property.UID, handler);
         buildProperty(findElement(XPATH_DTSTAMP, element), Property.DTSTAMP, handler);
+        buildProperty(findElement(XPATH_METHOD, element), Property.METHOD, handler);
+        for (Element category : findElements(XPATH_CATEGORY, element))
+            buildProperty(category, Property.CATEGORIES, handler);
         buildProperty(findElement(XPATH_LOCATION, element), Property.LOCATION, handler);
         buildProperty(findElement(XPATH_URL, element), Property.URL, handler);
         buildProperty(findElement(XPATH_DESCRIPTION, element), Property.DESCRIPTION, handler);
-
-        // XXX: duration, method, category, last-modified, status, class,
-        // attendee, contact, organizer
+        buildProperty(findElement(XPATH_LAST_MODIFIED, element), Property.LAST_MODIFIED, handler);
+        buildProperty(findElement(XPATH_STATUS, element), Property.STATUS, handler);
+        buildProperty(findElement(XPATH_CLASS, element), Property.CLASS, handler);
+        for (Element attendee : findElements(XPATH_ATTENDEE, element))
+            buildProperty(attendee, Property.ATTENDEE, handler);
+        buildProperty(findElement(XPATH_CONTACT, element), Property.CONTACT, handler);
+        buildProperty(findElement(XPATH_ORGANIZER, element), Property.ORGANIZER, handler);
 
         handler.endComponent(name);
     }

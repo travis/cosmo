@@ -159,25 +159,26 @@ public class HCalendarParser implements CalendarParser {
 
     static {
         BUILDER_FACTORY.setNamespaceAware(true);
+        BUILDER_FACTORY.setIgnoringComments(true);
 
-        XPATH_VEVENTS = _compileExpression("//*[@class='vevent']");
-        XPATH_DTSTART = _compileExpression(".//*[@class='dtstart']");
-        XPATH_DTEND = _compileExpression(".//*[@class='dtend']");
-        XPATH_DURATION = _compileExpression(".//*[@class='duration']");
-        XPATH_SUMMARY = _compileExpression(".//*[@class='summary']");
-        XPATH_UID = _compileExpression(".//*[@class='uid']");
-        XPATH_DTSTAMP = _compileExpression(".//*[@class='dtstamp']");
-        XPATH_METHOD = _compileExpression(".//*[@class='method']");
-        XPATH_CATEGORY = _compileExpression(".//*[@class='category']");
-        XPATH_LOCATION = _compileExpression(".//*[@class='location']");
-        XPATH_URL = _compileExpression(".//*[@class='url']");
-        XPATH_DESCRIPTION = _compileExpression(".//*[@class='description']");
-        XPATH_LAST_MODIFIED = _compileExpression(".//*[@class='last-modified']");
-        XPATH_STATUS = _compileExpression(".//*[@class='status']");
-        XPATH_CLASS = _compileExpression(".//*[@class='class']");
-        XPATH_ATTENDEE = _compileExpression(".//*[@class='attendee']");
-        XPATH_CONTACT = _compileExpression(".//*[@class='contact']");
-        XPATH_ORGANIZER = _compileExpression(".//*[@class='organizer']");
+        XPATH_VEVENTS = _compileExpression("//*[contains(@class, 'vevent')]");
+        XPATH_DTSTART = _compileExpression(".//*[contains(@class, 'dtstart')]");
+        XPATH_DTEND = _compileExpression(".//*[contains(@class, 'dtend')]");
+        XPATH_DURATION = _compileExpression(".//*[contains(@class, 'duration')]");
+        XPATH_SUMMARY = _compileExpression(".//*[contains(@class, 'summary')]");
+        XPATH_UID = _compileExpression(".//*[contains(@class, 'uid')]");
+        XPATH_DTSTAMP = _compileExpression(".//*[contains(@class, 'dtstamp')]");
+        XPATH_METHOD = _compileExpression(".//*[contains(@class, 'method')]");
+        XPATH_CATEGORY = _compileExpression(".//*[contains(@class, 'category')]");
+        XPATH_LOCATION = _compileExpression(".//*[contains(@class, 'location')]");
+        XPATH_URL = _compileExpression(".//*[contains(@class, 'url')]");
+        XPATH_DESCRIPTION = _compileExpression(".//*[contains(@class, 'description')]");
+        XPATH_LAST_MODIFIED = _compileExpression(".//*[contains(@class, 'last-modified')]");
+        XPATH_STATUS = _compileExpression(".//*[contains(@class, 'status')]");
+        XPATH_CLASS = _compileExpression(".//*[contains(@class, 'class')]");
+        XPATH_ATTENDEE = _compileExpression(".//*[contains(@class, 'attendee')]");
+        XPATH_CONTACT = _compileExpression(".//*[contains(@class, 'contact')]");
+        XPATH_ORGANIZER = _compileExpression(".//*[contains(@class, 'organizer')]");
     }
 
     private static XPathExpression _compileExpression(String expr) {
@@ -220,8 +221,6 @@ public class HCalendarParser implements CalendarParser {
     private static NodeList findNodes(XPathExpression expr,
                                       Object context)
         throws ParserException {
-        if (log.isDebugEnabled())
-            log.debug("Finding nodes for expression '" + expr + "'");
         try {
             return (NodeList) expr.evaluate(context, XPathConstants.NODESET);
         } catch (XPathException e) {
@@ -232,8 +231,6 @@ public class HCalendarParser implements CalendarParser {
     private static Node findNode(XPathExpression expr,
                                  Object context)
         throws ParserException {
-        if (log.isDebugEnabled())
-            log.debug("Finding node for expression '" + expr + "'");
         try {
             return (Node) expr.evaluate(context, XPathConstants.NODE);
         } catch (XPathException e) {
@@ -266,7 +263,7 @@ public class HCalendarParser implements CalendarParser {
     private static String getTextContent(Element element)
         throws ParserException {
         try {
-            return element.getTextContent().trim();
+            return element.getTextContent().trim().replaceAll("\\s+", " ");
         } catch (DOMException e) {
             throw new ParserException("Unable to get text content for element " + element.getNodeName(), -1, e);
         }
@@ -358,6 +355,9 @@ public class HCalendarParser implements CalendarParser {
             throw new ParserException("Property element '" + elementName + "' required", -1);
         }
 
+        if (log.isDebugEnabled())
+            log.debug("Building property " + propName);
+
         String value = null;
         if (element.getLocalName().equals("abbr")) {
             // "If an <abbr> element is used for a property, then the 'title'
@@ -367,22 +367,32 @@ public class HCalendarParser implements CalendarParser {
             value = element.getAttribute("title");
             if (StringUtils.isBlank(value))
                 throw new ParserException("Abbr element '" + elementName + "' requires a non-empty title", -1);
+            if (log.isDebugEnabled())
+                log.debug("Setting value '" + value + "' from title attribute");
         } else if (element.getLocalName().equals("a") && isUrlProperty(propName)) {
             value = element.getAttribute("href");
             if (StringUtils.isBlank(value))
                 throw new ParserException("A element '" + elementName + "' requires a non-empty href", -1);
+            if (log.isDebugEnabled())
+                log.debug("Setting value '" + value + "' from href attribute");
         } else if (element.getLocalName().equals("img")) {
             if (isUrlProperty(propName)) {
                 value = element.getAttribute("src");
                 if (StringUtils.isBlank(value))
                     throw new ParserException("Img element '" + elementName + "' requires a non-empty src", -1);
+                 if (log.isDebugEnabled())
+                     log.debug("Setting value '" + value + "' from src attribute");
             } else {
                 value = element.getAttribute("alt");
                 if (StringUtils.isBlank(value))
                     throw new ParserException("Img element '" + elementName + "' requires a non-empty alt", -1);
+                if (log.isDebugEnabled())
+                    log.debug("Setting value '" + value + "' from alt attribute");
             }
         } else {
             value = getTextContent(element);
+            if (log.isDebugEnabled())
+                log.debug("Setting value '" + value + "' from text content");
         }
 
         handler.startProperty(propName);

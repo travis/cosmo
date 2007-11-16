@@ -82,6 +82,7 @@ public class HCalendarProcessorTest extends TestCase {
         assertEquals("Incorrect DTEND", "DTEND;VALUE=DATE:20060310", event.getEndDate().toString().trim());
         assertEquals("Incorrect SUMMARY", "SUMMARY:O'Reilly Emerging Technology Conference", event.getSummary().toString().trim());
         assertEquals("Incorrect LOCATION", "LOCATION:Manchester Grand Hyatt in San Diego\\, CA", event.getLocation().toString().trim());
+        assertEquals("Incorrect DESCRIPTION", "DESCRIPTION:3/6-9 @ Manchester Grand Hyatt in San Diego\\, CA", event.getDescription().toString().trim());
         assertEquals("Incorrect URL", "URL:http://conferences.oreillynet.com/et2006/", event.getUrl().toString().trim());
     }
 

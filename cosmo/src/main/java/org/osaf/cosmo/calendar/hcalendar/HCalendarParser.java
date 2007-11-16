@@ -211,7 +211,7 @@ public class HCalendarParser implements CalendarParser {
         } catch (SAXException e) {
             if (e instanceof SAXParseException) {
                 SAXParseException pe = (SAXParseException) e;
-                throw new ParserException(e.getMessage(), pe.getLineNumber(), e);
+                throw new ParserException("Could not parse XML", pe.getLineNumber(), e);
             }
             throw new ParserException(e.getMessage(), -1, e);
         }
@@ -367,6 +367,20 @@ public class HCalendarParser implements CalendarParser {
             value = element.getAttribute("title");
             if (StringUtils.isBlank(value))
                 throw new ParserException("Abbr element '" + elementName + "' requires a non-empty title", -1);
+        } else if (element.getLocalName().equals("a") && isUrlProperty(propName)) {
+            value = element.getAttribute("href");
+            if (StringUtils.isBlank(value))
+                throw new ParserException("A element '" + elementName + "' requires a non-empty href", -1);
+        } else if (element.getLocalName().equals("img")) {
+            if (isUrlProperty(propName)) {
+                value = element.getAttribute("src");
+                if (StringUtils.isBlank(value))
+                    throw new ParserException("Img element '" + elementName + "' requires a non-empty src", -1);
+            } else {
+                value = element.getAttribute("alt");
+                if (StringUtils.isBlank(value))
+                    throw new ParserException("Img element '" + elementName + "' requires a non-empty alt", -1);
+            }
         } else {
             value = getTextContent(element);
         }
@@ -419,18 +433,30 @@ public class HCalendarParser implements CalendarParser {
                 name.equals(Property.DTSTAMP));
     }
 
+    private static boolean isUrlProperty(String name) {
+        return (name.equals(Property.URL));
+    }
+
     private static Date _icalDate(String original)
         throws ParseException {
-
         // in the real world, some generators use iCalendar formatted
-        // date-times
+        // dates and date-times, so try parsing those formats first before
+        // going to RFC 3339 formats
+
+        if (original.indexOf('T') == -1) {
+            // date-only
+            try {
+                // for some reason Date's pattern matches yyyy-MM-dd, so
+                // don't check it if we find -
+                if (original.indexOf('-') == -1)
+                    return new Date(original);
+            } catch (Exception e) {}
+            return new Date(HCAL_DATE_FORMAT.parse(original));
+        }
+
         try {
             return new DateTime(original);
-        } catch (Exception e2) {}
-
-        if (original.indexOf('T') == -1)
-            // date-only
-            return new Date(HCAL_DATE_FORMAT.parse(original));
+        } catch (Exception e) {}
 
         // the date-time value can represent its time zone in a few different
         // ways. we have to normalize those to match our pattern.

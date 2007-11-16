@@ -44,7 +44,11 @@ public class HCalendarProcessorTest extends TestCase {
         assertTrue("Component not a VEVENT", component instanceof VEvent);
 
         VEvent event = (VEvent) component;
-        System.out.println("Example 1:\n" + event.toString());
+        assertEquals("Incorrect DTSTART", "DTSTART;VALUE=DATE:20071005", event.getStartDate().toString().trim());
+        assertEquals("Incorrect DTEND", "DTEND;VALUE=DATE:20071020", event.getEndDate().toString().trim());
+        assertEquals("Incorrect SUMMARY", "SUMMARY:Web 2.0 Conference", event.getSummary().toString().trim());
+        assertEquals("Incorrect LOCATION", "LOCATION:Argent Hotel\\, San Francisco\\, CA", event.getLocation().toString().trim());
+        assertEquals("Incorrect URL", "URL:http://www.web2con.com/", event.getUrl().toString().trim());
     }
 
     public void testExample2() throws Exception {
@@ -56,7 +60,29 @@ public class HCalendarProcessorTest extends TestCase {
         assertTrue("Component not a VEVENT", component instanceof VEvent);
 
         VEvent event = (VEvent) component;
-        System.out.println("Example 2:\n" + event.toString());
+        assertEquals("Incorrect DTSTART", "DTSTART:19980312T133000Z", event.getStartDate().toString().trim());
+        assertEquals("Incorrect DTEND", "DTEND:19980312T143000Z", event.getEndDate().toString().trim());
+        assertEquals("Incorrect SUMMARY", "SUMMARY:XYZ Project Review", event.getSummary().toString().trim());
+        assertEquals("Incorrect UID", "UID:guid-1.host1.com", event.getUid().toString().trim());
+        assertEquals("Incorrect DTSTAMP", "DTSTAMP:19980309T231000Z", event.getDateStamp().toString().trim());
+        assertEquals("Incorrect LOCATION", "LOCATION:1CP Conference Room 4350", event.getLocation().toString().trim());
+        assertEquals("Incorrect DESCRIPTION", "DESCRIPTION:Project XYZ Review Meeting", event.getDescription().toString().trim());
+    }
+
+    public void testSummaryInImgAlt() throws Exception {
+        Reader content = helper.getReader("hcalendar/09-component-vevent-summary-in-img-alt.html");
+
+        HCalendarProcessor processor = new HCalendarProcessor();
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+        assertEquals("Incorrect DTSTART", "DTSTART;VALUE=DATE:20060306", event.getStartDate().toString().trim());
+        assertEquals("Incorrect DTEND", "DTEND;VALUE=DATE:20060310", event.getEndDate().toString().trim());
+        assertEquals("Incorrect SUMMARY", "SUMMARY:O'Reilly Emerging Technology Conference", event.getSummary().toString().trim());
+        assertEquals("Incorrect LOCATION", "LOCATION:Manchester Grand Hyatt in San Diego\\, CA", event.getLocation().toString().trim());
+        assertEquals("Incorrect URL", "URL:http://conferences.oreillynet.com/et2006/", event.getUrl().toString().trim());
     }
 
     protected void setUp() {

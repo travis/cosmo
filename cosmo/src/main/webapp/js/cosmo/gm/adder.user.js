@@ -30,6 +30,7 @@ function getEventNodes(){
 
 function addSelect(node) {
     var span = document.createElement('span');
+    span.className = "gdogSelect";
     var image = createCosmoIcon();
     span.appendChild(image);
     node.appendChild(span);
@@ -135,6 +136,15 @@ function hCalToBase64(xml){
 }
 
 function filterHCal(xml){
-    return xml;
+    var newXml = xml.cloneNode(true);
+    var z = newXml.childNodes
+    for (var i in newXml.childNodes){
+        var node = newXml.childNodes[i];
+        console.log(node.className);
+        if (node.className == "gdogSelect"){
+            newXml.removeChild(node);
+        }
+    }
+    return newXml;
 }
 

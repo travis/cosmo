@@ -117,7 +117,8 @@ import org.xml.sax.SAXParseException;
  * <p>
  * Some examples in the wild provide date and date-time values in iCalendar
  * format rather than RFC 3339 format. Although not technically legal
- * according to spec, these values are accepted.
+ * according to spec, these values are accepted. In this case, floating
+ * date-times are produced by the parser.
  * </p>
  * <h3>Supported Parameters</h3>
  * <p>

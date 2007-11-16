@@ -100,6 +100,20 @@ public class HCalendarProcessorTest extends TestCase {
         assertEquals("Incorrect DESCRIPTION", "DESCRIPTION:Melbourne's Cricket & Tennis Centres are in the heart of the city", event.getDescription().toString().trim());
     }
 
+    public void testSummaryUrlInSameClass() throws Exception {
+        Reader content = helper.getReader("hcalendar/12-component-vevent-summary-url-in-same-class.html");
+
+        HCalendarProcessor processor = new HCalendarProcessor();
+        CalendarComponent component = processor.readCalendarComponent(content);
+        assertNotNull("Null component", component);
+        assertTrue("Component not a VEVENT", component instanceof VEvent);
+
+        VEvent event = (VEvent) component;
+        assertEquals("Incorrect DTSTART", "DTSTART:20060125T000000", event.getStartDate().toString().trim());
+        assertEquals("Incorrect SUMMARY", "SUMMARY:Art Reception for Tom Schultz and Felix Macnee", event.getSummary().toString().trim());
+        assertEquals("Incorrect URL", "URL:http://www.laughingsquid.com/squidlist/calendar/12377/2006/1/25", event.getUrl().toString().trim());
+    }
+
     protected void setUp() {
         helper = new TestHelper();
     }

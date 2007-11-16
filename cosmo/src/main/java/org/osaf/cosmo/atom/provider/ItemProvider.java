@@ -125,11 +125,13 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
         try {
             String mediaType = request.getContentType().toString();
+            boolean isEntry =
+                MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, mediaType);
 
             Entry entry = null;
             ContentProcessor processor = null;
             NoteItem item = null;
-            if (MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, mediaType)) {
+            if (isEntry) {
                 // XXX: does abdera automatically resolve external content?
                 entry = (Entry) request.getDocument().getRoot();
                 processor = createContentProcessor(entry);
@@ -145,15 +147,20 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             item = (NoteItem) contentService.createContent(collection, item);
 
-            ItemTarget itemTarget =
-                new ItemTarget(request, item, target.getProjection(),
-                               target.getFormat());
             ServiceLocator locator = createServiceLocator(request);
-            ItemFeedGenerator generator =
-                createItemFeedGenerator(itemTarget, locator);
-            entry = generator.generateEntry(item);
 
-            return created(entry, item, locator);
+            if (isEntry) {
+                ItemTarget itemTarget =
+                    new ItemTarget(request, item, target.getProjection(),
+                                   target.getFormat());
+                ItemFeedGenerator generator =
+                    createItemFeedGenerator(itemTarget, locator);
+                entry = generator.generateEntry(item);
+
+                return created(entry, item, locator);
+            } else {
+                return created(item, locator);
+            }
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
@@ -810,6 +817,20 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return false;
         
         return true;
+    }
+
+    private ResponseContext created(NoteItem item,
+                                    ServiceLocator locator) {
+        AbstractResponseContext rc = createResponseContext(201, "Created");
+
+        rc.setEntityTag(new EntityTag(item.getEntityTag()));
+        rc.setLastModified(item.getModifiedDate());
+
+        rc.setLocation(locator.getAtomItemUrl(item.getUid(), true));
+        // don't set Content-Location since no content is included in the
+        // response
+
+        return rc;
     }
 
     private ResponseContext created(CollectionItem collection,

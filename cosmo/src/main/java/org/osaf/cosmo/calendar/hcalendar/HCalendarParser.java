@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -100,18 +99,16 @@ import org.xml.sax.SAXParseException;
  * <h4>Date and Date-Time Properties</h4>
  * <p>
  * hCalendar date-time values are formatted according to RFC 3339. There is no
- * representation in this specification for floating date-times. Therefore,
- * this parser will never produce floating date-time values.
+ * representation in this specification for time zone ids. All date-times
+ * are specified either in UTC or with an offset that can be used to convert
+ * the local time into UTC. Neither does hCal provide a reprsentation for
+ * floating date-times. Therefore, all date-time values produced by this
+ * parser are in UTC.
  * </p>
  * <p>
  * Some examples in the wild provide date and date-time values in iCalendar
  * format rather than RFC 3339 format. Although not technically legal
  * according to spec, these values are accepted.
- * </p>
- * <p>
- * <strong>Limitations:</strong> The parser converts all date-time values to
- * UTC, losing whatever time zone might have been specified in the hCalendar
- * value.
  * </p>
  * <h3>Supported Parameters</h3>
  * <p>
@@ -397,55 +394,40 @@ public class HCalendarParser implements CalendarParser {
         } catch (Exception e2) {}
 
         if (original.indexOf('T') == -1)
-            return new Date(parseDate(original));
+            // date-only
+            return new Date(HCAL_DATE_FORMAT.parse(original));
 
-        // XXX: there's no representation for floating date-times in
-        // RFC 3339
-
-        java.util.Calendar c = parseDateTime(original);
-        DateTime dt = new DateTime(c.getTime());
-        // XXX: map java time zone to iCal4j time zone
-        dt.setUtc(true);
-        return dt;
-    }
-
-    private static java.util.Date parseDate(String value)
-        throws ParseException {
-        return HCAL_DATE_FORMAT.parse(value);
-    }
-
-    private static Calendar parseDateTime(String value)
-        throws ParseException {
         // the date-time value can represent its time zone in a few different
         // ways. we have to normalize those to match our pattern.
 
-        String tzId = null;
         String normalized = null;
 
         // 2002-10-09T19:00:00Z
-        if (value.charAt(value.length()-1) == 'Z') {
-            tzId = "GMT-00:00";
-            normalized = value.replace("Z", tzId);
+        if (original.charAt(original.length()-1) == 'Z') {
+            normalized = original.replace("Z", "GMT-00:00");
         }
         // 2002-10-10T00:00:00+05:00
-        else if (value.indexOf("GMT") == -1 && 
-                 (value.charAt(value.length()-6) == '+' ||
-                  value.charAt(value.length()-6) == '-')) {
-            tzId = "GMT" + value.substring(value.length()-6);
-            normalized = value.substring(0, value.length()-6) + tzId;
+        else if (original.indexOf("GMT") == -1 && 
+                 (original.charAt(original.length()-6) == '+' ||
+                  original.charAt(original.length()-6) == '-')) {
+            String tzId = "GMT" + original.substring(original.length()-6);
+            normalized = original.substring(0, original.length()-6) + tzId;
         }
-        // 2002-10-10T00:00:00GMT+05:00
         else {
-            tzId = value.substring(value.length()-9);
-            normalized = value;
+            // 2002-10-10T00:00:00GMT+05:00
+            normalized = original;
         }
 
-        java.util.TimeZone tz = java.util.TimeZone.getTimeZone(tzId);
-        GregorianCalendar c = new GregorianCalendar(tz);
+        DateTime dt = new DateTime(HCAL_DATE_TIME_FORMAT.parse(normalized));
 
-        java.util.Date d = HCAL_DATE_TIME_FORMAT.parse(normalized);
-        c.setTime(d);
+        // hCalendar does not specify a representation for timezone ids
+        // or any other sort of timezone information. the best it does is
+        // give us a timezone offset that we can use to convert the local
+        // time to UTC. furthermore, it has no representation for floating
+        // date-times. therefore, all dates are converted to UTC.
 
-        return c;
+        dt.setUtc(true);
+
+        return dt;
     }
 }

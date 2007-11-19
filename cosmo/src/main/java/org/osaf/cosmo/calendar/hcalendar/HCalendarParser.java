@@ -463,12 +463,12 @@ public class HCalendarParser implements CalendarParser {
     private static boolean isDateProperty(String name) {
         return (name.equals(Property.DTSTART) ||
                 name.equals(Property.DTEND) ||
+                name.equals(Property.LAST_MODIFIED) ||
                 name.equals(Property.DTSTAMP));
     }
 
     private static boolean isUrlProperty(String name) {
-        return (name.equals(Property.URL) ||
-                name.equals(Property.LAST_MODIFIED));
+        return (name.equals(Property.URL));
     }
 
     private static boolean isTextProperty(String name) {

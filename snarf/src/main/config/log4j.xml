@@ -65,6 +65,10 @@
     <level value="INFO"/>
   </logger>
 
+  <logger name="org.osaf.cosmo.spring">
+    <level value="INFO"/>
+  </logger>
+
   <logger name="http-operations">
     <level value="INFO"/>
   </logger>

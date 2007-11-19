@@ -152,7 +152,6 @@ cosmo.view.service = new function () {
      * removing recurrence completely from a master item for a recurrence.
      */
     function saveItemChanges(item, qual, delta) {
-        dojo.debug("save item changes...");
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
         // setTimeout to allow the 'processing ...' state to
@@ -234,7 +233,7 @@ cosmo.view.service = new function () {
 
         // Give a sec for the processing state to show
         dojo.debug("before set timeout");
-        setTimeout(f, 500);
+        setTimeout(f, 35);
     }
     /**
      * Call the service to do a normal item save.

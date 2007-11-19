@@ -46,10 +46,14 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     
     CONTENT_TYPE_ATOM: "application/atom+xml",
 
-    _getUsernameForURI: function(){
+    _getUsernameForUri: function(){
         return encodeURIComponent(cosmo.util.auth.getUsername());
     },
-    
+
+    _getServiceUri: function(){
+        return this.getAtomBase() + "/user/" + this._getUsernameForUri();
+    },
+   
     getAndCheckEditLink: function(item, searchCrit){
         searchCrit = searchCrit || {};
         var editLink = item.getUrls()[this.EDIT_LINK];
@@ -81,8 +85,20 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return base.substring(0, queryIndex) + projection + this.queryHashToString(queryHash);
     },
 
-    createCollection: function(name){
-        dojo.unimplemented("cosmo.service.transport.Atom.createCollection");
+    createCollection: function(name, postContent, kwArgs){
+        kwArgs = kwArgs || {};
+        
+        var r = {};
+        r.url = this._getServiceUri();
+        r.contentType = this.CONTENT_TYPE_XHTML;
+        r.postContent = postContent;
+        r.method = this.METHOD_POST;
+        
+        var deferred = this.bind(r, kwArgs);
+        this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
+        
+        return deferred;
+        
     },
 
     getCollection: function(collectionUrl, kwArgs){
@@ -97,8 +113,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
         
         var r = {};
-        r.url = this.getAtomBase() + "/user/" + this._getUsernameForURI();
-        
+        r.url = this._getServiceUri();
         return this.bind(r, kwArgs);
     },
     
@@ -106,8 +121,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
         
         var r = {};
-        r.url = this.getAtomBase() + "/user/" + 
-                this._getUsernameForURI() + "/subscriptions";
+        r.url = this._getServiceUri() + "/subscriptions";
 
         return this.bind(r, kwArgs);
     },
@@ -207,8 +221,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = kwArgs || {};
 
         var r = {};
-        r.url = this.getAtomBase() + "/user/" + 
-            this._getUsernameForURI() + "/subscriptions";
+        r.url = this._getServiceUri() + "/subscriptions";
         r.contentType = this.CONTENT_TYPE_ATOM;
         r.postContent = postContent;
         r.method = this.METHOD_POST;
@@ -273,7 +286,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         kwArgs = dojo.lang.shallowCopy(kwArgs);
         kwArgs.noErr = true;
         return this.bind({
-          url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/"+ key,
+          url: this._getServiceUri() + "/preference/"+ key,
           method: this.METHOD_HEAD
         }, kwArgs);
     },
@@ -295,14 +308,14 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         // If exists returned a 200
         existsDeferred.addCallback(dojo.lang.hitch(this, function (){
             request.method = this.METHOD_PUT
-            request.url = this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key;
+            request.url = this._getServiceUri() + "/preference/" + key;
             return this.bind(request, kwArgs);
         }));
         
         // If exists returned a 404
         existsDeferred.addErrback(dojo.lang.hitch(this, function (){
             request.method = this.METHOD_POST;
-            request.url = this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences";
+            request.url = this._getServiceUri() + "/preferences";
 
             return this.bind(request, kwArgs);
         }));
@@ -311,7 +324,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     getPreferences: function (kwArgs){
         return this.bind(
-            {url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences"
+            {url: this._getServiceUri() + "/preferences"
             }, 
             kwArgs);
     },
@@ -319,7 +332,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     getPreference: function (key, kwArgs){
         return this.bind(
             {
-                url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
+                url: this._getServiceUri() + "/preference/" + key,
                 method: this.METHOD_GET
             },
             kwArgs);
@@ -328,7 +341,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     deletePreference: function(key, kwArgs){
         return this.bind(
             {
-                url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
+                url: this._getServiceUri() + "/preference/" + key,
                 method: this.METHOD_DELETE
             },
             kwArgs);

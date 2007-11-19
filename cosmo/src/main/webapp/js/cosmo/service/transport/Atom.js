@@ -34,8 +34,7 @@ dojo.require("cosmo.util.uri");
 dojo.require("cosmo.service.transport.Rest");
 dojo.require("cosmo.service.exception");
 
-dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
-    {
+dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
     initializer: function(urlCache){
         this.urlCache = urlCache;  
     },
@@ -98,7 +97,19 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
         
         return deferred;
+    },
+
+    deleteCollection: function(collection, kwArgs){
+        kwArgs = kwArgs || {};
         
+        var r = {};
+        r.url = this.getAndCheckEditLink(collection, searchCrit);
+        r.method = this.METHOD_DELETE;
+
+        var deferred = this.bind(r, kwArgs);
+        this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
+        
+        return deferred;
     },
 
     getCollection: function(collectionUrl, kwArgs){

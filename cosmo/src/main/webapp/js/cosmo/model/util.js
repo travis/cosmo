@@ -87,7 +87,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     },
 
     initializeClass: function(ctr, kwArgs){
-        if (ctr.prototype["__enhanced"]){
+               if (ctr.prototype["__enhanced"]){
             //it's already been enhanced, which usually means that this is a subclass.
             //so let's just copy the arrays/objects to the new prototype 
             //since we'll be adding to them and don't want to add to the parent's arrays/objects!
@@ -136,15 +136,26 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     //or other classes in this package.
     _initializeProperties: function(kwProps, kwArgs){
         kwArgs = kwArgs || {};
-        for (var x = 0; x < this.__propertyNames.length; x++){
-            var propertyName = this.__propertyNames[x];
-            if (dojo.lang.has(kwProps, propertyName)){
-                this.__setProperty(propertyName, kwProps[propertyName]);
-            } else if (!kwArgs.noDefaults){
+
+        //if there are properties to set, set them.
+        if (kwProps){
+            for (var x = 0; x < this.__propertyNames.length; x++){
+                var propertyName = this.__propertyNames[x];
+                if (dojo.lang.has(kwProps, propertyName)){
+                    this.__setProperty(propertyName, kwProps[propertyName]);
+                } else if (!kwArgs.noDefaults){
+                    this.__setProperty(propertyName, this.__getDefault(propertyName));
+                }
+            }
+        } else if (!kwArgs.noDefaults) {
+            //if there are not properties to set, and there are defaults, go through
+            //and set the defaults
+            for (x = 0; x < this.__propertyNames.length; x++){
+                var propertyName = this.__propertyNames[x];
                 this.__setProperty(propertyName, this.__getDefault(propertyName));
             }
         }
-        
+
         if (this.__immutable){
             this.__setProperty = function(){
                 throw new Error (this.declaredClass + " is an immutable type! No changes are allowed.")

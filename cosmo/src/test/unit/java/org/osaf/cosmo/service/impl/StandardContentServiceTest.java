@@ -39,6 +39,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.User;
@@ -100,6 +101,15 @@ public class StandardContentServiceTest extends TestCase {
         assertEquals(dummyContent, item);
 
         contentDao.removeContent(dummyContent);
+    }
+    
+    /** */
+    public void testInvalidModUid() throws Exception {
+        
+        Item item = service.findItemByUid("uid" + ModificationUid.RECURRENCEID_DELIMITER + "bogus");
+        
+        // bogus mod uid should result in no item found, not a ModelValidationException
+        assertNull(item);
     }
 
     /** */

@@ -36,6 +36,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
@@ -102,7 +103,14 @@ public class StandardContentService implements ContentService {
         // Handle case where uid represents an occurence of a
         // recurring item.
         if(uid.indexOf(ModificationUid.RECURRENCEID_DELIMITER)!=-1) {
-            ModificationUid modUid = new ModificationUid(uid);
+            ModificationUid modUid;
+            
+            try {
+                modUid = new ModificationUid(uid);
+            } catch (ModelValidationException e) {
+                // If ModificationUid is invalid, item isn't present
+                return null;
+            }
             // Find the parent, and then verify that the recurrenceId is a valid
             // occurrence date for the recurring item.
             NoteItem parent = (NoteItem) contentDao.findItemByUid(modUid.getParentUid());

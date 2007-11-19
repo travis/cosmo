@@ -21,36 +21,30 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.component.VFreeBusy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
-import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.calendar.query.CalendarFilterEvaluater;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.ContentDao;
-import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
-import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.NoteOccurrenceUtil;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.service.ContentService;
-import org.osaf.cosmo.service.freebusy.FreeBusyQueryProcessor;
 import org.osaf.cosmo.service.lock.LockManager;
 import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 import org.osaf.cosmo.service.triage.TriageStatusQueryProcessor;
@@ -69,8 +63,7 @@ public class StandardContentService implements ContentService {
     private ContentDao contentDao;
     private LockManager lockManager;
     private TriageStatusQueryProcessor triageStatusQueryProcessor;
-    private FreeBusyQueryProcessor freeBusyQueryProcessor;
-    
+  
     private long lockTimeout = 0;
 
     // ContentService methods
@@ -665,7 +658,7 @@ public class StandardContentService implements ContentService {
         try {
             
            for(ContentItem content: contentItems) {
-               if(content.getId()==-1)
+               if(content.getCreationDate()==null)
                    contentDao.createContent(parents, content);
                else if(content.getIsActive()==Boolean.FALSE)
                    contentDao.removeContent(content);
@@ -738,38 +731,6 @@ public class StandardContentService implements ContentService {
 
     
     /**
-     * Find calendar items by filter.
-     *
-     * @param calendar
-     *            calendar collection to search
-     * @param filter
-     *            filter to use in search
-     * @return set of ContentItem objects matching specified
-     *         filter.
-     */
-    public Set<ContentItem> findCalendarItems(CollectionItem calendar,
-                                       CalendarFilter filter) {
-        if (log.isDebugEnabled()) {
-            log.debug("finding events in calendar " + calendar.getUid() +
-                      " by filter " + filter);
-        }
-        return calendarDao.findCalendarItems(calendar, filter);
-    }
-
-    
-    public boolean matches(NoteItem item,
-                           CalendarFilter filter) {
-        if (log.isDebugEnabled())
-            log.debug("matching item " + item.getUid() + " to filter " + filter);
-        
-        Calendar calendar = ICalendarOutputter.getCalendarFromNote(item);
-        if(calendar!=null)
-            return new CalendarFilterEvaluater().evaluate(calendar, filter);
-        else
-            return false;
-    }
-    
-    /**
      * Find calendar events by time range.
      *
      * @param collection
@@ -812,29 +773,6 @@ public class StandardContentService implements ContentService {
                 context);
     }
     
-    /**
-     * Generate a VFREEBUSY component containing freebusy 
-     * periods for a collection.
-     * @param collection collection to query
-     * @param period time range to query freebusy information
-     * @return VFREEBUSY component containing freebusy periods
-     */
-    public VFreeBusy generateFreeBusy(CollectionItem collection, Period period) {
-        return freeBusyQueryProcessor.generateFreeBusy(collection, period);
-    }
-
-    /**
-     * Generate a VFREEBUSY component containing freebusy 
-     * periods for an item.
-     * @param item item to query
-     * @param period time range to query freebusy information
-     * @return VFREEBUSY component containing freebusy periods
-     */
-    public VFreeBusy generateFreeBusy(ICalendarItem item,
-                                      Period period) {
-        return freeBusyQueryProcessor.generateFreeBusy(item, period);
-    }
-
     /**
      * Find items by filter.
      *
@@ -962,8 +900,6 @@ public class StandardContentService implements ContentService {
             throw new IllegalStateException("lockManager must not be null");
         if(triageStatusQueryProcessor == null)
             throw new IllegalStateException("triageStatusQueryProcessor must not be null");
-        if(freeBusyQueryProcessor == null)
-            throw new IllegalStateException("freeBusyQueryProcessor must not be null");
     }
 
     /**
@@ -1002,11 +938,6 @@ public class StandardContentService implements ContentService {
         this.triageStatusQueryProcessor = triageStatusQueryProcessor;
     }
     
-    public void setFreeBusyQueryProcessor(
-            FreeBusyQueryProcessor freeBusyQueryProcessor) {
-        this.freeBusyQueryProcessor = freeBusyQueryProcessor;
-    }
-
     /** */
     public LockManager getLockManager() {
         return lockManager;
@@ -1115,7 +1046,7 @@ public class StandardContentService implements ContentService {
     }
     
     private NoteOccurrence getNoteOccurrence(NoteItem parent, net.fortuna.ical4j.model.Date recurrenceId) {
-        EventStamp eventStamp = EventStamp.getStamp(parent);
+        EventStamp eventStamp = StampUtils.getEventStamp(parent);
         
         // parent must be a recurring event
         if(eventStamp==null || !eventStamp.isRecurring())
@@ -1124,7 +1055,7 @@ public class StandardContentService implements ContentService {
         // verify that occurrence date is valid
         RecurrenceExpander expander = new RecurrenceExpander();
         if(expander.isOccurrence(eventStamp.getCalendar(), recurrenceId))
-            return new NoteOccurrence(recurrenceId, parent);
+            return NoteOccurrenceUtil.createNoteOccurrence(recurrenceId, parent);
         
         return null;
     }

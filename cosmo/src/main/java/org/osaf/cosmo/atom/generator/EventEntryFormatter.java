@@ -27,6 +27,7 @@ import org.osaf.cosmo.calendar.util.Dates;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.util.DateUtil;
 
 /**
@@ -69,7 +70,7 @@ public class EventEntryFormatter {
         } else {
             master = item;
         }    
-        stamp = EventStamp.getStamp(master);
+        stamp = StampUtils.getEventStamp(master);
         if (stamp != null) {
             if (occurrence != null) {
                 start = occurrence.getOccurrenceDate();

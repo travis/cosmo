@@ -44,6 +44,7 @@ import org.hibernate.validator.InvalidStateException;
 
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.PasswordRecovery;
@@ -104,6 +105,7 @@ public class CmpServlet extends HttpServlet {
     private static final String BEAN_SECURITY_MANAGER = "securityManager";
     private static final String BEAN_ACCOUNT_ACTIVATOR = "accountActivator";
     private static final String BEAN_OOTB_HELPER = "ootbHelper";
+    private static final String BEAN_ENTITY_FACTORY = "cosmoEntityFactory";
 
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
@@ -114,6 +116,7 @@ public class CmpServlet extends HttpServlet {
     private WebApplicationContext wac;
     private ContentService contentService;
     private UserService userService;
+    private EntityFactory entityFactory;
     private ServiceLocatorFactory serviceLocatorFactory;
     private CosmoSecurityManager securityManager;
     private PasswordRecoverer passwordRecoverer;
@@ -157,6 +160,9 @@ public class CmpServlet extends HttpServlet {
             if (ootbHelper == null)
                 ootbHelper = (OutOfTheBoxHelper)
                     getBean(BEAN_OOTB_HELPER, OutOfTheBoxHelper.class);
+            if (entityFactory == null)
+                entityFactory = (EntityFactory)
+                    getBean(BEAN_ENTITY_FACTORY, EntityFactory.class);
         }
 
         if (contentService == null)
@@ -468,6 +474,15 @@ public class CmpServlet extends HttpServlet {
     public void setOutOfTheBoxHelper(OutOfTheBoxHelper helper) {
         ootbHelper = helper;
     }
+    
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+    
 
     // private methods
 
@@ -832,7 +847,7 @@ public class CmpServlet extends HttpServlet {
         throws ServletException, IOException {
         try {
             Document xmldoc = readXmlRequest(req);
-            UserResource resource = new UserResource(getUrlBase(req), xmldoc);
+            UserResource resource = new UserResource(getUrlBase(req), xmldoc, entityFactory);
             User user = resource.getUser();
             user.setAdmin(Boolean.FALSE);
             user.setLocked(Boolean.FALSE);
@@ -872,7 +887,7 @@ public class CmpServlet extends HttpServlet {
             Boolean oldAdmin = user.getAdmin();
             Boolean oldLocked = user.isLocked();
             UserResource resource =
-                new UserResource(user, getUrlBase(req), xmldoc);
+                new UserResource(user, getUrlBase(req), xmldoc, entityFactory);
             if (user.isUsernameChanged()) {
                 // reset logged in user's username
                 user.setUsername(oldUsername);
@@ -926,7 +941,7 @@ public class CmpServlet extends HttpServlet {
         try {
             Document xmldoc = readXmlRequest(req);
             String urlUsername = usernameFromPathInfo(req.getPathInfo());
-            UserResource resource = new UserResource(getUrlBase(req), xmldoc);
+            UserResource resource = new UserResource(getUrlBase(req), xmldoc, entityFactory);
             User user = resource.getUser();
             if (user.getUsername() != null &&
                 ! user.getUsername().equals(urlUsername)) {
@@ -968,7 +983,7 @@ public class CmpServlet extends HttpServlet {
             Document xmldoc = readXmlRequest(req);
             String urlUsername = usernameFromPathInfo(req.getPathInfo());
             UserResource resource =
-                new UserResource(user, getUrlBase(req), xmldoc);
+                new UserResource(user, getUrlBase(req), xmldoc, entityFactory);
             userService.updateUser(user);
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             resp.setHeader("ETag", resource.getEntityTag());
@@ -1008,7 +1023,7 @@ public class CmpServlet extends HttpServlet {
                 passwordRecoverer.createRecoveryKey();
             
             final PasswordRecovery passwordRecovery = 
-                new PasswordRecovery(user, passwordRecoveryKey);
+                entityFactory.createPasswordRecovery(user, passwordRecoveryKey);
             
             userService.createPasswordRecovery(passwordRecovery);
             

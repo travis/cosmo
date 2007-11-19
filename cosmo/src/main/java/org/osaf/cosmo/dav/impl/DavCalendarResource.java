@@ -49,6 +49,7 @@ import org.osaf.cosmo.dav.property.ContentType;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.NoteItem;
@@ -74,9 +75,10 @@ public abstract class DavCalendarResource extends DavContentBase
 
     public DavCalendarResource(ContentItem item,
                                DavResourceLocator locator,
-                               DavResourceFactory factory)
+                               DavResourceFactory factory,
+                               EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
        
     // DavResource methods
@@ -128,7 +130,7 @@ public abstract class DavCalendarResource extends DavContentBase
      */
     public boolean matches(CalendarFilter filter)
         throws DavException {
-        return getContentService().matches((NoteItem)getItem(), filter);
+        return getCalendarQueryProcesor().filterQuery((NoteItem)getItem(), filter);
     }
 
     /**
@@ -139,8 +141,8 @@ public abstract class DavCalendarResource extends DavContentBase
      *         specified timerange
      */
     public VFreeBusy generateFreeBusy(Period period) {
-        return getContentService().
-            generateFreeBusy((ICalendarItem)getItem(), period);
+        return getCalendarQueryProcesor().
+            freeBusyQuery((ICalendarItem)getItem(), period);
     }
 
     /**

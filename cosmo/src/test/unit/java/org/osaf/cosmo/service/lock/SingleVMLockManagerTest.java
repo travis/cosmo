@@ -16,6 +16,7 @@
 package org.osaf.cosmo.service.lock;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.hibernate.HibCollectionItem;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
 
 import junit.framework.Assert;
@@ -68,7 +69,7 @@ public class SingleVMLockManagerTest extends TestCase {
         // t4 should be waiting
         Assert.assertFalse(t4.hasLock);
         
-        CollectionItem col = new CollectionItem();
+        CollectionItem col = new HibCollectionItem();
         col.setUid("3");
         
         Assert.assertEquals(1, lockManager.getNumWaitingThreads(col));
@@ -129,7 +130,7 @@ public class SingleVMLockManagerTest extends TestCase {
         }
         
         public void run() {
-            CollectionItem collection = new CollectionItem();
+            CollectionItem collection = new HibCollectionItem();
             collection.setUid(uid);
             lockManager.lockCollection(collection);
             hasLock = true;

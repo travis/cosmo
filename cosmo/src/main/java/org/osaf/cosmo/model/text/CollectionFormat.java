@@ -18,13 +18,14 @@ package org.osaf.cosmo.model.text;
 import java.text.ParseException;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * Interface for collection formatters.
  */
 public interface CollectionFormat {
 
-    public CollectionItem parse(String source)
+    public CollectionItem parse(String source, EntityFactory entityFactory)
         throws ParseException;
 
     public String format(CollectionItem collection);

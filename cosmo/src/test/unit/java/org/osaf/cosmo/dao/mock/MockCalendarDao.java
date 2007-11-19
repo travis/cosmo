@@ -18,12 +18,17 @@ package org.osaf.cosmo.dao.mock;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
+import org.osaf.cosmo.calendar.query.CalendarFilterEvaluater;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.ICalendarItem;
+import org.osaf.cosmo.model.Item;
 
 /**
  * Mock implementation of <code>CalendarDao</code> useful for testing.
@@ -65,20 +70,38 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
      * @return set CalendarEventItem objects matching specified
      *         filter.
      */
-    public Set<ContentItem> findCalendarItems(CollectionItem calendar,
+    public Set<ICalendarItem> findCalendarItems(CollectionItem collection,
                                              CalendarFilter filter) {
         lastCalendarFilter = filter;
-        return new HashSet<ContentItem>();
+        HashSet<ICalendarItem> results = new HashSet<ICalendarItem>();
+        CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
+        
+        // Evaluate filter against all calendar items
+        for (Item child : collection.getChildren()) {
+            
+            // only care about calendar items
+            if (child instanceof ICalendarItem) {
+                
+                ICalendarItem content = (ICalendarItem) child;
+                Calendar calendar = EntityConverter.convertContent(content);
+                    
+                if(calendar!=null) {
+                    if (evaluater.evaluate(calendar, filter) == true)
+                        results.add(content);
+                }
+            }
+        }
+        
+        return results;
 
     }
 
     public ContentItem findEventByIcalUid(String uid, CollectionItem calendar) {
-        // TODO implement
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public Set<ContentItem> findEvents(CollectionItem collection, DateTime rangeStart, DateTime rangeEnd, boolean expandRecurringEvents) {
-        return null;
+        throw new UnsupportedOperationException();
     }
     
     

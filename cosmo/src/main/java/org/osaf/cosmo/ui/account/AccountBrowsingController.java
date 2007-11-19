@@ -44,6 +44,7 @@ import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.Permission;
@@ -245,14 +246,14 @@ public class AccountBrowsingController extends MultiActionController
         request.setAttribute("Path", path);
 
         if (item.getStamp(EventStamp.class)!=null) {
-            EventStamp eventStamp = EventStamp.getStamp(item);
+            EventStamp eventStamp = StampUtils.getEventStamp(item);
             request.setAttribute("Item", item);
             request.setAttribute("Event", new EventBean(eventStamp));
 
             return new ModelAndView(eventView);
         } else if (item.getStamp(CalendarCollectionStamp.class)!=null) {
             CalendarCollectionStamp calendar = 
-                CalendarCollectionStamp.getStamp(item);
+                StampUtils.getCalendarCollectionStamp(item);
             request.setAttribute("Collection", item);
             request.setAttribute("Calendar", new CalendarBean(calendar));
 
@@ -296,13 +297,13 @@ public class AccountBrowsingController extends MultiActionController
             log.debug("downloading item " + item.getUid() + " at " + path);
 
         if (item.getStamp(EventStamp.class) != null) {
-            spoolEvent(EventStamp.getStamp(item), request, response);
+            spoolEvent(StampUtils.getEventStamp(item), request, response);
             return null;
         } else if (item instanceof FileItem) {
             spoolItem((FileItem) item, request, response);
             return null;
         } else if (item.getStamp(CalendarCollectionStamp.class) != null) {
-            spoolCalendar(CalendarCollectionStamp.getStamp(item), request,
+            spoolCalendar(StampUtils.getCalendarCollectionStamp(item), request,
                           response);
             return null;
         }

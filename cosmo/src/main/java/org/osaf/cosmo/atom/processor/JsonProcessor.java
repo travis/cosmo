@@ -25,6 +25,7 @@ import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.json.JsonStreamException;
 import org.osaf.cosmo.eim.json.JsonStreamReader;
 import org.osaf.cosmo.eim.json.JsonValidationException;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * A class that processes content specified as JSON-serialized EIM
@@ -35,6 +36,10 @@ import org.osaf.cosmo.eim.json.JsonValidationException;
 public class JsonProcessor extends BaseEimProcessor {
     private static final Log log = LogFactory.getLog(JsonProcessor.class);
 
+    public JsonProcessor(EntityFactory entityFactory) {
+        super(entityFactory);
+    }
+    
     /**
      * Converts the EIMML content body into a valid EIM record set.
      *

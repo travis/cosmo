@@ -18,13 +18,14 @@ package org.osaf.cosmo.model.text;
 import java.text.ParseException;
 
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * Interface for subscription formatters.
  */
 public interface SubscriptionFormat {
 
-    public CollectionSubscription parse(String source)
+    public CollectionSubscription parse(String source, EntityFactory entityFactory)
         throws ParseException;
 
     public String format(CollectionSubscription sub);

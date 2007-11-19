@@ -38,7 +38,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testExample1() throws Exception {
         Reader content = helper.getReader("hcalendar/example1.xhtml");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);
@@ -54,7 +54,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testExample2() throws Exception {
         Reader content = helper.getReader("hcalendar/example2.xhtml");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);
@@ -72,7 +72,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testSummaryInImgAlt() throws Exception {
         Reader content = helper.getReader("hcalendar/09-component-vevent-summary-in-img-alt.html");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);
@@ -89,7 +89,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testEntity() throws Exception {
         Reader content = helper.getReader("hcalendar/10-component-vevent-entity.html");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);
@@ -103,7 +103,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testSummaryUrlInSameClass() throws Exception {
         Reader content = helper.getReader("hcalendar/12-component-vevent-summary-url-in-same-class.html");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);
@@ -117,7 +117,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testLang() throws Exception {
         Reader content = helper.getReader("hcalendar/hcalendar-calendar-lang-sub-lang.html");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);
@@ -133,7 +133,7 @@ public class HCalendarProcessorTest extends TestCase {
     public void testEventful() throws Exception {
         Reader content = helper.getReader("hcalendar/eventful-1.html");
 
-        HCalendarProcessor processor = new HCalendarProcessor();
+        HCalendarProcessor processor = new HCalendarProcessor(helper.getEntityFactory());
         CalendarComponent component = processor.readCalendarComponent(content);
         assertNotNull("Null component", component);
         assertTrue("Component not a VEVENT", component instanceof VEvent);

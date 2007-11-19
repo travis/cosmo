@@ -40,6 +40,7 @@ public abstract class BaseProviderTestCase extends TestCase {
         provider.setAbdera(helper.getAbdera());
         provider.setGeneratorFactory(helper.getGeneratorFactory());
         provider.setServiceLocatorFactory(helper.getServiceLocatorFactory());
+        provider.setEntityFactory(helper.getEntityFactory());
         provider.init();
 
         helper.logIn();

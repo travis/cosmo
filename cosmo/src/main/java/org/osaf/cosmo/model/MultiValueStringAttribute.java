@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,71 +15,13 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-
-import org.hibernate.annotations.CollectionOfElements;
-
-
-/**
- * Represents attribute with a List<String> as its value
- */
-@Entity
-@DiscriminatorValue("multistring")
-public class MultiValueStringAttribute extends Attribute
-        implements java.io.Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 8518583717902318228L;
-    
-    @CollectionOfElements
-    @JoinTable(
-            name="multistring_values",
-            joinColumns = @JoinColumn(name="attributeid")
-    )
-    @Column(name="stringvalue", length=2048)
-    private Set<String> value = new HashSet<String>(0);
-
-    /** default constructor */
-    public MultiValueStringAttribute() {
-    }
-
-    public MultiValueStringAttribute(QName qname, Set<String> value)
-    {
-        setQName(qname);
-        this.value = value;
-    }
+public interface MultiValueStringAttribute extends Attribute{
 
     // Property accessors
-    public Set<String> getValue() {
-        return this.value;
-    }
+    public Set<String> getValue();
 
-    public void setValue(Set<String> value) {
-        this.value = value;
-    }
-    
-    public void setValue(Object value) {
-        if (value != null && !(value instanceof Set))
-            throw new ModelValidationException(
-                    "attempted to set non Set value on attribute");
-        setValue((Set<String>) value);
-    }
-    
-    public Attribute copy() {
-        MultiValueStringAttribute attr = new MultiValueStringAttribute();
-        attr.setQName(getQName().copy());
-        Set<String> newValue = new HashSet<String>(value);
-        attr.setValue(newValue);
-        return attr;
-    }
+    public void setValue(Set<String> value);
 
 }

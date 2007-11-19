@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,96 +17,14 @@ package org.osaf.cosmo.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.hibernate.annotations.Type;
-
 /**
- * Represents an attribute with a timestamp.  A timestamp
- * is a java.util.Date, containing the number of milliseconds
- * since the epoch (Jan 1, 1970 GMT).
+ * Attribute that stores timestamp value.
  */
-@Entity
-@DiscriminatorValue("timestamp")
-public class TimestampAttribute extends Attribute implements
-        java.io.Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 5263977785074085449L;
-    
-    @Column(name = "intvalue")
-    @Type(type="long_timestamp")
-    private Date value;
-
-    /** default constructor */
-    public TimestampAttribute() {
-    }
-
-    public TimestampAttribute(QName qname, Date value) {
-        setQName(qname);
-        this.value = value;
-    }
+public interface TimestampAttribute extends Attribute{
 
     // Property accessors
-    public Date getValue() {
-        return this.value;
-    }
+    public Date getValue();
 
-    public void setValue(Date value) {
-        this.value = value;
-    }
-    
-    public void setValue(Object value) {
-        if (value != null && !(value instanceof Date))
-            throw new ModelValidationException(
-                    "attempted to set non Date value on attribute");
-        setValue((Date) value);
-    }
-    
-    /**
-     * Convienence method for returning a Date value on a TimestampAttribute
-     * with a given QName stored on the given item.
-     * @param item item to fetch TextAttribute from
-     * @param qname QName of attribute
-     * @return Date value of TextAttribute
-     */
-    public static Date getValue(Item item, QName qname) {
-        TimestampAttribute ta = (TimestampAttribute) item.getAttribute(qname);
-        if(ta==null)
-            return null;
-        else
-            return ta.getValue();
-    }
-    
-    /**
-     * Convienence method for setting a Date value on a TimestampAttribute
-     * with a given QName stored on the given item.
-     * @param item item to fetch TimestampAttribute from
-     * @param qname QName of attribute
-     * @param value value to set on TextAttribute
-     */
-    public static void setValue(Item item, QName qname, Date value) {
-        TimestampAttribute attr = (TimestampAttribute) item.getAttribute(qname);
-        if(attr==null && value!=null) {
-            attr = new TimestampAttribute(qname,value);
-            item.addAttribute(attr);
-            return;
-        }
-        if(value==null)
-            item.removeAttribute(qname);
-        else
-            attr.setValue(value);
-    }
-    
-    public Attribute copy() {
-        TimestampAttribute attr = new TimestampAttribute();
-        attr.setQName(getQName().copy());
-        attr.setValue(value.clone());
-        return attr;
-    }
+    public void setValue(Date value);
 
 }

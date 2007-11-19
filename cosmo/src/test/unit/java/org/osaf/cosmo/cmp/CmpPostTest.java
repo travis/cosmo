@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibPasswordRecovery;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -169,7 +170,7 @@ public class CmpPostTest extends BaseCmpServletTestCase {
        
         userService.createUser(u1);
         
-        PasswordRecovery passwordRecovery = new PasswordRecovery(u1, "recoverykey1");
+        PasswordRecovery passwordRecovery = new HibPasswordRecovery(u1, "recoverykey1");
         
         userService.createPasswordRecovery(passwordRecovery);
 

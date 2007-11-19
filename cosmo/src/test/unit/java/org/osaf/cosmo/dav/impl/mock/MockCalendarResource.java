@@ -23,6 +23,7 @@ import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -38,16 +39,18 @@ public class MockCalendarResource extends DavCalendarResource {
 
     public MockCalendarResource(ContentItem item,
                                 DavResourceLocator locator,
-                                DavResourceFactory factory)
+                                DavResourceFactory factory,
+                                EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
         this.matchFilters = false;
     }
 
     public MockCalendarResource(DavResourceLocator locator,
-                                DavResourceFactory factory)
+                                DavResourceFactory factory,
+                                EntityFactory entityFactory)
         throws DavException {
-        this(new NoteItem(), locator, factory);
+        this(entityFactory.createNote(), locator, factory, entityFactory);
     }
 
     // DavCalendarResource methods

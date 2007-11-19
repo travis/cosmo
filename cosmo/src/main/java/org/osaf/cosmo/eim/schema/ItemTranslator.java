@@ -42,6 +42,7 @@ import org.osaf.cosmo.eim.schema.task.TaskGenerator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownApplicator;
 import org.osaf.cosmo.eim.schema.unknown.UnknownGenerator;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;

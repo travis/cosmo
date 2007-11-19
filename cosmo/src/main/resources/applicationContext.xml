@@ -84,60 +84,77 @@
   <bean id="validatePreInsertEventListener"
       class="org.hibernate.validator.event.ValidatePreInsertEventListener"/>
 
+  
+  <bean id="auditableObjectInterceptor"
+      class="org.osaf.cosmo.model.hibernate.AuditableObjectInterceptor"/>
+      
+  <bean id="eventStampInterceptor"
+      class="org.osaf.cosmo.model.hibernate.EventStampInterceptor"/>
+  
   <bean id="cosmoHibernateInterceptor"
-      class="org.osaf.cosmo.hibernate.CosmoInterceptor"/>
+      class="org.osaf.cosmo.hibernate.CompoundInterceptor">
+      <property name="interceptors">
+        <list>
+            <ref local="auditableObjectInterceptor"/>
+            <ref local="eventStampInterceptor"/>
+        </list>
+    </property>
+  </bean>
+      
+  <bean id="cosmoEntityFactory"
+      class="org.osaf.cosmo.model.hibernate.HibEntityFactory"/>
 
   <bean id="sessionFactory"
         class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
     <property name="lobHandler" ref="defaultLobHandler" />
     <property name="annotatedPackages">
         <list>
-            <value>org.osaf.cosmo.model</value>
+            <value>org.osaf.cosmo.model.hibernate</value>
         </list>
     </property>
     <property name="annotatedClasses">
         <list>
-            <value>org.osaf.cosmo.model.Attribute</value>
-            <value>org.osaf.cosmo.model.AttributeTombstone</value>
-            <value>org.osaf.cosmo.model.AvailabilityItem</value>
-            <value>org.osaf.cosmo.model.BaseEventStamp</value>
-            <value>org.osaf.cosmo.model.BinaryAttribute</value>
-            <value>org.osaf.cosmo.model.BooleanAttribute</value>
-            <value>org.osaf.cosmo.model.CalendarAttribute</value>
-            <value>org.osaf.cosmo.model.CalendarCollectionStamp</value>			
-            <value>org.osaf.cosmo.model.CollectionItem</value>
-            <value>org.osaf.cosmo.model.CollectionSubscription</value>
-            <value>org.osaf.cosmo.model.ContentData</value>
-            <value>org.osaf.cosmo.model.ContentItem</value>
-            <value>org.osaf.cosmo.model.DateAttribute</value>
-            <value>org.osaf.cosmo.model.DecimalAttribute</value>
-            <value>org.osaf.cosmo.model.DictionaryAttribute</value>
-            <value>org.osaf.cosmo.model.EventExceptionStamp</value>
-            <value>org.osaf.cosmo.model.EventStamp</value>
-            <value>org.osaf.cosmo.model.FileItem</value>
-            <value>org.osaf.cosmo.model.FreeBusyItem</value>
-            <value>org.osaf.cosmo.model.HomeCollectionItem</value>
-            <value>org.osaf.cosmo.model.ICalendarAttribute</value>
-            <value>org.osaf.cosmo.model.ICalendarItem</value>
-            <value>org.osaf.cosmo.model.IntegerAttribute</value>
-            <value>org.osaf.cosmo.model.Item</value>
-            <value>org.osaf.cosmo.model.ItemTombstone</value>
-            <value>org.osaf.cosmo.model.MessageStamp</value>
-            <value>org.osaf.cosmo.model.MultiValueStringAttribute</value>
-            <value>org.osaf.cosmo.model.NoteItem</value>
-            <value>org.osaf.cosmo.model.PasswordRecovery</value>
-            <value>org.osaf.cosmo.model.Preference</value>
-            <value>org.osaf.cosmo.model.ServerProperty</value>
-            <value>org.osaf.cosmo.model.StringAttribute</value>
-            <value>org.osaf.cosmo.model.Stamp</value>
-            <value>org.osaf.cosmo.model.StampTombstone</value>
-            <value>org.osaf.cosmo.model.TaskStamp</value>
-            <value>org.osaf.cosmo.model.TextAttribute</value>
-            <value>org.osaf.cosmo.model.Ticket</value>
-            <value>org.osaf.cosmo.model.TimestampAttribute</value>
-            <value>org.osaf.cosmo.model.Tombstone</value>
-            <value>org.osaf.cosmo.model.User</value>
-            <value>org.osaf.cosmo.model.XmlAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibAttributeTombstone</value>
+            <value>org.osaf.cosmo.model.hibernate.HibAvailabilityItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibBaseEventStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibBinaryAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibBooleanAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibCalendarAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp</value>			
+            <value>org.osaf.cosmo.model.hibernate.HibCollectionItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibCollectionSubscription</value>
+            <value>org.osaf.cosmo.model.hibernate.HibContentData</value>
+            <value>org.osaf.cosmo.model.hibernate.HibContentItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibDateAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibDecimalAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibDictionaryAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibEventExceptionStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibEventStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibFileItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibFreeBusyItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibHomeCollectionItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibICalendarAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibICalendarItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibIntegerAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibItemTombstone</value>
+            <value>org.osaf.cosmo.model.hibernate.HibMessageStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibMultiValueStringAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibNoteItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibPasswordRecovery</value>
+            <value>org.osaf.cosmo.model.hibernate.HibPreference</value>
+            <value>org.osaf.cosmo.model.hibernate.HibServerProperty</value>
+            <value>org.osaf.cosmo.model.hibernate.HibStringAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibStampTombstone</value>
+            <value>org.osaf.cosmo.model.hibernate.HibTaskStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibTextAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibTicket</value>
+            <value>org.osaf.cosmo.model.hibernate.HibTimestampAttribute</value>
+            <value>org.osaf.cosmo.model.hibernate.HibTombstone</value>
+            <value>org.osaf.cosmo.model.hibernate.HibUser</value>
+            <value>org.osaf.cosmo.model.hibernate.HibXmlAttribute</value>
         </list>
     </property>
     <property name="entityInterceptor">
@@ -185,6 +202,8 @@
       <ref bean="sessionFactory"/>  
     </property>
   </bean>
+  
+  
 
   <!-- Transaction manager for a single Hibernate SessionFactory
        (alternative to JTA) -->
@@ -256,9 +275,6 @@
     </property>
   </bean>
 
-  <bean id="eventStampIndexListener"
-        class="org.osaf.cosmo.model.EventStampIndexItemListener" />
-
   <bean id="standardItemFilterProcessor"
         class="org.osaf.cosmo.dao.hibernate.query.StandardItemFilterProcessor" />
 
@@ -280,11 +296,6 @@
     </property>
     <property name="itemFilterProcessor">
       <ref local="standardItemFilterProcessor" />
-    </property>
-    <property name="itemListeners">
-      <list>
-          <ref local="eventStampIndexListener"/>
-      </list>
     </property>
   </bean>
 
@@ -354,6 +365,9 @@
     <property name="messageSource">
       <ref local="messageSource" />
     </property>
+    <property name="entityFactory">
+      <ref bean="cosmoEntityFactory"/>
+    </property>
   </bean>
 
   <bean id="triageStatusQueryProcessor"
@@ -363,12 +377,6 @@
     </property>
   </bean>
   
-  <bean id="freeBusyQueryProcessor"
-      class="org.osaf.cosmo.service.impl.StandardFreeBusyQueryProcessor">
-    <property name="calendarDao">
-      <ref local="calendarDao" />
-    </property>
-  </bean>
 
   <bean id="userService" parent="txProxyTemplate">
     <property name="proxyInterfaces">
@@ -422,9 +430,6 @@
     <property name="triageStatusQueryProcessor">
       <ref bean="triageStatusQueryProcessor"/>
     </property>
-    <property name="freeBusyQueryProcessor">
-      <ref bean="freeBusyQueryProcessor"/>
-    </property>
   </bean>
 
   <bean id="serverPropertyService" parent="txProxyTemplate">
@@ -445,6 +450,12 @@
     </property>
   </bean>
 
+  <bean id="calendarQueryProcessor"
+        class="org.osaf.cosmo.calendar.query.impl.StandardCalendarQueryProcessor">
+    <property name="calendarDao">
+      <ref bean="calendarDao"/>
+    </property>
+  </bean>
   
   <!-- general protocol/interface resources -->
 
@@ -468,6 +479,8 @@
     <constructor-arg><ref local="contentService"/></constructor-arg>    
     <constructor-arg><ref local="userService"/></constructor-arg>
     <constructor-arg><ref local="securityManager"/></constructor-arg>
+    <constructor-arg><ref local="cosmoEntityFactory"/></constructor-arg>
+    <constructor-arg><ref local="calendarQueryProcessor"/></constructor-arg>
   </bean>
 
   <bean id="davResourceLocatorFactory"
@@ -480,6 +493,9 @@
     </property>
     <property name="resourceFactory">
       <ref bean="davResourceFactory"/>
+    </property>
+    <property name="entityFactory">
+      <ref bean="cosmoEntityFactory"/>
     </property>
   </bean>
 
@@ -508,13 +524,23 @@
     <property name="serviceLocatorFactory">
       <ref local="serviceLocatorFactory"/>
     </property>
+    <property name="entityFactory">
+      <ref bean="cosmoEntityFactory"/>
+    </property>
+  </bean>
+
+  <bean id="atomStandardProcessorFactory"
+        class="org.osaf.cosmo.atom.processor.StandardProcessorFactory">
+    <property name="entityFactory">
+      <ref bean="cosmoEntityFactory"/>
+    </property>
   </bean>
 
   <bean id="atomItemProvider"
         class="org.osaf.cosmo.atom.provider.ItemProvider"
         init-method="init" parent="atomBaseProvider">
     <property name="processorFactory">
-      <bean class="org.osaf.cosmo.atom.processor.StandardProcessorFactory"/>
+      <ref local="atomStandardProcessorFactory"/>
     </property>
     <property name="contentService">
       <ref local="contentService"/>
@@ -609,6 +635,9 @@
     <property name="securityManager">
       <ref local="securityManager"/>
     </property>
+    <property name="entityFactory">
+      <ref bean="cosmoEntityFactory"/>
+    </property>
   </bean>
 
   <!-- a helper for setting up the database schema and loading seed
@@ -634,7 +663,9 @@
     <property name="rootLoginUrl">
       <value>/account/view</value>
     </property>
-    
+    <property name="entityFactory">
+      <ref bean="cosmoEntityFactory"/>
+    </property>
   </bean>
 
   <!-- the servlet context configurer, which is used instead of

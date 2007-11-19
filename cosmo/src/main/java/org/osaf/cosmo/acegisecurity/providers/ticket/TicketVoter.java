@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.http.Methods;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.TicketType;
 
 /**
  * Votes affirmatively if the authenticated principal is a ticket and
@@ -67,13 +68,13 @@ public class TicketVoter implements AccessDecisionVoter {
             return ACCESS_DENIED;
 
         if (Methods.isReadMethod(method)) {
-            return ticket.getPrivileges().contains(Ticket.PRIVILEGE_READ) ?
+            return ticket.getPrivileges().contains(TicketType.PRIVILEGE_READ) ?
                 ACCESS_GRANTED :
                 ACCESS_DENIED;
         }
 
         if (Methods.isWriteMethod(method)) {
-            return ticket.getPrivileges().contains(Ticket.PRIVILEGE_WRITE) ?
+            return ticket.getPrivileges().contains(TicketType.PRIVILEGE_WRITE) ?
                 ACCESS_GRANTED :
                 ACCESS_DENIED;
         }

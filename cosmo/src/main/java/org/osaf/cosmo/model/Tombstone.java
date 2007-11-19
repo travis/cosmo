@@ -17,75 +17,31 @@ package org.osaf.cosmo.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.annotations.Type;
-
 /**
- * When an Item is removed from a collection, a tombstone is attached
- * to the collection to track when this removal ocurred.
+ * Represents something that was removed from an item.
  */
-@Entity
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
-@Table(name="tombstones")
-@DiscriminatorColumn(
-        name="tombstonetype",
-        discriminatorType=DiscriminatorType.STRING,
-        length=16)
-public abstract class Tombstone extends BaseModelObject {
-    
-    @Column(name = "removedate", nullable = false)
-    @Type(type="long_timestamp")
-    private Date timestamp = null;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemid", nullable = false)
-    private Item item = null;
+public interface Tombstone {
 
-    public Tombstone() {
-    }
-    
-    public Tombstone(Item item) {
-        this.item = item;
-        this.timestamp = new Date(System.currentTimeMillis());
-    }
-    
-    public Date getTimestamp() {
-        return timestamp;
-    }
+    /**
+     * Time that tombstone was created.  This is effectively 
+     * the time that the object was removed from the item.
+     * @return time tombstone was created
+     */
+    public Date getTimestamp();
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
+    /**
+     * @param timestamp time tombstone created
+     */
+    public void setTimestamp(Date timestamp);
 
-    public Item getItem() {
-        return item;
-    }
+    /**
+     * @return Item that tombstone is associated with.
+     */
+    public Item getItem();
 
-    public void setItem(Item item) {
-        this.item = item;
-    }
+    /**
+     * @param item Item that tombstone is associated with.
+     */
+    public void setItem(Item item);
 
-    @Override
-    public boolean equals(Object obj) {
-        if(obj==null || !(obj instanceof Tombstone))
-            return false;
-        return new EqualsBuilder().append(item, ((Tombstone) obj).getItem()).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(13, 23).append(item).toHashCode();
-    }
 }

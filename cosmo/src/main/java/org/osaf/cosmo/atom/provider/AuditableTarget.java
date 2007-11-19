@@ -26,7 +26,7 @@ import org.apache.abdera.util.EntityTag;
  * and a last modified date.
  *
  * @see Target
- * @see AuditableObject
+ * @see MockAuditableObject
  */
 public interface AuditableTarget extends Target {
 

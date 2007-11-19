@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.osaf.cosmo.dao.ServerPropertyDao;
 import org.osaf.cosmo.model.ServerProperty;
+import org.osaf.cosmo.model.hibernate.HibServerProperty;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -39,7 +40,7 @@ public class ServerPropertyDaoImpl extends HibernateDaoSupport implements
     public String getServerProperty(String property) {
         try {
             ServerProperty prop = (ServerProperty) getSession().createQuery(
-                    "from ServerProperty where name=:name").setParameter(
+                    "from HibServerProperty where name=:name").setParameter(
                     "name", property).uniqueResult();
             if (prop != null)
                 return prop.getValue();
@@ -57,14 +58,14 @@ public class ServerPropertyDaoImpl extends HibernateDaoSupport implements
         try {
             
             ServerProperty prop = (ServerProperty) getSession().createQuery(
-                    "from ServerProperty where name=:name").setParameter(
+                    "from HibServerProperty where name=:name").setParameter(
                     "name", property).uniqueResult();
             if (prop != null) {
                 prop.setValue(value);
                 getSession().update(prop);
             }
             else {
-                prop = new ServerProperty(property, value);
+                prop = new HibServerProperty(property, value);
                 getSession().save(prop);
             }
            

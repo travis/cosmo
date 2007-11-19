@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,60 +17,14 @@ package org.osaf.cosmo.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.hibernate.annotations.Type;
-
 /**
- * Represents an attribute with a date value with
- * no timezone information.
+ * Attribute that stores a Date value
  */
-@Entity
-@DiscriminatorValue("date")
-public class DateAttribute extends Attribute implements
-        java.io.Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 5263977785074085449L;
-    
-    @Column(name = "datevalue")
-    @Type(type="timestamp")
-    private Date value;
-
-    /** default constructor */
-    public DateAttribute() {
-    }
-
-    public DateAttribute(QName qname, Date value) {
-        setQName(qname);
-        this.value = value;
-    }
+public interface DateAttribute extends Attribute{
 
     // Property accessors
-    public Date getValue() {
-        return this.value;
-    }
+    public Date getValue();
 
-    public void setValue(Date value) {
-        this.value = value;
-    }
-    
-    public void setValue(Object value) {
-        if (value != null && !(value instanceof Date))
-            throw new ModelValidationException(
-                    "attempted to set non Date value on attribute");
-        setValue((Date) value);
-    }
-    
-    public Attribute copy() {
-        DateAttribute attr = new DateAttribute();
-        attr.setQName(getQName().copy());
-        attr.setValue(value.clone());
-        return attr;
-    }
+    public void setValue(Date value);
 
 }

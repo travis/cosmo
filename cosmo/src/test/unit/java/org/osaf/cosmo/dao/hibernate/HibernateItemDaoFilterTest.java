@@ -37,6 +37,10 @@ import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.filter.Restrictions;
 import org.osaf.cosmo.model.filter.StampFilter;
+import org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp;
+import org.osaf.cosmo.model.hibernate.HibCollectionItem;
+import org.osaf.cosmo.model.hibernate.HibEventStamp;
+import org.osaf.cosmo.model.hibernate.HibNoteItem;
 
 /**
  * Test findItems() api in ItemDao.
@@ -337,11 +341,11 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     }
 
     private CollectionItem generateCalendar(String name, String owner) {
-        CollectionItem calendar = new CollectionItem();
+        CollectionItem calendar = new HibCollectionItem();
         calendar.setName(name);
         calendar.setOwner(getUser(userDao, owner));
         
-        CalendarCollectionStamp ccs = new CalendarCollectionStamp();
+        CalendarCollectionStamp ccs = new HibCalendarCollectionStamp();
         calendar.addStamp(ccs);
         
         ccs.setDescription("test description");
@@ -352,21 +356,21 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
 
     private NoteItem generateEvent(String name, String file,
             String owner) throws Exception {
-        NoteItem event = new NoteItem();
+        NoteItem event = new HibNoteItem();
         event.setName(name);
         event.setDisplayName(name);
         event.setOwner(getUser(userDao, owner));
        
-        EventStamp evs = new EventStamp();
+        EventStamp evs = new HibEventStamp();
         event.addStamp(evs);
-        evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
        
         return event;
     }
     
     private NoteItem generateNote(String name,
             String owner) throws Exception {
-        NoteItem event = new NoteItem();
+        NoteItem event = new HibNoteItem();
         event.setName(name);
         event.setDisplayName(name);
         event.setOwner(getUser(userDao, owner));

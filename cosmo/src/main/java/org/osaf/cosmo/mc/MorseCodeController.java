@@ -18,6 +18,7 @@ package org.osaf.cosmo.mc;
 import java.util.Set;
 
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -88,7 +89,7 @@ public interface MorseCodeController {
     public PubCollection publishCollection(String uid,
                                            String parentUid,
                                            PubRecords records,
-                                           Set<Ticket.Type> ticketTypes);
+                                           Set<TicketType> ticketTypes);
    
     /**
      * Retrieves the current state of every item contained within the

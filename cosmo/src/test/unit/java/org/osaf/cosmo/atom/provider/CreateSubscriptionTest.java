@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.provider.mock.MockSubscriptionsRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.hibernate.HibCollectionSubscription;
 
 /**
  * Test class for {@link SubscriptionProvider#createEntry()} tests.
@@ -79,7 +80,7 @@ public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase {
     }
 
     public void testNoTicketKey() throws Exception {
-        CollectionSubscription sub = new CollectionSubscription();
+        CollectionSubscription sub = new HibCollectionSubscription();
         sub.setCollectionUid("deadbeef");
         RequestContext req = createRequestContext(sub);
 
@@ -89,7 +90,7 @@ public class CreateSubscriptionTest extends BaseSubscriptionProviderTestCase {
     }
 
     public void testNoCollectionUid() throws Exception {
-        CollectionSubscription sub = new CollectionSubscription();
+        CollectionSubscription sub = new HibCollectionSubscription();
         sub.setTicketKey("deadbeef");
         RequestContext req = createRequestContext(sub);
 

@@ -151,7 +151,8 @@ public class CreateCollectionTest extends BaseDavTestCase {
     }
 
     private CollectionProvider createCollectionProvider() {
-        return new CollectionProvider(testHelper.getResourceFactory());
+        return new CollectionProvider(testHelper.getResourceFactory(),
+                testHelper.getEntityFactory());
     }
 
     private DavCollection createTestMember(String segment)
@@ -171,6 +172,7 @@ public class CreateCollectionTest extends BaseDavTestCase {
         DavResourceLocator memberLocator =
             testHelper.createMemberLocator(locator, segment);
         return new DavCollectionBase(memberLocator,
-                                     testHelper.getResourceFactory());
+                                     testHelper.getResourceFactory(),
+                                     testHelper.getEntityFactory());
     }
 }

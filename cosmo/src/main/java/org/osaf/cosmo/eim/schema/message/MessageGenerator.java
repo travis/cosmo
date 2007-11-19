@@ -28,6 +28,7 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Generates EIM records from message stamps.
@@ -48,7 +49,7 @@ public class MessageGenerator extends BaseStampGenerator
     /** */
     public MessageGenerator(Item item) {
         super(PREFIX_MESSAGE, NS_MESSAGE, item);
-        setStamp(MessageStamp.getStamp(item));
+        setStamp(StampUtils.getMessageStamp(item));
     }
 
     @Override

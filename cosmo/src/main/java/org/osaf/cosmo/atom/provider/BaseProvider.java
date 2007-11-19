@@ -50,6 +50,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.model.AuditableObject;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.server.ServerConstants;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
@@ -64,6 +65,7 @@ public abstract class BaseProvider extends AbstractProvider
     private Abdera abdera;
     private GeneratorFactory generatorFactory;
     private ServiceLocatorFactory serviceLocatorFactory;
+    private EntityFactory entityFactory;
 
     // AbstractProvider methods
 
@@ -193,6 +195,16 @@ public abstract class BaseProvider extends AbstractProvider
         serviceLocatorFactory = factory;
     }
 
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+
+
     public void init() {
         if (abdera == null)
             throw new IllegalStateException("abdera is required");
@@ -200,6 +212,8 @@ public abstract class BaseProvider extends AbstractProvider
             throw new IllegalStateException("generatorFactory is required");
         if (serviceLocatorFactory == null)
             throw new IllegalStateException("serviceLocatorFactory is required");
+        if (entityFactory == null)
+            throw new IllegalStateException("entityFactory is required");
     }
 
     protected ResponseContext

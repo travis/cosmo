@@ -24,6 +24,7 @@ import org.apache.jackrabbit.webdav.xml.ElementIterator;
 
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.DateUtil;
 
@@ -105,10 +106,10 @@ public class UserResource implements CmpResource, OutputsXml {
      * and updates its properties as per the given
      * {@link org.w3c.dom.Document}.
      */
-    public UserResource(User user, String urlBase, Document doc) {
+    public UserResource(User user, String urlBase, Document doc, EntityFactory factory) {
         this.user = user;
         this.urlBase = urlBase;
-        setUser(doc);
+        setUser(doc, factory);
         calculateUserUrl();
         calculateHomedirUrl();
     }
@@ -117,10 +118,10 @@ public class UserResource implements CmpResource, OutputsXml {
      * Constructs a resource that represents a {@link User}
      * with properties as per the given {@link org.w3c.dom.Document}.
      */
-    public UserResource(String urlBase, Document doc) {
+    public UserResource(String urlBase, Document doc, EntityFactory factory) {
         this.urlBase = urlBase;
-        this.user = new User();
-        setUser(doc);
+        this.user = factory.createUser();
+        setUser(doc, factory);
         calculateUserUrl();
         calculateHomedirUrl();
     }
@@ -249,7 +250,7 @@ public class UserResource implements CmpResource, OutputsXml {
 
     /**
      */
-    protected void setUser(Document doc) {
+    protected void setUser(Document doc, EntityFactory factory) {
         if (doc == null) {
             return;
         }
@@ -319,7 +320,7 @@ public class UserResource implements CmpResource, OutputsXml {
                 if (user.getSubscription(displayName) != null)
                     throw new CmpException("Subscription with this name already exists");
                 CollectionSubscription subscription = 
-                    new CollectionSubscription();
+                    factory.createCollectionSubscription();
                 subscription.setDisplayName(displayName);
                 subscription.setCollectionUid(uuid);
                 subscription.setTicketKey(ticketKey);

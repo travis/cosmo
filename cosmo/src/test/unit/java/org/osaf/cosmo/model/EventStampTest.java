@@ -35,6 +35,9 @@ import net.fortuna.ical4j.model.component.VEvent;
 
 import org.osaf.cosmo.calendar.ICalDate;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
+import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test EventStamp
@@ -48,11 +51,11 @@ public class EventStampTest extends TestCase {
     public void testEventStampGetCalendar() throws Exception {
         TimeZoneRegistry registry =
             TimeZoneRegistryFactory.getInstance().createRegistry();
-        NoteItem master = new NoteItem();
+        NoteItem master = new MockNoteItem();
         master.setDisplayName("displayName");
         master.setBody("body");
         master.setIcalUid("icaluid");
-        EventStamp eventStamp = new EventStamp(master);
+        EventStamp eventStamp = new MockEventStamp(master);
         eventStamp.createCalendar();
         eventStamp.setStartDate(new DateTime("20070212T074500"));
         
@@ -97,9 +100,9 @@ public class EventStampTest extends TestCase {
     }
     
     public void testEventModificationGetCalendar() throws Exception {
-        NoteItem master = new NoteItem();
+        NoteItem master = new MockNoteItem();
         master.setIcalUid("icaluid");
-        EventStamp eventStamp = new EventStamp(master);
+        EventStamp eventStamp = new MockEventStamp(master);
         eventStamp.createCalendar();
         eventStamp.setStartDate(new DateTime("20070212T074500"));
         eventStamp.setDuration(new Dur("PT1H"));
@@ -108,12 +111,12 @@ public class EventStampTest extends TestCase {
         
         eventStamp.getEventCalendar().validate(true);
        
-        NoteItem mod = new NoteItem();
+        NoteItem mod = new MockNoteItem();
         mod.setDisplayName("modDisplayName");
         mod.setBody("modBody");
         mod.setModifies(master);
         master.addModification(mod);
-        EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
+        EventExceptionStamp exceptionStamp = new MockEventExceptionStamp(mod);
         mod.addStamp(exceptionStamp);
         exceptionStamp.createCalendar();
         exceptionStamp.setStartDate(eventStamp.getStartDate());
@@ -138,9 +141,9 @@ public class EventStampTest extends TestCase {
     }
     
     public void testInheritedAlarm() throws Exception {
-        NoteItem master = new NoteItem();
+        NoteItem master = new MockNoteItem();
         master.setIcalUid("icaluid");
-        EventStamp eventStamp = new EventStamp(master);
+        EventStamp eventStamp = new MockEventStamp(master);
         eventStamp.createCalendar();
         eventStamp.creatDisplayAlarm();
         Date date = new ICalDate(";VALUE=DATE-TIME:20070212T074500").getDate();
@@ -155,12 +158,12 @@ public class EventStampTest extends TestCase {
         
         eventStamp.setDisplayAlarmDescription("alarm");
         
-        NoteItem mod = new NoteItem();
+        NoteItem mod = new MockNoteItem();
         mod.setDisplayName("modDisplayName");
         mod.setBody("modBody");
         mod.setModifies(master);
         master.addModification(mod);
-        EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
+        EventExceptionStamp exceptionStamp = new MockEventExceptionStamp(mod);
         mod.addStamp(exceptionStamp);
         exceptionStamp.createCalendar();
         exceptionStamp.creatDisplayAlarm();
@@ -207,18 +210,18 @@ public class EventStampTest extends TestCase {
     }
     
     public void testInheritedAnyTime() throws Exception {
-        NoteItem master = new NoteItem();
-        EventStamp eventStamp = new EventStamp(master);
+        NoteItem master = new MockNoteItem();
+        EventStamp eventStamp = new MockEventStamp(master);
         eventStamp.createCalendar();
         eventStamp.setStartDate(new DateTime("20070212T074500"));
         eventStamp.setAnyTime(true);
         DateList dates = new ICalDate(";VALUE=DATE-TIME:20070212T074500,20070213T074500").getDateList();
         eventStamp.setRecurrenceDates(dates);
         
-        NoteItem mod = new NoteItem();
+        NoteItem mod = new MockNoteItem();
         mod.setModifies(master);
         master.addModification(mod);
-        EventExceptionStamp exceptionStamp = new EventExceptionStamp(mod);
+        EventExceptionStamp exceptionStamp = new MockEventExceptionStamp(mod);
         mod.addStamp(exceptionStamp);
         exceptionStamp.createCalendar();
         exceptionStamp.setRecurrenceId(new DateTime("20070212T074500"));
@@ -268,12 +271,12 @@ public class EventStampTest extends TestCase {
     }
     
     public void testExDates() throws Exception {
-        NoteItem master = new NoteItem();
+        NoteItem master = new MockNoteItem();
         master.setDisplayName("displayName");
         master.setBody("body");
-        EventStamp eventStamp = new EventStamp(master);
+        EventStamp eventStamp = new MockEventStamp(master);
         
-        eventStamp.setCalendar(getCalendar("recurring_with_exdates.ics"));
+        eventStamp.setEventCalendar(getCalendar("recurring_with_exdates.ics"));
         
         DateList exdates = eventStamp.getExceptionDates();
         

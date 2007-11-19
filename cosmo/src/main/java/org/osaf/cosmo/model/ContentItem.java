@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,97 +15,11 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-
 /**
  * Extends {@link Item} to represent an abstract
  * content item.
  */
-@Entity
-@DiscriminatorValue("content")
-public abstract class ContentItem extends Item {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4904755977871771389L;
-    
-    @Column(name = "lastmodifiedby", length=255)
-    private String lastModifiedBy = null;
-    
-    @Column(name = "lastmodification")
-    private Integer lastModification = null;
-    
-    @Embedded
-    private TriageStatus triageStatus = new TriageStatus();
-    
-    @Column(name = "sent")
-    private Boolean sent = null;
-    
-    @Column(name = "needsreply")
-    private Boolean needsReply = null;
-    
-    public ContentItem() {
-    }
-    
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public Integer getLastModification() {
-        return lastModification;
-    }
-
-    public void setLastModification(Integer lastModification) {
-        this.lastModification = lastModification;
-    }
-
-    public TriageStatus getTriageStatus() {
-        return triageStatus;
-    }
-  
-    public void setTriageStatus(TriageStatus ts) {
-        triageStatus = ts;
-    }
-
-    public Boolean getSent() {
-        return sent;
-    }
-
-    public void setSent(Boolean sent) {
-        this.sent = sent;
-    }
-
-    public Boolean getNeedsReply() {
-        return needsReply;
-    }
-
-    public void setNeedsReply(Boolean needsReply) {
-        this.needsReply = needsReply;
-    }
-    
-    @Override
-    protected void copyToItem(Item item) {
-        if(!(item instanceof ContentItem))
-            return;
-        
-        super.copyToItem(item);
-        
-        ContentItem contentItem = (ContentItem) item;
-        
-        contentItem.setLastModifiedBy(getLastModifiedBy());
-        contentItem.setLastModification(getLastModification());
-        contentItem.setTriageStatus(getTriageStatus());
-        contentItem.setSent(getSent());
-        contentItem.setNeedsReply(getNeedsReply());
-    }
+public interface ContentItem extends Item{
 
     public static class Action {
 
@@ -125,4 +39,25 @@ public abstract class ContentItem extends Item {
                     action.intValue() == CREATED);
         }
     }
+    
+    public String getLastModifiedBy();
+
+    public void setLastModifiedBy(String lastModifiedBy);
+
+    public Integer getLastModification();
+
+    public void setLastModification(Integer lastModification);
+
+    public TriageStatus getTriageStatus();
+
+    public void setTriageStatus(TriageStatus ts);
+
+    public Boolean getSent();
+
+    public void setSent(Boolean sent);
+
+    public Boolean getNeedsReply();
+
+    public void setNeedsReply(Boolean needsReply);
+
 }

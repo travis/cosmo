@@ -20,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.dav.impl.StandardDavRequest;
 import org.osaf.cosmo.dav.impl.StandardDavResponse;
+import org.osaf.cosmo.model.EntityFactory;
+import org.osaf.cosmo.model.hibernate.HibEntityFactory;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -36,11 +38,13 @@ public class DavTestContext {
     private MockHttpServletResponse httpResponse;
     private StandardDavRequest davRequest;
     private StandardDavResponse davResponse;
+    private EntityFactory entityFactory; 
 
     public DavTestContext(DavResourceLocatorFactory locatorFactory) {
         httpRequest = new MockHttpServletRequest();
         httpResponse = new MockHttpServletResponse();
-        davRequest = new StandardDavRequest(httpRequest, locatorFactory);
+        entityFactory = new HibEntityFactory();
+        davRequest = new StandardDavRequest(httpRequest, locatorFactory, entityFactory);
         davResponse = new StandardDavResponse(httpResponse);
     }
 

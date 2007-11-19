@@ -70,6 +70,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.EventStampFilter;
@@ -416,15 +417,16 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         try {
             CollectionItem content = readCollection(request);
 
-            CollectionItem collection = new CollectionItem();
+            CollectionItem collection = getEntityFactory().createCollection();
             collection.setUid(content.getUid());
             String name = content.getDisplayName().replaceAll("[\\/\\?\\#\\=\\;]", "_");
             collection.setName(name);
             collection.setDisplayName(content.getDisplayName());
             collection.setOwner(user);
 
-            CalendarCollectionStamp stamp =
-                new CalendarCollectionStamp(collection);
+            CalendarCollectionStamp stamp = getEntityFactory()
+                    .createCalendarCollectionStamp(collection);
+               
             stamp.setDescription(collection.getDisplayName());
             // XXX set the calendar language from Content-Language
             collection.addStamp(stamp);
@@ -678,7 +680,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                                         Entry entry,
                                         NoteItem item)
         throws ValidationException, ProcessorException {
-        EventStamp es = EventStamp.getStamp(item);
+        EventStamp es = StampUtils.getEventStamp(item);
         Date oldstart = es != null && es.isRecurring() ?
             es.getStartDate() : null;
 
@@ -687,7 +689,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         // oldStart will have a value if the item has an EventStamp
         // and the EventStamp is recurring
         if (oldstart != null) {
-            es = EventStamp.getStamp(item);
+            es = StampUtils.getEventStamp(item);
             // Case 1: EventStamp was removed from recurring event, so we
             // have to remove all modifications (a modification doesn't make
             // sense if there is no recurring event)
@@ -731,7 +733,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                         copy.setModifies(item);
                         
                         EventExceptionStamp ees =
-                            EventExceptionStamp.getStamp(copy);
+                            StampUtils.getEventExceptionStamp(copy);
                         
                         DateTime oldRid = (DateTime) ees.getRecurrenceId();
                         java.util.Date newRidTime =
@@ -749,7 +751,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                         // If the modification's dtstart is missing, then
                         // we have to adjust dtstart to be equal to the
                         // recurrenceId.
-                        if(isDtStartMissing(BaseEventStamp.getStamp(mod))) {
+                        if(isDtStartMissing(StampUtils.getBaseEventStamp(mod))) {
                             ees.setStartDate(ees.getRecurrenceId());
                         }
                         
@@ -784,9 +786,10 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             Reader in = request.getReader();
             if (in == null)
                 throw new ValidationException("An entity-body must be provided");
-
+           
             XhtmlCollectionFormat formatter = new XhtmlCollectionFormat();
-            CollectionItem collection = formatter.parse(IOUtils.toString(in));
+            CollectionItem collection = formatter.parse(IOUtils.toString(in), getEntityFactory());
+            
             if (collection.getDisplayName() == null)
                 throw new ValidationException("Display name is required");
 

@@ -40,7 +40,9 @@ import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.service.ContentService;
 
 /**
@@ -70,7 +72,7 @@ public class EventUtils {
         
         EventStamp eventStamp = (EventStamp) note.getStamp(EventStamp.class);
         if(eventStamp==null) {
-            eventStamp = new EventStamp(note);
+            eventStamp = StampUtils.getEventStamp(note);
             note.addStamp(eventStamp);
         }
         
@@ -122,7 +124,7 @@ public class EventUtils {
         
         ComponentList vevents = masterCalendar.getComponents().getComponents(
                 Component.VEVENT);
-        EventStamp eventStamp = EventStamp.getStamp(masterNote);
+        EventStamp eventStamp = StampUtils.getEventStamp(masterNote);
 
         // get list of exceptions (VEVENT with RECURRENCEID)
         for (Iterator<VEvent> i = vevents.iterator(); i.hasNext();) {
@@ -163,8 +165,7 @@ public class EventUtils {
 
         // remove old exceptions
         for (NoteItem noteItem : masterNote.getModifications()) {
-            EventExceptionStamp eventException = EventExceptionStamp
-                    .getStamp(noteItem);
+            EventExceptionStamp eventException = StampUtils.getEventExceptionStamp(noteItem);
             if (!exceptions.containsKey(eventException.getRecurrenceId()))
                 noteItem.setIsActive(false);
         }
@@ -187,8 +188,7 @@ public class EventUtils {
     private static NoteItem getModification(NoteItem masterNote,
             Date recurrenceId) {
         for (NoteItem mod : masterNote.getModifications()) {
-            EventExceptionStamp exceptionStamp = EventExceptionStamp
-                    .getStamp(mod);
+            EventExceptionStamp exceptionStamp = StampUtils.getEventExceptionStamp(mod);
             if (exceptionStamp.getRecurrenceId().equals(recurrenceId))
                 return mod;
         }
@@ -197,11 +197,11 @@ public class EventUtils {
     }
 
     private static void createNoteModification(NoteItem masterNote, VEvent event) {
-        NoteItem noteMod = new NoteItem();
-        EventExceptionStamp exceptionStamp = new EventExceptionStamp(noteMod);
-        exceptionStamp.setExceptionEvent(event);
+        NoteItem noteMod = masterNote.getFactory().createNote();
+        EventExceptionStamp exceptionStamp = masterNote.getFactory().createEventExceptionStamp(masterNote);
         noteMod.addStamp(exceptionStamp);
-
+        exceptionStamp.setExceptionEvent(event);
+        
         noteMod.setUid(new ModificationUid(masterNote, event.getRecurrenceId()
                 .getDate()).toString());
         noteMod.setOwner(masterNote.getOwner());
@@ -210,7 +210,9 @@ public class EventUtils {
 
         noteMod.setClientCreationDate(new Date());
         noteMod.setClientModifiedDate(noteMod.getClientCreationDate());
-        noteMod.setTriageStatus(TriageStatus.createInitialized());
+        TriageStatus triage = masterNote.getFactory().createTriageStatus();
+        TriageStatusUtil.initialize(triage);
+        noteMod.setTriageStatus(triage);
         noteMod.setLastModification(ContentItem.Action.CREATED);
         noteMod.setLastModifiedBy(masterNote.getLastModifiedBy());
         noteMod.setSent(Boolean.FALSE);
@@ -220,8 +222,7 @@ public class EventUtils {
     }
 
     private static void updateNoteModification(NoteItem noteMod, VEvent event) {
-        EventExceptionStamp exceptionStamp = EventExceptionStamp
-                .getStamp(noteMod);
+        EventExceptionStamp exceptionStamp = StampUtils.getEventExceptionStamp(noteMod);
         exceptionStamp.setExceptionEvent(event);
         
         // for now displayName is limited to 255 chars

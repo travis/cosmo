@@ -40,6 +40,7 @@ import org.osaf.cosmo.eim.eimml.EimmlStreamWriter;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.CollectionPath;
@@ -455,7 +456,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                     new PubRecords(i, reader.getCollectionName(), reader.getCollectionHue());
 
                 
-                Set<Ticket.Type> ticketTypes = null;
+                Set<TicketType> ticketTypes = null;
                 try {
                     ticketTypes = parseTicketTypes(req);
                 } catch (IllegalArgumentException e) {
@@ -657,17 +658,17 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         return true;
     }
 
-    private Set<Ticket.Type> parseTicketTypes(HttpServletRequest req) {
-        Set<Ticket.Type> types = new HashSet<Ticket.Type>();
+    private Set<TicketType> parseTicketTypes(HttpServletRequest req) {
+        Set<TicketType> types = new HashSet<TicketType>();
 
         Enumeration<String> e = (Enumeration<String>)
             req.getHeaders(HEADER_TICKET_TYPE);
         while (e.hasMoreElements()) {
             for (String id : StringUtils.split(e.nextElement())) {
-                if (! (id.equals(Ticket.Type.ID_READ_ONLY) ||
-                       id.equals(Ticket.Type.ID_READ_WRITE)))
+                if (! (id.equals(TicketType.ID_READ_ONLY) ||
+                       id.equals(TicketType.ID_READ_WRITE)))
                     throw new IllegalArgumentException("Ticket type " + id + " not allowed for collections");
-                types.add(Ticket.Type.createInstance(id));
+                types.add(TicketType.createInstance(id));
             }
         }
 

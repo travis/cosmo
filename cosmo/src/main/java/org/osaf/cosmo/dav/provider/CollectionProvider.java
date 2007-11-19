@@ -30,6 +30,7 @@ import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.ExistsException;
 import org.osaf.cosmo.dav.MethodNotAllowedException;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * <p>
@@ -43,8 +44,9 @@ import org.osaf.cosmo.dav.MethodNotAllowedException;
 public class CollectionProvider extends BaseProvider {
     private static final Log log = LogFactory.getLog(CollectionProvider.class);
 
-    public CollectionProvider(DavResourceFactory resourceFactory) {
-        super(resourceFactory);
+    public CollectionProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
+        super(resourceFactory, entityFactory);
     }
 
     // DavProvider methods

@@ -36,6 +36,7 @@ import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.DecimalAttribute;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.IntegerAttribute;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -79,7 +80,7 @@ public abstract class BaseApplicator implements EimSchemaConstants {
     protected void applyUnknownField(EimRecordField field)
         throws EimSchemaException {
         QName qn =
-            new QName(field.getRecord().getNamespace(), field.getName());
+            item.getFactory().createQName(field.getRecord().getNamespace(), field.getName());
         if (log.isDebugEnabled())
             log.debug("applying unknown field " + qn);
         
@@ -91,43 +92,43 @@ public abstract class BaseApplicator implements EimSchemaConstants {
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new BinaryAttribute(qn, value));
+                item.addAttribute(item.getFactory().createBinaryAttribute(qn, value));
         } else if (field instanceof BytesField) {
             byte[] value = ((BytesField)field).getBytes();
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new BinaryAttribute(qn, value));
+                item.addAttribute(item.getFactory().createBinaryAttribute(qn, value));
         } else if (field instanceof ClobField) {
             Reader value = ((ClobField)field).getClob();
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new TextAttribute(qn, value));
+                item.addAttribute(item.getFactory().createTextAttribute(qn, value));
         } else if (field instanceof DateTimeField) {
             Calendar value = ((DateTimeField)field).getCalendar();
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new CalendarAttribute(qn, value));
+                item.addAttribute(item.getFactory().createCalendarAttribute(qn, value));
         } else if (field instanceof DecimalField) {
             BigDecimal value = ((DecimalField)field).getDecimal();
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new DecimalAttribute(qn, value));
+                item.addAttribute(item.getFactory().createDecimalAttribute(qn, value));
         } else if (field instanceof IntegerField) {
             Integer value = ((IntegerField)field).getInteger();
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new IntegerAttribute(qn, new Long(value.longValue())));
+                item.addAttribute(item.getFactory().createIntegerAttribute(qn, new Long(value.longValue())));
         } else if (field instanceof TextField) {
             String value = ((TextField)field).getText();
             if(attribute!=null)
                 attribute.setValue(value);
             else
-                item.addAttribute(new StringAttribute(qn, value));
+                item.addAttribute(item.getFactory().createStringAttribute(qn, value));
         } else {
             throw new EimSchemaException("Field " + field.getName() + " is of unknown type " + field.getClass().getName());
         }

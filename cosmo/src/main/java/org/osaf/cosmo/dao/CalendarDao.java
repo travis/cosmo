@@ -22,6 +22,7 @@ import net.fortuna.ical4j.model.DateTime;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.ICalendarItem;
 
 /**
  * Interface for DAO that provides query apis for finding 
@@ -51,10 +52,10 @@ public interface CalendarDao {
      *            collection to search
      * @param filter
      *            filter to use in search
-     * @return set ContentItem objects that contain EventStamps matching specified
+     * @return set ICalendar objects that match specified
      *         filter.
      */
-    public Set<ContentItem> findCalendarItems(CollectionItem collection,
+    public Set<ICalendarItem> findCalendarItems(CollectionItem collection,
                                              CalendarFilter filter);
     
     /**

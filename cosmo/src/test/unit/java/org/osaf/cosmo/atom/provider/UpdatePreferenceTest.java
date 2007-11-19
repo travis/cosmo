@@ -17,12 +17,11 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.mock.MockPreferenceRequestContext;
 import org.osaf.cosmo.model.Preference;
+import org.osaf.cosmo.model.mock.MockPreference;
 
 /**
  * Test class for {@link PreferencesProvider#updateEntry()} tests.
@@ -32,9 +31,9 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         LogFactory.getLog(UpdatePreferenceTest.class);
 
     public void testUpdateEntry() throws Exception {
-        Preference pref = helper.makeAndStoreDummyPreference();
+        MockPreference pref = (MockPreference) helper.makeAndStoreDummyPreference();
         String oldKey = pref.getKey();
-        Preference newpref = newPreference();
+        MockPreference newpref = (MockPreference) newPreference();
         RequestContext req = createRequestContext(pref, newpref);
 
         ResponseContext res = provider.updateEntry(req);
@@ -82,7 +81,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
 
     public void testEntryNoValue() throws Exception {
         Preference pref = helper.makeDummyPreference();
-        Preference newpref = new Preference("new key", null);
+        Preference newpref = new MockPreference("new key", null);
         RequestContext req = createRequestContext(pref, newpref);
 
         ResponseContext res = provider.updateEntry(req);
@@ -92,7 +91,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
 
     public void testInvalidEntryNoKey() throws Exception {
         Preference pref = helper.makeDummyPreference();
-        Preference newpref = new Preference(null, "new value");
+        Preference newpref = new MockPreference(null, "new value");
         RequestContext req = createRequestContext(pref, newpref);
 
         ResponseContext res = provider.updateEntry(req);
@@ -101,7 +100,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
     }
 
     private Preference newPreference() {
-        Preference pref = new Preference();
+        Preference pref = new MockPreference();
         pref.setKey("new key");
         pref.setValue("new value");
         return pref;

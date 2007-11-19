@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,73 +15,40 @@
  */
 package org.osaf.cosmo.model;
 
-import java.security.MessageDigest;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
-import org.apache.commons.codec.binary.Base64;
-import org.hibernate.annotations.Type;
-
 /**
- * Extends BaseModelObject and adds creationDate, modifiedDate
- * to track when Object was created and modified.
+ * Represents a model object.
  */
-@MappedSuperclass
-public abstract class AuditableObject extends BaseModelObject {
+public interface AuditableObject {
 
-    private static final ThreadLocal<MessageDigest> etagDigestLocal = new ThreadLocal<MessageDigest>();
-    private static final Base64 etagEncoder = new Base64();
-    
-    @Column(name = "createdate")
-    @Type(type="long_timestamp")
-    private Date creationDate;
-    
-    @Column(name = "modifydate")
-    @Type(type="long_timestamp")
-    private Date modifiedDate;
-    
-    @Column(name="etag")
-    private String etag = "";
-    
     /**
      * @return date object was created
      */
-    public Date getCreationDate() {
-        return creationDate;
-    }
+    public Date getCreationDate();
 
     /**
      * @param creationDate 
      *                     date object was created
      */
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
+    public void setCreationDate(Date creationDate);
 
     /**
      * @return date object was last updated
      */
-    public Date getModifiedDate() {
-        return modifiedDate;
-    }
+    public Date getModifiedDate();
 
     /**
      * @param modifiedDate
      *                     date object was last modified
      */
-    public void setModifiedDate(Date modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
+    public void setModifiedDate(Date modifiedDate);
 
     /**
      * Update modifiedDate with current system time.
      */
-    public void updateTimestamp() {
-        modifiedDate = new Date();
-    }
-    
+    public void updateTimestamp();
+
     /**
      * <p>
      * Returns a string representing the state of the object. Entity tags can
@@ -89,52 +56,16 @@ public abstract class AuditableObject extends BaseModelObject {
      * equals method is not available.
      * </p>
      */
-    public String getEntityTag() {
-        return etag;
-    }
-    
-    public void setEntityTag(String etag) {
-        this.etag = etag;
-    }
-    
-    /**
-     * <p>
-     * Calculates updates object's entity tag.
-     * Returns calculated entity tag.  
-     * </p>
-     * <p>
-     * This implementation simply returns the empty string. Subclasses should
-     * override it when necessary.
-     * </p>
-     * 
-     * Subclasses should override
-     * this.
-     */
-    public String calculateEntityTag() {
-        return "";
-    }
+    public String getEntityTag();
 
     /**
-     * <p>
-     * Returns a Base64-encoded SHA-1 digest of the provided bytes.
-     * </p>
+     * @param etag entity tag
      */
-    protected static String encodeEntityTag(byte[] bytes) {
-        
-        // Use MessageDigest stored in threadlocal so that each
-        // thread has its own instance.
-        MessageDigest md = etagDigestLocal.get();
-        
-        if(md==null) {
-            try {
-                // initialize threadlocal
-                md = MessageDigest.getInstance("sha1");
-                etagDigestLocal.set(md);
-            } catch (Exception e) {
-                throw new RuntimeException("Platform does not support sha1?", e);
-            }
-        }
-        
-        return new String(etagEncoder.encode(md.digest(bytes)));
-    }
+    public void setEntityTag(String etag);
+    
+    /**
+     * @return EntityFactory that was used to create object.
+     */
+    public EntityFactory getFactory();
+
 }

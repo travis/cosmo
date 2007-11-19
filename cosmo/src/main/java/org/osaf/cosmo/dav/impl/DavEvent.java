@@ -23,8 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Extends <code>DavCalendarResource</code> to adapt the Cosmo
@@ -40,18 +42,20 @@ public class DavEvent extends DavCalendarResource {
 
     /** */
     public DavEvent(DavResourceLocator locator,
-                    DavResourceFactory factory)
+                    DavResourceFactory factory,
+                    EntityFactory entityFactory)
         throws DavException {
-        this(new NoteItem(), locator, factory);
-        getItem().addStamp(new EventStamp());
+        this(entityFactory.createNote(), locator, factory, entityFactory);
+        getItem().addStamp(entityFactory.createEventStamp((NoteItem) getItem()));
     }
     
     /** */
     public DavEvent(NoteItem item,
                     DavResourceLocator locator,
-                    DavResourceFactory factory)
+                    DavResourceFactory factory,
+                    EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
 
     // our methods
@@ -64,11 +68,11 @@ public class DavEvent extends DavCalendarResource {
     }
     
     public EventStamp getEventStamp() {
-        return EventStamp.getStamp(getItem());
+        return StampUtils.getEventStamp(getItem());
     }
 
     protected void setCalendar(Calendar calendar)
         throws DavException {
-        getEventStamp().setCalendar(calendar);
+        getEventStamp().setEventCalendar(calendar);
     }    
 }

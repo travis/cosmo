@@ -42,6 +42,7 @@ import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.dav.property.Etag;
 import org.osaf.cosmo.dav.property.LastModified;
 import org.osaf.cosmo.model.DataSizeException;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.ModelValidationException;
 
@@ -72,16 +73,18 @@ public class DavFile extends DavContentBase {
     /** */
     public DavFile(FileItem item,
                    DavResourceLocator locator,
-                   DavResourceFactory factory)
+                   DavResourceFactory factory,
+                   EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
 
     /** */
     public DavFile(DavResourceLocator locator,
-                   DavResourceFactory factory)
+                   DavResourceFactory factory,
+                   EntityFactory entityFactory)
         throws DavException {
-        this(new FileItem(), locator, factory);
+        this(entityFactory.createFileItem(), locator, factory, entityFactory);
     }
 
     // DavResource

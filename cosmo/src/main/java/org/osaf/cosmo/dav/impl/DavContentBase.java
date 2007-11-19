@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.dav.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,28 +23,22 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
-import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.ResourceType;
-import org.apache.jackrabbit.webdav.version.report.Report;
-import org.apache.jackrabbit.webdav.version.report.ReportInfo;
-
+import org.osaf.cosmo.dav.DavContent;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.property.DavProperty;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -80,9 +73,10 @@ public abstract class DavContentBase extends DavItemResourceBase
     /** */
     public DavContentBase(ContentItem item,
                           DavResourceLocator locator,
-                          DavResourceFactory factory)
+                          DavResourceFactory factory,
+                          EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
 
     // Jackrabbit DavResource
@@ -133,7 +127,8 @@ public abstract class DavContentBase extends DavItemResourceBase
         content.setLastModifiedBy(user != null ? user.getEmail() : "");
 
         if (content.getUid() == null) {
-            content.setTriageStatus(TriageStatus.createInitialized());
+            content.setTriageStatus(TriageStatusUtil.initialize(content
+                    .getFactory().createTriageStatus()));
             content.setLastModification(ContentItem.Action.CREATED);
             content.setSent(Boolean.FALSE);
             content.setNeedsReply(Boolean.FALSE);

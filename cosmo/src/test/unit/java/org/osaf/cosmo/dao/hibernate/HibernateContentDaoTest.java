@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Assert;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.property.ProdId;
 
@@ -55,15 +54,29 @@ import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.QName;
-import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TimestampAttribute;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.XmlAttribute;
+import org.osaf.cosmo.model.hibernate.HibAvailabilityItem;
+import org.osaf.cosmo.model.hibernate.HibCalendarAttribute;
+import org.osaf.cosmo.model.hibernate.HibCollectionItem;
+import org.osaf.cosmo.model.hibernate.HibDecimalAttribute;
+import org.osaf.cosmo.model.hibernate.HibFileItem;
+import org.osaf.cosmo.model.hibernate.HibFreeBusyItem;
+import org.osaf.cosmo.model.hibernate.HibICalendarAttribute;
+import org.osaf.cosmo.model.hibernate.HibItem;
+import org.osaf.cosmo.model.hibernate.HibNoteItem;
+import org.osaf.cosmo.model.hibernate.HibQName;
+import org.osaf.cosmo.model.hibernate.HibStringAttribute;
+import org.osaf.cosmo.model.hibernate.HibTicket;
+import org.osaf.cosmo.model.hibernate.HibTimestampAttribute;
+import org.osaf.cosmo.model.hibernate.HibTriageStatus;
+import org.osaf.cosmo.model.hibernate.HibXmlAttribute;
 import org.osaf.cosmo.xml.DomWriter;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -86,7 +99,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem newItem = contentDao.createContent(root, item);
 
-        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(getHibItem(newItem).getId() > -1);
         Assert.assertTrue(newItem.getUid() != null);
 
         clearSession();
@@ -105,7 +118,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem newItem = contentDao.createContent(root, item);
 
-        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(getHibItem(newItem).getId() > -1);
         Assert.assertTrue(newItem.getUid() != null);
 
         clearSession();
@@ -186,7 +199,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         item.addBooleanAttribute("booleanattribute", Boolean.TRUE);
         
         DecimalAttribute decAttr = 
-            new DecimalAttribute(new QName("decimalattribute"),new BigDecimal("1.234567"));
+            new HibDecimalAttribute(new HibQName("decimalattribute"),new BigDecimal("1.234567"));
         item.addAttribute(decAttr);
         
         // TODO: figure out db date type is handled because i'm seeing
@@ -205,14 +218,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem newItem = contentDao.createContent(root, item);
 
-        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(getHibItem(newItem).getId() > -1);
         Assert.assertTrue(newItem.getUid() != null);
 
         clearSession();
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        Attribute attr = queryItem.getAttribute(new QName("decimalattribute"));
+        Attribute attr = queryItem.getAttribute(new HibQName("decimalattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof DecimalAttribute);
         Assert.assertEquals(attr.getValue().toString(),"1.234567");
@@ -264,7 +277,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem item = generateTestContent();
         
         CalendarAttribute calAttr = 
-            new CalendarAttribute(new QName("calendarattribute"), "2002-10-10T00:00:00+05:00"); 
+            new HibCalendarAttribute(new HibQName("calendarattribute"), "2002-10-10T00:00:00+05:00"); 
         item.addAttribute(calAttr);
         
         ContentItem newItem = contentDao.createContent(root, item);
@@ -273,7 +286,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        Attribute attr = queryItem.getAttribute(new QName("calendarattribute"));
+        Attribute attr = queryItem.getAttribute(new HibQName("calendarattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof CalendarAttribute);
         
@@ -288,7 +301,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         queryItem = contentDao.findContentByUid(newItem.getUid());
-        Attribute queryAttr = queryItem.getAttribute(new QName("calendarattribute"));
+        Attribute queryAttr = queryItem.getAttribute(new HibQName("calendarattribute"));
         Assert.assertNotNull(queryAttr);
         Assert.assertTrue(queryAttr instanceof CalendarAttribute);
         
@@ -304,7 +317,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem item = generateTestContent();
         Date dateVal = new Date();
         TimestampAttribute tsAttr = 
-            new TimestampAttribute(new QName("timestampattribute"), dateVal); 
+            new HibTimestampAttribute(new HibQName("timestampattribute"), dateVal); 
         item.addAttribute(tsAttr);
         
         ContentItem newItem = contentDao.createContent(root, item);
@@ -313,7 +326,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        Attribute attr = queryItem.getAttribute(new QName("timestampattribute"));
+        Attribute attr = queryItem.getAttribute(new HibQName("timestampattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof TimestampAttribute);
         
@@ -328,7 +341,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         queryItem = contentDao.findContentByUid(newItem.getUid());
-        Attribute queryAttr = queryItem.getAttribute(new QName("timestampattribute"));
+        Attribute queryAttr = queryItem.getAttribute(new HibQName("timestampattribute"));
         Assert.assertNotNull(queryAttr);
         Assert.assertTrue(queryAttr instanceof TimestampAttribute);
         
@@ -350,7 +363,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertFalse(testElement.isEqualNode(testElement2));
         
         XmlAttribute xmlAttr = 
-            new XmlAttribute(new QName("xmlattribute"), testElement ); 
+            new HibXmlAttribute(new HibQName("xmlattribute"), testElement ); 
         item.addAttribute(xmlAttr);
         
         ContentItem newItem = contentDao.createContent(root, item);
@@ -359,7 +372,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        Attribute attr = queryItem.getAttribute(new QName("xmlattribute"));
+        Attribute attr = queryItem.getAttribute(new HibQName("xmlattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof XmlAttribute);
         
@@ -378,7 +391,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        attr = queryItem.getAttribute(new QName("xmlattribute"));
+        attr = queryItem.getAttribute(new HibQName("xmlattribute"));
         
         // Attribute shouldn't have been updated
         Assert.assertEquals(modifyDate, attr.getModifiedDate());
@@ -395,7 +408,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        attr = queryItem.getAttribute(new QName("xmlattribute"));
+        attr = queryItem.getAttribute(new HibQName("xmlattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof XmlAttribute);
         // Attribute should have been updated
@@ -412,8 +425,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem item = generateTestContent();
        
-        ICalendarAttribute icalAttr = new ICalendarAttribute(); 
-        icalAttr.setQName(new QName("icalattribute"));
+        ICalendarAttribute icalAttr = new HibICalendarAttribute(); 
+        icalAttr.setQName(new HibQName("icalattribute"));
         icalAttr.setValue(new FileInputStream(baseDir + "/vjournal.ics"));
         item.addAttribute(icalAttr);
         
@@ -423,7 +436,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        Attribute attr = queryItem.getAttribute(new QName("icalattribute"));
+        Attribute attr = queryItem.getAttribute(new HibQName("icalattribute"));
         Assert.assertNotNull(attr);
         Assert.assertTrue(attr instanceof ICalendarAttribute);
         
@@ -442,7 +455,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         queryItem = contentDao.findContentByUid(newItem.getUid());
         
-        ICalendarAttribute ica = (ICalendarAttribute) queryItem.getAttribute(new QName("icalattribute"));
+        ICalendarAttribute ica = (ICalendarAttribute) queryItem.getAttribute(new HibQName("icalattribute"));
         Assert.assertFalse(expected.toString().equals(ica.getValue().toString()));
     }
 
@@ -461,7 +474,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         CollectionItem root = (CollectionItem) contentDao
                 .getRootItem(testuser2);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(getUser(userDao, "testuser2"));
 
@@ -649,14 +662,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser2");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(user);
         a.setHue(new Long(1));
 
         a = contentDao.createCollection(root, a);
 
-        Assert.assertTrue(a.getId() > -1);
+        Assert.assertTrue(getHibItem(a).getId() > -1);
         Assert.assertNotNull(a.getUid());
 
         clearSession();
@@ -670,7 +683,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser2");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(user);
 
@@ -678,7 +691,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        Assert.assertTrue(a.getId() > -1);
+        Assert.assertTrue(getHibItem(a).getId() > -1);
         Assert.assertNotNull(a.getUid());
 
         CollectionItem queryItem = contentDao.findCollectionByUid(a.getUid());
@@ -697,7 +710,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser2");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(user);
 
@@ -717,7 +730,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser2");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(user);
 
@@ -741,13 +754,13 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         CollectionItem root = (CollectionItem) contentDao
                 .getRootItem(testuser2);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(getUser(userDao, "testuser2"));
 
         a = contentDao.createCollection(root, a);
 
-        CollectionItem b = new CollectionItem();
+        CollectionItem b = new HibCollectionItem();
         b.setName("b");
         b.setOwner(getUser(userDao, "testuser2"));
 
@@ -831,19 +844,19 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         CollectionItem root = (CollectionItem) contentDao
                 .getRootItem(testuser2);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(getUser(userDao, "testuser2"));
 
         a = contentDao.createCollection(root, a);
 
-        CollectionItem b = new CollectionItem();
+        CollectionItem b = new HibCollectionItem();
         b.setName("b");
         b.setOwner(getUser(userDao, "testuser2"));
 
         b = contentDao.createCollection(a, b);
 
-        CollectionItem c = new CollectionItem();
+        CollectionItem c = new HibCollectionItem();
         c.setName("c");
         c.setOwner(getUser(userDao, "testuser2"));
 
@@ -853,7 +866,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         d = contentDao.createContent(c, d);
 
-        CollectionItem e = new CollectionItem();
+        CollectionItem e = new HibCollectionItem();
         e.setName("e");
         e.setOwner(getUser(userDao, "testuser2"));
 
@@ -916,19 +929,19 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         CollectionItem root = (CollectionItem) contentDao
                 .getRootItem(testuser2);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(getUser(userDao, "testuser2"));
 
         a = contentDao.createCollection(root, a);
 
-        CollectionItem b = new CollectionItem();
+        CollectionItem b = new HibCollectionItem();
         b.setName("b");
         b.setOwner(getUser(userDao, "testuser2"));
 
         b = contentDao.createCollection(a, b);
 
-        CollectionItem c = new CollectionItem();
+        CollectionItem c = new HibCollectionItem();
         c.setName("c");
         c.setOwner(getUser(userDao, "testuser2"));
 
@@ -938,7 +951,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         d = contentDao.createContent(c, d);
 
-        CollectionItem e = new CollectionItem();
+        CollectionItem e = new HibCollectionItem();
         e.setName("e");
         e.setOwner(getUser(userDao, "testuser2"));
 
@@ -1033,7 +1046,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
         newItem = contentDao.findContentByUid(newItem.getUid());
 
-        Ticket ticket1 = new Ticket();
+        Ticket ticket1 = new HibTicket();
         ticket1.setKey("ticket1");
         ticket1.setTimeout(10);
         ticket1.setOwner(testuser);
@@ -1044,7 +1057,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         contentDao.createTicket(newItem, ticket1);
 
-        Ticket ticket2 = new Ticket();
+        Ticket ticket2 = new HibTicket();
         ticket2.setKey("ticket2");
         ticket2.setTimeout(100);
         ticket2.setOwner(testuser);
@@ -1097,7 +1110,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(user);
 
@@ -1113,7 +1126,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
-        CollectionItem b = new CollectionItem();
+        CollectionItem b = new HibCollectionItem();
         b.setName("b");
         b.setOwner(user);
         
@@ -1142,7 +1155,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        CollectionItem a = new CollectionItem();
+        CollectionItem a = new HibCollectionItem();
         a.setName("a");
         a.setOwner(user);
 
@@ -1158,7 +1171,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
-        CollectionItem b = new CollectionItem();
+        CollectionItem b = new HibCollectionItem();
         b.setName("b");
         b.setOwner(user);
         
@@ -1195,12 +1208,13 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem item = generateTestContent();
         item.setName("test");
-        TriageStatus initialTriageStatus = TriageStatus.createInitialized();
+        TriageStatus initialTriageStatus = new HibTriageStatus();
+        TriageStatusUtil.initialize(initialTriageStatus);
         item.setTriageStatus(initialTriageStatus);
 
         ContentItem newItem = contentDao.createContent(root, item);
 
-        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(getHibItem(newItem).getId() > -1);
         Assert.assertTrue(newItem.getUid() != null);
 
         clearSession();
@@ -1245,7 +1259,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
 
-        queryItem.removeAttribute(new QName("customattribute"));
+        queryItem.removeAttribute(new HibQName("customattribute"));
 
         queryItem = contentDao.updateContent(queryItem);
 
@@ -1257,9 +1271,9 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         Tombstone ts = queryItem.getTombstones().iterator().next();
         Assert.assertTrue(ts instanceof AttributeTombstone);
-        Assert.assertTrue(((AttributeTombstone) ts).getQName().equals(new QName("customattribute")));
+        Assert.assertTrue(((AttributeTombstone) ts).getQName().equals(new HibQName("customattribute")));
         
-        queryItem.addAttribute(new StringAttribute(new QName("customattribute"),"customattributevalue"));
+        queryItem.addAttribute(new HibStringAttribute(new HibQName("customattribute"),"customattributevalue"));
         clearSession();
 
         queryItem = contentDao.findContentByUid(newItem.getUid());
@@ -1271,7 +1285,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        FreeBusyItem newItem = new FreeBusyItem();
+        FreeBusyItem newItem = new HibFreeBusyItem();
         newItem.setOwner(user);
         newItem.setName("test");
         newItem.setIcalUid("icaluid");
@@ -1284,7 +1298,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         newItem = (FreeBusyItem) contentDao.createContent(root, newItem);
 
-        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(getHibItem(newItem).getId() > -1);
         Assert.assertTrue(newItem.getUid() != null);
 
         clearSession();
@@ -1298,7 +1312,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
-        AvailabilityItem newItem = new AvailabilityItem();
+        AvailabilityItem newItem = new HibAvailabilityItem();
         newItem.setOwner(user);
         newItem.setName("test");
         newItem.setIcalUid("icaluid");
@@ -1316,7 +1330,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         newItem = (AvailabilityItem) contentDao.createContent(root, newItem);
 
-        Assert.assertTrue(newItem.getId() > -1);
+        Assert.assertTrue(getHibItem(newItem).getId() > -1);
         Assert.assertTrue(newItem.getUid() != null);
 
         clearSession();
@@ -1381,7 +1395,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
     private FileItem generateTestContent(String name, String owner)
             throws Exception {
-        FileItem content = new FileItem();
+        FileItem content = new HibFileItem();
         content.setName(name);
         content.setDisplayName(name);
         content.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
@@ -1389,14 +1403,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         content.setContentEncoding("UTF8");
         content.setContentType("text/text");
         content.setOwner(getUser(userDao, owner));
-        content.addAttribute(new StringAttribute(new QName("customattribute"),
+        content.addAttribute(new HibStringAttribute(new HibQName("customattribute"),
                 "customattributevalue"));
         return content;
     }
     
     private NoteItem generateTestNote(String name, String owner)
             throws Exception {
-        NoteItem content = new NoteItem();
+        NoteItem content = new HibNoteItem();
         content.setName(name);
         content.setDisplayName(name);
         content.setOwner(getUser(userDao, owner));
@@ -1418,6 +1432,10 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
             .addText( "Bob McWhirter" );
 
         return new DOMWriter().write(document).getDocumentElement();
+    }
+    
+    private HibItem getHibItem(Item item) {
+        return (HibItem) item;
     }
 
 }

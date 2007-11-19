@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * Parses and formats a simple XHTML representation of a
@@ -40,9 +41,9 @@ public class XhtmlCollectionFormat extends BaseXhtmlFormat
     private static final Log log =
         LogFactory.getLog(XhtmlCollectionFormat.class);
 
-    public CollectionItem parse(String source)
+    public CollectionItem parse(String source, EntityFactory entityFactory)
         throws ParseException {
-        CollectionItem collection = new CollectionItem();
+        CollectionItem collection = entityFactory.createCollection();
 
         try {
             if (source == null)

@@ -40,6 +40,7 @@ import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
 import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * <p>
@@ -54,8 +55,9 @@ public class CalendarResourceProvider extends FileProvider {
     private static final Log log =
         LogFactory.getLog(CalendarResourceProvider.class);
 
-    public CalendarResourceProvider(DavResourceFactory resourceFactory) {
-        super(resourceFactory);
+    public CalendarResourceProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
+        super(resourceFactory, entityFactory);
     }
     
     // DavProvider methods
@@ -88,14 +90,14 @@ public class CalendarResourceProvider extends FileProvider {
         if (locator == null)
             return null;
         if (original instanceof DavTask)
-            return new DavTask(locator, getResourceFactory());
+            return new DavTask(locator, getResourceFactory(), getEntityFactory());
         if (original instanceof DavJournal)
-            return new DavJournal(locator, getResourceFactory());
+            return new DavJournal(locator, getResourceFactory(), getEntityFactory());
         if (original instanceof DavFreeBusy)
-            return new DavFreeBusy(locator, getResourceFactory());
+            return new DavFreeBusy(locator, getResourceFactory(), getEntityFactory());
         if (original instanceof DavAvailability)
-            return new DavAvailability(locator, getResourceFactory());
-        return new DavEvent(locator, getResourceFactory());
+            return new DavAvailability(locator, getResourceFactory(), getEntityFactory());
+        return new DavEvent(locator, getResourceFactory(), getEntityFactory());
     }
 
     protected DavContent createCalendarResource(DavRequest request,
@@ -104,16 +106,16 @@ public class CalendarResourceProvider extends FileProvider {
                                                 Calendar calendar)
         throws DavException {
         if (!calendar.getComponents(Component.VEVENT).isEmpty())
-            return new DavEvent(locator, getResourceFactory());
+            return new DavEvent(locator, getResourceFactory(), getEntityFactory());
         if (!calendar.getComponents(Component.VTODO).isEmpty())
-            return new DavTask(locator, getResourceFactory());
+            return new DavTask(locator, getResourceFactory(), getEntityFactory());
         if (!calendar.getComponents(Component.VJOURNAL).isEmpty())
-            return new DavJournal(locator, getResourceFactory());
+            return new DavJournal(locator, getResourceFactory(), getEntityFactory());
         if (!calendar.getComponents(Component.VFREEBUSY).isEmpty())
-            return new DavFreeBusy(locator, getResourceFactory());
+            return new DavFreeBusy(locator, getResourceFactory(), getEntityFactory());
         if (!calendar.getComponents(ICalendarConstants.COMPONENT_VAVAILABLITY)
                 .isEmpty())
-            return new DavAvailability(locator, getResourceFactory());
+            return new DavAvailability(locator, getResourceFactory(), getEntityFactory());
         throw new SupportedCalendarComponentException();
   }
 }

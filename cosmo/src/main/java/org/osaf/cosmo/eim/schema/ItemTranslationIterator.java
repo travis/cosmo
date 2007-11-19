@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.ContentItem;
 /**
  * Iterator that translates items to EIM records.
  *
- * @see Item
+ * @see MockItem
  * @see EimRecord
  */
 public class ItemTranslationIterator implements EimRecordSetIterator {

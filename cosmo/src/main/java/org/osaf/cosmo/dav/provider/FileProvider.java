@@ -29,6 +29,7 @@ import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.MethodNotAllowedException;
 import org.osaf.cosmo.dav.impl.DavFile;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * <p>
@@ -42,8 +43,9 @@ import org.osaf.cosmo.dav.impl.DavFile;
 public class FileProvider extends BaseProvider {
     private static final Log log = LogFactory.getLog(FileProvider.class);
 
-    public FileProvider(DavResourceFactory resourceFactory) {
-        super(resourceFactory);
+    public FileProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
+        super(resourceFactory, entityFactory);
     }
 
     // DavProvider methods

@@ -28,6 +28,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.tool.hbm2ddl.SchemaValidator;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.hibernate.SimpleConnectionProvider;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.ServerProperty;
 import org.osaf.cosmo.model.User;
@@ -46,6 +47,7 @@ public class DbInitializer {
     private UserService userService;
 
     private ServerPropertyService serverPropertyService;
+    private EntityFactory entityFactory;
 
     private LocalSessionFactoryBean localSessionFactory;
 
@@ -175,7 +177,7 @@ public class DbInitializer {
             log.debug("adding overlord");
         }
 
-        User overlord = new User();
+        User overlord = entityFactory.createUser();
         overlord.setUsername(User.USERNAME_OVERLORD);
         overlord.setFirstName("Cosmo");
         overlord.setLastName("Administrator");
@@ -184,7 +186,7 @@ public class DbInitializer {
         overlord.setAdmin(Boolean.TRUE);
 
         Preference loginUrlPref =
-            new Preference(UIConstants.PREF_KEY_LOGIN_URL, rootLoginUrl);
+            entityFactory.createPreference(UIConstants.PREF_KEY_LOGIN_URL, rootLoginUrl);
         overlord.addPreference(loginUrlPref);
 
         userService.createUser(overlord);
@@ -203,4 +205,14 @@ public class DbInitializer {
     public String getRootLoginUrl() {
         return rootLoginUrl;
     }
+
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+    
+    
 }

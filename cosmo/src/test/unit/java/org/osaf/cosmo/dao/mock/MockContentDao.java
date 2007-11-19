@@ -94,7 +94,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new IllegalArgumentException("collection cannot be null");
 
         if (collection instanceof MockCollectionItem)
-            ((MockCollectionItem) collection).setMockVersion(collection
+            ((MockCollectionItem) collection).setVersion(collection
                     .getVersion() + 1);
         
         getStorage().updateItem(collection);
@@ -176,9 +176,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
         content.getParents().add(parent);
-          
-        // Set mock id
-        setMockId(content);
         
         getStorage().storeItem((Item)content);
 
@@ -204,8 +201,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (getStorage().getItemByUid(content.getUid()) != null)
             throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
-        // Set mock id
-        setMockId(content);
         getStorage().storeItem((Item)content);
 
         return content;
@@ -230,7 +225,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
         if(content instanceof MockContentItem)
-            ((MockContentItem) content).setMockVersion(content.getVersion()+1);
+            ((MockContentItem) content).setVersion(content.getVersion()+1);
         
         getStorage().updateItem((Item) content);
 
@@ -315,8 +310,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         
         content.getParents().addAll(parents);
           
-        // Set mock id
-        setMockId(content);
         getStorage().storeItem((Item)content);
 
         return content;
@@ -324,7 +317,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
     public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
         for(ContentItem child : children) {
-            if(child.getId()==-1) {
+            if(child.getCreationDate()==null) {
                 createContent(collection, child);
             }
             else if(child.getIsActive()==false) {
@@ -343,7 +336,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
     public CollectionItem updateCollectionTimestamp(CollectionItem collection) {
         collection.setModifiedDate(new Date());
         if (collection instanceof MockCollectionItem)
-            ((MockCollectionItem) collection).setMockVersion(collection
+            ((MockCollectionItem) collection).setVersion(collection
                     .getVersion() + 1);
         return collection;
     }
@@ -357,21 +350,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             }
         }
         return items;
-    }
-    
-    private void setMockId(Item item) {
-        
-        if(item instanceof MockContentItem) {
-            ((MockContentItem) item).setMockId(System.currentTimeMillis());
-        }
-            
-        try {
-            Method m = BaseModelObject.class.getDeclaredMethod("setId", Long.class);
-            m.setAccessible(true);
-            m.invoke(item, new Long(System.currentTimeMillis()));
-        } catch (Exception e) {
-            throw new RuntimeException("unable to set item id");
-        }
     }
     
 }

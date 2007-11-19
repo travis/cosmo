@@ -22,6 +22,8 @@ import java.util.TimeZone;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.osaf.cosmo.model.mock.MockCalendarAttribute;
+
 /**
  * Test CalendarAttribute
  */
@@ -33,9 +35,9 @@ public class CalendarAttributeTest extends TestCase {
         String test2 = "2002-10-09T19:00:00Z";
         String test3 = "2002-10-10T00:00:00GMT+05:00";
         
-        CalendarAttribute ca1 = new CalendarAttribute();
-        CalendarAttribute ca2 = new CalendarAttribute();
-        CalendarAttribute ca3 = new CalendarAttribute();
+        CalendarAttribute ca1 = new MockCalendarAttribute();
+        CalendarAttribute ca2 = new MockCalendarAttribute();
+        CalendarAttribute ca3 = new MockCalendarAttribute();
         
         ca1.setValue(test1);
         Calendar cal1 = ca1.getValue();

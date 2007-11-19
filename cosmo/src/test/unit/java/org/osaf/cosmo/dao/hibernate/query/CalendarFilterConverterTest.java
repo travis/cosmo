@@ -36,6 +36,7 @@ import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.LikeExpression;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.filter.StampFilter;
+import org.osaf.cosmo.model.hibernate.HibCollectionItem;
 
 
 /**
@@ -50,7 +51,7 @@ public class CalendarFilterConverterTest extends TestCase {
     }
 
     public void testTranslateItemToFilter() throws Exception {
-        CollectionItem calendar = new CollectionItem();
+        CollectionItem calendar = new HibCollectionItem();
         calendar.setUid("calendar");
         CalendarFilter calFilter = new CalendarFilter();
         ComponentFilter rootComp = new ComponentFilter();
@@ -108,7 +109,7 @@ public class CalendarFilterConverterTest extends TestCase {
     }
     
     public void testGetFirstPassFilter() throws Exception {
-        CollectionItem calendar = new CollectionItem();
+        CollectionItem calendar = new HibCollectionItem();
         calendar.setUid("calendar");
         CalendarFilter calFilter = new CalendarFilter();
         ComponentFilter rootComp = new ComponentFilter();

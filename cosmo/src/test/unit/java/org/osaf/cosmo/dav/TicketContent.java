@@ -27,6 +27,7 @@ import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 import org.osaf.cosmo.dav.acl.DavPrivilegeSet;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.hibernate.HibTicket;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -115,7 +116,7 @@ public class TicketContent
             throw new Exception("root element not ticketinfo");
         }
 
-        Ticket ticket = new Ticket();
+        Ticket ticket = new HibTicket();
 
         String id = DomUtil.getChildTextTrim(root, ELEMENT_TICKET_ID,
                                              NAMESPACE_TICKET);

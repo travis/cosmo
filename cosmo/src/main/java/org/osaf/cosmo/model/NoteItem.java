@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,200 +16,62 @@
 package org.osaf.cosmo.model;
 
 import java.io.Reader;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.component.VJournal;
 
-import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.osaf.cosmo.calendar.ICalendarUtils;
-import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Journal;
 
 /**
  * Extends {@link ICalendarItem} to represent a Note item.
+ * A note is the basis for a pim item.
  */
-@Entity
-@DiscriminatorValue("note")
-public class NoteItem extends ICalendarItem {
-
-    public static final QName ATTR_NOTE_BODY = new QName(
-            NoteItem.class, "body");
-    
-    public static final QName ATTR_REMINDER_TIME = new QName(
-            NoteItem.class, "reminderTime");
-    
-    private static final long serialVersionUID = -6100568628972081120L;
-    
-    private static final Set<NoteItem> EMPTY_MODS = Collections
-            .unmodifiableSet(new HashSet<NoteItem>(0));
-
-    @OneToMany(mappedBy = "modifies", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.DELETE} )
-    //@BatchSize(size=50)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<NoteItem> modifications = new HashSet<NoteItem>(0);
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modifiesitemid")
-    private NoteItem modifies = null;
-    
-    @Column(name= "hasmodifications")
-    private boolean hasModifications = false;
-    
-    public NoteItem() {
-    }
+public interface NoteItem extends ICalendarItem{
 
     // Property accessors
-    public String getBody() {
-        return TextAttribute.getValue(this, ATTR_NOTE_BODY);
-    }
+    public String getBody();
 
-    public void setBody(String body) {
-        // body stored as TextAttribute on Item
-        TextAttribute.setValue(this, ATTR_NOTE_BODY, body);
-    }
-    
-    public void setBody(Reader body) {
-        // body stored as TextAttribute on Item
-        TextAttribute.setValue(this, ATTR_NOTE_BODY, body);
-    }
-    
-    public Date getReminderTime() {
-        return TimestampAttribute.getValue(this, ATTR_REMINDER_TIME);
-    }
+    public void setBody(String body);
 
-    public void setReminderTime(Date reminderTime) {
-        // reminderDate stored as TimestampAttribute on Item
-        TimestampAttribute.setValue(this, ATTR_REMINDER_TIME, reminderTime);
-    }
-    
+    public void setBody(Reader body);
+
+    public Date getReminderTime();
+
+    public void setReminderTime(Date reminderTime);
+
     /**
      * Return the Calendar object containing a VJOURNAL component.
      * @return calendar
      */
     @Journal
-    public Calendar getJournalCalendar() {
-        return getCalendar();
-    }
-    
+    public Calendar getJournalCalendar();
+
     /**
      * Set the Calendar object containing a VJOURNAL component.  
      * This allows non-standard icalendar properties to be stored 
      * with the note.
      * @param calendar
      */
-    public void setJournalCalendar(Calendar calendar) {
-        setCalendar(calendar);
-    }
-    
+    public void setJournalCalendar(Calendar calendar);
+
     /**
      * Return icalendar representation of NoteItem.  A note is serialized
      * as a VJOURNAL.
      * @return Calendar representation of NoteItem
      */
-    public Calendar getFullCalendar() {
-        // Start with existing calendar if present
-        Calendar calendar = getJournalCalendar();
-        
-        // otherwise, start with new calendar
-        if (calendar == null)
-            calendar = ICalendarUtils.createBaseCalendar(new VJournal());
-        else
-            // use copy when merging calendar with item properties
-            calendar = CalendarUtils.copyCalendar(calendar);
-        
-        // merge in displayName,body
-        VJournal journal = (VJournal) calendar.getComponent(Component.VJOURNAL);
-        mergeCalendarProperties(journal);
-        
-        return calendar;
-    }
-    
-    public Item copy() {
-        NoteItem copy = new NoteItem();
-        copyToItem(copy);
-        return copy;
-    }
-    
-    public Set<NoteItem> getModifications() {
-        if(hasModifications)
-            return Collections.unmodifiableSet(modifications);
-        else
-            return EMPTY_MODS;
-    }
-    
-    public void addModification(NoteItem mod) {
-        modifications.add(mod);
-        hasModifications = true;
-    }
-    
-    public boolean removeModification(NoteItem mod) {
-        boolean removed = modifications.remove(mod);
-        hasModifications = modifications.size()!=0;
-        return removed;
-    }
-    
-    public void removeAllModifications() {
-        modifications.clear();
-        hasModifications = false;
-    }
+    public Calendar getFullCalendar();
 
-    public NoteItem getModifies() {
-        return modifies;
-    }
-    
-    public void setModifies(NoteItem modifies) {
-        this.modifies = modifies;
-    }
-    
-    @Override
-    public String calculateEntityTag() {
-        String uid = getUid() != null ? getUid() : "-";
-        String modTime = getModifiedDate() != null ?
-            new Long(getModifiedDate().getTime()).toString() : "-";
-         
-        StringBuffer etag = new StringBuffer(uid + ":" + modTime);
-        
-        // etag is constructed from self plus modifications
-        if(modifies==null) {
-            for(NoteItem mod: getModifications()) {
-                uid = mod.getUid() != null ? mod.getUid() : "-";
-                modTime = mod.getModifiedDate() != null ?
-                        new Long(mod.getModifiedDate().getTime()).toString() : "-";
-                etag.append("," + uid + ":" + modTime);
-            }
-        }
-      
-        return encodeEntityTag(etag.toString().getBytes());
-    }
+    public Set<NoteItem> getModifications();
 
-    private void mergeCalendarProperties(VJournal journal) {
-        //uid = icaluid or uid
-        //summary = displayName
-        //description = body
-        String icalUid = getIcalUid();
-        if(icalUid==null)
-            icalUid = getUid();
-        
-        ICalendarUtils.setUid(icalUid, journal);
-        ICalendarUtils.setSummary(getDisplayName(), journal);
-        ICalendarUtils.setDescription(getBody(), journal);
-    }
+    public void addModification(NoteItem mod);
+
+    public boolean removeModification(NoteItem mod);
+
+    public void removeAllModifications();
+
+    public NoteItem getModifies();
+
+    public void setModifies(NoteItem modifies);
+
 }

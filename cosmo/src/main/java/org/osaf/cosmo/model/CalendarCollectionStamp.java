@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,120 +16,45 @@
 package org.osaf.cosmo.model;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Version;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.hibernate.validator.Timezone;
-import org.osaf.cosmo.icalendar.ICalendarConstants;
-
 
 /**
- * Represents a Calendar Collection.
+ * Stamp that can be added to CollectionItem that stores
+ * CalendarCollection specific attributes.
  */
-@Entity
-@DiscriminatorValue("calendar")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class CalendarCollectionStamp extends Stamp implements
-        java.io.Serializable, ICalendarConstants {
-    
-    // CalendarCollection specific attributes
-    public static final QName ATTR_CALENDAR_TIMEZONE = new QName(
-            CalendarCollectionStamp.class, "timezone");
-    
-    public static final QName ATTR_CALENDAR_DESCRIPTION = new QName(
-            CalendarCollectionStamp.class, "description");
-    
-    public static final QName ATTR_CALENDAR_LANGUAGE = new QName(
-            CalendarCollectionStamp.class, "language");
-    
-    private transient Calendar calendar;
-    
-    /** default constructor */
-    public CalendarCollectionStamp() {
-    }
-    
-    public String getType() {
-        return "calendar";
-    }
-    
-    public CalendarCollectionStamp(CollectionItem collection) {
-        this();
-        setItem(collection);
-    }
+public interface CalendarCollectionStamp extends Stamp{
 
-    public Stamp copy() {
-        CalendarCollectionStamp stamp = new CalendarCollectionStamp();
-        return stamp;
-    }
-    
-    public String getDescription() {
-        // description stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_CALENDAR_DESCRIPTION);
-    }
+    public String getType();
 
-    public void setDescription(String description) {
-        // description stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_CALENDAR_DESCRIPTION, description);
-    }
+    public String getDescription();
 
-    public String getLanguage() {
-        // language stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_CALENDAR_LANGUAGE);
-    }
+    public void setDescription(String description);
 
-    public void setLanguage(String language) {
-        // language stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_CALENDAR_LANGUAGE, language);
-    }
+    public String getLanguage();
+
+    public void setLanguage(String language);
 
     /**
      * @return calendar object representing timezone
      */
     @Timezone
-    public Calendar getTimezoneCalendar() {
-        // calendar stored as ICalendarAttribute on Item
-        return ICalendarAttribute.getValue(getItem(), ATTR_CALENDAR_TIMEZONE);
-    }
+    public Calendar getTimezoneCalendar();
 
     /**
      * @return timezone if present
      */
-    public TimeZone getTimezone() {
-        Calendar timezone = getTimezoneCalendar();
-        if (timezone == null)
-            return null;
-        VTimeZone vtz = (VTimeZone) timezone.getComponents().getComponent(Component.VTIMEZONE);
-        return new TimeZone(vtz);
-    }
-    
+    public TimeZone getTimezone();
+
     /**
      * @return name of timezone if one is set
      */
-    public String getTimezoneName() {
-        Calendar timezone = getTimezoneCalendar();
-        if (timezone == null)
-            return null;
-        return timezone.getComponents().getComponent(Component.VTIMEZONE).
-            getProperties().getProperty(Property.TZID).getValue();
-    }
+    public String getTimezoneName();
 
     /**
      * Set timezone definition for calendar.
@@ -137,10 +62,7 @@ public class CalendarCollectionStamp extends Stamp implements
      * @param timezone
      *            timezone definition in ical format
      */
-    public void setTimezoneCalendar(Calendar timezone) {
-        // timezone stored as ICalendarAttribute on Item
-        ICalendarAttribute.setValue(getItem(), ATTR_CALENDAR_TIMEZONE, timezone);
-    }
+    public void setTimezoneCalendar(Calendar timezone);
 
     /**
      * Returns a <code>Calendar</code> representing all of the events
@@ -148,79 +70,12 @@ public class CalendarCollectionStamp extends Stamp implements
      * the aggregate calendar once; subsequent recalls will return the
      * same calendar unless it is dumped by another method.
      */
-    public Calendar getCalendar()
-        throws IOException, ParserException {
-        if (calendar == null) {
-            calendar = loadCalendar();
-        }
-        return calendar;
-    }
+    public Calendar getCalendar() throws IOException, ParserException;
 
-    private Calendar loadCalendar()
-        throws IOException, ParserException {
-        Calendar calendar = new Calendar();
-        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        calendar.getProperties().add(Version.VERSION_2_0);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-
-        // extract the supported calendar components for each child item and
-        // add them to the collection calendar object.
-        // index the timezones by tzid so that we only include each tz
-        // once. if for some reason different calendar items have
-        // different tz definitions for a tzid, *shrug* last one wins
-        // for this same reason, we use a single calendar builder/time
-        // zone registry.
-        HashMap tzIdx = new HashMap();
-        Set<EventStamp> eventStamps = getEventStamps();
-        for (EventStamp eventStamp : eventStamps) {
-            
-            Calendar childCalendar = eventStamp.getCalendar();
-
-            for (Iterator j=childCalendar.getComponents().
-                     getComponents(Component.VEVENT).iterator();
-                 j.hasNext();) {
-                calendar.getComponents().add((Component) j.next());
-            }
-
-            for (Iterator j=childCalendar.getComponents().
-                     getComponents(Component.VTIMEZONE).iterator();
-                 j.hasNext();) {
-                Component tz = (Component) j.next();
-                Property tzId = tz.getProperties().getProperty(Property.TZID);
-                if (! tzIdx.containsKey(tzId.getValue())) {
-                    tzIdx.put(tzId.getValue(), tz);
-                }
-            }
-        }
-
-        for (Iterator i=tzIdx.values().iterator(); i.hasNext();) {
-            calendar.getComponents().add((Component) i.next());
-        }
-
-        return calendar;
-    }
-    
     /**
      * Return a set of all EventStamps for the collection's children.
      * @return set of EventStamps contained in children
      */
-    public Set<EventStamp> getEventStamps() {
-        Set<EventStamp> events = new HashSet<EventStamp>();
-        for (Iterator<Item> i= ((CollectionItem) getItem()).getChildren().iterator(); i.hasNext();) {
-            Item child = i.next();
-            Stamp stamp = child.getStamp(EventStamp.class);
-            if(stamp!=null)
-                events.add((EventStamp) stamp);
-        }
-        return events;
-    }
-    
-    /**
-     * Return CalendarCollectionStamp from Item
-     * @param item
-     * @return CalendarCollectionStamp from Item
-     */
-    public static CalendarCollectionStamp getStamp(Item item) {
-        return (CalendarCollectionStamp) item.getStamp(CalendarCollectionStamp.class);
-    }
+    public Set<EventStamp> getEventStamps();
+
 }

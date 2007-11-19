@@ -31,7 +31,7 @@ import org.osaf.cosmo.server.ServiceLocator;
  *
  * @see MockGeneratorFactory
  * @see Service
- * @see HomeCollectionItem
+ * @see MockHomeCollectionItem
  */
 public class MockServiceGenerator implements ServiceGenerator {
     private static final Log log =

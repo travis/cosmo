@@ -111,7 +111,7 @@ public class DavCollectionBaseTest extends BaseDavTestCase
     }
 
     public void testCaldavReportTypes() throws Exception {
-        DavCollectionBase test = new DavCollectionBase(null, null);
+        DavCollectionBase test = new DavCollectionBase(null, null, testHelper.getEntityFactory());
 
         assert(test.getReportTypes().contains(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY));
         assert(test.getReportTypes().contains(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET));

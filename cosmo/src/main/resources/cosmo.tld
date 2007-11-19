@@ -89,8 +89,13 @@
   </tag>
   <function>
     <name>triageStatusLabel</name>
-    <function-class>org.osaf.cosmo.model.TriageStatus</function-class>
+    <function-class>org.osaf.cosmo.model.TriageStatusUtil</function-class>
     <function-signature>java.lang.String label(java.lang.Integer)</function-signature>
+  </function>
+  <function>
+    <name>instanceOf</name>
+    <function-class>org.osaf.cosmo.ui.jsp.tag.TagUtils</function-class>
+    <function-signature>boolean instanceOf(java.lang.String, java.lang.Object)</function-signature>
   </function>
   <function>
     <name>getStaticHostUrlTemplate</name>

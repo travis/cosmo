@@ -15,33 +15,15 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 import net.fortuna.ical4j.model.Calendar;
 
 /**
  * Extends {@link Item} to represent an abstract
  * item that is backed by an icalendar component.
  */
-@Entity
-@DiscriminatorValue("icalendar")
-public abstract class ICalendarItem extends ContentItem {
+public interface ICalendarItem extends ContentItem{
 
-    public static final QName ATTR_ICALENDAR = new QName(
-            ICalendarItem.class, "icalendar");
-    
-    @Column(name="icaluid", length=255)
-    //@Index(name="idx_icaluid")
-    private String icalUid = null;
-    
-    public ICalendarItem() {
-    }
-    
-    public String getIcalUid() {
-        return icalUid;
-    }
+    public String getIcalUid();
 
     /**
      * Set the icalendar uid for this icalendar item.  The icalUid
@@ -49,50 +31,13 @@ public abstract class ICalendarItem extends ContentItem {
      * The icalUid only has to be unique within a collection.
      * @param icalUid
      */
-    public void setIcalUid(String icalUid) {
-        this.icalUid = icalUid;
-    }
-    
+    public void setIcalUid(String icalUid);
+
     /**
      * Return the full icalendar representation of the item.  
      * Subclasses can override this to manipulate the calendar
      * object before returning.
      */
-    public Calendar getFullCalendar() {
-        return getCalendar();
-    }
-    
-    /**
-     * Return the Calendar object containing a calendar component.
-     * Used by sublcasses to store specific components.
-     * @return calendar
-     */
-    protected Calendar getCalendar() {
-        // calendar stored as ICalendarAttribute on Item
-        return ICalendarAttribute.getValue(this, ATTR_ICALENDAR);
-    }
-    
-    /**
-     * Set the Calendar object containing a calendar component.
-     * Used by sublcasses to store specific components.
-     * @param calendar
-     */
-    protected void setCalendar(Calendar calendar) {
-        // calendar stored as ICalendarAttribute on Item
-        ICalendarAttribute.setValue(this, ATTR_ICALENDAR, calendar);
-    }
-    
-    @Override
-    protected void copyToItem(Item item) {
-        
-        if(!(item instanceof ICalendarItem))
-            return;
-        
-        super.copyToItem(item);
-        
-        // copy icalUid
-        ICalendarItem icalItem = (ICalendarItem) item;
-        icalItem.setIcalUid(getIcalUid());
-    }
-    
+    public Calendar getFullCalendar();
+
 }

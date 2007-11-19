@@ -17,10 +17,10 @@ package org.osaf.cosmo.atom.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.eim.json.JsonConstants;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * Standard implementation of {@link ProcessorFactory}.
@@ -37,6 +37,8 @@ public class StandardProcessorFactory
         MEDIA_TYPE_XHTML
     };
 
+    private EntityFactory entityFactory = null;
+    
     // ProcessorFactory methods
 
     /**
@@ -68,12 +70,24 @@ public class StandardProcessorFactory
         throws UnsupportedContentTypeException {
         if (type != null) {
             if (type.equals(MEDIA_TYPE_EIM_JSON))
-                return new JsonProcessor();
+                return new JsonProcessor(entityFactory);
             if (type.equals(MEDIA_TYPE_EIMML))
-                return new EimmlProcessor();
+                return new EimmlProcessor(entityFactory);
             if (type.equals(MEDIA_TYPE_XHTML))
-                return new HCalendarProcessor();
+                return new HCalendarProcessor(entityFactory);
+            if (type.equals(MEDIA_TYPE_XHTML))
+                return new HCalendarProcessor(entityFactory);
         }
         throw new UnsupportedContentTypeException(type);
     }
+
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+    
+    
 }

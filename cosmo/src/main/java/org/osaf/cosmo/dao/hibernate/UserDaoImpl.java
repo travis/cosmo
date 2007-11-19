@@ -32,6 +32,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.osaf.cosmo.dao.UserDao;
+import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
@@ -58,7 +59,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             if(user==null)
                 throw new IllegalArgumentException("user is required");
             
-            if(user.getId()!=-1)
+            if(getBaseModelObject(user).getId()!=-1)
                 throw new IllegalArgumentException("new user is required");
             
             if (findUserByUsernameIgnoreCase(user.getUsername()) != null)
@@ -66,9 +67,6 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
             if (findUserByEmailIgnoreCase(user.getEmail()) != null)
                 throw new DuplicateEmailException(user.getEmail());
-
-            user.setCreationDate(new Date());
-            user.setModifiedDate(new Date());
 
             if (user.getUid() == null || "".equals(user.getUid()))
                 user.setUid(getIdGenerator().nextIdentifier().toString());
@@ -126,7 +124,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     public Set<User> getUsers() {
         try {
             HashSet<User> users = new HashSet<User>();
-            Iterator it = getSession().createQuery("from User").iterate();
+            Iterator it = getSession().getNamedQuery("user.all").iterate();
             while (it.hasNext())
                 users.add((User) it.next());
 
@@ -143,8 +141,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             List<User> results = crit.list();
 
             // Need the total
-            Long size = (Long) getSession().createQuery(
-                    "select count(*) from User").uniqueResult();
+            Long size = (Long) getSession().getNamedQuery("user.count")
+                    .uniqueResult();
 
             return new ArrayPagedList<User, User.SortType>(pageCriteria, results, size.intValue());
         } catch (HibernateException e) {
@@ -181,7 +179,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             // prevent auto flushing when querying for existing users
             getSession().setFlushMode(FlushMode.MANUAL);
 
-            User findUser = findUserByUsernameOrEmailIgnoreCaseAndId(user
+            User findUser = findUserByUsernameOrEmailIgnoreCaseAndId(getBaseModelObject(user)
                     .getId(), user.getUsername(), user.getEmail());
 
             if (findUser != null) {
@@ -254,6 +252,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byUsername").setParameter(
                 "username", username);
         hibQuery.setCacheable(true);
+        hibQuery.setFlushMode(FlushMode.MANUAL);
         return (User) hibQuery.uniqueResult();
     }
     
@@ -262,6 +261,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byUsername.ignorecase").setParameter(
                 "username", username);
         hibQuery.setCacheable(true);
+        hibQuery.setFlushMode(FlushMode.MANUAL);
         List users = hibQuery.list();
         if (users.size() > 0)
             return (User) users.get(0);
@@ -290,6 +290,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byEmail").setParameter(
                 "email", email);
         hibQuery.setCacheable(true);
+        hibQuery.setFlushMode(FlushMode.MANUAL);
         List users = hibQuery.list();
         if (users.size() > 0)
             return (User) users.get(0);
@@ -302,6 +303,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byEmail.ignorecase").setParameter(
                 "email", email);
         hibQuery.setCacheable(true);
+        hibQuery.setFlushMode(FlushMode.MANUAL);
         List users = hibQuery.list();
         if (users.size() > 0)
             return (User) users.get(0);
@@ -314,6 +316,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         Query hibQuery = session.getNamedQuery("user.byUid").setParameter(
                 "uid", uid);
         hibQuery.setCacheable(true);
+        hibQuery.setFlushMode(FlushMode.MANUAL);
         return (User) hibQuery.uniqueResult();
     }
     
@@ -370,5 +373,9 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                 Order.asc(property) :
                    Order.desc(property);
         }
+    }
+    
+    protected BaseModelObject getBaseModelObject(Object obj) {
+        return (BaseModelObject) obj;
     }
 }

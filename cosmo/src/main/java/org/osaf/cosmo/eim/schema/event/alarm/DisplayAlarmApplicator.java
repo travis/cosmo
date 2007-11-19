@@ -38,6 +38,7 @@ import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Applies display alarm EIM records to an EventStamp/NoteItem.
@@ -54,7 +55,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
     /** */
     public DisplayAlarmApplicator(Item item) {
         super(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM, item);
-        setStamp(BaseEventStamp.getStamp(item));
+        setStamp(StampUtils.getBaseEventStamp(item));
     }
     
     @Override
@@ -79,7 +80,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
     @Override
     public void applyRecord(EimRecord record) throws EimSchemaException {
         // stamp could have been added before record is processed
-        setStamp(BaseEventStamp.getStamp(getItem()));
+        setStamp(StampUtils.getBaseEventStamp(getItem()));
         
         // If item is not an event, then process differently
         if(getEventStamp()==null) {
@@ -226,7 +227,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         
     
     private BaseEventStamp getEventStamp() {
-        return BaseEventStamp.getStamp(getItem());
+        return StampUtils.getBaseEventStamp(getItem());
     }
     
     private void setReminderTime(NoteItem note, BaseEventStamp eventStamp, Trigger trigger) {

@@ -21,6 +21,7 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibNoteItem;
 
 public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTestCase {
 
@@ -111,7 +112,7 @@ public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTe
 
     private NoteItem generateTestContent(String name, String owner)
             throws Exception {
-        NoteItem content = new NoteItem();
+        NoteItem content = new HibNoteItem();
         content.setName(name);
         content.setDisplayName(name);
         content.setOwner(getUser(userDao, owner));

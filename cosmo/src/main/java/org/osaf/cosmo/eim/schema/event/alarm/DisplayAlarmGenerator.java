@@ -33,6 +33,7 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Generates EIM records from event stamps.
@@ -54,7 +55,7 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
     /** */
     public DisplayAlarmGenerator(Item item) {
         super(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM, item);
-        setStamp(BaseEventStamp.getStamp(item));
+        setStamp(StampUtils.getBaseEventStamp(item));
     }
 
     @Override

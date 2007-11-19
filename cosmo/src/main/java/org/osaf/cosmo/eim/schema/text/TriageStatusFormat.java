@@ -25,7 +25,9 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 
 /**
@@ -51,8 +53,10 @@ public class TriageStatusFormat extends Format {
     private static String AUTOTRIAGE_OFF = "0";
 
     private ParseException parseException;
-
-    private TriageStatusFormat() {
+    private EntityFactory entityFactory;
+    
+    private TriageStatusFormat(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
     }
 
     public final String format(TriageStatus ts) {
@@ -75,7 +79,7 @@ public class TriageStatusFormat extends Format {
         if (code != null)
             // validate that this is a known code; throws
             // IllegalArgumentException if not
-            TriageStatus.label(code);
+            TriageStatusUtil.label(code);
         else
             code = new Integer(-1);
 
@@ -143,13 +147,13 @@ public class TriageStatusFormat extends Format {
             return null;
         }
 
-        TriageStatus ts = new TriageStatus();
+        TriageStatus ts = entityFactory.createTriageStatus();
 
         try {
             pos.setIndex(index);
             Integer code = new Integer(chunks[0]);
             // validate the code as being known
-            TriageStatus.label(code);
+            TriageStatusUtil.label(code);
             ts.setCode(code);
             index += chunks[0].length() + 1;
         } catch (Exception e) {
@@ -187,7 +191,7 @@ public class TriageStatusFormat extends Format {
         return ts;
     }
 
-    public static final TriageStatusFormat getInstance() {
-        return new TriageStatusFormat();
+    public static final TriageStatusFormat getInstance(EntityFactory entityFactory) {
+        return new TriageStatusFormat(entityFactory);
     }
 }

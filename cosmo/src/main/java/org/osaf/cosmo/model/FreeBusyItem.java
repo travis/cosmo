@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 import net.fortuna.ical4j.model.Calendar;
 
 import org.osaf.cosmo.hibernate.validator.FreeBusy;
@@ -25,36 +22,19 @@ import org.osaf.cosmo.hibernate.validator.FreeBusy;
 /**
  * Extends {@link ICalendarItem} to represent a VFREEBUSY item.
  */
-@Entity
-@DiscriminatorValue("freebusy")
-public class FreeBusyItem extends ICalendarItem {
+public interface FreeBusyItem extends ICalendarItem{
 
-  
-    public FreeBusyItem() {
-    }
-
-    @Override
-    public Item copy() {
-        FreeBusyItem copy = new FreeBusyItem();
-        copyToItem(copy);
-        return copy;
-    }
-    
     /**
      * Return the Calendar object containing a VFREEBUSY component.
      * @return calendar
      */
     @FreeBusy
-    public Calendar getFreeBusyCalendar() {
-        return getCalendar();
-    }
-    
+    public Calendar getFreeBusyCalendar();
+
     /**
      * Set the Calendar object containing a VFREEBUSY component.
      * @param calendar
      */
-    public void setFreeBusyCalendar(Calendar calendar) {
-        setCalendar(calendar);
-    }
-    
+    public void setFreeBusyCalendar(Calendar calendar);
+
 }

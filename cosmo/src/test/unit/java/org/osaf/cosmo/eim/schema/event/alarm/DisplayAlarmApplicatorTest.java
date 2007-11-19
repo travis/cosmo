@@ -30,6 +30,9 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link DisplayAlarmApplicator}.
@@ -40,8 +43,8 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
         LogFactory.getLog(DisplayAlarmApplicatorTest.class);
 
     public void testApplyField() throws Exception {
-        NoteItem noteItem = new NoteItem();
-        EventStamp eventStamp = new EventStamp(noteItem);
+        NoteItem noteItem = new MockNoteItem();
+        EventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.createCalendar();
         eventStamp.setStartDate(new DateTime(true));
         noteItem.addStamp(eventStamp);
@@ -74,7 +77,7 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyFieldNonEvent() throws Exception {
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         EimRecord record = makeTestRecordNonEvent();
 
         DisplayAlarmApplicator applicator =
@@ -92,8 +95,8 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyMissingField() throws Exception {
-        NoteItem masterNote = new NoteItem();
-        EventStamp masterEvent = new EventStamp(masterNote);
+        NoteItem masterNote = new MockNoteItem();
+        EventStamp masterEvent = new MockEventStamp(masterNote);
         masterEvent.createCalendar();
         masterEvent.creatDisplayAlarm();
         masterEvent.setDisplayAlarmDescription("My alarm");
@@ -103,8 +106,8 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
         
         masterNote.addStamp(masterEvent);
         
-        NoteItem modNote = new NoteItem();
-        EventExceptionStamp modEvent = new EventExceptionStamp(modNote);
+        NoteItem modNote = new MockNoteItem();
+        EventExceptionStamp modEvent = new MockEventExceptionStamp(modNote);
         modEvent.createCalendar();
         modNote.setModifies(masterNote);
         modNote.addStamp(modEvent);

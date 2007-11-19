@@ -36,10 +36,12 @@ import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibItem;
+import org.osaf.cosmo.model.hibernate.HibUser;
 
 public class HibernateTestHelper {
     public User createDummyUser(UserDao userDao, int index) {
-        User user = new User();
+        User user = new HibUser();
         user.setUsername("user" + index);
         user.setPassword("password" + index);
         user.setEmail("user" + index + "@test" + index);
@@ -56,7 +58,7 @@ public class HibernateTestHelper {
         Assert.assertEquals(item1.getClientModifiedDate(), item2.getClientModifiedDate());
         Assert.assertEquals(item1.getModifiedDate(), item2.getModifiedDate());
         Assert.assertEquals(item1.getDisplayName(), item2.getDisplayName());
-        Assert.assertEquals(item1.getId(), item2.getId());
+        Assert.assertEquals(getHibItem(item1).getId(), getHibItem(item2).getId());
         Assert.assertEquals(item1.getUid(), item2.getUid());
         Assert.assertEquals(item1.getAttributes().size(), item2.getAttributes()
                 .size());
@@ -153,7 +155,7 @@ public class HibernateTestHelper {
     public User getUser(UserDao userDao, ContentDao contentDao, String username) {
         User user = userDao.getUser(username);
         if (user == null) {
-            user = new User();
+            user = new HibUser();
             user.setUsername(username);
             user.setPassword(username);
             user.setEmail(username + "@testem");
@@ -168,5 +170,9 @@ public class HibernateTestHelper {
             contentDao.createRootItem(user);
         }
         return user;
+    }
+    
+    private HibItem getHibItem(Item item) {
+        return (HibItem) item;
     }
 }

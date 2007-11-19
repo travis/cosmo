@@ -28,6 +28,7 @@ import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
@@ -66,7 +67,7 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
         throws UnsupportedFormatException {
         super(factory, locator, format);
         if (triageStatus != -1)
-            TriageStatus.label(triageStatus); // validates legitimacy
+            TriageStatusUtil.label(triageStatus); // validates legitimacy
         this.triageStatus = triageStatus;
     }
 
@@ -97,7 +98,7 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      */
     protected SortedSet<NoteItem> findContents(CollectionItem collection) {
         String label = triageStatus == -1 ?
-            null : TriageStatus.label(triageStatus);
+            null : TriageStatusUtil.label(triageStatus);
         Date now = Calendar.getInstance().getTime();
         TimeZone tz = null;
         if (getFilter() != null) {
@@ -126,7 +127,7 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
      */
     protected SortedSet<NoteItem> findOccurrences(NoteItem item) {
         String label = triageStatus == -1 ?
-            null : TriageStatus.label(triageStatus);
+            null : TriageStatusUtil.label(triageStatus);
         Date now = Calendar.getInstance().getTime();
         TimeZone tz = null;
         if (getFilter() != null) {

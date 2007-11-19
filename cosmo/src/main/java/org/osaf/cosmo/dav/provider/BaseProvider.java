@@ -61,6 +61,7 @@ import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.impl.DavFile;
 import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
@@ -78,9 +79,12 @@ public abstract class BaseProvider
     private static final Log log = LogFactory.getLog(BaseProvider.class);
 
     private DavResourceFactory resourceFactory;
+    private EntityFactory entityFactory;
 
-    public BaseProvider(DavResourceFactory resourceFactory) {
+    public BaseProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
         this.resourceFactory = resourceFactory;
+        this.entityFactory = entityFactory;
     }
 
     // DavProvider methods
@@ -347,7 +351,7 @@ public abstract class BaseProvider
             return null;
         DavResource destination = resourceFactory.resolve(locator);
         return destination != null ? destination :
-            new DavFile(locator, resourceFactory);
+            new DavFile(locator, resourceFactory, entityFactory);
     }
 
     protected void validateDestination(DavRequest request,
@@ -555,6 +559,10 @@ public abstract class BaseProvider
 
     public DavResourceFactory getResourceFactory() {
         return resourceFactory;
+    }
+    
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
     }
 
     private boolean isFreeBusyReport(ReportInfo info) {

@@ -30,6 +30,7 @@ import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.service.ContentService;
 
@@ -90,7 +91,7 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
         }
 
         CollectionItem collection = (CollectionItem) item;
-        if (CalendarCollectionStamp.getStamp(collection) == null) {
+        if (StampUtils.getCalendarCollectionStamp(collection) == null) {
             resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                            "Requested item not a calendar collection");
             return;

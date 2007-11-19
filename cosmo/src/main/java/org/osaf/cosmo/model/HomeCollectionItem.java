@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,9 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-
 /**
  * Extends {@link CollectionItem} to represent a users home collection.
  */
-@Entity
-@DiscriminatorValue("homecollection")
-public class HomeCollectionItem extends CollectionItem {
+public interface HomeCollectionItem extends CollectionItem{
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4301319758735788800L;
-
-    public void setName(String name) {
-        // Prevent name changes to home collection
-        if(getName()==null)
-            super.setName(name);
-    }
 }

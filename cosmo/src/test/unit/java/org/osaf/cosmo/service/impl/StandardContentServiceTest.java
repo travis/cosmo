@@ -22,7 +22,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -31,20 +30,21 @@ import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
+import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
-import org.osaf.cosmo.model.mock.MockContentItem;
-import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
 import org.osaf.cosmo.service.util.EventUtils;
 
@@ -80,7 +80,6 @@ public class StandardContentServiceTest extends TestCase {
         service.setContentDao(contentDao);
         service.setLockManager(lockManager);
         service.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
-        service.setFreeBusyQueryProcessor(new StandardFreeBusyQueryProcessor());
         service.init();
     }
 
@@ -88,7 +87,7 @@ public class StandardContentServiceTest extends TestCase {
     public void testFindItemByPath() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        ContentItem dummyContent = new NoteItem();
+        ContentItem dummyContent = new MockNoteItem();
         dummyContent.setName("foo");
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
@@ -116,7 +115,7 @@ public class StandardContentServiceTest extends TestCase {
     public void testRemoveItem() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        ContentItem dummyContent = new NoteItem();
+        ContentItem dummyContent = new MockNoteItem();
         dummyContent.setName("foo");
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
@@ -135,7 +134,7 @@ public class StandardContentServiceTest extends TestCase {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
 
-        ContentItem content = new NoteItem();
+        ContentItem content = new MockNoteItem();
         content.setName("foo");
         content.setOwner(user);
         content = contentDao.createContent(rootCollection, content);
@@ -151,7 +150,7 @@ public class StandardContentServiceTest extends TestCase {
     public void testRemoveContent() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        ContentItem dummyContent = new NoteItem();
+        ContentItem dummyContent = new MockNoteItem();
         dummyContent.setName("foo");
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
@@ -169,11 +168,11 @@ public class StandardContentServiceTest extends TestCase {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
         
-        CollectionItem dummyCollection = new CollectionItem();
+        CollectionItem dummyCollection = new MockCollectionItem();
         dummyCollection.setName("foo");
         dummyCollection.setOwner(user);
         
-        NoteItem dummyContent = new NoteItem();
+        NoteItem dummyContent = new MockNoteItem();
         dummyContent.setName("bar");
         dummyContent.setOwner(user);
         
@@ -193,15 +192,15 @@ public class StandardContentServiceTest extends TestCase {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
         
-        CollectionItem dummyCollection = new CollectionItem();
+        CollectionItem dummyCollection = new MockCollectionItem();
         dummyCollection.setName("foo");
         dummyCollection.setOwner(user);
         
-        ContentItem dummyContent1 = new MockContentItem();
+        ContentItem dummyContent1 = new MockNoteItem();
         dummyContent1.setName("bar1");
         dummyContent1.setOwner(user);
         
-        ContentItem dummyContent2 = new MockContentItem();
+        ContentItem dummyContent2 = new MockNoteItem();
         dummyContent2.setName("bar2");
         dummyContent2.setOwner(user);
         
@@ -224,7 +223,7 @@ public class StandardContentServiceTest extends TestCase {
         bar1.setIsActive(false);
         bar2.addStringAttribute("foo", "bar");
         
-        ContentItem bar3 = new MockContentItem();
+        ContentItem bar3 = new MockNoteItem();
         bar3.setName("bar3");
         bar3.setOwner(user);
         
@@ -256,7 +255,7 @@ public class StandardContentServiceTest extends TestCase {
         dummyCollection.setName("foo");
         dummyCollection.setOwner(user);
         
-        ContentItem dummyContent = new MockContentItem();
+        ContentItem dummyContent = new MockNoteItem();
         dummyContent.setName("bar1");
         dummyContent.setOwner(user);
         
@@ -283,13 +282,13 @@ public class StandardContentServiceTest extends TestCase {
     public void testUpdateEvent() throws Exception {
         User user = testHelper.makeDummyUser();
         CollectionItem rootCollection = contentDao.createRootItem(user);
-        NoteItem masterNote = new NoteItem();
+        NoteItem masterNote = new MockNoteItem();
         masterNote.setName("foo");
         masterNote.setOwner(user);
         
         Calendar calendar = getCalendar("event_with_exceptions1.ics"); 
         
-        EventStamp eventStamp = new EventStamp(masterNote);
+        EventStamp eventStamp = new MockEventStamp(masterNote);
         masterNote.addStamp(eventStamp);
         contentDao.createContent(rootCollection, masterNote);
         
@@ -303,7 +302,7 @@ public class StandardContentServiceTest extends TestCase {
         
         Assert.assertEquals(masterNote.getModifications().size(), 4);
         for(NoteItem mod : masterNote.getModifications()) {
-            EventExceptionStamp eventException = EventExceptionStamp.getStamp(mod);
+            EventExceptionStamp eventException = StampUtils.getEventExceptionStamp(mod);
             VEvent exceptionEvent = eventException.getExceptionEvent();
             Assert.assertEquals(mod.getModifies(), masterNote);
             Assert.assertEquals(masterEvent.getUid().getValue(), exceptionEvent.getUid().getValue());
@@ -365,7 +364,7 @@ public class StandardContentServiceTest extends TestCase {
     
     private EventExceptionStamp getEventException(String recurrenceId, Set<NoteItem> items) {
         for(NoteItem mod : items) {
-            EventExceptionStamp ees = EventExceptionStamp.getStamp(mod);
+            EventExceptionStamp ees = StampUtils.getEventExceptionStamp(mod);
             if(ees.getRecurrenceId().toString().equals(recurrenceId))
                 return ees;
         }

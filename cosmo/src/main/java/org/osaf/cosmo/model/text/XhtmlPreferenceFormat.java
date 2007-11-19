@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Preference;
 
 /**
@@ -38,9 +39,10 @@ public class XhtmlPreferenceFormat extends BaseXhtmlFormat
     private static final Log log =
         LogFactory.getLog(XhtmlPreferenceFormat.class);
 
-    public Preference parse(String source)
+   
+    public Preference parse(String source, EntityFactory entityFactory)
         throws ParseException {
-        Preference pref = new Preference();
+        Preference pref = entityFactory.createPreference();
 
         try {
             if (source == null)

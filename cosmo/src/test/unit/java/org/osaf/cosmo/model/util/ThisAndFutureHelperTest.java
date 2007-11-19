@@ -39,6 +39,10 @@ import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test EventStamp
@@ -65,7 +69,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         Set<NoteItem> results = 
             helper.breakRecurringEvent(oldSeries, newSeries, lastRecurrenceId);
         
-        EventStamp eventStamp = EventStamp.getStamp(oldSeries);
+        EventStamp eventStamp = StampUtils.getEventStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
         Assert.assertEquals(new DateTime("20070807T235959Z"), recur.getUntil());
@@ -96,7 +100,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         Set<NoteItem> results = 
             helper.breakRecurringEvent(oldSeries, newSeries, lastRecurrenceId);
         
-        EventStamp eventStamp = EventStamp.getStamp(oldSeries);
+        EventStamp eventStamp = StampUtils.getEventStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
         Assert.assertEquals(new DateTime("20070807T235959Z"), recur.getUntil());
@@ -117,7 +121,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         NoteItem mod = getByUid("newmaster:20070811T101500", results);
         Assert.assertNotNull(mod);
         
-        EventExceptionStamp ees = EventExceptionStamp.getStamp(mod);
+        EventExceptionStamp ees = StampUtils.getEventExceptionStamp(mod);
         Assert.assertNotNull(ees);
         
         Assert.assertTrue(ees.getStartDate().equals(ees.getRecurrenceId()));
@@ -139,7 +143,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         Set<NoteItem> results = 
             helper.breakRecurringEvent(oldSeries, newSeries, lastRecurrenceId);
         
-        EventStamp eventStamp = EventStamp.getStamp(oldSeries);
+        EventStamp eventStamp = StampUtils.getEventStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
         Assert.assertEquals(new DateTime("20070808T235959Z", tz), recur.getUntil());
@@ -168,7 +172,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         Set<NoteItem> results = 
             helper.breakRecurringEvent(oldSeries, newSeries, lastRecurrenceId);
         
-        EventStamp eventStamp = EventStamp.getStamp(oldSeries);
+        EventStamp eventStamp = StampUtils.getEventStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
         Assert.assertEquals(new Date("20070807"), recur.getUntil());
@@ -206,9 +210,9 @@ public class ThisAndFutureHelperTest extends TestCase {
     }
     
     protected NoteItem createEvent(String uid, Calendar calendar) {
-        NoteItem master = new NoteItem();
+        NoteItem master = new MockNoteItem();
         master.setUid(uid);
-        EventStamp es = new EventStamp(master);
+        EventStamp es = new MockEventStamp(master);
         master.addStamp(es);
         
         ComponentList vevents = calendar.getComponents().getComponents(
@@ -221,11 +225,11 @@ public class ThisAndFutureHelperTest extends TestCase {
             VEvent event = i.next();
             if (event.getRecurrenceId() != null) {
                 exceptions.add(event);
-                NoteItem mod = new NoteItem();
+                NoteItem mod = new MockNoteItem();
                 mod.setUid(new ModificationUid(master,event.getRecurrenceId().getDate()).toString());
                 mod.setModifies(master);
                 master.addModification(mod);
-                EventExceptionStamp ees = new EventExceptionStamp(mod);
+                EventExceptionStamp ees = new MockEventExceptionStamp(mod);
                 mod.addStamp(ees);
                 ees.createCalendar();
                 ees.setRecurrenceId(event.getRecurrenceId().getDate());

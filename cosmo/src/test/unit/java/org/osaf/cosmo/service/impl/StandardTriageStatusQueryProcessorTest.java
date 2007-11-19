@@ -18,13 +18,13 @@ package org.osaf.cosmo.service.impl;
 import java.util.Set;
 
 import junit.framework.Assert;
+import junit.framework.TestCase;
 import net.fortuna.ical4j.model.DateTime;
 
+import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
-import org.osaf.cosmo.dao.UserDao;
-import org.osaf.cosmo.dao.hibernate.AbstractHibernateDaoTestCase;
-import org.osaf.cosmo.dao.hibernate.ContentDaoImpl;
-import org.osaf.cosmo.dao.hibernate.UserDaoImpl;
+import org.osaf.cosmo.dao.mock.MockContentDao;
+import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -33,16 +33,19 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.osaf.cosmo.service.triage.TriageStatusQueryContext;
 
 /**
- * Test StandardTriageStatusQueryProcessor
+ * Test StandardTriageStatusQueryProcessor using mock implementations.
  *
  */
-public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDaoTestCase {
+public class StandardTriageStatusQueryProcessorTest extends TestCase {
 
-    protected ContentDaoImpl contentDao = null;
-    protected UserDaoImpl userDao = null;
+    private MockContentDao contentDao;
+    private MockEntityFactory factory;
+    private MockDaoStorage storage;
+    private TestHelper testHelper;
     protected StandardTriageStatusQueryProcessor queryProcessor = null;
     
     protected final String CALENDAR_UID = "calendaruid";
@@ -53,32 +56,35 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     }
     
     @Override
-    protected void onSetUpInTransaction() throws Exception {
-        // TODO Auto-generated method stub
-        super.onSetUpInTransaction();
-        
+    protected void setUp() throws Exception {
+        testHelper = new TestHelper();
+        factory = new MockEntityFactory();
+        storage = new MockDaoStorage();
+        contentDao = new MockContentDao(storage);
+  
         queryProcessor = new StandardTriageStatusQueryProcessor();
         queryProcessor.setContentDao(contentDao);
         
-        CollectionItem calendar = generateCalendar("testcalendar", "testuser");
+        User user = testHelper.makeDummyUser();
+        CollectionItem root = contentDao.createRootItem(user);
+        
+        CollectionItem calendar = generateCalendar("testcalendar", user);
         
         calendar.setUid(CALENDAR_UID);
         
-        CollectionItem root = (CollectionItem) contentDao.getRootItem(getUser(userDao, "testuser"));
-        
         contentDao.createCollection(root, calendar);
        
-        NoteItem note = generateNote("testlaternote", "testuser");
+        NoteItem note = generateNote("testlaternote", user);
         note.setUid(NOTE_UID + "later");
         note.getTriageStatus().setCode(TriageStatus.CODE_LATER);
         contentDao.createContent(calendar, note);
         
-        note = generateNote("testdonenote", "testuser");
+        note = generateNote("testdonenote", user);
         note.setUid(NOTE_UID + "done");
         note.getTriageStatus().setCode(TriageStatus.CODE_DONE);
         note = (NoteItem) contentDao.createContent(calendar, note);
         
-        NoteItem noteMod = generateNote("testnotemod", "testuser");
+        NoteItem noteMod = generateNote("testnotemod", user);
         noteMod.setUid(NOTE_UID + "mod");
         noteMod.setModifies(note);
         noteMod.getTriageStatus().setCode(TriageStatus.CODE_NOW);
@@ -86,7 +92,7 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
         
         for (int i = 1; i <= 3; i++) {
             ContentItem event = generateEvent("test" + i + ".ics", "eventwithtimezone"
-                    + i + ".ics", "testuser");
+                    + i + ".ics", user);
             event.setUid("calendar2_" + i);
             contentDao.createContent(calendar, event);
         }
@@ -186,17 +192,13 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
         // should be included because occurrence is included
         verifyItemInSet(results, "calendar2_3");
     }
-    
-    private User getUser(UserDao userDao, String username) {
-        return helper.getUser(userDao, contentDao, username);
-    }
 
-    private CollectionItem generateCalendar(String name, String owner) {
-        CollectionItem calendar = new CollectionItem();
+    private CollectionItem generateCalendar(String name, User owner) {
+        CollectionItem calendar = factory.createCollection();
         calendar.setName(name);
-        calendar.setOwner(getUser(userDao, owner));
+        calendar.setOwner(owner);
         
-        CalendarCollectionStamp ccs = new CalendarCollectionStamp();
+        CalendarCollectionStamp ccs = factory.createCalendarCollectionStamp(calendar);
         calendar.addStamp(ccs);
         
         ccs.setDescription("test description");
@@ -206,25 +208,25 @@ public class StandardTriageStatusQueryProcessorTest extends AbstractHibernateDao
     }
 
     private NoteItem generateEvent(String name, String file,
-            String owner) throws Exception {
-        NoteItem event = new NoteItem();
+            User owner) throws Exception {
+        NoteItem event = factory.createNote();
         event.setName(name);
         event.setDisplayName(name);
-        event.setOwner(getUser(userDao, owner));
+        event.setOwner(owner);
        
-        EventStamp evs = new EventStamp();
+        EventStamp evs = factory.createEventStamp(event);
         event.addStamp(evs);
-        evs.setCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        evs.setEventCalendar(CalendarUtils.parseCalendar(testHelper.getBytes(file)));
        
         return event;
     }
     
     private NoteItem generateNote(String name,
-            String owner) throws Exception {
-        NoteItem event = new NoteItem();
+            User owner) throws Exception {
+        NoteItem event = factory.createNote();
         event.setName(name);
         event.setDisplayName(name);
-        event.setOwner(getUser(userDao, owner));
+        event.setOwner(owner);
        
         return event;
     }

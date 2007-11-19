@@ -15,19 +15,14 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import java.io.IOException;
-
-import org.apache.abdera.model.Entry;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.TargetType;
 import org.apache.abdera.util.Constants;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.ItemTarget;
-import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Mock implementation of {@link RequestContext}.
@@ -73,7 +68,7 @@ public class MockItemRequestContext extends BaseMockRequestContext
     }
 
     private static NoteItem newItem(String uid) {
-        NoteItem item = new NoteItem();
+        NoteItem item = new MockNoteItem();
         item.setUid(uid);
         return item;
     }

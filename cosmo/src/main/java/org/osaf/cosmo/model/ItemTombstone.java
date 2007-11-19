@@ -15,51 +15,21 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 /**
  * When an Item is removed from a collection, a tombstone is attached
- * to the collection to track when this removal ocurred.
+ * to the collection to track when this removal ocurred.  The item
+ * uid is stored with the tombstone to track which item was removed.
  */
-@Entity
-@DiscriminatorValue("item")
-public class ItemTombstone extends Tombstone {
-    
-    @Column(name="itemuid", length=255)
-    private String itemUid = null;
+public interface ItemTombstone extends Tombstone{
 
-    public ItemTombstone() {
-    }
-    
-    public ItemTombstone(CollectionItem parent, Item item) {
-        super(parent);
-        itemUid = item.getUid();
-    }
-    
-    public String getItemUid() {
-        return this.itemUid;
-    }
+    /**
+     * @return uid of item removed
+     */
+    public String getItemUid();
 
-    public void setItemUid(String itemUid) {
-        this.itemUid = itemUid;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof ItemTombstone))
-            return false;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(
-                itemUid, ((ItemTombstone) obj).getItemUid()).isEquals();
-    }
+    /**
+     * @param itemUid uid of item removed
+     */
+    public void setItemUid(String itemUid);
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 27).appendSuper(super.hashCode())
-                .append(itemUid.hashCode()).toHashCode();
-    }
 }

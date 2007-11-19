@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Ticket;
 
 /**
@@ -40,9 +41,9 @@ public class XhtmlSubscriptionFormat extends BaseXhtmlFormat
     private static final Log log =
         LogFactory.getLog(XhtmlSubscriptionFormat.class);
 
-    public CollectionSubscription parse(String source)
+    public CollectionSubscription parse(String source, EntityFactory entityFactory)
         throws ParseException {
-        CollectionSubscription sub = new CollectionSubscription();
+        CollectionSubscription sub = entityFactory.createCollectionSubscription();
 
         try {
             if (source == null)

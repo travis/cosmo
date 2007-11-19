@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -46,19 +47,18 @@ import net.fortuna.ical4j.model.property.XProperty;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.osaf.cosmo.security.mock.MockAnonymousPrincipal;
 import org.osaf.cosmo.security.mock.MockUserPrincipal;
-
 import org.w3c.dom.Document;
 
 /**
@@ -81,6 +81,15 @@ public class TestHelper {
     static int sseq = 0;
     static int tseq = 0;
     static int useq = 0;
+
+    private EntityFactory entityFactory = new MockEntityFactory();
+    
+    public TestHelper() {
+    }
+
+    public TestHelper(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
 
     public Calendar makeDummyCalendar() {
         Calendar cal =new Calendar();
@@ -153,7 +162,7 @@ public class TestHelper {
     /**
      */
     public Ticket makeDummyTicket(String timeout) {
-        Ticket ticket = new Ticket();
+        Ticket ticket = entityFactory.creatTicket();
         ticket.setTimeout(timeout);
         ticket.setPrivileges(new HashSet());
         ticket.getPrivileges().add(Ticket.PRIVILEGE_READ);
@@ -189,7 +198,7 @@ public class TestHelper {
         if (password == null)
             throw new IllegalArgumentException("password required");
 
-        User user = new User();
+        User user = entityFactory.createUser();
         user.setUsername(username);
         user.setFirstName(username);
         user.setLastName(username);
@@ -218,7 +227,7 @@ public class TestHelper {
         String serial = new Integer(++sseq).toString();
         String displayName = "dummy sub " + serial;
 
-        CollectionSubscription sub = new CollectionSubscription();
+        CollectionSubscription sub = entityFactory.createCollectionSubscription();
         sub.setDisplayName(displayName);
         sub.setTicketKey(ticket.getKey());
         sub.setCollectionUid(collection.getUid());
@@ -243,7 +252,7 @@ public class TestHelper {
     public Preference makeDummyPreference() {
         String serial = new Integer(++pseq).toString();
 
-        Preference pref = new Preference();
+        Preference pref = entityFactory.createPreference();
         pref.setKey("dummy pref " + serial);
         pref.setValue(pref.getKey());
         pref.setCreationDate(java.util.Calendar.getInstance().getTime());
@@ -300,7 +309,7 @@ public class TestHelper {
         String serial = new Integer(++cseq).toString();
         String name = "test content " + serial;
 
-        FileItem content = new FileItem();
+        FileItem content = entityFactory.createFileItem();
 
         content.setUid(name);
         content.setName(name);
@@ -325,7 +334,7 @@ public class TestHelper {
         if (name == null)
             name = "test item " + serial;
 
-        NoteItem note = new NoteItem();
+        NoteItem note = entityFactory.createNote();
 
         note.setUid(name);
         note.setName(name);
@@ -343,7 +352,7 @@ public class TestHelper {
         String serial = new Integer(++lseq).toString();
         String name = "test collection " + serial;
 
-        CollectionItem collection = new CollectionItem();
+        CollectionItem collection = entityFactory.createCollection();
         collection.setUid(serial);
         collection.setName(name);
         collection.setDisplayName(name);
@@ -364,14 +373,14 @@ public class TestHelper {
         if (name == null)
             name = "test calendar collection " + serial;
 
-        CollectionItem collection = new CollectionItem();
+        CollectionItem collection = entityFactory.createCollection();
         collection.setUid(serial);
         collection.setName(name);
         collection.setDisplayName(name);
         collection.setOwner(user);
         collection.setCreationDate(java.util.Calendar.getInstance().getTime());
         collection.setModifiedDate(collection.getCreationDate());
-        collection.addStamp(new CalendarCollectionStamp(collection));
+        collection.addStamp(entityFactory.createCalendarCollectionStamp(collection));
 
         return collection;
     }
@@ -384,6 +393,17 @@ public class TestHelper {
         }
         return in;
     }
+    
+    /** */
+    public byte[] getBytes(String name) throws Exception {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtils.copy(in, bos);
+        return bos.toByteArray();
+    }
 
     /** */
     public Reader getReader(String name) {
@@ -394,4 +414,14 @@ public class TestHelper {
             throw new RuntimeException("error converting input stream to reader", e);
         }
     }
+
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+    
+    
 }

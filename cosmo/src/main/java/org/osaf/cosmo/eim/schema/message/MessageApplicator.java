@@ -28,6 +28,7 @@ import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Applies EIM records to message stamps.
@@ -42,7 +43,7 @@ public class MessageApplicator extends BaseStampApplicator
     /** */
     public MessageApplicator(Item item) {
         super(PREFIX_MESSAGE, NS_MESSAGE, item);
-        setStamp(MessageStamp.getStamp(item));
+        setStamp(StampUtils.getMessageStamp(item));
     }
 
     /**
@@ -52,7 +53,7 @@ public class MessageApplicator extends BaseStampApplicator
      * that stamp.
      */
     protected Stamp createStamp(EimRecord record) throws EimSchemaException {
-        return new MessageStamp();
+        return getItem().getFactory().createMessageStamp();
     }
 
     /**

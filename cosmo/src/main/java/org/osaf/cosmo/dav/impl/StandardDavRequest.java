@@ -54,6 +54,7 @@ import org.osaf.cosmo.dav.caldav.InvalidCalendarDataException;
 import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.util.BufferedServletInputStream;
 
@@ -91,18 +92,22 @@ public class StandardDavRequest extends WebdavRequestImpl
     private DavResourceLocatorFactory locatorFactory;
     private DavResourceLocator locator;
     private DavResourceLocator destinationLocator;
+    private EntityFactory entityFactory;
 
     public StandardDavRequest(HttpServletRequest request,
-                              DavResourceLocatorFactory factory) {
-        this(request, factory, false);
+                              DavResourceLocatorFactory factory,
+                              EntityFactory entityFactory) {
+        this(request, factory, entityFactory, false);
     }
 
     public StandardDavRequest(HttpServletRequest request,
                               DavResourceLocatorFactory factory,
+                              EntityFactory entityFactory,
                               boolean bufferRequestContent) {
         super(request, null);
         this.locatorFactory = factory;
         this.bufferRequestContent = bufferRequestContent;
+        this.entityFactory = entityFactory;
     }
 
     // DavRequest methods
@@ -395,7 +400,7 @@ public class StandardDavRequest extends WebdavRequestImpl
                                      DavPrivilege.READ_FREE_BUSY))
             throw new BadRequestException("Empty or invalid " + QN_PRIVILEGE);
 
-        Ticket ticket = new Ticket();
+        Ticket ticket = entityFactory.creatTicket();
         ticket.setTimeout(timeout);
         privileges.setTicketPrivileges(ticket);
 

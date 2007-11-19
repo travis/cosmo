@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TaskStamp;
 
 /**
@@ -61,7 +62,7 @@ public class ICalendarOutputter {
                               OutputStream out)
         throws IOException {
         CalendarCollectionStamp stamp =
-            CalendarCollectionStamp.getStamp(collection);
+            StampUtils.getCalendarCollectionStamp(collection);
         if (stamp == null)
             throw new IllegalArgumentException("non-calendar collection cannot be formatted as iCalendar");
 
@@ -113,11 +114,11 @@ public class ICalendarOutputter {
         if(note.getModifies()!=null)
             return null;
         
-        EventStamp event = EventStamp.getStamp(note);
+        EventStamp event = StampUtils.getEventStamp(note);
         if(event!=null)
             return event.getCalendar();
         
-        TaskStamp task = TaskStamp.getStamp(note);
+        TaskStamp task = StampUtils.getTaskStamp(note);
         if(task!=null)
             return task.getCalendar();
         

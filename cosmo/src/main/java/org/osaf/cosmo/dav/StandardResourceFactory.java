@@ -18,6 +18,7 @@ package org.osaf.cosmo.dav;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.calendar.query.CalendarQueryProcessor;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavRequest;
 import org.osaf.cosmo.dav.DavResource;
@@ -39,6 +40,7 @@ import org.osaf.cosmo.dav.impl.DavTask;
 import org.osaf.cosmo.model.AvailabilityItem;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.FreeBusyItem;
@@ -66,13 +68,19 @@ public class StandardResourceFactory
     private ContentService contentService;
     private UserService userService;
     private CosmoSecurityManager securityManager;
+    private EntityFactory entityFactory;
+    private CalendarQueryProcessor calendarQueryProcessor;
 
     public StandardResourceFactory(ContentService contentService,
                                    UserService userService,
-                                   CosmoSecurityManager securityManager) {
+                                   CosmoSecurityManager securityManager,
+                                   EntityFactory entityFactory,
+                                   CalendarQueryProcessor calendarQueryProcessor) {
         this.contentService = contentService;
         this.userService = userService;
         this.securityManager = securityManager;
+        this.entityFactory = entityFactory;
+        this.calendarQueryProcessor = calendarQueryProcessor;
     }
 
     /**
@@ -106,16 +114,16 @@ public class StandardResourceFactory
         // the request is creating a resource or the request is targeting a
         // nonexistent item.
         if (request.getMethod().equals("MKCALENDAR"))
-            return new DavCalendarCollection(locator, this);
+            return new DavCalendarCollection(locator, this,entityFactory);
         if (request.getMethod().equals("MKCOL"))
-            return new DavCollectionBase(locator, this);
+            return new DavCollectionBase(locator, this, entityFactory);
         if (request.getMethod().equals("PUT")) {
             // will be replaced by the provider if a different resource
             // type is required
             DavResource parent = resolve(locator.getParentLocator());
             if (parent instanceof DavCalendarCollection)
-                return new DavEvent(locator, this);
-            return new DavFile(locator, this);
+                return new DavEvent(locator, this, entityFactory);
+            return new DavFile(locator, this, entityFactory);
         }
 
         throw new NotFoundException();
@@ -170,14 +178,14 @@ public class StandardResourceFactory
 
         if (item instanceof HomeCollectionItem)
             return new DavHomeCollection((HomeCollectionItem) item, locator,
-                                         this);
+                                         this, entityFactory);
 
         if (item instanceof CollectionItem) {
             if (item.getStamp(CalendarCollectionStamp.class) != null)
                 return new DavCalendarCollection((CollectionItem) item,
-                                                 locator, this);
+                                                 locator, this,entityFactory);
             else
-                return new DavCollectionBase((CollectionItem) item, locator, this);
+                return new DavCollectionBase((CollectionItem) item, locator, this, entityFactory);
         }
 
         if (item instanceof NoteItem) {
@@ -186,19 +194,19 @@ public class StandardResourceFactory
             if(note.getModifies()!=null)
                 return null;
             else if (item.getStamp(EventStamp.class) != null)
-                return new DavEvent(note, locator, this);
+                return new DavEvent(note, locator, this, entityFactory);
             else if (item.getStamp(TaskStamp.class) != null)
-                return new DavTask(note, locator, this);
+                return new DavTask(note, locator, this, entityFactory);
             else 
-                return new DavJournal(note, locator, this);
+                return new DavJournal(note, locator, this, entityFactory);
         }
         
         if(item instanceof FreeBusyItem)
-            return new DavFreeBusy((FreeBusyItem) item, locator, this);
+            return new DavFreeBusy((FreeBusyItem) item, locator, this, entityFactory);
         if(item instanceof AvailabilityItem)
-            return new DavAvailability((AvailabilityItem) item, locator, this);
+            return new DavAvailability((AvailabilityItem) item, locator, this, entityFactory);
 
-        return new DavFile((FileItem) item, locator, this);
+        return new DavFile((FileItem) item, locator, this, entityFactory);
     }
 
     // our methods
@@ -232,6 +240,10 @@ public class StandardResourceFactory
 
     public ContentService getContentService() {
         return contentService;
+    }
+    
+    public CalendarQueryProcessor getCalendarQueryProcessor() {
+        return calendarQueryProcessor;
     }
 
     public UserService getUserService() {

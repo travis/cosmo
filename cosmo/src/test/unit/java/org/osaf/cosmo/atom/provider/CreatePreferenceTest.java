@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.provider.mock.MockPreferencesRequestContext;
 import org.osaf.cosmo.model.Preference;
+import org.osaf.cosmo.model.hibernate.HibPreference;
 
 /**
  * Test class for {@link PreferenceProvider#createEntry()} tests.
@@ -73,7 +74,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
     }
 
     public void testEntryNoValue() throws Exception {
-        Preference pref = new Preference("new key", null);
+        Preference pref = new HibPreference("new key", null);
         RequestContext req = createRequestContext(pref);
 
         ResponseContext res = provider.createEntry(req);
@@ -82,7 +83,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
     }
 
     public void testInvalidEntryNoKey() throws Exception {
-        Preference pref = new Preference(null, "new value");
+        Preference pref = new HibPreference(null, "new value");
         RequestContext req = createRequestContext(pref);
 
         ResponseContext res = provider.createEntry(req);

@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dav;
 
+import org.osaf.cosmo.calendar.query.CalendarQueryProcessor;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
@@ -68,6 +69,8 @@ public interface DavResourceFactory {
 
     public ContentService getContentService();
 
+    public CalendarQueryProcessor getCalendarQueryProcessor();
+    
     public UserService getUserService();
 
     public CosmoSecurityManager getSecurityManager();

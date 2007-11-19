@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,12 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validator.NotNull;
-
 /**
  * Represents a subscription to a shared collection.
  * A subscription belongs to a user and consists of 
  * a ticket key and a collection uid.
  */
-@Entity
-//Define a unique constraint on user and name
-//because we don't want two subscriptions with the same name
-//to be associated with the same user
-@Table(name="subscription", uniqueConstraints = {
-        @UniqueConstraint(columnNames={"ownerid", "displayname"})})
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class CollectionSubscription extends AuditableObject {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1376628118792909419L;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ownerid", nullable = false)
-    @NotNull
-    private User owner;
-    
-    @Column(name = "displayname", nullable = false, length = 255)
-    @NotNull
-    private String displayName;
-    
-    @Column(name = "ticketkey", nullable = false, length = 255)
-    @NotNull
-    private String ticketKey;
-    
-    @Column(name = "collectionuid", nullable = false, length = 255)
-    @NotNull
-    private String collectionUid;
-    
-    /**
-     */
-    public CollectionSubscription() {
-    }
+public interface CollectionSubscription extends AuditableObject{
 
     /**
      * Return the uid of the shared collection.  
@@ -75,33 +29,19 @@ public class CollectionSubscription extends AuditableObject {
      * shared and then the owner deletes the collection.
      * @return Collection uid
      */
-    public String getCollectionUid() {
-        return collectionUid;
-    }
+    public String getCollectionUid();
 
-    public void setCollectionUid(String collectionUid) {
-        this.collectionUid = collectionUid;
-    }
-    
-    public void setCollection(CollectionItem collection) {
-        this.collectionUid = collection.getUid();
-    }
+    public void setCollectionUid(String collectionUid);
 
-    public String getDisplayName() {
-        return displayName;
-    }
+    public void setCollection(CollectionItem collection);
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
+    public String getDisplayName();
 
-    public User getOwner() {
-        return owner;
-    }
+    public void setDisplayName(String displayName);
 
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
+    public User getOwner();
+
+    public void setOwner(User owner);
 
     /**
      * Return the ticket key used to subscribe to the shared collection.
@@ -110,26 +50,10 @@ public class CollectionSubscription extends AuditableObject {
      * created for a shared collection, and then removed by the owner.
      * @return
      */
-    public String getTicketKey() {
-        return ticketKey;
-    }
+    public String getTicketKey();
 
-    public void setTicketKey(String ticketKey) {
-        this.ticketKey = ticketKey;
-    }  
-    
-    public void setTicket(Ticket ticket) {
-        this.ticketKey = ticket.getKey();
-    }
+    public void setTicketKey(String ticketKey);
 
-    public String calculateEntityTag() {
-        // subscription is unique by name for its owner
-        String uid = (getOwner() != null && getOwner().getUid() != null) ?
-            getOwner().getUid() : "-";
-        String name = getDisplayName() != null ? getDisplayName() : "-";
-        String modTime = getModifiedDate() != null ?
-            new Long(getModifiedDate().getTime()).toString() : "-";
-        String etag = uid + ":" + name + ":" + modTime;
-        return encodeEntityTag(etag.getBytes());
-    }
+    public void setTicket(Ticket ticket);
+
 }

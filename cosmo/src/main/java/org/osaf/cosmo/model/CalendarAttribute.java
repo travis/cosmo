@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,73 +15,18 @@
  */
 package org.osaf.cosmo.model;
 
-import java.text.ParseException;
 import java.util.Calendar;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.hibernate.annotations.Columns;
-import org.hibernate.annotations.Type;
-import org.osaf.cosmo.util.DateUtil;
-
 /**
- * Represents an attribute with a java.util.Calendar value.
+ * Attribute that stores Calendar value.
  */
-@Entity
-@DiscriminatorValue("calendar")
-public class CalendarAttribute extends Attribute implements
-        java.io.Serializable {
-
-    @Columns(columns = { 
-            @Column(name = "datevalue"), @Column(name = "tzvalue", length=32) })
-    @Type(type="composite_calendar")
-    private Calendar value;
-
-    /** default constructor */
-    public CalendarAttribute() {
-    }
-
-    /**
-     * @param qname qualified name
-     * @param value initial value
-     */
-    public CalendarAttribute(QName qname, Calendar value) {
-        setQName(qname);
-        this.value = value;
-    }
-    
-    /**
-     * @param qname qualified name
-     * @param value String representation of Calendar
-     */
-    public CalendarAttribute(QName qname, String value) {
-        setQName(qname);
-        setValue(value);
-    }
+public interface CalendarAttribute extends Attribute{
 
     // Property accessors
-    public Calendar getValue() {
-        return this.value;
-    }
+    public Calendar getValue();
 
-    public void setValue(Calendar value) {
-        this.value = value;
-    }
-    
-    public void setValue(Object value) {
-        if (value != null && !(value instanceof Calendar)
-                && !(value instanceof String))
-            throw new ModelValidationException(
-                    "attempted to set non Calendar value on attribute");
-        
-        if(value instanceof Calendar)
-            setValue((Calendar) value);
-        else 
-            setValue((String) value);
-    }
-    
+    public void setValue(Calendar value);
+
     /**
      * Set Calendar value with a date string
      * that is in one of the following formats:
@@ -92,28 +37,6 @@ public class CalendarAttribute extends Attribute implements
      * 
      * @param date string
      */
-    public void setValue(String value) {
-        try {
-            this.value = DateUtil.parseRfc3339Calendar(value);
-        } catch (ParseException e) {
-            throw new ModelValidationException("invalid date format: " + value);
-        }
-    }
-    
-    public Attribute copy() {
-        CalendarAttribute attr = new CalendarAttribute();
-        attr.setQName(getQName().copy());
-        if(attr!=null)
-            attr.setValue(value.clone());
-        return attr;
-    }
-    
-    /**
-     * Return Calendar representation in RFC 3339 format.
-     */
-    public String toString() {
-        if(value==null)
-            return "null";
-        return DateUtil.formatRfc3339Calendar(value);
-    }
+    public void setValue(String value);
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,61 +15,20 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Index;
-import org.hibernate.validator.NotNull;
-
 /**
- * Represents a Cosmo Server Property
+ * Represents a Cosmo Server Property, which is a simple
+ * key value/pair.
  */
-@Entity
-@Table(name="server_properties")
-public class ServerProperty extends BaseModelObject implements
-        java.io.Serializable {
+public interface ServerProperty {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4099057363051156531L;
-    
-    @Column(name = "propertyname", unique=true, length=255)
-    @Index(name="idx_svrpropname")
-    @NotNull
-    private String name;
-    
-    @Column(name = "propertyvalue", length=2048)
-    private String value;
-  
-    
     public static final String PROP_SCHEMA_VERSION = "cosmo.schemaVersion";
     
-    // Constructors
+    public String getName();
 
-    /** default constructor */
-    public ServerProperty() {
-    }
-    
-    public ServerProperty(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
+    public void setName(String name);
 
-    public String getName() {
-        return name;
-    }
+    public String getValue();
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setValue(String value);
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
 }

@@ -27,7 +27,7 @@ import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link ModifiedByApplicator}.
@@ -129,7 +129,7 @@ public class ModifiedByApplicatorTest extends BaseApplicatorTestCase
                                      String lastModifiedBy,
                                      Integer action,
                                      Date modifiedDate) {
-        ContentItem contentItem = new NoteItem();
+        ContentItem contentItem = new MockNoteItem();
         contentItem.setUid(uuid);
         contentItem.setLastModifiedBy(lastModifiedBy);
         contentItem.setLastModification(action);

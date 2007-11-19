@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,111 +15,43 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-
 /**
- * Extends {@link Item} to represent a collection of items
+ * Item that represents a collection of items.
  */
-@Entity
-@DiscriminatorValue("collection")
-public class CollectionItem extends Item {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2873258323314048223L;
-    
-    // CollectionItem specific attributes
-    public static final QName ATTR_EXCLUDE_FREE_BUSY_ROLLUP =
-        new QName(CollectionItem.class, "excludeFreeBusyRollup");
-    
-    public static final QName ATTR_HUE =
-        new QName(CollectionItem.class, "hue");
-
-    @ManyToMany(mappedBy="parents",fetch=FetchType.LAZY)
-    private Set<Item> children = new HashSet<Item>(0);
-    
-    public CollectionItem() {
-    };
+public interface CollectionItem extends Item{
 
     /**
      * Return active children items (those with isActive=true).
      * @return active children items
      */
-    public Set<Item> getChildren() {
-        return children;
-    }
+    public Set<Item> getChildren();
 
-    private void setChildren(Set<Item> children) {
-        this.children = children;
-    }
-    
     /**
      * Return child item with matching uid
      * @return identified child item, or null if no child with that
      * uid exists
      */
-    public Item getChild(String uid) {
-        for (Item child : children) {
-            if (child.getUid().equals(uid))
-                return child;
-        }
-        return null;
-    }
+    public Item getChild(String uid);
 
-    public Item getChildByName(String name) {
-        for (Item child : children) {
-            if (child.getName().equals(name))
-                return child;
-        }
-        return null;
-    }
+    public Item getChildByName(String name);
 
-    public boolean isExcludeFreeBusyRollup() {
-        Boolean val =
-            (Boolean) getAttributeValue(ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
-        if (val != null)
-            return val.booleanValue();
-        return false;
-    }
+    public boolean isExcludeFreeBusyRollup();
 
-    public void setExcludeFreeBusyRollup(boolean flag) {
-        setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
-    }
-    
-    public Long getHue() {
-        return IntegerAttribute.getValue(this, ATTR_HUE);
-    }
-    
-    public void setHue(Long value) {
-        IntegerAttribute.setValue(this, ATTR_HUE, value);
-    }
-    
+    public void setExcludeFreeBusyRollup(boolean flag);
+
+    public Long getHue();
+
+    public void setHue(Long value);
+
     /**
      * Remove ItemTombstone with an itemUid equal to a given Item's uid
      * @param item
      * @return true if a tombstone was removed
      */
-    public boolean removeTombstone(Item item) {
-        for(Iterator<Tombstone> it = getTombstones().iterator();it.hasNext();) {
-            Tombstone ts = it.next();
-            if(ts instanceof ItemTombstone) {
-                if(((ItemTombstone) ts).getItemUid().equals(item.getUid())) {
-                    it.remove();
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
+    public boolean removeTombstone(Item item);
+
     /**
      * Generate alternative hash code for collection.
      * This hash code will return a different value if
@@ -127,13 +59,6 @@ public class CollectionItem extends Item {
      * has changed since the last hash code was generated.
      * @return
      */
-    public int generateHash() {
-        return getVersion();
-    }
-    
-    public Item copy() {
-        CollectionItem copy = new CollectionItem();
-        copyToItem(copy);
-        return copy;
-    }
+    public int generateHash();
+
 }

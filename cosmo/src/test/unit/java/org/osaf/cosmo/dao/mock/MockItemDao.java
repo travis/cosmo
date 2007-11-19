@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,8 @@ import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.filter.ItemFilterEvaluater;
+import org.osaf.cosmo.model.filter.ItemFilterPostProcessor;
 import org.osaf.cosmo.util.PathUtil;
 
 /**
@@ -264,7 +267,7 @@ public class MockItemDao implements ItemDao {
         storage.removeItemByPath(getItemPath(item));
         if (storage.getRootUid(item.getOwner().getUid()).
             equals(item.getUid())) {
-            storage.removeRootUid(item.getOwner().getId());
+            storage.removeRootUid(item.getOwner().getUid());
         }
     }
 
@@ -373,13 +376,31 @@ public class MockItemDao implements ItemDao {
     }
     
     public Set<Item> findItems(ItemFilter filter) {
-        // do nothing for now
-        return null;
+        ItemFilterEvaluater evaluater = new ItemFilterEvaluater();
+        ItemFilterPostProcessor postProcessor = new ItemFilterPostProcessor();
+        HashSet<Item> results = new HashSet<Item>();
+        for(Item i : storage.getAllItems())
+            if(evaluater.evaulate(i, filter))
+                results.add(i);
+        
+        return postProcessor.processResults(results, filter);
     }
     
     public Set<Item> findItems(ItemFilter[] filters) {
-        // do nothing for now
-        return null;
+        ItemFilterEvaluater evaluater = new ItemFilterEvaluater();
+        ItemFilterPostProcessor postProcessor = new ItemFilterPostProcessor();
+        HashSet<Item> allResults = new HashSet<Item>();
+        
+        for(ItemFilter f: filters) {
+            HashSet<Item> results = new HashSet<Item>();
+            for(Item i : storage.getAllItems())
+                if(evaluater.evaulate(i, f))
+                    results.add(i);
+            
+            allResults.addAll(postProcessor.processResults(results, f));
+        }
+        
+        return allResults;
     }
 
     public String generateUid() {

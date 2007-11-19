@@ -60,6 +60,7 @@ import org.osaf.cosmo.dav.property.ExcludeFreeBusyRollup;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.xml.DomWriter;
@@ -105,16 +106,18 @@ public class DavCollectionBase extends DavItemResourceBase
 
     public DavCollectionBase(CollectionItem collection,
                              DavResourceLocator locator,
-                             DavResourceFactory factory)
+                             DavResourceFactory factory,
+                             EntityFactory entityFactory)
         throws DavException {
-        super(collection, locator, factory);
+        super(collection, locator, factory, entityFactory);
         members = new ArrayList();
     }
 
     public DavCollectionBase(DavResourceLocator locator,
-                             DavResourceFactory factory)
+                             DavResourceFactory factory,
+                             EntityFactory entityFactory)
         throws DavException {
-        this(new CollectionItem(), locator, factory);
+        this(entityFactory.createCollection(), locator, factory, entityFactory);
     }
 
     // Jackrabbit DavResource
@@ -312,7 +315,7 @@ public class DavCollectionBase extends DavItemResourceBase
         ContentItem content = (ContentItem) member.getItem();
 
         try {
-            if (content.getId() != -1) {
+            if (content.getClientCreationDate() != null) {
                 if (log.isDebugEnabled())
                     log.debug("updating member " + member.getResourcePath());
 

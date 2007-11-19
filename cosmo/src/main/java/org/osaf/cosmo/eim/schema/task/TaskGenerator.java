@@ -25,6 +25,7 @@ import org.osaf.cosmo.eim.EimRecord;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseStampGenerator;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TaskStamp;
 
 /**
@@ -45,7 +46,7 @@ public class TaskGenerator extends BaseStampGenerator {
     /** */
     public TaskGenerator(Item item) {
         super(PREFIX_TASK, NS_TASK, item);
-        setStamp(TaskStamp.getStamp(item));
+        setStamp(StampUtils.getTaskStamp(item));
     }
 
     @Override

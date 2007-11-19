@@ -17,6 +17,7 @@ package org.osaf.cosmo.model.text;
 
 import java.text.ParseException;
 
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Preference;
 
 /**
@@ -24,7 +25,7 @@ import org.osaf.cosmo.model.Preference;
  */
 public interface PreferenceFormat {
 
-    public Preference parse(String source)
+    public Preference parse(String source, EntityFactory factory)
         throws ParseException;
 
     public String format(Preference sub);

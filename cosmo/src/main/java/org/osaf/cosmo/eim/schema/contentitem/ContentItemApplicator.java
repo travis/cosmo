@@ -27,6 +27,7 @@ import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.text.TriageStatusFormat;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.TriageStatus;
 
@@ -76,7 +77,7 @@ public class ContentItemApplicator extends BaseItemApplicator
                     EimFieldValidator.validateText(field, MAXLEN_TRIAGE);
                 try {
                     TriageStatus ts =
-                        TriageStatusFormat.getInstance().parse(value);
+                        TriageStatusFormat.getInstance(getItem().getFactory()).parse(value);
                     contentItem.setTriageStatus(ts);
                 } catch (ParseException e) {
                     throw new EimValidationException("Illegal triage status", e);

@@ -39,6 +39,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Applies EIM records to event stamps.
@@ -53,7 +54,7 @@ public class EventApplicator extends BaseStampApplicator
     /** */
     public EventApplicator(Item item) {
         super(PREFIX_EVENT, NS_EVENT, item);
-        setStamp(BaseEventStamp.getStamp(item));
+        setStamp(StampUtils.getBaseEventStamp(item));
     }
 
     /**
@@ -68,11 +69,13 @@ public class EventApplicator extends BaseStampApplicator
         
         // Create master event stamp, or event exception stamp
         if(note.getModifies()==null) {
-            eventStamp = new EventStamp(getItem());
+            eventStamp = getItem().getFactory().createEventStamp(note);
+            getItem().addStamp(eventStamp);
             eventStamp.createCalendar();
         }
         else {
-            eventStamp = new EventExceptionStamp(getItem());
+            eventStamp = getItem().getFactory().createEventExceptionStamp(note);
+            getItem().addStamp(eventStamp);
             eventStamp.createCalendar();
             
             ModificationUid modUid = new ModificationUid(note.getUid());

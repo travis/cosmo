@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
 
@@ -32,6 +31,9 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link DisplayAlarmGenerator}.
@@ -43,11 +45,11 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
 
     public void testGenerateRecord() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        EventStamp eventStamp = new EventStamp(noteItem);
+        EventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         eventStamp.creatDisplayAlarm();
@@ -88,7 +90,7 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateRecordNonEvent() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setReminderTime(new Date());
         noteItem.setUid("1");
@@ -124,7 +126,7 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateNoAlarmNonEvent() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
@@ -147,11 +149,11 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateNoAlarmEvent() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        EventStamp eventStamp = new EventStamp(noteItem);
+        EventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         noteItem.addStamp(eventStamp);
@@ -175,8 +177,8 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateMissingRecord() throws Exception {
         
-        NoteItem masterNote = new NoteItem();
-        EventStamp masterEvent = new EventStamp(masterNote);
+        NoteItem masterNote = new MockNoteItem();
+        EventStamp masterEvent = new MockEventStamp(masterNote);
         masterEvent.createCalendar();
         masterEvent.creatDisplayAlarm();
         masterEvent.setDisplayAlarmDescription("My alarm");
@@ -186,9 +188,9 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
         
         masterNote.addStamp(masterEvent);
         
-        NoteItem modNote = new NoteItem();
+        NoteItem modNote = new MockNoteItem();
         modNote.setUid("1");
-        EventExceptionStamp modEvent = new EventExceptionStamp(modNote);
+        EventExceptionStamp modEvent = new MockEventExceptionStamp(modNote);
         modEvent.createCalendar();
         modEvent.creatDisplayAlarm();
         modNote.setModifies(masterNote);

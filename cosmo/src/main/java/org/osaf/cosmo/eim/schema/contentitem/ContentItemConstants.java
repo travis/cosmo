@@ -18,7 +18,7 @@ package org.osaf.cosmo.eim.schema.contentitem;
 /**
  * Constants related to the content item schema.
  *
- * @see ContentItem
+ * @see MockContentItem
  */
 public interface ContentItemConstants {
     /** */

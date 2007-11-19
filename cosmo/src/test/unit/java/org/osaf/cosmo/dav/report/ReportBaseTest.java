@@ -28,6 +28,7 @@ import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.dav.report.mock.MockReport;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp;
 
 import org.w3c.dom.Document;
 
@@ -44,7 +45,7 @@ public class ReportBaseTest extends BaseDavTestCase
 
         CollectionItem coll1 = testHelper.
             makeAndStoreDummyCollection(testHelper.getHomeCollection());
-        coll1.addStamp(new CalendarCollectionStamp(coll1));
+        coll1.addStamp(new HibCalendarCollectionStamp(coll1));
         
         CollectionItem coll2 = testHelper.
             makeAndStoreDummyCollection(testHelper.getHomeCollection());

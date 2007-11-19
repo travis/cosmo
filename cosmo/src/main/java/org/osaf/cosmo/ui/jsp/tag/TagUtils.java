@@ -49,4 +49,22 @@ public abstract class TagUtils {
                                    " from web application context", e);
         }
     }
+    
+    /**
+     * Determines if an object is an instance of a given type.
+     * @param type fully qualified type name
+     * @param value object to test
+     * @return true if the value is an instance of the given type
+     */
+    public static boolean instanceOf(String type, Object value) {
+
+        try {
+            Class c = Class.forName(type, true, Thread.currentThread()
+                    .getContextClassLoader());
+            return c.isInstance(value);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

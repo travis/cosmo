@@ -15,83 +15,22 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validator.NotNull;
-
 /**
- * Represents a user preference.
+ * Represents a user preference, which is a key,value
+ * pair associated to a user.
  */
-@Entity
-@Table(name="user_preferences", uniqueConstraints = {
-    @UniqueConstraint(columnNames={"userid", "preferencename"})})
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Preference extends AuditableObject {
+public interface Preference extends AuditableObject{
 
-    private static final long serialVersionUID = 1376628118792909420L;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userid", nullable = false)
-    @NotNull
-    private User user;
-    
-    @Column(name = "preferencename", nullable = false, length = 255)
-    @NotNull
-    private String key;
-    
-    @Column(name = "preferencevalue", nullable = false, length = 255)
-    @NotNull
-    private String value;
-    
-    public Preference() {
-    }
+    public String getKey();
 
-    public Preference(String key,
-                      String value) {
-        this.key = key;
-        this.value = value;
-    }
+    public void setKey(String key);
 
-    public String getKey() {
-        return key;
-    }
+    public String getValue();
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+    public void setValue(String value);
 
-    public String getValue() {
-        return value;
-    }
+    public User getUser();
 
-    public void setValue(String value) {
-        this.value = value;
-    }
+    public void setUser(User user);
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-    
-    public String calculateEntityTag() {
-        // preference is unique by name for its user
-        String uid = (getUser() != null && getUser().getUid() != null) ?
-            getUser().getUid() : "-";
-        String key = getKey() != null ? getKey() : "-";
-        String modTime = getModifiedDate() != null ?
-            new Long(getModifiedDate().getTime()).toString() : "-";
-        String etag = uid + ":" + key + ":" + modTime;
-        return encodeEntityTag(etag.getBytes());
-    }
 }

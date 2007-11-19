@@ -69,7 +69,7 @@ public class ContentItemGenerator extends BaseItemGenerator
         }
 
         
-        String ts = TriageStatusFormat.getInstance().
+        String ts = TriageStatusFormat.getInstance(getItem().getFactory()).
             format(contentItem.getTriageStatus());
         
         // missing TriageStatus ends up as empty string instead of null

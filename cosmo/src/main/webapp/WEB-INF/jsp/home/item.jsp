@@ -40,7 +40,7 @@
   - <span class="md"><c:out value="${Path}"/></span>
 </div>
 
-<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem' || eventstamp!=null}">
+<c:if test="${cosmoui:instanceOf('org.osaf.cosmo.model.FileItem', Item) || eventstamp!=null}">
 <div style="margin-top:12px;">
 <c:choose>
 <c:when test="${eventstamp != null}">
@@ -155,7 +155,7 @@
         <fmt:formatDate value="${Item.modifiedDate}" type="both"/>
       </td>
     </tr>
-<c:if test="${Item.class.name != 'org.osaf.cosmo.model.FileItem'}">
+<c:if test="${!cosmoui:instanceOf('org.osaf.cosmo.model.NoteItem', Item)}">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         iCalendar UID:
@@ -176,7 +176,7 @@
   </table>
 </div>
 
-<c:if test="${Item.class.name == 'org.osaf.cosmo.model.FileItem'}">
+<c:if test="${cosmoui:instanceOf('org.osaf.cosmo.model.FileItem', Item)}">
 <div class="hd" style="margin-top: 12px;">
   Content Properties
 </div>
@@ -379,7 +379,7 @@
 </div>
 </c:if>
 
-<c:if test="${Item.class.name != 'org.osaf.cosmo.model.FileItem' && fn:length(Item.modifications) > 0}">
+<c:if test="${cosmoui:instanceOf('org.osaf.cosmo.model.NoteItem', Item) && fn:length(Item.modifications) > 0}">
 <div class="hd" style="margin-top: 12px;">
   Modifications
 </div>
@@ -439,8 +439,6 @@
 
 <c:out value="${eventstamp.calendar}"/>
 </pre>
-
-<jsp:include page="inc-indexes.jsp" />
 
 </c:if>
 

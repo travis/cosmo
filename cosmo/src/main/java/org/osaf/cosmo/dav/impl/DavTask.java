@@ -30,7 +30,9 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TaskStamp;
 
 /**
@@ -47,18 +49,20 @@ public class DavTask extends DavCalendarResource {
 
     /** */
     public DavTask(DavResourceLocator locator,
-                  DavResourceFactory factory)
+                  DavResourceFactory factory,
+                  EntityFactory entityFactory)
         throws DavException {
-        this(new NoteItem(), locator, factory);
-        getItem().addStamp(new TaskStamp());
+        this(entityFactory.createNote(), locator, factory, entityFactory);
+        getItem().addStamp(entityFactory.createTaskStamp());
     }
 
     /** */
     public DavTask(NoteItem item,
                    DavResourceLocator locator,
-                   DavResourceFactory factory)
+                   DavResourceFactory factory,
+                   EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
     
     // our methods
@@ -79,7 +83,7 @@ public class DavTask extends DavCalendarResource {
     }
     
     public TaskStamp getTaskStamp() {
-        return TaskStamp.getStamp(getItem());
+        return StampUtils.getTaskStamp(getItem());
     }
 
     /**

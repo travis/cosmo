@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +33,8 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockHomeCollectionItem;
+import org.osaf.cosmo.model.mock.MockItem;
 
 /**
  * Simple in-memory storage system for mock data access objects.
@@ -96,10 +99,14 @@ public class MockDaoStorage {
     }
 
     /** */
-    public void removeRootUid(Long userId) {
+    public void removeRootUid(String userId) {
         rootUids.remove(userId);
     }
 
+    public Collection<Item> getAllItems() {
+        return itemsByUid.values();
+    }
+    
     /** */
     public HomeCollectionItem getRootItem(String userId) {
         String rootUid = rootUids.get(userId);
@@ -111,7 +118,7 @@ public class MockDaoStorage {
 
     /** */
     public HomeCollectionItem createRootItem(User user) {
-        HomeCollectionItem rootCollection = new HomeCollectionItem();
+        HomeCollectionItem rootCollection = new MockHomeCollectionItem();
         rootCollection.setName(user.getUsername());
         rootCollection.setOwner(user);
         rootCollection.setUid(calculateUid());
@@ -136,7 +143,7 @@ public class MockDaoStorage {
             item.setName(item.getUid());
         item.setCreationDate(new Date());
         item.setModifiedDate(item.getCreationDate());
-        item.setEntityTag(item.calculateEntityTag());
+        item.setEntityTag(getMockItem(item).calculateEntityTag());
 
         if(item.getParent()!=null) {
             for (Item sibling : item.getParent().getChildren()) {
@@ -257,5 +264,9 @@ public class MockDaoStorage {
 
     private String calculateTicketKey() {
         return idGenerator.nextStringIdentifier();
+    }
+    
+    private MockItem getMockItem(Item item) {
+        return (MockItem) item;
     }
 }

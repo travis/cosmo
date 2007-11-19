@@ -42,6 +42,8 @@ import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteItemTriageStatusComparator;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.NoteOccurrenceUtil;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EventStampFilter;
@@ -60,6 +62,7 @@ public class StandardTriageStatusQueryProcessor implements
         TriageStatusQueryProcessor {
 
     private ContentDao contentDao = null;
+    
     private static final Log log = LogFactory.getLog(StandardTriageStatusQueryProcessor.class);
     private static final Comparator<NoteItem> COMPARE_ASC = new NoteItemTriageStatusComparator(false);
     private static final Comparator<NoteItem> COMPARE_DESC = new NoteItemTriageStatusComparator(true);
@@ -160,7 +163,7 @@ public class StandardTriageStatusQueryProcessor implements
         };
         for(Item item : contentDao.findItems(filters)) {
             NoteItem note = (NoteItem) item;
-            EventStamp eventStamp = EventStamp.getStamp(note);
+            EventStamp eventStamp = StampUtils.getEventStamp(note);
             
             // Don't add recurring events
             if(eventStamp==null || eventStamp.isRecurring()==false) {
@@ -220,7 +223,7 @@ public class StandardTriageStatusQueryProcessor implements
     private Set<NoteItem>
         getNowFromRecurringNote(NoteItem note,
                                 TriageStatusQueryContext context) {
-        EventStamp eventStamp = EventStamp.getStamp(note);
+        EventStamp eventStamp = StampUtils.getEventStamp(note);
         DateTime currentDate = new DateTime(context.getPointInTime()); 
         RecurrenceExpander expander = new RecurrenceExpander();
         HashSet<NoteItem> results = new HashSet<NoteItem>();
@@ -234,7 +237,7 @@ public class StandardTriageStatusQueryProcessor implements
             // Not interested in modifications
             if(!instance.isOverridden()) {
                 // add occurrence
-                results.add(new NoteOccurrence(instance.getRid(), note));
+                results.add(NoteOccurrenceUtil.createNoteOccurrence(instance.getRid(), note));
             } else {
                 // return modification if it has no triage-status
                 ModificationUid modUid = new ModificationUid(note, instance.getRid());
@@ -270,7 +273,7 @@ public class StandardTriageStatusQueryProcessor implements
         // Add all items that are have an explicit LATER triage
         for(Item item : contentDao.findItems(laterFilter)) {
             NoteItem note = (NoteItem) item;
-            EventStamp eventStamp = EventStamp.getStamp(note);
+            EventStamp eventStamp = StampUtils.getEventStamp(note);
 
             // Don't add recurring events
             if(eventStamp==null || eventStamp.isRecurring()==false) {
@@ -334,7 +337,7 @@ public class StandardTriageStatusQueryProcessor implements
     private NoteItem
         getLaterFromRecurringNote(NoteItem note,
                                   TriageStatusQueryContext context) {
-        EventStamp eventStamp = EventStamp.getStamp(note);
+        EventStamp eventStamp = StampUtils.getEventStamp(note);
         Date currentDate = context.getPointInTime();
         Date futureDate = laterDur.getTime(currentDate);
 
@@ -379,7 +382,7 @@ public class StandardTriageStatusQueryProcessor implements
         // Add all items that are have an explicit DONE triage
         for(Item item : contentDao.findItems(doneFilter)) {
             NoteItem note = (NoteItem) item;
-            EventStamp eventStamp = EventStamp.getStamp(note);
+            EventStamp eventStamp = StampUtils.getEventStamp(note);
             
             // Don't add recurring events
             if(eventStamp==null || eventStamp.isRecurring()==false) {
@@ -445,7 +448,7 @@ public class StandardTriageStatusQueryProcessor implements
     private NoteItem
         getDoneFromRecurringNote(NoteItem note,
                                  TriageStatusQueryContext context) {
-        EventStamp eventStamp = EventStamp.getStamp(note);
+        EventStamp eventStamp = StampUtils.getEventStamp(note);
         Date currentDate = context.getPointInTime();
         Date pastDate = doneDur.getTime(currentDate);
        
@@ -485,7 +488,7 @@ public class StandardTriageStatusQueryProcessor implements
                     if(status==null || status.getCode().equals(TriageStatus.CODE_DONE))
                         return mod;
                 } else {
-                    return new NoteOccurrence(instance.getRid(), note);
+                    return NoteOccurrenceUtil.createNoteOccurrence(instance.getRid(), note);
                 }
             }
                 
@@ -520,7 +523,7 @@ public class StandardTriageStatusQueryProcessor implements
                     if(status==null || status.getCode().equals(TriageStatus.CODE_LATER))
                         return mod;
                 } else {
-                    return new NoteOccurrence(instance.getRid(), note);
+                    return NoteOccurrenceUtil.createNoteOccurrence(instance.getRid(), note);
                 }
             }   
         }

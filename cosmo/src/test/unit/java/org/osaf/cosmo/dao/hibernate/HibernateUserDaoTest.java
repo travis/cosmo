@@ -25,8 +25,10 @@ import junit.framework.Assert;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
-import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibPasswordRecovery;
+import org.osaf.cosmo.model.hibernate.HibPreference;
+import org.osaf.cosmo.model.hibernate.HibUser;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
 
@@ -40,7 +42,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testCreateUser() {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -50,7 +52,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
 
         user1 = userDao.createUser(user1);
 
-        User user2 = new User();
+        User user2 = new HibUser();
         user2.setUsername("user2");
         user2.setFirstName("User2");
         user2.setLastName("2");
@@ -85,7 +87,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         // try to create duplicate
-        User user3 = new User();
+        User user3 = new HibUser();
         user3.setUsername("user2");
         user3.setFirstName("User");
         user3.setLastName("1");
@@ -111,7 +113,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testUserProperties() {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -129,8 +131,8 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertNotNull(queryUser1.getUid());
         verifyUser(user1, queryUser1);
         
-        queryUser1.addPreference(new Preference("prop1", "value1"));
-        queryUser1.addPreference(new Preference("prop2", "value2"));
+        queryUser1.addPreference(new HibPreference("prop1", "value1"));
+        queryUser1.addPreference(new HibPreference("prop2", "value2"));
 
         userDao.updateUser(queryUser1);
         
@@ -161,7 +163,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testCreateDuplicateUserEmail() {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("uSeR1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -172,7 +174,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         user1 = userDao.createUser(user1);
         clearSession();
 
-        User user2 = new User();
+        User user2 = new HibUser();
         user2.setUsername("UsEr1");
         user2.setFirstName("User2");
         user2.setLastName("2");
@@ -192,7 +194,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
         user2 = userDao.createUser(user2);
         clearSession();
         
-        User user3 = new User();
+        User user3 = new HibUser();
         user3.setUsername("user3");
         user3.setFirstName("User2");
         user3.setLastName("2");
@@ -214,7 +216,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testUpdateUser() throws Exception {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -240,7 +242,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testUpdateUserDuplicate() throws Exception {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -250,7 +252,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
 
         user1 = userDao.createUser(user1);
         
-        User user2 = new User();
+        User user2 = new HibUser();
         user2.setUsername("user2");
         user2.setFirstName("User2");
         user2.setLastName("2");
@@ -329,7 +331,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
 
     public void testDeleteUser() throws Exception {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -351,7 +353,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
 
     public void testDeleteUserByUsername() throws Exception {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -374,7 +376,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testCreatePasswordRecovery() throws Exception {
-        User user1 = new User();
+        User user1 = new HibUser();
         user1.setUsername("user1");
         user1.setFirstName("User");
         user1.setLastName("1");
@@ -384,7 +386,7 @@ public class HibernateUserDaoTest extends AbstractHibernateDaoTestCase {
 
         user1 = userDao.createUser(user1);
         
-        PasswordRecovery passwordRecovery = new PasswordRecovery(user1, "1");
+        PasswordRecovery passwordRecovery = new HibPasswordRecovery(user1, "1");
         
         userDao.createPasswordRecovery(passwordRecovery);
         

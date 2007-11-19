@@ -28,6 +28,7 @@ import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.AvailabilityItem;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * Extends <code>DavCalendarResource</code> to adapt the Cosmo
@@ -42,17 +43,19 @@ public class DavAvailability extends DavCalendarResource {
     
     /** */
     public DavAvailability(DavResourceLocator locator,
-                      DavResourceFactory factory)
+                      DavResourceFactory factory,
+                      EntityFactory entityFactory)
         throws DavException {
-        this(new AvailabilityItem(), locator, factory);
+        this(entityFactory.createAvailability(), locator, factory, entityFactory);
     }
 
     /** */
     public DavAvailability(AvailabilityItem item,
                       DavResourceLocator locator,
-                      DavResourceFactory factory)
+                      DavResourceFactory factory,
+                      EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
 
     // our methods

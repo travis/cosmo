@@ -23,6 +23,7 @@ import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.ItemTranslator;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
@@ -38,6 +39,12 @@ import org.osaf.cosmo.model.NoteItem;
 public abstract class BaseEimProcessor extends BaseContentProcessor {
     private static final Log log = LogFactory.getLog(BaseEimProcessor.class);
 
+    private EntityFactory entityFactory = null;
+    
+    public BaseEimProcessor(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+    
     // ContentProcessor methods
 
     /**
@@ -108,7 +115,7 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
     private NoteItem createChild(CollectionItem collection,
                                  EimRecordSet recordset)
         throws ValidationException {
-        NoteItem child = new NoteItem();
+        NoteItem child = entityFactory.createNote();
 
         child.setUid(recordset.getUuid());
         child.setIcalUid(child.getUid());

@@ -17,12 +17,11 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.mock.MockSubscriptionRequestContext;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.mock.MockCollectionSubscription;
 
 /**
  * Test class for {@link SubscriptionProvider#updateEntry()} tests.
@@ -32,9 +31,9 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         LogFactory.getLog(UpdateSubscriptionTest.class);
 
     public void testUpdateEntry() throws Exception {
-        CollectionSubscription sub = helper.makeAndStoreDummySubscription();
+        MockCollectionSubscription sub = (MockCollectionSubscription) helper.makeAndStoreDummySubscription();
         String oldName = sub.getDisplayName();
-        CollectionSubscription newsub = newSubscription();
+        MockCollectionSubscription newsub = (MockCollectionSubscription) newSubscription();
         RequestContext req = createRequestContext(sub, newsub);
 
         ResponseContext res = provider.updateEntry(req);
@@ -87,7 +86,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
     public void testNoTicketKey() throws Exception {
         CollectionSubscription sub =
             helper.makeDummySubscription(helper.getUser());
-        CollectionSubscription newsub = new CollectionSubscription();
+        CollectionSubscription newsub = new MockCollectionSubscription();
         newsub.setCollectionUid("deadbeef");
         RequestContext req = createRequestContext(sub, newsub);
 
@@ -99,7 +98,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
     public void testNoCollectionUid() throws Exception {
         CollectionSubscription sub =
             helper.makeDummySubscription(helper.getUser());
-        CollectionSubscription newsub = new CollectionSubscription();
+        CollectionSubscription newsub = new MockCollectionSubscription();
         newsub.setTicketKey("deadbeef");
         RequestContext req = createRequestContext(sub, newsub);
 
@@ -109,7 +108,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
     }
 
     private CollectionSubscription newSubscription() {
-        CollectionSubscription sub = new CollectionSubscription();
+        CollectionSubscription sub = new MockCollectionSubscription();
         sub.setDisplayName("new display name");
         sub.setCollectionUid("new uid");
         sub.setTicketKey("new key");

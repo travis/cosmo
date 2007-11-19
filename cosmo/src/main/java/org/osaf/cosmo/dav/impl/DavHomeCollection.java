@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.HomeCollectionItem;
 
 /**
@@ -37,9 +38,10 @@ public class DavHomeCollection extends DavCollectionBase {
     /** */
     public DavHomeCollection(HomeCollectionItem collection,
                              DavResourceLocator locator,
-                             DavResourceFactory factory)
+                             DavResourceFactory factory,
+                             EntityFactory entityFactory)
         throws DavException {
-        super(collection, locator, factory);
+        super(collection, locator, factory, entityFactory);
     }
 
     // DavResource

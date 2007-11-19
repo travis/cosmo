@@ -16,7 +16,6 @@
 package org.osaf.cosmo.eim.schema.event;
 
 import junit.framework.Assert;
-
 import net.fortuna.ical4j.model.Date;
 
 import org.apache.commons.logging.Log;
@@ -30,7 +29,11 @@ import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.QName;
+import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
+import org.osaf.cosmo.model.mock.MockQName;
 
 /**
  * Test Case for {@link EventApplicator}.
@@ -41,7 +44,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         LogFactory.getLog(EventApplicatorTest.class);
 
     public void testApplyField() throws Exception {
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
        
         EimRecord record = makeTestRecord();
 
@@ -49,7 +52,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
             new EventApplicator(noteItem);
         applicator.applyRecord(record);
 
-        EventStamp eventStamp = EventStamp.getStamp(noteItem);
+        EventStamp eventStamp = StampUtils.getEventStamp(noteItem);
         
         Assert.assertEquals(eventStamp.getLocation(), "here");
         Assert.assertEquals(eventStamp.getStartDate(), EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T074500").getDate());
@@ -65,7 +68,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyFieldNegativeDur() throws Exception {
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
        
         EimRecord record = makeTestRecordWithNegativeDur();
 
@@ -79,8 +82,8 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyFieldWithUnknown() throws Exception {
-        NoteItem noteItem = new NoteItem();
-        EventStamp es = new EventStamp(noteItem);
+        NoteItem noteItem = new MockNoteItem();
+        EventStamp es = new MockEventStamp(noteItem);
         noteItem.addStamp(es);
         es.createCalendar();
         es.setStartDate(new Date("01011979"));
@@ -95,7 +98,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
 
         // verify unkown field got stored
         Assert.assertEquals(1, noteItem.getAttributes().size());
-        Attribute attribute = noteItem.getAttribute(new QName(NS_EVENT, "unknown"));
+        Attribute attribute = noteItem.getAttribute(new MockQName(NS_EVENT, "unknown"));
         Assert.assertNotNull(attribute);
         Assert.assertEquals("NA", attribute.getValue());
         
@@ -104,8 +107,8 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyMissingField() throws Exception {
-        NoteItem masterNote = new NoteItem();
-        EventStamp masterEvent = new EventStamp(masterNote);
+        NoteItem masterNote = new MockNoteItem();
+        EventStamp masterEvent = new MockEventStamp(masterNote);
         masterEvent.createCalendar();
         masterEvent.setLocation("here");
         masterEvent.setStatus("CONFIRMED");
@@ -114,8 +117,8 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
         
         masterNote.addStamp(masterEvent);
         
-        NoteItem modNote = new NoteItem();
-        EventExceptionStamp modEvent = new EventExceptionStamp(modNote);
+        NoteItem modNote = new MockNoteItem();
+        EventExceptionStamp modEvent = new MockEventExceptionStamp(modNote);
         modEvent.createCalendar();
         modEvent.setRecurrenceId(EimValueConverter.toICalDate(";VALUE=DATE-TIME:20070212T074500").getDate());
         modEvent.setLocation("blah");
@@ -144,7 +147,7 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyFieldNoDtStart() throws Exception {
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
        
         EimRecord record = makeTestBogusRecord();
         EventApplicator applicator = new EventApplicator(noteItem);

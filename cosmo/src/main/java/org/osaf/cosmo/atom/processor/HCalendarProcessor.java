@@ -24,12 +24,12 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.CalendarComponent;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.hcalendar.HCalendarParser;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * An {@link ICalendarProcessor} that reads calendar components from
@@ -40,6 +40,11 @@ public class HCalendarProcessor extends BaseICalendarProcessor {
     private static final Log log = LogFactory.getLog(HCalendarProcessor.class);
 
     // BaseICalendarProcessor methods
+    
+    
+    public HCalendarProcessor(EntityFactory entityFactory) {
+        super(entityFactory);
+    }
 
     /**
      * Converts the content body into a {@link VEvent}. The provided

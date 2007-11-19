@@ -25,13 +25,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.processor.BaseContentProcessor;
+import org.osaf.cosmo.atom.processor.ContentProcessor;
 import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * A mock implementation of {@link ContentProcessor}.
@@ -65,7 +67,7 @@ public class MockContentProcessor extends BaseContentProcessor {
         if (factory.isFailureMode())
             throw new ProcessorException("Failure mode");
 
-        NoteItem item = new NoteItem();
+        NoteItem item = new MockNoteItem();
         item.setOwner(collection.getOwner());
         setItemProperties(content, item);
 
@@ -120,7 +122,7 @@ public class MockContentProcessor extends BaseContentProcessor {
             item.setDisplayName(name);
         }
 
-        EventStamp es = EventStamp.getStamp(item);
+        EventStamp es = StampUtils.getEventStamp(item);
         if (es != null) {
             String startDate = props.getProperty("startDate");
             if (startDate != null)

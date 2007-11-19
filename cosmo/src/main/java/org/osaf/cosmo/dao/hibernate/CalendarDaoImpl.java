@@ -26,14 +26,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.CalendarFilterEvaluater;
 import org.osaf.cosmo.dao.CalendarDao;
 import org.osaf.cosmo.dao.hibernate.query.CalendarFilterConverter;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
-import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
@@ -50,10 +51,11 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
     private ItemFilterProcessor itemFilterProcessor = null;
   
    
+   
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.CalendarDao#findCalendarItems(org.osaf.cosmo.model.CollectionItem, org.osaf.cosmo.calendar.query.CalendarFilter)
      */
-    public Set<ContentItem> findCalendarItems(CollectionItem collection,
+    public Set<ICalendarItem> findCalendarItems(CollectionItem collection,
                                              CalendarFilter filter) {
 
         try {
@@ -62,13 +64,13 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                 // translate CalendarFilter to ItemFilter and execute filter
                 ItemFilter itemFilter = filterConverter.translateToItemFilter(collection, filter);
                 Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
-                return (Set<ContentItem>) results;
+                return (Set<ICalendarItem>) results;
             } catch (IllegalArgumentException e) {
             }
             
             // Use brute-force method if CalendarFilter can't be translated
             // to an ItemFilter (slower but at least gets the job done).
-            HashSet<ContentItem> results = new HashSet<ContentItem>();
+            HashSet<ICalendarItem> results = new HashSet<ICalendarItem>();
             Set<Item> itemsToProcess = null;
             
             // Optimization:
@@ -86,11 +88,11 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             // Evaluate filter against all calendar items
             for (Item child : itemsToProcess) {
                 
-                // only care about content items
-                if (child instanceof ContentItem) {
+                // only care about calendar items
+                if (child instanceof ICalendarItem) {
                     
-                    ContentItem content = (ContentItem) child;
-                    Calendar calendar = ICalendarOutputter.getCalendar(content);
+                    ICalendarItem content = (ICalendarItem) child;
+                    Calendar calendar = EntityConverter.convertContent(content);
                         
                     if(calendar!=null) {
                         if (evaluater.evaluate(calendar, filter) == true)

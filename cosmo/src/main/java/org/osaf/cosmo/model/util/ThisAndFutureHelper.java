@@ -27,7 +27,6 @@ import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 
-import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
 import org.osaf.cosmo.calendar.util.Dates;
 import org.osaf.cosmo.model.EventExceptionStamp;
@@ -35,7 +34,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
-import org.osaf.cosmo.util.DateUtil;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Helper class to handle breaking a recurring series to
@@ -48,8 +47,6 @@ import org.osaf.cosmo.util.DateUtil;
  * break has to be removed and added to the new series.
  */
 public class ThisAndFutureHelper {
-    
-    private static final long TIME_OFFSET = 1000;
     
     /**
      * Given an existing recurring series and new series, break the
@@ -70,7 +67,7 @@ public class ThisAndFutureHelper {
         if(occurrence instanceof NoteOccurrence)
             lastRid = ((NoteOccurrence) occurrence).getOccurrenceDate();
         else {
-            EventExceptionStamp ees = EventExceptionStamp.getStamp(occurrence);
+            EventExceptionStamp ees = StampUtils.getEventExceptionStamp(occurrence);
             lastRid = ees.getRecurrenceId();
         }
         
@@ -100,7 +97,7 @@ public class ThisAndFutureHelper {
         modifyOldSeries(oldSeries, lastRecurrenceId);
         
         // get list of modifications that need to be moved
-        List<NoteItem> modsToMove = getModifiationsToMove(oldSeries, newSeries, lastRecurrenceId);
+        List<NoteItem> modsToMove = getModificationsToMove(oldSeries, newSeries, lastRecurrenceId);
         
         // move modifications by creating copy
         for(NoteItem modToMove: modsToMove) {
@@ -111,7 +108,7 @@ public class ThisAndFutureHelper {
             copy.setIcalUid(null);
             
             EventExceptionStamp ees =
-                EventExceptionStamp.getStamp(copy);
+                StampUtils.getEventExceptionStamp(copy);
            
             ees.setIcalUid(newSeries.getIcalUid());
             
@@ -137,7 +134,7 @@ public class ThisAndFutureHelper {
     }
     
     private void modifyOldSeries(NoteItem oldSeries, Date lastRecurrenceId) {
-        EventStamp event = EventStamp.getStamp(oldSeries);
+        EventStamp event = StampUtils.getEventStamp(oldSeries);
       
         // We set the end date to 1 second before the begining of the next day
         java.util.Calendar untilDateCalendar = java.util.Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -155,10 +152,10 @@ public class ThisAndFutureHelper {
         // TODO: Figure out what to do with RDATEs
     }
     
-    private List<NoteItem> getModifiationsToMove(NoteItem oldSeries, NoteItem newSeries, Date lastRecurrenceId) {
+    private List<NoteItem> getModificationsToMove(NoteItem oldSeries, NoteItem newSeries, Date lastRecurrenceId) {
         ArrayList<NoteItem> mods = new ArrayList<NoteItem>();
         RecurrenceExpander expander = new RecurrenceExpander();
-        EventStamp newEvent = EventStamp.getStamp(newSeries);
+        EventStamp newEvent = StampUtils.getEventStamp(newSeries);
         Calendar newEventCal = newEvent.getEventCalendar();
         
         Date newStartDate = newEvent.getStartDate();
@@ -170,7 +167,7 @@ public class ThisAndFutureHelper {
         // Find all modifications with a recurrenceId that is in the set of
         // recurrenceIds for the new series
         for(NoteItem mod: oldSeries.getModifications()) {
-            EventExceptionStamp event = EventExceptionStamp.getStamp(mod);
+            EventExceptionStamp event = StampUtils.getEventExceptionStamp(mod);
             Date recurrenceId = event.getRecurrenceId();
             Date dtStart = event.getStartDate();
             

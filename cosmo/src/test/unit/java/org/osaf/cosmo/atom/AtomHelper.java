@@ -20,16 +20,12 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import org.apache.abdera.Abdera;
-import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.Provider;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
+import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.MockHelper;
-import org.osaf.cosmo.atom.generator.ContentFactory;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.mock.MockGeneratorFactory;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
@@ -39,11 +35,9 @@ import org.osaf.cosmo.atom.provider.mock.BaseMockRequestContext;
 import org.osaf.cosmo.atom.provider.mock.MockProvider;
 import org.osaf.cosmo.atom.provider.mock.MockProviderManager;
 import org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager;
-import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
-
+import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
@@ -59,6 +53,7 @@ public class AtomHelper extends MockHelper {
     private MockGeneratorFactory generatorFactory;
     private MockProcessorFactory processorFactory;
     private StandardServiceContext serviceContext;
+    private EntityFactory entityFactory;
 
     public AtomHelper() {
         super();
@@ -67,6 +62,7 @@ public class AtomHelper extends MockHelper {
 
         generatorFactory = new MockGeneratorFactory(abdera);
         processorFactory = new MockProcessorFactory();
+        entityFactory = new MockEntityFactory();
 
         serviceContext = new StandardServiceContext();
         serviceContext.setAbdera(abdera);
@@ -79,6 +75,10 @@ public class AtomHelper extends MockHelper {
 
     public Abdera getAbdera() {
         return abdera;
+    }
+
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
     }
 
     public GeneratorFactory getGeneratorFactory() {

@@ -17,20 +17,13 @@ package org.osaf.cosmo.cmp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-
-import org.osaf.cosmo.cmp.CmpConstants;
-import org.osaf.cosmo.cmp.CmpServlet;
-import org.osaf.cosmo.cmp.UserResource;
-import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
-
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.User;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

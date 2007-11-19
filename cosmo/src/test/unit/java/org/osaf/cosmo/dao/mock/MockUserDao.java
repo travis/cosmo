@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibUser;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
 import org.osaf.cosmo.util.ArrayPagedList;
@@ -62,7 +63,7 @@ public class MockUserDao implements UserDao {
         passwordRecoveryIdx = new HashMap<String, PasswordRecovery>();
 
         // add overlord user
-        User overlord = new User();
+        User overlord = new HibUser();
         overlord.setUsername(User.USERNAME_OVERLORD);
         overlord.setFirstName("Cosmo");
         overlord.setLastName("Administrator");

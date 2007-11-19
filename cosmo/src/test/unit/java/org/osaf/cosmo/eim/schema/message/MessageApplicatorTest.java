@@ -27,6 +27,9 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.model.mock.MockMessageStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link MessageApplicator}.
@@ -37,8 +40,8 @@ public class MessageApplicatorTest extends BaseApplicatorTestCase
         LogFactory.getLog(MessageApplicatorTest.class);
 
     public void testApplyField() throws Exception {
-        NoteItem noteItem = new NoteItem();
-        MessageStamp messageStamp = new MessageStamp(noteItem);
+        NoteItem noteItem = new MockNoteItem();
+        MessageStamp messageStamp = new MockMessageStamp(noteItem);
         noteItem.addStamp(messageStamp);
 
         EimRecord record = makeTestRecord();
@@ -59,9 +62,9 @@ public class MessageApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyMissingFields() throws Exception {
-        NoteItem masterNote = new NoteItem();
-        NoteItem modItem = new NoteItem();
-        MessageStamp messageStamp = new MessageStamp(masterNote);
+        NoteItem masterNote = new MockNoteItem();
+        NoteItem modItem = new MockNoteItem();
+        MessageStamp messageStamp = new MockMessageStamp(masterNote);
         messageStamp.setMessageId("test");
         messageStamp.setHeaders("test");
         messageStamp.setFrom("test");
@@ -81,7 +84,7 @@ public class MessageApplicatorTest extends BaseApplicatorTestCase
             new MessageApplicator(modItem);
         applicator.applyRecord(record);
 
-        MessageStamp modStamp = MessageStamp.getStamp(modItem);
+        MessageStamp modStamp = StampUtils.getMessageStamp(modItem);
         
         Assert.assertNull(modStamp.getMessageId());
         Assert.assertNull(modStamp.getHeaders());

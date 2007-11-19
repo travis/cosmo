@@ -26,6 +26,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -96,7 +97,7 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
         for (NoteItem modification : item.getModifications())
             entry.addLink(newModificationLink(modification));
 
-        EventStamp stamp = EventStamp.getStamp(item);
+        EventStamp stamp = StampUtils.getEventStamp(item);
         if (stamp != null && stamp.isRecurring())
             entry.addLink(newExpandedLink(item));
 

@@ -32,7 +32,7 @@ public class DavCalendarResourceTest extends BaseDavTestCase {
         LogFactory.getLog(DavCalendarResourceTest.class);
 
     public void testCaldavReportTypes() throws Exception {
-        MockCalendarResource test = new MockCalendarResource(null, null);
+        MockCalendarResource test = new MockCalendarResource(null, null, testHelper.getEntityFactory());
 
         assert(test.getReportTypes().contains(FreeBusyReport.REPORT_TYPE_CALDAV_FREEBUSY));
         assert(test.getReportTypes().contains(MultigetReport.REPORT_TYPE_CALDAV_MULTIGET));

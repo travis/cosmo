@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,90 +15,14 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 /**
- * Represents attribute with an integer value.
+ * Attribute that stores an Integer value.
  */
-@Entity
-@DiscriminatorValue("integer")
-public class IntegerAttribute extends Attribute implements java.io.Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -7110319771835652090L;
-
-    @Column(name = "intvalue")
-    private Long value;
-
-    /** default constructor */
-    public IntegerAttribute() {
-    }
-
-    public IntegerAttribute(QName qname, Long value) {
-        setQName(qname);
-        this.value = value;
-    }
+public interface IntegerAttribute extends Attribute{
 
     // Property accessors
-    public Long getValue() {
-        return this.value;
-    }
+    public Long getValue();
 
-    public Attribute copy() {
-        IntegerAttribute attr = new IntegerAttribute();
-        attr.setQName(getQName().copy());
-        attr.setValue(new Long(value));
-        return attr;
-    }
-
-    public void setValue(Long value) {
-        this.value = value;
-    }
-
-    public void setValue(Object value) {
-        if (value != null && !(value instanceof Long))
-            throw new ModelValidationException(
-                    "attempted to set non Long value on attribute");
-        setValue((Long) value);
-    }
-    
-    /**
-     * Convienence method for returning a Long value on a IntegerAttribute
-     * with a given QName stored on the given item.
-     * @param item item to fetch IntegerAttribute from
-     * @param qname QName of attribute
-     * @return Long value of IntegerAttribute
-     */
-    public static Long getValue(Item item, QName qname) {
-        IntegerAttribute ia = (IntegerAttribute) item.getAttribute(qname);
-        if(ia==null)
-            return null;
-        else
-            return ia.getValue();
-    }
-    
-    /**
-     * Convienence method for setting a Long value on a IntegerAttribute
-     * with a given QName stored on the given item.
-     * @param item item to fetch IntegerAttribute from
-     * @param qname QName of attribute
-     * @param value value to set on IntegerAttribute
-     */
-    public static void setValue(Item item, QName qname, Long value) {
-        IntegerAttribute attr = (IntegerAttribute) item.getAttribute(qname);
-        if(attr==null && value!=null) {
-            attr = new IntegerAttribute(qname,value);
-            item.addAttribute(attr);
-            return;
-        }
-        if(value==null)
-            item.removeAttribute(qname);
-        else
-            attr.setValue(value);
-    }
+    public void setValue(Long value);
 
 }

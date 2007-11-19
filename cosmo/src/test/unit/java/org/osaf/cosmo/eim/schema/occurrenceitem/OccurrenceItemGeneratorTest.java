@@ -27,6 +27,8 @@ import org.osaf.cosmo.eim.schema.BaseGeneratorTestCase;
 import org.osaf.cosmo.eim.schema.occurenceitem.OccurrenceItemGenerator;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.NoteOccurrenceUtil;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link OccurrenceItemGenerator}.
@@ -37,9 +39,9 @@ public class OccurrenceItemGeneratorTest extends BaseGeneratorTestCase {
 
     public void testGenerateRecord() throws Exception {
        
-        NoteItem master = new NoteItem();
+        NoteItem master = new MockNoteItem();
         master.setUid("uid");
-        NoteOccurrence occurrenceItem = new NoteOccurrence(new Date("20070101"), master);
+        NoteOccurrence occurrenceItem = NoteOccurrenceUtil.createNoteOccurrence(new Date("20070101"), master);
         
         OccurrenceItemGenerator generator = new OccurrenceItemGenerator(occurrenceItem);
 

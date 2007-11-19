@@ -33,6 +33,7 @@ import org.apache.jackrabbit.webdav.xml.ElementIterator;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibUser;
 import org.osaf.cosmo.util.DateUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -362,7 +363,7 @@ public class CmpGetTest extends BaseCmpServletTestCase {
         return null;
     }
 
-    public class CmpUser extends User {
+    public class CmpUser extends HibUser {
         private String url;
         private String homedirUrl;
 

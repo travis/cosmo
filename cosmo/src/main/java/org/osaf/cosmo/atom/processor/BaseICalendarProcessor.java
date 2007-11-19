@@ -26,10 +26,13 @@ import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 
 /**
  * A base class for implementations of {@link ContentProcessor} that
@@ -41,6 +44,12 @@ import org.osaf.cosmo.model.TriageStatus;
 public abstract class BaseICalendarProcessor extends BaseContentProcessor {
     private static final Log log = LogFactory.getLog(BaseICalendarProcessor.class);
 
+    private EntityFactory entityFactory;
+    
+    public BaseICalendarProcessor(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
+    
     // ContentProcessor methods
 
     /**
@@ -94,7 +103,7 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
     protected abstract CalendarComponent readCalendarComponent(Reader content) throws ValidationException, ProcessorException;
 
     private NoteItem createChild(CollectionItem collection) {
-        NoteItem item = new NoteItem();
+        NoteItem item = entityFactory.createNote();
 
         // let the storage layer assign a uid to the item
 
@@ -104,7 +113,7 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
 
         item.setClientCreationDate(java.util.Calendar.getInstance().getTime());
         item.setClientModifiedDate(item.getClientCreationDate());
-        item.setTriageStatus(TriageStatus.createInitialized());
+        item.setTriageStatus(TriageStatusUtil.initialize(entityFactory.createTriageStatus()));
         item.setLastModifiedBy(item.getOwner().getUsername());
         item.setLastModification(ContentItem.Action.CREATED);
         item.setSent(Boolean.FALSE);
@@ -156,12 +165,16 @@ public abstract class BaseICalendarProcessor extends BaseContentProcessor {
                 item.getTriageStatus().setCode(TriageStatus.CODE_LATER);
         }
 
-        EventStamp es = EventStamp.getStamp(item);
+        EventStamp es = StampUtils.getEventStamp(item);
         if (es == null) {
-            es = new EventStamp();
+            es = entityFactory.createEventStamp(item);
             item.addStamp(es);
         }
 
-        es.setCalendar(ICalendarUtils.createBaseCalendar(event));
+        es.setEventCalendar(ICalendarUtils.createBaseCalendar(event));
+    }
+
+    protected EntityFactory getEntityFactory() {
+        return entityFactory;
     }
 }

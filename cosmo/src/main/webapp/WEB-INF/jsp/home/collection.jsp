@@ -144,7 +144,7 @@
       </td>
     </tr>
     <c:forEach var="item" items="${Collection.children}">
-      <c:choose><c:when test="${item.class.name=='org.osaf.cosmo.model.NoteItem' &&  !empty item.modifies}"></c:when>
+      <c:choose><c:when test="${cosmoui:instanceOf('org.osaf.cosmo.model.NoteItem', item) &&  !empty item.modifies}"></c:when>
       <c:otherwise>
       
     <tr>
@@ -156,16 +156,16 @@
         <c:out value="${item.displayName}"/>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.stampMap['calendar'] != null}">Calendar</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.CollectionItem'}">Folder</c:when><c:when test="${item.stampMap['event'] != null}">Event</c:when><c:when test="${item.class.name == 'org.osaf.cosmo.model.FileItem'}">File</c:when><c:otherwise>Item</c:otherwise></c:choose>
+        <c:choose><c:when test="${item.parent == null}">Home</c:when><c:when test="${item.stampMap['calendar'] != null}">Calendar</c:when><c:when test="${cosmoui:instanceOf('org.osaf.cosmo.model.CollectionItem', item)}">Folder</c:when><c:when test="${item.stampMap['event'] != null}">Event</c:when><c:when test="${cosmoui:instanceOf('org.osaf.cosmo.model.FileItem', item)}">File</c:when><c:otherwise>Item</c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">         
         <fmt:formatDate value="${item.creationDate}" type="both"/>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.NoteItem'}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${cosmoui:instanceOf('org.osaf.cosmo.model.NoteItem', item)}"><fmt:formatDate value="${item.modifiedDate}" type="both"/></c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">
-        <c:choose><c:when test="${item.class.name == 'org.osaf.cosmo.model.FileItem'}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
+        <c:choose><c:when test="${cosmoui:instanceOf('org.osaf.cosmo.model.FileItem', item)}"><fmt:formatNumber value="${item.contentLength}"/> b</c:when><c:otherwise><span class="disabled">-</span></c:otherwise></c:choose>
       </td>
     </tr>
       </c:otherwise></c:choose>

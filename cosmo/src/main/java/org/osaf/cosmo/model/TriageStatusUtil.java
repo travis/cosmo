@@ -1,0 +1,53 @@
+/*
+ * Copyright 2007 Open Source Applications Foundation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.osaf.cosmo.model;
+
+import java.math.BigDecimal;
+
+/**
+ * Contains static helper methods for dealing with TriageStatus
+ * objects.
+ */
+public class TriageStatusUtil {
+    public static String label(Integer code) {
+        if (code.equals(TriageStatus.CODE_NOW))
+            return TriageStatus.LABEL_NOW;
+        if (code.equals(TriageStatus.CODE_LATER))
+            return TriageStatus.LABEL_LATER;
+        if (code.equals(TriageStatus.CODE_DONE))
+            return TriageStatus.LABEL_DONE;
+        throw new IllegalStateException("Unknown code " + code);
+    }
+
+    public static Integer code(String label) {
+        if (label.equals(TriageStatus.LABEL_NOW))
+            return new Integer(TriageStatus.CODE_NOW);
+        if (label.equals(TriageStatus.LABEL_LATER))
+            return new Integer(TriageStatus.CODE_LATER);
+        if (label.equals(TriageStatus.LABEL_DONE))
+            return new Integer(TriageStatus.CODE_DONE);
+        throw new IllegalStateException("Unknown label " + label);
+    }
+    
+    public static TriageStatus initialize(TriageStatus ts) {
+        ts.setCode(new Integer(TriageStatus.CODE_NOW));
+        // XXX there's gotta be a better way!
+        String time = (System.currentTimeMillis() / 1000) + ".00";
+        ts.setRank(new BigDecimal(time).negate());
+        ts.setAutoTriage(Boolean.TRUE);
+        return ts;
+    }
+}

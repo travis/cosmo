@@ -25,6 +25,10 @@ import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibCollectionItem;
+import org.osaf.cosmo.model.hibernate.HibCollectionSubscription;
+import org.osaf.cosmo.model.hibernate.HibItem;
+import org.osaf.cosmo.model.hibernate.HibTicket;
 
 public class HibernateUserDaoSubscriptionTest
     extends AbstractHibernateDaoTestCase {
@@ -44,7 +48,7 @@ public class HibernateUserDaoSubscriptionTest
         CollectionItem collection = getCollection(root, "subcoll1");
         Ticket ticket = generateTicket(collection, user);
 
-        CollectionSubscription sub1 = new CollectionSubscription();
+        CollectionSubscription sub1 = new HibCollectionSubscription();
         sub1.setDisplayName("sub1");
         sub1.setCollection(collection);
         sub1.setTicket(ticket);
@@ -61,8 +65,8 @@ public class HibernateUserDaoSubscriptionTest
         CollectionSubscription querySub = user
                 .getSubscription("sub1");
         assertNotNull("sub1 not found", querySub);
-        assertEquals("sub1 not same subscriber", user.getId(), querySub
-                .getOwner().getId());
+        assertEquals("sub1 not same subscriber", user.getUid(), querySub
+                .getOwner().getUid());
         assertEquals("sub1 not same collection", collection.getUid(), querySub
                 .getCollectionUid());
         assertEquals("sub1 not same ticket", ticket.getKey(), querySub
@@ -106,7 +110,7 @@ public class HibernateUserDaoSubscriptionTest
             if (child.getName().equals(name))
                 return (CollectionItem) child;
         }
-        CollectionItem collection = new CollectionItem();
+        CollectionItem collection = new HibCollectionItem();
         collection.setName(name);
         collection.setDisplayName(name);
         collection.setOwner(parent.getOwner());
@@ -115,10 +119,11 @@ public class HibernateUserDaoSubscriptionTest
 
     private Ticket generateTicket(Item item,
                                   User owner) {
-        Ticket ticket = new Ticket();
+        Ticket ticket = new HibTicket();
         ticket.setOwner(owner);
         ticket.setTimeout(Ticket.TIMEOUT_INFINITE);
         contentDao.createTicket(item, ticket);
         return ticket;
     }
+    
 }

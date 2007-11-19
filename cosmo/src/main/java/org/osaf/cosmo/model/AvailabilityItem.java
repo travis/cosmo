@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,26 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
 import net.fortuna.ical4j.model.Calendar;
 
 import org.osaf.cosmo.hibernate.validator.Availability;
 
 /**
- * Extends {@link ICalendarItem} to represent a VAVAILABILITY item.
+ * Extends ICalendarItem to represent a VAVAILABILITY object.
  */
-@Entity
-@DiscriminatorValue("availability")
-public class AvailabilityItem extends ICalendarItem {
+public interface AvailabilityItem extends ICalendarItem {
 
-  
-    public AvailabilityItem() {
-    }
-
-    @Override
-    public Item copy() {
-        AvailabilityItem copy = new AvailabilityItem();
-        copyToItem(copy);
-        return copy;
-    }
-    
     /**
      * Return the Calendar object containing a VAVAILABILITY component.
      * @return calendar
      */
     @Availability
-    public Calendar getAvailabilityCalendar() {
-        return getCalendar();
-    }
-    
+    public Calendar getAvailabilityCalendar();
+
     /**
      * Set the Calendar object containing a VAVAILABILITY component.
      * @param calendar
      */
-    public void setAvailabilityCalendar(Calendar calendar) {
-        setCalendar(calendar);
-    }
-    
+    public void setAvailabilityCalendar(Calendar calendar);
+
 }

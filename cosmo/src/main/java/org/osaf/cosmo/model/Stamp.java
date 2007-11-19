@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,114 +15,37 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.Date;
-
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.Index;
-
 /**
- * Represents an abstract Stamp on an Item. A Stamp is a set of related
+ * Represents a Stamp on an Item. A Stamp is a set of related
  * properties and apis that is associated to an item.
  */
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "stamptype", 
-                     discriminatorType = DiscriminatorType.STRING, length = 16)
-// Unique constraint for stamptype and itemid to prevent items
-// having more than one of the same stamp
-@Table(name = "stamp", uniqueConstraints = { 
-        @UniqueConstraint(columnNames = { "itemid", "stamptype" }) })
-// Define index on discriminator
-@org.hibernate.annotations.Table(appliesTo = "stamp", 
-        indexes = { @Index(name = "idx_stamptype", columnNames = { "stamptype" }) })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public abstract class Stamp extends AuditableObject implements
-        java.io.Serializable {
-
-    // Fields
-    @ManyToOne(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SELECT)
-    @JoinColumn(name = "itemid", nullable = false)
-    private Item item;
-    
-    // Constructors
-    /** default constructor */
-    public Stamp() {
-    }
+public interface Stamp extends AuditableObject {
 
     /**
      * @return Item attribute belongs to
      */
-    public Item getItem() {
-        return item;
-    }
+    public Item getItem();
 
     /**
      * @param item
      *            attribute belongs to
      */
-    public void setItem(Item item) {
-        this.item = item;
-    }
+    public void setItem(Item item);
 
-    
-    /**
-     * Convenience method for retrieving an attribute on the underlying
-     * item.
-     * @param qname QName of attribute
-     * @return attribute value
-     */
-    protected Attribute getAttribute(QName qname) {
-        return getItem().getAttribute(qname);
-    }
-    
-    /**
-     * Convenience method for adding an attribute to the underlying item
-     * @param attribute attribute to add
-     */
-    protected void addAttribute(Attribute attribute) {
-        getItem().addAttribute(attribute);
-    }
-    
-    /**
-     * Convenience method for removing an attribute to the underlying item
-     * @param qname QName of attribute to remove
-     */
-    protected void removeAttribute(QName qname) {
-        getItem().removeAttribute(qname);
-    }
-    
     /**
      * @return Stamp type
      */
-    public abstract String getType();
+    public String getType();
 
-   
     /**
      * Return a new instance of Stamp containing a copy of the Stamp
      * @return copy of Stamp
      */
-    public abstract Stamp copy();
-    
-    
+    public Stamp copy();
+
     /**
      * Update stamp's timestamp
      */
-    public void updateTimestamp() {
-        setModifiedDate(new Date());
-    }
+    public void updateTimestamp();
+
 }

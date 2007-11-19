@@ -24,16 +24,14 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.xml.Namespace;
-
+import org.osaf.cosmo.calendar.query.CalendarQueryProcessor;
 import org.osaf.cosmo.dav.ConflictException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavException;
@@ -65,12 +63,11 @@ import org.osaf.cosmo.dav.property.Uuid;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
 import org.osaf.cosmo.model.Attribute;
-import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.DuplicateItemNameException;
-import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.QName;
@@ -110,6 +107,7 @@ public abstract class DavItemResourceBase extends DavResourceBase
     private Item item;
     private DavCollection parent;
     private DavAcl acl;
+    private EntityFactory entityFactory;
 
     static {
         registerLiveProperty(DavPropertyName.CREATIONDATE);
@@ -126,10 +124,12 @@ public abstract class DavItemResourceBase extends DavResourceBase
 
     public DavItemResourceBase(Item item,
                                DavResourceLocator locator,
-                               DavResourceFactory factory)
+                               DavResourceFactory factory,
+                               EntityFactory entityFactory)
         throws DavException {
         super(locator, factory);
         this.item = item;
+        this.entityFactory = entityFactory;
         this.acl = makeAcl();
     }
 
@@ -235,7 +235,8 @@ public abstract class DavItemResourceBase extends DavResourceBase
             }
             if (parent == null)
                 parent = new DavCollectionBase(parentLocator,
-                                               getResourceFactory());
+                                               getResourceFactory(),
+                                               entityFactory);
         }
 
         return parent;
@@ -301,11 +302,19 @@ public abstract class DavItemResourceBase extends DavResourceBase
         return getSecurityManager().getSecurityContext().
             findVisibleTickets(item);
     }
+    
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
 
     // our methods
 
     protected ContentService getContentService() {
         return getResourceFactory().getContentService();
+    }
+    
+    protected CalendarQueryProcessor getCalendarQueryProcesor() {
+        return getResourceFactory().getCalendarQueryProcessor();
     }
 
     /**
@@ -637,7 +646,7 @@ public abstract class DavItemResourceBase extends DavResourceBase
     private QName propNameToQName(DavPropertyName name) {
         String uri = name.getNamespace() != null ?
             name.getNamespace().getURI() : "";
-        return new QName(uri, name.getName());
+        return entityFactory.createQName(uri, name.getName());
     }
 
     private DavPropertyName qNameToPropName(QName qname) {

@@ -31,6 +31,9 @@ import org.osaf.cosmo.eim.schema.text.TriageStatusFormat;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.mock.MockEntityFactory;
+import org.osaf.cosmo.model.mock.MockNoteItem;
+import org.osaf.cosmo.model.mock.MockTriageStatus;
 
 /**
  * Test Case for {@link ContentItemApplicator}.
@@ -41,7 +44,7 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
         LogFactory.getLog(ContentItemApplicatorTest.class);
 
     public void testApplyField() throws Exception {
-        ContentItem contentItem = new NoteItem();
+        ContentItem contentItem = new MockNoteItem();
 
         EimRecord record = makeTestRecord();
 
@@ -52,7 +55,7 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
         checkTextValue(record.getFields().get(0),
                        contentItem.getDisplayName());
         checkTextValue(record.getFields().get(1),
-                       TriageStatusFormat.getInstance().
+                       TriageStatusFormat.getInstance(new MockEntityFactory()).
                        format(contentItem.getTriageStatus()));
         checkBooleanValue(record.getFields().get(2), contentItem.getSent());
         checkBooleanValue(record.getFields().get(3),
@@ -63,8 +66,8 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyMissingField() throws Exception {
-        NoteItem modification = new NoteItem();
-        NoteItem parent = new NoteItem();
+        NoteItem modification = new MockNoteItem();
+        NoteItem parent = new MockNoteItem();
         parent.setDisplayName("test");
         modification.setModifies(parent);
 
@@ -82,12 +85,12 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
 
         record.addField(new TextField(FIELD_TITLE, "The Bangs"));
 
-        TriageStatus ts = new TriageStatus();
+        TriageStatus ts = new MockTriageStatus();
         ts.setCode(TriageStatus.CODE_DONE);
         ts.setRank(new BigDecimal("-12345.67"));
         ts.setAutoTriage(Boolean.TRUE);
         record.addField(new TextField(FIELD_TRIAGE,
-                                      TriageStatusFormat.getInstance().
+                                      TriageStatusFormat.getInstance(new MockEntityFactory()).
                                       format(ts)));
 
         record.addField(new IntegerField(FIELD_HAS_BEEN_SENT, new Integer(1)));
@@ -105,12 +108,12 @@ public class ContentItemApplicatorTest extends BaseApplicatorTestCase
 
         addMissingTextField(FIELD_TITLE, record);
 
-        TriageStatus ts = new TriageStatus();
+        TriageStatus ts = new MockTriageStatus();
         ts.setCode(TriageStatus.CODE_DONE);
         ts.setRank(new BigDecimal("-76543.21"));
         ts.setAutoTriage(Boolean.TRUE);
         record.addField(new TextField(FIELD_TRIAGE,
-                                      TriageStatusFormat.getInstance().
+                                      TriageStatusFormat.getInstance(new MockEntityFactory()).
                                       format(ts)));
 
         record.addField(new IntegerField(FIELD_HAS_BEEN_SENT, new Integer(0)));

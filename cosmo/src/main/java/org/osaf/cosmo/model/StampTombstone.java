@@ -15,53 +15,21 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 /**
  * When an Stamp is removed from an item, a tombstone is attached
- * to the item to track when this removal ocurred.
+ * to the item to track when this removal ocurred.  A stamp tombstone
+ * contains the stamp type to indicate which stamp was removed.
  */
-@Entity
-@DiscriminatorValue("stamp")
-public class StampTombstone extends Tombstone {
-    
-    @Column(name="stamptype", length=255)
-    private String stampType = null;
+public interface StampTombstone extends Tombstone {
 
-    public StampTombstone() {
-    }
-    
-    public StampTombstone(Item item, Stamp stamp) {
-        super(item);
-        stampType = stamp.getType();
-    }
-    
-    public String getStampType() {
-        return this.stampType;
-    }
+    /**
+     * @return type of stamp that was removed from item
+     */
+    public String getStampType();
 
-    public void setStampType(String stampType) {
-        this.stampType = stampType;
-    }
+    /**
+     * @param stampType type of stamp that was removed from item
+     */
+    public void setStampType(String stampType);
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof StampTombstone))
-            return false;
-        return new EqualsBuilder().appendSuper(super.equals(obj)).append(
-                stampType, ((StampTombstone) obj).getStampType()).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(15, 25).appendSuper(super.hashCode())
-                .append(stampType.hashCode()).toHashCode();
-    }
-    
-    
 }

@@ -32,6 +32,9 @@ import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.model.hibernate.HibEventExceptionStamp;
+import org.osaf.cosmo.model.hibernate.HibEventStamp;
 
 /**
  * Test class for {@link ItemProvider#updateEntry()} tests.
@@ -142,7 +145,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
     private NoteItem makeAndStoreRecurringEvent(String start)
         throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
-        EventStamp stamp = new EventStamp();
+        EventStamp stamp = new HibEventStamp();
         item.addStamp(stamp);
         stamp.createCalendar();
 
@@ -160,7 +163,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         master.addModification(item);
         item.setModifies(master);
 
-        EventExceptionStamp stamp = new EventExceptionStamp();
+        EventExceptionStamp stamp = new HibEventExceptionStamp();
         item.addStamp(stamp);
         stamp.createCalendar();
 
@@ -176,7 +179,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         NoteItem copy = (NoteItem) master.copy();
         copy.setUid(master.getUid());
 
-        EventStamp stamp = EventStamp.getStamp(copy);
+        EventStamp stamp = StampUtils.getEventStamp(copy);
         stamp.setStartDate(new DateTime(start));
 
         return copy;

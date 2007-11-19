@@ -18,8 +18,8 @@ package org.osaf.cosmo;
 import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.calendar.query.CalendarQueryProcessor;
+import org.osaf.cosmo.calendar.query.impl.StandardCalendarQueryProcessor;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
@@ -27,12 +27,13 @@ import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.HomeCollectionItem;
-import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
 import org.osaf.cosmo.security.mock.MockTicketPrincipal;
@@ -41,7 +42,6 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.service.impl.StandardContentService;
-import org.osaf.cosmo.service.impl.StandardFreeBusyQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
@@ -51,10 +51,12 @@ import org.osaf.cosmo.service.lock.SingleVMLockManager;
 public class MockHelper extends TestHelper {
     private static final Log log = LogFactory.getLog(MockHelper.class);
 
+    private MockEntityFactory entityFactory;
     private MockSecurityManager securityManager;
     private ServiceLocatorFactory serviceLocatorFactory;
     private StandardContentService contentService;
     private StandardUserService userService;
+    private StandardCalendarQueryProcessor calendarQueryProcessor;
     private User user;
     private HomeCollectionItem homeCollection;
 
@@ -79,15 +81,19 @@ public class MockHelper extends TestHelper {
         MockUserDao userDao = new MockUserDao();
         SingleVMLockManager lockManager = new SingleVMLockManager();
         
+        entityFactory = new MockEntityFactory();
+        
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
         contentService.setContentDao(contentDao);
         contentService.setLockManager(lockManager);
         contentService.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
-        contentService.setFreeBusyQueryProcessor(new StandardFreeBusyQueryProcessor());
-        
+       
         contentService.init();
 
+        calendarQueryProcessor = new StandardCalendarQueryProcessor();
+        calendarQueryProcessor.setCalendarDao(calendarDao);
+        
         userService = new StandardUserService();
         userService.setContentDao(contentDao);
         userService.setUserDao(userDao);
@@ -128,6 +134,14 @@ public class MockHelper extends TestHelper {
 
     public ContentService getContentService() {
         return contentService;
+    }
+    
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+    
+    public CalendarQueryProcessor getCalendarQueryProcessor() {
+        return calendarQueryProcessor;
     }
 
     public UserService getUserService() {

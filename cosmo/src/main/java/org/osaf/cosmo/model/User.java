@@ -1,12 +1,12 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
- *
+ * Copyright 2007 Open Source Applications Foundation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,77 +15,18 @@
  */
 package org.osaf.cosmo.model;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Index;
-import org.hibernate.validator.Email;
-import org.hibernate.validator.Length;
-import org.hibernate.validator.NotNull;
 
 /**
+ * Represents a user in the cosmo server.
  */
-@Entity
-@Table(name="users")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class User extends AuditableObject {
+public interface User extends AuditableObject{
 
-    /**
-     */
-    private static final long serialVersionUID = -5401963358519490736L;
     /**
      */
     public static final String USERNAME_OVERLORD = "root";
-    /**
-     */
-    public static final int USERNAME_LEN_MIN = 3;
-    /**
-     */
-    public static final int USERNAME_LEN_MAX = 32;
-    /**
-     */
-    public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$");
-    /**
-     */
-    public static final int PASSWORD_LEN_MIN = 5;
-    /**
-     */
-    public static final int PASSWORD_LEN_MAX = 16;
-    /**
-     */
-    public static final int FIRSTNAME_LEN_MIN = 1;
-    /**
-     */
-    public static final int FIRSTNAME_LEN_MAX = 128;
-    /**
-     */
-    public static final int LASTNAME_LEN_MIN = 1;
-    /**
-     */
-    public static final int LASTNAME_LEN_MAX = 128;
-    /**
-     */
-    public static final int EMAIL_LEN_MIN = 1;
-    /**
-     */
-    public static final int EMAIL_LEN_MAX = 128;
-
+    
     // Sort Strings
-
     /**
      * A String indicating the results should be sorted by Last Name then First Name
      */
@@ -119,13 +60,12 @@ public class User extends AuditableObject {
      */
     public static final String LOCKED_SORT_STRING = "Locked";
     
-    
 
     /**
      * The Default Sort Type
      */
     public static final String DEFAULT_SORT_STRING = NAME_SORT_STRING;
-
+    
     public static final String NAME_URL_STRING = "name";
     public static final String USERNAME_URL_STRING = "username";
     public static final String ADMIN_URL_STRING = "admin";
@@ -134,472 +74,14 @@ public class User extends AuditableObject {
     public static final String LAST_MODIFIED_URL_STRING = "modified";
     public static final String ACTIVATED_URL_STRING = "activated";
     public static final String LOCKED_URL_STRING = "locked";
-
-    @Column(name = "uid", nullable=false, unique=true, length=255)
-    @NotNull
-    @Length(min=1, max=255)
-    @Index(name="idx_useruid")
-    private String uid;
-    
-    @Column(name = "username", nullable=false, unique=true)
-    @Index(name="idx_username")
-    @NotNull
-    @Length(min=USERNAME_LEN_MIN, max=USERNAME_LEN_MAX)
-    @org.hibernate.validator.Pattern(regex="^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$")
-    private String username;
-    
-    private transient String oldUsername;
-    
-    @Column(name = "password")
-    @NotNull
-    private String password;
-    
-    @Column(name = "firstname")
-    @Length(min=FIRSTNAME_LEN_MIN, max=FIRSTNAME_LEN_MAX)
-    private String firstName;
-    
-    @Column(name = "lastname")
-    @Length(min=LASTNAME_LEN_MIN, max=LASTNAME_LEN_MAX)
-    private String lastName;
-    
-    @Column(name = "email", nullable=false, unique=true)
-    @Index(name="idx_useremail")
-    @NotNull
-    @Length(min=EMAIL_LEN_MIN, max=EMAIL_LEN_MAX)
-    @Email
-    private String email;
-    
-    private transient String oldEmail;
-    
-    @Column(name = "activationid", nullable=true, length=255)
-    @Length(min=1, max=255)
-    @Index(name="idx_activationid")
-    private String activationId;
-    
-    @Column(name = "admin")
-    private Boolean admin;
-    
-    private transient Boolean oldAdmin;
-    
-    @Column(name = "locked")
-    private Boolean locked;
-    
-    @OneToMany(mappedBy = "user", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN })
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<Preference> preferences = new HashSet<Preference>(0);
-    
-    @OneToMany(mappedBy = "owner", fetch=FetchType.LAZY)
-    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<CollectionSubscription> subscriptions = 
-        new HashSet<CollectionSubscription>(0);
-
-    /**
-     */
-    public User() {
-        admin = Boolean.FALSE;
-        locked = Boolean.FALSE;
-    }
-
-    /**
-     */
-    public String getUid() {
-        return uid;
-    }
-
-    /**
-     * @param uid
-     */
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    /**
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     */
-    public void setUsername(String username) {
-        oldUsername = this.username;
-        this.username = username;
-    }
-
-    /**
-     */
-    public String getOldUsername() {
-        return oldUsername != null ? oldUsername : username;
-    }
-
-    /**
-     */
-    public boolean isUsernameChanged() {
-        return oldUsername != null && ! oldUsername.equals(username);
-    }
-
-    /**
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     */
-    public String getFirstName() {
-        return firstName;
-    }
-
-    /**
-     */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    /**
-     */
-    public String getLastName() {
-        return lastName;
-    }
-
-    /**
-     */
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    /**
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     */
-    public void setEmail(String email) {
-        oldEmail = this.email;
-        this.email = email;
-    }
-
-    /**
-     */
-    public String getOldEmail() {
-        return oldEmail;
-    }
-
-    /**
-     */
-    public boolean isEmailChanged() {
-        return oldEmail != null && ! oldEmail.equals(email);
-    }
-
-    /**
-     */
-    public Boolean getAdmin() {
-        return admin;
-    }
-    
-    public Boolean getOldAdmin() {
-        return oldAdmin;
-    }
-
-    /**
-     */
-    public boolean isAdminChanged() {
-        return oldAdmin != null && ! oldAdmin.equals(admin);
-    }
-
-    /**
-     */
-    public void setAdmin(Boolean admin) {
-        oldAdmin = this.admin;
-        this.admin = admin;
-    }
-
-    /**
-     */
-    public String getActivationId() {
-        return activationId;
-    }
-
-    /**
-     */
-    public void setActivationId(String activationId) {
-        this.activationId = activationId;
-    }
-
-    /**
-     */
-    public boolean isOverlord() {
-        return username != null && username.equals(USERNAME_OVERLORD);
-    }
-
-    /**
-     */
-    public boolean isActivated() {
-        return this.activationId == null;
-    }
-
-    /**
-     *
-     *
-     */
-    public void activate(){
-       this.activationId = null;
-    }
-
-    public Boolean isLocked() {
-        return locked;
-    }
-    
-    public void setLocked(Boolean locked) {
-        this.locked = locked;
-    }
-
-    /**
-     * Username determines equality 
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || username == null)
-            return false;
-        if (! (obj instanceof User))
-            return false;
-        
-        return username.equals(((User) obj).getUsername());
-    }
-
-    @Override
-        public int hashCode() {
-        if (username == null)
-            return super.hashCode();
-        else
-            return username.hashCode();
-    }
-
-    /**
-     */
-    public String toString() {
-        return new ToStringBuilder(this).
-            append("username", username).
-            append("password", "xxxxxx").
-            append("firstName", firstName).
-            append("lastName", lastName).
-            append("email", email).
-            append("admin", admin).
-            append("activationId", activationId).
-            append("locked", locked).
-            toString();
-    }
-
-    /**
-     */
-    public void validate() {
-        validateUsername();
-        validateFirstName();
-        validateLastName();
-        validateEmail();
-    }
-
-    /**
-     */
-    public void validateUsername() {
-        if (username == null) {
-            throw new ModelValidationException("Username not specified");
-        }
-        if (username.length() < USERNAME_LEN_MIN ||
-            username.length() > USERNAME_LEN_MAX) {
-            throw new ModelValidationException("Username must be " +
-                                               USERNAME_LEN_MIN + " to " +
-                                               USERNAME_LEN_MAX +
-                                               " characters in length");
-        }
-        Matcher m = USERNAME_PATTERN.matcher(username);
-        if (! m.matches()) {
-            throw new ModelValidationException("Username contains illegal " +
-                                               "characters");
-        }
-    }
-
-    /**
-     */
-    public void validateRawPassword() {
-        if (password == null) {
-            throw new ModelValidationException("Password not specified");
-        }
-        if (password.length() < PASSWORD_LEN_MIN ||
-            password.length() > PASSWORD_LEN_MAX) {
-            throw new ModelValidationException("Password must be " +
-                                               PASSWORD_LEN_MIN + " to " +
-                                               PASSWORD_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
-    /**
-     */
-    public void validateFirstName() {
-        if (firstName == null) {
-            throw new ModelValidationException("First name is null");
-        }
-        if (firstName.length() < FIRSTNAME_LEN_MIN ||
-            firstName.length() > FIRSTNAME_LEN_MAX) {
-            throw new ModelValidationException("First name must be " +
-                                               FIRSTNAME_LEN_MIN + " to " +
-                                               FIRSTNAME_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
-    /**
-     */
-    public void validateLastName() {
-        if (lastName == null) {
-            throw new ModelValidationException("Last name is null");
-        }
-        if (lastName.length() < LASTNAME_LEN_MIN ||
-            lastName.length() > LASTNAME_LEN_MAX) {
-            throw new ModelValidationException("Last name must be " +
-                                               LASTNAME_LEN_MIN + " to " +
-                                               LASTNAME_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
-    /**
-     */
-    public void validateEmail() {
-        if (email == null) {
-            throw new ModelValidationException("Email is null");
-        }
-        if (email.length() < EMAIL_LEN_MIN ||
-            email.length() > EMAIL_LEN_MAX) {
-            throw new ModelValidationException("Email must be " +
-                                               EMAIL_LEN_MIN + " to " +
-                                               EMAIL_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
-    public Set<Preference> getPreferences() {
-        return preferences;
-    }
-
-    public void addPreference(Preference preference) {
-        preference.setUser(this);
-        preferences.add(preference);
-    }
-
-    public Preference getPreference(String key) {
-        for (Preference pref : preferences) {
-            if (pref.getKey().equals(key))
-                return pref;
-        }
-        return null;
-    }
-
-    public void removePreference(String key) {
-        removePreference(getPreference(key));
-    }
-
-    public void removePreference(Preference preference) {
-        if (preference != null)
-            preferences.remove(preference);
-    }
-    
-    public Set<CollectionSubscription> getCollectionSubscriptions() {
-        return subscriptions;
-    }
-
-    public void addSubscription(CollectionSubscription subscription) {
-        subscription.setOwner(this);
-        subscriptions.add(subscription);
-    }
-
-    /**
-     * Get the CollectionSubscription with the specified displayName
-     * @param displayname display name of subscription to return
-     * @return subscription with specified display name
-     */
-    public CollectionSubscription getSubscription(String displayname) {
-
-        for (CollectionSubscription sub : subscriptions) {
-            if (sub.getDisplayName().equals(displayname))
-                return sub;
-        }
-
-        return null;
-    }
     
     /**
-     * Get the CollectionSubscription with the specified collectionUid 
-     * and ticketKey
-     * @param collectionUid collection uid of subscription to return
-     * @param ticketKey ticketKey of subscription to return
-     * @return subscription with specified collectionUid and ticketKey
      */
-    public CollectionSubscription getSubscription(String collectionUid, String ticketKey){
-        for (CollectionSubscription sub : subscriptions) {
-            if (sub.getCollectionUid().equals(collectionUid)
-                    && sub.getTicketKey().equals(ticketKey)) {
-                return sub;
-            }
-        }
-
-        return null;
-    }
-
-    
+    public static final int PASSWORD_LEN_MIN = 5;
     /**
-     * Remove the CollectionSubscription with the specifed collectionUid and ticketKey
-     * @param collectionUid collection uid of subscription to remove
-     * @param ticketKey ticketKey of subscription to remove
      */
-    public void removeSubscription(String collectionUid, String ticketKey){
-        removeSubscription(getSubscription(collectionUid, ticketKey));
-    }
+    public static final int PASSWORD_LEN_MAX = 16;
     
-    /**
-     * Remove the CollectionSubscription with the specifed displayName
-     * @param name display name of the subscription to remove
-     */
-    public void removeSubscription(String displayName) {
-        removeSubscription(getSubscription(displayName));
-    }
-
-    /** */
-    public void removeSubscription(CollectionSubscription sub) {
-        if (sub != null)
-            subscriptions.remove(sub);
-    }
-
-    /**
-     * Return true if this user is subscribed to <code>collection</code>
-     */
-    public boolean isSubscribedTo(CollectionItem collection){
-        for (CollectionSubscription sub : subscriptions){
-            if (collection.getUid().equals(sub.getCollectionUid())) return true;
-        }
-        return false;
-    }
-
-    
-    public String calculateEntityTag() {
-        String username = getUsername() != null ? getUsername() : "-";
-        String modTime = getModifiedDate() != null ?
-            new Long(getModifiedDate().getTime()).toString() : "-";
-        String etag = username + ":" + modTime;
-        return encodeEntityTag(etag.getBytes());
-    }
-
     /*
      * I'm not sure about putting this enum here, but it seems weird in other
      * places too. Since sort information is already here, in the *_SORT_STRING
@@ -653,4 +135,188 @@ public class User extends AuditableObject {
             }
         }
     }
+    
+    /**
+     */
+    public String getUid();
+
+    /**
+     * @param uid
+     */
+    public void setUid(String uid);
+
+    /**
+     */
+    public String getUsername();
+
+    /**
+     */
+    public void setUsername(String username);
+
+    /**
+     */
+    public String getOldUsername();
+
+    /**
+     */
+    public boolean isUsernameChanged();
+
+    /**
+     */
+    public String getPassword();
+
+    /**
+     */
+    public void setPassword(String password);
+
+    /**
+     */
+    public String getFirstName();
+
+    /**
+     */
+    public void setFirstName(String firstName);
+
+    /**
+     */
+    public String getLastName();
+
+    /**
+     */
+    public void setLastName(String lastName);
+
+    /**
+     */
+    public String getEmail();
+
+    /**
+     */
+    public void setEmail(String email);
+
+    /**
+     */
+    public String getOldEmail();
+
+    /**
+     */
+    public boolean isEmailChanged();
+
+    /**
+     */
+    public Boolean getAdmin();
+
+    public Boolean getOldAdmin();
+
+    /**
+     */
+    public boolean isAdminChanged();
+
+    /**
+     */
+    public void setAdmin(Boolean admin);
+
+    /**
+     */
+    public String getActivationId();
+
+    /**
+     */
+    public void setActivationId(String activationId);
+
+    /**
+     */
+    public boolean isOverlord();
+
+    /**
+     */
+    public boolean isActivated();
+
+    /**
+     *
+     *
+     */
+    public void activate();
+
+    public Boolean isLocked();
+
+    public void setLocked(Boolean locked);
+
+    /**
+     */
+    public void validate();
+
+    /**
+     */
+    public void validateUsername();
+
+    /**
+     */
+    public void validateRawPassword();
+
+    /**
+     */
+    public void validateFirstName();
+
+    /**
+     */
+    public void validateLastName();
+
+    /**
+     */
+    public void validateEmail();
+
+    public Set<Preference> getPreferences();
+
+    public void addPreference(Preference preference);
+
+    public Preference getPreference(String key);
+
+    public void removePreference(String key);
+
+    public void removePreference(Preference preference);
+
+    public Set<CollectionSubscription> getCollectionSubscriptions();
+
+    public void addSubscription(CollectionSubscription subscription);
+
+    /**
+     * Get the CollectionSubscription with the specified displayName
+     * @param displayname display name of subscription to return
+     * @return subscription with specified display name
+     */
+    public CollectionSubscription getSubscription(String displayname);
+
+    /**
+     * Get the CollectionSubscription with the specified collectionUid 
+     * and ticketKey
+     * @param collectionUid collection uid of subscription to return
+     * @param ticketKey ticketKey of subscription to return
+     * @return subscription with specified collectionUid and ticketKey
+     */
+    public CollectionSubscription getSubscription(String collectionUid,
+            String ticketKey);
+
+    /**
+     * Remove the CollectionSubscription with the specifed collectionUid and ticketKey
+     * @param collectionUid collection uid of subscription to remove
+     * @param ticketKey ticketKey of subscription to remove
+     */
+    public void removeSubscription(String collectionUid, String ticketKey);
+
+    /**
+     * Remove the CollectionSubscription with the specifed displayName
+     * @param name display name of the subscription to remove
+     */
+    public void removeSubscription(String displayName);
+
+    /** */
+    public void removeSubscription(CollectionSubscription sub);
+
+    /**
+     * Return true if this user is subscribed to <code>collection</code>
+     */
+    public boolean isSubscribedTo(CollectionItem collection);
+
+    public String calculateEntityTag();
+
 }

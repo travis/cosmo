@@ -270,7 +270,7 @@ public class PreferencesProvider extends BaseProvider
 
         try {
             XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
-            Preference pref = formatter.parse(entry.getContent());
+            Preference pref = formatter.parse(entry.getContent(), getEntityFactory());
             if (pref.getKey() == null)
                 throw new ValidationException("Preference requires a key");
             if (pref.getValue() == null)

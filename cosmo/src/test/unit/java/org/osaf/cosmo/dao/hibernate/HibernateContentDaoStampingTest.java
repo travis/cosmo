@@ -35,6 +35,13 @@ import org.osaf.cosmo.model.StampTombstone;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp;
+import org.osaf.cosmo.model.hibernate.HibEventExceptionStamp;
+import org.osaf.cosmo.model.hibernate.HibEventStamp;
+import org.osaf.cosmo.model.hibernate.HibMessageStamp;
+import org.osaf.cosmo.model.hibernate.HibNoteItem;
+import org.osaf.cosmo.model.hibernate.HibQName;
+import org.osaf.cosmo.model.hibernate.HibStringAttribute;
 
 public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCase {
 
@@ -54,14 +61,14 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setIcalUid("icaluid");
         item.setBody("this is a body");
         
-        MessageStamp message = new MessageStamp(item);
+        MessageStamp message = new HibMessageStamp(item);
         message.setBcc("bcc");
         message.setTo("to");
         message.setFrom("from");
         message.setCc("cc");
         
-        EventStamp event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        EventStamp event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
         item.addStamp(message);
         item.addStamp(event);
@@ -104,8 +111,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setIcalUid("icaluid");
         item.setBody("this is a body");
         
-        EventStamp event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        HibEventStamp event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
         item.addStamp(event);
         
@@ -116,7 +123,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         
-        event = (EventStamp) queryItem.getStamp(EventStamp.class);
+        event = (HibEventStamp) queryItem.getStamp(EventStamp.class);
         Assert.assertEquals("20050817T115000", event.getTimeRangeIndex().getStartDate());
         Assert.assertEquals("20050817T131500",event.getTimeRangeIndex().getEndDate());
         Assert.assertTrue(event.getTimeRangeIndex().getIsFloating().booleanValue());
@@ -129,7 +136,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         queryItem = contentDao.findContentByUid(newItem.getUid());
         
-        event = (EventStamp) queryItem.getStamp(EventStamp.class);
+        event = (HibEventStamp) queryItem.getStamp(EventStamp.class);
         Assert.assertEquals("20070101", event.getTimeRangeIndex().getStartDate());
         Assert.assertEquals("20070101",event.getTimeRangeIndex().getEndDate());
         Assert.assertTrue(event.getTimeRangeIndex().getIsFloating().booleanValue());
@@ -144,14 +151,14 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         ((NoteItem) item).setBody("this is a body");
         ((NoteItem) item).setIcalUid("icaluid");
         
-        MessageStamp message = new MessageStamp(item);
+        MessageStamp message = new HibMessageStamp(item);
         message.setBcc("bcc");
         message.setTo("to");
         message.setFrom("from");
         message.setCc("cc");
         
-        EventStamp event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        EventStamp event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
         item.addStamp(message);
         item.addStamp(event);
@@ -167,7 +174,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         stamp = queryItem.getStamp(EventStamp.class);
         EventStamp es = (EventStamp) stamp;
-        es.setCalendar(helper.getCalendar(baseDir + "/cal2.ics"));
+        es.setEventCalendar(helper.getCalendar(baseDir + "/cal2.ics"));
         Calendar newCal = es.getCalendar();
         
         contentDao.updateContent(queryItem);
@@ -189,8 +196,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
         ContentItem item = generateTestContent();
         
-        EventStamp event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/noevent.ics"));
+        EventStamp event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/noevent.ics"));
         item.addStamp(event);
        
         try {
@@ -198,6 +205,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
             clearSession();
             Assert.fail("able to create invalid event!");
         } catch (InvalidStateException e) {}
+        catch (IllegalStateException e) {}
     }
     
     public void testRemoveStamp() throws Exception {
@@ -209,8 +217,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setIcalUid("icaluid");
         item.setBody("this is a body");
         
-        EventStamp event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        EventStamp event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
         item.addStamp(event);
         
@@ -234,8 +242,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertTrue(ts instanceof StampTombstone);
         Assert.assertEquals(((StampTombstone)ts).getStampType(),stamp.getType());
         
-        event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         queryItem.addStamp(event);
         
         contentDao.updateContent(queryItem);
@@ -251,7 +259,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         Calendar testCal = helper.getCalendar(baseDir + "/timezone.ics");
         
-        CalendarCollectionStamp calendarStamp = new CalendarCollectionStamp(root);
+        CalendarCollectionStamp calendarStamp = new HibCalendarCollectionStamp(root);
         calendarStamp.setDescription("description");
         calendarStamp.setTimezoneCalendar(testCal);
         calendarStamp.setLanguage("en");
@@ -264,8 +272,8 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         root = contentDao.findCollectionByUid(root.getUid());
         
         ContentItem item = generateTestContent();
-        EventStamp event = new EventStamp();
-        event.setCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
+        EventStamp event = new HibEventStamp();
+        event.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         item.addStamp(event);
         
         contentDao.createContent(root, item);
@@ -292,7 +300,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         Calendar testCal = helper.getCalendar(baseDir + "/cal1.ics");
         
-        CalendarCollectionStamp calendarStamp = new CalendarCollectionStamp(root);
+        CalendarCollectionStamp calendarStamp = new HibCalendarCollectionStamp(root);
         calendarStamp.setTimezoneCalendar(testCal);
         
         root.addStamp(calendarStamp);
@@ -315,7 +323,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setIcalUid("icaluid");
         item.setBody("this is a body");
         
-        EventExceptionStamp eventex = new EventExceptionStamp();
+        EventExceptionStamp eventex = new HibEventExceptionStamp();
         eventex.setEventCalendar(helper.getCalendar(baseDir + "/exception.ics"));
         
         item.addStamp(eventex);
@@ -346,7 +354,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         item.setIcalUid("icaluid");
         item.setBody("this is a body");
         
-        EventExceptionStamp eventex = new EventExceptionStamp();
+        EventExceptionStamp eventex = new HibEventExceptionStamp();
         eventex.setEventCalendar(helper.getCalendar(baseDir + "/cal1.ics"));
         
         item.addStamp(eventex);
@@ -369,11 +377,11 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
 
     private NoteItem generateTestContent(String name, String owner)
             throws Exception {
-        NoteItem content = new NoteItem();
+        NoteItem content = new HibNoteItem();
         content.setName(name);
         content.setDisplayName(name);
         content.setOwner(getUser(userDao, owner));
-        content.addAttribute(new StringAttribute(new QName("customattribute"),
+        content.addAttribute(new HibStringAttribute(new HibQName("customattribute"),
                 "customattributevalue"));
         return content;
     }

@@ -264,8 +264,6 @@
 <c:out value="${eventstamp.eventCalendar}"/>
 </pre>
 
-<jsp:include page="inc-indexes.jsp" />
-
 </c:if>
 
 </cosmo:standardLayout>

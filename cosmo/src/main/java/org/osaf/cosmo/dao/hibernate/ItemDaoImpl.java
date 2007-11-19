@@ -34,18 +34,21 @@ import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
+import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
-import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.hibernate.HibEventStamp;
+import org.osaf.cosmo.model.hibernate.HibHomeCollectionItem;
+import org.osaf.cosmo.model.hibernate.HibItemTombstone;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -160,7 +163,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
      */
     public HomeCollectionItem getRootItem(User user) {
         try {
-            return findRootItem(user.getId());
+            return findRootItem(getBaseModelObject(user).getId());
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }
@@ -175,10 +178,10 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             if(user==null)
                 throw new IllegalArgumentException("invalid user");
 
-            if(findRootItem(user.getId())!=null)
+            if(findRootItem(getBaseModelObject(user).getId())!=null)
                 throw new RuntimeException("user already has root item");
 
-            HomeCollectionItem newItem = new HomeCollectionItem();
+            HomeCollectionItem newItem = new HibHomeCollectionItem();
 
             newItem.setOwner(user);
             newItem.setName(user.getUsername());
@@ -373,7 +376,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             if(!parent.getUid().equals(oldParent.getUid())) {
                 parent.removeTombstone(item);
                 item.getParents().add(parent);
-                oldParent.addTombstone(new ItemTombstone(oldParent, item));
+                oldParent.addTombstone(new HibItemTombstone(oldParent, item));
                 item.getParents().remove(oldParent);
             }
             
@@ -572,7 +575,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected void verifyNotInLoop(Item item, CollectionItem newParent) {
         // need to verify that the new parent is not a child
         // of the item, otherwise we get a loop
-        if (item.getId().equals(newParent.getId()))
+        if (getBaseModelObject(item).getId().equals(getBaseModelObject(newParent).getId()))
             throw new ModelValidationException(
                     "Invalid parent - will cause loop");
         
@@ -608,7 +611,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             ICalendarItem ical = (ICalendarItem) item;
             if (ical.getIcalUid() == null) {
                 ical.setIcalUid(item.getUid());
-                EventStamp es = EventStamp.getStamp(ical);
+                EventStamp es = HibEventStamp.getStamp(ical);
                 if (es != null)
                     es.setIcalUid(ical.getIcalUid());
             }
@@ -733,7 +736,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         if(!item.getParents().contains(collection))
             return;
         
-        collection.addTombstone(new ItemTombstone(collection, item));
+        collection.addTombstone(new HibItemTombstone(collection, item));
         item.getParents().remove(collection);
         
         // If the item belongs to no collection, then it should
@@ -752,6 +755,10 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     protected void removeItemInternal(Item item) {
         getSession().delete(item);
+    }
+    
+    protected BaseModelObject getBaseModelObject(Object obj) {
+        return (BaseModelObject) obj;
     }
     
 }

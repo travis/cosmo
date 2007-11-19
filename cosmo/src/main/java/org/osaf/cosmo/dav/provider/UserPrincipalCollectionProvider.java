@@ -28,6 +28,7 @@ import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.MethodNotAllowedException;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * <p>
@@ -42,8 +43,9 @@ public class UserPrincipalCollectionProvider extends CollectionProvider {
     private static final Log log =
         LogFactory.getLog(UserPrincipalCollectionProvider.class);
 
-    public UserPrincipalCollectionProvider(DavResourceFactory resourceFactory) {
-        super(resourceFactory);
+    public UserPrincipalCollectionProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
+        super(resourceFactory, entityFactory);
     }
 
     // DavProvider methods

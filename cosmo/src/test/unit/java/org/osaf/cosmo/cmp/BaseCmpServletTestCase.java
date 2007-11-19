@@ -16,26 +16,23 @@
 package org.osaf.cosmo.cmp;
 
 import org.apache.commons.id.random.SessionIdGenerator;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.BaseMockServletTestCase;
 import org.osaf.cosmo.TestHelper;
-import org.osaf.cosmo.cmp.CmpServlet;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
+import org.osaf.cosmo.model.EntityFactory;
+import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.osaf.cosmo.service.account.AutomaticAccountActivator;
 import org.osaf.cosmo.service.account.MockPasswordRecoverer;
 import org.osaf.cosmo.service.account.OutOfTheBoxHelper;
 import org.osaf.cosmo.service.impl.StandardContentService;
-import org.osaf.cosmo.service.impl.StandardFreeBusyQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
 import org.osaf.cosmo.service.impl.StandardUserService;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
-
 import org.springframework.context.support.StaticMessageSource;
 
 /**
@@ -57,6 +54,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
+        EntityFactory entityFactory = new MockEntityFactory();
         MockDaoStorage storage = new MockDaoStorage();
         MockCalendarDao calendarDao = new MockCalendarDao(storage);
         MockContentDao contentDao = new MockContentDao(storage);
@@ -73,13 +71,13 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         OutOfTheBoxHelper ootbHelper = new OutOfTheBoxHelper();
         ootbHelper.setContentDao(contentDao);
         ootbHelper.setMessageSource(messageSource);
+        ootbHelper.setEntityFactory(entityFactory);
 
         contentService = new StandardContentService();
         contentService.setCalendarDao(calendarDao);
         contentService.setContentDao(contentDao);
         contentService.setLockManager(lockManager);
         contentService.setTriageStatusQueryProcessor(new StandardTriageStatusQueryProcessor());
-        contentService.setFreeBusyQueryProcessor(new StandardFreeBusyQueryProcessor());
         contentService.init();
 
         userService = new StandardUserService();
@@ -97,6 +95,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         servlet.setAccountActivator(accountActivator);
         servlet.setPasswordRecoverer(passwordRecoverer);
         servlet.setOutOfTheBoxHelper(ootbHelper);
+        servlet.setEntityFactory(entityFactory);
         servlet.init(getServletConfig());
     }
 

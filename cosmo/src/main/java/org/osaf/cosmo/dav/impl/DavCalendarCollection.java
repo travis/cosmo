@@ -28,28 +28,23 @@ import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-
 import org.osaf.cosmo.calendar.query.CalendarFilter;
-import org.osaf.cosmo.dav.ConflictException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.ForbiddenException;
 import org.osaf.cosmo.dav.LockedException;
-import org.osaf.cosmo.dav.PreconditionFailedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
 import org.osaf.cosmo.dav.caldav.MaxResourceSizeException;
-import org.osaf.cosmo.dav.caldav.UidConflictException;
 import org.osaf.cosmo.dav.caldav.TimeZoneExtractor;
+import org.osaf.cosmo.dav.caldav.UidConflictException;
 import org.osaf.cosmo.dav.caldav.property.CalendarDescription;
 import org.osaf.cosmo.dav.caldav.property.CalendarTimezone;
 import org.osaf.cosmo.dav.caldav.property.MaxResourceSize;
@@ -63,9 +58,11 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DataSizeException;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.service.util.EventUtils;
 
 /**
@@ -106,17 +103,19 @@ public class DavCalendarCollection extends DavCollectionBase
     /** */
     public DavCalendarCollection(CollectionItem collection,
                                  DavResourceLocator locator,
-                                 DavResourceFactory factory)
+                                 DavResourceFactory factory,
+                                 EntityFactory entityFactory)
         throws DavException {
-        super(collection, locator, factory);
+        super(collection, locator, factory, entityFactory);
     }
 
     /** */
     public DavCalendarCollection(DavResourceLocator locator,
-                                 DavResourceFactory factory)
+                                 DavResourceFactory factory,
+                                 EntityFactory entityFactory)
         throws DavException {
-        this(new CollectionItem(), locator, factory);
-        getItem().addStamp(new CalendarCollectionStamp((CollectionItem) getItem()));
+        this(entityFactory.createCollection(), locator, factory, entityFactory);
+        getItem().addStamp(entityFactory.createCalendarCollectionStamp((CollectionItem) getItem()));
     }
 
     // Jackrabbit DavResource
@@ -161,7 +160,7 @@ public class DavCalendarCollection extends DavCollectionBase
 
         CollectionItem collection = (CollectionItem) getItem();
         for (ContentItem memberItem :
-             getContentService().findCalendarItems(collection, filter)) {
+             getCalendarQueryProcesor().filterQuery(collection, filter)) {
             DavResource resource = memberToResource(memberItem);
             if(resource!=null)
                 members.add((DavCalendarResource) resource);
@@ -180,7 +179,7 @@ public class DavCalendarCollection extends DavCollectionBase
      */
     public VFreeBusy generateFreeBusy(Period period) {
 
-        VFreeBusy vfb = getContentService().generateFreeBusy(
+        VFreeBusy vfb = this.getCalendarQueryProcesor().freeBusyQuery(
                 (CollectionItem) getItem(), period);
         
         return vfb;
@@ -205,7 +204,7 @@ public class DavCalendarCollection extends DavCollectionBase
     }
     
     public CalendarCollectionStamp getCalendarCollectionStamp() {
-        return CalendarCollectionStamp.getStamp(getItem());
+        return StampUtils.getCalendarCollectionStamp(getItem());
     }
 
 
@@ -329,10 +328,10 @@ public class DavCalendarCollection extends DavCollectionBase
         CollectionItem collection = (CollectionItem) getItem();
         CalendarCollectionStamp cc = getCalendarCollectionStamp();
         ContentItem content = (ContentItem) member.getItem();
-        EventStamp event = EventStamp.getStamp(content);
+        EventStamp event = StampUtils.getEventStamp(content);
         Calendar calendar = event.getCalendar();
 
-        if (event.getId() != -1) {
+        if (event.getCreationDate()!=null) {
             if (log.isDebugEnabled())
                 log.debug("updating event " + member.getResourcePath());
 

@@ -24,6 +24,7 @@ import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Stamp;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TaskStamp;
 
 /**
@@ -38,12 +39,12 @@ public class TaskApplicator extends BaseStampApplicator {
     /** */
     public TaskApplicator(Item item) {
         super(PREFIX_TASK, NS_TASK, item);
-        setStamp(TaskStamp.getStamp(item));
+        setStamp(StampUtils.getTaskStamp(item));
     }
 
     /** */
     protected Stamp createStamp(EimRecord record) throws EimSchemaException {
-        return new TaskStamp();
+        return getItem().getFactory().createTaskStamp();
     }
 
     /**

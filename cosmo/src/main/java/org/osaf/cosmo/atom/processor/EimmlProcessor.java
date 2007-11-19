@@ -25,6 +25,7 @@ import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlStreamException;
 import org.osaf.cosmo.eim.eimml.EimmlStreamReader;
 import org.osaf.cosmo.eim.eimml.EimmlValidationException;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * A class that processes content specified as EIMML-serialized EIM
@@ -35,6 +36,10 @@ import org.osaf.cosmo.eim.eimml.EimmlValidationException;
 public class EimmlProcessor extends BaseEimProcessor {
     private static final Log log = LogFactory.getLog(EimmlProcessor.class);
 
+    public EimmlProcessor(EntityFactory entityFactory) {
+        super(entityFactory);
+    }
+    
     /**
      * Converts the EIMML content body into a valid EIM record set.
      *

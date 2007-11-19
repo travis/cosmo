@@ -34,6 +34,7 @@ import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
 import org.osaf.cosmo.dav.caldav.MissingParentException;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavItemCollection;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * <p>
@@ -48,8 +49,9 @@ public class CalendarCollectionProvider extends CollectionProvider {
     private static final Log log =
         LogFactory.getLog(CalendarCollectionProvider.class);
 
-    public CalendarCollectionProvider(DavResourceFactory resourceFactory) {
-        super(resourceFactory);
+    public CalendarCollectionProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
+        super(resourceFactory, entityFactory);
     }
 
     // DavProvider methods

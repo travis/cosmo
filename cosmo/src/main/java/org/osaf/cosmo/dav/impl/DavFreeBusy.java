@@ -26,6 +26,7 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.FreeBusyItem;
 
 /**
@@ -41,17 +42,19 @@ public class DavFreeBusy extends DavCalendarResource {
     
     /** */
     public DavFreeBusy(DavResourceLocator locator,
-                      DavResourceFactory factory)
+                      DavResourceFactory factory,
+                      EntityFactory entityFactory)
         throws DavException {
-        this(new FreeBusyItem(), locator, factory);
+        this(entityFactory.createFreeBusy(), locator, factory, entityFactory);
     }
 
     /** */
     public DavFreeBusy(FreeBusyItem item,
                       DavResourceLocator locator,
-                      DavResourceFactory factory)
+                      DavResourceFactory factory,
+                      EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
 
     // our methods

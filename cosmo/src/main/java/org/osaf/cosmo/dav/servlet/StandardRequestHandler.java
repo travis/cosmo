@@ -57,6 +57,7 @@ import org.osaf.cosmo.dav.provider.UserPrincipalCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalProvider;
 import org.osaf.cosmo.http.IfMatch;
 import org.osaf.cosmo.http.IfNoneMatch;
+import org.osaf.cosmo.model.EntityFactory;
 
 import org.springframework.web.HttpRequestHandler;
 
@@ -75,6 +76,7 @@ public class StandardRequestHandler implements HttpRequestHandler {
 
     private DavResourceLocatorFactory locatorFactory;
     private DavResourceFactory resourceFactory;
+    private EntityFactory entityFactory;
 
     // RequestHandler methods
                
@@ -212,18 +214,18 @@ public class StandardRequestHandler implements HttpRequestHandler {
      */
     protected DavProvider createProvider(DavResource resource) {
         if (resource instanceof DavHomeCollection)
-            return new HomeCollectionProvider(resourceFactory);
+            return new HomeCollectionProvider(resourceFactory, entityFactory);
         if (resource instanceof DavCalendarCollection)
-            return new CalendarCollectionProvider(resourceFactory);
+            return new CalendarCollectionProvider(resourceFactory, entityFactory);
         if (resource instanceof DavCollectionBase)
-            return new CollectionProvider(resourceFactory);
+            return new CollectionProvider(resourceFactory, entityFactory);
         if (resource instanceof DavCalendarResource)
-            return new CalendarResourceProvider(resourceFactory);
+            return new CalendarResourceProvider(resourceFactory, entityFactory);
         if (resource instanceof DavUserPrincipalCollection)
-            return new UserPrincipalCollectionProvider(resourceFactory);
+            return new UserPrincipalCollectionProvider(resourceFactory, entityFactory);
         if (resource instanceof DavUserPrincipal)
-            return new UserPrincipalProvider(resourceFactory);
-        return new FileProvider(resourceFactory);
+            return new UserPrincipalProvider(resourceFactory, entityFactory);
+        return new FileProvider(resourceFactory, entityFactory);
     }
 
     /**
@@ -236,9 +238,9 @@ public class StandardRequestHandler implements HttpRequestHandler {
         // Create buffered request if method is PUT so we can retry
         // on concurrency exceptions
         if (request.getMethod().equals("PUT"))
-            return new StandardDavRequest(request, locatorFactory, true);
+            return new StandardDavRequest(request, locatorFactory, entityFactory, true);
         else
-            return new StandardDavRequest(request, locatorFactory);   
+            return new StandardDavRequest(request, locatorFactory, entityFactory);   
     }
 
     /**
@@ -283,6 +285,14 @@ public class StandardRequestHandler implements HttpRequestHandler {
 
     public void setResourceFactory(DavResourceFactory factory) {
         resourceFactory = factory;
+    }
+    
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
     }
 
     private void ifMatch(DavRequest request,

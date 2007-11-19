@@ -17,58 +17,22 @@ package org.osaf.cosmo.model;
 
 import net.fortuna.ical4j.model.Date;
 
+public interface NoteOccurrence extends NoteItem{
 
-/**
- * Represents an occurrence of a recurring NoteItem.
- * A NoteOccurrence occurence consists of the master NoteItem 
- * and an occurrence date.  The uid of a NoteOccurence is
- * a combination of the master NoteItem's uid and the occurrence
- * date.
- */
-public class NoteOccurrence extends NoteItem {
-
-    Date occurrenceDate = null;
-    NoteItem masterNote = null;
-    ModificationUid modUid = null;
-    
-    public NoteOccurrence(Date occurrenceDate, NoteItem masterNote) {
-        // uid is the same as a modification's uid
-        this.modUid = new ModificationUid(masterNote, occurrenceDate);
-        setUid(modUid.toString());
-        
-        // set base fields from master
-        setModifiedDate(masterNote.getModifiedDate());
-        setCreationDate(masterNote.getCreationDate());
-        setDisplayName(masterNote.getDisplayName());
-        setOwner(masterNote.getOwner());
-        this.occurrenceDate = occurrenceDate;
-        this.masterNote = masterNote;
-    }
-   
     /**
      * A NoteOccurrence is an occurrence of a recurring NoteItem.
      * @return the master NoteItem
      */
-    public NoteItem getMasterNote() {
-        return masterNote;
-    }
-    
+    public NoteItem getMasterNote();
+
     /**
      * @return date of the occurrence
      */
-    public Date getOccurrenceDate() {
-        return occurrenceDate;
-    }
+    public Date getOccurrenceDate();
 
     /**
-    * @return the ModificationUid
+     * @return the ModificationUid
      */
-    public ModificationUid getModificationUid() {
-        return modUid;
-    }
+    public ModificationUid getModificationUid();
 
-    @Override
-    public Item copy() {
-        return new NoteOccurrence(occurrenceDate, masterNote);
-    }
 }

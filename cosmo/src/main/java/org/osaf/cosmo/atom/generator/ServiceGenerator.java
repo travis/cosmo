@@ -24,7 +24,7 @@ import org.osaf.cosmo.model.User;
  * collections owned by and subscribed to by a user.
  *
  * @see Service
- * @see CollectionItem
+ * @see MockCollectionItem
  * @see User
  */
 public interface ServiceGenerator {

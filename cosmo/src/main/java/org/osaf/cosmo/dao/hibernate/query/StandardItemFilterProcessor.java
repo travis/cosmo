@@ -35,7 +35,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.NoteOccurrenceUtil;
 import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EqualsExpression;
@@ -51,6 +51,7 @@ import org.osaf.cosmo.model.filter.NullExpression;
 import org.osaf.cosmo.model.filter.StampFilter;
 import org.osaf.cosmo.model.filter.TextAttributeFilter;
 import org.osaf.cosmo.model.filter.FilterOrder.Order;
+import org.osaf.cosmo.model.hibernate.HibNoteItem;
 
 /**
  * Standard Implementation of <code>ItemFilterProcessor</code>.
@@ -134,7 +135,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             ItemFilter filter) {
         
         if("".equals(selectBuf.toString()))
-            selectBuf.append("select i from Item i");
+            selectBuf.append("select i from HibItem i");
         
         // filter on uid
         if(filter.getUid()!=null)
@@ -173,7 +174,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             TextAttributeFilter filter) {
         
         String alias = "ta" + params.size();
-        selectBuf.append(", TextAttribute " + alias);
+        selectBuf.append(", HibTextAttribute " + alias);
         appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname");
         params.put(alias + "qname", filter.getQname());
         formatExpression(whereBuf, params, alias + ".value", filter.getValue());
@@ -197,7 +198,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         String toAppend = "";
         if(filter.isMissing())
             toAppend += "not ";
-        toAppend += "exists (select s.id from Stamp s where s.item=i and s.class="
+        toAppend += "exists (select s.id from HibStamp s where s.item=i and s.class=Hib"
                     + filter.getStampClass().getSimpleName() + ")";
         appendWhere(whereBuf, toAppend);
     }
@@ -211,7 +212,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         if(filter.isMissing())
             toAppend += "not ";
         
-        toAppend += "exists (select a.id from Attribute a where a.item=i and a.qname=:"
+        toAppend += "exists (select a.id from HibAttribute a where a.item=i and a.qname=:"
                 + param + ")";
         appendWhere(whereBuf, toAppend);
         params.put(param, filter.getQname());
@@ -221,7 +222,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             StringBuffer whereBuf, HashMap<String, Object> params,
             EventStampFilter filter) {
         
-        selectBuf.append(", BaseEventStamp es");
+        selectBuf.append(", HibBaseEventStamp es");
         appendWhere(whereBuf, "es.item=i");
         
         // handle recurring event filter
@@ -251,7 +252,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
     private void handleNoteItemFilter(StringBuffer selectBuf,
             StringBuffer whereBuf, StringBuffer orderBuf,  HashMap<String, Object> params,
             NoteItemFilter filter) {
-        selectBuf.append("select i from NoteItem i");
+        selectBuf.append("select i from HibNoteItem i");
         handleItemFilter(selectBuf, whereBuf, params, filter);
         handleContentItemFilter(selectBuf, whereBuf, orderBuf, params, filter);
         
@@ -262,9 +263,9 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         // filter by body
         if(filter.getBody()!=null) {
             String alias = "ta" + params.size();
-            selectBuf.append(", TextAttribute " + alias);
+            selectBuf.append(", HibTextAttribute " + alias);
             appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname");
-            params.put(alias + "qname", NoteItem.ATTR_NOTE_BODY);
+            params.put(alias + "qname", HibNoteItem.ATTR_NOTE_BODY);
             formatExpression(whereBuf, params, alias + ".value", filter.getBody());
         }
         
@@ -295,7 +296,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             ContentItemFilter filter) {
         
         if("".equals(selectBuf.toString())) {
-            selectBuf.append("select i from ContentItem i");
+            selectBuf.append("select i from HibContentItem i");
             handleItemFilter(selectBuf, whereBuf, params, filter);
         }
         
@@ -424,7 +425,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             // Ignore overrides as they are separate items that should have
             // already been added
             if (entry.getValue().isOverridden() == false) {
-                results.add(new NoteOccurrence(entry.getValue().getRid(), note));
+                results.add(NoteOccurrenceUtil.createNoteOccurrence(entry.getValue().getRid(), note));
             }
         }
 

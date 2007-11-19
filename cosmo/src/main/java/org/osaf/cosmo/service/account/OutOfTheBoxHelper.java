@@ -22,27 +22,26 @@ import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.util.Dates;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.DateUtil;
-
 import org.springframework.context.MessageSource;
 
 /**
@@ -56,6 +55,7 @@ public class OutOfTheBoxHelper {
 
     private ContentDao contentDao;
     private MessageSource messageSource;
+    private EntityFactory entityFactory;
 
     /**
      * <p>
@@ -85,7 +85,7 @@ public class OutOfTheBoxHelper {
     }
 
     private CollectionItem makeCollection(OutOfTheBoxContext context) {
-        CollectionItem collection = new CollectionItem();
+        CollectionItem collection = entityFactory.createCollection();
         Locale locale = context.getLocale();
         User user = context.getUser();
 
@@ -99,14 +99,14 @@ public class OutOfTheBoxHelper {
         collection.setDisplayName(displayName);
         collection.setOwner(user);
 
-        CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+        CalendarCollectionStamp ccs = entityFactory.createCalendarCollectionStamp(collection);
         collection.addStamp(ccs);
 
         return collection;
     }
 
     private NoteItem makeWelcomeItem(OutOfTheBoxContext context) {
-        NoteItem item = new NoteItem();
+        NoteItem item = entityFactory.createNote();
         TimeZone tz= context.getTimeZone();
         Locale locale = context.getLocale();
         User user = context.getUser();
@@ -123,7 +123,9 @@ public class OutOfTheBoxHelper {
         item.setOwner(user);
         item.setClientCreationDate(Calendar.getInstance(tz, locale).getTime());
         item.setClientModifiedDate(item.getClientCreationDate());
-        item.setTriageStatus(TriageStatus.createInitialized());
+        TriageStatus triage = entityFactory.createTriageStatus();
+        TriageStatusUtil.initialize(triage);
+        item.setTriageStatus(triage);
         item.setLastModifiedBy(user.getUsername());
         item.setLastModification(ContentItem.Action.CREATED);
         item.setSent(Boolean.FALSE);
@@ -138,16 +140,16 @@ public class OutOfTheBoxHelper {
             Dates.getInstance(start.getTime(), Value.DATE_TIME);
         startDate.setTimeZone(vtz(tz.getID()));
 
-        EventStamp es = new EventStamp();
+        EventStamp es = entityFactory.createEventStamp(item);
         item.addStamp(es);
         es.createCalendar();
         es.setStartDate(startDate);
         es.setDuration(new Dur(0, 1, 0, 0));
 
-        TaskStamp ts = new TaskStamp();
+        TaskStamp ts = entityFactory.createTaskStamp();
         item.addStamp(ts);
 
-        MessageStamp ms = new MessageStamp();
+        MessageStamp ms = entityFactory.createMessageStamp();
         item.addStamp(ms);
         ms.setFrom(from);
         ms.setTo(to);
@@ -159,7 +161,7 @@ public class OutOfTheBoxHelper {
     }
 
     private NoteItem makeTryOutItem(OutOfTheBoxContext context) {
-        NoteItem item = new NoteItem();
+        NoteItem item = entityFactory.createNote();
         TimeZone tz= context.getTimeZone();
         Locale locale = context.getLocale();
         User user = context.getUser();
@@ -167,7 +169,8 @@ public class OutOfTheBoxHelper {
         String name = _("Ootb.TryOut.Title", locale);
         String body = _("Ootb.TryOut.Body", locale);
 
-        TriageStatus triage = TriageStatus.createInitialized();
+        TriageStatus triage = entityFactory.createTriageStatus();
+        TriageStatusUtil.initialize(triage);
         triage.setCode(TriageStatus.CODE_LATER);
 
         item.setUid(contentDao.generateUid());
@@ -192,27 +195,28 @@ public class OutOfTheBoxHelper {
             Dates.getInstance(start.getTime(), Value.DATE_TIME);
         startDate.setTimeZone(vtz(tz.getID()));
 
-        EventStamp es = new EventStamp();
+        EventStamp es = entityFactory.createEventStamp(item);
         item.addStamp(es);
         es.createCalendar();
         es.setStartDate(startDate);
         es.setDuration(new Dur(0, 1, 0, 0));
 
-        TaskStamp ts = new TaskStamp();
+        TaskStamp ts = entityFactory.createTaskStamp();
         item.addStamp(ts);
 
         return item;
     }
 
     private NoteItem makeSignUpItem(OutOfTheBoxContext context) {
-        NoteItem item = new NoteItem();
+        NoteItem item = entityFactory.createNote();
         TimeZone tz= context.getTimeZone();
         Locale locale = context.getLocale();
         User user = context.getUser();
 
         String name = _("Ootb.SignUp.Title", locale);
 
-        TriageStatus triage = TriageStatus.createInitialized();
+        TriageStatus triage = entityFactory.createTriageStatus();
+        TriageStatusUtil.initialize(triage);
         triage.setCode(TriageStatus.CODE_DONE);
 
         item.setUid(contentDao.generateUid());
@@ -227,7 +231,7 @@ public class OutOfTheBoxHelper {
         item.setNeedsReply(Boolean.FALSE);
         item.setIcalUid(item.getUid());
 
-        TaskStamp ts = new TaskStamp();
+        TaskStamp ts = entityFactory.createTaskStamp();
         item.addStamp(ts);
 
         return item;
@@ -238,6 +242,18 @@ public class OutOfTheBoxHelper {
             throw new IllegalStateException("contentDao is required");
         if (messageSource == null)
             throw new IllegalStateException("messageSource is required");
+        if (entityFactory == null)
+            throw new IllegalStateException("entityFactory is required");
+    }
+    
+    
+
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
     }
 
     public ContentDao getContentDao() {

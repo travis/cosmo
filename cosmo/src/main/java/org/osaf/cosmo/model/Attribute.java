@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Index;
-
 /**
  * Represents an attribute associated with an Item.
  * An attribute consists of a QName (qualified name)
@@ -46,101 +27,45 @@ import org.hibernate.annotations.Index;
  * (String, Integer, Binary, Boolean, etc.)
  * 
  */
-@Entity
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
-// Define a unique constraint on item, namespace, and localname
-@Table(name="attribute", uniqueConstraints = {
-        @UniqueConstraint(columnNames={"itemid", "namespace", "localname"})})
-// Define indexes on discriminator and key fields
-@org.hibernate.annotations.Table(
-        appliesTo="attribute", 
-        indexes={@Index(name="idx_attrtype", columnNames={"attributetype"}),
-                 @Index(name="idx_attrname", columnNames={"localname"}),
-                 @Index(name="idx_attrns", columnNames={"namespace"})})
-@DiscriminatorColumn(
-        name="attributetype",
-        discriminatorType=DiscriminatorType.STRING,
-        length=16)
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public abstract class Attribute extends AuditableObject implements java.io.Serializable {
+public interface Attribute extends AuditableObject {
 
-    // Fields
-    @Embedded
-    @AttributeOverrides( {
-            @AttributeOverride(name="namespace", column = @Column(name="namespace", nullable = false, length=255) ),
-            @AttributeOverride(name="localName", column = @Column(name="localname", nullable = false, length=255) )
-    } )
-    private QName qname;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemid", nullable = false)
-    private Item item;
+    public QName getQName();
 
-    // Constructors
-    /** default constructor */
-    public Attribute() {
-    }
+    public void setQName(QName qname);
 
-    public QName getQName() {
-        return qname;
-    }
-
-    public void setQName(QName qname) {
-        this.qname = qname;
-    }
-    
     /**
      * For backwards compatability.  Return the local name.
      * @return local name of attribute
      */
-    public String getName() {
-        if(qname==null)
-            return null;
-        
-        return qname.getLocalName();
-    }
+    public String getName();
 
     /**
      * @return Item attribute belongs to
      */
-    public Item getItem() {
-        return item;
-    }
+    public Item getItem();
 
     /**
      * @param item
      *            Item attribute belongs to
      */
-    public void setItem(Item item) {
-        this.item = item;
-    }
+    public void setItem(Item item);
 
     /**
      * @return the attribute value
      */
-    public abstract Object getValue();
+    public Object getValue();
 
     /**
      * @param value
      *            the attribute value
      */
-    public abstract void setValue(Object value);
+    public void setValue(Object value);
 
     /**
      * Return a new instance of Attribute containing a copy of the Attribute
      * 
      * @return copy of Attribute
      */
-    public abstract Attribute copy();
-    
-    /**
-     * Return string representation
-     */
-    public String toString() {
-        Object value = getValue();
-        if(value==null)
-            return "null";
-        return value.toString();
-    }
+    public Attribute copy();
 
 }

@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.ClobField;
 import org.osaf.cosmo.eim.DecimalField;
 import org.osaf.cosmo.eim.EimRecord;
@@ -33,6 +32,7 @@ import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
+import org.osaf.cosmo.model.mock.MockQName;
 
 /**
  * Base class for record applicator tests.
@@ -82,7 +82,7 @@ public class BaseApplicatorTestCase extends TestCase
     /** */
     protected void checkUnknownValue(EimRecordField field,
                                      Item item) {
-        QName qname = new QName(field.getRecord().getNamespace(),
+        QName qname = new MockQName(field.getRecord().getNamespace(),
                                 field.getName());
         Attribute attr = item.getAttribute(qname);
         assertNotNull("attribute " + qname + " not found", attr);

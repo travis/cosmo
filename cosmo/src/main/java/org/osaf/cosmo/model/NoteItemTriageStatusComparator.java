@@ -45,7 +45,7 @@ public class NoteItemTriageStatusComparator implements Comparator<NoteItem> {
             return note.getTriageStatus().getRank().scaleByPowerOfTen(3).longValue();
         
         // otherwise use startDate * -1
-        BaseEventStamp eventStamp = BaseEventStamp.getStamp(note);
+        BaseEventStamp eventStamp = StampUtils.getBaseEventStamp(note);
         if(eventStamp!=null) {
             return eventStamp.getStartDate().getTime()*-1;
         }

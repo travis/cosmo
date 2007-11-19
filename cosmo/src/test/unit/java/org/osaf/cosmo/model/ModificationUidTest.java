@@ -22,10 +22,7 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
-import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.ModelValidationException;
-import org.osaf.cosmo.model.ModificationUid;
-import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 public class ModificationUidTest extends TestCase {
    
@@ -33,7 +30,7 @@ public class ModificationUidTest extends TestCase {
         TimeZoneRegistryFactory.getInstance().createRegistry();
     
     public void testModificationUid() throws Exception {
-        Item parent = new NoteItem();
+        Item parent = new MockNoteItem();
         parent.setUid("abc");
         Date date = new Date("20070101");
         

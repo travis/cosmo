@@ -25,6 +25,8 @@ import org.osaf.cosmo.eim.EimRecordField;
 import org.osaf.cosmo.eim.schema.BaseGeneratorTestCase;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockMessageStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link MessageGenerator}.
@@ -36,11 +38,11 @@ public class MessageGeneratorTest extends BaseGeneratorTestCase
 
     public void testGenerateRecord() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        MessageStamp messageStamp = new MessageStamp(noteItem);
+        MessageStamp messageStamp = new MockMessageStamp(noteItem);
         messageStamp.setModifiedDate(noteItem.getModifiedDate());
         messageStamp.setMessageId("id");
         messageStamp.setHeaders("headers");

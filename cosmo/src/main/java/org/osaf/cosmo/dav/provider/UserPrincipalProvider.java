@@ -28,6 +28,7 @@ import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.MethodNotAllowedException;
+import org.osaf.cosmo.model.EntityFactory;
 
 /**
  * <p>
@@ -42,8 +43,9 @@ public class UserPrincipalProvider extends BaseProvider {
     private static final Log log =
         LogFactory.getLog(UserPrincipalProvider.class);
 
-    public UserPrincipalProvider(DavResourceFactory resourceFactory) {
-        super(resourceFactory);
+    public UserPrincipalProvider(DavResourceFactory resourceFactory,
+            EntityFactory entityFactory) {
+        super(resourceFactory, entityFactory);
     }
 
     // DavProvider methods

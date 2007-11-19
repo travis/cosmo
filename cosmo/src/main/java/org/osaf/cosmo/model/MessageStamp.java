@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,205 +17,56 @@ package org.osaf.cosmo.model;
 
 import java.io.Reader;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-
 /**
- * Represents a Message Stamp.
+ * Stamp that associates message-specific attributes to an item.
  */
-@Entity
-@DiscriminatorValue("message")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class MessageStamp extends Stamp implements
-        java.io.Serializable {
+public interface MessageStamp extends Stamp{
 
     public static final String FORMAT_DATE_SENT = "EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z";
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -6100568628972081120L;
-    
-    public static final QName ATTR_MESSAGE_ID = new QName(
-            MessageStamp.class, "messageId");
-    
-    public static final QName ATTR_MESSAGE_HEADERS = new QName(
-            MessageStamp.class, "headers");
-    
-    public static final QName ATTR_MESSAGE_FROM = new QName(
-            MessageStamp.class, "from");
-    
-    public static final QName ATTR_MESSAGE_TO = new QName(
-            MessageStamp.class, "to");
-    
-    public static final QName ATTR_MESSAGE_CC = new QName(
-            MessageStamp.class, "cc");
-    
-    public static final QName ATTR_MESSAGE_BCC = new QName(
-            MessageStamp.class, "bcc");
-    
-    public static final QName ATTR_MESSAGE_ORIGINATORS = new QName(
-            MessageStamp.class, "originators");
-    
-    public static final QName ATTR_MESSAGE_DATE_SENT = new QName(
-            MessageStamp.class, "dateSent");
-    
-    public static final QName ATTR_MESSAGE_IN_REPLY_TO = new QName(
-            MessageStamp.class, "inReplyTo");
-    
-    public static final QName ATTR_MESSAGE_REFERENCES = new QName(
-            MessageStamp.class, "references");
-    
-    /** default constructor */
-    public MessageStamp() {
-    }
-    
-    public MessageStamp(Item item) {
-        setItem(item);
-    }
-    
-    public String getType() {
-        return "message";
-    }
     
     // Property accessors
-    public String getMessageId() {
-        // id stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_ID);
-    }
+    public String getMessageId();
 
-    public void setMessageId(String id) {
-        // id stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_ID, id);
-        updateTimestamp();
-    }
-    
-    public String getHeaders() {
-        // headers stored as TextAttribute on Item
-        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_HEADERS);
-    }
+    public void setMessageId(String id);
 
-    public void setHeaders(String headers) {
-        // headers stored as TextAttribute on Item
-        TextAttribute.setValue(getItem(), ATTR_MESSAGE_HEADERS, headers);
-        updateTimestamp();
-    }
-    
-    public void setHeaders(Reader headers) {
-        // headers stored as TextAttribute on Item
-        TextAttribute.setValue(getItem(), ATTR_MESSAGE_HEADERS, headers);
-        updateTimestamp();
-    }
-    
-    public String getFrom() {
-        // from stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_FROM);
-    }
+    public String getHeaders();
 
-    public void setFrom(String from) {
-        // from stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_FROM, from);
-        updateTimestamp();
-    }
+    public void setHeaders(String headers);
 
-    public String getTo() {
-        // to stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_TO);
-    }
+    public void setHeaders(Reader headers);
 
-    public void setTo(String to) {
-        // to stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_TO, to);
-        updateTimestamp();
-    }
-    
-    public String getBcc() {
-        // bcc stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_BCC);
-    }
+    public String getFrom();
 
-    public void setBcc(String bcc) {
-        //bcc stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_BCC, bcc);
-        updateTimestamp();
-    }
+    public void setFrom(String from);
 
-    public String getCc() {
-        // cc stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_CC);
-    }
+    public String getTo();
 
-    public void setCc(String cc) {
-        // cc stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_CC, cc);
-        updateTimestamp();
-    }
- 
-    public String getOriginators() {
-        // originators stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_ORIGINATORS);
-    }
+    public void setTo(String to);
 
-    public void setOriginators(String originators) {
-        // originators stored as StringAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_ORIGINATORS, originators);
-        updateTimestamp();
-    }
-    
-    public String getDateSent() {
-        // inReployTo stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_DATE_SENT);
-    }
+    public String getBcc();
 
-    public void setDateSent(String dateSent) {
-        // inReployTo stored as TextAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_DATE_SENT, dateSent);
-        updateTimestamp();
-    }
-    
-    public String getInReplyTo() {
-        // inReployTo stored as StringAttribute on Item
-        return StringAttribute.getValue(getItem(), ATTR_MESSAGE_IN_REPLY_TO);
-    }
+    public void setBcc(String bcc);
 
-    public void setInReplyTo(String inReplyTo) {
-        // inReployTo stored as TextAttribute on Item
-        StringAttribute.setValue(getItem(), ATTR_MESSAGE_IN_REPLY_TO, inReplyTo);
-        updateTimestamp();
-    }
+    public String getCc();
 
-    public String getReferences() {
-        // references stored as TextAttribute on Item
-        return TextAttribute.getValue(getItem(), ATTR_MESSAGE_REFERENCES);
-    }
+    public void setCc(String cc);
 
-    public void setReferences(String references) {
-        // references stored as TextAttribute on Item
-        TextAttribute.setValue(getItem(), ATTR_MESSAGE_REFERENCES, references);
-        updateTimestamp();
-    }
-    
-    public void setReferences(Reader references) {
-        // references stored as TextAttribute on Item
-        TextAttribute.setValue(getItem(), ATTR_MESSAGE_REFERENCES, references);
-        updateTimestamp();
-    }
+    public String getOriginators();
 
-    /**
-     * Return MessageStamp from Item
-     * @param item
-     * @return MessageStamp from Item
-     */
-    public static MessageStamp getStamp(Item item) {
-        return (MessageStamp) item.getStamp(MessageStamp.class);
-    }
-    
-    public Stamp copy() {
-        MessageStamp stamp = new MessageStamp();
-        return stamp;
-    }
+    public void setOriginators(String originators);
+
+    public String getDateSent();
+
+    public void setDateSent(String dateSent);
+
+    public String getInReplyTo();
+
+    public void setInReplyTo(String inReplyTo);
+
+    public String getReferences();
+
+    public void setReferences(String references);
+
+    public void setReferences(Reader references);
+
 }

@@ -24,6 +24,7 @@ import org.osaf.cosmo.dav.BaseDavTestCase;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.model.EntityFactory;
 
 import org.w3c.dom.Document;
 
@@ -38,9 +39,11 @@ public abstract class BaseReportTestCase extends BaseDavTestCase {
         throws Exception {
         return (DavResource)
             clazz.getConstructor(DavResourceLocator.class,
-                                 DavResourceFactory.class).
+                                 DavResourceFactory.class,
+                                 EntityFactory.class).
                 newInstance(testHelper.getHomeLocator(),
-                            testHelper.getResourceFactory());
+                            testHelper.getResourceFactory(),
+                            testHelper.getEntityFactory());
     }
 
     protected ReportBase makeReport(Class clazz,

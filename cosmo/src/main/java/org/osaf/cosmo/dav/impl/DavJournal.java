@@ -35,6 +35,7 @@ import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
@@ -50,17 +51,19 @@ public class DavJournal extends DavCalendarResource {
     
     /** */
     public DavJournal(DavResourceLocator locator,
-                      DavResourceFactory factory)
+                      DavResourceFactory factory,
+                      EntityFactory entityFactory)
         throws DavException {
-        this(new NoteItem(), locator, factory);
+        this(entityFactory.createNote(), locator, factory, entityFactory);
     }
 
     /** */
     public DavJournal(NoteItem item,
                       DavResourceLocator locator,
-                      DavResourceFactory factory)
+                      DavResourceFactory factory,
+                      EntityFactory entityFactory)
         throws DavException {
-        super(item, locator, factory);
+        super(item, locator, factory, entityFactory);
     }
 
     // our methods

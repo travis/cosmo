@@ -29,6 +29,9 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
+import org.osaf.cosmo.model.mock.MockEventStamp;
+import org.osaf.cosmo.model.mock.MockNoteItem;
 
 /**
  * Test Case for {@link EventGenerator}.
@@ -40,11 +43,11 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
 
     public void testGenerateRecord() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        EventStamp eventStamp = new EventStamp(noteItem);
+        EventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         eventStamp.setLocation("here");
@@ -94,12 +97,12 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateMissingRecord() throws Exception {
         
-        NoteItem noteItem = new NoteItem();
+        NoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
-        noteItem.setModifies(new NoteItem());
+        noteItem.setModifies(new MockNoteItem());
         
-        EventExceptionStamp eventStamp = new EventExceptionStamp(noteItem);
+        EventExceptionStamp eventStamp = new MockEventExceptionStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         eventStamp.setLocation(null);

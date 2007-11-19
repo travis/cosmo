@@ -32,6 +32,7 @@ import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
@@ -40,6 +41,7 @@ import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
@@ -63,6 +65,7 @@ public class StandardMorseCodeController implements MorseCodeController {
     private ContentService contentService;
     private UserService userService;
     private CosmoSecurityManager securityManager;
+    private EntityFactory entityFactory;
 
     /**
      * Returns information about every collection in the user's home
@@ -146,7 +149,7 @@ public class StandardMorseCodeController implements MorseCodeController {
     public PubCollection publishCollection(String uid,
                                            String parentUid,
                                            PubRecords records,
-                                           Set<Ticket.Type> ticketTypes) {
+                                           Set<TicketType> ticketTypes) {
         if (log.isDebugEnabled()) {
             if (parentUid != null)
                 log.debug("publishing collection " + uid +
@@ -169,7 +172,7 @@ public class StandardMorseCodeController implements MorseCodeController {
             parent = (CollectionItem) parentItem;
         }
 
-        CollectionItem collection = new CollectionItem();
+        CollectionItem collection = entityFactory.createCollection();
         User owner = computeItemOwner();
         collection.setUid(uid);
         collection.setOwner(owner);
@@ -183,14 +186,14 @@ public class StandardMorseCodeController implements MorseCodeController {
             collection.setHue(records.getHue());
         
         // stamp it as a calendar
-        CalendarCollectionStamp ccs = new CalendarCollectionStamp(collection);
+        CalendarCollectionStamp ccs = entityFactory.createCalendarCollectionStamp(collection);
         collection.addStamp(ccs);
 
         Set<Item> children = recordsToItems(records.getRecordSets(),
                                             collection);
 
-        for (Ticket.Type type : ticketTypes)
-            collection.addTicket(new Ticket(type));
+        for (TicketType type : ticketTypes)
+            collection.addTicket(entityFactory.createTicket(type));
 
         // throws UidinUseException
         collection =
@@ -404,6 +407,16 @@ public class StandardMorseCodeController implements MorseCodeController {
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
     }
+    
+    
+
+    public EntityFactory getEntityFactory() {
+        return entityFactory;
+    }
+
+    public void setEntityFactory(EntityFactory entityFactory) {
+        this.entityFactory = entityFactory;
+    }
 
     /** */
     public void init() {
@@ -413,6 +426,8 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new IllegalStateException("userService is required");
         if (securityManager == null)
             throw new IllegalStateException("securityManager is required");
+        if (entityFactory == null)
+            throw new IllegalStateException("entityFactory is required");
     }
 
     private User computeItemOwner() {
@@ -500,7 +515,7 @@ public class StandardMorseCodeController implements MorseCodeController {
     
     private ContentItem createBaseChildItem(CollectionItem collection,
                                         EimRecordSet recordset) {
-        NoteItem child = new NoteItem();
+        NoteItem child = entityFactory.createNote();
 
         child.setUid(recordset.getUuid());
         child.setIcalUid(child.getUid());

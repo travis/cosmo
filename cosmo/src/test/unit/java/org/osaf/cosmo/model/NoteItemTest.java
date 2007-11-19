@@ -20,6 +20,8 @@ import java.util.Date;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.osaf.cosmo.model.mock.MockNoteItem;
+
 /**
  * Test NoteItem
  */
@@ -27,11 +29,11 @@ public class NoteItemTest extends TestCase {
    
   
     public void testNoteItemEtag() throws Exception {
-        NoteItem master = new NoteItem();
+        MockNoteItem master = new MockNoteItem();
         master.setUid("1");
         master.setModifiedDate(new Date());
         
-        NoteItem mod = new NoteItem();
+        MockNoteItem mod = new MockNoteItem();
         mod.setUid("2");
         mod.setModifiedDate(new Date());
         mod.setModifies(master);

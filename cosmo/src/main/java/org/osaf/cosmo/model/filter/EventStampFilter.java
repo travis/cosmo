@@ -17,6 +17,8 @@ package org.osaf.cosmo.model.filter;
 
 import java.util.Date;
 
+import org.osaf.cosmo.model.BaseEventStamp;
+
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.TimeZone;
@@ -112,6 +114,7 @@ public class EventStampFilter extends StampFilter {
     }
 
     public EventStampFilter() {
+        setStampClass(BaseEventStamp.class);
     }
 
     public TimeZone getTimezone() {

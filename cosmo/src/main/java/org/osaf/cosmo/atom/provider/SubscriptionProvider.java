@@ -274,7 +274,7 @@ public class SubscriptionProvider extends BaseProvider
 
         try {
             XhtmlSubscriptionFormat formatter = new XhtmlSubscriptionFormat();
-            CollectionSubscription sub = formatter.parse(entry.getContent());
+            CollectionSubscription sub = formatter.parse(entry.getContent(), getEntityFactory());
             if (sub.getDisplayName() == null)
                 throw new ValidationException("Subscription requires a display name");
             if (sub.getCollectionUid() == null)

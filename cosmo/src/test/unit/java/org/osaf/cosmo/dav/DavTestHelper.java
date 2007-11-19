@@ -17,31 +17,16 @@ package org.osaf.cosmo.dav;
 
 import java.net.URL;
 
-import org.apache.commons.id.random.SessionIdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.jackrabbit.webdav.DavResourceIterator;
-
 import org.osaf.cosmo.MockHelper;
-import org.osaf.cosmo.dao.mock.MockCalendarDao;
-import org.osaf.cosmo.dao.mock.MockContentDao;
-import org.osaf.cosmo.dao.mock.MockDaoStorage;
-import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
-import org.osaf.cosmo.dav.DavCollection;
-import org.osaf.cosmo.dav.DavResource;
-import org.osaf.cosmo.dav.DavResourceFactory;
-import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.ExtendedDavConstants;
-import org.osaf.cosmo.dav.StandardResourceFactory;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
 import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.util.PathUtil;
 import org.osaf.cosmo.util.UriTemplate;
 
 public class DavTestHelper extends MockHelper
@@ -51,7 +36,7 @@ public class DavTestHelper extends MockHelper
     private StandardResourceFactory resourceFactory;
     private StandardResourceLocatorFactory locatorFactory;
     private DavResourceLocator homeLocator;
-    private DavHomeCollection homeResource;
+
     private URL baseUrl;
 
     public DavTestHelper() {
@@ -60,7 +45,9 @@ public class DavTestHelper extends MockHelper
         resourceFactory =
             new StandardResourceFactory(getContentService(),
                                         getUserService(),
-                                        getSecurityManager());
+                                        getSecurityManager(),
+                                        getEntityFactory(),
+                                        getCalendarQueryProcessor());
         locatorFactory = new StandardResourceLocatorFactory();
         try {
             baseUrl = new URL("http", "localhost", -1, "/dav");
@@ -77,6 +64,7 @@ public class DavTestHelper extends MockHelper
             locatorFactory.createResourceLocatorByPath(baseUrl, path);
     }
 
+    
     public DavResourceFactory getResourceFactory() {
         return resourceFactory;
     }
@@ -92,7 +80,7 @@ public class DavTestHelper extends MockHelper
     public DavHomeCollection initializeHomeResource()
         throws DavException {
         return new DavHomeCollection(getHomeCollection(), homeLocator,
-                                     resourceFactory);
+                                     resourceFactory, getEntityFactory());
     }
 
     public DavUserPrincipal getPrincipal(User user)
@@ -136,7 +124,7 @@ public class DavTestHelper extends MockHelper
         DavResourceLocator locator =
             createMemberLocator(homeLocator, collection.getName());
         return new DavCalendarCollection(collection, locator,
-                                         resourceFactory);
+                                         resourceFactory, getEntityFactory());
     }
 
     public DavEvent initializeDavEvent(DavCalendarCollection parent,
@@ -148,6 +136,6 @@ public class DavTestHelper extends MockHelper
             item = makeAndStoreDummyItem(collection, name);
         DavResourceLocator locator =
             createMemberLocator(parent.getResourceLocator(), item.getName());
-        return new DavEvent(item, locator, resourceFactory);
+        return new DavEvent(item, locator, resourceFactory, getEntityFactory());
     }
 }

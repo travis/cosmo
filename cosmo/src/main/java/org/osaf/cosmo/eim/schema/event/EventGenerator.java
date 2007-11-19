@@ -31,6 +31,7 @@ import org.osaf.cosmo.eim.schema.text.DurationFormat;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.StampUtils;
 
 /**
  * Generates EIM records from event stamps.
@@ -52,7 +53,7 @@ public class EventGenerator extends BaseStampGenerator
     /** */
     public EventGenerator(Item item) {
         super(PREFIX_EVENT, NS_EVENT, item);
-        setStamp(BaseEventStamp.getStamp(item));
+        setStamp(StampUtils.getBaseEventStamp(item));
     }
     
     @Override

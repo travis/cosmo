@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
 
 /**
@@ -51,7 +52,7 @@ public abstract class BaseItemProviderTestCase extends BaseProviderTestCase {
         props.setProperty("name", item.getDisplayName() != null ?
                           item.getDisplayName() : "");
 
-        EventStamp es = EventStamp.getStamp(item);
+        EventStamp es = StampUtils.getEventStamp(item);
         if (es != null)
             props.setProperty("startDate", es.getStartDate().toString());
 

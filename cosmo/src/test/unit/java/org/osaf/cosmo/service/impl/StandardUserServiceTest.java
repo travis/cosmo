@@ -29,6 +29,7 @@ import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibPasswordRecovery;
 import org.springframework.dao.DataRetrievalFailureException;
 
 /**
@@ -228,7 +229,7 @@ public class StandardUserServiceTest extends TestCase {
         user = userDao.createUser(user);
         
         PasswordRecovery passwordRecovery = 
-            new PasswordRecovery(user, "pwrecovery1");
+            new HibPasswordRecovery(user, "pwrecovery1");
         
         passwordRecovery = service.createPasswordRecovery(passwordRecovery);
 
@@ -250,7 +251,7 @@ public class StandardUserServiceTest extends TestCase {
         
         userDao.createUser(user);
 
-        PasswordRecovery passwordRecovery = new PasswordRecovery(user, "pwrecovery2");
+        PasswordRecovery passwordRecovery = new HibPasswordRecovery(user, "pwrecovery2");
         
         passwordRecovery = service.createPasswordRecovery(passwordRecovery);
         

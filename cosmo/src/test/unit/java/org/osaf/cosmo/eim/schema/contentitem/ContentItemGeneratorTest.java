@@ -30,9 +30,13 @@ import org.osaf.cosmo.eim.schema.BaseGeneratorTestCase;
 import org.osaf.cosmo.eim.schema.text.TriageStatusFormat;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.mock.MockEntityFactory;
+import org.osaf.cosmo.model.mock.MockNoteItem;
+import org.osaf.cosmo.model.mock.MockQName;
+import org.osaf.cosmo.model.mock.MockStringAttribute;
+import org.osaf.cosmo.model.mock.MockTriageStatus;
 
 /**
  * Test Case for {@link ContentItemGenerator}.
@@ -54,12 +58,12 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
         Boolean needsReply = Boolean.TRUE;
         Date clientCreationDate = Calendar.getInstance().getTime();
 
-        TriageStatus ts = new TriageStatus();
+        TriageStatus ts = new MockTriageStatus();
         ts.setCode(triageStatusCode);
         ts.setRank(triageStatusRank);
         ts.setAutoTriage(autoTriage);
 
-        ContentItem contentItem = new NoteItem();
+        ContentItem contentItem = new MockNoteItem();
         contentItem.setUid(uid);
         contentItem.setName(name);
         contentItem.setDisplayName(displayName);
@@ -89,7 +93,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
 
         EimRecordField triageStatusField = fields.get(1);
         checkTextField(triageStatusField, FIELD_TRIAGE,
-                       TriageStatusFormat.getInstance().format(ts));
+                       TriageStatusFormat.getInstance(new MockEntityFactory()).format(ts));
 
         EimRecordField sentField = fields.get(2);
         checkBooleanField(sentField, FIELD_HAS_BEEN_SENT, sent);
@@ -109,7 +113,7 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
     public void testInactiveNotDeleted() throws Exception {
         // inactive items are not deleted via item records but via
         // recordset
-        ContentItem contentItem = new NoteItem();
+        ContentItem contentItem = new MockNoteItem();
         contentItem.setIsActive(false);
 
         ContentItemGenerator generator = new ContentItemGenerator(contentItem);
@@ -118,8 +122,8 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
     }
 
     public void testGenerateMissingField() throws Exception {
-        NoteItem modification = new NoteItem();
-        NoteItem parent = new NoteItem();
+        NoteItem modification = new MockNoteItem();
+        NoteItem parent = new MockNoteItem();
         modification.setUid("1");
         parent.setDisplayName("test");
         modification.setDisplayName(null);
@@ -143,8 +147,8 @@ public class ContentItemGeneratorTest extends BaseGeneratorTestCase
     }
     
     private StringAttribute makeStringAttribute() {
-        StringAttribute attr = new StringAttribute();
-        attr.setQName(new QName(NS_ITEM, "Blues Traveler"));
+        StringAttribute attr = new MockStringAttribute();
+        attr.setQName(new MockQName(NS_ITEM, "Blues Traveler"));
         attr.setValue("Sweet talkin' hippie");
         return attr;
     }

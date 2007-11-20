@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavException;
@@ -63,7 +64,6 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
-import org.osaf.cosmo.service.util.EventUtils;
 
 /**
  * Extends <code>DavCollection</code> to adapt the Cosmo
@@ -325,20 +325,23 @@ public class DavCalendarCollection extends DavCollectionBase
 
     private void saveEvent(DavItemContent member)
         throws DavException {
-        CollectionItem collection = (CollectionItem) getItem();
-        CalendarCollectionStamp cc = getCalendarCollectionStamp();
+        
         ContentItem content = (ContentItem) member.getItem();
         EventStamp event = StampUtils.getEventStamp(content);
-        Calendar calendar = event.getCalendar();
-
+        EntityConverter converter = new EntityConverter(getEntityFactory());
+        Set<ContentItem> toUpdate = new HashSet<ContentItem>();
+        
+        // convert icalendar representation to cosmo data model
+        toUpdate.addAll(converter.convertEventCalendar(
+                (NoteItem) content, event.getEventCalendar()));
+        
         if (event.getCreationDate()!=null) {
             if (log.isDebugEnabled())
                 log.debug("updating event " + member.getResourcePath());
 
             try {
-                EventUtils.updateEvent(getContentService(),
-                                       (NoteItem) content,
-                                       event.getEventCalendar());
+                getContentService().updateContentItems(content.getParents(),
+                        toUpdate);
             } catch (IcalUidInUseException e) {
                 throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
@@ -349,9 +352,8 @@ public class DavCalendarCollection extends DavCollectionBase
                 log.debug("creating event " + member.getResourcePath());
 
             try {
-                content = EventUtils.createEvent(getContentService(), collection,
-                                                 (NoteItem) content,
-                                                 event.getEventCalendar());
+                getContentService().createContentItems(
+                        (CollectionItem) getItem(), toUpdate);
             } catch (IcalUidInUseException e) {
                 throw new UidConflictException(e);
             } catch (CollectionLockedException e) {

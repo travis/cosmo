@@ -136,6 +136,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             return collection;
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
+        } catch (InvalidStateException ise) {
+            logInvalidStateException(ise);
+            throw ise;
         }
     }
 

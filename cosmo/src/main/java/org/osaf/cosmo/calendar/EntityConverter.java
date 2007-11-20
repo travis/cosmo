@@ -37,6 +37,7 @@ import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.DtStamp;
 
 import org.apache.commons.lang.StringUtils;
+import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventExceptionStamp;
@@ -85,9 +86,8 @@ public class EntityConverter {
      * </p>
      * <p>
      * If the given note is already persistent, and the calendar does not
-     * contain an exception event matching an existing modificaton, that
-     * modification is removed from the master note and set inactive. It is
-     * still returned in the result set.
+     * contain an exception event matching an existing modification, that
+     * modification is set inactive. It is still returned in the result set.
      * </p>
      */
     public Set<NoteItem> convertEventCalendar(NoteItem note,
@@ -106,13 +106,10 @@ public class EntityConverter {
         LinkedHashSet<NoteItem> items = new LinkedHashSet<NoteItem>();
         items.add(note);
 
-        for(Iterator<NoteItem> it = note.getModifications().iterator();
-            it.hasNext();) {
+        // add modifications to set of items
+        for(Iterator<NoteItem> it = note.getModifications().iterator(); it.hasNext();) {
             NoteItem mod = it.next();
             items.add(mod);
-            // remove deleted modifications from parent
-            if( mod.getIsActive() == Boolean.FALSE)
-                it.remove();
         }
 
         return items;
@@ -205,7 +202,7 @@ public class EntityConverter {
         syncExceptions(exceptions, masterNote);
     }
 
-    private void compactTimezones(EventStamp stamp) {
+    private void compactTimezones(BaseEventStamp stamp) {
         Calendar master = stamp.getEventCalendar();
         if(master==null)
             return;
@@ -284,6 +281,12 @@ public class EntityConverter {
         noteMod.setOwner(masterNote.getOwner());
         noteMod.setName(noteMod.getUid());
         
+        // copy VTIMEZONEs to front if present
+        EventStamp es = StampUtils.getEventStamp(masterNote);
+        ComponentList vtimezones = es.getEventCalendar().getComponents(Component.VTIMEZONE);
+        for(Iterator<Component> it = vtimezones.iterator(); it.hasNext();)
+            exceptionStamp.getEventCalendar().getComponents().add(0, it.next());
+        
         setCalendarAttributes(noteMod, event);
 
         TriageStatus ts = entityFactory.createTriageStatus();
@@ -306,12 +309,13 @@ public class EntityConverter {
             StampUtils.getEventExceptionStamp(noteMod);
         exceptionStamp.setExceptionEvent(event);
         
-        // for now displayName is limited to 255 chars
-        if(event.getSummary()!=null)
-            noteMod.setDisplayName(StringUtils.substring(event.getSummary().getValue(),0,255));
-       
-        if(event.getDescription()!=null)
-            noteMod.setBody(event.getDescription().getValue());
+        // copy VTIMEZONEs to front if present
+        ComponentList vtimezones = exceptionStamp.getMasterStamp()
+                .getEventCalendar().getComponents(Component.VTIMEZONE);
+        for(Iterator<Component> it = vtimezones.iterator(); it.hasNext();)
+            exceptionStamp.getEventCalendar().getComponents().add(0, it.next());
+        
+        setCalendarAttributes(noteMod, event);
         
         noteMod.setClientModifiedDate(new Date());
         noteMod.setLastModifiedBy(noteMod.getModifies().getLastModifiedBy());
@@ -320,10 +324,10 @@ public class EntityConverter {
     
     private void setCalendarAttributes(NoteItem note,
                                        VEvent event) {
-        // for now displayName is limited to 255 chars
+        // for now displayName is limited to 1024 chars
         if (event.getSummary() != null)
             note.setDisplayName(StringUtils.substring(event.getSummary()
-                    .getValue(), 0, 255));
+                    .getValue(), 0, 1024));
 
         if (event.getDescription() != null)
             note.setBody(event.getDescription().getValue());

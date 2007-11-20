@@ -31,6 +31,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.TestHelper;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
@@ -47,7 +48,6 @@ import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockEventStamp;
 import org.osaf.cosmo.model.mock.MockNoteItem;
 import org.osaf.cosmo.service.lock.SingleVMLockManager;
-import org.osaf.cosmo.service.util.EventUtils;
 
 /**
  * Test Case for <code>StandardContentService</code> which uses mock
@@ -302,7 +302,10 @@ public class StandardContentServiceTest extends TestCase {
         masterNote.addStamp(eventStamp);
         contentDao.createContent(rootCollection, masterNote);
         
-        EventUtils.updateEvent(service, masterNote, calendar);
+        EntityConverter converter = new EntityConverter(testHelper.getEntityFactory());
+        Set<ContentItem> toUpdate = new HashSet<ContentItem>();
+        toUpdate.addAll(converter.convertEventCalendar(masterNote, calendar));
+        service.updateContentItems(masterNote.getParents(), toUpdate);
         
         Calendar masterCal = eventStamp.getEventCalendar();
         VEvent masterEvent = eventStamp.getMasterEvent();
@@ -334,7 +337,8 @@ public class StandardContentServiceTest extends TestCase {
         
         // now update
         calendar = getCalendar("event_with_exceptions2.ics"); 
-        EventUtils.updateEvent(service, masterNote, calendar);
+        toUpdate.addAll(converter.convertEventCalendar(masterNote, calendar));
+        service.updateContentItems(masterNote.getParents(), toUpdate);
         
         // should have removed 1, added 2 so that makes 4-1+2=5
         Assert.assertEquals(masterNote.getModifications().size(), 5);

@@ -67,6 +67,7 @@ public class EventUtils {
      * @param masterNote master note item
      * @param calendar Calendar containing master/override VEVENTs
      * @return newly created master note item
+     * @deprecated
      */
     public static NoteItem createEvent(ContentService service, CollectionItem parent, NoteItem note, Calendar calendar) {
         
@@ -100,6 +101,7 @@ public class EventUtils {
      * @parem service ContentService to use to update event and modification items
      * @param note master note item to update
      * @param calendar Calendar containing master/override VEVENTs
+     * @deprecated
      */
     public static void updateEvent(ContentService service, NoteItem note, Calendar calendar) {
         updateEventInternal(note, calendar);

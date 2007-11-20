@@ -91,5 +91,20 @@ public class EimValueConverterTest extends TestCase {
         } catch (EimConversionException e) {
         }
         
+        strTrigger = ";VALUE=DATE:-PT15M";
+        try {
+            
+            trigger = EimValueConverter.toIcalTrigger(strTrigger);
+            fail("able to convert invalid trigger");
+        } catch (EimConversionException e) {
+        }
+        
+        strTrigger = ";VALUE=DATE-TIME:-PT15M";
+        try {
+            
+            trigger = EimValueConverter.toIcalTrigger(strTrigger);
+            fail("able to convert invalid trigger");
+        } catch (EimConversionException e) {
+        }
     }
 }

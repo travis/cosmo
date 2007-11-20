@@ -877,6 +877,47 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070505", instance.getEnd().toString());
     }
     
+    public void testRecurringWithUntil() throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        FileInputStream fis = new FileInputStream(baseDir + "/instancelist/recurring_until.ics");
+        Calendar calendar = cb.build(fis);
+        
+        InstanceList instances = new InstanceList();
+        
+        DateTime start = new DateTime("20070101T090000Z");
+        DateTime end = new DateTime("20070201T090000Z");
+        
+        addToInstanceList(calendar, instances, start, end);
+        
+        Assert.assertEquals(3, instances.size() );
+        
+        Iterator<String> keys = instances.keySet().iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070102T161500Z", key);
+        Assert.assertEquals("20070102T101500", instance.getStart().toString());
+        Assert.assertEquals("20070102T111500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070103T161500Z", key);
+        Assert.assertEquals("20070103T101500", instance.getStart().toString());
+        Assert.assertEquals("20070103T111500", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20070104T161500Z", key);
+        Assert.assertEquals("20070104T101500", instance.getStart().toString());
+        Assert.assertEquals("20070104T111500", instance.getEnd().toString());
+    }
+    
     private static void addToInstanceList(Calendar calendar,
             InstanceList instances, Date start, Date end) {
         ComponentList comps = calendar.getComponents();

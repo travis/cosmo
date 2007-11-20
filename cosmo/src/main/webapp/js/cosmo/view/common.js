@@ -244,6 +244,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
     var error = deltaAndError[1];
     var delta = deltaAndError[0];
     if (error || delta.hasChanges()) {
+        dojo.debug(error || delta);
         // Cancel button -- just hide the dialog, do nothing
         var cancel = function () {
             // Execute any pre-cancel code passed in

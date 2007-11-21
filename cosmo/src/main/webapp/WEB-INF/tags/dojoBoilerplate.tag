@@ -49,7 +49,7 @@
     var searchIds = [<c:forEach var="searchId" items="${searchIds}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>
                      "${searchId}"</c:forEach>];
 
-    var djConfig = {isDebug: true, 
+    var djConfig = {isDebug: false, 
                     baseUrl: "${baseUrl}",
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",

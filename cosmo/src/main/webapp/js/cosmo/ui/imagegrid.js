@@ -23,7 +23,6 @@
 
 dojo.provide("cosmo.ui.imagegrid");
 
-dojo.require("dojo.hostenv");
 dojo.require("dojo.event.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");

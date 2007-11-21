@@ -483,14 +483,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
 
             //now we have to expand out the item for the viewing range
-            var deferredArray = [cosmo.app.pim.serv.getDashboardItems(data.getMaster(),
-                { sync: true })];
+            var deferredArray = [cosmo.app.pim.serv.getDashboardItems(data.getMaster())];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
-              deferredArray.push(cosmo.app.pim.serv.getDashboardItems(newItemNote,
-                  { sync: true }));
+                deferredArray.push(cosmo.app.pim.serv.getDashboardItems(newItemNote));
             }
             deferred = new dojo.DeferredList(deferredArray);
-
+            cosmo.util.deferred.addStdDLCallback(deferredArray);
             var addExpandedOccurrences = function (results) {
                 var error = cosmo.util.deferred.getFirstError(results);
 
@@ -579,14 +577,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     cosmo.view.service.processingQueue.length);
             }
         }
-
-        if (deferred){
-            deferred.addCallback(updateEventsCallback);
-        }
-        else {
-            updateEventsCallback();
-        }
-        self._doSortAndDisplay();
+        deferred = deferred || cosmo.util.deferred.getFiredDeferred()
+        deferred.addCallback(updateEventsCallback);
+        deferred.addCallback(function(){self._doSortAndDisplay()});
+        return deferred;
     };
     this._removeSuccess = function (cmd) {
         var recurOpts = cosmo.view.service.recurringEventOptions;

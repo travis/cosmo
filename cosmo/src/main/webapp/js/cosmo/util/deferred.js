@@ -18,7 +18,6 @@ dojo.provide("cosmo.util.deferred");
 dojo.require("cosmo.app");
 
 cosmo.util.deferred = {
-    //FIXME: don't think we actually use this    
     getFiredDeferred: function (result){
         var d = new dojo.Deferred();
         d.callback(result);
@@ -29,6 +28,19 @@ cosmo.util.deferred = {
         deferred.addErrback(function (e){
             cosmo.app.showErr(primaryMessage || _("Error.DeferredPrimary"), 
                               secondaryMessage || _("Error.DeferredSecondary"), e);
+        });
+    },
+    
+    /* Add callback to deferredList to display error messages from component deferreds */
+    addStdDLCallback: function(deferredList, primaryMessage, secondaryMessage){
+        deferredList.addCallback(function (dResultList){
+            for (var i = 0; i < dResultList.length; i++){
+                var result = dResultList[i];
+                if (!result[0]){
+                    cosmo.app.showErr(primaryMessage || _("Error.DeferredPrimary"), 
+                              secondaryMessage || _("Error.DeferredSecondary"), result[1]);
+                }
+            }
         });
     },
     

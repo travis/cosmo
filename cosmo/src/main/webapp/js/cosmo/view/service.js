@@ -366,7 +366,7 @@ cosmo.view.service = new function () {
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
                 //itself.
-                var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.currentCollection.getUrls().self, {sync:true});
+                var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.currentCollection.getUrls().self);
                 deferred.addErrback(function (){
                     //reload collections will handle showing the error message, as it will try and load the 
                     //original collection

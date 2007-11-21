@@ -104,16 +104,15 @@ cosmo.view.list.loadItems = function (o) {
             return false;
         }
     });
-    deferred.addCallback(function (itemLL){
-        itemLoadList = itemLL;
+    deferred.addCallback(function (itemLoadList){
+        // Create a hash from the array
+        var itemRegistry = cosmo.view.list.createItemRegistry(itemLoadList);
+        cosmo.view.list.itemRegistry = itemRegistry;
+        
+        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
+                                                data: itemRegistry, opts: opts });
     });
-    // Create a hash from the array
-    var itemRegistry = cosmo.view.list.createItemRegistry(itemLoadList);
-    cosmo.view.list.itemRegistry = itemRegistry;
-
-    dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
-        data: itemRegistry, opts: opts });
-    return true;
+    return deferred;
 };
 
 cosmo.view.list.createItemRegistry = function (arrParam) {

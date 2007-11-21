@@ -171,6 +171,7 @@ cosmo.util.hash.Hash = function () {
         this.cursorPos = (this.length-1);
     };
     this.each = function (func, o) {
+        var resultList = [];
         var opts = o || {};
         var len = this.order.length;
         var start = opts.start ? opts.start : 0;
@@ -180,22 +181,22 @@ cosmo.util.hash.Hash = function () {
             var key = this.order[i];
             var val = this.items[key];
             if (opts.keyOnly) {
-                func(key);
+                resultList.push(func(key));
             }
             else if (opts.valueOnly) {
-                func(val);
+                resultList.push(func(val));
             }
             else {
-                func(key, val);
+                resultList.push(func(key, val));
             }
         }
-        return true;
+        return resultList;
     };
     this.eachKey = function (func) {
-        this.each(func, { keyOnly: true });
+        return this.each(func, { keyOnly: true });
     };
     this.eachValue = function (func) {
-        this.each(func, { valueOnly: true });
+        return this.each(func, { valueOnly: true });
     };
     this.clone = function () {
         var h = new Hash();

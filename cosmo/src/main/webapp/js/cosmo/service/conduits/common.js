@@ -240,11 +240,9 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     deleteItem: function(item, kwArgs){
-        kwArgs = kwArgs || {};
-
         return this._transport.deleteItem(item, kwArgs);
     },
-    
+
     removeItem: function(item, collection, kwArgs){
         kwArgs = kwArgs || {};
 
@@ -257,9 +255,12 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return this._transport.createSubscription(subscription, 
             this._translator.subscriptionToAtomEntry(subscription), 
             kwArgs);
-            
     },
 
+    deleteSubscription: function(subscription, kwArgs){
+        return this._transport.deleteSubscription(subscription, kwArgs);
+    },
+    
     // This is hacky, TODO: point to Atom for 0.10
     createCollection: function (name, kwArgs){
         return this._transport.bind({

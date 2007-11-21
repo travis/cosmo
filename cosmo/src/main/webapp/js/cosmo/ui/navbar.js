@@ -23,6 +23,7 @@ dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.util.deferred");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
@@ -156,9 +157,11 @@ cosmo.ui.navbar.Bar = function (p) {
         this.defaultViewHasBeenInitialized = true;
 
         var doDisplay = function () {
+            var displayDeferred = null;
             if (viewName == _pim.views.LIST) {
                 // Only switch views if the data for the view loads successfully
-                if (_view.loadItems()) {
+                displayDeferred = _view.loadItems();
+                displayDeferred.addCallback(function(){
                     // If the cal canvas is currently showing, save the scroll
                     // offset of the timed canvas
                     if (self.calCanvas.domNode.style.display == 'block') {
@@ -166,7 +169,7 @@ cosmo.ui.navbar.Bar = function (p) {
                     }
                     self.calCanvas.domNode.style.display = 'none';
                     self.listCanvas.domNode.style.display = 'block';
-                }
+                });
             }
             else if (viewName == _pim.views.CAL) {
                 // Set up topic subscriptions in the canvas -- published
@@ -176,15 +179,24 @@ cosmo.ui.navbar.Bar = function (p) {
                 }
                 // Only switch views if the data for the view loads successfully
                 // or if we're not gettting data from the server
-                if (noLoad || _view.triggerLoadEvents()) {
+                var switchViews = function(){
                     self.listCanvas.domNode.style.display = 'none';
                     self.calCanvas.domNode.style.display = 'block';
                     cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
+                }
+                if (noLoad) switchViews();
+                else {
+                    displayDeferred = _view.triggerLoadEvents();
+                    displayDeferred.addCallback(switchViews);
                 }
             }
             else {
                 throw(viewName + ' is not a valid view.');
             }
+            displayDeferred = displayDeferred || cosmo.util.deferred.getFiredDeferred();
+            displayDeferred.addErrback(function(e){dojo.debug(e)});
+            return displayDeferred;
+
         }
         setTimeout(doDisplay, 0);
     };

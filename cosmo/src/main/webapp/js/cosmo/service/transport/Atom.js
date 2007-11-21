@@ -50,8 +50,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         return encodeURIComponent(cosmo.util.auth.getUsername());
     },
     
-    getAndCheckEditLink: function(item, searchCrit){
-        searchCrit = searchCrit || {};
+    getAndCheckEditLink: function(item, kwArgs){
+        kwArgs = kwArgs || {};
         var editLink = item.getUrls()[this.EDIT_LINK];
         if (!editLink) {
             throw new cosmo.service.exception.ClientSideError(
@@ -59,8 +59,8 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
                 item.getUid() + ": " + item.toString()
             )
         }
-        return this.generateUri(editLink,  searchCrit.projection || 
-                                this.PROJECTION_FULL_EIM_JSON);
+        return this.generateUri(editLink,  kwArgs.noProjection ? "" :
+                                kwArgs.projection || this.PROJECTION_FULL_EIM_JSON);
     },
     
     getAtomBase: function () {
@@ -244,7 +244,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
 
     deleteItem: function(item, kwArgs){
         kwArgs = kwArgs || {};
-        var editLink = this.getAndCheckEditLink(item);
+        var editLink = this.getAndCheckEditLink(item, kwArgs);
         var r = {};
         r.url = this.getAtomBase() + "/" + editLink;
         r.method = this.METHOD_DELETE;
@@ -252,6 +252,12 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
          
         return deferred;
+    },
+
+    deleteSubscription: function(subscription, kwArgs){
+        kwArgs = kwArgs || {};
+        kwArgs.noProjection = true;
+        return this.deleteItem(subscription, kwArgs);
     },
 
     removeItem: function(item, collection, kwArgs){

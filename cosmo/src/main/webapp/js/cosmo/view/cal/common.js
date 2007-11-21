@@ -18,6 +18,7 @@ dojo.provide('cosmo.view.cal.common');
 
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.util.deferred");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");
@@ -141,6 +142,7 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
 
     var _this = this;
     var loadEach = function (collId, coll) {
+        var loadDeferred = null;
         if (goToNav) { coll.isDisplayed = false; }
         var handleErr = function (e) {
             var reloadDeferred = null;
@@ -152,10 +154,10 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
         };
         if (coll.isDisplayed != coll.doDisplay) {
             if (coll.doDisplay) {
-                var deferred = cosmo.app.pim.serv.getItems(coll,
+                loadDeferred = cosmo.app.pim.serv.getItems(coll,
                     { start: start, end: end }, { sync: true });
-                deferred.addErrback(handleErr);
-                deferred.addCallback(function (eventLoadList){
+                loadDeferred.addErrback(handleErr);
+                loadDeferred.addCallback(function (eventLoadList){
                     var h = _this.createEventRegistry(eventLoadList, collId);
                     collectionReg[collId] = h;
                 });
@@ -165,14 +167,18 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
             }
             coll.isDisplayed = coll.doDisplay;
         }
+        return loadDeferred || cosmo.util.deferred.getFiredDeferred();
     }
-    cosmo.app.pim.collections.each(loadEach);
-
-    var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
+    var l = cosmo.app.pim.collections.each(loadEach);
+    var loadDeferred = new dojo.DeferredList(l);
+    cosmo.util.deferred.addStdDLCallback(loadDeferred);
+    loadDeferred.addCallback(function(){
+        var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
     
-    dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
-        data: itemRegistry, opts: opts });
-    return true;
+        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
+                                                data: itemRegistry, opts: opts });
+    });
+    return loadDeferred;
 };
 /**
  * Create a Hash of CalItem objects with data property of stamped

@@ -37,6 +37,7 @@ dojo.require("cosmo.ui.timeout");
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.uri');
 dojo.require('cosmo.util.hash');
+dojo.require('cosmo.util.deferred');
 dojo.require('cosmo.service.conduits.common');
 dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
@@ -303,6 +304,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             collectionsLoadedDeferred = new dojo.DeferredList(
                 [userCollectionsDeferred, subscriptionsDeferred]
             );
+            cosmo.util.deferred.addStdDLCallback(collectionsLoadedDeferred);
         }
         collectionsLoadedDeferred.addCallback(dojo.lang.hitch(this, function (){
             // Sort the collections
@@ -353,7 +355,8 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         var filteredSubscriptions = dojo.lang.filter(subscriptions,
             function(sub){
                if (sub.getCollectionDeleted() || sub.getTicketDeleted()){
-                   self.serv.deleteItem(sub);
+                   var deleteDeferred = self.serv.deleteSubscription(sub);
+                   cosmo.util.deferred.addStdErrback(deleteDeferred);
                    deletedSubscriptions.push(sub);
                    return false;
                } else {

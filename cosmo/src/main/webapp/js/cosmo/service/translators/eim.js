@@ -88,56 +88,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     RID_FMT: "%Y%m%dT%H%M%S",
 
-    // Wrap each of the specified property's getter with a function
-    // that will call the lazy loader and then revert each
-    // getter.
-    setLazyLoader: function (object, propertyNames, loaderFunction){
-        var oldGetters = {};
-        var oldSetters = {};
-        for (var i = 0; i < propertyNames.length; i++) {
-            var propertyName = propertyNames[i];
-            var getterName = "get" + dojo.string.capitalize(propertyName);
-            var setterName = "set" + dojo.string.capitalize(propertyName);
-            oldGetters[getterName] = object[getterName];
-            oldSetters[setterName] = object[setterName];
-            
-            // This is needed to create a new scope so we can enclose "getter name"
-            var createReplacerFunction = function(){
-                
-                var resetMethods = function(){
-                    for (var oldGetterName in oldGetters){
-                        object[oldGetterName] = oldGetters[oldGetterName];
-                    }
-                    for (var oldSetterName in oldSetters){
-                        object[oldSetterName] = oldSetters[oldSetterName];
-                    }
-                }
-                // Create a new variable to hold the current getter name
-                // that won't get replaced during the next iteration
-                // of the for loop.
-                var myGetName = getterName;
-                var mySetName = setterName;
-                object[myGetName] = 
-                    function(){   
-                        // does the get and loads properties from new object into old object
-                        resetMethods();
-                        loaderFunction(object, propertyNames);
-                        return object[myGetName]();
-                    };
-                object[mySetName] = 
-                    function(val){   
-                        // does the get and loads properties from new object into old object
-                        resetMethods();
-                        loaderFunction(object, propertyNames);
-                        return object[mySetName](val);
-                    };
-            }
-            createReplacerFunction();
-        }
-    },
-    
     translateGetCollection: function (atomXml, oldCollection){
-
         var uid = atomXml.getElementsByTagName("id")[0].firstChild.nodeValue.substring(9);
         var displayName = cosmo.util.html.getElementsByTagName(atomXml, "title")[0].firstChild.nodeValue;
         var collection = oldCollection || new cosmo.model.Collection();
@@ -183,7 +134,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 for (var j = 0; j < collectionElements.length; j++){
                     var collection = this.collectionXmlToCollection(collectionElements[j]);
                     collection.href = collectionElements[j].getAttribute("href");
-                    this.setLazyLoader(collection, ["urls", "uid", "writeable"], kwArgs.lazyLoader);
                     collections.push(collection);
                 }
             }
@@ -229,7 +179,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var urls = this.getUrls(entry)
             subscription.setUrls(urls);
             this.urlCache.setUrls(subscription, urls);
-            this.setLazyLoader(collection, ["urls", "writeable"], kwArgs.lazyLoader);
             subscriptions.push(subscription);
         }
         return subscriptions;

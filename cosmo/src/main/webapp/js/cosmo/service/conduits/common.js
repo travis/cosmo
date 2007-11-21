@@ -45,51 +45,65 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         var deferred = this._transport.getCollections(kwArgs);
 
-        this._addTranslation(deferred, "translateGetCollections", 
-        {
-            lazyLoader:  this.generateLazyLoader(
-                dojo.lang.hitch(this, 
-                                function (collection){
-                                    return this.getCollection(collection.href, 
-                                                              {sync: true}).results[0];
-                                }
-                )
-                )
+        this._addTranslation(deferred, "translateGetCollections");
 
-        } );
+        // Flesh out each collection
+        deferred.addCallback(dojo.lang.hitch(this, function(collections){
+            var collectionDetailDeferreds = [];
+            for (var i = 0; i < collections.length; i++){
+                collectionDetailDeferreds.push(
+                    this.getCollection(collections[i].href)
+                );
+            }
+            return new dojo.DeferredList(collectionDetailDeferreds);
+        }));
+
+        deferred.addCallback(this._extractDeferredListResults);
 
         return deferred;
     },
     
-    generateLazyLoader: function (getFunction){
-        return function(oldObject, propertyNames){
-            var newObject = getFunction(oldObject);
-            for (var i = 0; i < propertyNames.length; i++){
-                var propertyName = propertyNames[i];
-                var setterName = "set" + dojo.string.capitalize(propertyName);
-                var getterName = "get" + dojo.string.capitalize(propertyName);
-                oldObject[setterName](newObject[getterName]());
+    _extractDeferredListResults: function (results){
+        var list = [];
+        for (var i = 0; i < results.length; i++){
+            if (results[i][0]){
+                list.push(results[i][1]);
+            } else {
+                cosmo.app.showErr("", "", results[i][1]);
             }
         }
+        return list;
     },
-    
+
     getSubscriptions: function (kwArgs){
         kwArgs = kwArgs || {};
 
         var deferred = this._transport.getSubscriptions(kwArgs);
 
-        this._addTranslation(deferred, "translateGetSubscriptions", 
-        {
-            lazyLoader:  this.generateLazyLoader(
-                dojo.lang.hitch(this, 
-                                function (collection){
-                                    return this.getCollection(collection.href, 
-                                                              {sync: true, noAuth: true}).results[0];
-                                }
-                )
-                )
-        });
+        this._addTranslation(deferred, "translateGetSubscriptions");
 
+        // Flesh out each collection
+        deferred.addCallback(dojo.lang.hitch(this, function(subscriptions){
+            collectionDetailDeferreds = [];
+            for (var i = 0; i < subscriptions.length; i++){
+                //capturing scope
+                (dojo.lang.hitch(this, function (){
+                    var subscription = subscriptions[i];
+                    var deferred = this.getCollection(subscription.getCollection().href);
+                    deferred.addCallback(function(collection){
+                        subscription.setCollection(collection);
+                    });
+                    collectionDetailDeferreds.push(deferred);
+                }))();
+            }
+            var deferredList = new dojo.DeferredList(collectionDetailDeferreds);
+            // Finally, return subscription list from last deferred
+            deferredList.addCallback(function(){
+                return subscriptions;
+            });
+            return deferredList;
+        }));
+        deferred.addErrback(function(e){cosmo.app.showErr("", "", e)});
         return deferred;
     },
 

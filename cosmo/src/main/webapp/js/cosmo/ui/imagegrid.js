@@ -23,7 +23,7 @@
 
 dojo.provide("cosmo.ui.imagegrid");
 
-dojo.require("dojo.io.*");
+dojo.require("dojo.hostenv");
 dojo.require("dojo.event.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
@@ -33,20 +33,20 @@ cosmo.ui.imagegrid.config = {};
 cosmo.ui.imagegrid.DISABLED_OPACITY = 0.3;
 cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImageUrl('image_grid.png');
 
-cosmo.ui.imagegrid.readConfig = function (type, data, obj) {
+cosmo.ui.imagegrid.readConfig = function (data) {
     cosmo.ui.imagegrid.config = data;
 };
 
 // Get the config data file that tells us
 // which images are where, and what sizes
-dojo.io.bind({ url: cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/"+ 'imagegrid.json',
-    method: 'POST', // This is not RESTful, but POST avoids Prototype hijacking
-    sync: true,
-    mimetype: 'application/json',
-    content: '',
-    load: function(type, data, obj) {
-        cosmo.ui.imagegrid.readConfig(type, data, obj); },
-    error: function(type, error) { alert(error.message); } });
+
+cosmo.ui.imagegrid.readConfig(
+    dojo.json.evalJson(
+        dojo.hostenv.getText(
+            cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/imagegrid.json"
+        )
+    )
+);
 
 cosmo.ui.imagegrid.Image = function (p) {
     this.row = p.row;

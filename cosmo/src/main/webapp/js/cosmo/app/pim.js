@@ -25,6 +25,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require('cosmo.convenience');
 // --
 dojo.require("dojo.lang");
+dojo.require("dojo.DeferredList");
 
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
@@ -118,39 +119,40 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Tell the calendar view what week we're on
         //cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
-        this.loadCollections(params);
+        var loadCollectionsDeferred = this.loadCollections(params);
+        loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
 
-        // Base layout
-        // ===============================
-        this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
-
-        // Display the default view
-        this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
-        dojo.debug("clank");
-        if (!cosmo.app.pim.currentCollection) {
-            cosmo.app.hideMask();
-            cosmo.app.showErr(_("Error.NoCollections"));
-        } else {
-
-            // Show errors for deleted subscriptions -- deletedSubscriptions
-            // is a private var populated in the loadCollections method
-            if (deletedSubscriptions && deletedSubscriptions.length > 0){
-                for (var x = 0; x < deletedSubscriptions.length; x++){
-                    var errorMessage;
+            // Base layout
+            // ===============================
+            this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
+            
+            // Display the default view
+            this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
+            if (!cosmo.app.pim.currentCollection) {
+                cosmo.app.hideMask();
+                cosmo.app.showErr(_("Error.NoCollections"));
+            } else {
+                
+                // Show errors for deleted subscriptions -- deletedSubscriptions
+                // is a private var populated in the loadCollections method
+                if (deletedSubscriptions && deletedSubscriptions.length > 0){
+                    for (var x = 0; x < deletedSubscriptions.length; x++){
+                        var errorMessage;
                     var deletedSubscription = deletedSubscriptions[x];
-                    if (deletedSubscription.getCollectionDeleted()){
-                        errorMessage = "Main.Error.SubscribedCollectionDeleted";
-                    } else if (deletedSubscription.getTicketDeleted()){
-                        errorMessage = "Main.Error.SubscribedTicketDeleted";
+                        if (deletedSubscription.getCollectionDeleted()){
+                            errorMessage = "Main.Error.SubscribedCollectionDeleted";
+                        } else if (deletedSubscription.getTicketDeleted()){
+                            errorMessage = "Main.Error.SubscribedTicketDeleted";
+                        }
+                        cosmo.app.showErr(_(errorMessage,
+                                            deletedSubscription.getDisplayName()));
                     }
-                    cosmo.app.showErr(_(errorMessage,
-                        deletedSubscription.getDisplayName()));
+                }
+                if (this.authAccess){
+                    cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
                 }
             }
-            if (this.authAccess){
-                cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
-            }
-        }
+        }));
     };
 
     // ==========================
@@ -260,78 +262,89 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             }
             return lozengeColors;
         };
+        
+        var collectionsLoadedDeferred = null;
 
         //If we received a ticket key, use the collectionUrl in params to load a collection
         if (params.ticketKey) {
-            try {
-               var collection = this.serv.getCollection(params.collectionUrl, {sync:true}).results[0];
-               selectUid = collection.getUid();
-            }
-            catch(e) {
+            collectionsLoadedDeferred = this.serv.getCollection(params.collectionUrl);
+            collectionsLoadedDeferred.addCallback(function (collection) {
+                selectUid = collection.getUid();
+                collections.push(collection);
+            });
+
+            collectionsLoadedDeferred.addErrback(function (e){
                 cosmo.app.showErr(_('Main.Error.LoadItemsFailed'), e);
-                return false;
-            }
-            collections.push(collection);
+                return e;
+            });
         }
 
         // Otherwise, get all collections for this user
         else {
             // User's own collections
-            var userCollections = this.serv.getCollections({sync: true}).results[0];
-            for (var i = 0; i < userCollections.length; i++){
-                var collection = userCollections[i];
-                collections.push(collection);
-            }
+            var userCollectionsDeferred = this.serv.getCollections();
+            userCollectionsDeferred.addCallback(function (userCollections){
+                for (var i = 0; i < userCollections.length; i++){
+                    collections.push(userCollections[i]);
+                }
+            });
 
             // Subscriptions
-            var subscriptions = this.serv.getSubscriptions({sync:true}).results[0];
-            var result = this.filterOutDeletedSubscriptions(subscriptions);
-            subscriptions = result[0];
-            deletedSubscriptions = result[1];
-            for (var i = 0; i < subscriptions.length; i++){
-                var subscription = subscriptions[i];
-                collections.push(subscription);
-            }
+            var subscriptionsDeferred = this.serv.getSubscriptions();
+            subscriptionsDeferred.addCallback(dojo.lang.hitch(this, function (subscriptions){
+                var result = this.filterOutDeletedSubscriptions(subscriptions);
+                subscriptions = result[0];
+                deletedSubscriptions = result[1];
+                for (var i = 0; i < subscriptions.length; i++){
+                    var subscription = subscriptions[i];
+                    collections.push(subscription);
+                }
+            }));
+            collectionsLoadedDeferred = new dojo.DeferredList(
+                [userCollectionsDeferred, subscriptionsDeferred]
+            );
         }
-
-        // Sort the collections
-        var f = function (a, b) {
-            var aName = a.getDisplayName().toLowerCase();
-            var bName = b.getDisplayName().toLowerCase();
-            var r = 0;
-            if (aName == bName) {
-                r = (a.getUid() > b.getUid()) ? 1 : -1;
+        collectionsLoadedDeferred.addCallback(dojo.lang.hitch(this, function (){
+            // Sort the collections
+            var f = function (a, b) {
+                var aName = a.getDisplayName().toLowerCase();
+                var bName = b.getDisplayName().toLowerCase();
+                var r = 0;
+                if (aName == bName) {
+                    r = (a.getUid() > b.getUid()) ? 1 : -1;
+                }
+                else {
+                    r = (aName > bName) ? 1 : -1;
+                }
+                return r;
+            };
+            collections.sort(f);
+            var c = collections;
+            var hues = this.collectionHues;
+            for (var i = 0; i < c.length; i++) {
+                var coll = c[i];
+                coll.isDisplayed = false;
+                coll.isOverlaid = false;
+                coll.doDisplay = false;
+                index = i % hues.length;
+                var hue = hues[index];
+                coll.hue = hue;
+                coll.colors = calcColors(hue);
+                this.collections.addItem(coll.getUid(), coll);
+            }
+            
+            if (params.collectionUid){
+                this.currentCollection =
+                    this.collections.getItem(params.collectionUid);
             }
             else {
-                r = (aName > bName) ? 1 : -1;
+                this.currentCollection = collections[0];
             }
-            return r;
-        };
-        collections.sort(f);
-        var c = collections;
-        var hues = this.collectionHues;
-        for (var i = 0; i < c.length; i++) {
-            var coll = c[i];
-            coll.isDisplayed = false;
-            coll.isOverlaid = false;
-            coll.doDisplay = false;
-            index = i % hues.length;
-            var hue = hues[index];
-            coll.hue = hue;
-            coll.colors = calcColors(hue);
-            this.collections.addItem(coll.getUid(), coll);
-        }
-
-        if (params.collectionUid){
-            this.currentCollection =
-                this.collections.getItem(params.collectionUid);
-        }
-        else {
-            this.currentCollection = collections[0];
-        }
-        if (this.currentCollection){
-            this.currentCollection.doDisplay = true;
-        }
+            if (this.currentCollection){
+                this.currentCollection.doDisplay = true;
+            }
+        }));
+        return collectionsLoadedDeferred;
 
     };
 
@@ -365,7 +378,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
 
     this.reloadCollections = function (removedCollection) {
         var currentCollection = this.currentCollection;
-       
+        var loadCollectionsDeferred;
         // Don't bother saving state and reloading from
         // the server if it's a removal
         if (!removedCollection) {
@@ -379,45 +392,53 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             // Preserve selected/overlaid state
             this.collections.each(saveState);
             // Reload collections from the server
-            this.loadCollections({ ticketKey: this.ticketKey });
-            // Restore any saved state
-            for (var p in state) {
-                var savedProps = state[p];
-                var loadedColl = this.collections.getItem(p);
-                if (loadedColl) {
-                    for (q in savedProps) {
-                        loadedColl[q] = savedProps[q];
+            var loadCollectionsDeferred = this.loadCollections({ ticketKey: this.ticketKey });
+            loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function () {
+                // Restore any saved state
+                for (var p in state) {
+                    var savedProps = state[p];
+                    var loadedColl = this.collections.getItem(p);
+                    if (loadedColl) {
+                        for (q in savedProps) {
+                            loadedColl[q] = savedProps[q];
+                        }
                     }
                 }
-            }
-        }
-
-        // If we had an originally selected collection
-        if (currentCollection) {
-            var selCollId = currentCollection.getUid();
-            var newSel = this.collections.getItem(selCollId);
-            // If the originally selected collection is in
-            // the new set, point to the one in the new set
-            if (newSel) {
-                this.currentCollection = newSel;
-                newSel.doDisplay = true;
-            }
-            // If the originally selected collection is gone,
-            // and was not the one removed by the user,
-            // show the user a nice error message
-            else {
-                if (currentCollection != removedCollection) {
-                    cosmo.app.showErr(_("Main.Error.CollectionRemoved",
-                        currentCollection.getDisplayName()));
+            }));
+        } else {
+            loadCollectionsDeferred = new dojo.Deferred();
+            loadCollectionsDeferred.callback();
+        }                                           
+        
+        loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
+            // If we had an originally selected collection
+            if (currentCollection) {
+                var selCollId = currentCollection.getUid();
+                var newSel = this.collections.getItem(selCollId);
+                // If the originally selected collection is in
+                // the new set, point to the one in the new set
+                if (newSel) {
+                    this.currentCollection = newSel;
+                    newSel.doDisplay = true;
                 }
-                // Default new selection is the first collection
-                // in the list
-                this.currentCollection = this.collections.getAtPos(0);
-                this.currentCollection.doDisplay = true;
+                // If the originally selected collection is gone,
+                // and was not the one removed by the user,
+                // show the user a nice error message
+                else {
+                    if (currentCollection != removedCollection) {
+                        cosmo.app.showErr(_("Main.Error.CollectionRemoved",
+                                            currentCollection.getDisplayName()));
+                    }
+                    // Default new selection is the first collection
+                    // in the list
+                    this.currentCollection = this.collections.getAtPos(0);
+                    this.currentCollection.doDisplay = true;
+                }
+                cosmo.view.displayViewFromCollections(
+                    this.currentCollection);
             }
-            cosmo.view.displayViewFromCollections(
-                this.currentCollection);
-        }
+        }));
+        return loadCollectionsDeferred;
     }
 }, cosmo.app.pim);
 

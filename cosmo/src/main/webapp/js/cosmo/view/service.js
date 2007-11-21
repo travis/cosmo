@@ -367,20 +367,20 @@ cosmo.view.service = new function () {
                 //let's see if it was the collection that got deleted, or the item
                 //itself.
                 var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.currentCollection.getUrls().self, {sync:true});
-                if (deferred.results[1]){
+                deferred.addErrback(function (){
                     //reload collections will handle showing the error message, as it will try and load the 
                     //original collection
-                    cosmo.app.pim.reloadCollections();
-                    return;
-                } else {
+                    return cosmo.app.pim.reloadCollections();
+                } );
+                deferred.addCallback(function (){
                     errMsg = _('Main.Error.EventEditSaveFailed.EventRemoved');
                     cosmo.app.showErr(errMsg);
                     //easiest thing to do here just reload the collections, since it would be a pain to figure
                     //out if you need to re-expand if the removed item was an occurrence, etc. 
-                    cosmo.app.pim.reloadCollections();
-                    self.processingQueue.shift();
-                    return;
-                }
+                    var reloadDeferred = cosmo.app.pim.reloadCollections();
+                    reloadDeferred.addCallback(function(){self.processingQueue.shift()});
+                    return reloadDeferred;
+                });
             } else if (err instanceof cosmo.service.exception.CollectionLockedException){
                     errMsg = _('Main.Error.EventEditSaveFailed.CollectionLocked');
                     cosmo.app.showErr(errMsg);

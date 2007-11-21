@@ -143,32 +143,22 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
     var loadEach = function (collId, coll) {
         if (goToNav) { coll.isDisplayed = false; }
         var handleErr = function (e) {
+            var reloadDeferred = null;
             if (e instanceof cosmo.service.exception.ResourceNotFoundException){
-                cosmo.app.pim.reloadCollections();
+                reloadDeferred = cosmo.app.pim.reloadCollections();
             }
             cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
+            return reloadDeferred;
         };
         if (coll.isDisplayed != coll.doDisplay) {
             if (coll.doDisplay) {
-                try {
-                    var deferred = cosmo.app.pim.serv.getItems(coll,
-                        { start: start, end: end }, { sync: true });
-                    var results = deferred.results;
-                    // Catch any error stuffed in the deferred
-                    if (results[1]) {
-                        handleErr(results[1]);
-                        return false;
-                    }
-                    else {
-                        eventLoadList = results[0];
-                        var h = _this.createEventRegistry(eventLoadList, collId);
-                        collectionReg[collId] = h;
-                    }
-                }
-                catch(e) {
-                    handleErr(e);
-                    return false;
-                }
+                var deferred = cosmo.app.pim.serv.getItems(coll,
+                    { start: start, end: end }, { sync: true });
+                deferred.addErrback(handleErr);
+                deferred.addCallback(function (eventLoadList){
+                    var h = _this.createEventRegistry(eventLoadList, collId);
+                    collectionReg[collId] = h;
+                });
             }
             else {
                 collectionReg[collId] = new cosmo.util.hash.Hash();

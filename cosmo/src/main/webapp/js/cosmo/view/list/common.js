@@ -90,31 +90,23 @@ cosmo.view.list.loadItems = function (o) {
 
     // Load the array of items
     // ======================
-    try {
-        // Look up for Note if passed a Note, otherwise get for
-        // the entire collection
-        var target = note || collection;
-        var deferred = cosmo.app.pim.serv.getDashboardItems(target,
-            { sync: true });
-        var results = deferred.results;
-        // Catch any error stuffed in the deferred
-        if (results[1]) {
-            if (results[1] instanceof cosmo.service.exception.ResourceNotFoundException){
-                cosmo.app.pim.reloadCollections()
-                return false;
-            } else {
-                showErr(results[1]);
-                return false;
-            }
+    // Look up for Note if passed a Note, otherwise get for
+    // the entire collection
+    var deferred = cosmo.app.pim.serv.getDashboardItems(note || collection,
+        { sync: true });
+    // Catch any error stuffed in the deferred
+    deferred.addErrback(function (e){
+        if (e instanceof cosmo.service.exception.ResourceNotFoundException){
+            cosmo.app.pim.reloadCollections()
+            return false;
+        } else {
+            showErr(e);
+            return false;
         }
-        else {
-            itemLoadList = results[0];
-        }
-    }
-    catch (e) {
-        showErr(e);
-        return false;
-    }
+    });
+    deferred.addCallback(function (itemLL){
+        itemLoadList = itemLL;
+    });
     // Create a hash from the array
     var itemRegistry = cosmo.view.list.createItemRegistry(itemLoadList);
     cosmo.view.list.itemRegistry = itemRegistry;

@@ -248,7 +248,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     // We can fix this by returning a collection from a create request.
                     // On the plus side, most of the collections should be cached since
                     // we already had them loaded.
-                    cosmo.app.pim.reloadCollections();
+                    return cosmo.app.pim.reloadCollections();
                 });
                 createDeferred.addBoth(function(){
                     cosmo.app.hideDialog();

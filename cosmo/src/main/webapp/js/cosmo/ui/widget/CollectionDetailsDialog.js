@@ -214,8 +214,11 @@ dojo.widget.HtmlWidget, function(){
 
                             // Re-render collections, update selected collection
                             // if necessary, and update the view
-                            cosmo.app.pim.reloadCollections(collectionToDelete);
-                            cosmo.app.hideDialog();
+                            var reloadDeferred = cosmo.app.pim.reloadCollections(collectionToDelete);
+                            reloadDeferred.addCallback(function(){
+                                cosmo.app.hideDialog();
+                            });
+                            return reloadDeferred;
                         });
                     } else {
                         cosmo.app.hideDialog();

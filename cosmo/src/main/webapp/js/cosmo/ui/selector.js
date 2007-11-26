@@ -25,6 +25,7 @@ dojo.require('cosmo.convenience');
 dojo.require("cosmo.topics");
 dojo.require("cosmo.view.names");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.ui.menu");
 
 cosmo.ui.selector.CollectionSelector = function (p) {
     var _this = this;
@@ -42,35 +43,43 @@ cosmo.ui.selector.CollectionSelector = function (p) {
 
     // Private vars
     this._scrollTop = 0;
-    this._selectedIndex = null;
-    this._doRolloverEffect =  function(e, isOver) {
+    this._doRolloverEffect =  function(e, isOver, isFromContextual) {
         // Safari 2 sucks -- DOM-event/DOM-node contention problems
         if (navigator.userAgent.indexOf('Safari/41') > -1) {
             return false;
         }
+        // Don't do rollovers when contextual menu is showing,
+        // except to move it if the contextual menu moves
+        //if (_this.contextMenu.displayed && !isFromContextual) {
+        //    return false;
+        //}
         if (e && e.target) {
             var targ = e.target;
             while (!targ.className) { targ = targ.parentNode; }
             if (targ.id == 'body') { return false; }
             var prefix = 'collectionSelector';
             if (targ.className.indexOf(prefix) > -1) {
-                var colorString;
                 if (targ.className.indexOf('Details') > -1) {
                     var collId = targ.id.replace('collectionSelectorItemDetails_', '');
                     var coll = cosmo.app.pim.collections.getItem(collId);
                     var hue = coll.hue;
                     var sv = isOver ? [50, 100] : [80, 90];
-                    colorString = this._getRGB(hue, sv[0], sv[1]);
+                    var colorString = this._getRGB(hue, sv[0], sv[1]);
                     targ.style.backgroundColor = colorString;
                 }
                 else {
-                    colorString = isOver ? '#deeeff' : '';
+                    // Don't apply rollover fu to selected item
+                    var id = targ.id.replace('collectionSelectorItemSel_', '');
+                    if (id == cosmo.app.pim.currentCollection.getUid()) {
+                        return false;
+                    }
+                    var addRemoveKey = isOver ? 'add' : 'remove';
                     var par = targ.parentNode;
                     var ch = par.childNodes;
                     for (var i = 0; i < ch.length; i++) {
                         var node = ch[i];
                         if (node.className != 'collectionSelectorDetails') {
-                            ch[i].style.backgroundColor = colorString;
+                            dojo.html[addRemoveKey + 'Class'](ch[i], 'mouseoverItem');
                         }
                     }
                 }
@@ -188,6 +197,8 @@ cosmo.ui.selector.CollectionSelector = function (p) {
             this, 'handleMouseOut');
         dojo.event.connect(container, 'onclick',
             this, 'handleClick');
+        dojo.event.connect(container, 'oncontextmenu',
+            this, 'handleClick');
 
         this.domNode.appendChild(form);
         form.appendChild(container);
@@ -260,6 +271,21 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         d.appendChild(a);
         this.domNode.appendChild(d);
 
+        if (!this.hasBeenRendered) {
+            /*
+            var _menuItem = cosmo.ui.menu.HierarchicalMenuItem;
+            var items = [];
+            this.contextMenu =
+                cosmo.ui.menu.HierarchicalMenuManager.createContextMenu(
+                    'collectionSelectorContext', items, { minWidth: 100 });
+            this.contextMenu.doAfterHiding = function () {
+                _this._doRolloverEffect(
+                    { target: _this._contextMenuCurrrentCollection }, false, true);
+            };
+            */
+            this.hasBeenRendered = true;
+        }
+
     };
     this.handleMouseOver = function (e) {
         this._doRolloverEffect(e, true);
@@ -288,6 +314,21 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 // Selector
                 if (targ.id.indexOf(prefix + 'Sel_') > -1) {
                     var id = targ.id.replace(prefix + 'Sel_', '');
+
+                    /*
+                    // Right-click -- contextual menu
+                    if (e.button == 2) {
+                        if (this._contextMenuCurrrentCollection) {
+                            cosmo.ui.menu.HierarchicalMenuManager.hideHierarchicalMenu();
+                        }
+                        this._contextMenuCurrrentCollection = targ;
+                        cosmo.ui.menu.HierarchicalMenuManager.showContextMenu(e,
+                            _this.contextMenu);
+                        this._doRolloverEffect(e, true, true);
+                        return false;
+                    }
+                    */
+
                     newCurrColl = collections.getItem(id);
                     if (id != currId) {
                         // Turn off display for the originally selected
@@ -321,4 +362,6 @@ cosmo.ui.selector.CollectionSelector = function (p) {
 
 cosmo.ui.selector.CollectionSelector.prototype =
     new cosmo.ui.ContentBox();
+
+
 

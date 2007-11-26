@@ -132,9 +132,14 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 }
             }
             else {
+                if (targ.id ==  'listView_item' +
+                    self.getSelectedItemId()) { return false; }
                 var ch = targ.childNodes;
                 for (var i = 0; i < ch.length; i++) {
-                    dojo.html.addClass(ch[i], 'listViewSelectedCell');
+                    // Don't apply rollover effect to triage col
+                    if (ch[i].className.indexOf('listViewTriage') == -1) {
+                        dojo.html.addClass(ch[i], 'mouseoverItem');
+                    }
                 }
             }
         }
@@ -156,11 +161,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 }
             }
             else {
-                if (targ.id ==  'listView_item' +
-                    self.getSelectedItemId()) { return false; }
                 var ch = targ.childNodes;
                 for (var i = 0; i < ch.length; i++) {
-                    dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+                    dojo.html.removeClass(ch[i], 'mouseoverItem');
                 }
             }
         }
@@ -178,12 +181,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
             }
             // Normal row cell clicked
             else {
-                self.handleSelectionChange(targ);
+                self.handleSelectionChange(e, targ);
 
             }
         }
     };
-    this.handleSelectionChange = function (p, discardUnsavedChanges) {
+    this.handleSelectionChange = function (e, p, discardUnsavedChanges) {
         var args = Array.prototype.slice.call(arguments);
         var writeable = cosmo.app.pim.currentCollection.isWriteable();
         // Original selection
@@ -217,7 +220,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 if (origSelectionNode) {
                     ch = origSelectionNode.childNodes;
                     for (var i = 0; i < ch.length; i++) {
-                        dojo.html.removeClass(ch[i], 'listViewSelectedCell');
+                        dojo.html.removeClass(ch[i], 'selectedItem');
                     }
                 }
 
@@ -226,7 +229,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
             // The new selection
             var ch = p.childNodes;
             for (var i = 0; i < ch.length; i++) {
-                dojo.html.addClass(ch[i], 'listViewSelectedCell');
+                // Don't apply selection effect to triage col
+                if (ch[i].className.indexOf('listViewTriage') == -1) {
+                    dojo.html.removeClass(ch[i], 'mouseoverItem');
+                    dojo.html.addClass(ch[i], 'selectedItem');
+                }
             }
             // Load the selected item's stuff into the detail-view form
             if (item) {
@@ -240,6 +247,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 // to all parts of the UI
                 setTimeout(f, 0);
             }
+        }
+        if (e.button == 2) {
+              cosmo.ui.menu.HierarchicalMenuManager.showContextMenu(e,
+                  cosmo.view.contextMenu.menu);
+              return false;
         }
 
     };
@@ -289,7 +301,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var display = item.display;
             var sort = item.sort;
             var selCss = 'listView_item' + display.uid == selId ?
-              ' listViewSelectedCell' : '';
+              ' selectedItem' : '';
             var title = fillCell(display.title);
             var who = fillCell(display.who);
             var start = fillCell(display.startDate);
@@ -397,7 +409,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var row = _createElem('tr');
         var cell = _createElem('td');
         cell.colSpan = colCount - 1;
-        cell.className = 'listViewDataCell listViewSelectedCell';
+        cell.className = 'listViewDataCell selectedItem';
         cell.style.textAlign = 'center';
         cell.style.whiteSpace = 'nowrap';
         cell.innerHTML = 'Processing ...';

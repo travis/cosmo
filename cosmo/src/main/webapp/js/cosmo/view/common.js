@@ -31,6 +31,7 @@ cosmo.view.viewBase = new function () {
         // Subscribe to the '/app' channel
         dojo.event.topic.subscribe('/app', this, 'handlePub_app');
         this.hasBeenInitialized = true;
+        cosmo.view.contextMenu.menu = cosmo.view.contextMenu.menu || cosmo.view.contextMenu.createMenu();
     };
 
     this.isCurrentView = function () {
@@ -218,6 +219,10 @@ cosmo.view.canvasBase = new function () {
         var id = this.selectedItemIdRegistry[key];
         return id;
     };
+};
+
+cosmo.view.getCurrentView = function () {
+    return cosmo.view[cosmo.app.pim.currentView];
 };
 
 cosmo.view.handleUnsavedChanges = function (origSelection,

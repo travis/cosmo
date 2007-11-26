@@ -277,9 +277,6 @@
     vertical-align: top;
     border-bottom: 1px solid #ddd;
 }
-.listViewSelectedCell {
-    background-color: #deeeff;
-}
 .listViewTriageCell {
     text-align: center;
     font-size: 10px;
@@ -520,7 +517,8 @@
     overflow: hidden;
 }
 .collectionSelectorSel {
-    background-color: #deeeff;
+    background-color: #659dd3;
+    color: #fff;
 }
 .collectionSelectorDetails {
     width: 16px;
@@ -607,5 +605,32 @@
     font-size: 0.9em;
 }
 .miniSelected {
-    background: #deeeff;
+    background: #659dd3;
+    color: #fff;
 }
+/* Contextual menu */
+.hierMenu {
+    position: absolute;
+    table-layout: fixed;
+    background-color: #fff;
+    border: 1px solid #aaa;
+    z-Index: 999999;
+}
+.hierMenuItem {
+    cursor: pointer;
+}
+.hierMenuText {
+    height: 24px;
+    line-height: 24px;
+    overflow: hidden;
+    -moz-user-select: none;
+    padding: 0px;
+    margin: 0px;
+}
+.hierMenuTextClipper {
+    margin: 0 4px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+

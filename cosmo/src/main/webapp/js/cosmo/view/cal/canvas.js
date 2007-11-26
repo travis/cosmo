@@ -30,10 +30,12 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
+dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.view.common");
+dojo.require("cosmo.view.contextMenu");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.view.cal.common");
 dojo.require('cosmo.view.cal.lozenge');
@@ -84,6 +86,7 @@ cosmo.view.cal.canvas = new function () {
     // Init flag -- NavBar's displayView uses this to know
     // when to call the canvas init function
     this.hasBeenInitialized = false;
+    this.contextMenu = null;
 
     // Public methods
     // ****************
@@ -379,7 +382,7 @@ cosmo.view.cal.canvas = new function () {
                 $(currDayIdPrefix + i + '30').className = 'hourDivBottom' + currDayClass;
             }
         }
-
+        
         // -----------
         // Do it!
         // -----------
@@ -403,6 +406,8 @@ cosmo.view.cal.canvas = new function () {
             dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+            dojo.event.connect(hoursNode, 'oncontextmenu', self, '_handleContextForCanvasOnly') 
+            dojo.event.connect(allDayColsNode, 'oncontextmenu', self, '_handleContextForCanvasOnly');
             // Get a reference to the main scrolling area for timed events;
             this.timedCanvas = $('timedCanvas');
             // Refs for appending lozenges to avoid lookup by id
@@ -522,7 +527,7 @@ cosmo.view.cal.canvas = new function () {
             throw(lozengeType + 'is not a valid lozenge type.');
         }
     };
-    this.handleSelectionChange = function (id, discardUnsavedChanges) {
+    this.handleSelectionChange = function (e, id, discardUnsavedChanges) {
         var args = Array.prototype.slice.call(arguments);
         var s = getIndexEvent(id);
         var item = cosmo.view.cal.itemRegistry.getItem(s);
@@ -579,36 +584,44 @@ cosmo.view.cal.canvas = new function () {
         // up a draggable, also naturaly no move/resize for
         // read-only collections
         if (!discardUnsavedChanges && writeable) {
-            // Set up Draggable and save dragMode -- user may be dragging
-            if (id.indexOf('AllDay') > -1) {
-                dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
+            // Right-click -- context menu
+            if (e.button == 2) {
+                  cosmo.ui.menu.HierarchicalMenuManager.showContextMenu(e,
+                      cosmo.view.contextMenu.menu);
+                  return false;
             }
+            // Left-click proceed to possible move/resize
             else {
-                dragItem = new cosmo.view.cal.draggable.HasTimeDraggable(s);
-            }
+                // Set up Draggable and save dragMode -- user may be dragging
+                if (id.indexOf('AllDay') > -1) {
+                    dragItem = new cosmo.view.cal.draggable.NoTimeDraggable(s);
+                }
+                else {
+                    dragItem = new cosmo.view.cal.draggable.HasTimeDraggable(s);
+                }
 
-            switch(true) {
-                // Main content area -- drag entire event
-                case id.indexOf('Content') > -1:
-                case id.indexOf('Title') > -1:
-                case id.indexOf('Start') > -1:
-                    dragItem.init('drag', item);
-                    break;
-                // Top lip -- resize top
-                case id.indexOf('Top') > -1:
-                    dragItem.init('resizetop', item);
-                    break;
-                // Bottom lip -- resize bottom
-                case id.indexOf('Bottom') > -1:
-                    dragItem.init('resizebottom', item);
-                    break;
-                default:
-                    // Do nothing
-                    break;
+                switch(true) {
+                    // Main content area -- drag entire event
+                    case id.indexOf('Content') > -1:
+                    case id.indexOf('Title') > -1:
+                    case id.indexOf('Start') > -1:
+                        dragItem.init('drag', item);
+                        break;
+                    // Top lip -- resize top
+                    case id.indexOf('Top') > -1:
+                        dragItem.init('resizetop', item);
+                        break;
+                    // Bottom lip -- resize bottom
+                    case id.indexOf('Bottom') > -1:
+                        dragItem.init('resizebottom', item);
+                        break;
+                    default:
+                        // Do nothing
+                        break;
+                }
+                // Set the Cal draggable to the dragged lozenge
+                cosmo.app.dragItem = dragItem;
             }
-
-            // Set the Cal draggable to the dragged lozenge
-            cosmo.app.dragItem = dragItem;
         }
     };
     /**
@@ -784,6 +797,14 @@ cosmo.view.cal.canvas = new function () {
 
     // Private methods
     // ****************
+    this._handleContextForCanvasOnly = function (e) {
+        var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+        var id = elem.id;
+        if (id.indexOf('hourDiv') == -1) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    };
     /**
      * Removes an event lozenge from the canvas -- called in three cases:
      * (1) Actually removing an event from the calendar (this gets
@@ -1234,7 +1255,7 @@ cosmo.view.cal.canvas = new function () {
             // On event lozenge -- simple select, or move/resize
             case (id.indexOf('eventDiv') > -1):
                 // Get the clicked-on event
-                self.handleSelectionChange(id);
+                self.handleSelectionChange(e, id);
                 break;
         }
     }

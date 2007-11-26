@@ -519,6 +519,18 @@ Link styles
     * Mousedown effect: Underline
     * Mousedown link color: #0066cc
     * Visited link color: #57beff */
+/* Selections, mouseovers
+ * Use !important rule to ensure colors get set no
+ * matter the order the class is added
+ */
+.selectedItem {
+    background-color: #659dd3 !important;
+    color: #fff !important;
+}
+.mouseoverItem {
+    background-color: #deeeff !important;
+}
+
 
 /* Buttons
  * --------------------- */
@@ -527,7 +539,7 @@ Link styles
     margin: auto;
     text-align: center;
     font-size: 11px;
-    color: #339;
+    color: #155ecc;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
@@ -539,11 +551,11 @@ Link styles
     background-position: 0px 0px;
 }
 .btnElemMouseover {
-    color: #3333aa;
+    color: #104698;
     background-position: 0px -19px;
 }
 .btnElemMousedown {
-    color: #3333aa;
+    color: #104698;
     border-color: #555 #bbb #bbb #555;
     background-position: 0px -19px;
 }

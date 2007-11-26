@@ -658,7 +658,7 @@ cosmo.ui.minical.MiniCal = function (p) {
                 datIndex = dt.getDate();
                 idStr = idPrefix + monIndex + '_day' + datIndex + idSuffix;
                 selDiv = document.getElementById(idStr);
-                selDiv.className = selDiv.className + ' miniSelected';
+                selDiv.className = selDiv.className + ' selectedItem';
                 self.selectedDays.push(selDiv);
                 datIndex++;
                 dt.setDate(datIndex);
@@ -666,9 +666,9 @@ cosmo.ui.minical.MiniCal = function (p) {
         }
 
         // Deselect selected cells if needed -- remove appended
-        // ' miniSelected' (space plus miniSelected) CSS class
+        // ' selectedItem' (space plus selectedItem) CSS class
         while (selDiv = selDays.pop()) {
-            selDiv.className = selDiv.className.replace(' miniSelected', '');
+            selDiv.className = selDiv.className.replace(' selectedItem', '');
         }
 
         // Create new selection

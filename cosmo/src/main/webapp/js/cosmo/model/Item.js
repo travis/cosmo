@@ -106,8 +106,8 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, at
             }
         },
     
-        _setModifiedProperty: function (propertyName, value){
-            var modification = this._master.getModification(this.recurrenceId);
+        _setModifiedProperty: function (propertyName, value, create){
+            var modification = this._master.getModification(this.recurrenceId, create);
             var modifiedStamp = modification._modifiedStamps[stampName];
             if (!modifiedStamp){
                 modifiedStamp = {};
@@ -182,8 +182,15 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
            
         }, 
         
-        getModification: function (/*cosmo.datetime.Date*/ recurrenceId){
-            return this._modifications[this._formatRecurrenceId(recurrenceId)];
+        getModification: function (/*cosmo.datetime.Date*/ recurrenceId, create){
+            var mod =  this._modifications[this._formatRecurrenceId(recurrenceId)];
+            if (!mod && create){
+                mod = new cosmo.model.Modification({
+                        recurrenceId: recurrenceId
+                });
+                this.addModification(mod);
+            }
+            return mod;
         },
         
         addModification: function(/*cosmo.model.Modification*/modification){
@@ -404,8 +411,8 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
         return modification.getModifiedProperties()[propertyName];
     },
     
-    _setModifiedProperty: function (propertyName, value){
-        var modification = this._master.getModification(this.recurrenceId);
+    _setModifiedProperty: function (propertyName, value, create){
+        var modification = this._master.getModification(this.recurrenceId, create);
         modification._modifiedProperties[propertyName] = value;  
     },
     
@@ -545,6 +552,15 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     
     getAutoTriage: function(){
         return this._getNonInheritableProperty("autoTriage", dojo.lang.hitch(this, function(){return true}))
+    },
+
+    setTriageStatus: function(triageStatus){
+        if (!this.hasRecurrence()){
+            this.__setProperty("triageStatus", triageStatus);
+        }
+        
+        this._setModifiedProperty("triageStatus", triageStatus, true);
+        
     },
     
     getStampsToDelete: function(){

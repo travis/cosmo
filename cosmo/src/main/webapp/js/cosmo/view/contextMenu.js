@@ -32,10 +32,10 @@ cosmo.view.contextMenu = new function () {
               dojo.event.topic.publish('/calEvent',
                   { action: 'removeConfirm',
                     data: selItem });
-          } }),
-        new _menuItem({
+          } })
+        /*new _menuItem({
           display: "Add to Collection",
-          items: [] })
+          items: [] }) */
     ];
     this.createMenu = function () {
         return cosmo.ui.menu.HierarchicalMenuManager.createContextMenu(
@@ -43,9 +43,10 @@ cosmo.view.contextMenu = new function () {
             doBeforeShowing: this._updateCollectionData });
     };
     this._updateCollectionData = function () {
+        return false; // Shut off for now
         var collectionMenuItems = [];
         var createCollectiomMenuItem = function (id, coll) {
-            var m = new _menuItem({ 
+            var m = new _menuItem({
                 display: coll.getDisplayName(),
                 handleClick: function () { alert('Not yet implemented.'); } });
             collectionMenuItems.push(m);

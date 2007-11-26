@@ -141,17 +141,23 @@ public class MockUserDao implements UserDao {
 
         user.setUid(idGenerator.nextIdentifier().toString());
         
-        // Set create/modified date for User and associated subscriptions
+        // Set create/modified date, etag for User and associated subscriptions
         // and perferences.
         ((MockAuditableObject) user).setModifiedDate(new Date());
         ((MockAuditableObject) user).setCreationDate(new Date());
+        ((MockAuditableObject) user).setEntityTag(((MockAuditableObject) user)
+                .calculateEntityTag());
         
         for(CollectionSubscription cs: user.getCollectionSubscriptions()) {
+            ((MockAuditableObject) cs).setEntityTag(((MockAuditableObject) cs)
+                    .calculateEntityTag());
             ((MockAuditableObject) cs).setModifiedDate(new Date());
             ((MockAuditableObject) cs).setCreationDate(new Date());
         }
         
         for(Preference p: user.getPreferences()) {
+            ((MockAuditableObject) p).setEntityTag(((MockAuditableObject) p)
+                    .calculateEntityTag());
             ((MockAuditableObject) p).setModifiedDate(new Date());
             ((MockAuditableObject) p).setCreationDate(new Date());
         }
@@ -178,17 +184,23 @@ public class MockUserDao implements UserDao {
             throw new IllegalArgumentException("null user");
         }
         
-        // Update modified date for User and associated subscriptions
-        // and perferences.
-        ((MockUser) user).setModifiedDate(new Date());
+        // Update modified date, etag for User and associated subscriptions
+        // and preferences.
+        ((MockAuditableObject) user).setModifiedDate(new Date());
+        ((MockAuditableObject) user).setEntityTag(((MockAuditableObject) user)
+                .calculateEntityTag());
         
         for(CollectionSubscription cs: user.getCollectionSubscriptions()) {
+            ((MockAuditableObject) cs).setEntityTag(((MockAuditableObject) cs)
+                    .calculateEntityTag());
             ((MockAuditableObject) cs).setModifiedDate(new Date());
             if(cs.getCreationDate()==null)
                 ((MockAuditableObject) cs).setCreationDate(new Date());
         }
         
         for(Preference p: user.getPreferences()) {
+            ((MockAuditableObject) p).setEntityTag(((MockAuditableObject) p)
+                    .calculateEntityTag());
             ((MockAuditableObject) p).setModifiedDate(new Date());
             if(p.getCreationDate()==null)
                 ((MockAuditableObject) p).setCreationDate(new Date());

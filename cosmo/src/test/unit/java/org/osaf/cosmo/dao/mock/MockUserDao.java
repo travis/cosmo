@@ -15,27 +15,29 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 
 import org.apache.commons.id.uuid.VersionFourGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dao.UserDao;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.DuplicateEmailException;
 import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.model.hibernate.HibUser;
+import org.osaf.cosmo.model.mock.MockAuditableObject;
+import org.osaf.cosmo.model.mock.MockUser;
+import org.osaf.cosmo.util.ArrayPagedList;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
-import org.osaf.cosmo.util.ArrayPagedList;
 
 /**
  * Mock implementation of {@link UserDao} useful for testing.
@@ -63,7 +65,7 @@ public class MockUserDao implements UserDao {
         passwordRecoveryIdx = new HashMap<String, PasswordRecovery>();
 
         // add overlord user
-        User overlord = new HibUser();
+        MockUser overlord = new MockUser();
         overlord.setUsername(User.USERNAME_OVERLORD);
         overlord.setFirstName("Cosmo");
         overlord.setLastName("Administrator");
@@ -138,7 +140,22 @@ public class MockUserDao implements UserDao {
         }
 
         user.setUid(idGenerator.nextIdentifier().toString());
-
+        
+        // Set create/modified date for User and associated subscriptions
+        // and perferences.
+        ((MockAuditableObject) user).setModifiedDate(new Date());
+        ((MockAuditableObject) user).setCreationDate(new Date());
+        
+        for(CollectionSubscription cs: user.getCollectionSubscriptions()) {
+            ((MockAuditableObject) cs).setModifiedDate(new Date());
+            ((MockAuditableObject) cs).setCreationDate(new Date());
+        }
+        
+        for(Preference p: user.getPreferences()) {
+            ((MockAuditableObject) p).setModifiedDate(new Date());
+            ((MockAuditableObject) p).setCreationDate(new Date());
+        }
+            
         user.validate();
         if (usernameIdx.containsKey(user.getUsername())) {
             throw new DuplicateUsernameException("username in use");
@@ -146,7 +163,7 @@ public class MockUserDao implements UserDao {
         if (emailIdx.containsKey(user.getEmail())) {
             throw new DuplicateEmailException("email in use");
         }
-
+        
         usernameIdx.put(user.getUsername(), user);
         emailIdx.put(user.getEmail(), user);
         uidIdx.put(user.getUid(), user);
@@ -160,6 +177,23 @@ public class MockUserDao implements UserDao {
         if (user == null) {
             throw new IllegalArgumentException("null user");
         }
+        
+        // Update modified date for User and associated subscriptions
+        // and perferences.
+        ((MockUser) user).setModifiedDate(new Date());
+        
+        for(CollectionSubscription cs: user.getCollectionSubscriptions()) {
+            ((MockAuditableObject) cs).setModifiedDate(new Date());
+            if(cs.getCreationDate()==null)
+                ((MockAuditableObject) cs).setCreationDate(new Date());
+        }
+        
+        for(Preference p: user.getPreferences()) {
+            ((MockAuditableObject) p).setModifiedDate(new Date());
+            if(p.getCreationDate()==null)
+                ((MockAuditableObject) p).setCreationDate(new Date());
+        }
+        
         user.validate();
         String key = user.isUsernameChanged() ?
             user.getOldUsername() :

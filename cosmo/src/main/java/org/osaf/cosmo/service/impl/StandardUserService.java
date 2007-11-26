@@ -161,9 +161,7 @@ public class StandardUserService extends BaseService implements UserService {
         user.validateRawPassword();
 
         user.setPassword(digestPassword(user.getPassword()));
-        user.setCreationDate(new Date());
-        user.setModifiedDate(user.getCreationDate());
-
+        
         fireBeforeEvent(new ServiceEvent("CREATE_USER", user), listeners);
 
         try {
@@ -212,8 +210,7 @@ public class StandardUserService extends BaseService implements UserService {
             user.validateRawPassword();
             user.setPassword(digestPassword(user.getPassword()));
         }
-        user.setModifiedDate(new Date());
-
+       
         userDao.updateUser(user);
 
         User newUser = userDao.getUser(user.getUsername());

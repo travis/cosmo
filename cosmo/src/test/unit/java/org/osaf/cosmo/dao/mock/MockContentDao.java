@@ -334,7 +334,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
     }
 
     public CollectionItem updateCollectionTimestamp(CollectionItem collection) {
-        collection.setModifiedDate(new Date());
+        ((MockCollectionItem) collection).setModifiedDate(new Date());
         if (collection instanceof MockCollectionItem)
             ((MockCollectionItem) collection).setVersion(collection
                     .getVersion() + 1);

@@ -45,11 +45,11 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
 
     public void testGenerateRecord() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        EventStamp eventStamp = new MockEventStamp(noteItem);
+        MockEventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         eventStamp.creatDisplayAlarm();
@@ -90,7 +90,7 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateRecordNonEvent() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setReminderTime(new Date());
         noteItem.setUid("1");
@@ -126,7 +126,7 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateNoAlarmNonEvent() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
@@ -149,11 +149,11 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateNoAlarmEvent() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        EventStamp eventStamp = new MockEventStamp(noteItem);
+        MockEventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         noteItem.addStamp(eventStamp);
@@ -188,9 +188,9 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
         
         masterNote.addStamp(masterEvent);
         
-        NoteItem modNote = new MockNoteItem();
+        MockNoteItem modNote = new MockNoteItem();
         modNote.setUid("1");
-        EventExceptionStamp modEvent = new MockEventExceptionStamp(modNote);
+        MockEventExceptionStamp modEvent = new MockEventExceptionStamp(modNote);
         modEvent.createCalendar();
         modEvent.creatDisplayAlarm();
         modNote.setModifies(masterNote);

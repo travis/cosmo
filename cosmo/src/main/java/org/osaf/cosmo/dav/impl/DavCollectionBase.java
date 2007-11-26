@@ -315,7 +315,7 @@ public class DavCollectionBase extends DavItemResourceBase
         ContentItem content = (ContentItem) member.getItem();
 
         try {
-            if (content.getClientCreationDate() != null) {
+            if (content.getCreationDate() != null) {
                 if (log.isDebugEnabled())
                     log.debug("updating member " + member.getResourcePath());
 

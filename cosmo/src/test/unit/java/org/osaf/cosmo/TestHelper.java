@@ -231,9 +231,7 @@ public class TestHelper {
         sub.setDisplayName(displayName);
         sub.setTicketKey(ticket.getKey());
         sub.setCollectionUid(collection.getUid());
-        sub.setCreationDate(java.util.Calendar.getInstance().getTime());
-        sub.setModifiedDate(sub.getCreationDate());
-
+        
         return sub;
     }
 
@@ -255,9 +253,7 @@ public class TestHelper {
         Preference pref = entityFactory.createPreference();
         pref.setKey("dummy pref " + serial);
         pref.setValue(pref.getKey());
-        pref.setCreationDate(java.util.Calendar.getInstance().getTime());
-        pref.setModifiedDate(pref.getCreationDate());
-
+       
         return pref;
     }
 
@@ -318,9 +314,7 @@ public class TestHelper {
         content.setContentEncoding("UTF-8");
         content.setContentLanguage("en_US");
         content.setContentType("text/plain");
-        content.setCreationDate(java.util.Calendar.getInstance().getTime());
-        content.setModifiedDate(content.getCreationDate());
-
+        
         return content;
     }
 
@@ -341,9 +335,7 @@ public class TestHelper {
         note.setOwner(user);
         note.setIcalUid(serial);
         note.setBody("This is a note. I love notes.");
-        note.setCreationDate(java.util.Calendar.getInstance().getTime());
-        note.setModifiedDate(note.getCreationDate());
-        
+       
         return note;
     }
 
@@ -357,9 +349,7 @@ public class TestHelper {
         collection.setName(name);
         collection.setDisplayName(name);
         collection.setOwner(user);
-        collection.setCreationDate(java.util.Calendar.getInstance().getTime());
-        collection.setModifiedDate(collection.getCreationDate());
-
+       
         return collection;
     }
     
@@ -378,8 +368,7 @@ public class TestHelper {
         collection.setName(name);
         collection.setDisplayName(name);
         collection.setOwner(user);
-        collection.setCreationDate(java.util.Calendar.getInstance().getTime());
-        collection.setModifiedDate(collection.getCreationDate());
+       
         collection.addStamp(entityFactory.createCalendarCollectionStamp(collection));
 
         return collection;

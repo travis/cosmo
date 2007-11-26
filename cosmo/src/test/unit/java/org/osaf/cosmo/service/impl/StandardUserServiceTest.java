@@ -116,8 +116,7 @@ public class StandardUserServiceTest extends TestCase {
         User u1 = testHelper.makeDummyUser();
         u1.setPassword(service.digestPassword(u1.getPassword()));
         String digestedPassword = u1.getPassword();
-        u1.setCreationDate(new Date());
-        u1.setModifiedDate(u1.getCreationDate());
+        
         userDao.createUser(u1);
 
         // change password

@@ -43,11 +43,11 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
 
     public void testGenerateRecord() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        EventStamp eventStamp = new MockEventStamp(noteItem);
+        MockEventStamp eventStamp = new MockEventStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         eventStamp.setLocation("here");
@@ -97,12 +97,12 @@ public class EventGeneratorTest extends BaseGeneratorTestCase
     
     public void testGenerateMissingRecord() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         noteItem.setModifies(new MockNoteItem());
         
-        EventExceptionStamp eventStamp = new MockEventExceptionStamp(noteItem);
+        MockEventExceptionStamp eventStamp = new MockEventExceptionStamp(noteItem);
         eventStamp.setModifiedDate(noteItem.getModifiedDate());
         eventStamp.createCalendar();
         eventStamp.setLocation(null);

@@ -28,21 +28,9 @@ public interface AuditableObject {
     public Date getCreationDate();
 
     /**
-     * @param creationDate 
-     *                     date object was created
-     */
-    public void setCreationDate(Date creationDate);
-
-    /**
      * @return date object was last updated
      */
     public Date getModifiedDate();
-
-    /**
-     * @param modifiedDate
-     *                     date object was last modified
-     */
-    public void setModifiedDate(Date modifiedDate);
 
     /**
      * Update modifiedDate with current system time.
@@ -58,11 +46,6 @@ public interface AuditableObject {
      */
     public String getEntityTag();
 
-    /**
-     * @param etag entity tag
-     */
-    public void setEntityTag(String etag);
-    
     /**
      * @return EntityFactory that was used to create object.
      */

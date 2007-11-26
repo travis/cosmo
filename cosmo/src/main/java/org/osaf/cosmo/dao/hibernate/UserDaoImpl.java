@@ -189,7 +189,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                     throw new DuplicateUsernameException(user.getUsername());
             }
 
-            user.setModifiedDate(new Date());
+            user.updateTimestamp();
             getSession().update(user);
             getSession().flush();
 

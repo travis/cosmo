@@ -82,8 +82,8 @@ public class EventApplicatorTest extends BaseApplicatorTestCase
     }
     
     public void testApplyFieldWithUnknown() throws Exception {
-        NoteItem noteItem = new MockNoteItem();
-        EventStamp es = new MockEventStamp(noteItem);
+        MockNoteItem noteItem = new MockNoteItem();
+        MockEventStamp es = new MockEventStamp(noteItem);
         noteItem.addStamp(es);
         es.createCalendar();
         es.setStartDate(new Date("01011979"));

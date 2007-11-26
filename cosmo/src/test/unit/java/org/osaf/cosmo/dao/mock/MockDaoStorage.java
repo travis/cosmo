@@ -118,7 +118,7 @@ public class MockDaoStorage {
 
     /** */
     public HomeCollectionItem createRootItem(User user) {
-        HomeCollectionItem rootCollection = new MockHomeCollectionItem();
+        MockHomeCollectionItem rootCollection = new MockHomeCollectionItem();
         rootCollection.setName(user.getUsername());
         rootCollection.setOwner(user);
         rootCollection.setUid(calculateUid());
@@ -142,9 +142,9 @@ public class MockDaoStorage {
             item.setUid(calculateUid());
         if (item.getName() == null)
             item.setName(item.getUid());
-        item.setCreationDate(new Date());
-        item.setModifiedDate(item.getCreationDate());
-        item.setEntityTag(getMockItem(item).calculateEntityTag());
+        ((MockItem) item).setCreationDate(new Date());
+        ((MockItem) item).setModifiedDate(item.getCreationDate());
+        ((MockItem) item).setEntityTag(getMockItem(item).calculateEntityTag());
 
         if(item.getParent()!=null) {
             for (Item sibling : item.getParent().getChildren()) {
@@ -189,7 +189,7 @@ public class MockDaoStorage {
             }
         }
 
-        item.setModifiedDate(new Date());
+        ((MockItem) item).setModifiedDate(new Date());
 
         String path = "";
         if (parentItem != null)

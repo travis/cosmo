@@ -75,7 +75,7 @@ public class EventStampTest extends TestCase {
         Assert.assertEquals(1, comps.size());
         VEvent event = (VEvent) comps.get(0);
         
-        // test VALUE=DATE-TIME is note present
+        // test VALUE=DATE-TIME is not present
         Assert.assertNull(event.getStartDate().getParameter(Parameter.VALUE));
         
         // test item properties got merged into calendar

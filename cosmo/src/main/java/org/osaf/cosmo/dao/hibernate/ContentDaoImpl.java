@@ -252,7 +252,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         try {
             if(!getSession().contains(collection))
                 collection = (CollectionItem) getSession().merge(collection);
-            collection.setModifiedDate(new Date());
+            collection.updateTimestamp();
             getSession().flush();
             return collection;
         } catch (HibernateException e) {
@@ -622,7 +622,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if (content.getOwner() == null)
             throw new IllegalArgumentException("content must have owner");
         
-        content.setModifiedDate(new Date());
+        content.updateTimestamp();
         
         if(isNoteModification(content)) {
             // ensure master is dirty so that etag gets updated
@@ -640,7 +640,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if (collection.getOwner() == null)
             throw new IllegalArgumentException("collection must have owner");
         
-        collection.setModifiedDate(new Date());
+        collection.updateTimestamp();
     }
     
     /**

@@ -38,11 +38,11 @@ public class MessageGeneratorTest extends BaseGeneratorTestCase
 
     public void testGenerateRecord() throws Exception {
         
-        NoteItem noteItem = new MockNoteItem();
+        MockNoteItem noteItem = new MockNoteItem();
         noteItem.setModifiedDate(new Date());
         noteItem.setUid("1");
         
-        MessageStamp messageStamp = new MockMessageStamp(noteItem);
+        MockMessageStamp messageStamp = new MockMessageStamp(noteItem);
         messageStamp.setModifiedDate(noteItem.getModifiedDate());
         messageStamp.setMessageId("id");
         messageStamp.setHeaders("headers");

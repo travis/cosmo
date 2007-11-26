@@ -38,6 +38,7 @@ import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStamp;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Due;
 import net.fortuna.ical4j.model.property.Duration;
@@ -126,6 +127,29 @@ public class ICalendarUtils {
             comp.getProperties().add(description);
         }
         description.setValue(text);
+    }
+    
+    /**
+     * Update the DTSTAMP property on a component.
+     * @param date DTSTAMP value to update.  If null, the DTSTAMP property
+     *        will be removed
+     * @param comp component to update
+     */
+    public static void setDtStamp(java.util.Date date, Component comp) {
+        DtStamp dtStamp = (DtStamp)
+        comp.getProperties().getProperty(Property.DTSTAMP);
+   
+        if (date == null) {
+            if (dtStamp != null)
+                comp.getProperties().remove(dtStamp);
+            return;
+        }                
+        if (dtStamp == null) {
+            dtStamp = new DtStamp();
+            comp.getProperties().add(dtStamp);
+        }
+        
+        dtStamp.getDate().setTime(date.getTime());
     }
     
     /**

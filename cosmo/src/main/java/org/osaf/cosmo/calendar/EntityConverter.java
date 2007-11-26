@@ -287,8 +287,6 @@ public class EntityConverter {
         for(Iterator<Component> it = vtimezones.iterator(); it.hasNext();)
             exceptionStamp.getEventCalendar().getComponents().add(0, it.next());
         
-        setCalendarAttributes(noteMod, event);
-
         TriageStatus ts = entityFactory.createTriageStatus();
         TriageStatusUtil.initialize(ts);
 
@@ -301,6 +299,8 @@ public class EntityConverter {
         noteMod.setNeedsReply(Boolean.FALSE);
         noteMod.setModifies(masterNote);
         masterNote.addModification(noteMod);
+        
+        setCalendarAttributes(noteMod, event);
     }
 
     private void updateNoteModification(NoteItem noteMod,
@@ -315,11 +315,11 @@ public class EntityConverter {
         for(Iterator<Component> it = vtimezones.iterator(); it.hasNext();)
             exceptionStamp.getEventCalendar().getComponents().add(0, it.next());
         
-        setCalendarAttributes(noteMod, event);
-        
         noteMod.setClientModifiedDate(new Date());
         noteMod.setLastModifiedBy(noteMod.getModifies().getLastModifiedBy());
         noteMod.setLastModification(ContentItem.Action.EDITED);
+        
+        setCalendarAttributes(noteMod, event);
     }
     
     private void setCalendarAttributes(NoteItem note,
@@ -332,6 +332,10 @@ public class EntityConverter {
         if (event.getDescription() != null)
             note.setBody(event.getDescription().getValue());
 
+        // look for DTSTAMP
+        if(event.getDateStamp()!=null)
+            note.setClientModifiedDate(event.getDateStamp().getDate());
+        
         // look for VALARM
         VAlarm va = ICalendarUtils.getDisplayAlarm(event);
         if (va != null) {

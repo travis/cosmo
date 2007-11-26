@@ -74,13 +74,6 @@ public class MockEventExceptionStamp extends MockBaseEventStamp implements
         return getExceptionEvent();
     }
      
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#setCalendar(net.fortuna.ical4j.model.Calendar)
-     */
-    @Override
-    public void setCalendar(Calendar calendar) {
-        setEventCalendar(calendar);
-    }
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#getExceptionEvent()

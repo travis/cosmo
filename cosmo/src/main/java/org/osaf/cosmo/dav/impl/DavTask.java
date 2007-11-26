@@ -42,7 +42,7 @@ import org.osaf.cosmo.model.TaskStamp;
  *
  * This class does not define any live properties.
  *
- * @see DavFile
+ * @see DavCalendarResource
  */
 public class DavTask extends DavCalendarResource {
     private static final Log log = LogFactory.getLog(DavTask.class);
@@ -135,6 +135,10 @@ public class DavTask extends DavCalendarResource {
         if (val == null)
             val = "";
         note.setBody(val);
+        
+        // look for DTSTAMP
+        if(vtodo.getDateStamp()!=null)
+            note.setClientModifiedDate(vtodo.getDateStamp().getDate());
         
         // look for VALARM
         VAlarm va = ICalendarUtils.getDisplayAlarm(vtodo);

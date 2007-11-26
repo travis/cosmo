@@ -68,8 +68,6 @@ public abstract class MockBaseEventStamp extends MockStamp
     protected static final TimeZoneRegistry TIMEZONE_REGISTRY =
         TimeZoneRegistryFactory.getInstance().createRegistry();
     
-    public static final String TIME_INFINITY = "Z-TIME-INFINITY";
-    
     protected static final String VALUE_MISSING = "MISSING";
     
     private Calendar eventCalendar = null;
@@ -78,11 +76,6 @@ public abstract class MockBaseEventStamp extends MockStamp
      * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getEvent()
      */
     public abstract VEvent getEvent();
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setCalendar(net.fortuna.ical4j.model.Calendar)
-     */
-    public abstract void setCalendar(Calendar calendar);
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getEventCalendar()
@@ -780,7 +773,7 @@ public abstract class MockBaseEventStamp extends MockStamp
 
         Calendar cal = ICalendarUtils.createBaseCalendar(new VEvent(), icalUid);
         
-        setCalendar(cal);
+        setEventCalendar(cal);
     }
     
     /* (non-Javadoc)

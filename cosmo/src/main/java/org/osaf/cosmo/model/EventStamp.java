@@ -47,10 +47,4 @@ public interface EventStamp extends BaseEventStamp{
      */
     public VEvent getMasterEvent();
 
-    /**
-     * Remove any timezones in the master calendar that are
-     * found in the timezone registry.
-     */
-    public void compactTimezones();
-
 }

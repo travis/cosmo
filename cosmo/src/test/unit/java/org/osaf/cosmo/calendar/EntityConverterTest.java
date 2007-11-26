@@ -26,6 +26,7 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,9 +55,19 @@ public class EntityConverterTest extends TestCase {
         // should be master and mod
         Assert.assertEquals(2, items.size());
         
-        // get mod
+        // get master
         Iterator<NoteItem> it = items.iterator();
-        it.next();
+        master = it.next();
+        
+        // check ical props
+        // DTSTAMP
+        Assert.assertEquals(master.getClientModifiedDate().getTime(), new DateTime("20051222T210507Z").getTime());
+        // UID
+        Assert.assertEquals(master.getIcalUid(), "F5B811E00073B22BA6B87551@ninevah.local");
+        // SUMMARY
+        Assert.assertEquals(master.getDisplayName(), "event 6");
+        
+        // get mod
         NoteItem mod = it.next();
         
         Assert.assertTrue(mod.getModifies()==master);

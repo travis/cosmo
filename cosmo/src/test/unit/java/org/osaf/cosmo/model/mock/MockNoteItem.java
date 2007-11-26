@@ -215,9 +215,15 @@ public class MockNoteItem extends MockICalendarItem implements NoteItem {
         //uid = icaluid or uid
         //summary = displayName
         //description = body
+        //dtstamp = clientModifiedDate
         String icalUid = getIcalUid();
         if(icalUid==null)
             icalUid = getUid();
+        
+        if(getClientModifiedDate()!=null)
+            ICalendarUtils.setDtStamp(getClientModifiedDate(), journal);
+        else
+            ICalendarUtils.setDtStamp(getModifiedDate(), journal);
         
         ICalendarUtils.setUid(icalUid, journal);
         ICalendarUtils.setSummary(getDisplayName(), journal);

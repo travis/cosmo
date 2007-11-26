@@ -19,18 +19,10 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.component.VJournal;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Summary;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
@@ -44,7 +36,7 @@ import org.osaf.cosmo.model.NoteItem;
  *
  * This class does not define any live properties.
  *
- * @see DavFile
+ * @see DavCalendarResource
  */
 public class DavJournal extends DavCalendarResource {
     private static final Log log = LogFactory.getLog(DavJournal.class);
@@ -130,5 +122,9 @@ public class DavJournal extends DavCalendarResource {
         if (val == null)
             val = "";
         note.setBody(val);
+        
+        // look for DTSTAMP
+        if(vjournal.getDateStamp()!=null)
+            note.setClientModifiedDate(vjournal.getDateStamp().getDate());
     }
 }

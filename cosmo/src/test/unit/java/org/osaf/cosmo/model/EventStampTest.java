@@ -55,9 +55,11 @@ public class EventStampTest extends TestCase {
         master.setDisplayName("displayName");
         master.setBody("body");
         master.setIcalUid("icaluid");
+        master.setClientModifiedDate(new DateTime("20070101T100000Z"));
         EventStamp eventStamp = new MockEventStamp(master);
         eventStamp.createCalendar();
         eventStamp.setStartDate(new DateTime("20070212T074500"));
+        
         
         Calendar cal = eventStamp.getCalendar();
         
@@ -80,7 +82,8 @@ public class EventStampTest extends TestCase {
         Assert.assertEquals("displayName", event.getSummary().getValue());
         Assert.assertEquals("body", event.getDescription().getValue());
         Assert.assertEquals("icaluid", event.getUid().getValue());
-        
+        Assert.assertEquals(master.getClientModifiedDate().getTime(), event.getDateStamp().getDate().getTime());
+         
         // date has timezone, so there should be a timezone
         Assert.assertEquals(1, cal.getComponents(Component.VTIMEZONE).size());
         

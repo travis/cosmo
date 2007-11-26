@@ -108,12 +108,21 @@ public class MockTaskStamp extends MockStamp implements
         //uid = icaluid or uid
         //summary = displayName
         //description = body
-        String icalUid = ((NoteItem)getItem()).getIcalUid();
+        //dtstamp = clientModifiedDate/modifiedDate
+        
+        NoteItem note = (NoteItem) getItem();
+        
+        String icalUid = note.getIcalUid();
         if(icalUid==null)
             icalUid = getItem().getUid();
         
+        if(note.getClientModifiedDate()!=null)
+            ICalendarUtils.setDtStamp(note.getClientModifiedDate(), task);
+        else
+            ICalendarUtils.setDtStamp(note.getModifiedDate(), task);
+        
         ICalendarUtils.setUid(icalUid, task);
-        ICalendarUtils.setSummary(getItem().getDisplayName(), task);
-        ICalendarUtils.setDescription(((NoteItem)getItem()).getBody(), task);
+        ICalendarUtils.setSummary(note.getDisplayName(), task);
+        ICalendarUtils.setDescription(note.getBody(), task);
     }
 }

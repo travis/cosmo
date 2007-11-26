@@ -155,7 +155,7 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
         if (coll.isDisplayed != coll.doDisplay) {
             if (coll.doDisplay) {
                 loadDeferred = cosmo.app.pim.serv.getItems(coll,
-                    { start: start, end: end }, { sync: true });
+                    { start: start, end: end });
                 loadDeferred.addErrback(handleErr);
                 loadDeferred.addCallback(function (eventLoadList){
                     var h = _this.createEventRegistry(eventLoadList, collId);

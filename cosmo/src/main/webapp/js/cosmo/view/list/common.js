@@ -92,8 +92,7 @@ cosmo.view.list.loadItems = function (o) {
     // ======================
     // Look up for Note if passed a Note, otherwise get for
     // the entire collection
-    var deferred = cosmo.app.pim.serv.getDashboardItems(note || collection,
-        { sync: true });
+    var deferred = cosmo.app.pim.serv.getDashboardItems(note || collection);
     // Catch any error stuffed in the deferred
     deferred.addErrback(function (e){
         if (e instanceof cosmo.service.exception.ResourceNotFoundException){

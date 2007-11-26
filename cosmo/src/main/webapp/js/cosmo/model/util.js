@@ -286,11 +286,6 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
 }   
 
   cosmo.model._occurrenceGetProperty = function (propertyName){
-      if (this.isOccurrenceStamp 
-          && this.isOccurrenceStamp() && this.stampMetaData.seriesOnly){
-            return this._getMasterProperty(propertyName);
-        }
-
         //get the master version
         var master = this.getMaster();
         var masterProperty = this._getMasterProperty(propertyName);
@@ -319,11 +314,6 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
 }
 
 cosmo.model._occurrenceSetProperty = function (propertyName, value){
-    if (this.isOccurrenceStamp 
-        && this.isOccurrenceStamp() && this.stampMetaData.seriesOnly){
-        this.getMaster().__setProperty(propertyName, value);
-    }
-
     if (this.__noOverride[propertyName]){
         throw new Error("You can not override property '" + propertyName +"'");
     }

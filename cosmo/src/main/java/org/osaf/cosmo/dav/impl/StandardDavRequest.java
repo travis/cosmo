@@ -18,12 +18,15 @@ package org.osaf.cosmo.dav.impl;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashSet;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -111,6 +114,24 @@ public class StandardDavRequest extends WebdavRequestImpl
     }
 
     // DavRequest methods
+
+    public EntityTag[] getIfMatch() {
+      return EntityTag.parseTags(getHeader("If-Match"));
+    }
+
+    public Date getIfModifiedSince() {
+        long value = getDateHeader("If-Modified-Since");
+        return value != -1 ? new Date(value) : null;
+    }
+
+    public EntityTag[] getIfNoneMatch() {
+      return EntityTag.parseTags(getHeader("If-None-Match"));
+    }
+
+    public Date getIfUnmodifiedSince() {
+        long value = getDateHeader("If-Unmodified-Since");
+        return value != -1 ? new Date(value) : null;
+    }
 
     public int getPropFindType()
         throws DavException {

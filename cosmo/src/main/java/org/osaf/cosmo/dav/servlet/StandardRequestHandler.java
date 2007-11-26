@@ -55,8 +55,6 @@ import org.osaf.cosmo.dav.provider.FileProvider;
 import org.osaf.cosmo.dav.provider.HomeCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalProvider;
-import org.osaf.cosmo.http.IfMatch;
-import org.osaf.cosmo.http.IfNoneMatch;
 import org.osaf.cosmo.model.EntityFactory;
 
 import org.springframework.web.HttpRequestHandler;
@@ -299,16 +297,19 @@ public class StandardRequestHandler implements HttpRequestHandler {
                          DavResponse response,
                          DavResource resource)
         throws DavException, IOException {
-        EntityTag etag = etag(resource);
-        try {
-            if (IfMatch.allowMethod(request.getHeader("If-Match"), etag))
-                return;
-        } catch (ParseException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        EntityTag[] requestEtags = request.getIfMatch();
+        if (requestEtags.length == 0)
+            return;
 
-        if (etag != null)
-            response.addHeader("ETag", etag.toString());
+        EntityTag resourceEtag = etag(resource);
+        if (resourceEtag == null)
+            return;
+
+        if (EntityTag.matchesAny(resourceEtag, requestEtags))
+            return;
+
+        if (resourceEtag != null)
+            response.setHeader("ETag", resourceEtag.toString());
 
         throw new PreconditionFailedException("If-Match disallows conditional request");
     }
@@ -317,17 +318,19 @@ public class StandardRequestHandler implements HttpRequestHandler {
                              DavResponse response,
                              DavResource resource)
         throws DavException, IOException {
-        EntityTag etag = etag(resource);
-        try {
-            if (IfNoneMatch.allowMethod(request.getHeader("If-None-Match"),
-                                        etag))
-                return;
-        } catch (ParseException e) {
-            throw new BadRequestException(e.getMessage());
-        }
+        EntityTag[] requestEtags = request.getIfNoneMatch();
+        if (requestEtags.length == 0)
+            return;
 
-        if (etag != null)
-            response.addHeader("ETag", etag.toString());
+        EntityTag resourceEtag = etag(resource);
+        if (resourceEtag == null)
+            return;
+
+        if (! EntityTag.matchesAny(resourceEtag, requestEtags))
+            return;
+
+        if (resourceEtag != null)
+            response.addHeader("ETag", resourceEtag.toString());
 
         if (deservesNotModified(request))
             throw new NotModifiedException();
@@ -369,7 +372,7 @@ public class StandardRequestHandler implements HttpRequestHandler {
             return;
         mod = mod / 1000 * 1000;
 
-        long since = request.getDateHeader("If-Modified-Since");
+        long since = request.getDateHeader("If-Unmodified-Since");
         if (since == -1)
             return;
 

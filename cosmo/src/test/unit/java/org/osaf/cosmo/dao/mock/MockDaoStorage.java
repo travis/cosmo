@@ -124,6 +124,7 @@ public class MockDaoStorage {
         rootCollection.setUid(calculateUid());
         rootCollection.setCreationDate(new Date());
         rootCollection.setModifiedDate(rootCollection.getCreationDate());
+        rootCollection.setEntityTag(getMockItem(rootCollection).calculateEntityTag());
 
         itemsByUid.put(rootCollection.getUid(), rootCollection);
         itemsByPath.put("/" + rootCollection.getName(), rootCollection);

@@ -98,17 +98,7 @@ public abstract class HibAuditableObject extends BaseModelObject implements Audi
     }
     
     /**
-     * <p>
-     * Calculates updates object's entity tag.
-     * Returns calculated entity tag.  
-     * </p>
-     * <p>
-     * This implementation simply returns the empty string. Subclasses should
-     * override it when necessary.
-     * </p>
-     * 
-     * Subclasses should override
-     * this.
+     * Calculates object's entity tag. Returns the empty string. Subclasses should override this.
      */
     public String calculateEntityTag() {
         return "";

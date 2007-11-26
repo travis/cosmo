@@ -15,9 +15,13 @@
  */
 package org.osaf.cosmo.dav;
 
+import java.util.Date;
+
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+
+import org.apache.abdera.util.EntityTag;
 
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.caldav.CaldavRequest;
@@ -30,6 +34,14 @@ import org.osaf.cosmo.dav.ticket.TicketDavRequest;
  */
 public interface DavRequest
     extends WebdavRequest, CaldavRequest, ReportRequest, TicketDavRequest {
+
+    public EntityTag[] getIfMatch();
+
+    public Date getIfModifiedSince();
+
+    public EntityTag[] getIfNoneMatch();
+
+    public Date getIfUnmodifiedSince();
 
     public int getPropFindType()
         throws DavException;

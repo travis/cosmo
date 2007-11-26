@@ -895,6 +895,12 @@
   <bean id="protocolAuthenticationEntryPoint"
         class="org.osaf.cosmo.acegisecurity.ui.CosmoAuthenticationEntryPoint"/>
 
+  <bean id="protocolDigestAuthenticationEntryPoint"
+        class="org.osaf.cosmo.acegisecurity.ui.CosmoDigestAuthenticationEntryPoint">
+    <property name="realmName" value="Cosmo"/>
+    <property name="key" value="foo"/>
+  </bean>
+
   <bean id="protocolTicketProcessingFilter"
         class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
 
@@ -905,6 +911,16 @@
     </property>
     <property name="authenticationEntryPoint">
       <ref local="protocolAuthenticationEntryPoint"/>
+    </property>
+  </bean>
+
+  <bean id="protocolDigestProcessingFilter"
+        class="org.acegisecurity.ui.digestauth.DigestProcessingFilter">
+    <property name="userDetailsService">
+       <ref local="userDetailsService"/>
+    </property>
+    <property name="authenticationEntryPoint">
+      <ref local="protocolDigestAuthenticationEntryPoint"/>
     </property>
   </bean>
 

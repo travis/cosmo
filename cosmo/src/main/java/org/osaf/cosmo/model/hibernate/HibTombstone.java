@@ -64,28 +64,28 @@ public abstract class HibTombstone extends BaseModelObject implements Tombstone 
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTombstone#getTimestamp()
+     * @see org.osaf.cosmo.model.Tombstone#getTimestamp()
      */
     public Date getTimestamp() {
         return timestamp;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTombstone#setTimestamp(java.util.Date)
+     * @see org.osaf.cosmo.model.Tombstone#setTimestamp(java.util.Date)
      */
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTombstone#getItem()
+     * @see org.osaf.cosmo.model.Tombstone#getItem()
      */
     public Item getItem() {
         return item;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTombstone#setItem(org.osaf.cosmo.model.copy.Item)
+     * @see org.osaf.cosmo.model.Tombstone#setItem(org.osaf.cosmo.model.Item)
      */
     public void setItem(Item item) {
         this.item = item;

@@ -74,20 +74,24 @@ public class HibBinaryAttribute extends HibAttribute implements java.io.Serializ
     }
 
     // Property accessors
+ 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBinaryAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public byte[] getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBinaryAttribute#setValue(byte[])
+     * @see org.osaf.cosmo.model.BinaryAttribute#setValue(byte[])
      */
     public void setValue(byte[] value) {
         this.value = value;
     }
 
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Attribute#setValue(java.lang.Object)
+     */
     public void setValue(Object value) {
         if (value != null && !(value instanceof byte[]))
             throw new ModelValidationException(
@@ -96,7 +100,7 @@ public class HibBinaryAttribute extends HibAttribute implements java.io.Serializ
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBinaryAttribute#getLength()
+     * @see org.osaf.cosmo.model.BinaryAttribute#getLength()
      */
     public int getLength() {
         if(value!=null)
@@ -106,7 +110,7 @@ public class HibBinaryAttribute extends HibAttribute implements java.io.Serializ
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBinaryAttribute#getInputStream()
+     * @see org.osaf.cosmo.model.BinaryAttribute#getInputStream()
      */
     public InputStream getInputStream() {
         if(value!=null)

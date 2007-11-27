@@ -93,35 +93,30 @@ public abstract class HibBaseEventStamp extends HibStamp
     @Embedded
     private HibEventTimeRangeIndex timeRangeIndex = null;
     
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getEvent()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getEvent()
      */
     public abstract VEvent getEvent();
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getEventCalendar()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getEventCalendar()
      */
     public Calendar getEventCalendar() {
         return eventCalendar;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setEventCalendar(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setEventCalendar(net.fortuna.ical4j.model.Calendar)
      */
     public void setEventCalendar(Calendar calendar) {
         this.eventCalendar = calendar;
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getTimeRangeIndex()
-     */
     public HibEventTimeRangeIndex getTimeRangeIndex() {
         return timeRangeIndex;
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setTimeRangeIndex(org.osaf.cosmo.model.copy.EventTimeRangeIndex)
-     */
     public void setTimeRangeIndex(HibEventTimeRangeIndex timeRangeIndex) {
         this.timeRangeIndex = timeRangeIndex;
     }
@@ -138,14 +133,14 @@ public abstract class HibBaseEventStamp extends HibStamp
     
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getIcalUid()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getIcalUid()
      */
     public String getIcalUid() {
         return getEvent().getUid().getValue();
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setIcalUid(java.lang.String)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setIcalUid(java.lang.String)
      */
     public void setIcalUid(String uid) {
         VEvent event = getEvent();
@@ -159,21 +154,21 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setSummary(java.lang.String)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setSummary(java.lang.String)
      */
     public void setSummary(String text) {
         ICalendarUtils.setSummary(text, getEvent());
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDescription(java.lang.String)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDescription(java.lang.String)
      */
     public void setDescription(String text) {
         ICalendarUtils.setDescription(text, getEvent());
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getStartDate()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getStartDate()
      */
     public Date getStartDate() {
         VEvent event = getEvent();
@@ -187,7 +182,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setStartDate(net.fortuna.ical4j.model.Date)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setStartDate(net.fortuna.ical4j.model.Date)
      */
     public void setStartDate(Date date) {
         DtStart dtStart = getEvent().getStartDate();
@@ -201,7 +196,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getEndDate()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getEndDate()
      */
     public Date getEndDate() {
         VEvent event = getEvent();
@@ -231,7 +226,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setEndDate(net.fortuna.ical4j.model.Date)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setEndDate(net.fortuna.ical4j.model.Date)
      */
     public void setEndDate(Date date) {
         DtEnd dtEnd = getEvent().getEndDate();
@@ -286,22 +281,24 @@ public abstract class HibBaseEventStamp extends HibStamp
             prop.getParameters().add(new TzId(prop.getDates().getTimeZone().getID()));
     }
 
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getDuration()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getDuration()
      */
     public Dur getDuration() {
         return ICalendarUtils.getDuration(getEvent());
     }
 
+  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDuration(net.fortuna.ical4j.model.Dur)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDuration(net.fortuna.ical4j.model.Dur)
      */
     public void setDuration(Dur dur) {
         ICalendarUtils.setDuration(getEvent(), dur);
     }
-
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getLocation()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getLocation()
      */
     public String getLocation() {
         Property p = getEvent().getProperties().
@@ -312,7 +309,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setLocation(java.lang.String)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setLocation(java.lang.String)
      */
     public void setLocation(String text) {
         
@@ -332,7 +329,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getRecurrenceRules()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getRecurrenceRules()
      */
     public List<Recur> getRecurrenceRules() {
         ArrayList<Recur> l = new ArrayList<Recur>();
@@ -346,7 +343,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setRecurrenceRules(java.util.List)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setRecurrenceRules(java.util.List)
      */
     public void setRecurrenceRules(List<Recur> recurs) {
         if (recurs == null)
@@ -360,7 +357,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setRecurrenceRule(net.fortuna.ical4j.model.Recur)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setRecurrenceRule(net.fortuna.ical4j.model.Recur)
      */
     public void setRecurrenceRule(Recur recur) {
         if (recur == null)
@@ -371,7 +368,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getExceptionRules()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getExceptionRules()
      */
     public List<Recur> getExceptionRules() {
         ArrayList<Recur> l = new ArrayList<Recur>();
@@ -382,7 +379,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setExceptionRules(java.util.List)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setExceptionRules(java.util.List)
      */
     public void setExceptionRules(List<Recur> recurs) {
         if (recurs == null)
@@ -395,7 +392,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getRecurrenceDates()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getRecurrenceDates()
      */
     public DateList getRecurrenceDates() {
         
@@ -420,7 +417,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setRecurrenceDates(net.fortuna.ical4j.model.DateList)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setRecurrenceDates(net.fortuna.ical4j.model.DateList)
      */
     public void setRecurrenceDates(DateList dates) {
         if (dates == null)
@@ -438,7 +435,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getExceptionDates()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getExceptionDates()
      */
     public DateList getExceptionDates() {
         DateList l = null;
@@ -457,7 +454,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getDisplayAlarm()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getDisplayAlarm()
      */
     public VAlarm getDisplayAlarm() {
         VEvent event = getEvent();
@@ -480,7 +477,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#removeDisplayAlarm()
+     * @see org.osaf.cosmo.model.BaseEventStamp#removeDisplayAlarm()
      */
     public void removeDisplayAlarm() {
         VEvent event = getEvent();
@@ -498,7 +495,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getDisplayAlarmDescription()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getDisplayAlarmDescription()
      */
     public String getDisplayAlarmDescription() {
         VAlarm alarm = getDisplayAlarm();
@@ -515,7 +512,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDisplayAlarmDescription(java.lang.String)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDisplayAlarmDescription(java.lang.String)
      */
     public void setDisplayAlarmDescription(String newDescription) {
         VAlarm alarm = getDisplayAlarm();
@@ -534,7 +531,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getDisplayAlarmTrigger()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getDisplayAlarmTrigger()
      */
     public Trigger getDisplayAlarmTrigger() {
         VAlarm alarm = getDisplayAlarm();
@@ -546,7 +543,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDisplayAlarmTrigger(net.fortuna.ical4j.model.property.Trigger)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDisplayAlarmTrigger(net.fortuna.ical4j.model.property.Trigger)
      */
     public void setDisplayAlarmTrigger(Trigger newTrigger) {
         VAlarm alarm = getDisplayAlarm();
@@ -563,7 +560,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDisplayAlarmTriggerDate(net.fortuna.ical4j.model.DateTime)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDisplayAlarmTriggerDate(net.fortuna.ical4j.model.DateTime)
      */
     public void setDisplayAlarmTriggerDate(DateTime triggerDate) {
         VAlarm alarm = getDisplayAlarm();
@@ -583,7 +580,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getDisplayAlarmDuration()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getDisplayAlarmDuration()
      */
     public Dur getDisplayAlarmDuration() {
         VAlarm alarm = getDisplayAlarm();
@@ -598,7 +595,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDisplayAlarmDuration(net.fortuna.ical4j.model.Dur)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDisplayAlarmDuration(net.fortuna.ical4j.model.Dur)
      */
     public void setDisplayAlarmDuration(Dur dur) {
         VAlarm alarm = getDisplayAlarm();
@@ -622,7 +619,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getDisplayAlarmRepeat()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getDisplayAlarmRepeat()
      */
     public Integer getDisplayAlarmRepeat() {
         VAlarm alarm = getDisplayAlarm();
@@ -638,7 +635,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setDisplayAlarmRepeat(java.lang.Integer)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setDisplayAlarmRepeat(java.lang.Integer)
      */
     public void setDisplayAlarmRepeat(Integer count) {
         VAlarm alarm = getDisplayAlarm();
@@ -660,7 +657,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setExceptionDates(net.fortuna.ical4j.model.DateList)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setExceptionDates(net.fortuna.ical4j.model.DateList)
      */
     public void setExceptionDates(DateList dates) {
         if (dates == null)
@@ -678,7 +675,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getRecurrenceId()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getRecurrenceId()
      */
     public Date getRecurrenceId() {
         RecurrenceId rid = getEvent().getRecurrenceId();
@@ -688,7 +685,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setRecurrenceId(net.fortuna.ical4j.model.Date)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setRecurrenceId(net.fortuna.ical4j.model.Date)
      */
     public void setRecurrenceId(Date date) {
         RecurrenceId recurrenceId = (RecurrenceId)
@@ -709,7 +706,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getStatus()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getStatus()
      */
     public String getStatus() {
         Property p = getEvent().getProperties().
@@ -720,7 +717,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setStatus(java.lang.String)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setStatus(java.lang.String)
      */
     public void setStatus(String text) {
         // ical4j Status value is immutable, so if there's any change
@@ -737,7 +734,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#isAnyTime()
+     * @see org.osaf.cosmo.model.BaseEventStamp#isAnyTime()
      */
     public Boolean isAnyTime() {
         DtStart dtStart = getEvent().getStartDate();
@@ -753,14 +750,14 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#getAnyTime()
+     * @see org.osaf.cosmo.model.BaseEventStamp#getAnyTime()
      */
     public Boolean getAnyTime() {
         return isAnyTime();
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#setAnyTime(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.BaseEventStamp#setAnyTime(java.lang.Boolean)
      */
     public void setAnyTime(Boolean isAnyTime) {
         DtStart dtStart = getEvent().getStartDate();
@@ -789,7 +786,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#createCalendar()
+     * @see org.osaf.cosmo.model.BaseEventStamp#createCalendar()
      */
     public void createCalendar() {
         
@@ -815,7 +812,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#isRecurring()
+     * @see org.osaf.cosmo.model.BaseEventStamp#isRecurring()
      */
     public boolean isRecurring() {
        if(getRecurrenceRules().size()>0)
@@ -827,7 +824,7 @@ public abstract class HibBaseEventStamp extends HibStamp
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBaseEventStamp#creatDisplayAlarm()
+     * @see org.osaf.cosmo.model.BaseEventStamp#creatDisplayAlarm()
      */
     public void creatDisplayAlarm() {
         VAlarm alarm = new VAlarm();

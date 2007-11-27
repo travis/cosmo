@@ -97,56 +97,56 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getKey()
+     * @see org.osaf.cosmo.model.Ticket#getKey()
      */
     public String getKey() {
         return key;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setKey(java.lang.String)
+     * @see org.osaf.cosmo.model.Ticket#setKey(java.lang.String)
      */
     public void setKey(String key) {
         this.key = key;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getTimeout()
+     * @see org.osaf.cosmo.model.Ticket#getTimeout()
      */
     public String getTimeout() {
         return timeout;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setTimeout(java.lang.String)
+     * @see org.osaf.cosmo.model.Ticket#setTimeout(java.lang.String)
      */
     public void setTimeout(String timeout) {
         this.timeout = timeout;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setTimeout(java.lang.Integer)
+     * @see org.osaf.cosmo.model.Ticket#setTimeout(java.lang.Integer)
      */
     public void setTimeout(Integer timeout) {
         this.timeout = "Second-" + timeout;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getPrivileges()
+     * @see org.osaf.cosmo.model.Ticket#getPrivileges()
      */
     public Set<String> getPrivileges() {
         return privileges;
     }
-
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setPrivileges(java.util.Set)
+     * @see org.osaf.cosmo.model.Ticket#setPrivileges(java.util.Set)
      */
     public void setPrivileges(Set<String> privileges) {
         this.privileges = privileges;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getType()
+     * @see org.osaf.cosmo.model.Ticket#getType()
      */
     public TicketType getType() {
         if (privileges.contains(PRIVILEGE_READ)) {
@@ -166,35 +166,35 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getCreated()
+     * @see org.osaf.cosmo.model.Ticket#getCreated()
      */
     public Date getCreated() {
         return created;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setCreated(java.util.Date)
+     * @see org.osaf.cosmo.model.Ticket#setCreated(java.util.Date)
      */
     public void setCreated(Date created) {
         this.created = created;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getOwner()
+     * @see org.osaf.cosmo.model.Ticket#getOwner()
      */
     public User getOwner() {
         return owner;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setOwner(org.osaf.cosmo.model.copy.User)
+     * @see org.osaf.cosmo.model.Ticket#setOwner(org.osaf.cosmo.model.User)
      */
     public void setOwner(User owner) {
         this.owner = owner;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#hasTimedOut()
+     * @see org.osaf.cosmo.model.Ticket#hasTimedOut()
      */
     public boolean hasTimedOut() {
         if (timeout == null || timeout.equals(TIMEOUT_INFINITE)) {
@@ -211,7 +211,7 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#isGranted(org.osaf.cosmo.model.copy.Item)
+     * @see org.osaf.cosmo.model.Ticket#isGranted(org.osaf.cosmo.model.Item)
      */
     public boolean isGranted(Item item) {
         
@@ -232,7 +232,7 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#isReadOnly()
+     * @see org.osaf.cosmo.model.Ticket#isReadOnly()
      */
     public boolean isReadOnly() {
         TicketType type = getType();
@@ -240,7 +240,7 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#isReadWrite()
+     * @see org.osaf.cosmo.model.Ticket#isReadWrite()
      */
     public boolean isReadWrite() {
         TicketType type = getType();
@@ -248,7 +248,7 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#isFreeBusy()
+     * @see org.osaf.cosmo.model.Ticket#isFreeBusy()
      */
     public boolean isFreeBusy() {
         TicketType type = getType();
@@ -290,21 +290,21 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#compareTo(org.osaf.cosmo.model.copy.Ticket)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(Ticket t) {
         return key.compareTo(t.getKey());
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#getItem()
+     * @see org.osaf.cosmo.model.Ticket#getItem()
      */
     public Item getItem() {
         return item;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTicket#setItem(org.osaf.cosmo.model.copy.Item)
+     * @see org.osaf.cosmo.model.Ticket#setItem(org.osaf.cosmo.model.Item)
      */
     public void setItem(Item item) {
         this.item = item;

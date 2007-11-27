@@ -45,49 +45,49 @@ public class HibTriageStatus implements TriageStatus {
     }
    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#getCode()
+     * @see org.osaf.cosmo.model.TriageStatus#getCode()
      */
     public Integer getCode() {
         return code;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#setCode(java.lang.Integer)
+     * @see org.osaf.cosmo.model.TriageStatus#setCode(java.lang.Integer)
      */
     public void setCode(Integer code) {
         this.code = code;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#getRank()
+     * @see org.osaf.cosmo.model.TriageStatus#getRank()
      */
     public BigDecimal getRank() {
         return rank;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#setRank(java.math.BigDecimal)
+     * @see org.osaf.cosmo.model.TriageStatus#setRank(java.math.BigDecimal)
      */
     public void setRank(BigDecimal rank) {
         this.rank = rank;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#getAutoTriage()
+     * @see org.osaf.cosmo.model.TriageStatus#getAutoTriage()
      */
     public Boolean getAutoTriage() {
         return autoTriage;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#setAutoTriage(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.TriageStatus#setAutoTriage(java.lang.Boolean)
      */
     public void setAutoTriage(Boolean autoTriage) {
         this.autoTriage = autoTriage;
     }
-        
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTriageStatus#copy()
+     * @see org.osaf.cosmo.model.TriageStatus#copy()
      */
     public TriageStatus copy() {
         TriageStatus copy = new HibTriageStatus();

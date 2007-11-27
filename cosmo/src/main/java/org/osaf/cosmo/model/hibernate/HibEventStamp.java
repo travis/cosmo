@@ -67,9 +67,6 @@ public class HibEventStamp extends HibBaseEventStamp implements
         return "event";
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventStamp#getEvent()
-     */
     @Override
     public VEvent getEvent() {
         return getMasterEvent();
@@ -82,15 +79,15 @@ public class HibEventStamp extends HibBaseEventStamp implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventStamp#getCalendar()
+     * @see org.osaf.cosmo.model.EventStamp#getCalendar()
      */
     public Calendar getCalendar() {
        return prototype.getCalendar();
     }
 
-   
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventStamp#getExceptions()
+     * @see org.osaf.cosmo.model.EventStamp#getExceptions()
      */
     public List<Component> getExceptions() {
         ArrayList<Component> exceptions = new ArrayList<Component>();
@@ -105,9 +102,9 @@ public class HibEventStamp extends HibBaseEventStamp implements
         
         return exceptions;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventStamp#getMasterEvent()
+     * @see org.osaf.cosmo.model.EventStamp#getMasterEvent()
      */
     public VEvent getMasterEvent() {
         if(getEventCalendar()==null)

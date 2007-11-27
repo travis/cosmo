@@ -66,20 +66,24 @@ public class HibCalendarAttribute extends HibAttribute implements
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Calendar getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarAttribute#setValue(java.util.Calendar)
+     * @see org.osaf.cosmo.model.CalendarAttribute#setValue(java.util.Calendar)
      */
     public void setValue(Calendar value) {
         this.value = value;
     }
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Attribute#setValue(java.lang.Object)
+     */
     public void setValue(Object value) {
         if (value != null && !(value instanceof Calendar)
                 && !(value instanceof String))
@@ -92,8 +96,9 @@ public class HibCalendarAttribute extends HibAttribute implements
             setValue((String) value);
     }
     
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarAttribute#setValue(java.lang.String)
+     * @see org.osaf.cosmo.model.CalendarAttribute#setValue(java.lang.String)
      */
     public void setValue(String value) {
         try {

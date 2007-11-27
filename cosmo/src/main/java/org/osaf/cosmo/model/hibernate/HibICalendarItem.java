@@ -43,21 +43,21 @@ public abstract class HibICalendarItem extends HibContentItem implements ICalend
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalenarItem#getIcalUid()
+     * @see org.osaf.cosmo.model.ICalendarItem#getIcalUid()
      */
     public String getIcalUid() {
         return icalUid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalenarItem#setIcalUid(java.lang.String)
+     * @see org.osaf.cosmo.model.ICalendarItem#setIcalUid(java.lang.String)
      */
     public void setIcalUid(String icalUid) {
         this.icalUid = icalUid;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalenarItem#getFullCalendar()
+     * @see org.osaf.cosmo.model.ICalendarItem#getFullCalendar()
      */
     public Calendar getFullCalendar() {
         return getCalendar();

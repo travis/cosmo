@@ -56,14 +56,14 @@ public class HibTaskStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTaskStamp#getType()
+     * @see org.osaf.cosmo.model.Stamp#getType()
      */
     public String getType() {
         return "task";
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTaskStamp#getTaskCalendar()
+     * @see org.osaf.cosmo.model.TaskStamp#getTaskCalendar()
      */
     @Task
     public Calendar getTaskCalendar() {
@@ -72,15 +72,15 @@ public class HibTaskStamp extends HibStamp implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTaskStamp#setTaskCalendar(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.TaskStamp#setTaskCalendar(net.fortuna.ical4j.model.Calendar)
      */
     public void setTaskCalendar(Calendar calendar) {
         // calendar stored as ICalendarAttribute on Item
         HibICalendarAttribute.setValue(getItem(), ATTR_ICALENDAR, calendar);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTaskStamp#getCalendar()
+     * @see org.osaf.cosmo.model.TaskStamp#getCalendar()
      */
     public Calendar getCalendar() {
         // Start with existing calendar if present

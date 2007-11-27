@@ -158,14 +158,14 @@ public abstract class HibItem extends HibAuditableObject implements Item {
   
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getStamps()
+     * @see org.osaf.cosmo.model.Item#getStamps()
      */
     public Set<Stamp> getStamps() {
         return Collections.unmodifiableSet(stamps);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getStampMap()
+     * @see org.osaf.cosmo.model.Item#getStampMap()
      */
     public Map<String, Stamp> getStampMap() {
         if(stampMap==null) {
@@ -176,9 +176,9 @@ public abstract class HibItem extends HibAuditableObject implements Item {
         
         return stampMap;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addStamp(org.osaf.cosmo.model.copy.Stamp)
+     * @see org.osaf.cosmo.model.Item#addStamp(org.osaf.cosmo.model.Stamp)
      */
     public void addStamp(Stamp stamp) {
         if (stamp == null)
@@ -195,9 +195,9 @@ public abstract class HibItem extends HibAuditableObject implements Item {
         stamp.setItem(this);
         stamps.add(stamp);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#removeStamp(org.osaf.cosmo.model.copy.Stamp)
+     * @see org.osaf.cosmo.model.Item#removeStamp(org.osaf.cosmo.model.Stamp)
      */
     public void removeStamp(Stamp stamp) {
         // only remove stamps that belong to item
@@ -211,7 +211,7 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getStamp(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#getStamp(java.lang.String)
      */
     public Stamp getStamp(String type) {
         for(Stamp stamp : stamps)
@@ -221,9 +221,9 @@ public abstract class HibItem extends HibAuditableObject implements Item {
         
         return null;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getStamp(java.lang.Class)
+     * @see org.osaf.cosmo.model.Item#getStamp(java.lang.Class)
      */
     public Stamp getStamp(Class clazz) {
         for(Stamp stamp : stamps)
@@ -235,14 +235,14 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getAttributes()
+     * @see org.osaf.cosmo.model.Item#getAttributes()
      */
     public Map<QName, Attribute> getAttributes() {
         return Collections.unmodifiableMap(attributes);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addTicket(org.osaf.cosmo.model.copy.Ticket)
+     * @see org.osaf.cosmo.model.Item#addTicket(org.osaf.cosmo.model.Ticket)
      */
     public void addTicket(Ticket ticket) {
         ticket.setItem(this);
@@ -250,14 +250,14 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#removeTicket(org.osaf.cosmo.model.copy.Ticket)
+     * @see org.osaf.cosmo.model.Item#removeTicket(org.osaf.cosmo.model.Ticket)
      */
     public void removeTicket(Ticket ticket) {
         tickets.remove(ticket);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addAttribute(org.osaf.cosmo.model.copy.Attribute)
+     * @see org.osaf.cosmo.model.Item#addAttribute(org.osaf.cosmo.model.Attribute)
      */
     public void addAttribute(Attribute attribute) {
         if (attribute == null)
@@ -277,14 +277,14 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#removeAttribute(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#removeAttribute(java.lang.String)
      */
     public void removeAttribute(String name) {
        removeAttribute(new HibQName(name));
     }
-    
+  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#removeAttribute(org.osaf.cosmo.model.copy.QName)
+     * @see org.osaf.cosmo.model.Item#removeAttribute(org.osaf.cosmo.model.QName)
      */
     public void removeAttribute(QName qname) {
         if(attributes.containsKey(qname)) {
@@ -294,7 +294,7 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#removeAttributes(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#removeAttributes(java.lang.String)
      */
     public void removeAttributes(String namespace) {
         ArrayList<QName> toRemove = new ArrayList<QName>();
@@ -308,28 +308,28 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getAttribute(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#getAttribute(java.lang.String)
      */
     public Attribute getAttribute(String name) {
         return getAttribute(new HibQName(name));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getAttribute(org.osaf.cosmo.model.copy.QName)
+     * @see org.osaf.cosmo.model.Item#getAttribute(org.osaf.cosmo.model.QName)
      */
     public Attribute getAttribute(QName qname) {
         return attributes.get(qname);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getAttributeValue(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#getAttributeValue(java.lang.String)
      */
     public Object getAttributeValue(String name) {
        return getAttributeValue(new HibQName(name));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getAttributeValue(org.osaf.cosmo.model.copy.QName)
+     * @see org.osaf.cosmo.model.Item#getAttributeValue(org.osaf.cosmo.model.QName)
      */
     public Object getAttributeValue(QName qname) {
         Attribute attr = attributes.get(qname);
@@ -339,112 +339,112 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addStringAttribute(java.lang.String, java.lang.String)
+     * @see org.osaf.cosmo.model.Item#addStringAttribute(java.lang.String, java.lang.String)
      */
     public void addStringAttribute(String name, String value) {
         addStringAttribute(new HibQName(name), value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addStringAttribute(org.osaf.cosmo.model.copy.QName, java.lang.String)
+     * @see org.osaf.cosmo.model.Item#addStringAttribute(org.osaf.cosmo.model.QName, java.lang.String)
      */
     public void addStringAttribute(QName qname, String value) {
         addAttribute(new HibStringAttribute(qname, value));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addIntegerAttribute(java.lang.String, java.lang.Long)
+     * @see org.osaf.cosmo.model.Item#addIntegerAttribute(java.lang.String, java.lang.Long)
      */
     public void addIntegerAttribute(String name, Long value) {
         addIntegerAttribute(new HibQName(name), value);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addIntegerAttribute(org.osaf.cosmo.model.copy.QName, java.lang.Long)
+     * @see org.osaf.cosmo.model.Item#addIntegerAttribute(org.osaf.cosmo.model.QName, java.lang.Long)
      */
     public void addIntegerAttribute(QName qname, Long value) {
         addAttribute(new HibIntegerAttribute(qname, value));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addBooleanAttribute(java.lang.String, java.lang.Boolean)
+     * @see org.osaf.cosmo.model.Item#addBooleanAttribute(java.lang.String, java.lang.Boolean)
      */
     public void addBooleanAttribute(String name, Boolean value) {
         addBooleanAttribute(new HibQName(name), value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addBooleanAttribute(org.osaf.cosmo.model.copy.QName, java.lang.Boolean)
+     * @see org.osaf.cosmo.model.Item#addBooleanAttribute(org.osaf.cosmo.model.QName, java.lang.Boolean)
      */
     public void addBooleanAttribute(QName qname, Boolean value) {
         addAttribute(new HibBooleanAttribute(qname, value));
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDateAttribute(java.lang.String, java.util.Date)
+     * @see org.osaf.cosmo.model.Item#addDateAttribute(java.lang.String, java.util.Date)
      */
     public void addDateAttribute(String name, Date value) {
         addDateAttribute(new HibQName(name), value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDateAttribute(org.osaf.cosmo.model.copy.QName, java.util.Date)
+     * @see org.osaf.cosmo.model.Item#addDateAttribute(org.osaf.cosmo.model.QName, java.util.Date)
      */
     public void addDateAttribute(QName qname, Date value) {
         addAttribute(new HibDateAttribute(qname, value));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addMultiValueStringAttribute(java.lang.String, java.util.Set)
+     * @see org.osaf.cosmo.model.Item#addMultiValueStringAttribute(java.lang.String, java.util.Set)
      */
     public void addMultiValueStringAttribute(String name, Set<String> value) {
         addMultiValueStringAttribute(new HibQName(name), value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addMultiValueStringAttribute(org.osaf.cosmo.model.copy.QName, java.util.Set)
+     * @see org.osaf.cosmo.model.Item#addMultiValueStringAttribute(org.osaf.cosmo.model.QName, java.util.Set)
      */
     public void addMultiValueStringAttribute(QName qname, Set<String> value) {
         addAttribute(new HibMultiValueStringAttribute(qname, value));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDictionaryAttribute(java.lang.String, java.util.Map)
+     * @see org.osaf.cosmo.model.Item#addDictionaryAttribute(java.lang.String, java.util.Map)
      */
     public void addDictionaryAttribute(String name, Map<String, String> value) {
         addDictionaryAttribute(new HibQName(name), value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDictionaryAttribute(org.osaf.cosmo.model.copy.QName, java.util.Map)
+     * @see org.osaf.cosmo.model.Item#addDictionaryAttribute(org.osaf.cosmo.model.QName, java.util.Map)
      */
     public void addDictionaryAttribute(QName qname, Map<String, String> value) {
         addAttribute(new HibDictionaryAttribute(qname, value));
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addXmlAttribute(java.lang.String, org.w3c.dom.Element)
+     * @see org.osaf.cosmo.model.Item#addXmlAttribute(java.lang.String, org.w3c.dom.Element)
      */
     public void addXmlAttribute(String name, Element value) {
         addXmlAttribute(new HibQName(name), value);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addXmlAttribute(org.osaf.cosmo.model.copy.QName, org.w3c.dom.Element)
+     * @see org.osaf.cosmo.model.Item#addXmlAttribute(org.osaf.cosmo.model.QName, org.w3c.dom.Element)
      */
     public void addXmlAttribute(QName qname, Element value) {
         addAttribute(new HibXmlAttribute(qname, value));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setAttribute(java.lang.String, java.lang.Object)
+     * @see org.osaf.cosmo.model.Item#setAttribute(java.lang.String, java.lang.Object)
      */
     public void setAttribute(String name, Object value) {
         setAttribute(new HibQName(name),value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setAttribute(org.osaf.cosmo.model.copy.QName, java.lang.Object)
+     * @see org.osaf.cosmo.model.Item#setAttribute(org.osaf.cosmo.model.QName, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
     public void setAttribute(QName key, Object value) {
@@ -478,7 +478,7 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getAttributes(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#getAttributes(java.lang.String)
      */
     public Map<String, Attribute> getAttributes(String namespace) {
         HashMap<String, Attribute> attrs = new HashMap<String, Attribute>();
@@ -515,105 +515,105 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getClientCreationDate()
+     * @see org.osaf.cosmo.model.Item#getClientCreationDate()
      */
     public Date getClientCreationDate() {
         return clientCreationDate;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setClientCreationDate(java.util.Date)
+     * @see org.osaf.cosmo.model.Item#setClientCreationDate(java.util.Date)
      */
     public void setClientCreationDate(Date clientCreationDate) {
         this.clientCreationDate = clientCreationDate;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getClientModifiedDate()
+     * @see org.osaf.cosmo.model.Item#getClientModifiedDate()
      */
     public Date getClientModifiedDate() {
         return clientModifiedDate;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setClientModifiedDate(java.util.Date)
+     * @see org.osaf.cosmo.model.Item#setClientModifiedDate(java.util.Date)
      */
     public void setClientModifiedDate(Date clientModifiedDate) {
         this.clientModifiedDate = clientModifiedDate;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getName()
+     * @see org.osaf.cosmo.model.Item#getName()
      */
     public String getName() {
         return name;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setName(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#setName(java.lang.String)
      */
     public void setName(String name) {
         this.name = name;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getDisplayName()
+     * @see org.osaf.cosmo.model.Item#getDisplayName()
      */
     public String getDisplayName() {
         return displayName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setDisplayName(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#setDisplayName(java.lang.String)
      */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getOwner()
+     * @see org.osaf.cosmo.model.Item#getOwner()
      */
     public User getOwner() {
         return owner;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setOwner(org.osaf.cosmo.model.copy.User)
+     * @see org.osaf.cosmo.model.Item#setOwner(org.osaf.cosmo.model.User)
      */
     public void setOwner(User owner) {
         this.owner = owner;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getUid()
+     * @see org.osaf.cosmo.model.Item#getUid()
      */
     public String getUid() {
         return uid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setUid(java.lang.String)
+     * @see org.osaf.cosmo.model.Item#setUid(java.lang.String)
      */
     public void setUid(String uid) {
         this.uid = uid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getVersion()
+     * @see org.osaf.cosmo.model.Item#getVersion()
      */
     public Integer getVersion() {
         return version;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getParents()
+     * @see org.osaf.cosmo.model.Item#getParents()
      */
     public Set<CollectionItem> getParents() {
         return parents;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getParent()
+     * @see org.osaf.cosmo.model.Item#getParent()
      */
     public CollectionItem getParent() {
         if(parents.size()==0)
@@ -623,35 +623,35 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getIsActive()
+     * @see org.osaf.cosmo.model.Item#getIsActive()
      */
     public Boolean getIsActive() {
         return isActive;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setIsActive(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.Item#setIsActive(java.lang.Boolean)
      */
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getTickets()
+     * @see org.osaf.cosmo.model.Item#getTickets()
      */
     public Set<Ticket> getTickets() {
         return tickets;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getTombstones()
+     * @see org.osaf.cosmo.model.Item#getTombstones()
      */
     public Set<Tombstone> getTombstones() {
         return tombstones;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addTombstone(org.osaf.cosmo.model.copy.Tombstone)
+     * @see org.osaf.cosmo.model.Item#addTombstone(org.osaf.cosmo.model.Tombstone)
      */
     public void addTombstone(Tombstone tombstone) {
         tombstone.setItem(this);
@@ -679,12 +679,6 @@ public abstract class HibItem extends HibAuditableObject implements Item {
         else
             return uid.hashCode();
     }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#copy()
-     */
-    public abstract Item copy();
-   
     
     @Override
     public String calculateEntityTag() {

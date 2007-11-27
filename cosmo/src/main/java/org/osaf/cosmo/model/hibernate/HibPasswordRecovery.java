@@ -81,65 +81,65 @@ public class HibPasswordRecovery extends BaseModelObject implements PasswordReco
         this.timeout = timeout;
         this.created = new Date();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#getKey()
+     * @see org.osaf.cosmo.model.PasswordRecovery#getKey()
      */
     public String getKey() {
         return key;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#setKey(java.lang.String)
+     * @see org.osaf.cosmo.model.PasswordRecovery#setKey(java.lang.String)
      */
     public void setKey(String key) {
         this.key = key;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#getTimeout()
+     * @see org.osaf.cosmo.model.PasswordRecovery#getTimeout()
      */
     public long getTimeout() {
         return timeout;
     }
-    
+  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#setTimeout(long)
+     * @see org.osaf.cosmo.model.PasswordRecovery#setTimeout(long)
      */
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#getCreated()
+     * @see org.osaf.cosmo.model.PasswordRecovery#getCreated()
      */
     public Date getCreated() {
         return created;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#setCreated(java.util.Date)
+     * @see org.osaf.cosmo.model.PasswordRecovery#setCreated(java.util.Date)
      */
     public void setCreated(Date created) {
         this.created = created;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#getUser()
+     * @see org.osaf.cosmo.model.PasswordRecovery#getUser()
      */
     public User getUser() {
         return user;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#setUser(org.osaf.cosmo.model.copy.User)
+     * @see org.osaf.cosmo.model.PasswordRecovery#setUser(org.osaf.cosmo.model.User)
      */
     public void setUser(User user) {
         this.user = user;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePasswordRecovery#hasExpired()
+     * @see org.osaf.cosmo.model.PasswordRecovery#hasExpired()
      */
     public boolean hasExpired() {
         Date now = new Date();

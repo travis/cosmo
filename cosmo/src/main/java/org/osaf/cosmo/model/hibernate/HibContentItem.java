@@ -57,70 +57,70 @@ public abstract class HibContentItem extends HibItem implements ContentItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#getLastModifiedBy()
+     * @see org.osaf.cosmo.model.ContentItem#getLastModifiedBy()
      */
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#setLastModifiedBy(java.lang.String)
+     * @see org.osaf.cosmo.model.ContentItem#setLastModifiedBy(java.lang.String)
      */
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#getLastModification()
+     * @see org.osaf.cosmo.model.ContentItem#getLastModification()
      */
     public Integer getLastModification() {
         return lastModification;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#setLastModification(java.lang.Integer)
+     * @see org.osaf.cosmo.model.ContentItem#setLastModification(java.lang.Integer)
      */
     public void setLastModification(Integer lastModification) {
         this.lastModification = lastModification;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#getTriageStatus()
+     * @see org.osaf.cosmo.model.ContentItem#getTriageStatus()
      */
     public TriageStatus getTriageStatus() {
         return triageStatus;
     }
   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#setTriageStatus(org.osaf.cosmo.model.copy.TriageStatus)
+     * @see org.osaf.cosmo.model.ContentItem#setTriageStatus(org.osaf.cosmo.model.TriageStatus)
      */
     public void setTriageStatus(TriageStatus ts) {
         triageStatus = ts;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#getSent()
+     * @see org.osaf.cosmo.model.ContentItem#getSent()
      */
     public Boolean getSent() {
         return sent;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#setSent(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.ContentItem#setSent(java.lang.Boolean)
      */
     public void setSent(Boolean sent) {
         this.sent = sent;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#getNeedsReply()
+     * @see org.osaf.cosmo.model.ContentItem#getNeedsReply()
      */
     public Boolean getNeedsReply() {
         return needsReply;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceContentItem#setNeedsReply(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.ContentItem#setNeedsReply(java.lang.Boolean)
      */
     public void setNeedsReply(Boolean needsReply) {
         this.needsReply = needsReply;

@@ -30,8 +30,6 @@ import org.osaf.cosmo.hibernate.validator.Timezone;
  */
 public interface CalendarCollectionStamp extends Stamp{
 
-    public String getType();
-
     public String getDescription();
 
     public void setDescription(String description);

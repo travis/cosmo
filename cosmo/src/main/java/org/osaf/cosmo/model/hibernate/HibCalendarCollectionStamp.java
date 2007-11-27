@@ -71,9 +71,9 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     /** default constructor */
     public HibCalendarCollectionStamp() {
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getType()
+     * @see org.osaf.cosmo.model.Stamp#getType()
      */
     public String getType() {
         return "calendar";
@@ -88,9 +88,9 @@ public class HibCalendarCollectionStamp extends HibStamp implements
         CalendarCollectionStamp stamp = new HibCalendarCollectionStamp();
         return stamp;
     }
-    
+        
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getDescription()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getDescription()
      */
     public String getDescription() {
         // description stored as StringAttribute on Item
@@ -98,7 +98,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#setDescription(java.lang.String)
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#setDescription(java.lang.String)
      */
     public void setDescription(String description) {
         // description stored as StringAttribute on Item
@@ -106,7 +106,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getLanguage()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getLanguage()
      */
     public String getLanguage() {
         // language stored as StringAttribute on Item
@@ -114,7 +114,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#setLanguage(java.lang.String)
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#setLanguage(java.lang.String)
      */
     public void setLanguage(String language) {
         // language stored as StringAttribute on Item
@@ -122,7 +122,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getTimezoneCalendar()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getTimezoneCalendar()
      */
     @Timezone
     public Calendar getTimezoneCalendar() {
@@ -131,7 +131,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getTimezone()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getTimezone()
      */
     public TimeZone getTimezone() {
         Calendar timezone = getTimezoneCalendar();
@@ -140,9 +140,9 @@ public class HibCalendarCollectionStamp extends HibStamp implements
         VTimeZone vtz = (VTimeZone) timezone.getComponents().getComponent(Component.VTIMEZONE);
         return new TimeZone(vtz);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getTimezoneName()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getTimezoneName()
      */
     public String getTimezoneName() {
         Calendar timezone = getTimezoneCalendar();
@@ -153,7 +153,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#setTimezoneCalendar(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#setTimezoneCalendar(net.fortuna.ical4j.model.Calendar)
      */
     public void setTimezoneCalendar(Calendar timezone) {
         // timezone stored as ICalendarAttribute on Item
@@ -161,7 +161,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getCalendar()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getCalendar()
      */
     public Calendar getCalendar()
         throws IOException, ParserException {
@@ -216,7 +216,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getEventStamps()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getEventStamps()
      */
     public Set<EventStamp> getEventStamps() {
         Set<EventStamp> events = new HashSet<EventStamp>();

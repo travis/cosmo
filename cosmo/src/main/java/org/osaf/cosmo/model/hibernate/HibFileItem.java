@@ -70,7 +70,7 @@ public class HibFileItem extends HibContentItem implements FileItem {
 
    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#getContent()
+     * @see org.osaf.cosmo.model.FileItem#getContent()
      */
     public byte[] getContent() {
         try {
@@ -84,8 +84,9 @@ public class HibFileItem extends HibContentItem implements FileItem {
         }
     }
 
+
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#setContent(byte[])
+     * @see org.osaf.cosmo.model.FileItem#setContent(byte[])
      */
     public void setContent(byte[] content) {
         if (content.length > MAX_CONTENT_SIZE)
@@ -99,14 +100,14 @@ public class HibFileItem extends HibContentItem implements FileItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#clearContent()
+     * @see org.osaf.cosmo.model.FileItem#clearContent()
      */
     public void clearContent() {
         contentData = null;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#setContent(java.io.InputStream)
+     * @see org.osaf.cosmo.model.FileItem#setContent(java.io.InputStream)
      */
     public void setContent(InputStream is) throws IOException {
         if(contentData==null) {
@@ -124,7 +125,7 @@ public class HibFileItem extends HibContentItem implements FileItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#getContentInputStream()
+     * @see org.osaf.cosmo.model.FileItem#getContentInputStream()
      */
     public InputStream getContentInputStream() {
         if(contentData==null)
@@ -134,35 +135,35 @@ public class HibFileItem extends HibContentItem implements FileItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#getContentEncoding()
+     * @see org.osaf.cosmo.model.FileItem#getContentEncoding()
      */
     public String getContentEncoding() {
         return contentEncoding;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#setContentEncoding(java.lang.String)
+     * @see org.osaf.cosmo.model.FileItem#setContentEncoding(java.lang.String)
      */
     public void setContentEncoding(String contentEncoding) {
         this.contentEncoding = contentEncoding;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#getContentLanguage()
+     * @see org.osaf.cosmo.model.FileItem#getContentLanguage()
      */
     public String getContentLanguage() {
         return contentLanguage;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#setContentLanguage(java.lang.String)
+     * @see org.osaf.cosmo.model.FileItem#setContentLanguage(java.lang.String)
      */
     public void setContentLanguage(String contentLanguage) {
         this.contentLanguage = contentLanguage;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#getContentLength()
+     * @see org.osaf.cosmo.model.FileItem#getContentLength()
      */
     public Long getContentLength() {
         return contentLength;
@@ -170,7 +171,7 @@ public class HibFileItem extends HibContentItem implements FileItem {
 
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#setContentLength(java.lang.Long)
+     * @see org.osaf.cosmo.model.FileItem#setContentLength(java.lang.Long)
      */
     public void setContentLength(Long contentLength) {
         this.contentLength = contentLength;
@@ -178,7 +179,7 @@ public class HibFileItem extends HibContentItem implements FileItem {
 
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#getContentType()
+     * @see org.osaf.cosmo.model.FileItem#getContentType()
      */
     public String getContentType() {
         return contentType;
@@ -186,7 +187,7 @@ public class HibFileItem extends HibContentItem implements FileItem {
 
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFileItem#setContentType(java.lang.String)
+     * @see org.osaf.cosmo.model.FileItem#setContentType(java.lang.String)
      */
     public void setContentType(String contentType) {
         this.contentType = contentType;

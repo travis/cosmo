@@ -63,42 +63,42 @@ public class HibPreference extends HibAuditableObject implements Preference {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePreference#getKey()
+     * @see org.osaf.cosmo.model.Preference#getKey()
      */
     public String getKey() {
         return key;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePreference#setKey(java.lang.String)
+     * @see org.osaf.cosmo.model.Preference#setKey(java.lang.String)
      */
     public void setKey(String key) {
         this.key = key;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePreference#getValue()
+     * @see org.osaf.cosmo.model.Preference#getValue()
      */
     public String getValue() {
         return value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePreference#setValue(java.lang.String)
+     * @see org.osaf.cosmo.model.Preference#setValue(java.lang.String)
      */
     public void setValue(String value) {
         this.value = value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePreference#getUser()
+     * @see org.osaf.cosmo.model.Preference#getUser()
      */
     public User getUser() {
         return user;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfacePreference#setUser(org.osaf.cosmo.model.copy.User)
+     * @see org.osaf.cosmo.model.Preference#setUser(org.osaf.cosmo.model.User)
      */
     public void setUser(User user) {
         this.user = user;

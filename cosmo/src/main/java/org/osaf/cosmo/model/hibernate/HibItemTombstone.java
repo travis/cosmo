@@ -42,16 +42,16 @@ public class HibItemTombstone extends HibTombstone implements ItemTombstone {
         super(parent);
         itemUid = item.getUid();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItemTombstone#getItemUid()
+     * @see org.osaf.cosmo.model.ItemTombstone#getItemUid()
      */
     public String getItemUid() {
         return this.itemUid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItemTombstone#setItemUid(java.lang.String)
+     * @see org.osaf.cosmo.model.ItemTombstone#setItemUid(java.lang.String)
      */
     public void setItemUid(String itemUid) {
         this.itemUid = itemUid;

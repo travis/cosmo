@@ -54,7 +54,7 @@ public class HibXmlAttribute extends HibAttribute
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceXmlAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Element getValue() {
         return this.value;
@@ -70,7 +70,7 @@ public class HibXmlAttribute extends HibAttribute
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceXmlAttribute#setValue(org.w3c.dom.Element)
+     * @see org.osaf.cosmo.model.XmlAttribute#setValue(org.w3c.dom.Element)
      */
     public void setValue(Element value) {
         this.value = value;

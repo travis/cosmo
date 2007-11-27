@@ -58,15 +58,16 @@ public class HibStringAttribute extends HibAttribute implements
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStringAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public String getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStringAttribute#setValue(java.lang.String)
+     * @see org.osaf.cosmo.model.StringAttribute#setValue(java.lang.String)
      */
     public void setValue(String value) {
         this.value = value;

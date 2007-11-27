@@ -56,7 +56,7 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     };
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getChildren()
+     * @see org.osaf.cosmo.model.CollectionItem#getChildren()
      */
     public Set<Item> getChildren() {
         return children;
@@ -65,9 +65,9 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     private void setChildren(Set<Item> children) {
         this.children = children;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getChild(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionItem#getChild(java.lang.String)
      */
     public Item getChild(String uid) {
         for (Item child : children) {
@@ -78,7 +78,7 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getChildByName(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionItem#getChildByName(java.lang.String)
      */
     public Item getChildByName(String name) {
         for (Item child : children) {
@@ -89,7 +89,7 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#isExcludeFreeBusyRollup()
+     * @see org.osaf.cosmo.model.CollectionItem#isExcludeFreeBusyRollup()
      */
     public boolean isExcludeFreeBusyRollup() {
         Boolean val =
@@ -100,28 +100,28 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#setExcludeFreeBusyRollup(boolean)
+     * @see org.osaf.cosmo.model.CollectionItem#setExcludeFreeBusyRollup(boolean)
      */
     public void setExcludeFreeBusyRollup(boolean flag) {
         setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getHue()
+     * @see org.osaf.cosmo.model.CollectionItem#getHue()
      */
     public Long getHue() {
         return HibIntegerAttribute.getValue(this, ATTR_HUE);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#setHue(java.lang.Long)
+     * @see org.osaf.cosmo.model.CollectionItem#setHue(java.lang.Long)
      */
     public void setHue(Long value) {
         HibIntegerAttribute.setValue(this, ATTR_HUE, value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#removeTombstone(org.osaf.cosmo.model.copy.Item)
+     * @see org.osaf.cosmo.model.CollectionItem#removeTombstone(org.osaf.cosmo.model.Item)
      */
     public boolean removeTombstone(Item item) {
         for(Iterator<Tombstone> it = getTombstones().iterator();it.hasNext();) {
@@ -137,7 +137,7 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#generateHash()
+     * @see org.osaf.cosmo.model.CollectionItem#generateHash()
      */
     public int generateHash() {
         return getVersion();

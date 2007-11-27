@@ -44,14 +44,14 @@ public class HibStampTombstone extends HibTombstone implements StampTombstone {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStampTombstone#getStampType()
+     * @see org.osaf.cosmo.model.StampTombstone#getStampType()
      */
     public String getStampType() {
         return this.stampType;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStampTombstone#setStampType(java.lang.String)
+     * @see org.osaf.cosmo.model.StampTombstone#setStampType(java.lang.String)
      */
     public void setStampType(String stampType) {
         this.stampType = stampType;

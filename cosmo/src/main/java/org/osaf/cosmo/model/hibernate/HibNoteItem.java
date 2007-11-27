@@ -79,62 +79,61 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getBody()
+     * @see org.osaf.cosmo.model.NoteItem#getBody()
      */
     public String getBody() {
         return HibTextAttribute.getValue(this, ATTR_NOTE_BODY);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#setBody(java.lang.String)
+     * @see org.osaf.cosmo.model.NoteItem#setBody(java.lang.String)
      */
     public void setBody(String body) {
         // body stored as TextAttribute on Item
         HibTextAttribute.setValue(this, ATTR_NOTE_BODY, body);
     }
-    
+  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#setBody(java.io.Reader)
+     * @see org.osaf.cosmo.model.NoteItem#setBody(java.io.Reader)
      */
     public void setBody(Reader body) {
         // body stored as TextAttribute on Item
         HibTextAttribute.setValue(this, ATTR_NOTE_BODY, body);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getReminderTime()
+     * @see org.osaf.cosmo.model.NoteItem#getReminderTime()
      */
     public Date getReminderTime() {
         return HibTimestampAttribute.getValue(this, ATTR_REMINDER_TIME);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#setReminderTime(java.util.Date)
+     * @see org.osaf.cosmo.model.NoteItem#setReminderTime(java.util.Date)
      */
     public void setReminderTime(Date reminderTime) {
         // reminderDate stored as TimestampAttribute on Item
         HibTimestampAttribute.setValue(this, ATTR_REMINDER_TIME, reminderTime);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getJournalCalendar()
+     * @see org.osaf.cosmo.model.NoteItem#getJournalCalendar()
      */
     @Journal
     public Calendar getJournalCalendar() {
         return getCalendar();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#setJournalCalendar(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.NoteItem#setJournalCalendar(net.fortuna.ical4j.model.Calendar)
      */
     public void setJournalCalendar(Calendar calendar) {
         setCalendar(calendar);
     }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getFullCalendar()
-     */
+  
+    @Override
     public Calendar getFullCalendar() {
         // Start with existing calendar if present
         Calendar calendar = getJournalCalendar();
@@ -160,7 +159,7 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getModifications()
+     * @see org.osaf.cosmo.model.NoteItem#getModifications()
      */
     public Set<NoteItem> getModifications() {
         if(hasModifications)
@@ -168,17 +167,17 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
         else
             return EMPTY_MODS;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#addModification(org.osaf.cosmo.model.copy.NoteItem)
+     * @see org.osaf.cosmo.model.NoteItem#addModification(org.osaf.cosmo.model.NoteItem)
      */
     public void addModification(NoteItem mod) {
         modifications.add(mod);
         hasModifications = true;
     }
-    
+  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#removeModification(org.osaf.cosmo.model.copy.NoteItem)
+     * @see org.osaf.cosmo.model.NoteItem#removeModification(org.osaf.cosmo.model.NoteItem)
      */
     public boolean removeModification(NoteItem mod) {
         boolean removed = modifications.remove(mod);
@@ -187,7 +186,7 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#removeAllModifications()
+     * @see org.osaf.cosmo.model.NoteItem#removeAllModifications()
      */
     public void removeAllModifications() {
         modifications.clear();
@@ -195,14 +194,14 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getModifies()
+     * @see org.osaf.cosmo.model.NoteItem#getModifies()
      */
     public NoteItem getModifies() {
         return modifies;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#setModifies(org.osaf.cosmo.model.copy.NoteItem)
+     * @see org.osaf.cosmo.model.NoteItem#setModifies(org.osaf.cosmo.model.NoteItem)
      */
     public void setModifies(NoteItem modifies) {
         this.modifies = modifies;

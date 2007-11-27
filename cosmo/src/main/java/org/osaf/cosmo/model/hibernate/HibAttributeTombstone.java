@@ -59,14 +59,14 @@ public class HibAttributeTombstone extends HibTombstone implements AttributeTomb
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttributeTombstone#getQName()
+     * @see org.osaf.cosmo.model.AttributeTombstone#getQName()
      */
     public QName getQName() {
         return qname;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttributeTombstone#setQName(org.osaf.cosmo.model.copy.QName)
+     * @see org.osaf.cosmo.model.AttributeTombstone#setQName(org.osaf.cosmo.model.QName)
      */
     public void setQName(QName qname) {
         this.qname = qname;

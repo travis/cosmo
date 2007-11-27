@@ -35,7 +35,9 @@ public class HibFreeBusyItem extends HibICalendarItem implements FreeBusyItem {
     public HibFreeBusyItem() {
     }
 
-    @Override
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Item#copy()
+     */
     public Item copy() {
         FreeBusyItem copy = new HibFreeBusyItem();
         copyToItem(copy);
@@ -43,7 +45,7 @@ public class HibFreeBusyItem extends HibICalendarItem implements FreeBusyItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFreeBusyItem#getFreeBusyCalendar()
+     * @see org.osaf.cosmo.model.FreeBusyItem#getFreeBusyCalendar()
      */
     @FreeBusy
     public Calendar getFreeBusyCalendar() {
@@ -51,7 +53,7 @@ public class HibFreeBusyItem extends HibICalendarItem implements FreeBusyItem {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceFreeBusyItem#setFreeBusyCalendar(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.FreeBusyItem#setFreeBusyCalendar(net.fortuna.ical4j.model.Calendar)
      */
     public void setFreeBusyCalendar(Calendar calendar) {
         setCalendar(calendar);

@@ -68,14 +68,14 @@ public class HibICalendarAttribute extends HibAttribute implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalendarAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Calendar getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalendarAttribute#setValue(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.ICalendarAttribute#setValue(net.fortuna.ical4j.model.Calendar)
      */
     public void setValue(Calendar value) {
         this.value = value;
@@ -97,7 +97,7 @@ public class HibICalendarAttribute extends HibAttribute implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalendarAttribute#setValue(java.lang.String)
+     * @see org.osaf.cosmo.model.ICalendarAttribute#setValue(java.lang.String)
      */
     public void setValue(String value) {
         try {
@@ -110,7 +110,7 @@ public class HibICalendarAttribute extends HibAttribute implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceICalendarAttribute#setValue(java.io.InputStream)
+     * @see org.osaf.cosmo.model.ICalendarAttribute#setValue(java.io.InputStream)
      */
     public void setValue(InputStream is) {
         try {

@@ -68,14 +68,14 @@ public abstract class HibStamp extends HibAuditableObject implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStamp#getItem()
+     * @see org.osaf.cosmo.model.Stamp#getItem()
      */
     public Item getItem() {
         return item;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStamp#setItem(org.osaf.cosmo.model.copy.Item)
+     * @see org.osaf.cosmo.model.Stamp#setItem(org.osaf.cosmo.model.Item)
      */
     public void setItem(Item item) {
         this.item = item;
@@ -109,19 +109,7 @@ public abstract class HibStamp extends HibAuditableObject implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStamp#getType()
-     */
-    public abstract String getType();
-
-   
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStamp#copy()
-     */
-    public abstract Stamp copy();
-    
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceStamp#updateTimestamp()
+     * @see org.osaf.cosmo.model.hibernate.HibAuditableObject#updateTimestamp()
      */
     public void updateTimestamp() {
         setModifiedDate(new Date());

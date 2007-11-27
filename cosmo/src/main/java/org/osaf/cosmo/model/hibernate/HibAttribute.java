@@ -78,21 +78,21 @@ public abstract class HibAttribute extends HibAuditableObject implements java.io
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#getQName()
+     * @see org.osaf.cosmo.model.Attribute#getQName()
      */
     public QName getQName() {
         return qname;
     }
-
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#setQName(org.osaf.cosmo.model.copy.QName)
+     * @see org.osaf.cosmo.model.Attribute#setQName(org.osaf.cosmo.model.QName)
      */
     public void setQName(QName qname) {
         this.qname = qname;
     }
-    
+        
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#getName()
+     * @see org.osaf.cosmo.model.Attribute#getName()
      */
     public String getName() {
         if(qname==null)
@@ -102,31 +102,21 @@ public abstract class HibAttribute extends HibAuditableObject implements java.io
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#getItem()
+     * @see org.osaf.cosmo.model.Attribute#getItem()
      */
     public Item getItem() {
         return item;
     }
-
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#setItem(org.osaf.cosmo.model.copy.Item)
+     * @see org.osaf.cosmo.model.Attribute#setItem(org.osaf.cosmo.model.Item)
      */
     public void setItem(Item item) {
         this.item = item;
     }
-
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#getValue()
-     */
-    public abstract Object getValue();
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#setValue(java.lang.Object)
-     */
-    public abstract void setValue(Object value);
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAttribute#copy()
+     * @see org.osaf.cosmo.model.Attribute#copy()
      */
     public abstract Attribute copy();
     

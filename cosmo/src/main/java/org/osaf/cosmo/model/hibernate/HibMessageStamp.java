@@ -80,17 +80,18 @@ public class HibMessageStamp extends HibStamp implements
     public HibMessageStamp(Item item) {
         setItem(item);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getType()
+     * @see org.osaf.cosmo.model.Stamp#getType()
      */
     public String getType() {
         return "message";
     }
     
     // Property accessors
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getMessageId()
+     * @see org.osaf.cosmo.model.MessageStamp#getMessageId()
      */
     public String getMessageId() {
         // id stored as StringAttribute on Item
@@ -98,16 +99,16 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setMessageId(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setMessageId(java.lang.String)
      */
     public void setMessageId(String id) {
         // id stored as StringAttribute on Item
         HibStringAttribute.setValue(getItem(), ATTR_MESSAGE_ID, id);
         updateTimestamp();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getHeaders()
+     * @see org.osaf.cosmo.model.MessageStamp#getHeaders()
      */
     public String getHeaders() {
         // headers stored as TextAttribute on Item
@@ -115,25 +116,25 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setHeaders(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setHeaders(java.lang.String)
      */
     public void setHeaders(String headers) {
         // headers stored as TextAttribute on Item
         HibTextAttribute.setValue(getItem(), ATTR_MESSAGE_HEADERS, headers);
         updateTimestamp();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setHeaders(java.io.Reader)
+     * @see org.osaf.cosmo.model.MessageStamp#setHeaders(java.io.Reader)
      */
     public void setHeaders(Reader headers) {
         // headers stored as TextAttribute on Item
         HibTextAttribute.setValue(getItem(), ATTR_MESSAGE_HEADERS, headers);
         updateTimestamp();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getFrom()
+     * @see org.osaf.cosmo.model.MessageStamp#getFrom()
      */
     public String getFrom() {
         // from stored as StringAttribute on Item
@@ -141,7 +142,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setFrom(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setFrom(java.lang.String)
      */
     public void setFrom(String from) {
         // from stored as StringAttribute on Item
@@ -150,7 +151,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getTo()
+     * @see org.osaf.cosmo.model.MessageStamp#getTo()
      */
     public String getTo() {
         // to stored as StringAttribute on Item
@@ -158,16 +159,16 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setTo(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setTo(java.lang.String)
      */
     public void setTo(String to) {
         // to stored as StringAttribute on Item
         HibStringAttribute.setValue(getItem(), ATTR_MESSAGE_TO, to);
         updateTimestamp();
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getBcc()
+     * @see org.osaf.cosmo.model.MessageStamp#getBcc()
      */
     public String getBcc() {
         // bcc stored as StringAttribute on Item
@@ -175,7 +176,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setBcc(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setBcc(java.lang.String)
      */
     public void setBcc(String bcc) {
         //bcc stored as StringAttribute on Item
@@ -184,7 +185,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getCc()
+     * @see org.osaf.cosmo.model.MessageStamp#getCc()
      */
     public String getCc() {
         // cc stored as StringAttribute on Item
@@ -192,7 +193,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setCc(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setCc(java.lang.String)
      */
     public void setCc(String cc) {
         // cc stored as StringAttribute on Item
@@ -201,7 +202,7 @@ public class HibMessageStamp extends HibStamp implements
     }
  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getOriginators()
+     * @see org.osaf.cosmo.model.MessageStamp#getOriginators()
      */
     public String getOriginators() {
         // originators stored as StringAttribute on Item
@@ -209,7 +210,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setOriginators(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setOriginators(java.lang.String)
      */
     public void setOriginators(String originators) {
         // originators stored as StringAttribute on Item
@@ -218,7 +219,7 @@ public class HibMessageStamp extends HibStamp implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getDateSent()
+     * @see org.osaf.cosmo.model.MessageStamp#getDateSent()
      */
     public String getDateSent() {
         // inReployTo stored as StringAttribute on Item
@@ -226,16 +227,16 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setDateSent(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setDateSent(java.lang.String)
      */
     public void setDateSent(String dateSent) {
         // inReployTo stored as TextAttribute on Item
         HibStringAttribute.setValue(getItem(), ATTR_MESSAGE_DATE_SENT, dateSent);
         updateTimestamp();
     }
-    
+  
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getInReplyTo()
+     * @see org.osaf.cosmo.model.MessageStamp#getInReplyTo()
      */
     public String getInReplyTo() {
         // inReployTo stored as StringAttribute on Item
@@ -243,7 +244,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setInReplyTo(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setInReplyTo(java.lang.String)
      */
     public void setInReplyTo(String inReplyTo) {
         // inReployTo stored as TextAttribute on Item
@@ -252,7 +253,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#getReferences()
+     * @see org.osaf.cosmo.model.MessageStamp#getReferences()
      */
     public String getReferences() {
         // references stored as TextAttribute on Item
@@ -260,7 +261,7 @@ public class HibMessageStamp extends HibStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setReferences(java.lang.String)
+     * @see org.osaf.cosmo.model.MessageStamp#setReferences(java.lang.String)
      */
     public void setReferences(String references) {
         // references stored as TextAttribute on Item
@@ -269,7 +270,7 @@ public class HibMessageStamp extends HibStamp implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMessageStamp#setReferences(java.io.Reader)
+     * @see org.osaf.cosmo.model.MessageStamp#setReferences(java.io.Reader)
      */
     public void setReferences(Reader references) {
         // references stored as TextAttribute on Item

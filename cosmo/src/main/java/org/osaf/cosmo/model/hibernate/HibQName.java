@@ -63,51 +63,45 @@ public class HibQName implements QName {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceQName#getLocalName()
+     * @see org.osaf.cosmo.model.QName#getLocalName()
      */
     public String getLocalName() {
         return localName;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceQName#setLocalName(java.lang.String)
+     * @see org.osaf.cosmo.model.QName#setLocalName(java.lang.String)
      */
     public void setLocalName(String localName) {
         this.localName = localName;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceQName#getNamespace()
+     * @see org.osaf.cosmo.model.QName#getNamespace()
      */
     public String getNamespace() {
         return namespace;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceQName#setNamespace(java.lang.String)
+     * @see org.osaf.cosmo.model.QName#setNamespace(java.lang.String)
      */
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceQName#copy()
+     * @see org.osaf.cosmo.model.QName#copy()
      */
     public QName copy() {
         return new HibQName(namespace, localName);
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
+   
     public int hashCode() {
         return new HashCodeBuilder(13, 27).
             append(namespace).append(localName).toHashCode();
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+  
     public boolean equals(Object o) {
         if (! (o instanceof HibQName)) {
             return false;

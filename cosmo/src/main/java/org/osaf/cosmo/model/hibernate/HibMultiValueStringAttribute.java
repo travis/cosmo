@@ -63,15 +63,16 @@ public class HibMultiValueStringAttribute extends HibAttribute
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMultiValueStringAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Set<String> getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceMultiValueStringAttribute#setValue(java.util.Set)
+     * @see org.osaf.cosmo.model.MultiValueStringAttribute#setValue(java.util.Set)
      */
     public void setValue(Set<String> value) {
         this.value = value;

@@ -53,13 +53,17 @@ public class HibDecimalAttribute extends HibAttribute implements java.io.Seriali
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceDecimalAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public BigDecimal getValue() {
         return this.value;
     }
 
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.hibernate.HibAttribute#copy()
+     */
     public Attribute copy() {
         DecimalAttribute attr = new HibDecimalAttribute();
         attr.setQName(getQName().copy());
@@ -69,12 +73,15 @@ public class HibDecimalAttribute extends HibAttribute implements java.io.Seriali
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceDecimalAttribute#setValue(java.math.BigDecimal)
+     * @see org.osaf.cosmo.model.DecimalAttribute#setValue(java.math.BigDecimal)
      */
     public void setValue(BigDecimal value) {
         this.value = value;
     }
 
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Attribute#setValue(java.lang.Object)
+     */
     public void setValue(Object value) {
         if (value != null && !(value instanceof BigDecimal))
             throw new ModelValidationException(

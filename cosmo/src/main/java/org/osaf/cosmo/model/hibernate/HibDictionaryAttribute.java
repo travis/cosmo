@@ -65,20 +65,24 @@ public class HibDictionaryAttribute extends HibAttribute
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceDictionaryAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Map<String, String> getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceDictionaryAttribute#setValue(java.util.Map)
+     * @see org.osaf.cosmo.model.DictionaryAttribute#setValue(java.util.Map)
      */
     public void setValue(Map<String, String> value) {
         this.value = value;
     }
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Attribute#setValue(java.lang.Object)
+     */
     public void setValue(Object value) {
         if (value != null && !(value instanceof Map))
             throw new ModelValidationException(
@@ -86,6 +90,9 @@ public class HibDictionaryAttribute extends HibAttribute
         setValue((Map<String, String>) value);
     }
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.hibernate.HibAttribute#copy()
+     */
     public Attribute copy() {
         DictionaryAttribute attr = new HibDictionaryAttribute();
         attr.setQName(getQName().copy());

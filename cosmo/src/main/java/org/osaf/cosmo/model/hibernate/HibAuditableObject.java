@@ -49,50 +49,42 @@ public abstract class HibAuditableObject extends BaseModelObject implements Audi
     private String etag = "";
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#getCreationDate()
+     * @see org.osaf.cosmo.model.AuditableObject#getCreationDate()
      */
     public Date getCreationDate() {
         return creationDate;
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#setCreationDate(java.util.Date)
-     */
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#getModifiedDate()
+     * @see org.osaf.cosmo.model.AuditableObject#getModifiedDate()
      */
     public Date getModifiedDate() {
         return modifiedDate;
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#setModifiedDate(java.util.Date)
-     */
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
 
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#updateTimestamp()
+     * @see org.osaf.cosmo.model.AuditableObject#updateTimestamp()
      */
     public void updateTimestamp() {
         modifiedDate = new Date();
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#getEntityTag()
+     * @see org.osaf.cosmo.model.AuditableObject#getEntityTag()
      */
     public String getEntityTag() {
         return etag;
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAuditableObject#setEntityTag(java.lang.String)
-     */
     public void setEntityTag(String etag) {
         this.etag = etag;
     }

@@ -35,23 +35,27 @@ public class HibAvailabilityItem extends HibICalendarItem implements Availabilit
     public HibAvailabilityItem() {
     }
 
-    @Override
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Item#copy()
+     */
     public Item copy() {
         AvailabilityItem copy = new HibAvailabilityItem();
         copyToItem(copy);
         return copy;
     }
     
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAvailabilityItem#getAvailabilityCalendar()
+     * @see org.osaf.cosmo.model.AvailabilityItem#getAvailabilityCalendar()
      */
     @Availability
     public Calendar getAvailabilityCalendar() {
         return getCalendar();
     }
     
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceAvailabilityItem#setAvailabilityCalendar(net.fortuna.ical4j.model.Calendar)
+     * @see org.osaf.cosmo.model.AvailabilityItem#setAvailabilityCalendar(net.fortuna.ical4j.model.Calendar)
      */
     public void setAvailabilityCalendar(Calendar calendar) {
         setCalendar(calendar);

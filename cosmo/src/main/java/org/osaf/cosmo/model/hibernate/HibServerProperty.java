@@ -57,28 +57,28 @@ public class HibServerProperty extends BaseModelObject implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceServerProperty#getName()
+     * @see org.osaf.cosmo.model.ServerProperty#getName()
      */
     public String getName() {
         return name;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceServerProperty#setName(java.lang.String)
+     * @see org.osaf.cosmo.model.ServerProperty#setName(java.lang.String)
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceServerProperty#getValue()
+     * @see org.osaf.cosmo.model.ServerProperty#getValue()
      */
     public String getValue() {
         return value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceServerProperty#setValue(java.lang.String)
+     * @see org.osaf.cosmo.model.ServerProperty#setValue(java.lang.String)
      */
     public void setValue(String value) {
         this.value = value;

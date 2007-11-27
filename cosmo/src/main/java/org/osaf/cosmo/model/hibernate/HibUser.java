@@ -151,28 +151,28 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getUid()
+     * @see org.osaf.cosmo.model.User#getUid()
      */
     public String getUid() {
         return uid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setUid(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setUid(java.lang.String)
      */
     public void setUid(String uid) {
         this.uid = uid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getUsername()
+     * @see org.osaf.cosmo.model.User#getUsername()
      */
     public String getUsername() {
         return username;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setUsername(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setUsername(java.lang.String)
      */
     public void setUsername(String username) {
         oldUsername = this.username;
@@ -180,70 +180,70 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getOldUsername()
+     * @see org.osaf.cosmo.model.User#getOldUsername()
      */
     public String getOldUsername() {
         return oldUsername != null ? oldUsername : username;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isUsernameChanged()
+     * @see org.osaf.cosmo.model.User#isUsernameChanged()
      */
     public boolean isUsernameChanged() {
         return oldUsername != null && ! oldUsername.equals(username);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getPassword()
+     * @see org.osaf.cosmo.model.User#getPassword()
      */
     public String getPassword() {
         return password;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setPassword(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setPassword(java.lang.String)
      */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getFirstName()
+     * @see org.osaf.cosmo.model.User#getFirstName()
      */
     public String getFirstName() {
         return firstName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setFirstName(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setFirstName(java.lang.String)
      */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getLastName()
+     * @see org.osaf.cosmo.model.User#getLastName()
      */
     public String getLastName() {
         return lastName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setLastName(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setLastName(java.lang.String)
      */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getEmail()
+     * @see org.osaf.cosmo.model.User#getEmail()
      */
     public String getEmail() {
         return email;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setEmail(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setEmail(java.lang.String)
      */
     public void setEmail(String email) {
         oldEmail = this.email;
@@ -251,42 +251,42 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getOldEmail()
+     * @see org.osaf.cosmo.model.User#getOldEmail()
      */
     public String getOldEmail() {
         return oldEmail;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isEmailChanged()
+     * @see org.osaf.cosmo.model.User#isEmailChanged()
      */
     public boolean isEmailChanged() {
         return oldEmail != null && ! oldEmail.equals(email);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getAdmin()
+     * @see org.osaf.cosmo.model.User#getAdmin()
      */
     public Boolean getAdmin() {
         return admin;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getOldAdmin()
+     * @see org.osaf.cosmo.model.User#getOldAdmin()
      */
     public Boolean getOldAdmin() {
         return oldAdmin;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isAdminChanged()
+     * @see org.osaf.cosmo.model.User#isAdminChanged()
      */
     public boolean isAdminChanged() {
         return oldAdmin != null && ! oldAdmin.equals(admin);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setAdmin(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.User#setAdmin(java.lang.Boolean)
      */
     public void setAdmin(Boolean admin) {
         oldAdmin = this.admin;
@@ -294,49 +294,49 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getActivationId()
+     * @see org.osaf.cosmo.model.User#getActivationId()
      */
     public String getActivationId() {
         return activationId;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setActivationId(java.lang.String)
+     * @see org.osaf.cosmo.model.User#setActivationId(java.lang.String)
      */
     public void setActivationId(String activationId) {
         this.activationId = activationId;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isOverlord()
+     * @see org.osaf.cosmo.model.User#isOverlord()
      */
     public boolean isOverlord() {
         return username != null && username.equals(USERNAME_OVERLORD);
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isActivated()
+     * @see org.osaf.cosmo.model.User#isActivated()
      */
     public boolean isActivated() {
         return this.activationId == null;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#activate()
+     * @see org.osaf.cosmo.model.User#activate()
      */
     public void activate(){
        this.activationId = null;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isLocked()
+     * @see org.osaf.cosmo.model.User#isLocked()
      */
     public Boolean isLocked() {
         return locked;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#setLocked(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.User#setLocked(java.lang.Boolean)
      */
     public void setLocked(Boolean locked) {
         this.locked = locked;
@@ -379,7 +379,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#validate()
+     * @see org.osaf.cosmo.model.User#validate()
      */
     public void validate() {
         validateUsername();
@@ -389,7 +389,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#validateUsername()
+     * @see org.osaf.cosmo.model.User#validateUsername()
      */
     public void validateUsername() {
         if (username == null) {
@@ -410,7 +410,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#validateRawPassword()
+     * @see org.osaf.cosmo.model.User#validateRawPassword()
      */
     public void validateRawPassword() {
         if (password == null) {
@@ -426,7 +426,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#validateFirstName()
+     * @see org.osaf.cosmo.model.User#validateFirstName()
      */
     public void validateFirstName() {
         if (firstName == null) {
@@ -442,7 +442,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#validateLastName()
+     * @see org.osaf.cosmo.model.User#validateLastName()
      */
     public void validateLastName() {
         if (lastName == null) {
@@ -458,7 +458,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#validateEmail()
+     * @see org.osaf.cosmo.model.User#validateEmail()
      */
     public void validateEmail() {
         if (email == null) {
@@ -473,15 +473,16 @@ public class HibUser extends HibAuditableObject implements User {
         }
     }
 
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getPreferences()
+     * @see org.osaf.cosmo.model.User#getPreferences()
      */
     public Set<Preference> getPreferences() {
         return preferences;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#addPreference(org.osaf.cosmo.model.copy.Preference)
+     * @see org.osaf.cosmo.model.User#addPreference(org.osaf.cosmo.model.Preference)
      */
     public void addPreference(Preference preference) {
         preference.setUser(this);
@@ -489,7 +490,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getPreference(java.lang.String)
+     * @see org.osaf.cosmo.model.User#getPreference(java.lang.String)
      */
     public Preference getPreference(String key) {
         for (Preference pref : preferences) {
@@ -500,14 +501,14 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#removePreference(java.lang.String)
+     * @see org.osaf.cosmo.model.User#removePreference(java.lang.String)
      */
     public void removePreference(String key) {
         removePreference(getPreference(key));
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#removePreference(org.osaf.cosmo.model.copy.Preference)
+     * @see org.osaf.cosmo.model.User#removePreference(org.osaf.cosmo.model.Preference)
      */
     public void removePreference(Preference preference) {
         if (preference != null)
@@ -515,14 +516,14 @@ public class HibUser extends HibAuditableObject implements User {
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getCollectionSubscriptions()
+     * @see org.osaf.cosmo.model.User#getCollectionSubscriptions()
      */
     public Set<CollectionSubscription> getCollectionSubscriptions() {
         return subscriptions;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#addSubscription(org.osaf.cosmo.model.copy.CollectionSubscription)
+     * @see org.osaf.cosmo.model.User#addSubscription(org.osaf.cosmo.model.CollectionSubscription)
      */
     public void addSubscription(CollectionSubscription subscription) {
         subscription.setOwner(this);
@@ -530,7 +531,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getSubscription(java.lang.String)
+     * @see org.osaf.cosmo.model.User#getSubscription(java.lang.String)
      */
     public CollectionSubscription getSubscription(String displayname) {
 
@@ -541,9 +542,9 @@ public class HibUser extends HibAuditableObject implements User {
 
         return null;
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#getSubscription(java.lang.String, java.lang.String)
+     * @see org.osaf.cosmo.model.User#getSubscription(java.lang.String, java.lang.String)
      */
     public CollectionSubscription getSubscription(String collectionUid, String ticketKey){
         for (CollectionSubscription sub : subscriptions) {
@@ -556,23 +557,23 @@ public class HibUser extends HibAuditableObject implements User {
         return null;
     }
 
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#removeSubscription(java.lang.String, java.lang.String)
+     * @see org.osaf.cosmo.model.User#removeSubscription(java.lang.String, java.lang.String)
      */
     public void removeSubscription(String collectionUid, String ticketKey){
         removeSubscription(getSubscription(collectionUid, ticketKey));
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#removeSubscription(java.lang.String)
+     * @see org.osaf.cosmo.model.User#removeSubscription(java.lang.String)
      */
     public void removeSubscription(String displayName) {
         removeSubscription(getSubscription(displayName));
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#removeSubscription(org.osaf.cosmo.model.copy.CollectionSubscription)
+     * @see org.osaf.cosmo.model.User#removeSubscription(org.osaf.cosmo.model.CollectionSubscription)
      */
     public void removeSubscription(CollectionSubscription sub) {
         if (sub != null)
@@ -580,7 +581,7 @@ public class HibUser extends HibAuditableObject implements User {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#isSubscribedTo(org.osaf.cosmo.model.copy.CollectionItem)
+     * @see org.osaf.cosmo.model.User#isSubscribedTo(org.osaf.cosmo.model.CollectionItem)
      */
     public boolean isSubscribedTo(CollectionItem collection){
         for (CollectionSubscription sub : subscriptions){
@@ -589,10 +590,6 @@ public class HibUser extends HibAuditableObject implements User {
         return false;
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceUser#calculateEntityTag()
-     */
     public String calculateEntityTag() {
         String username = getUsername() != null ? getUsername() : "-";
         String modTime = getModifiedDate() != null ?

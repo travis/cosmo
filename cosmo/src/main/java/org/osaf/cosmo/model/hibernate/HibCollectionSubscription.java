@@ -71,70 +71,70 @@ public class HibCollectionSubscription extends HibAuditableObject implements Col
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#getCollectionUid()
+     * @see org.osaf.cosmo.model.CollectionSubscription#getCollectionUid()
      */
     public String getCollectionUid() {
         return collectionUid;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#setCollectionUid(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionSubscription#setCollectionUid(java.lang.String)
      */
     public void setCollectionUid(String collectionUid) {
         this.collectionUid = collectionUid;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#setCollection(org.osaf.cosmo.model.copy.CollectionItem)
+     * @see org.osaf.cosmo.model.CollectionSubscription#setCollection(org.osaf.cosmo.model.CollectionItem)
      */
     public void setCollection(CollectionItem collection) {
         this.collectionUid = collection.getUid();
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#getDisplayName()
+     * @see org.osaf.cosmo.model.CollectionSubscription#getDisplayName()
      */
     public String getDisplayName() {
         return displayName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#setDisplayName(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionSubscription#setDisplayName(java.lang.String)
      */
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#getOwner()
+     * @see org.osaf.cosmo.model.CollectionSubscription#getOwner()
      */
     public User getOwner() {
         return owner;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#setOwner(org.osaf.cosmo.model.copy.User)
+     * @see org.osaf.cosmo.model.CollectionSubscription#setOwner(org.osaf.cosmo.model.User)
      */
     public void setOwner(User owner) {
         this.owner = owner;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#getTicketKey()
+     * @see org.osaf.cosmo.model.CollectionSubscription#getTicketKey()
      */
     public String getTicketKey() {
         return ticketKey;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#setTicketKey(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionSubscription#setTicketKey(java.lang.String)
      */
     public void setTicketKey(String ticketKey) {
         this.ticketKey = ticketKey;
     }  
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionSubscription#setTicket(org.osaf.cosmo.model.copy.Ticket)
+     * @see org.osaf.cosmo.model.CollectionSubscription#setTicket(org.osaf.cosmo.model.Ticket)
      */
     public void setTicket(Ticket ticket) {
         this.ticketKey = ticket.getKey();

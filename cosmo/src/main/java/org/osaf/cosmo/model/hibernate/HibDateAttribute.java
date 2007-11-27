@@ -54,20 +54,24 @@ public class HibDateAttribute extends HibAttribute implements
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceDataAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Date getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceDataAttribute#setValue(java.util.Date)
+     * @see org.osaf.cosmo.model.DateAttribute#setValue(java.util.Date)
      */
     public void setValue(Date value) {
         this.value = value;
     }
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Attribute#setValue(java.lang.Object)
+     */
     public void setValue(Object value) {
         if (value != null && !(value instanceof Date))
             throw new ModelValidationException(
@@ -75,6 +79,9 @@ public class HibDateAttribute extends HibAttribute implements
         setValue((Date) value);
     }
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.hibernate.HibAttribute#copy()
+     */
     public Attribute copy() {
         DateAttribute attr = new HibDateAttribute();
         attr.setQName(getQName().copy());

@@ -55,15 +55,16 @@ public class HibTimestampAttribute extends HibAttribute implements
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTimestampAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Date getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTimestampAttribute#setValue(java.util.Date)
+     * @see org.osaf.cosmo.model.TimestampAttribute#setValue(java.util.Date)
      */
     public void setValue(Date value) {
         this.value = value;

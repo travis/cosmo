@@ -75,22 +75,23 @@ public class HibTextAttribute extends HibAttribute implements
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTextAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public String getValue() {
         return this.value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTextAttribute#setValue(java.lang.String)
+     * @see org.osaf.cosmo.model.TextAttribute#setValue(java.lang.String)
      */
     public void setValue(String value) {
         this.value = value;
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTextAttribute#getReader()
+     * @see org.osaf.cosmo.model.TextAttribute#getReader()
      */
     public Reader getReader() {
         if(value!=null)
@@ -100,7 +101,7 @@ public class HibTextAttribute extends HibAttribute implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTextAttribute#getLength()
+     * @see org.osaf.cosmo.model.TextAttribute#getLength()
      */
     public int getLength() {
         if(value!=null)

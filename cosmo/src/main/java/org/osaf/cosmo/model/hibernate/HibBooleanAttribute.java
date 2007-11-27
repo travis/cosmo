@@ -49,8 +49,9 @@ public class HibBooleanAttribute extends HibAttribute implements java.io.Seriali
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBooleanAttribute#getValue()
+     * @see org.osaf.cosmo.model.hibernate.HibAttribute#getValue()
      */
     public Boolean getValue() {
         return this.value;
@@ -63,15 +64,16 @@ public class HibBooleanAttribute extends HibAttribute implements java.io.Seriali
         return attr;
     }
 
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBooleanAttribute#setValue(java.lang.Boolean)
+     * @see org.osaf.cosmo.model.BooleanAttribute#setValue(java.lang.Boolean)
      */
     public void setValue(Boolean value) {
         this.value = value;
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceBooleanAttribute#setValue(java.lang.Object)
+     * @see org.osaf.cosmo.model.Attribute#setValue(java.lang.Object)
      */
     public void setValue(Object value) {
         if (value != null && !(value instanceof Boolean))

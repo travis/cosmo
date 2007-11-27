@@ -62,7 +62,7 @@ public class HibEventExceptionStamp extends HibBaseEventStamp implements
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#getType()
+     * @see org.osaf.cosmo.model.Stamp#getType()
      */
     public String getType() {
         return "eventexception";
@@ -74,9 +74,6 @@ public class HibEventExceptionStamp extends HibBaseEventStamp implements
         return getEventCalendar();
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#getEvent()
-     */
     @Override
     public VEvent getEvent() {
         return getExceptionEvent();
@@ -84,15 +81,15 @@ public class HibEventExceptionStamp extends HibBaseEventStamp implements
     
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#getExceptionEvent()
+     * @see org.osaf.cosmo.model.EventExceptionStamp#getExceptionEvent()
      */
     public VEvent getExceptionEvent() {
         return (VEvent) getEventCalendar().getComponents().getComponents(
                 Component.VEVENT).get(0);
     }
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#setExceptionEvent(net.fortuna.ical4j.model.component.VEvent)
+     * @see org.osaf.cosmo.model.EventExceptionStamp#setExceptionEvent(net.fortuna.ical4j.model.component.VEvent)
      */
     public void setExceptionEvent(VEvent event) {
         if(getEventCalendar()==null)
@@ -214,9 +211,9 @@ public class HibEventExceptionStamp extends HibBaseEventStamp implements
         return new XParameter(PARAM_X_OSAF_ANYTIME, VALUE_MISSING);
     }
 
-    
+   
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventExceptionStamp#getMasterStamp()
+     * @see org.osaf.cosmo.model.EventExceptionStamp#getMasterStamp()
      */
     public EventStamp getMasterStamp() {
         NoteItem note = (NoteItem) getItem();

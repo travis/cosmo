@@ -472,12 +472,16 @@
     border-bottom: 1px solid #ccc;
 }
 #detailViewByline {
-    height: 24px;
-    padding: 4px 10px 0px 10px;
+    height: 48px;
+    padding: 4px 4px 0px 4px;
     border-top: 1px solid #ccc;
+}
+.detailViewBylineEntry {
+    overflow: hidden;
+    white-space: nowrap;
 	  font-weight: bold;
 	  font-size: 10px;
-    line-height: 12px;
+    height: 14px;
     color: #808080;
 }
 /* Collection selector

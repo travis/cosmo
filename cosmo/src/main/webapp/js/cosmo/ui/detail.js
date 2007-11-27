@@ -1127,7 +1127,7 @@ cosmo.ui.detail.EventFormElements= function () {
                     tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
             });
         }
-        
+
         return options;
     }
     function clearTimezone() {
@@ -1461,9 +1461,9 @@ cosmo.ui.detail.EventFormElements.prototype.enableDisableEventStatus = function 
         var endTime = html.getFormValue(form, "endTime");
         var startDate = html.getFormValue(form, "startDate");
         var endDate  = html.getFormValue(form, "endDate");
-        
+
         if (html.getFormValue(form, "eventAllDay") == "0"){
-            if (!endTime || endTime == "hh:mm" 
+            if (!endTime || endTime == "hh:mm"
                || ( (startTime == endTime && startDate == endDate))){
                 show = false;
             }
@@ -1472,47 +1472,64 @@ cosmo.ui.detail.EventFormElements.prototype.enableDisableEventStatus = function 
         form["eventStatus"].disabled = !show;
 }
 
-dojo.declare("cosmo.ui.detail.Byline", null, {
-    domNode: null,
-
-    initializer: function (){
-        this.domNode = _createElem("div");
-        this.domNode.id = "detailViewByline";
-    },
-
-    actionToText: new function (){
-        this[cosmo.model.ACTION_EDITED] = _("Main.DetailForm.Byline.Edited");
-        this[cosmo.model.ACTION_QUEUED] = _("Main.DetailForm.Byline.Queued");
-        this[cosmo.model.ACTION_SENT] = _("Main.DetailForm.Byline.Sent");
-        this[cosmo.model.ACTION_UPDATED] = _("Main.DetailForm.Byline.Update");
-        this[cosmo.model.ACTION_CREATED] = _("Main.DetailForm.Byline.Created");
-    },
-
-    updateFromItem: function (item){
-
+cosmo.ui.detail.Byline = function () {
+    this.domNode = _createElem("div");
+    this.domNode.id = "detailViewByline";
+    // Link the action codes in the model to the verbs used in the
+    // localized string resources, e.g., 100 => 'Edited'
+    this._keyList = new function () {
+        var actionList = ['Edited', 'Queued', 'Sent', 'Updated', 'Created'];
+        for (var i = 0; i < actionList.length; i++) {
+            var act = actionList[i];
+            var key = cosmo.model['ACTION_' + act.toUpperCase()];
+            this[key] = act;
+        }
+    };
+    this.updateFromItem = function (item){
         var modby = item.getModifiedBy();
-        var dt = new cosmo.datetime.Date();
-        dt.updateFromUTC(modby.getTimeStamp());
+        var actionCode = modby.getAction();
         var userId = modby.getUserId();
-        this.domNode.innerHTML =
-            [
-            '<span id="detailViewBylineAction">',
-            dojo.string.escapeXml(this.actionToText[modby.getAction()] || ""), '</span>',
-            userId? (_("Main.DetailForm.Byline.By") + '<span id="detailViewBylineWho">' +
-             dojo.string.escapeXml(userId) + ' </span>') : "",
-            _("Main.DetailForm.Byline.On"), '<span id="detailViewBylineDate">',
-            dojo.string.escapeXml(dt.strftime(_("Main.DetailForm.Byline.DateFormat"))), '</span>',
-            _("Main.DetailForm.Byline.At"), '<span id="detailViewBylineTime">',
-            dojo.string.escapeXml(dt.strftime(_("Main.DetailForm.Byline.TimeFormat"))), '</span>'
 
-            ].join('');
+        // Blow away any previous content
+        this.clearAll();
 
-        var x = modby;
-        var y = this.domNode;
+        if (userId) {
+            // The action in question
+            var d = _createElem('div');
+            d.className = 'detailViewBylineEntry';
+            d.appendChild(_createText(_('Main.DetailForm.Byline.' +
+                this._keyList[actionCode])));
+            this.domNode.appendChild(d);
 
-    }
-}
-);
+            // The responsible party
+            var d = _createElem('div');
+            d.className = 'detailViewBylineEntry';
+            var label = _('Main.DetailForm.Byline.Who');
+            if (label && userId) {
+                var str = label + ' ' + userId;
+                d.appendChild(_createText(str));
+                d.title = str;
+            }
+            this.domNode.appendChild(d);
+
+            // When did the action happen
+            var dt = new cosmo.datetime.Date();
+            dt.updateFromUTC(modby.getTimeStamp());
+            // Desired date format, e.g., "11/26/07, at 6:00:58 PM"
+            dt = dt.strftime(_("Main.DetailForm.Byline.DateFormat"));
+            var d = _createElem('div');
+            d.className = 'detailViewBylineEntry';
+            var label = _('Main.DetailForm.Byline.When');
+            if (label && userId) {
+                var str = label + ' ' + dt;
+                d.appendChild(_createText(str));
+                d.title = str;
+            }
+            this.domNode.appendChild(d);
+        }
+    };
+};
+cosmo.ui.detail.Byline.prototype = new cosmo.ui.ContentBox();
 
 cosmo.ui.detail.ButtonSection = function () {
     var self = this;

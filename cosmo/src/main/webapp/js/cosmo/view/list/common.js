@@ -180,7 +180,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     var dt = st ? st.getStartDate() : null;
     var sr = dt ? dt.getTime() : 0;
     var fm = dt ? dt.strftime('%b %d, %Y %I:%M %p') : '';
-    setVals('startDate', sr, fm);
+    setVals('start', sr, fm);
     // Triage
     var tr = data.getTriageStatus();
     var rank = parseInt(data.getRank());

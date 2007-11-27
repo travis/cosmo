@@ -304,7 +304,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
               ' selectedItem' : '';
             var title = fillCell(display.title);
             var who = fillCell(display.who);
-            var start = fillCell(display.startDate);
+            var start = fillCell(display.start);
             r = '';
             r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + '">';

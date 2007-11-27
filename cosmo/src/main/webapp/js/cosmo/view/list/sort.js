@@ -19,18 +19,17 @@ dojo.provide('cosmo.view.list.sort');
 dojo.require('cosmo.view.list.common');
 
 cosmo.view.list.sort.doSort = function (hash, col, dir) {
-    var defaultSortKey = col.substr(0, 1).toLowerCase() + col.substr(1);
-    var customSortKey = defaultSortKey + 'dir'
+    var currSortKey = col.substr(0, 1).toLowerCase() + col.substr(1);
     // Sort based on the precalc'd values in item.sort
-    var defaultSort = function (a, b) {
-        var valA = a.sort[defaultSortKey];
-        var valB =  b.sort[defaultSortKey];
+    var currSort = function (a, b) {
+        var valA = a.sort[currSortKey];
+        var valB =  b.sort[currSortKey];
         valA = (typeof valA == 'string') ? valA.toLowerCase() : valA;
         valB = (typeof valB == 'string') ? valB.toLowerCase() : valB;
         if (valA == valB) {
             // If sort is already on title, secondary sort is uid
             // (it could be anything; I just picked that out of the air)
-            var newKey = (defaultSortKey == 'title') ? 'uid' : 'title';
+            var newKey = (currSortKey == 'title') ? 'uid' : 'title';
             if (a.sort[newKey] > b.sort[newKey]) {
                 r = 1;
             }
@@ -48,10 +47,8 @@ cosmo.view.list.sort.doSort = function (hash, col, dir) {
         r = dir == 'Desc' ? r : (0 - r);
         return r;
     };
-    // Get the comparator function
-    var f = cosmo.view.list.sort.customSorts[customSortKey] || defaultSort;
     // Sort the list
-    cosmo.view.list.itemRegistry.sort(f);
+    cosmo.view.list.itemRegistry.sort(currSort);
     return true;
 };
 cosmo.view.list.sort.defaultDirections = {
@@ -61,9 +58,3 @@ cosmo.view.list.sort.defaultDirections = {
     STARTDATE: 'Desc',
     TRIAGE: 'Desc'
 };
-cosmo.view.list.sort.customSorts = {
-  // any custom sorts go here, e.g.:
-  // taskDesc: function (a, b) {},
-  // startDateAsc: function (a, b) {}
-}
-

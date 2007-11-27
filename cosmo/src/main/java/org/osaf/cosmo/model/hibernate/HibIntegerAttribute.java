@@ -50,8 +50,9 @@ public class HibIntegerAttribute extends HibAttribute implements java.io.Seriali
     }
 
     // Property accessors
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceIntegerAttribute#getValue()
+     * @see org.osaf.cosmo.model.Attribute#getValue()
      */
     public Long getValue() {
         return this.value;
@@ -65,7 +66,7 @@ public class HibIntegerAttribute extends HibAttribute implements java.io.Seriali
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceIntegerAttribute#setValue(java.lang.Long)
+     * @see org.osaf.cosmo.model.IntegerAttribute#setValue(java.lang.Long)
      */
     public void setValue(Long value) {
         this.value = value;

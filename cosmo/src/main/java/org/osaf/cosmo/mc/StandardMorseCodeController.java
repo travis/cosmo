@@ -34,6 +34,7 @@ import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.ModelValidationException;
@@ -196,8 +197,11 @@ public class StandardMorseCodeController implements MorseCodeController {
             collection.addTicket(entityFactory.createTicket(type));
 
         // throws UidinUseException
-        collection =
-            contentService.createCollection(parent, collection, children);
+        try {
+            collection = contentService.createCollection(parent, collection, children);
+        } catch (IcalUidInUseException e) {
+            throw new UidConflictException(e);
+        }
        
         return new PubCollection(collection);
     }
@@ -371,6 +375,8 @@ public class StandardMorseCodeController implements MorseCodeController {
             // This means the data has been updated since the last sync token,
             // so a StaleCollectionException should be thrown
             throw new StaleCollectionException(uid);
+        } catch (IcalUidInUseException e) {
+            throw new UidConflictException(e);
         }
 
         return new PubCollection(collection);

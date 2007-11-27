@@ -155,9 +155,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
                                "Item not a collection");
             } catch (MorseCodeException e) {
-                log.error("Error deleting collection " + cp.getUid(), e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Error deleting collection: " + e.getMessage());
+                handleGeneralException(e, resp);
+                return;
+            } catch (RuntimeException e) {    
+                handleGeneralException(new MorseCodeException(e), resp);
                 return;
             }
         }
@@ -213,12 +214,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                msg + ": " + e.getMessage());
                 return;
-            } catch (MorseCodeException e) {
-                String msg = "Error discovering collections for user " +
-                    up.getUsername();
-                log.error(msg, e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               msg + ": " + e.getMessage());
+            } catch (MorseCodeException e) {    
+                handleGeneralException(e, resp);
+                return;
+            } catch (RuntimeException e) {    
+                handleGeneralException(new MorseCodeException(e), resp);
                 return;
             }
         }
@@ -296,19 +296,12 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                msg + ": " + e.getMessage());
                 return;
-            } catch (MorseCodeException e) {
-                String msg = tokenStr == null ?
-                    "Error subscribing to collection" :
-                    "Error synchronizing collection";
-                log.error(msg + " " + cp.getUid(), e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               msg + ": " + e.getMessage());
+            } catch (MorseCodeException e) {    
+                handleGeneralException(e, resp);
                 return;
-            } catch (RuntimeException e) {
-                String msg ="Unexpected server error";
-                log.error(msg + " " + cp.getUid(), e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        msg + ": " + e.getMessage());
+            } catch (RuntimeException e) {    
+                handleGeneralException(new MorseCodeException(e), resp);
+                return;
             }
         }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -409,17 +402,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                    root.getMessage());
                     return;
                 }
-                if (e.getCode() >= 500)
-                    log.error("Unknown Morse Code exception", e);
-                else if (e.getCode() >= 400)
-                    log.info("Client error (" + e.getCode() + "): " + e.getMessage());
-                resp.sendError(e.getCode(), e.getMessage());
-                resp.setContentType("application/xml");
-                try {
-                    e.writeTo(resp.getOutputStream());
-                } catch (Exception e2) {
-                    log.error("Unable to write exception response", e2);
-                }
+                handleGeneralException(e, resp);
+                return;
+            } catch (RuntimeException e) {    
+                handleGeneralException(new MorseCodeException(e), resp);
                 return;
             } finally {
                 if (reader != null)
@@ -502,7 +488,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             } catch (UnknownCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
                                "Unknown parent collection");
-                return;
+                 return;
             } catch (NotCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
                                "Parent item not a collection");
@@ -536,17 +522,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                    root.getMessage());
                     return;
                 }
-                if (e.getCode() >= 500)
-                    log.error("Unknown Morse Code exception", e);
-                else if (e.getCode() >= 400)
-                    log.info("Client error (" + e.getCode() + "): " + e.getMessage());
-                resp.sendError(e.getCode(), e.getMessage());
-                resp.setContentType("application/xml");
-                try {
-                    e.writeTo(resp.getOutputStream());
-                } catch (Exception e2) {
-                    log.error("Unable to write exception response", e2);
-                }
+                handleGeneralException(e, resp);
+                return;
+            } catch (RuntimeException e) {    
+                handleGeneralException(new MorseCodeException(e), resp);
                 return;
             } finally {
                 if (reader != null)
@@ -696,5 +675,22 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             append("=").
             append(ticket.getKey());
         return buf.toString();
+    }
+
+    private void handleGeneralException(MorseCodeException e,
+                                        HttpServletResponse resp)
+        throws IOException {
+        log.debug("handling general exception");
+        if (e.getCode() >= 500)
+            log.error("Unknown Morse Code exception", e);
+        else if (e.getCode() >= 400)
+            log.info("Client error (" + e.getCode() + "): " + e.getMessage());
+        resp.sendError(e.getCode(), e.getMessage());
+        resp.setContentType("application/xml");
+        try {
+            e.writeTo(resp.getOutputStream());
+        } catch (Exception e2) {
+            log.error("Unable to write exception response", e2);
+        }
     }
 }

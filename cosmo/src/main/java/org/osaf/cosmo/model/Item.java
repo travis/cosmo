@@ -298,8 +298,6 @@ public interface Item extends AuditableObject{
 
     public Set<Tombstone> getTombstones();
 
-    public void addTombstone(Tombstone tombstone);
-
     public Item copy();
 
 }

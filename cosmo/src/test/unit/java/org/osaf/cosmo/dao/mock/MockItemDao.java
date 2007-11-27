@@ -279,7 +279,7 @@ public class MockItemDao implements ItemDao {
      */
     public void createTicket(Item item,
                              Ticket ticket) {
-        item.getTickets().add(ticket);
+        item.addTicket(ticket);
         storage.createTicket(item, ticket);
     }
 
@@ -327,7 +327,7 @@ public class MockItemDao implements ItemDao {
                              Ticket ticket) {
         Set itemTickets = storage.findItemTickets(item);
         if (itemTickets.contains(ticket)) {
-            item.getTickets().remove(ticket);
+            item.removeTicket(ticket);
             storage.removeTicket(item, ticket);
             return;
         }

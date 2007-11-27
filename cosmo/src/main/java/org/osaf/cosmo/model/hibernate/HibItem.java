@@ -138,7 +138,7 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     
     @OneToMany(targetEntity=HibTombstone.class, mappedBy="item", fetch=FetchType.LAZY)
     @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
-    private Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
+    protected Set<Tombstone> tombstones = new HashSet<Tombstone>(0);
     
     private transient Map<String, Stamp> stampMap = null;
     
@@ -640,14 +640,14 @@ public abstract class HibItem extends HibAuditableObject implements Item {
      * @see org.osaf.cosmo.model.Item#getTickets()
      */
     public Set<Ticket> getTickets() {
-        return tickets;
+        return Collections.unmodifiableSet(tickets);
     }
 
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.Item#getTombstones()
      */
     public Set<Tombstone> getTombstones() {
-        return tombstones;
+        return Collections.unmodifiableSet(tombstones);
     }
 
     /* (non-Javadoc)

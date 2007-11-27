@@ -46,13 +46,6 @@ public interface CollectionItem extends Item{
     public void setHue(Long value);
 
     /**
-     * Remove ItemTombstone with an itemUid equal to a given Item's uid
-     * @param item
-     * @return true if a tombstone was removed
-     */
-    public boolean removeTombstone(Item item);
-
-    /**
      * Generate alternative hash code for collection.
      * This hash code will return a different value if
      * collection or any child items in the collection

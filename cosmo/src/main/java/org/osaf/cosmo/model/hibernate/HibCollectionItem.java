@@ -16,7 +16,6 @@
 package org.osaf.cosmo.model.hibernate;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
@@ -28,7 +27,6 @@ import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.QName;
-import org.osaf.cosmo.model.Tombstone;
 
 /**
  * Hibernate persistent CollectionItem.
@@ -60,10 +58,6 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
      */
     public Set<Item> getChildren() {
         return children;
-    }
-
-    private void setChildren(Set<Item> children) {
-        this.children = children;
     }
    
     /* (non-Javadoc)
@@ -120,20 +114,14 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
         HibIntegerAttribute.setValue(this, ATTR_HUE, value);
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.CollectionItem#removeTombstone(org.osaf.cosmo.model.Item)
+    /**
+     * Remove ItemTombstone with an itemUid equal to a given Item's uid
+     * @param item
+     * @return true if a tombstone was removed
      */
     public boolean removeTombstone(Item item) {
-        for(Iterator<Tombstone> it = getTombstones().iterator();it.hasNext();) {
-            Tombstone ts = it.next();
-            if(ts instanceof ItemTombstone) {
-                if(((ItemTombstone) ts).getItemUid().equals(item.getUid())) {
-                    it.remove();
-                    return true;
-                }
-            }
-        }
-        return false;
+        ItemTombstone ts = new HibItemTombstone(this, item);
+        return tombstones.remove(ts);
     }
     
     /* (non-Javadoc)

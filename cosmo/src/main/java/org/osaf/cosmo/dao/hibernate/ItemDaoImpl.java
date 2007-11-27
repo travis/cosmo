@@ -46,8 +46,10 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
+import org.osaf.cosmo.model.hibernate.HibCollectionItem;
 import org.osaf.cosmo.model.hibernate.HibEventStamp;
 import org.osaf.cosmo.model.hibernate.HibHomeCollectionItem;
+import org.osaf.cosmo.model.hibernate.HibItem;
 import org.osaf.cosmo.model.hibernate.HibItemTombstone;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -268,7 +270,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         try {
             getSession().update(item);
             getSession().refresh(item);
-            item.getTickets().remove(ticket);
+            item.removeTicket(ticket);
         } catch (HibernateException e) {
             throw convertHibernateAccessException(e);
         }
@@ -374,9 +376,9 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             
             item.setName(moveName);
             if(!parent.getUid().equals(oldParent.getUid())) {
-                parent.removeTombstone(item);
+                ((HibCollectionItem)parent).removeTombstone(item);
                 item.getParents().add(parent);
-                oldParent.addTombstone(new HibItemTombstone(oldParent, item));
+                getHibItem(oldParent).addTombstone(new HibItemTombstone(oldParent, item));
                 item.getParents().remove(oldParent);
             }
             
@@ -736,7 +738,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         if(!item.getParents().contains(collection))
             return;
         
-        collection.addTombstone(new HibItemTombstone(collection, item));
+        getHibItem(collection).addTombstone(new HibItemTombstone(collection, item));
         item.getParents().remove(collection);
         
         // If the item belongs to no collection, then it should
@@ -749,7 +751,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         
         getSession().update(item);
         getSession().update(collection);
-        collection.removeTombstone(item);
+        ((HibCollectionItem)collection).removeTombstone(item);
         item.getParents().add(collection);  
     }
     
@@ -759,6 +761,14 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     protected BaseModelObject getBaseModelObject(Object obj) {
         return (BaseModelObject) obj;
+    }
+    
+    protected HibItem getHibItem(Item item) {
+        return (HibItem) item;
+    }
+    
+    protected HibCollectionItem getHibCollectionItem(CollectionItem item) {
+        return (HibCollectionItem) item;
     }
     
 }

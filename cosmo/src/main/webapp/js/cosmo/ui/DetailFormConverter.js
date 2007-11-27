@@ -354,7 +354,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         } else {           
            var deltaEndDate = delta.getStampProperty("event", "endDate");
            var deltaStartDate = delta.getStampProperty("event", "startDate");
-           if (!endTimeFieldValue || (deltaEndDate.equals(deltaStartDate))){
+           if (!endTimeFieldValue || (deltaStartDate.equals(deltaEndDate))){
                //this is attime, so kill duration, end time
                delta.removeStampProperty("event", "endDate");
                delta.addStampProperty("event", "duration", new cosmo.model.Duration(cosmo.model.ZERO_DURATION));

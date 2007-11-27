@@ -409,9 +409,16 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                    root.getMessage());
                     return;
                 }
-                log.error("Error updating collection " + cp.getUid(), e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Error updating collection: " + e.getMessage());
+                if (e.getCode() >= 500)
+                    log.error("Unknown Morse Code exception", e);
+                else if (e.getCode() >= 400)
+                    log.info("Client error (" + e.getCode() + "): " + e.getMessage());
+                resp.sendError(e.getCode(), e.getMessage());
+                try {
+                    e.writeTo(resp.getOutputStream());
+                } catch (Exception e2) {
+                    log.error("Unable to write exception response", e2);
+                }
                 return;
             } finally {
                 if (reader != null)
@@ -528,10 +535,16 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                                    root.getMessage());
                     return;
                 }
-                log.error("Error publishing collection " + cp.getUid(), e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Error publishing collection: " +
-                               e.getMessage());
+                if (e.getCode() >= 500)
+                    log.error("Unknown Morse Code exception", e);
+                else if (e.getCode() >= 400)
+                    log.info("Client error (" + e.getCode() + "): " + e.getMessage());
+                resp.sendError(e.getCode(), e.getMessage());
+                try {
+                    e.writeTo(resp.getOutputStream());
+                } catch (Exception e2) {
+                    log.error("Unable to write exception response", e2);
+                }
                 return;
             } finally {
                 if (reader != null)

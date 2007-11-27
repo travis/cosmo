@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
-import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collection;
@@ -78,7 +77,6 @@ import org.osaf.cosmo.model.hibernate.HibTimestampAttribute;
 import org.osaf.cosmo.model.hibernate.HibTriageStatus;
 import org.osaf.cosmo.model.hibernate.HibXmlAttribute;
 import org.osaf.cosmo.xml.DomWriter;
-import org.springframework.dao.DataIntegrityViolationException;
 
 public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
@@ -427,7 +425,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
        
         ICalendarAttribute icalAttr = new HibICalendarAttribute(); 
         icalAttr.setQName(new HibQName("icalattribute"));
-        icalAttr.setValue(new FileInputStream(baseDir + "/vjournal.ics"));
+        icalAttr.setValue(helper.getInputStream("vjournal.ics"));
         item.addAttribute(icalAttr);
         
         ContentItem newItem = contentDao.createContent(root, item);
@@ -443,7 +441,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         net.fortuna.ical4j.model.Calendar calendar = (net.fortuna.ical4j.model.Calendar) attr.getValue();
         Assert.assertNotNull(calendar);
         
-        net.fortuna.ical4j.model.Calendar expected = CalendarUtils.parseCalendar(new FileInputStream(baseDir + "/vjournal.ics"));
+        net.fortuna.ical4j.model.Calendar expected = CalendarUtils.parseCalendar(helper.getInputStream("vjournal.ics"));
         
         Assert.assertEquals(expected.toString(),calendar.toString());
         
@@ -528,7 +526,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem.setDisplayName("this is a test item2");
         queryItem.removeAttribute("customattribute");
         queryItem.setContentLanguage("es");
-        queryItem.setContent(helper.getBytes(baseDir + "/testdata2.txt"));
+        queryItem.setContent(helper.getBytes("testdata2.txt"));
 
         // Make sure modified date changes
         Thread.sleep(1000);
@@ -801,7 +799,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem queryC = contentDao.findContentByPath("/testuser2/a/b/c");
         Assert.assertNotNull(queryC);
         helper.verifyInputStream(
-                new FileInputStream(baseDir + "/testdata1.txt"), ((FileItem) queryC)
+                helper.getInputStream("testdata1.txt"), ((FileItem) queryC)
                         .getContent());
         Assert.assertEquals("c", queryC.getName());
 
@@ -1291,8 +1289,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         newItem.setIcalUid("icaluid");
         
         CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "/vfreebusy.ics");
-        net.fortuna.ical4j.model.Calendar calendar = cb.build(fis);
+        net.fortuna.ical4j.model.Calendar calendar = cb.build(helper.getInputStream("vfreebusy.ics"));
         
         newItem.setFreeBusyCalendar(calendar);
         
@@ -1323,8 +1320,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         System.setProperty("ical4j.validation.relaxed", "true");
         
         CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "/vavailability.ics");
-        net.fortuna.ical4j.model.Calendar calendar = cb.build(fis);
+        net.fortuna.ical4j.model.Calendar calendar = cb.build(helper.getInputStream("vavailability.ics"));
         
         newItem.setAvailabilityCalendar(calendar);
         
@@ -1398,7 +1394,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         FileItem content = new HibFileItem();
         content.setName(name);
         content.setDisplayName(name);
-        content.setContent(helper.getBytes(baseDir + "/testdata1.txt"));
+        content.setContent(helper.getBytes("testdata1.txt"));
         content.setContentLanguage("en");
         content.setContentEncoding("UTF8");
         content.setContentType("text/text");

@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.calendar;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Iterator;
 
 import junit.framework.Assert;
@@ -35,14 +35,12 @@ import net.fortuna.ical4j.model.component.VEvent;
  * expansion.
  */
 public class InstanceListTest extends TestCase {
-    protected String baseDir = "src/test/unit/resources/testdata/";
+    
     private static final TimeZoneRegistry TIMEZONE_REGISTRY =
                 TimeZoneRegistryFactory.getInstance().createRegistry();
     
     public void testFloatingRecurring() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "floating_recurr_event.ics");
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("floating_recurr_event.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -95,9 +93,7 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testUTCInstanceList() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "floating_recurr_event.ics");
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("floating_recurr_event.ics");
         
         TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/New_York");
         
@@ -154,9 +150,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testUTCInstanceListAllDayEvent() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_weekly_recurring.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("allday_weekly_recurring.ics");
         
         InstanceList instances = new InstanceList();
         instances.setUTC(true);
@@ -190,10 +185,9 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testUTCInstanceListAllDayWithExDates() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_recurring_with_exdates.ics");
-        Calendar calendar = cb.build(fis);
         
+        Calendar calendar = getCalendar("allday_recurring_with_exdates.ics");
+       
         InstanceList instances = new InstanceList();
         instances.setUTC(true);
         instances.setTimezone(TIMEZONE_REGISTRY.getTimeZone("America/Chicago"));
@@ -233,9 +227,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testUTCInstanceListAllDayEventWithMods() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_weekly_recurring_with_mods.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("allday_weekly_recurring_with_mods.ics");
         
         InstanceList instances = new InstanceList();
         instances.setUTC(true);
@@ -269,9 +262,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testInstanceListInstanceBeforeStartRange() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "eventwithtimezone3.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("eventwithtimezone3.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -310,9 +302,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testFloatingWithSwitchingTimezoneInstanceList() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "floating_recurr_event.ics");
-        Calendar calendar = cb.build(fis);
+       
+        Calendar calendar = getCalendar("floating_recurr_event.ics");
         
         TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles");
         InstanceList instances = new InstanceList();
@@ -367,9 +358,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testExdateWithTimezone() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_exdates.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("recurring_with_exdates.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -401,9 +391,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testExdateUtc() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_exdates_utc.ics");
-        Calendar calendar = cb.build(fis);
+       
+        Calendar calendar = getCalendar("recurring_with_exdates_utc.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -435,9 +424,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testExdateNoTimezone() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_exdates_floating.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("recurring_with_exdates_floating.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -469,9 +457,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testRdateWithTimezone() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_rdates.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("recurring_with_rdates.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -538,9 +525,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testExruleWithTimezone() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_exrule.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("recurring_with_exrule.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -572,9 +558,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testAllDayRecurring() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_recurring.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("allday_recurring.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -621,9 +606,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testAllDayRecurringWithExDates() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_recurring_with_exdates.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("allday_recurring_with_exdates.ics");
         
         InstanceList instances = new InstanceList();
         TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
@@ -664,9 +648,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testAllDayRecurringWithMods() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_weekly_recurring_with_mods.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("allday_weekly_recurring_with_mods.ics");
         
         InstanceList instances = new InstanceList();
         TimeZone tz = TIMEZONE_REGISTRY.getTimeZone("America/Chicago");
@@ -700,9 +683,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testAllDayRecurringWithTimeZone() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "allday_recurring.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("allday_recurring.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -746,9 +728,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testInstanceStartBeforeRange() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "recurring_with_exdates.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("recurring_with_exdates.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -774,10 +755,9 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070529T061500", instance.getEnd().toString());
     }
     
-    public void XXtestComplicatedRecurringWithTimezone() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "/instancelist/complicated_recurring.ics");
-        Calendar calendar = cb.build(fis);
+    public void testComplicatedRecurringWithTimezone() throws Exception {
+        
+        Calendar calendar = getCalendar("complicated_recurring.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -796,36 +776,35 @@ public class InstanceListTest extends TestCase {
         key = keys.next();
         instance = (Instance) instances.get(key);
         
-        Assert.assertEquals("20070102T151500Z", key);
+        Assert.assertEquals("20070102T161500Z", key);
         Assert.assertEquals("20070102T101500", instance.getStart().toString());
         Assert.assertEquals("20070102T111500", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
-        Assert.assertEquals("20070104T151500Z", key);
+        Assert.assertEquals("20070104T161500Z", key);
         Assert.assertEquals("20070104T101500", instance.getStart().toString());
         Assert.assertEquals("20070104T111500", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
-        Assert.assertEquals("20070116T151500Z", key);
+        Assert.assertEquals("20070116T161500Z", key);
         Assert.assertEquals("20070116T101500", instance.getStart().toString());
         Assert.assertEquals("20070116T111500", instance.getEnd().toString());
         
         key = keys.next();
         instance = (Instance) instances.get(key);
         
-        Assert.assertEquals("20070118T151500Z", key);
+        Assert.assertEquals("20070118T161500Z", key);
         Assert.assertEquals("20070118T101500", instance.getStart().toString());
         Assert.assertEquals("20070118T111500", instance.getEnd().toString());
     }
     
     public void testComplicatedRecurringAllDay() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "/instancelist/complicated_allday_recurring.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("complicated_allday_recurring.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -878,9 +857,8 @@ public class InstanceListTest extends TestCase {
     }
     
     public void testRecurringWithUntil() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "/instancelist/recurring_until.ics");
-        Calendar calendar = cb.build(fis);
+        
+        Calendar calendar = getCalendar("recurring_until.ics");
         
         InstanceList instances = new InstanceList();
         
@@ -933,6 +911,16 @@ public class InstanceListTest extends TestCase {
                 instances.addOverride(event, start, end);
             }
         }
+    }
+    
+    protected Calendar getCalendar(String name) throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        InputStream in = getClass().getClassLoader().getResourceAsStream("instancelist/" + name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }        
+        Calendar calendar = cb.build(in);
+        return calendar;
     }
     
 }

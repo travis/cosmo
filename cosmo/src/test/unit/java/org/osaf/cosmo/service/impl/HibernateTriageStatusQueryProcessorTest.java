@@ -218,7 +218,7 @@ public class HibernateTriageStatusQueryProcessorTest extends AbstractHibernateDa
        
         EventStamp evs = new HibEventStamp();
         event.addStamp(evs);
-        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(file)));
        
         return event;
     }

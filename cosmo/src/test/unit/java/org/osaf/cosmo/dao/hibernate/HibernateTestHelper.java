@@ -17,7 +17,6 @@ package org.osaf.cosmo.dao.hibernate;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Assert;
-
 import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.io.IOUtils;
@@ -115,16 +113,27 @@ public class HibernateTestHelper {
             Assert.fail("attributes not equal");
     }
 
-    public byte[] getBytes(String fileName) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        FileInputStream fis = new FileInputStream(fileName);
-        IOUtils.copy(fis, baos);
-        return baos.toByteArray();
+    public byte[] getBytes(String name) throws Exception {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtils.copy(in, bos);
+        return bos.toByteArray();
     }
     
-    public Calendar getCalendar(String fileName) throws Exception {
-        FileInputStream fis = new FileInputStream(fileName);
-        return CalendarUtils.parseCalendar(fis);
+    public InputStream getInputStream(String name) throws Exception {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }
+        return in;
+    }
+    
+    public Calendar getCalendar(String name) throws Exception {
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        return CalendarUtils.parseCalendar(in);
     }
 
     public void verifyInputStream(InputStream is1, byte[] content)

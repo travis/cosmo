@@ -24,7 +24,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class AbstractHibernateDaoTestCase extends AbstractSpringDaoTestCase {
 
     protected HibernateTestHelper helper = null;
-    protected String baseDir = "src/test/unit/resources/testdata";
     
     protected Session session = null;
     protected SessionFactory sessionFactory = null;

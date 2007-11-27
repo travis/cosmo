@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.calendar;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class RecurrenceExpanderTest extends TestCase {
-    protected String baseDir = "src/test/unit/resources/testdata/expander/";
+    
     private static final Log log = LogFactory.getLog(RecurrenceExpanderTest.class);
     private static final TimeZoneRegistry TIMEZONE_REGISTRY =
         TimeZoneRegistryFactory.getInstance().createRegistry();
@@ -153,8 +153,11 @@ public class RecurrenceExpanderTest extends TestCase {
     
     protected Calendar getCalendar(String name) throws Exception {
         CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + name);
-        Calendar calendar = cb.build(fis);
+        InputStream in = getClass().getClassLoader().getResourceAsStream("expander/" + name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }        
+        Calendar calendar = cb.build(in);
         return calendar;
     }
     

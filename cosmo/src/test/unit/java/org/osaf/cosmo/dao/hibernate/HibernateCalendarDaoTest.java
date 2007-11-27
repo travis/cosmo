@@ -115,7 +115,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
 
         // test update event
         queryEvent.setName("test2.ics");
-        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/cal2.ics")));
+        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes("cal2.ics")));
         
         queryEvent = contentDao.updateContent(queryEvent);
 
@@ -407,7 +407,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
        
         EventStamp evs = new HibEventStamp();
         event.addStamp(evs);
-        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(file)));
         event.setIcalUid(evs.getIcalUid());
         if(evs.getEvent().getDescription()!=null)
             event.setBody(evs.getEvent().getDescription().getValue());
@@ -427,7 +427,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
        
         EventExceptionStamp evs = new HibEventExceptionStamp();
         event.addStamp(evs);
-        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(baseDir + "/" + file)));
+        evs.setEventCalendar(CalendarUtils.parseCalendar(helper.getBytes(file)));
         
         return event;
     }

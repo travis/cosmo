@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.calendar.query;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -28,7 +28,6 @@ import net.fortuna.ical4j.model.Period;
  * Test CalendarFilterEvaluater
  */
 public class CalendarFilterEvaluaterTest extends TestCase {
-    protected String baseDir = "src/test/unit/resources/testdata/";
     
     @Override
     protected void setUp() throws Exception {
@@ -39,10 +38,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
 
     public void testEvaluateFilterPropFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "cal1.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("cal1.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -78,10 +76,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateFilterParamFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "cal1.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("cal1.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -114,10 +111,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateFilterEventTimeRangeFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "cal1.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("cal1.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -142,10 +138,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateFilterRecurringEventTimeRangeFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "eventwithtimezone1.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("eventwithtimezone1.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -170,10 +165,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
        
     public void testEvaluateFilterPropertyTimeRangeFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "cal1.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("cal1.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -200,10 +194,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateComplicated() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "cal1.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("cal1.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -247,10 +240,10 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVAlarmFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "event_with_alarm.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("event_with_alarm.ics");
+        
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -312,10 +305,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateFilterPropFilterAgainstException() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "event_with_exception.ics");
+       
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("event_with_exception.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -329,10 +321,10 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVJournalFilterPropFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "vjournal.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("vjournal.ics");
+        
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -354,10 +346,10 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVToDoFilterPropFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "vtodo.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("vtodo.ics");
+        
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -379,9 +371,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVToDoTimeRangeFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        Calendar calendar1 = cb.build(new FileInputStream(baseDir + "/vtodo/vtodo.ics"));
-        Calendar calendar2 = cb.build(new FileInputStream(baseDir + "/vtodo/vtodo_due_only.ics"));
+        
+        Calendar calendar1 = getCalendar("vtodo/vtodo.ics");
+        Calendar calendar2 = getCalendar("vtodo/vtodo_due_only.ics");
         
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
        
@@ -419,10 +411,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVFreeBusyFilterFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "vfreebusy.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("vfreebusy.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -444,10 +435,10 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVFreeBusyFilterFilterTimeRange() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar1 = cb.build(new FileInputStream(baseDir + "vfreebusy.ics"));
-        Calendar calendar2 = cb.build(new FileInputStream(baseDir + "vfreebusy_no_dtstart.ics"));
+        Calendar calendar1 = getCalendar("vfreebusy.ics");
+        Calendar calendar2 = getCalendar("vfreebusy_no_dtstart.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -477,10 +468,9 @@ public class CalendarFilterEvaluaterTest extends TestCase {
     }
     
     public void testEvaluateVAvailabilityFilter() throws Exception {
-        CalendarBuilder cb = new CalendarBuilder();
-        FileInputStream fis = new FileInputStream(baseDir + "vavailability.ics");
+        
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();
-        Calendar calendar = cb.build(fis);
+        Calendar calendar = getCalendar("vavailability.ics");
         
         CalendarFilter filter = new CalendarFilter();
         ComponentFilter compFilter = new ComponentFilter("VCALENDAR");
@@ -489,5 +479,15 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         compFilter.getComponentFilters().add(vfbFilter);
         
         Assert.assertTrue(evaluater.evaluate(calendar, filter));
+    }
+    
+    protected Calendar getCalendar(String name) throws Exception {
+        CalendarBuilder cb = new CalendarBuilder();
+        InputStream in = getClass().getClassLoader().getResourceAsStream(name);
+        if (in == null) {
+            throw new IllegalStateException("resource " + name + " not found");
+        }        
+        Calendar calendar = cb.build(in);
+        return calendar;
     }
 }

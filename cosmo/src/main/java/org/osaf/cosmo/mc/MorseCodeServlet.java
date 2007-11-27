@@ -414,6 +414,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 else if (e.getCode() >= 400)
                     log.info("Client error (" + e.getCode() + "): " + e.getMessage());
                 resp.sendError(e.getCode(), e.getMessage());
+                resp.setContentType("application/xml");
                 try {
                     e.writeTo(resp.getOutputStream());
                 } catch (Exception e2) {
@@ -540,6 +541,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 else if (e.getCode() >= 400)
                     log.info("Client error (" + e.getCode() + "): " + e.getMessage());
                 resp.sendError(e.getCode(), e.getMessage());
+                resp.setContentType("application/xml");
                 try {
                     e.writeTo(resp.getOutputStream());
                 } catch (Exception e2) {

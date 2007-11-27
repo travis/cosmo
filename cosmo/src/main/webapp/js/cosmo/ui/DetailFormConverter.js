@@ -118,7 +118,6 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
 
             displayName: { type : "string",
                            field: "noteTitle",
-                      validation: [["required"]]
             }
         },
         

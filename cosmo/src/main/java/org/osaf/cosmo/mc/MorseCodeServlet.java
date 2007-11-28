@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.mc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -24,7 +25,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -70,6 +73,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
     private static final Log log = LogFactory.getLog(MorseCodeServlet.class);
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
 
     private static final String BEAN_CONTROLLER =
         "morseCodeController";
@@ -671,26 +675,47 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
 
     private String formatTicket(Ticket ticket) {
         StringBuffer buf = new StringBuffer();
-        buf.append(ticket.getType()).
-            append("=").
-            append(ticket.getKey());
+        buf.append(ticket.getType()).append("=").append(ticket.getKey());
         return buf.toString();
     }
 
     private void handleGeneralException(MorseCodeException e,
                                         HttpServletResponse resp)
         throws IOException {
-        log.debug("handling general exception");
         if (e.getCode() >= 500)
             log.error("Unknown Morse Code exception", e);
         else if (e.getCode() >= 400)
             log.info("Client error (" + e.getCode() + "): " + e.getMessage());
-        resp.sendError(e.getCode(), e.getMessage());
-        resp.setContentType("application/xml");
+
+        resp.setStatus(e.getCode());
+        if (! e.hasContent())
+            return;
+
+        XMLStreamWriter writer = null;
+
         try {
-            e.writeTo(resp.getOutputStream());
-        } catch (Exception e2) {
-            log.error("Unable to write exception response", e2);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(out);
+            writer.writeStartDocument();
+            e.writeTo(writer);
+            writer.writeEndDocument();
+
+            resp.setContentType("application/xml");
+            byte[] bytes = out.toByteArray();
+            resp.setContentLength(bytes.length);
+            resp.getOutputStream().write(bytes);
+        } catch (Throwable e2) {
+            log.error("Error writing XML", e2);
+            log.error("Original exception", e);
+            resp.setStatus(500);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (XMLStreamException e2) {
+                    log.warn("Unable to close XML writer", e2);
+                }
+            }
         }
     }
 }

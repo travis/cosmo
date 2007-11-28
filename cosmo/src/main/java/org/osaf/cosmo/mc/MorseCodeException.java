@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -31,7 +30,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class MorseCodeException extends RuntimeException
     implements MorseCodeConstants {
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
     
     private int code;
     private McNamespaceContext nsc;
@@ -77,13 +75,6 @@ public class MorseCodeException extends RuntimeException
 
     public McNamespaceContext getNamespaceContext() {
         return nsc;
-    }
-
-    public void writeTo(OutputStream out)
-        throws XMLStreamException {
-        XMLStreamWriter writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(out);
-        writeTo(writer);
-        writer.close();
     }
 
     public void writeTo(XMLStreamWriter writer)

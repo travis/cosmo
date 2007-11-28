@@ -17,3 +17,6 @@ drop table tmp_item
 # have to cheat here since derby doesn't support clobs in functions
 CREATE FUNCTION REPLACE(STR VARCHAR(20000), OLD VARCHAR(1024), NEW VARCHAR(1024)) RETURNS VARCHAR(20000) PARAMETER STYLE JAVA NO SQL LANGUAGE JAVA EXTERNAL NAME 'org.osaf.cosmo.util.StringUtils.replace'
 update event_stamp set icaldata=replace(CAST(icaldata as VARCHAR(20000)),'TRIGGER;VALUE=DATE:','TRIGGER:') where icaldata like '%TRIGGER;VALUE=DATE:%'
+
+# fix bad calendar-color attribute added by ical 3
+update attribute set textvalue= substr(cast(textvalue as varchar(1000)),1,18) || ' xmlns:' || substr(cast(textvalue as varchar(1000)),2,2) || '="http://apple.com/ns/ical/"' || substr(cast(textvalue as varchar(1000)),19) where attributetype='xml' and textvalue like '%calendar-color%' and textvalue not like '%xmlns:%'

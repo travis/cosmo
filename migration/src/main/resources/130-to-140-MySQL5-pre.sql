@@ -16,3 +16,6 @@ drop table tmp_item;
 
 # fix bad VALARM TRIGGERS allowed in previous versions
 update event_stamp set icaldata=replace(icaldata,'TRIGGER;VALUE=DATE:','TRIGGER:') where icaldata like '%TRIGGER;VALUE=DATE:%';
+
+# fix bad calendar-color attribute added by ical 3
+update attribute set textvalue=concat(substring(textvalue,1,18),' xmlns:',substring(textvalue,2,2),'="http://apple.com/ns/ical/"',substring(textvalue,19)) where attributetype='xml' and textvalue like '%calendar-color%' and textvalue not like '%xmlns:%';

@@ -126,6 +126,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 timeField: "startTime",
                 meridianField: "startMeridian",
                 tzIdField: "tzId",
+                tzRegionField: "tzRegion",
                 allDayField: "eventAllDay",
                 validation: [["required"]]               
             },
@@ -136,6 +137,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 timeField: "endTime",
                 meridianField: "endMeridian",
                 tzIdField: "tzId",
+                tzRegionField: "tzRegion",
                 allDayField: "eventAllDay",
                 validation: [["required"]]               
             },
@@ -200,6 +202,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         timeFieldValue = timeFieldValue == "hh:mm" ? null : timeFieldValue;
         var meridianFieldValue = this._getFormValue(form, info.meridianField);
         var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
+        var tzRegionFieldValue = this._getFormValue(form, info.tzRegionField);
         var allDayFieldValue = this._getFormValue(form, info.allDayField) == "1";
         var errors = [];
 
@@ -207,6 +210,10 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             return [null,null];
         }
         
+        if (tzRegionFieldValue && !tzIdFieldValue){
+            errors.push(new cosmo.ui.Error(null, "App.Error.NoTzId"));
+        }
+
         var err = cosmo.util.validate.dateFormat(dateFieldValue);
         if (err){
             errors.push(new cosmo.ui.Error(propertyName, null, err));

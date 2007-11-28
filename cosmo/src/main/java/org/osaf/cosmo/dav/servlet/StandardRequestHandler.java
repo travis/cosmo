@@ -56,6 +56,7 @@ import org.osaf.cosmo.dav.provider.HomeCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalProvider;
 import org.osaf.cosmo.model.EntityFactory;
+import org.osaf.cosmo.server.ServerConstants;
 
 import org.springframework.web.HttpRequestHandler;
 
@@ -68,7 +69,8 @@ import org.springframework.web.HttpRequestHandler;
  * method based on the request method.
  * </p>
  */
-public class StandardRequestHandler implements HttpRequestHandler {
+public class StandardRequestHandler
+    implements HttpRequestHandler, ServerConstants {
     private static final Log log =
         LogFactory.getLog(StandardRequestHandler.class);
 
@@ -103,8 +105,16 @@ public class StandardRequestHandler implements HttpRequestHandler {
             preconditions(wreq, wres, resource);
             process(wreq, wres, resource);
         } catch (Throwable e) {
-            DavException de = e instanceof DavException ?
-                (DavException) e : new DavException(e);    
+            DavException de = null;
+            if (e instanceof DavException) {
+                de = (DavException) e;
+            } else {
+                de = new DavException(e);
+                // stuff the exception into a request attribute so that
+                // filters can examine it
+                request.setAttribute(ATTR_SERVICE_EXCEPTION, e);
+            }
+ 
             if (de.getErrorCode() >= 500)
                 log.error("Internal dav error", e);
             else if (de.getErrorCode() >= 400 && de.getMessage() != null)

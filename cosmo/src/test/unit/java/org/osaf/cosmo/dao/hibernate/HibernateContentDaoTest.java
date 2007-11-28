@@ -1336,6 +1336,69 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         helper.verifyItem(newItem, queryItem);
     }
     
+    public void testContentDaoUpdateCollection2() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem note1 = generateTestNote("test1", "testuser");
+        NoteItem note2 = generateTestNote("test2", "testuser");
+
+        note1.setUid("1");
+        note2.setUid("2");
+        
+        Set<ContentItem> items = new HashSet<ContentItem>();
+        items.add(note1);
+        items.add(note2);
+
+        contentDao.updateCollection(root, items);
+
+        items.clear();
+        
+        note1 = (NoteItem) contentDao.findContentByUid("1");
+        note2 = (NoteItem) contentDao.findContentByUid("2");
+        
+        items.add(note1);
+        items.add(note2);
+        
+        Assert.assertNotNull(note1);
+        Assert.assertNotNull(note2);
+        
+        note1.setDisplayName("changed");
+        note2.setIsActive(false);
+       
+        contentDao.updateCollection(root, items);
+        
+        note1 = (NoteItem) contentDao.findContentByUid("1");
+        note2 = (NoteItem) contentDao.findContentByUid("2");
+        
+        Assert.assertNotNull(note1);
+        Assert.assertEquals("changed", note1.getDisplayName());
+        Assert.assertNull(note2);
+    }
+    
+    public void testContentDaoUpdateCollectionWithDuplicateIcalUids() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem note1 = generateTestNote("test1", "testuser");
+        NoteItem note2 = generateTestNote("test2", "testuser");
+
+        note1.setUid("1");
+        note1.setIcalUid("1");
+        note2.setUid("2");
+        note2.setIcalUid("1");
+        
+        Set<ContentItem> items = new HashSet<ContentItem>();
+        items.add(note1);
+        items.add(note2);
+
+        try {
+            contentDao.updateCollection(root, items);
+            Assert.fail("able to create duplicate icaluids!");
+        } catch (IcalUidInUseException e) {
+        }
+    }
+    
     private void verifyTicket(Ticket ticket1, Ticket ticket2) {
         Assert.assertEquals(ticket1.getKey(), ticket2.getKey());
         Assert.assertEquals(ticket1.getTimeout(), ticket2.getTimeout());

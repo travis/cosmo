@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dao.hibernate;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -94,11 +95,34 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
      */
     public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
         
+        // Keep track of duplicate icalUids because we don't flush
+        // the db until the end so we need to handle the case of 
+        // duplicate icalUids in the same request.
+        HashMap<String, NoteItem> icalUidMap = new HashMap<String, NoteItem>();
+        
         try {
             updateCollectionInternal(collection);
             
             // Either create, update, or delete each item
             for (ContentItem item : children) {
+                
+                // Because we batch all the db operations, we must check
+                // for duplicate icalUid within the same request
+                if (item instanceof NoteItem
+                        && ((NoteItem) item).getIcalUid() != null) {
+                    NoteItem note = (NoteItem) item;
+                    if (item.getIsActive() == true) {
+                        NoteItem dup = icalUidMap.get(note.getIcalUid());
+                        if (dup != null && !dup.getUid().equals(item.getUid()))
+                            throw new IcalUidInUseException("iCal uid"
+                                    + note.getIcalUid()
+                                    + " already in use for collection "
+                                    + collection.getUid(), item.getUid(), dup
+                                    .getUid());
+                    }
+
+                    icalUidMap.put(note.getIcalUid(), note);
+                }
                 
                 // create item
                 if(getBaseModelObject(item).getId()==-1) {

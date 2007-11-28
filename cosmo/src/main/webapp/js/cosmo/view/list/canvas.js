@@ -283,13 +283,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var colHeaderIcons = {};
         var t = '';
         var r = '';
-        var cols = [
-            { name: 'Task', width: '20px', display: 'taskColumn', isIcon: true },
-            { name: 'Title', width: '50%', display: 'Title', isIcon: false },
-            { name: 'Who', width: '20%', display: 'UpdatedBy', isIcon: false },
-            { name: 'Start', width: '30%', display: 'StartsOn', isIcon: false },
-            { name: 'Triage', width: '36px', display: 'triageStatusColumn', isIcon: true }
-        ];
+        var cols = [];
         var colCount = 0; // Used to generated the 'processing' row
         var fillCell = function (s) {
             var cell = s;
@@ -330,6 +324,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         var size = this.itemsPerPage;
         var st = (this.currPageNum * size) - size;
+        
+        // Create an ordered list of the column objects, in order
+        var order = cosmo.view.list.columnOrder;
+        for (var i = 0; i < order.length; i++) {
+            cols.push(cosmo.view.list.columns[order[i]]);
+        }
 
         t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: ' + this.width + 'px;">\n';
         // Header row
@@ -370,7 +370,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             }
             colStyle += ' width: ' + w + 'px;';
 
-            r += '<td id="listView' + col.name +
+            r += '<td id="listView_' + col.name +
                 'Header" class="listViewHeaderCell';
             if (isSelected) {
               r += ' listViewHeaderCellSel'
@@ -402,7 +402,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         // Add column header icons
         for (var i in colHeaderIcons) {
           var icon = colHeaderIcons[i];
-          $('listView' + i + 'Header').appendChild(icon);
+          $('listView_' + i + 'Header').appendChild(icon);
         }
 
         // Create the 'processing' row
@@ -624,12 +624,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
         // If id was passed in, it means a change to the sort
         // if no id, then just re-run the current sort and re-display
         if (typeof id != 'undefined') {
-            s = id.replace('listView', '').replace('Header', '');
+            s = id.replace('listView_', '').replace('Header', '');
             if (this.currSortCol == s) {
                 this.currSortDir = this.currSortDir == 'Desc' ? 'Asc' : 'Desc';
             }
             else {
-                this.currSortDir = cosmo.view.list.sort.defaultDirections[s.toUpperCase()];
+                this.currSortDir = cosmo.view.list.columns[s.toUpperCase()].initSort;
             }
             this.currPageNum = 1;
             this.currSortCol = s;

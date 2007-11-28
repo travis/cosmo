@@ -51,10 +51,4 @@ cosmo.view.list.sort.doSort = function (hash, col, dir) {
     cosmo.view.list.itemRegistry.sort(currSort);
     return true;
 };
-cosmo.view.list.sort.defaultDirections = {
-    TASK: 'Asc',
-    WHO: 'Desc',
-    TITLE: 'Desc',
-    STARTDATE: 'Desc',
-    TRIAGE: 'Desc'
-};
+

@@ -43,6 +43,17 @@ cosmo.view.list.canvasInstance =
 // The list of items -- cosmo.util.hash.Hash obj
 cosmo.view.list.itemRegistry = null;
 
+cosmo.view.list.columnOrder = ['TASK', 'TITLE', 'WHO', 'START', 'TRIAGE'];
+// Note: the 'display' prop is used either as the key for the localized
+// string, or as the key for the image icon in imagegrid.js
+cosmo.view.list.columns = {
+    TASK: { name: 'task', width: '20px', display: 'taskColumn', isIcon: true, initSort: 'Asc' },
+    TITLE: { name: 'title', width: '50%', display: 'Title', isIcon: false, initSort: 'Desc' },
+    WHO: { name: 'who', width: '20%', display: 'UpdatedBy', isIcon: false, initSort: 'Desc' },
+    START: { name: 'start', width: '30%', display: 'StartsOn', isIcon: false, initSort: 'Desc' },
+    TRIAGE: { name: 'triage', width: '36px', display: 'triageStatusColumn', isIcon: true, initSort: 'Desc' }
+};
+
 cosmo.view.list.triageStatusCodeMappings = {
     300: 'Done',
     100: 'Now',
@@ -154,6 +165,7 @@ cosmo.view.list.createItemRegistry = function (arrParam) {
 // require a lot of the same calculations -- don't do them
 // twice
 cosmo.view.list.setSortAndDisplay = function (item) {
+    var cols = cosmo.view.list.columns;
     var sort = {};
     var display = {};
     var data = item.data;
@@ -167,20 +179,20 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     // Task-ness
     var sr = data.getTaskStamp() ? 1 : 0;
     var fm = sr ? '[x]' : '';
-    setVals('task', sr, fm);
+    setVals(cols.TASK.name, sr, fm);
     // Title
     var t = data.getDisplayName();
-    setVals('title', t, t);
+    setVals(cols.TITLE.name, t, t);
     // Who
     var m = data.getModifiedBy();
     m = m ? m.getUserId() : '';
-    setVals('who', m, m);
+    setVals(cols.WHO.name, m, m);
     // Start
     var st = data.getEventStamp();
     var dt = st ? st.getStartDate() : null;
     var sr = dt ? dt.getTime() : 0;
     var fm = dt ? dt.strftime('%b %d, %Y %I:%M %p') : '';
-    setVals('start', sr, fm);
+    setVals(cols.START.name, sr, fm);
     // Triage
     var tr = data.getTriageStatus();
     var rank = parseInt(data.getRank());
@@ -188,7 +200,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
         this.triageStatusCodeMappings[tr]) : '(NONE)';
     tr = (tr * 10000000000);
     tr = tr + rank;
-    setVals('triage', tr, fm);
+    setVals(cols.TRIAGE.name, tr, fm);
 
     // Use two separate keyword/val objs since
     // access to the values are done in totally

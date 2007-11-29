@@ -212,8 +212,6 @@ cosmo.view.cal.canvas = new function () {
          * @return Boolean, true.
          */
         function showHours() {
-            var str = '';
-            var row = '';
             var start = 0;
             var idstr = '';
             var hour = 0;
@@ -228,21 +226,13 @@ cosmo.view.cal.canvas = new function () {
             // Subtract one px for border per asinine CSS spec
             var halfHourHeight = (HOUR_UNIT_HEIGHT/2) - 1;
 
-            var w = '';
-            // Working/non-working hours line
-            w += '<div class="';
-            w += (j < 8 || j > 17) ? 'nonWorkingHours' : 'workingHours';
-            w += '" style="width:' + workingHoursBarWidth +
-                'px; height:' + (halfHourHeight+1) +
-                'px; float:left; font-size:1px;">&nbsp;</div>';
-            var workingHoursLine = '';
-
-            str = '';
             viewDiv = timelineNode;
             timeLineWidth = parseInt(viewDiv.offsetWidth);
             // Subtract 1 for 1px border
             timeLineWidth = timeLineWidth - workingHoursBarWidth - 1;
 
+            var str = '';
+            var row = '';
             // Timeline of hours on left
             for (var j = 0; j < 24; j++) {
                 hour = j == 12 ? _('App.Noon') : cosmo.datetime.util.hrMil2Std(j);
@@ -260,7 +250,6 @@ cosmo.view.cal.canvas = new function () {
                 row += '<div class="hourDivSubLeft">' + hour +
                     meridian + '</div>';
                 row += '</div>\n';
-                row += workingHoursLine;
                 row += '<br class="clearAll"/>'
 
                 idstr = i + '-' + j + '30';
@@ -278,7 +267,6 @@ cosmo.view.cal.canvas = new function () {
                 }
                 row += ' width:' + timeLineWidth +
                     'px; float:left;">&nbsp;</div>\n';
-                row += workingHoursLine;
                 row += '<br class="clearAll"/>'
 
                 str += row;
@@ -1579,7 +1567,7 @@ cosmo.view.cal.canvas.Canvas = function (p) {
             (this.width - HOUR_LISTING_WIDTH - SCROLLBAR_SPACER_WIDTH)/7 );
 
         // Bolt onto older rendering code in cosmo.view.cal.canvas
-        // FIXME: This is a temporary shim until we can convert pull
+        // FIXME: This is a temporary shim until we can pull
         // rendering-specific functions into cosmo.view.cal.canvas.Canvas,
         // leaving only the utility functions in cosmo.view.cal.canvas
         // ==============

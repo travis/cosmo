@@ -119,9 +119,9 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
         else {
             queryDate = goToNav;
         }
-        cosmo.app.pim.currDate = queryDate;
     }
     else {
+        // Default on app load is to get the current week
         queryDate = cosmo.app.pim.currDate;
     }
     _cal.setQuerySpan(queryDate);

@@ -20,20 +20,20 @@ dojo.require("cosmo.model.exception");
 
 dojo.declare("cosmo.ui.DetailFormConverter", null, {
    _item: null,
-   
+
    initializer: function(item){
        this._item = item;
        this._errors = new cosmo.ui.ErrorList();
    },
-   
+
    createDelta: function(){
-     	if (cosmo.ui.detail.item.data.getItemUid() != this._item.getItemUid()){
-     		throw new cosmo.model.exception.DetailItemNotDeltaItemException(
-     			"Item in detail view doesn't match item in Delta.")
-     	}
-   
+      if (cosmo.ui.detail.item.data.getItemUid() != this._item.getItemUid()){
+          throw new cosmo.model.exception.DetailItemNotDeltaItemException(
+          "Item in detail view doesn't match item in Delta.")
+      }
+
         var delta = new cosmo.model.Delta(this._item);
-        
+
         //get the form values for the "main" section
         this._populateDelta(delta, "note", true);
         for (var x = 0; x < cosmo.ui.detail.itemStamps.length; x++){
@@ -41,21 +41,21 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var hasFields = cosmo.ui.detail.itemStamps[x].hasBody;
             this._populateDelta(delta, stampName.toLowerCase(),hasFields);
         }
-     
+
         if (cosmo.ui.detail.isStampEnabled("event")){
             this._populateAnyTimeAtTime(delta);
         }
-        
+
         this._populateDeltaFromTriageWidget(delta);
         if (this._errors.isEmpty()){
             this._performInterPropertyValidations(delta);
         }
-        
+
         this._removeRecurrenceChangeIfUnsupported(delta);
         delta.deltafy(true);
-        return [delta, this._errors.toString()];  
+        return [delta, this._errors.toString()];
     },
-    
+
     _populateDelta: function(delta, stampName, hasFields){
         var map =  this._stampPropertiesMaps[stampName];
 
@@ -68,14 +68,14 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 delta.addAddedStamp(stampName);
             }
         }
-        
+
         if (!hasFields){
             return;
         }
 
-        var form = stampName == "note" ? cosmo.ui.detail.getMainForm() 
+        var form = stampName == "note" ? cosmo.ui.detail.getMainForm()
                                        : cosmo.ui.detail.getStampForm(stampName);
-        
+
         for (var propertyName in map){
             var propertyInfo = map[propertyName];
             var valueAndErrors = this[propertyInfo.type + "Converter"](form, propertyInfo, propertyName);
@@ -98,7 +98,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             }
         }
     },
-    
+
     _populateDeltaFromTriageWidget: function(delta){
         var formTriageStatus = parseInt(cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.markupBar.triageSection.currTriageStatus);
         if (formTriageStatus != this._item.getTriageStatus()){
@@ -106,8 +106,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             delta.addProperty("autoTriage", false);
         }
      },
-     
-     _getFormValue: cosmo.util.html.getFormValue, 
+
+     _getFormValue: cosmo.util.html.getFormValue,
 
     _stampPropertiesMaps: {
         note: {
@@ -118,7 +118,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                            field: "noteTitle",
             }
         },
-        
+
         event: {
             startDate: {
                 type: "date",
@@ -128,7 +128,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 tzIdField: "tzId",
                 tzRegionField: "tzRegion",
                 allDayField: "eventAllDay",
-                validation: [["required"]]               
+                validation: [["required"]]
             },
 
             endDate: {
@@ -139,31 +139,31 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 tzIdField: "tzId",
                 tzRegionField: "tzRegion",
                 allDayField: "eventAllDay",
-                validation: [["required"]]               
+                validation: [["required"]]
             },
-            
+
             "location": {
                 type: "string",
                 field: "eventLocation"},
-            
+
             status: {
                 type: "string",
-                field: "eventStatus"  
+                field: "eventStatus"
             },
-            
+
             allDay: {
                 type: "boolean",
                 field: "eventAllDay"
             },
-            
+
             rrule: {
                 type: "recurrenceRule",
                 frequencyField: "recurrenceInterval",
                 endDateField: "recurrenceEnd",
-                tzIdField: "tzId"                
+                tzIdField: "tzId"
             }
         },
-        
+
         mail: {
             fromAddress: {
                   type: "string",
@@ -181,19 +181,19 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                   type: "string",
                   field: "mailBcc"}
         },
-        
+
         task: {
         }
     },
-    
+
     stringConverter: function(form, info){
         return [this._getFormValue(form, info.field),null]
-     }, 
-     
-     booleanConverter: function(form, info){
-         return [this._getFormValue(form, info.field) == "1", null]  
      },
-     
+
+     booleanConverter: function(form, info){
+         return [this._getFormValue(form, info.field) == "1", null]
+     },
+
     dateConverter: function(form, info, propertyName){
         //this code adapted from mde's original cal_form code.
         var dateFieldValue = this._getFormValue(form, info.dateField);
@@ -209,7 +209,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         if (!dateFieldValue){
             return [null,null];
         }
-        
+
         if (tzRegionFieldValue && !tzIdFieldValue){
             errors.push(new cosmo.ui.Error(null, "App.Error.NoTzId"));
         }
@@ -220,13 +220,13 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         } else {
             var jsDate  = new Date(dateFieldValue);
         }
-        
+
         if (timeFieldValue){
             var err = cosmo.util.validate.timeFormat(timeFieldValue);
             if (err){
                 errors.push(new cosmo.ui.Error(propertyName, null, err));
             }
- 
+
             var err = cosmo.util.validate.required(meridianFieldValue);
             if (err){
                 errors.push(new cosmo.ui.Error(propertyName, null, err));
@@ -234,7 +234,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             var t = cosmo.datetime.util.parseTimeString(timeFieldValue);
             var h = cosmo.datetime.util.hrStd2Mil(t.hours, (meridianFieldValue == "pm"));
             var m = t.minutes;
-            
+
             if (!errors.length) {
                 jsDate.setHours(h, m);
             }
@@ -242,8 +242,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
 
         if (errors.length){
             return [null, errors];
-        } 
-        
+        }
+
         var dt = new cosmo.datetime.Date();
         if (tzIdFieldValue && timeFieldValue){
             dt.tzId = tzIdFieldValue;
@@ -252,42 +252,42 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
         } else {
             dt.tzId = null;
             dt.utc = false;
-            dt.updateFromUTC(jsDate.getTime());            
+            dt.updateFromUTC(jsDate.getTime());
         }
         dt.utc = false;
         return [dt, null];
-    }, 
-    
+    },
+
     requiredValidator: function(value, propertyName){
         if (!value){
             var propertyDisplayName = _("Main.DetailForm." + propertyName);
-            return new cosmo.ui.Error(null, 
-                                      null,  
+            return new cosmo.ui.Error(null,
+                                      null,
                                       '"' + propertyDisplayName +'" is a required field.');
 
         }
         return null;
     },
-    
+
     recurrenceRuleConverter: function(form, info, propertyName){
         var propertyDisplayName = _("Main.DetailForm." + propertyName);
         var frequencyFieldValue = this._getFormValue(form, info.frequencyField);
         var endDateFieldValue = this._getFormValue(form, info.endDateField);
         endDateFieldValue = endDateFieldValue == "mm/dd/yyyy" ? null : endDateFieldValue;
-        
+
         var errors = [];
-        
+
         if (!frequencyFieldValue){
             return [null, null];
         }
-        
+
         var endDate = null;
         if (endDateFieldValue){
             var err = cosmo.util.validate.dateFormat(endDateFieldValue);
 
             if (err) {
                 return [null, [new cosmo.ui.Error(propertyName, null, "ending date field: " + err)]];
-            } 
+            }
 
             var jsDate= new Date(endDateFieldValue);
             endDate = new cosmo.datetime.Date(jsDate.getFullYear(), jsDate.getMonth(), jsDate.getDate());
@@ -296,27 +296,27 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 endDate.tzId = tzIdFieldValue;
             }
         }
-        
+
         return [new cosmo.model.RecurrenceRule({
             frequency: frequencyFieldValue,
             endDate: endDate
         }),null];
 
     },
-    
+
     _validateValue: function(value, validationInfo, propertyName){
-        return this[validationInfo[0]+"Validator"](value, propertyName, validationInfo[1]);    
+        return this[validationInfo[0]+"Validator"](value, propertyName, validationInfo[1]);
     },
-    
+
     _performInterPropertyValidations: function (delta){
         var eventStampProperties = delta.getStampProperties("event");
-        
+
         if(eventStampProperties){
-            if(eventStampProperties.endDate 
-                && (eventStampProperties.startDate.getTime() 
+            if(eventStampProperties.endDate
+                && (eventStampProperties.startDate.getTime()
                 > eventStampProperties.endDate.getTime())){
 
-                this._errors.addError(new cosmo.ui.Error(null, null, 
+                this._errors.addError(new cosmo.ui.Error(null, null,
                                                          '"Starts" and "Ends" time fields: '
                                                          + 'Event cannot end before it starts.'));
                 return;
@@ -332,14 +332,14 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 }
             }
         }
-    }, 
-    
+    },
+
     _populateAnyTimeAtTime: function(delta){
         if (delta.getStampProperty("event", "allDay")){
-               delta.addStampProperty("event", "anyTime", false) 
+               delta.addStampProperty("event", "anyTime", false)
                return "";
         }
-        
+
         var form = cosmo.ui.detail.getStampForm("event");
         var startTimeFieldValue = this._getFormValue(form, "startTime");
         startTimeFieldValue = startTimeFieldValue == "hh:mm" ? null : startTimeFieldValue;
@@ -352,7 +352,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
            } else {
                this._errors.addError(new cosmo.ui.Error(null,"App.Error.NoEndTimeWithoutStartTime"));
            }
-        } else {           
+        } else {
            var deltaEndDate = delta.getStampProperty("event", "endDate");
            var deltaStartDate = delta.getStampProperty("event", "startDate");
            if (!endTimeFieldValue || (deltaStartDate && deltaStartDate.equals(deltaEndDate))){
@@ -366,7 +366,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
            }
         }
         return "";
-        
+
     },
     _removeRecurrenceChangeIfUnsupported: function(delta){
         if (this._item.hasRecurrence() && delta.getStampProperty("event", "rrule") == null){
@@ -374,7 +374,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             if (!es.getRrule().isSupported()){
                 delta.removeStampProperty("event", "rrule");
             }
-        }  
+        }
     }
 });
 
@@ -439,16 +439,16 @@ dojo.declare("cosmo.ui.ErrorList", null, {
         var s = "";
         var self = this;
          dojo.lang.map(this._errorsList, function(error) {
-            var property = error.property 
-                ? self._getPropertyDisplayName(error.property) 
+            var property = error.property
+                ? self._getPropertyDisplayName(error.property)
                 : null;
-            var errorMessage = error.errorMessage 
+            var errorMessage = error.errorMessage
                 || _.apply(null, dojo.lang.unnest(error.errorKey, error.params));
-            var message = property 
+            var message = property
                  ?  ("'" + property + "': "
                      + " " + errorMessage)
                  : errorMessage;
-                
+
             s += message + "<br>";
         });
         return s;
@@ -458,5 +458,5 @@ dojo.declare("cosmo.ui.ErrorList", null, {
         return _("Main.DetailForm." + propertyName);
     }
 
-    
+
 })

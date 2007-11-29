@@ -85,7 +85,10 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                 //we were able to convert the string from the form into a value, but
                 //there are other validations to perform?
                 var validationInfo = propertyInfo.validation;
-                errors.push(this._validateValue(value, validationInfo, propertyName));
+                var err = this._validateValue(value, validationInfo, propertyName);
+                if (err) {
+                    errors.push(err);
+                }
             }
             if (!errors.length){
                 if (stampName == "note"){

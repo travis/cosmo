@@ -97,9 +97,16 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         BaseEventStamp eventStamp = getEventStamp();
         NoteItem note = (NoteItem) getItem();
         
+        // keep track of whether alarm existed before
+        boolean newAlarm = false;
+        // keep track of whether trigger field is present
+        boolean triggerPresent = false;
+        
         // create display alarm if it doesn't exist
-        if(eventStamp.getDisplayAlarm()==null)
+        if(eventStamp.getDisplayAlarm()==null) {
             eventStamp.creatDisplayAlarm();
+            newAlarm = true;
+        }
             
         for (EimRecordField field : record.getFields()) {
             if(field.getName().equals(FIELD_DESCRIPTION)) {
@@ -112,6 +119,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                 }
             }
             else if(field.getName().equals(FIELD_TRIGGER)) {
+                triggerPresent = true;
                 if(field.isMissing()) {
                     handleMissingAttribute("displayAlarmTrigger");
                 }
@@ -139,7 +147,9 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                         Dur dur = DurationFormat.getInstance().parse(value);
                         eventStamp.setDisplayAlarmDuration(dur);
                     } catch (ParseException e) {
-                        throw new EimValidationException("Illegal duration", e);
+                        throw new EimValidationException(
+                                "Illegal duration for item "
+                                        + record.getRecordSet().getUuid(), e);
                     }
                 }
             }
@@ -159,12 +169,12 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
                         + " found in " + record.getNamespace());
         }
         
-        // Make sure trigger is present and if not, delete the alarm
-        if(eventStamp.getDisplayAlarm()!=null) {
-            if(!isModification() && eventStamp.getDisplayAlarmTrigger()==null) {
-                eventStamp.removeDisplayAlarm();
-            }
-        }
+        // Make sure trigger is present for new alarms
+        if (newAlarm && !triggerPresent)
+            throw new EimValidationException(
+                    "Trigger must be specified for item "
+                            + record.getRecordSet().getUuid());
+
     }
     
     public void applyRecordNonEvent(EimRecord record) throws EimSchemaException {

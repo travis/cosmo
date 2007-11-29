@@ -23,9 +23,11 @@ import net.fortuna.ical4j.model.Period;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.EimRecord;
+import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.IntegerField;
 import org.osaf.cosmo.eim.TextField;
 import org.osaf.cosmo.eim.schema.BaseApplicatorTestCase;
+import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
@@ -74,6 +76,23 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
 
         Assert.assertNull(noteItem.getReminderTime());
         Assert.assertNull(eventStamp.getDisplayAlarm());
+    }
+    
+    public void testApplyBogusRecord() throws Exception {
+        NoteItem noteItem = new MockNoteItem();
+        EventStamp eventStamp = new MockEventStamp(noteItem);
+        eventStamp.createCalendar();
+        eventStamp.setStartDate(new DateTime(true));
+        noteItem.addStamp(eventStamp);
+        
+        EimRecord record = makeTestRecordNoTrigger();
+
+        DisplayAlarmApplicator applicator =
+            new DisplayAlarmApplicator(noteItem);
+        try {
+            applicator.applyRecord(record);
+            Assert.fail("able to apply bogus record");
+        } catch (EimValidationException e) {}
     }
     
     public void testApplyFieldNonEvent() throws Exception {
@@ -136,6 +155,21 @@ public class DisplayAlarmApplicatorTest extends BaseApplicatorTestCase
 
         return record;
     }
+    
+    private EimRecord makeTestRecordNoTrigger() {
+        EimRecordSet set = new EimRecordSet();
+        set.setUuid("bogus");
+        EimRecord record = new EimRecord(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM);
+
+        record.addField(new TextField(FIELD_DESCRIPTION, "My alarm"));
+        record.addField(new TextField(FIELD_DURATION, "P1W"));
+        record.addField(new IntegerField(FIELD_REPEAT, 1));
+
+        record.setRecordSet(set);
+        
+        return record;
+    }
+    
     
     private EimRecord makeTestNoneRecord() {
         EimRecord record = new EimRecord(PREFIX_DISPLAY_ALARM, NS_DISPLAY_ALARM);

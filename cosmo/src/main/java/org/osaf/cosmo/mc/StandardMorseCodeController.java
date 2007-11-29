@@ -201,6 +201,8 @@ public class StandardMorseCodeController implements MorseCodeController {
             collection = contentService.createCollection(parent, collection, children);
         } catch (IcalUidInUseException e) {
             throw new UidConflictException(e);
+        } catch (ModelValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
        
         return new PubCollection(collection);
@@ -377,6 +379,8 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new StaleCollectionException(uid);
         } catch (IcalUidInUseException e) {
             throw new UidConflictException(e);
+        } catch (ModelValidationException e) {
+            throw new ValidationException(e.getMessage());
         }
 
         return new PubCollection(collection);

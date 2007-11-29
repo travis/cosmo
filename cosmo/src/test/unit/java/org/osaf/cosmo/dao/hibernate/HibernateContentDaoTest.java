@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -1374,6 +1375,91 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertNotNull(note1);
         Assert.assertEquals("changed", note1.getDisplayName());
         Assert.assertNull(note2);
+    }
+    
+    public void testContentDaoUpdateCollectionWithMods() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        NoteItem note1 = generateTestNote("test1", "testuser");
+        NoteItem note2 = generateTestNote("test2", "testuser");
+
+        note1.setUid("1");
+        note2.setUid("1:20070101");
+        
+        note2.setModifies(note1);
+        
+        Set<ContentItem> items = new LinkedHashSet<ContentItem>();
+        items.add(note2);
+        items.add(note1);
+
+        
+        // should fail because modification is processed before master
+        try {
+            contentDao.updateCollection(root, items);
+            Assert.fail("able to create invalid mod");
+        } catch (ModelValidationException e) {
+        }
+        
+        items.clear();
+      
+        // now make sure master is processed before mod
+        items.add(note1);
+        items.add(note2);
+       
+        contentDao.updateCollection(root, items);
+        
+        note1 = (NoteItem) contentDao.findContentByUid("1");
+        Assert.assertNotNull(note1);
+        Assert.assertTrue(1==note1.getModifications().size());
+        note2 = (NoteItem) contentDao.findContentByUid("1:20070101");
+        Assert.assertNotNull(note2);
+        Assert.assertNotNull(note2.getModifies());  
+        
+        // now create new collection
+        CollectionItem a = new HibCollectionItem();
+        a.setUid("a");
+        a.setName("a");
+        a.setOwner(user);
+        
+        a = contentDao.createCollection(root, a);
+        
+        // try to add mod to another collection before adding master
+        items.clear();
+        items.add(note2);
+        
+        // should fail because modification is added before master
+        try {
+            contentDao.updateCollection(a, items);
+            Assert.fail("able to add mod before master");
+        } catch (ModelValidationException e) {
+        }
+        
+        items.clear();
+        items.add(note1);
+        items.add(note2);
+        
+        contentDao.updateCollection(a, items);
+        
+        // now create new collection
+        CollectionItem b = new HibCollectionItem();
+        b.setUid("b");
+        b.setName("b");
+        b.setOwner(user);
+        
+        b = contentDao.createCollection(root, b);
+        
+        // only add master
+        items.clear();
+        items.add(note1);
+        
+        contentDao.updateCollection(b, items);
+        
+        // adding master should add mods too
+        clearSession();
+        b = contentDao.findCollectionByUid("b");
+        Assert.assertNotNull(b);
+        Assert.assertEquals(2, b.getChildren().size());
     }
     
     public void testContentDaoUpdateCollectionWithDuplicateIcalUids() throws Exception {

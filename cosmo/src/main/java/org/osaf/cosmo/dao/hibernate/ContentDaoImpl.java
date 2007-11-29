@@ -35,6 +35,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.hibernate.HibCollectionItem;
 import org.osaf.cosmo.model.hibernate.HibItem;
@@ -565,7 +566,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             note.getModifies().addModification(note);
             
             if(!note.getModifies().getParents().contains(parent))
-                throw new IllegalArgumentException("note modification cannot be added to collection that parent note is not in");
+                throw new ModelValidationException("cannot create modification "
+                        + note.getUid() + " in collection " + parent.getUid()
+                        + ", master must be created or added first");
             
             // Add modification to all parents of master
             for (CollectionItem col : note.getModifies().getParents()) {
@@ -622,9 +625,19 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             note.getModifies().updateTimestamp();
             note.getModifies().addModification(note);
             
-            if (!note.getModifies().getParents().equals(parents))
-                throw new IllegalArgumentException(
-                        "Note modification parents must equal the parents of master note");
+            if (!note.getModifies().getParents().equals(parents)) {
+                StringBuffer modParents = new StringBuffer();
+                StringBuffer masterParents = new StringBuffer();
+                for(CollectionItem p: parents)
+                    modParents.append(p.getUid() + ",");
+                for (CollectionItem p : note.getModifies().getParents())
+                    masterParents.append(p.getUid() + ",");
+                throw new ModelValidationException(
+                        "cannot create modification " + note.getUid()
+                                + " in collections " + modParents.toString()
+                                + " because master's parents are different: "
+                                + masterParents.toString());
+            }
         }
         
         for(CollectionItem parent: parents) {
@@ -678,9 +691,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
         // Don't allow note modifications to be added to a collection
         // When a master is added, all the modifications are added
-        if (isNoteModification(item)) {
-            throw new IllegalArgumentException("cannot add modification, only master");
-        }
+        if (isNoteModification(item))
+            throw new ModelValidationException("cannot add modification "
+                    + item.getUid() + " to collection " + collection.getUid()
+                    + ", only master");
         
         if (item instanceof ICalendarItem)
             // verify icaluid is unique within collection

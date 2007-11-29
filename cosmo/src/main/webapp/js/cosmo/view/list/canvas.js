@@ -500,7 +500,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 deferredArray.push(cosmo.app.pim.serv.getDashboardItems(newItemNote));
             }
             deferred = new dojo.DeferredList(deferredArray);
-            cosmo.util.deferred.addStdDLCallback(deferredArray);
+            cosmo.util.deferred.addStdDLCallback(deferred);
             var addExpandedOccurrences = function (results) {
                 var error = cosmo.util.deferred.getFirstError(results);
 

@@ -700,7 +700,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     updates.add(mod);
                 }
                 updates.add(item);
-                item.getModifications().clear();
+                
                 // Update item and remove modifications in one atomic service call
                 contentService.updateContentItems(item.getParents(), updates);
             } 

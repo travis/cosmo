@@ -420,7 +420,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             CollectionItem collection = getEntityFactory().createCollection();
             collection.setUid(content.getUid());
             String name = content.getDisplayName().replaceAll("[\\/\\?\\#\\=\\;]", "_");
-            collection.setName(name);
+            collection.setName(collection.getUid());
             collection.setDisplayName(content.getDisplayName());
             collection.setOwner(user);
 

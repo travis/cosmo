@@ -546,6 +546,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     protected Item copyItem(Item item, CollectionItem parent, boolean deepCopy) {
         
         Item item2 = item.copy();
+        item2.setName(item.getName());
         
         // copy base Item fields
         item2.getParents().add(parent);

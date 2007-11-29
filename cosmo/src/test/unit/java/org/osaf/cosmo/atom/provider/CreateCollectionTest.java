@@ -51,7 +51,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
         CollectionItem stored = helper.findCollection(collection.getUid());
         assertNotNull("Collection not stored", stored);
         assertEquals("Incorrect uid", collection.getUid(), stored.getUid());
-        assertEquals("Incorrect name", collection.getDisplayName(), stored.getName());
+        assertEquals("Incorrect name", collection.getUid(), stored.getName());
         assertEquals("Incorrect display name", collection.getDisplayName(), stored.getDisplayName());
         assertEquals("Incorrect owner", collection.getOwner(), stored.getOwner());
     }    
@@ -73,7 +73,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         CollectionItem stored = helper.findCollection(collection.getUid());
         assertNotNull("Collection not stored", stored);
-        assertEquals("Incorrect name", "test _ _ _ _ _ name", stored.getName());
+        assertEquals("Incorrect name", collection.getUid(), stored.getName());
         assertEquals("Incorrect display name", collection.getDisplayName(), stored.getDisplayName());
     }
 

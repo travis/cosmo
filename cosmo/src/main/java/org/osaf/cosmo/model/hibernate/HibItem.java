@@ -691,7 +691,6 @@ public abstract class HibItem extends HibAuditableObject implements Item {
 
     protected void copyToItem(Item item) {
         item.setOwner(getOwner());
-        item.setName(getName());
         item.setDisplayName(getDisplayName());
         
         // copy attributes

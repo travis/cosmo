@@ -732,7 +732,7 @@ cosmo.view.cal.canvas = new function () {
                     saveSuccess(cmd);
                 }
                 else {
-                    removeEvent(cmd.data);
+                    removeRecurrenceChain(cmd.data.data.getUid());
                 }
                 break;
             case 'remove':
@@ -820,10 +820,8 @@ cosmo.view.cal.canvas = new function () {
      * Remove a cal event object, usually removes the event
      * lozenge as well
      * @param ev CalItem object, the event to select
-     * @param rem Boolean, if explicit false is passed,
-     * don't remove the lozenge along with the CalItem obj
      */
-    function removeEvent(item, rem) {
+    function removeEvent(item) {
         var currColl = cosmo.app.pim.currentCollection;
         cosmo.view.cal.removeItemFromCollectionRegistry(item, currColl);
         if (item.collectionIds.length) {
@@ -836,6 +834,19 @@ cosmo.view.cal.canvas = new function () {
             removeEventFromDisplay(item.id, item);
         }
     }
+
+    function removeRecurrenceChain(id){
+        var currentCollection = cosmo.app.pim.currentCollection;
+        var registry = cosmo.view.cal.collectionItemRegistries[currentCollection.getUid()];
+        var clone = registry.clone();
+        clone.each(function(currentId, item){
+            if (item.data.getUid() == id){
+                registry.removeItem(id);
+                removeEventFromDisplay(item.id, item);
+            }
+        });
+    }
+
     /**
      * Clear the entire itemRegistry, usually clear the
      * lozenges from the canvas as well
@@ -990,7 +1001,7 @@ cosmo.view.cal.canvas = new function () {
             var expandDeferred1 = cosmo.app.pim.serv.expandRecurringItem(data.getMaster(),
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd)
             var deferredArray = [expandDeferred1];
-            if (saveType == recurOpts.ALL_FUTURE_EVENTS){
+            if (saveType == recurOpts.ALL_FUTURE_EVENTS) {
               deferredArray.push(cosmo.app.pim.serv.expandRecurringItem(newItemNote,
                 cosmo.view.cal.viewStart,cosmo.view.cal.viewEnd));
             }

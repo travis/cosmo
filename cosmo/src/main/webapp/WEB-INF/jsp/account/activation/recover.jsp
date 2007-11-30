@@ -19,7 +19,7 @@
 --%>
 
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<div dojoType="cosmo:recover" prefix="Account.RecoverActivation." recoverFunctionModule="cosmo.cmp"
+<cosmo:recover prefix="Account.RecoverActivation." recoverFunctionModule="cosmo.cmp"
                recoverFunctionName="sendActivation"/>
 
 

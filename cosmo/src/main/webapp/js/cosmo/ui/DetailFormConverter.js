@@ -118,7 +118,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
                   field: "noteDescription"},
 
             displayName: { type : "string",
-                           field: "noteTitle",
+                           field: "noteTitle"
             }
         },
 

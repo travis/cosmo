@@ -126,14 +126,14 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             // Base layout
             // ===============================
             this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
-            
+
             // Display the default view
             this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
             if (!cosmo.app.pim.currentCollection) {
                 cosmo.app.hideMask();
                 cosmo.app.showErr(_("Error.NoCollections"));
             } else {
-                
+
                 // Show errors for deleted subscriptions -- deletedSubscriptions
                 // is a private var populated in the loadCollections method
                 if (deletedSubscriptions && deletedSubscriptions.length > 0){
@@ -263,7 +263,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             }
             return lozengeColors;
         };
-        
+
         var collectionsLoadedDeferred = null;
 
         //If we received a ticket key, use the collectionUrl in params to load a collection
@@ -334,7 +334,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                 coll.colors = calcColors(hue);
                 this.collections.addItem(coll.getUid(), coll);
             }
-            
+
             if (params.collectionUid){
                 this.currentCollection =
                     this.collections.getItem(params.collectionUid);
@@ -411,8 +411,8 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         } else {
             loadCollectionsDeferred = new dojo.Deferred();
             loadCollectionsDeferred.callback();
-        }                                           
-        
+        }
+
         loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
             // If we had an originally selected collection
             if (currentCollection) {

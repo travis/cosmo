@@ -186,13 +186,16 @@ cosmo.view.list.canvas.Canvas = function (p) {
             }
         }
     };
-    this.handleSelectionChange = function (e, p, discardUnsavedChanges) {
+    this.handleSelectionChange = function (e, target, discardUnsavedChanges) {
         var args = Array.prototype.slice.call(arguments);
         var writeable = cosmo.app.pim.currentCollection.isWriteable();
         // Original selection
         var origSelection = self.getSelectedItem();
+        // Paranoia check -- bail if there's no target, or the target
+        // has no id -- this shouldn't ever happen, but it does in IE7
+        if (!target || !target.id) { return false; }
         // New selection
-        var id = p.id.replace('listView_item', '');
+        var id = target.id.replace('listView_item', '');
         var item = this.view.itemRegistry.getItem(id);
 
         if ((!origSelection) || (origSelection.id != item.id)) {
@@ -227,7 +230,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             }
 
             // The new selection
-            var ch = p.childNodes;
+            var ch = target.childNodes;
             for (var i = 0; i < ch.length; i++) {
                 // Don't apply selection effect to triage col
                 if (ch[i].className.indexOf('listViewTriage') == -1) {

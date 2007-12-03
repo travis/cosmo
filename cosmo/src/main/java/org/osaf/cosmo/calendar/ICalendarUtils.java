@@ -87,6 +87,19 @@ public class ICalendarUtils {
     }
     
     /**
+     * Create a base Calendar containing no components.
+     * @return base Calendar
+     */
+    public static Calendar createBaseCalendar() {
+        Calendar cal = new Calendar();
+        cal.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        cal.getProperties().add(Version.VERSION_2_0);
+        cal.getProperties().add(CalScale.GREGORIAN);
+        
+        return cal;
+    }
+    
+    /**
      * Update the SUMMARY property on a component.
      * @param text SUMMARY value to update.  If null, the SUMMARY property
      *        will be removed

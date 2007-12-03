@@ -1,0 +1,13 @@
+{"params": {"validator": "1", "id": "listViewGoToPage"}, "method": "asserts.assertValue"}
+{"params": {"id": "listViewPageNum"}, "method": "asserts.assertNode"}
+{"params": {"validator": "3", "id": "listViewPageNum"}, "method": "asserts.assertText"}
+{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.listViewPager.nextButton.widgetId"}, "method": "click"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"validator": "2", "id": "listViewGoToPage"}, "method": "asserts.assertValue"}
+{"params": {"validator": "3", "id": "listViewPageNum"}, "method": "asserts.assertText"}
+{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.listViewPager.nextButton.widgetId"}, "method": "click"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"validator": "3", "id": "listViewGoToPage"}, "method": "asserts.assertValue"}
+{"params": {"validator": "3", "id": "listViewPageNum"}, "method": "asserts.assertText"}
+{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.listViewPager.prevButton.widgetId"}, "method": "click"}
+{"params": {"validator": "2", "id": "listViewGoToPage"}, "method": "asserts.assertValue"}

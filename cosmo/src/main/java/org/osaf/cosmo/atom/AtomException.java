@@ -15,19 +15,43 @@
  */
 package org.osaf.cosmo.atom;
 
+import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Document;
+import org.apache.abdera.protocol.error.Error;
+
 /**
  * An unclassified Atom exception.
  */
-public class AtomException extends Exception {
+public class AtomException extends Exception implements AtomConstants {
 
-    /** */
+    private int code;
+
     public AtomException(String message) {
-        super(message);
+        this(message, null);
     }
 
-    /** */
     public AtomException(String message,
                          Throwable cause) {
+        this(500, message, cause);
+    }
+
+    public AtomException(int code,
+                         Throwable cause) {
+        this(code, cause.getMessage(), cause);
+    }
+
+    public AtomException(int code,
+                         String message,
+                         Throwable cause) {
         super(message, cause);
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public Document<Error> createDocument(Abdera abdera) {
+        return Error.create(abdera, code, getMessage()).getDocument();
     }
 }

@@ -27,6 +27,7 @@ import javax.activation.MimeType;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Base;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Element;
@@ -48,6 +49,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.atom.AtomException;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.model.AuditableObject;
 import org.osaf.cosmo.model.EntityFactory;
@@ -370,6 +372,11 @@ public abstract class BaseProvider extends AbstractProvider
         return createResponseContext(204);
     }
 
+    protected ResponseContext conflict(RequestContext request,
+                                       AtomException e) {
+        return returnBase(e.createDocument(abdera), e.getCode(), null);
+    }
+
     protected ResponseContext preconditionfailed(Abdera abdera,
                                                  RequestContext request,
                                                  String reason) {
@@ -443,6 +450,14 @@ public abstract class BaseProvider extends AbstractProvider
         rc.setMustRevalidate(true);
         rc.setExpires(new java.util.Date());
         
+        return rc;
+    }
+
+    protected ResponseContext returnBase(Base base, 
+                                         int status,
+                                         Date lastModified) {
+        ResponseContext rc = super.returnBase(base, status, lastModified);
+        rc.setWriter(abdera.getWriterFactory().getWriter("PrettyXML"));
         return rc;
     }
 }

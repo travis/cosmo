@@ -50,6 +50,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.atom.UidConflictException;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
@@ -67,6 +68,7 @@ import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
+import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
@@ -184,6 +186,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return badrequest(getAbdera(), request, reason);
         } catch (UidInUseException e) {
             return conflict(getAbdera(), request, "Uid already in use");
+        } catch (IcalUidInUseException e) {
+            return conflict(request, new UidConflictException(e));
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
@@ -272,6 +276,8 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             else
                 reason = reason + e.getMessage();
             return badrequest(getAbdera(), request, reason);
+        } catch (IcalUidInUseException e) {
+            return conflict(request, new UidConflictException(e));
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);

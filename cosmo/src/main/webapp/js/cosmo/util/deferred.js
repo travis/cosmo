@@ -41,6 +41,7 @@ cosmo.util.deferred = {
                               secondaryMessage || _("Error.DeferredSecondary"), result[1]);
                 }
             }
+            return dResultList;
         });
     },
     

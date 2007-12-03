@@ -163,7 +163,7 @@
       <param-name>methods</param-name>
       <param-value>POST,PUT,DELETE,MKCALENDAR</param-value>
       <param-name>exceptions</param-name>
-      <param-value>org.springframework.dao.ConcurrencyFailureException</param-value>
+      <param-value>org.springframework.dao.ConcurrencyFailureException,org.springframework.dao.DataIntegrityViolationException</param-value>
     </init-param>
   </filter>
   <filter-mapping>

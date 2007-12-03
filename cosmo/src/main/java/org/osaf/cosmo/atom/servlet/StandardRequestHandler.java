@@ -26,7 +26,7 @@ import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.TargetType;
 import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
-import org.apache.abdera.protocol.server.impl.AbstractRequestHandler;
+import org.apache.abdera.protocol.server.impl.DefaultRequestHandler;
 import org.apache.abdera.util.EntityTag;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,7 +41,7 @@ import org.osaf.cosmo.atom.provider.ExtendedProvider;
  * Extends {@link DefaultRequestHandler} to provide Cosmo-specific
  * behaviors.
  */
-public class StandardRequestHandler extends AbstractRequestHandler
+public class StandardRequestHandler extends DefaultRequestHandler
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(StandardRequestHandler.class);

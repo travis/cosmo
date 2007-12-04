@@ -531,7 +531,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 // the edited ocurrence's master
                 var note = item.data.getMaster();
                 var id = note.getItemUid();
-                var newItem = new cosmo.view.list.ListItem(id, null, note);
+                var newItem = new cosmo.view.list.ListItem();
+                newItem.data = note;
+                newItem.id = id;
                 self.view.itemRegistry.setItem(id, newItem);
                 // Use the updated item from here forward -- set its precalc'd
                 // sort/display props, and point the selection at it in

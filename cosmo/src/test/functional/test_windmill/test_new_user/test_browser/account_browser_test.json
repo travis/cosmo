@@ -1,18 +1,3 @@
-{"params": {"jsid": "{$calView}"},  "method": "click"}
-{"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "hourDiv1-1000"},  "method": "doubleClick"}
-{"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "hourDiv1-1200"},  "method": "doubleClick"}
-{"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "hourDiv4-1200"},  "method": "doubleClick"}
-{"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"link": "Settings"},  "method": "click"}
-{"params": {"milliseconds": "2000"},  "method": "waits.sleep"}
-{"params": {"jsid": "{$dialogTab1}"},  "method": "click"}
-{"params": {"id": "showAccountBrowser"},  "method": "check"}
-{"params": {"jsid": " {$btnsRight0}"},  "method": "click"}
-{"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"url": "http:\/\/qacosmo.osafoundation.org\/browse\/{$random}"},  "method": "open"}
 {"params": {"link": "[browse]"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"link": "[browse]"},  "method": "click"}
@@ -24,4 +9,3 @@
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"link": "[remove]"},  "method": "click"}
 {"params": {"milliseconds": ""},  "method": "waits.sleep"}
-{"params": {"link": "Log out"},  "method": "click"}

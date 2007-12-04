@@ -1,0 +1,13 @@
+{"params": {"link": "Settings"}, "method": "click"}
+{"params": {"id": "modalDialogContent"}, "method": "waits.forElement"}
+{"params": {"id": "password"}, "method": "click"}
+{"params": {"text": "bobber", "id": "password"}, "method": "type"}
+{"params": {"text": "bobbers", "id": "confirm"}, "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
+{"params": {"id": "modalDialogContent"}, "method": "waits.forElement"}
+{"params": {"validator": "Passwords do not match.", "id": "modalDialogContent"}, "method": "asserts.assertText"}
+{"params": {"id": "confirm"}, "method": "click"}
+{"params": {"text": "bobber", "id": "confirm"}, "method": "type"}
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}

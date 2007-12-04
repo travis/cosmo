@@ -22,6 +22,7 @@ create_user_json = """{"method": "click", "params": {"link" : "Create a new acco
 {"params": {"text": "tester", "id": "password"},  "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
 {"method": "waits.forElement", "params": {"id": "modalDialogPrompt", "timeout": 40000}}
+{"method": "waits.forElement", "params": {"id": "modalDialogPrompt"}}
 {"params": {"validator": "You have successfully created your Chandler Server account.", "id": "modalDialogPrompt"},  "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"},  "method": "click"}"""
 
@@ -44,12 +45,15 @@ create_user_json_lab = """{"params": {"link": "Sign up."},  "method": "click"}
 {"params": {"validator": "Passwords do not match.", "id": "modalDialogContent"},  "method": "asserts.assertText"}
 {"params": {"text": "tester", "id": "password"},  "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
+{"method": "waits.forElement", "params": {"id": "modalDialogPrompt"}}
 {"params": {"validator": "You have successfully created your Chandler Hub account.", "id": "modalDialogPrompt"},  "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"},  "method": "click"}"""
 
 login_with_user_json = """{"method": "type", "params": {"id" : "loginDialogUsernameInput", "text": "{$random}"}}
+{"params": {"milliseconds": 500}, "method": "waits.sleep"}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "testers"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
+{"params": {"milliseconds": 500}, "method": "waits.sleep"}
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}

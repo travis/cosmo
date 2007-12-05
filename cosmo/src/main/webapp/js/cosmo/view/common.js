@@ -161,7 +161,7 @@ cosmo.view.viewBase = new function () {
                     // Currently selected item, if any
                     var item = this.canvasInstance.getSelectedItem();
                     if (item &&
-                        cosmo.app.pim.currentCollection.isWriteable() &&
+                        cosmo.app.pim.getSelectedCollection().isWriteable() &&
                         isValidEventSource(e, elem)) {
                         switch (e.keyCode) {
                             // Enter
@@ -184,17 +184,17 @@ cosmo.view.viewBase = new function () {
 
 cosmo.view.canvasBase = new function () {
     this.getSelectedItem = function () {
-        var key = cosmo.app.pim.currentCollection.getUid();
+        var key = cosmo.app.pim.getSelectedCollectionId();
         var id = this.selectedItemIdRegistry[key];
         return this.view.itemRegistry.getItem(id) || null;
     };
     this.getSelectedItemCacheCopy = function () {
-        var key = cosmo.app.pim.currentCollection.getUid();
+        var key = cosmo.app.pim.getSelectedCollectionId();
         var id = this.selectedItemIdRegistry[key];
         return this.selectedItemCache[id] || null;
     };
     this.setSelectedItem = function (p) {
-        var key = cosmo.app.pim.currentCollection.getUid();
+        var key = cosmo.app.pim.getSelectedCollectionId();
         var id = '';
         var item = null;
         if (typeof p == 'string') {
@@ -210,12 +210,12 @@ cosmo.view.canvasBase = new function () {
         return true;
     };
     this.clearSelectedItem = function () {
-        var key = cosmo.app.pim.currentCollection.getUid();
+        var key = cosmo.app.pim.getSelectedCollectionId();
         this.selectedItemIdRegistry[key] = '';
         return true;
     };
     this.getSelectedItemId = function () {
-        var key = cosmo.app.pim.currentCollection.getUid();
+        var key = cosmo.app.pim.getSelectedCollectionId();
         var id = this.selectedItemIdRegistry[key];
         return id;
     };
@@ -299,20 +299,22 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
 
 cosmo.view.displayViewFromCollections = function (c) {
     var newCollection = c || null;
-    var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
-    // Publish this through a setTimeout call to
-    // avoid hanging the UI thread
     if (newCollection) {
-        cosmo.app.pim.currentCollection = newCollection;
+        cosmo.app.pim.setSelectedCollection(newCollection);
     }
+    // Show the 'loading' message if there's a selected collection
+    // to load data from
+    if (cosmo.app.pim.getSelectedCollection()) {
+        var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+        loading.show();
+    }
+    // Wrap in setTimeout so we don't lock up the UI
+    // thread during the publish operation
     var f = function () { dojo.event.topic.publish('/calEvent', {
         action: 'loadCollection', opts: { loadType: 'changeCollection',
         collection: newCollection }, data: {}
     }); };
-    loading.show();
-    // Wrap in setTimeout so we don't lock up the UI
-    // thread during the publish operation --
-    // Make the timeout value a bit higher to
+    // Make the timeout value greater than zero to
     // ensure that the 'loading' status message appears
     setTimeout(f, 35);
 };

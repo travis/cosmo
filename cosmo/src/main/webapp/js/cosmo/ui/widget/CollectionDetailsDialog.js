@@ -216,6 +216,10 @@ dojo.widget.HtmlWidget, function(){
                             // if necessary, and update the view
                             var reloadDeferred = cosmo.app.pim.reloadCollections(collectionToDelete);
                             reloadDeferred.addCallback(function(){
+                                var f = function () {
+                                    cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage);
+                                }
+                                setTimeout(f, 0);
                                 cosmo.app.hideDialog();
                             });
                             return reloadDeferred;

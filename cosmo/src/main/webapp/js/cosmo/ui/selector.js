@@ -70,7 +70,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 else {
                     // Don't apply rollover fu to selected item
                     var id = targ.id.replace('collectionSelectorItemSel_', '');
-                    if (id == cosmo.app.pim.currentCollection.getUid()) {
+                    if (id == cosmo.app.pim.getSelectedCollection().getUid()) {
                         return false;
                     }
                     var addRemoveKey = isOver ? 'add' : 'remove';
@@ -120,7 +120,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         }
         var _this = this;
         var collections = cosmo.app.pim.collections;
-        var currColl = cosmo.app.pim.currentCollection;
+        var currColl = cosmo.app.pim.getSelectedCollection();
         var container = _createElem('div');
         container.id = 'collectionSelectorContainer';
         var form = _createElem('form');
@@ -183,10 +183,22 @@ cosmo.ui.selector.CollectionSelector = function (p) {
 
         // Clear the DOM
         this.clearAll();
-        collections.each(displayColl);
+        if (collections.length) {
+            collections.each(displayColl);
+        }
+        else {
+            tr = _createElem('tr');
+            td = _createElem('td');
+            td.id = 'collectionSelectorNoCollectionsPrompt'
+            td.appendChild(_createText(_("Main.NewCollectionPrompt")));
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        }
         table.appendChild(tbody);
         this.domNode.style.width = LEFT_SIDEBAR_WIDTH + 'px';
-        container.style.height = COLLECTION_SELECTOR_HEIGHT + 'px';
+        // Allocate space for the "New collection" link at the bottom
+        var scrollingAreaHeight = COLLECTION_SELECTOR_HEIGHT - 16;
+        container.style.height = scrollingAreaHeight + 'px';
         container.appendChild(table);
 
         // Attach event listeners -- event will be delagated
@@ -234,7 +246,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         d.id = "newCollectionDiv";
         var a = _createElem("a");
         a.id = "newCollectionLink";
-        a.appendChild(_createText(_("Main.NewCollection")));
+        a.appendChild(_createText(_("Main.NewCollectionLink")));
 
         dojo.event.connect(a, "onclick", function(){
             var collectionNameDeferred =
@@ -262,9 +274,12 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     return cosmo.app.pim.reloadCollections();
                 });
                 createDeferred.addBoth(function(){
+                    var f = function () {
+                        cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage);
+                    }
+                    setTimeout(f, 0);
                     cosmo.app.hideDialog();
                 });
-
             });
         });
 
@@ -301,7 +316,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
             var prefix = 'collectionSelectorItem';
             if (targ.id.indexOf(prefix) > -1) {
                 var collections = cosmo.app.pim.collections;
-                var currColl = cosmo.app.pim.currentCollection;
+                var currColl = cosmo.app.pim.getSelectedCollection();
                 var currId = currColl.getUid();
                 var newCurrColl = null;;
                 if (targ.id.indexOf(prefix + 'Details_') > -1) {

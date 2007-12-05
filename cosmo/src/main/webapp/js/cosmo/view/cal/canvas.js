@@ -523,7 +523,7 @@ cosmo.view.cal.canvas = new function () {
         if (item.lozenge.getInputDisabled()) {
             return false;
         }
-        var writeable = cosmo.app.pim.currentCollection.isWriteable();
+        var writeable = cosmo.app.pim.getSelectedCollection().isWriteable();
         var c = cosmo.view.cal.canvas;
         var origSelection = c.getSelectedItem();
 
@@ -651,7 +651,7 @@ cosmo.view.cal.canvas = new function () {
             // cosmo.ui.selector. This should be refactored
             // into a method of some kind of abstracted UI-only
             // collection object
-            var currColl = cosmo.app.pim.currentCollection;
+            var currColl = cosmo.app.pim.getSelectedCollection();
             var ch = $('collectionSelectorItemCheck_' + currColl.getUid());
             if (!ch || (ch && !ch.checked)) {
                 currColl.doDisplay = false;
@@ -822,7 +822,7 @@ cosmo.view.cal.canvas = new function () {
      * @param ev CalItem object, the event to select
      */
     function removeEvent(item) {
-        var currColl = cosmo.app.pim.currentCollection;
+        var currColl = cosmo.app.pim.getSelectedCollection();
         cosmo.view.cal.removeItemFromCollectionRegistry(item, currColl);
         if (item.collectionIds.length) {
             item.lozenge.setInputDisabled(false);
@@ -836,8 +836,8 @@ cosmo.view.cal.canvas = new function () {
     }
 
     function removeRecurrenceChain(id){
-        var currentCollection = cosmo.app.pim.currentCollection;
-        var registry = cosmo.view.cal.collectionItemRegistries[currentCollection.getUid()];
+        var selectedCollection = cosmo.app.pim.getSelectedCollection();
+        var registry = cosmo.view.cal.collectionItemRegistries[selectedCollection.getUid()];
         var clone = registry.clone();
         clone.each(function(currentId, item){
             if (item.data.getUid() == id){
@@ -917,7 +917,7 @@ cosmo.view.cal.canvas = new function () {
         item.lozenge.updateDisplayMain();
     }
     function foregroundSelectedCollection() {
-        var selCollId = cosmo.app.pim.currentCollection.getUid();
+        var selCollId = cosmo.app.pim.getSelectedCollection().getUid();
         var selColl = cosmo.view.cal.collectionItemRegistries[selCollId];
         var selItem = self.getSelectedItem();
         var f = function(id, item) {
@@ -1038,7 +1038,7 @@ cosmo.view.cal.canvas = new function () {
         // Non-recurring (normal single item, recurrence removal), "only this item'
         else {
             // The id for the current collection -- used in creating new CalItems
-            var currCollId = cosmo.app.pim.currentCollection.getUid();
+            var currCollId = cosmo.app.pim.getSelectedCollection().getUid();
             // The item just had its recurrence removed.
             // The only item that should remain is the item that was the
             // first occurrence -- put that item on the canvas, if it's
@@ -1206,7 +1206,7 @@ cosmo.view.cal.canvas = new function () {
             }
             else {
                 removeAllEventsFromDisplay();
-                var currColl = cosmo.app.pim.currentCollection;
+                var currColl = cosmo.app.pim.getSelectedCollection();
                 var dt = removeType == recurOpts.ALL_FUTURE_EVENTS ?
                     item.data.getEventStamp().getRrule().getEndDate() : null;
                 cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry(
@@ -1262,30 +1262,35 @@ cosmo.view.cal.canvas = new function () {
      * Double-clicks -- if event source is in the scrolling area
      * for normal events, or in the resizeable all-day event area
      * calls createNewCalItem to create a new event
-     * FIXME: This could be segregated into two functions
-     * attached to each of the two canvas areas
      */
     function dblClickHandler(e) {
         var id = '';
         var elem = null;
+        var collection = cosmo.app.pim.getSelectedCollection();
+        // User has no collections, show the user a nice error
+        if (!collection) {
+           cosmo.app.showErr(_('Main.Error.ItemNewSaveFailed'),
+              _('Main.Error.NoCollectionsForItemSave'));
+        }
+        else {
+            // Event creation only in write-mode
+            if (collection.isWriteable()) {
+                e = !e ? window.event : e;
+                elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+                id = elem.id
 
-        // Event creation only in write-mode
-        if (cosmo.app.pim.currentCollection.isWriteable()) {
-            e = !e ? window.event : e;
-            elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
-            id = elem.id
-
-            switch (true) {
-                // On hour column -- create a new event
-                case (id.indexOf('hourDiv') > -1):
-                // On all-day column -- create new all-day event
-                case (id.indexOf('allDayListDiv') > -1):
-                    createNewCalItem(id);
-                    break;
-                // On event title -- edit-in-place
-                case (id.indexOf('eventDiv') > -1):
-                    // Edit-in-place will go here
-                    break;
+                switch (true) {
+                    // On hour column -- create a new event
+                    case (id.indexOf('hourDiv') > -1):
+                    // On all-day column -- create new all-day event
+                    case (id.indexOf('allDayListDiv') > -1):
+                        createNewCalItem(id);
+                        break;
+                    // On event title -- edit-in-place
+                    case (id.indexOf('eventDiv') > -1):
+                        // Edit-in-place will go here
+                        break;
+                }
             }
         }
     }
@@ -1423,7 +1428,7 @@ cosmo.view.cal.canvas = new function () {
         }
 
         // Put the new item in the currently selected collection
-        var currCollId = cosmo.app.pim.currentCollection.getUid();
+        var currCollId = cosmo.app.pim.getSelectedCollection().getUid();
 
         // Set EventStamp start and end calculated from click position
         // --------

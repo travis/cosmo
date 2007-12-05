@@ -148,10 +148,13 @@ cosmo.ui.navbar.Bar = function (p) {
         if (!_view.hasBeenInitialized) {
             _view.init();
         }
-        // Don't show the canvas-level 'loading' message
-        // on initial load -- we have the app-level one
+        // When *not* to show the canvas-level 'loading' message
+        // 1. on initial load -- we have the app-level one
         // still showing
-        if (this.defaultViewHasBeenInitialized) {
+        // 2. When there are no collections loaded -- in that
+        // // case, navigating around should show no 'loading'
+        // message, because nothing is loading
+        if (cosmo.app.pim.getSelectedCollection() && this.defaultViewHasBeenInitialized) {
             _loading.show();
         }
         this.defaultViewHasBeenInitialized = true;
@@ -184,9 +187,11 @@ cosmo.ui.navbar.Bar = function (p) {
                     self.calCanvas.domNode.style.display = 'block';
                     cosmo.view.cal.canvas.resetTimedCanvasScrollOffset();
                 }
-                if (noLoad) switchViews();
+                if (noLoad) {
+                    switchViews();
+                }
                 else {
-                    displayDeferred = _view.triggerLoadEvents();
+                    displayDeferred = _view.loadItems();
                     displayDeferred.addCallback(switchViews);
                 }
             }
@@ -287,8 +292,15 @@ cosmo.ui.navbar.CalViewNav = function (p) {
         // with topics, but we need the feedback box to show
         // instantly -- so, call the 'loading' box's show method
         // directly, then publish the message to the topic on
-        // a set timeout
+        // a setTimeout
         var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
+        var showLoading = function () {
+            // Don't display the 'loading data' message if
+            // there's no selected collection to load data from
+            if (cosmo.app.pim.getSelectedCollection()) {
+                loading.show();
+            }
+        }
         var publish = function (dir) {
             dojo.event.topic.publish('/calEvent', {
                 action: 'loadCollection',
@@ -299,14 +311,14 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             var backFunc = function () {
                 publish('back');
             };
-            loading.show();
+            showLoading();
             setTimeout(backFunc, 0);
         }
         var next = function next() {
             var nextFunc = function () {
                 publish('next');
             };
-            loading.show();
+            showLoading();
             setTimeout(nextFunc, 0);
         }
         this.navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
@@ -319,7 +331,7 @@ cosmo.ui.navbar.CalViewNav = function (p) {
         this._showMonthHeader();
     };
     // FIXME: There is similar logic is dup'd in ...
-    // view.cal.common.triggerLoadEvents
+    // view.cal.common.loadItems
     // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
@@ -383,7 +395,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         isProcessing = false;
 
         // If the collection isn't writeable, disable everything
-        var writeable = cosmo.app.pim.currentCollection.getWriteable();
+        var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
 
         var disableButton = function () {
           self.formNode.removeChild(self.createButton.domNode);
@@ -425,7 +437,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             disabled: writeable ? false : true
         };
         var text = cosmo.util.html.createInput(o);
-        // Dynamically size the quick-entry text so the 
+        // Dynamically size the quick-entry text so the
         // page nav can fit -- max it out at 220px wide
         var w = this.parent.width - 300;
         w = w > 220 ? 220 : w;
@@ -501,6 +513,10 @@ cosmo.ui.navbar.ListPager = function (p) {
             this.prevButton.destroy();
             this.nextButton.destroy();
         }
+
+        // Bail out if the list view is a zero-lenth list
+        // no length = nothing to page through
+        if (!cosmo.view.list.itemRegistry.length) { return false; }
 
         var table = _createElem('table');
         var body = _createElem('tbody');

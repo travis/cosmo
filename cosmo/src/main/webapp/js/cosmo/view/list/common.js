@@ -76,7 +76,7 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
     switch (act) {
         case 'loadCollection':
             if ((opts.loadType == 'changeCollection') &&
-                cosmo.app.pim.currentCollection) {
+                cosmo.app.pim.getSelectedCollection()) {
                 cosmo.view.list.loadItems();
             }
             break;
@@ -90,9 +90,9 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
 cosmo.view.list.loadItems = function (o) {
     var opts = o || {};
     var note = opts.note || null;
-    // Default to the app's currentCollection if one isn't passed
-    var collection = opts.collection || cosmo.app.pim.currentCollection;
-    if (!cosmo.app.pim.currentCollection) return;
+    // Default to the app's selectedCollection if one isn't passed
+    var collection = opts.collection || cosmo.app.pim.getSelectedCollection();
+    //if (!cosmo.app.pim.getSelectedCollection()) return;
     var itemLoadList = null;
     var showErr = function (e) {
         cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"",e);
@@ -101,9 +101,21 @@ cosmo.view.list.loadItems = function (o) {
 
     // Load the array of items
     // ======================
+    var deferred;
+    // User has collections loaded, we have a selected collection
     // Look up for Note if passed a Note, otherwise get for
     // the entire collection
-    var deferred = cosmo.app.pim.serv.getDashboardItems(note || collection);
+    //
+    if (cosmo.app.pim.getSelectedCollection()) {
+        deferred = cosmo.app.pim.serv.getDashboardItems(note || collection);
+    }
+    // User has no collections
+    // Create a dummy Deferred with an empty item list
+    else {
+        deferred = new dojo.Deferred();
+        deferred.addCallback(function () { return []; });
+        deferred.callback();
+    }
     // Catch any error stuffed in the deferred
     deferred.addErrback(function (e){
         if (e instanceof cosmo.service.exception.ResourceNotFoundException){

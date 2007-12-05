@@ -153,7 +153,7 @@ cosmo.ui.menu.allItems = [
             if (sel.selectedIndex != 0) {
             cosmo.app.showDialog(
                 cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                    cosmo.app.pim.currentCollection,
+                    cosmo.app.pim.getSelectedCollection(),
                     sel.options[sel.selectedIndex].value));
             }
         };

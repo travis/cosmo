@@ -138,7 +138,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
                    && !!item.getEventStamp().getRrule()){
             transportFunc = "expandRecurringItem";
         } else {
-            throw new Error("Can not get dashboard items for " + item);
+            throw new Error("Cannot get dashboard items for " + item);
         }
 
         var deferred = this._transport[transportFunc](item, {projection: "/dashboard/eim-json"}, kwArgs);

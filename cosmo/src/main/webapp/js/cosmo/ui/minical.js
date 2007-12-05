@@ -75,7 +75,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         self.domNode.style.visibility = 'visible';
     };
     // FIXME: There is similar logic is dup'd in ...
-    // view.cal.common.triggerLoadEvents
+    // view.cal.common.loadItems
     // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
@@ -133,7 +133,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         switch (act) {
             case 'loadCollection':
                 // FIXME: There is similar logic is dup'd in ...
-                // view.cal.common.triggerLoadEvents
+                // view.cal.common.loadItems
                 // ui.minical.handlePub
                 // ui.minical -- setSelectionSpan private function
                 // ui.navbar._showMonthheader
@@ -746,9 +746,6 @@ cosmo.ui.minical.MiniCal = function (p) {
         // Convert to int because FF saves attributes as strings
         dt = new Date(parseInt(dt));
 
-        // FIXME: This loads the calendar data twice
-        // We need to refactor this to allow date params
-        // to be passed to the initial loading of the cal view
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
@@ -781,9 +778,6 @@ cosmo.ui.minical.MiniCal = function (p) {
         // All okey-dokey -- submit
         else {
             var d = new Date(val);
-            // FIXME: This loads the calendar data twice
-            // We need to refactor this to allow date params
-            // to be passed to the initial loading of the cal view
             cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
                 { viewName: cosmo.view.names.CAL, noLoad: true });
             var f = function () {

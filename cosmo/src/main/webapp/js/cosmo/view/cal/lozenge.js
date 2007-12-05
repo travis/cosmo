@@ -181,7 +181,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype._showProcessingMessage = function () {
 cosmo.view.cal.lozenge.Lozenge.prototype._mainAreaCursorChange = function (isProc) {
     var cursorChange = '';
     // Read-only collection -- clickable but not draggable/resizable
-    if (!cosmo.app.pim.currentCollection.isWriteable()) {
+    if (!cosmo.app.pim.getSelectedCollection().isWriteable()) {
         cursorChange = 'pointer';
     }
     // Writeable collection -- drag/resize cursors
@@ -492,7 +492,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype._resizeHandleCursorChange = func
     var topChange = '';
     var bottomChange = '';
     // Read-only collection -- clickable but not draggable/resizable
-    if (!cosmo.app.pim.currentCollection.isWriteable()) {
+    if (!cosmo.app.pim.getSelectedCollection().isWriteable()) {
         topChange = 'pointer';
         bottomChange = 'pointer';
     }

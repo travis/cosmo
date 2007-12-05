@@ -188,7 +188,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     };
     this.handleSelectionChange = function (e, target, discardUnsavedChanges) {
         var args = Array.prototype.slice.call(arguments);
-        var writeable = cosmo.app.pim.currentCollection.isWriteable();
+        var writeable = cosmo.app.pim.getSelectedCollection().isWriteable();
         // Original selection
         var origSelection = self.getSelectedItem();
         // Paranoia check -- bail if there's no target, or the target

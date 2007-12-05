@@ -53,8 +53,11 @@ yPos = 0;
 cosmo.app.pim = dojo.lang.mixin(new function () {
 
     var self = this;
+
     // Private variable for the list of any deleted subscriptions
-    var deletedSubscriptions = [];
+    this._deletedSubscriptions = [];
+    this._selectedCollection = null;
+
     // Available views
     this.views = cosmo.view.names;
     // The Cosmo service -- used to talk to the backend
@@ -79,8 +82,6 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     this.midColWidth = 0;
     // Current date for highlighting in the interface
     this.currDate = null;
-    // The path to the currently selected collection
-    this.currentCollection = null;
     // Collections available to the user
     this.collections = new cosmo.util.hash.Hash();
     // Colors used to display the different collections
@@ -129,29 +130,24 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
 
             // Display the default view
             this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
-            if (!cosmo.app.pim.currentCollection) {
-                cosmo.app.hideMask();
-                cosmo.app.showErr(_("Error.NoCollections"));
-            } else {
-
-                // Show errors for deleted subscriptions -- deletedSubscriptions
-                // is a private var populated in the loadCollections method
-                if (deletedSubscriptions && deletedSubscriptions.length > 0){
-                    for (var x = 0; x < deletedSubscriptions.length; x++){
-                        var errorMessage;
-                    var deletedSubscription = deletedSubscriptions[x];
-                        if (deletedSubscription.getCollectionDeleted()){
-                            errorMessage = "Main.Error.SubscribedCollectionDeleted";
-                        } else if (deletedSubscription.getTicketDeleted()){
-                            errorMessage = "Main.Error.SubscribedTicketDeleted";
-                        }
-                        cosmo.app.showErr(_(errorMessage,
-                                            deletedSubscription.getDisplayName()));
+            // Show errors for deleted subscriptions -- this._deletedSubscriptions
+            // is a private var populated in the loadCollections method
+            var deletedSubscriptions = this._deletedSubscriptions;
+            if (deletedSubscriptions && deletedSubscriptions.length > 0){
+                for (var x = 0; x < deletedSubscriptions.length; x++){
+                    var errorMessage;
+                var deletedSubscription = deletedSubscriptions[x];
+                    if (deletedSubscription.getCollectionDeleted()){
+                        errorMessage = "Main.Error.SubscribedCollectionDeleted";
+                    } else if (deletedSubscription.getTicketDeleted()){
+                        errorMessage = "Main.Error.SubscribedTicketDeleted";
                     }
+                    cosmo.app.showErr(_(errorMessage,
+                                        deletedSubscription.getDisplayName()));
                 }
-                if (this.authAccess){
-                    cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
-                }
+            }
+            if (this.authAccess){
+                cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
             }
         }));
     };
@@ -295,7 +291,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             subscriptionsDeferred.addCallback(dojo.lang.hitch(this, function (subscriptions){
                 var result = this.filterOutDeletedSubscriptions(subscriptions);
                 subscriptions = result[0];
-                deletedSubscriptions = result[1];
+                this._deletedSubscriptions = result[1];
                 for (var i = 0; i < subscriptions.length; i++){
                     var subscription = subscriptions[i];
                     collections.push(subscription);
@@ -336,20 +332,33 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             }
 
             if (params.collectionUid){
-                this.currentCollection =
+                this._selectedCollection =
                     this.collections.getItem(params.collectionUid);
             }
             else {
-                this.currentCollection = collections[0];
+                this._selectedCollection = collections[0];
             }
-            if (this.currentCollection){
-                this.currentCollection.doDisplay = true;
+            if (this._selectedCollection){
+                this._selectedCollection.doDisplay = true;
             }
         }));
         return collectionsLoadedDeferred;
 
     };
-
+    this.setSelectedCollection = function (collection) {
+        this._selectedCollection = collection || null;
+    };
+    this.getSelectedCollection = function () {
+        return this._selectedCollection || null;
+    };
+    this.getSelectedCollectionId = function () {
+        return this._selectedCollection ?
+            this._selectedCollection.getUid() : '';
+    };
+    this.getSelectedCollectionWriteable = function () {
+        return this._selectedCollection ?
+            this._selectedCollection.getWriteable() : false;
+    };
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
         var filteredSubscriptions = dojo.lang.filter(subscriptions,
@@ -365,26 +374,16 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         });
         return [filteredSubscriptions, deletedSubscriptions];
     };
-
-    // ==========================
-    // Cleanup
-    // ==========================
-    this.cleanup = function () {
-        if (this.uiMask) {
-            this.uiMask.cleanup();
-        }
-        if (this.allDayArea) {
-            this.allDayArea.cleanup();
-        }
-        this.allDayArea = null;
-    };
-
     this.reloadCollections = function (removedCollection) {
-        var currentCollection = this.currentCollection;
+        var selectedCollection = this._selectedCollection;
         var loadCollectionsDeferred;
         // Don't bother saving state and reloading from
         // the server if it's a removal
-        if (!removedCollection) {
+        if (removedCollection) {
+            loadCollectionsDeferred = new dojo.Deferred();
+            loadCollectionsDeferred.callback();
+        }
+        else {
             var state = {};
             var saveState = function (id, coll) {
                 state[id] = {
@@ -408,41 +407,52 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                     }
                 }
             }));
-        } else {
-            loadCollectionsDeferred = new dojo.Deferred();
-            loadCollectionsDeferred.callback();
-        }
+        } 
 
         loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
             // If we had an originally selected collection
-            if (currentCollection) {
-                var selCollId = currentCollection.getUid();
+            if (selectedCollection) {
+                var selCollId = selectedCollection.getUid();
                 var newSel = this.collections.getItem(selCollId);
                 // If the originally selected collection is in
                 // the new set, point to the one in the new set
                 if (newSel) {
-                    this.currentCollection = newSel;
+                    this._selectedCollection = newSel;
                     newSel.doDisplay = true;
                 }
                 // If the originally selected collection is gone,
                 // and was not the one removed by the user,
                 // show the user a nice error message
                 else {
-                    if (currentCollection != removedCollection) {
+                    if (selectedCollection != removedCollection) {
                         cosmo.app.showErr(_("Main.Error.CollectionRemoved",
-                                            currentCollection.getDisplayName()));
+                                            selectedCollection.getDisplayName()));
                     }
                     // Default new selection is the first collection
                     // in the list
-                    this.currentCollection = this.collections.getAtPos(0);
-                    this.currentCollection.doDisplay = true;
+                    this._selectedCollection = this.collections.getAtPos(0);
+                    this._selectedCollection.doDisplay = true;
                 }
                 cosmo.view.displayViewFromCollections(
-                    this.currentCollection);
+                    this._selectedCollection);
             }
         }));
         return loadCollectionsDeferred;
-    }
+    };
+
+    // ==========================
+    // Cleanup
+    // ==========================
+    this.cleanup = function () {
+        if (this.uiMask) {
+            this.uiMask.cleanup();
+        }
+        if (this.allDayArea) {
+            this.allDayArea.cleanup();
+        }
+        this.allDayArea = null;
+    };
+
 }, cosmo.app.pim);
 
 Cal = cosmo.app.pim;

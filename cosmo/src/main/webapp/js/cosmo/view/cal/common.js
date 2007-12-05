@@ -69,10 +69,7 @@ cosmo.view.cal.handlePub_calEvent = function (cmd) {
     var delta = cmd.delta;
     switch (act) {
         case 'loadCollection':
-            // Only try to load events if the collection exists
-            if (cosmo.app.pim.currentCollection){
-                cosmo.view.cal.triggerLoadEvents(opts);
-            }
+            cosmo.view.cal.loadItems(opts);
             break;
         default:
             // Do nothing
@@ -80,7 +77,7 @@ cosmo.view.cal.handlePub_calEvent = function (cmd) {
     }
 };
 
-cosmo.view.cal.triggerLoadEvents = function (p) {
+cosmo.view.cal.loadItems = function (p) {
     dojo.debug("trigger!");
     var _cal = cosmo.view.cal; // Scope-ness
     var params = p || {};
@@ -97,7 +94,7 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
 
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
-    // view.cal.common.triggerLoadEvents
+    // view.cal.common.loadItems
     // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
@@ -134,8 +131,8 @@ cosmo.view.cal.triggerLoadEvents = function (p) {
     }
     for (var n in params) { opts[n] = params[n]; }
 
-    // Default to the app's currentCollection if one isn't passed
-    var collection = opts.collection || cosmo.app.pim.currentCollection;
+    // Default to the app's selectedCollection if one isn't passed
+    var collection = opts.collection || cosmo.app.pim.getSelectedCollection();
 
     start = opts.viewStart;
     end = opts.viewEnd;
@@ -204,10 +201,10 @@ cosmo.view.cal.createEventRegistry = function(arr, collId) {
 };
 cosmo.view.cal.createItemRegistryFromCollections = function () {
     var itemReg = new cosmo.util.hash.Hash();
-    if (cosmo.app.pim.currentCollection){
+    if (cosmo.app.pim.getSelectedCollection()){
         var collectionReg = cosmo.view.cal.collectionItemRegistries;
         var currCollId = '';
-        var selCollId = cosmo.app.pim.currentCollection.getUid();
+        var selCollId = cosmo.app.pim.getSelectedCollection().getUid();
         // Do something sensible with duplicate items when
         // building the consolidated itemRegistry
         var fillInItem = function (id, item) {

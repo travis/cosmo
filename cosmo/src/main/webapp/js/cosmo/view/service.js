@@ -257,7 +257,7 @@ cosmo.view.service = new function () {
         dojo.debug("Do save: iznew: " + isNew)
 
         if (isNew){
-            deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection,{});
+            deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.getSelectedCollection(),{});
         } else if (opts.saveType) {
             dojo.debug("opty! " + opts.saveType );
             switch(opts.saveType){
@@ -298,7 +298,7 @@ cosmo.view.service = new function () {
                      }
                      else {
                          dojo.debug("doSaveItem: creating a new modificaiton")
-                         deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.currentCollection);
+                         deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.getSelectedCollection());
                      }
                 break;
             }
@@ -366,7 +366,7 @@ cosmo.view.service = new function () {
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
                 //itself.
-                var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.currentCollection.getUrls().self);
+                var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.getSelectedCollection().getUrls().self);
                 deferred.addErrback(function (){
                     //reload collections will handle showing the error message, as it will try and load the 
                     //original collection
@@ -527,10 +527,10 @@ cosmo.view.service = new function () {
 
 
         if (opts.removeType == "singleEvent"){
-            deferred = cosmo.app.pim.serv.removeItem(item.data, cosmo.app.pim.currentCollection);
+            deferred = cosmo.app.pim.serv.removeItem(item.data, cosmo.app.pim.getSelectedCollection());
             reqId = deferred.id;
         } else if (opts.removeType == OPTIONS.ALL_EVENTS){
-            deferred = cosmo.app.pim.serv.removeItem(item.data.getMaster(), cosmo.app.pim.currentCollection);
+            deferred = cosmo.app.pim.serv.removeItem(item.data.getMaster(), cosmo.app.pim.getSelectedCollection());
             reqId = deferred.id;
         } else if (opts.removeType == OPTIONS.ALL_FUTURE_EVENTS){
             var data = item.data;

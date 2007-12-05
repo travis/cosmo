@@ -43,6 +43,11 @@ public class HibStampTombstone extends HibTombstone implements StampTombstone {
         stampType = stamp.getType();
     }
     
+    public HibStampTombstone(Item item, String stampType) {
+        super(item);
+        this.stampType = stampType;
+    }
+    
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.StampTombstone#getStampType()
      */

@@ -29,11 +29,7 @@ import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.MessageStamp;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
-import org.osaf.cosmo.model.StampTombstone;
-import org.osaf.cosmo.model.StringAttribute;
-import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp;
 import org.osaf.cosmo.model.hibernate.HibEventExceptionStamp;
@@ -237,10 +233,6 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertNotNull(queryItem);
         Assert.assertEquals(queryItem.getStamps().size(),0);
         Assert.assertEquals(1, queryItem.getTombstones().size());
-        
-        Tombstone ts = queryItem.getTombstones().iterator().next();
-        Assert.assertTrue(ts instanceof StampTombstone);
-        Assert.assertEquals(((StampTombstone)ts).getStampType(),stamp.getType());
         
         event = new HibEventStamp();
         event.setEventCalendar(helper.getCalendar("cal1.ics"));

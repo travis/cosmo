@@ -390,7 +390,7 @@
               <configuration>
                   <generateHtml>true</generateHtml>
                   <generatePdf>false</generatePdf>
-                  <generateXml>false</generateXml>
+                  <generateXml>true</generateXml>
               </configuration>
             </plugin>
             <plugin>

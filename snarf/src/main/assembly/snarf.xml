@@ -77,7 +77,7 @@
     </fileSets>
     <files>
         <file>
-            <source>src/main/config/server.xml</source>
+            <source>${basedir}/src/main/config/server.xml</source>
             <outputDirectory>tomcat/conf/</outputDirectory>
             <filtered>True</filtered>
             <fileMode>420</fileMode>

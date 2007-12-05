@@ -385,13 +385,13 @@
     <reporting>
         <plugins>
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-clover-plugin</artifactId>
-              <configuration>
-                  <generateHtml>true</generateHtml>
-                  <generatePdf>false</generatePdf>
-                  <generateXml>true</generateXml>
-              </configuration>
+                <artifactId>maven-clover-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <configuration>
+                    <generateHtml>true</generateHtml>
+                    <generatePdf>false</generatePdf>
+                    <generateXml>true</generateXml>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -556,6 +556,18 @@
                     </webResources>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-clover-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -639,8 +651,8 @@
                        </executions>
                      </plugin>
                      <plugin>
-                         <groupId>org.apache.maven.plugins</groupId>
                          <artifactId>maven-clover-plugin</artifactId>
+                         <groupId>org.apache.maven.plugins</groupId>
                          <configuration>
                              <jdk>1.5</jdk>
                              <excludes>

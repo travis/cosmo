@@ -115,8 +115,8 @@
     </scm>
     <modules>
         <module>cosmo</module>
-        <module>snarf</module>
         <module>migration</module>
+        <module>snarf</module>
     </modules>
     <repositories>
         <repository>
@@ -216,12 +216,12 @@
             </dependency>
             <dependency>
                 <groupId>org.osaf.cosmo</groupId>
-                <artifactId>snarf</artifactId>
+                <artifactId>migration</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.osaf.cosmo</groupId>
-                <artifactId>migration</artifactId>
+                <artifactId>snarf</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

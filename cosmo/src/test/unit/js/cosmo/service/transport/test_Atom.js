@@ -34,9 +34,9 @@ cosmotest.service.transport.test_Atom = {
     },
     test_getUsernameForURI: function(){
         var at = new cosmo.service.transport.Atom();
-        cosmo.util.auth.setUsername("!@#$%^&*()\"';:?/+=-_<>,.");
+        cosmo.util.auth.setUsername("!@#$%^&*()\"';?/+=-_<>,.");
         jum.assertEquals("not escaping correctly",
-                         "!%40%23%24%25%5E%26*()%22'%3B%3A%3F%2F%2B%3D-_%3C%3E%2C.",
+                         "!%40%23%24%25%5E%26*()%22'%3B%3F%2F%2B%3D-_%3C%3E%2C.",
                          at._getUsernameForURI());
                          
     }

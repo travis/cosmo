@@ -70,11 +70,11 @@
   <Service name="Catalina">
     <Connector port="8080" enableLookups="false"
                minSpareThreads="4" maxSpareThreads="50"
-               maxThreads="200"/>
+               maxThreads="200" URIEncoding="UTF-8"/>
 <!--
     <Connector port="8443" enableLookups="false" secure="true"
                minSpareThreads="4" maxSpareThreads="50"
-               maxThreads="200"
+               maxThreads="200" URIEncoding="UTF-8"
                scheme="https" clientAuth="want"
                keystorePass="osafcosmo" sslProtocol="TLS"/>
 -->

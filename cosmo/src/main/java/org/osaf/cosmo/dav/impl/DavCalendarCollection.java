@@ -16,6 +16,7 @@
 package org.osaf.cosmo.dav.impl;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -329,7 +330,7 @@ public class DavCalendarCollection extends DavCollectionBase
         ContentItem content = (ContentItem) member.getItem();
         EventStamp event = StampUtils.getEventStamp(content);
         EntityConverter converter = new EntityConverter(getEntityFactory());
-        Set<ContentItem> toUpdate = new HashSet<ContentItem>();
+        Set<ContentItem> toUpdate = new LinkedHashSet<ContentItem>();
         
         // convert icalendar representation to cosmo data model
         toUpdate.addAll(converter.convertEventCalendar(

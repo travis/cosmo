@@ -139,7 +139,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         // Test all of the various characters that should work.
         String[] testStrings = { "abcdefghijklmnopqrstuvwxyz",
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                                 "1234567890", "!@#$%^&*(){}:\"?><",
+                                 "1234567890", "!@#$%^&*(){}\"?><",
                                  ",.\\;'[]=-",
         };
 

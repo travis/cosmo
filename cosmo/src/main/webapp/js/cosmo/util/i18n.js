@@ -21,8 +21,6 @@
 dojo.provide("cosmo.util.i18n");
 dojo.require("cosmo.ui.conf");
 
-cosmo.util.i18n.replacePat = /\{\d+\}/g;
-
 cosmo.util.i18n.getText = function () {
     if (!this._localtext) {
         this.setLocalizationMessages(cosmo.ui.conf.getLocalText());
@@ -31,13 +29,8 @@ cosmo.util.i18n.getText = function () {
     var args = Array.prototype.slice.apply(arguments);
     var key = args.shift();
     var str = this._localtext[key] || "[[" + key + "]]";
-    if (args.length) {
-        var arr = str.match(this.replacePat);
-        if (arr) {
-            for (var i = 0; i < arr.length; i++) {
-                str = str.replace(arr[i], args[i]);
-            }
-        }
+    for (var i in args){
+        str = str.replace(new RegExp("\{" + i + "\\}", "g"), args[i]);
     }
     return str;
 };

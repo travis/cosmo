@@ -144,7 +144,11 @@ public class ThisAndFutureHelper {
         untilDateCalendar.set(java.util.Calendar.MINUTE, 59);
         untilDateCalendar.set(java.util.Calendar.SECOND, 59);
         Date untilDate = Dates.getInstance(untilDateCalendar.getTime(), lastRecurrenceId);
-
+        
+        // UNTIL must be UTC according to spec
+        if(untilDate instanceof DateTime) 
+            ((DateTime) untilDate).setUtc(true);
+        
         List<Recur> recurs = event.getRecurrenceRules();
         for (Recur recur : recurs)
             recur.setUntil(untilDate);

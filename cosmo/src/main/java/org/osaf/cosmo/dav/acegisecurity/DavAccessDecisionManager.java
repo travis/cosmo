@@ -302,8 +302,15 @@ public class DavAccessDecisionManager
             contentService.findItemByPath(path, home.getUid()) :
             home;
         if (item == null) {
+            // the targeted resource does not exist. that's okay for write
+            // methods, but it's not ok for read methods.
             if (! (method.equals("PUT") || method.equals("MKCOL") ||
                    method.equals("MKCALENDAR"))) {
+                // if the principal does not even have permission to read the
+                // targeted home collection, they get a 403.
+                if (! evaluator.evaluate(home, DavPrivilege.READ))
+                    throw new AclEvaluationException(home, DavPrivilege.READ);
+                // the principal has enough access to see a 404.
                 if (log.isDebugEnabled())
                     log.debug("Item '" + path + "' within home collection for " + username + " not found; allowing for 404");
                 return;
@@ -313,18 +320,28 @@ public class DavAccessDecisionManager
         CollectionItem parent = home;
         if (path != null && path != "/") {
             String parentPath = PathUtil.getParentPath(path);
-            try {
-                parent = (CollectionItem)
-                    contentService.findItemByPath(parentPath, home.getUid());
-                if (parent == null) {
-                    if (log.isDebugEnabled())
-                        log.debug("Parent item '" + parentPath + "' within home collection for " + username + " not found; allowing for 409");
-                    return;
+            Item parentItem = null;
+            if (parentPath != "/") {
+                try {
+                    parentItem = contentService.findItemByPath(parentPath, home.getUid());
+                    if (parentItem == null) {
+                        // the targeted resource's parent does not exist. that
+                        // is a conflict condition.
+                        // if the principal does not even have permission to
+                        // read the targeted home collection, they get a 403.
+                        if (! evaluator.evaluate(home, DavPrivilege.READ))
+                            throw new AclEvaluationException(home, DavPrivilege.READ);
+                        // the principal has enough access to see a 409.
+                        if (log.isDebugEnabled())
+                            log.debug("Parent item '" + parentPath + "' within home collection for " + username + " not found; allowing for 409");
+                        return;
+                    }
+                    parent = (CollectionItem) parentItem;
+                } catch (ClassCastException e) {    
+                    // the targeted resource's parent is not a collection.
+                    // that is a forbidden no matter how you slice it.
+                    throw new AclEvaluationException(parentItem, DavPrivilege.READ);
                 }
-            } catch (ClassCastException e) {
-                if (log.isDebugEnabled())
-                    log.debug("Parent item '" + parentPath + "' not a collection; allowing for 403");
-                return;
             }
         }
 

@@ -107,11 +107,15 @@ public class DavFile extends DavContentBase {
         if (content.getContentLanguage() != null)
             outputContext.setContentLanguage(content.getContentLanguage());
 
-        outputContext.setContentLength(content.getContentLength().longValue());
+        long len = content.getContentLength() != null ?
+            content.getContentLength().longValue() : 0;
+        outputContext.setContentLength(len);
         outputContext.setModificationTime(getModificationTime());
         outputContext.setETag(getETag());
 
         if (! outputContext.hasStream())
+            return;
+        if (content.getContentInputStream() == null)
             return;
 
         IOUtil.spool(content.getContentInputStream(),

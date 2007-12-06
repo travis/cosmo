@@ -163,26 +163,10 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * description: Create the user described by <code>userHash</code>.
          */
         createUser: function (userHash, handlerDict, sync) {
-                var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
-                                '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
-                                '<username>' + userHash.username + '</username>' +
-                                '<password>' + userHash.password + '</password>' +
-                                '<firstName>' + userHash.firstName + '</firstName>' +
-                                '<lastName>' + userHash.lastName + '</lastName>' +
-                                '<email>' + userHash.email + '</email>';
+            var request_content = this.userHashToXML(userHash);
+            
 
-                if (userHash.administrator) {
-                    request_content += '<' + EL_ADMINISTRATOR + ' >true</' +
-                    	EL_ADMINISTRATOR + '>';
-                }
-                
-                if (userHash.locked) {
-                    request_content += '<locked>true</locked>';
-                }
-
-                request_content += '</user>'
-
-                requestDict = this.getDefaultCMPRequest(handlerDict, true, sync)
+                requestDict = this.getDefaultCMPRequest(handlerDict, sync)
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
                     encodeURIComponent(dojo.string.trim(userHash.username));
                 requestDict.method = "POST";
@@ -223,13 +207,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     handlerDict = this._wrap204Bandaid(handlerDict);
                 }
 
-                var request_content = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
-                        '<user xmlns="http://osafoundation.org/cosmo/CMP">';
-                for (propName in userHash) {
-                     request_content += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
-
-                }
-                request_content += "</user>";
+                var request_content = this.userHashToXML(userHash);
 
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
@@ -260,7 +238,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
 
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
-                                    encodeURIComponent(dojo.string.trim(username));
+                                    encodeURIComponent(username);
                 requestDict.method = "POST";
                 requestDict.headers['X-Http-Method-Override'] = "DELETE";
                 dojo.io.bind(requestDict);
@@ -289,7 +267,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
                 for (var i = 0; i < usernames.length; i++){
                     usernames[i] = "user=" +
-                        encodeURIComponent(dojo.string.trim(usernames[i]));
+                        encodeURIComponent(usernames[i]);
                 }
                 var requestContent = usernames.join("&");
 
@@ -401,14 +379,8 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     handlerDict = this._wrap204Bandaid(handlerDict);
                 }
 
-                var requestContent = '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
-                        '<user xmlns="http://osafoundation.org/cosmo/CMP">';
+                var requestContent = this.userHashToXML(userHash)
 
-                for (propName in userHash) {
-
-                    requestContent += "<" + propName + ">" + userHash[propName] + "</" + propName + ">";
-                }
-                requestContent += "</user>";
                 var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
                 requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account";
                 requestDict.method = "POST";
@@ -446,25 +418,25 @@ dojo.declare("cosmo.cmp.Cmp", null,
         getSignupXML: function(/*Object*/ userHash,
                                /*Object*/ handlerDict,
                                /*boolean?*/ sync) {
-
             var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
             requestDict.url = cosmo.env.getBaseUrl() + "/cmp/signup";
             requestDict.method = "POST";
             requestDict.headers['X-Http-Method-Override'] = "PUT";
             requestDict.postContent = this.userHashToXML(userHash);
-
             dojo.io.bind(requestDict);
         },
 
         userHashToXML: function(/*Object*/ userHash){
             return '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                 '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
-                '<username>' + userHash.username + '</username>' +
-                '<password>' + userHash.password + '</password>' +
-                '<firstName>' + userHash.firstName + '</firstName>' +
-                '<lastName>' + userHash.lastName + '</lastName>' +
-                '<email>' + userHash.email + '</email>' +
+                '<username>' + dojo.string.escapeXml(userHash.username) + '</username>' +
+                '<password>' + dojo.string.escapeXml(userHash.password) + '</password>' +
+                '<firstName>' + dojo.string.escapeXml(userHash.firstName) + '</firstName>' +
+                '<lastName>' + dojo.string.escapeXml(userHash.lastName) + '</lastName>' +
+                '<email>' + dojo.string.escapeXml(userHash.email) + '</email>' +
                 (userHash.subscription? this._subscriptionToXML(userHash.subscription) : "") +
+                (userHash.administrator? '<' + EL_ADMINISTRATOR + ' >true</' + EL_ADMINISTRATOR + '>' : "") +
+                (userHash.locked?'<locked>true</locked>' : "") +
                 '</user>';
         },
 
@@ -476,7 +448,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 throw new cosmo.cmp.SubscriptionInfoMissingException(
                     name, ticket, uuid);
             }
-            return '<subscription name="' + name + 
+            return '<subscription name="' + dojo.string.escapeXml(name) + 
                 '" ticket="' + ticket + '">' + 
                 uuid + '</subscription>';
         },
@@ -533,6 +505,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         cmpUserXMLToJSON: function (/*Element*/ cmpUserXml){
             var user = cmpUserXml;
+            
             var obj = {};
             obj.firstName = user.getElementsByTagName("firstName")[0].firstChild.nodeValue;
             obj.lastName = user.getElementsByTagName("lastName")[0].firstChild.nodeValue;
@@ -543,7 +516,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
             obj.url = user.getElementsByTagName("url")[0].firstChild.nodeValue;
             obj.locked = (dojo.string.trim(
                 user.getElementsByTagName("locked")[0].firstChild.nodeValue) == "true");
-
             obj.administrator =	(dojo.string.trim(
                 user.getElementsByTagName("administrator")[0].firstChild.nodeValue) == "true");
             if (user.getElementsByTagName("unactivated").length > 0){

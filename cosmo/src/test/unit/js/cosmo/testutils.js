@@ -44,24 +44,22 @@ cosmotest.testutils = {
         return cosmotest.testutils.createUser("User0");
     },
 
-    createUser: function(username){
+    createUser: function(username, email){
         cosmo.util.auth.clearAuth();
         var user = {
             password: "testing",
             username: username,
             firstName: username,
             lastName: username,
-            email: username + "@cosmotesting.osafoundation.org"
+            email: (email || username) + "@cosmotesting.osafoundation.org"
         };
-        
         cosmo.cmp.signup(user, {
-            load: function(){}, 
-            error: function(){
-                cosmotest.testutils.cleanupUser(user);
-                i++;
+            load: function(type, data, evt){
+                cosmo.util.auth.setCred(user.username, user.password);
+            },
+            error: function(e){
+                dojo.debug(e);
             }}, true);
-        cosmo.util.auth.setCred(user.username, user.password);
-        
         return user;
     },
     

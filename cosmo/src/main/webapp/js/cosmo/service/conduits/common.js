@@ -52,7 +52,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             var collectionDetailDeferreds = [];
             for (var i = 0; i < collections.length; i++){
                 collectionDetailDeferreds.push(
-                    this.getCollection(collections[i].href)
+                    this.getCollection(collections[i].href, kwArgs)
                 );
             }
             return new dojo.DeferredList(collectionDetailDeferreds);
@@ -89,7 +89,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
                 //capturing scope
                 (dojo.lang.hitch(this, function (){
                     var subscription = subscriptions[i];
-                    var deferred = this.getCollection(subscription.getCollection().href);
+                    var deferred = this.getCollection(subscription.getCollection().href, kwArgs);
                     deferred.addCallback(function(collection){
                         subscription.setCollection(collection);
                     });
@@ -138,7 +138,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
                    && !!item.getEventStamp().getRrule()){
             transportFunc = "expandRecurringItem";
         } else {
-            throw new Error("Cannot get dashboard items for " + item);
+            throw new Error("Can not get dashboard items for " + item);
         }
 
         var deferred = this._transport[transportFunc](item, {projection: "/dashboard/eim-json"}, kwArgs);

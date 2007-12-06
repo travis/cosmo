@@ -868,6 +868,8 @@ public class CmpServlet extends HttpServlet {
                            e.getMessage());
         } catch (ModelValidationException e) {
             handleModelValidationError(resp, e);
+        } catch (InvalidStateException ise) {
+            handleInvalidStateException(resp, ise);
         }
     }
 
@@ -927,6 +929,8 @@ public class CmpServlet extends HttpServlet {
                            e.getMessage());
         } catch (ModelValidationException e) {
             handleModelValidationError(resp, e);
+        }catch (InvalidStateException ise) {
+            handleInvalidStateException(resp, ise);
         }
     }
     

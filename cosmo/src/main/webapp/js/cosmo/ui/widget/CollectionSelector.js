@@ -220,6 +220,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
             renderSingleCollectionName();
         },
 
+        _getIndexByDisplayName: function(collections, displayName){
+            for (var x = 0; x < collections.length; x++){
+                if (collections[x].getDisplayName() == displayName){
+                    return x;
+                }
+            }
+            return -1;
+        },
+
         _collectionWithDisplayNameExists: function(cols, displayName){
             var index = this._getIndexByDisplayName(cols, displayName);
             return index != -1;

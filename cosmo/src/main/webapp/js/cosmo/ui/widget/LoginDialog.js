@@ -8,6 +8,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.cookie");
+dojo.require("cosmo.account.login");
 dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
@@ -35,20 +36,20 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
         _usernameFocus: false,
         _passwordFocus: false,
 
-        handleLoginResp: function (type, str, evt) {
+        handleLoginSuccess: function (type, str, evt) {
 
-            if (str == cosmo.env.getBaseUrl() + "/loginfailed"){
-                this.showErr(_('Login.Error.AuthFailed'));
-                this.passwordInput.value = '';
-                
-            } else {
                 var username  = this.usernameInput.value;
                 cosmo.util.auth.setCred(this.usernameInput.value,
                     this.passwordInput.value);
 
                 location = str;
-            }
         },
+
+        handleLoginError: function (type, str, evt){
+                this.showErr(_('Login.Error.AuthFailed'));
+                this.passwordInput.value = '';
+        },
+                         
         doLogin: function () {
             var self = this;
             var un = self.usernameInput.value;
@@ -64,16 +65,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.LoginDialog", dojo.widget.HtmlWidget,
             }
             else {
                 self.showPrompt('normal', _('Login.Prompt.Processing'));
-
-                postData = { 'j_username': un, 'j_password': pw };
-
-                dojo.io.bind({
-                    url: self.authProc,
-                    method: 'POST',
-                    content: postData,
-                    load: function(type, data, evt) {self.handleLoginResp(type, data, evt);},
-                    error: function(type, error) { alert(error.message); }
-                });
+                cosmo.account.login.doLogin(
+                    un, pw, 
+                    {load: dojo.lang.hitch(this, this.handleLoginSuccess),
+                     error: dojo.lang.hitch(this, this.handleLoginError) 
+                    });
             }
             return false;
         },

@@ -16,23 +16,58 @@
 
 dojo.provide("cosmotest.testutils");
 
+dojo.require("cosmo.cmp");
+dojo.require("cosmo.util.auth");
 
-cosmotest.testutils.init = function initCosmoTests(/*Array*/ testModules){
-    var alltests = jum_new_alltests();
-    for (var x = 0; x < testModules.length; x++){
-        var moduleName = testModules[x];
-        dojo.require(moduleName);
-        var module = dojo.evalObjPath(moduleName);
-        var functionNames = this.getFunctionNames(module);
-        for (var y = 0; y < functionNames.length; y++){
-            var functionName = functionNames[y];
-            jum_add_test(alltests, moduleName, functionName.split("_")[1], functionName, dojo.evalObjPath(moduleName +"." +functionName) );
-        }         
+cosmotest.testutils = {
+    init: function initCosmoTests(/*Array*/ testModules){
+        var alltests = jum_new_alltests();
+        for (var x = 0; x < testModules.length; x++){
+            var moduleName = testModules[x];
+            dojo.require(moduleName);
+            var module = dojo.evalObjPath(moduleName);
+            var functionNames = this.getFunctionNames(module);
+            for (var y = 0; y < functionNames.length; y++){
+                var functionName = functionNames[y];
+                jum_add_test(alltests, moduleName, functionName.split("_")[1], functionName, dojo.evalObjPath(moduleName +"." +functionName) );
+            }         
+            
+        }
+        jum.setTests(alltests);
+    },
+    
+    getFunctionNames: function getFunctionNames(scope){
+        return jum_get_object_function_names(scope);
+    },
+
+    createTestAccount: function(){
+        return cosmotest.testutils.createUser("User0");
+    },
+
+    createUser: function(username){
+        cosmo.util.auth.clearAuth();
+        var user = {
+            password: "testing",
+            username: username,
+            firstName: username,
+            lastName: username,
+            email: username + "@cosmotesting.osafoundation.org"
+        };
         
+        cosmo.cmp.signup(user, {
+            load: function(){}, 
+            error: function(){
+                cosmotest.testutils.cleanupUser(user);
+                i++;
+            }}, true);
+        cosmo.util.auth.setCred(user.username, user.password);
+        
+        return user;
+    },
+    
+    cleanupUser: function(user){
+        cosmo.util.auth.setCred("root", "cosmo");
+        cosmo.cmp.deleteUser(user.username, {handle: function(){}}, true);
+        cosmo.util.auth.clearAuth();
     }
-    jum.setTests(alltests);
-}
-
-cosmotest.testutils.getFunctionNames = function getFunctionNames(scope){
-       return jum_get_object_function_names(scope);
 }

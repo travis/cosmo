@@ -51,7 +51,12 @@ cosmo.account.getFieldList = function (accountInfo, subscription) {
         };
         f.validators = function (elem) {
             return (cosmo.util.validate.required(elem) ||
-            cosmo.util.validate.minLength(elem, 3)); };
+                    cosmo.util.validate.minLength(elem, 3) || 
+                    cosmo.util.validate.doesNotMatch(
+                        elem, new RegExp(":|\u007F"), "Signup.Error.UsernameIllegalChar") ||
+                    cosmo.util.validate.inBMP(elem, "Signup.Error.UsernameBMP") ||
+                    cosmo.util.validate.noControl(elem, "Signup.Error.UsernameControl")
+                   ); };
         f.value = a[f.elemName];
         list.push(f);
     }

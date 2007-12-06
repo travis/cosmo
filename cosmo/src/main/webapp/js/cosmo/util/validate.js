@@ -152,12 +152,56 @@ cosmo.util.validate = new function () {
     
     this.tosChecked = function(s) {
         var err = '';
-        var val = typeof s == 'object' ? s.value : s;
         if (!s.checked){
             err = _('Signup.Error.TOS');
         }
         return err;
     }
+
+    this.match = function(s, r, error){
+        var err = null;
+        var val = typeof s == 'object' ? s.value : s;
+        if (!val.match(r)){
+            err = error? _(error, val, r) : _('Validation.MatchRegExp', val, r);
+        }
+        return err;
+    }
+
+    this.doesNotMatch = function(s, r, error){
+        var err = null;
+        var val = typeof s == 'object' ? s.value : s;
+        var m = val.match(r)
+        if (m){
+            err = error? _(error, val, m) : _('Validation.DoesNotMatchRegExp', [val, m]);
+        }
+        return err;
+    }
+
+    // Make sure string contains only characters in BMP
+    // Do this by checking for Unicode surrogate chars
+    this.inBMP = function(s, error){
+        var err = null;
+        var val = typeof s == 'object' ? s.value : s;
+        for (var i in val){
+            var c = val.charCodeAt(i);
+            if (c > 0xD7FF && c < 0xE000)
+                err = error? _(error, c, i) : _('Validation.NonBMPChar', c, i);
+        }
+        return err;
+    }
+    
+    // Make sure string does not contain control chars (< U+0020)
+    this.noControl = function(s, error){
+        var err = null;
+        var val = typeof s == 'object' ? s.value : s;
+        for (var i in val){
+            var c = val.charCodeAt(i);
+            if (c < 0x0020)
+                err = error? _(error, c, i) : _('Validation.ControlChar', c, i);
+        }
+        return err;
+    }
+    
 }
 
 cosmo.util.validate.constructor = null;

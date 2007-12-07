@@ -41,6 +41,9 @@ test_list = [
 'dashboard/dash_quick_create.json',
 'dashboard/dash_paging.json',
 
+#credentials tests
+'credentials/signup_login.js',
+
 #tear down
 'teardown/logout.json'
 ]

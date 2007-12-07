@@ -22,8 +22,8 @@ dojo.require("cosmo.util.auth");
 dojo.require("cosmo.convenience");
 
 cosmo.account.login.doLogin = function(un, pw, handlers){
-    var postData = "j_username=" + encodeURI(un) + 
-        "&j_password=" + encodeURI(pw);
+    var postData = "j_username=" + encodeURIComponent(un) + 
+        "&j_password=" + encodeURIComponent(pw);
 
     var _authSuccessCB = function(type, data, obj){
         if (data == cosmo.env.getBaseUrl() + "/loginfailed"){

@@ -484,6 +484,11 @@ public class StandardTriageStatusQueryProcessor implements
                 if(instance.isOverridden()) {
                     ModificationUid modUid = new ModificationUid(note, instance.getRid());
                     NoteItem mod = (NoteItem) contentDao.findItemByUid(modUid.toString());
+                    // shouldn't happen, but log and continue if it does
+                    if(mod==null) {
+                        log.error("no modification found for uid: " + modUid.toString());
+                        continue;
+                    }
                     TriageStatus status = mod.getTriageStatus();
                     if(status==null || status.getCode().equals(TriageStatus.CODE_DONE))
                         return mod;
@@ -519,6 +524,11 @@ public class StandardTriageStatusQueryProcessor implements
                 if(instance.isOverridden()) {
                     ModificationUid modUid = new ModificationUid(note, instance.getRid());
                     NoteItem mod = (NoteItem) contentDao.findItemByUid(modUid.toString());
+                    // shouldn't happen, but log and continue if it does
+                    if(mod==null) {
+                        log.error("no modification found for uid: " + modUid.toString());
+                        continue;
+                    }
                     TriageStatus status = mod.getTriageStatus();
                     if(status==null || status.getCode().equals(TriageStatus.CODE_LATER))
                         return mod;

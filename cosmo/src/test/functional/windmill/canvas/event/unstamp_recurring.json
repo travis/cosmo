@@ -1,0 +1,38 @@
+/** Verify unstamping eventness in list view works:
+ *    1) go to calendar view:
+ *    2) create recurring event
+ *    3) go to list view
+ *    4) unstamp eventness
+ *    5) verify (only) one event in item registry...
+**/
+
+//create the event 
+{"params": {"id": "hourDiv0-930"}, "method": "doubleClick"}
+{"method": "waits.sleep", "params": {"milliseconds" : 1100}}
+
+//make it recurring, daily
+{"params": {"id": "recurrenceInterval"}, "method": "click"}
+{"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
+
+//save it
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 1100}}
+
+//go to list view
+{"params": {"jsid": "{$listView}"}, "method": "click"}
+
+//select it
+{"params": {"jsid": "cosmo ? 'listView_item' + windmill['testWindow'].cosmo.view.list.itemRegistry.getAtPos(1).id : ''"}, "method": "click"}
+
+//unstamp event
+{"params": {"id": "sectionEventEnableToggle"}, "method": "check"}
+
+//save it!
+{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+
+//all events
+{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+
+{"method": "waits.sleep", "params": {"milliseconds" : 1100}}
+
+

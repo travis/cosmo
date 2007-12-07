@@ -137,7 +137,7 @@ cosmo.view.cal.CalItem.prototype.endsAfterViewRange =
 };
 cosmo.view.cal.CalItem.prototype.isInSelectedCollection =
     function () {
-    var selCollId = cosmo.app.pim.getSelectedCollection().getUid();
+    var selCollId = cosmo.app.pim.getSelectedCollectionId();
     var selColl = cosmo.view.cal.collectionItemRegistries[selCollId];
     return !!selColl.getItem(this.id);
 

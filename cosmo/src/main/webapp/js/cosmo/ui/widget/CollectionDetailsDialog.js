@@ -214,7 +214,9 @@ dojo.widget.HtmlWidget, function(){
 
                             // Re-render collections, update selected collection
                             // if necessary, and update the view
-                            var reloadDeferred = cosmo.app.pim.reloadCollections(collectionToDelete);
+                            var reloadDeferred = cosmo.app.pim.reloadCollections({ 
+                                removedCollection: collectionToDelete,
+                                removeByThisUser: true });
                             reloadDeferred.addCallback(function(){
                                 var f = function () {
                                     cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage);

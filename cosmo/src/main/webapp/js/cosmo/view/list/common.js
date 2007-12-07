@@ -75,8 +75,7 @@ cosmo.view.list.handlePub_calEvent = function (cmd) {
     var delta = cmd.delta;
     switch (act) {
         case 'loadCollection':
-            if ((opts.loadType == 'changeCollection') &&
-                cosmo.app.pim.getSelectedCollection()) {
+            if (opts.loadType == 'changeCollection') {
                 cosmo.view.list.loadItems();
             }
             break;
@@ -119,7 +118,10 @@ cosmo.view.list.loadItems = function (o) {
     // Catch any error stuffed in the deferred
     deferred.addErrback(function (e){
         if (e instanceof cosmo.service.exception.ResourceNotFoundException){
-            cosmo.app.pim.reloadCollections()
+            cosmo.app.pim.reloadCollections({
+                removedCollection: collection,
+                removedByThisUser: false
+            });
             return false;
         } else {
             showErr(e);

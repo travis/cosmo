@@ -69,7 +69,6 @@ cosmo.view.viewBase = new function () {
             dt.getMonth(), dt.getDate(), 23, 59) : null;
         var filterFunc = function (id, item) {
             if (!item) { 
-                console.log(id);    
                 throw new Error('item does not exist'); 
             }
             var keep = false;
@@ -161,7 +160,7 @@ cosmo.view.viewBase = new function () {
                     // Currently selected item, if any
                     var item = this.canvasInstance.getSelectedItem();
                     if (item &&
-                        cosmo.app.pim.getSelectedCollection().isWriteable() &&
+                        cosmo.app.pim.getSelectedCollectionWriteable() &&
                         isValidEventSource(e, elem)) {
                         switch (e.keyCode) {
                             // Enter

@@ -523,7 +523,7 @@ cosmo.view.cal.canvas = new function () {
         if (item.lozenge.getInputDisabled()) {
             return false;
         }
-        var writeable = cosmo.app.pim.getSelectedCollection().isWriteable();
+        var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
         var c = cosmo.view.cal.canvas;
         var origSelection = c.getSelectedItem();
 
@@ -917,7 +917,7 @@ cosmo.view.cal.canvas = new function () {
         item.lozenge.updateDisplayMain();
     }
     function foregroundSelectedCollection() {
-        var selCollId = cosmo.app.pim.getSelectedCollection().getUid();
+        var selCollId = cosmo.app.pim.getSelectedCollectionId();
         var selColl = cosmo.view.cal.collectionItemRegistries[selCollId];
         var selItem = self.getSelectedItem();
         var f = function(id, item) {
@@ -1038,7 +1038,7 @@ cosmo.view.cal.canvas = new function () {
         // Non-recurring (normal single item, recurrence removal), "only this item'
         else {
             // The id for the current collection -- used in creating new CalItems
-            var currCollId = cosmo.app.pim.getSelectedCollection().getUid();
+            var currCollId = cosmo.app.pim.getSelectedCollectionId();
             // The item just had its recurrence removed.
             // The only item that should remain is the item that was the
             // first occurrence -- put that item on the canvas, if it's
@@ -1428,7 +1428,7 @@ cosmo.view.cal.canvas = new function () {
         }
 
         // Put the new item in the currently selected collection
-        var currCollId = cosmo.app.pim.getSelectedCollection().getUid();
+        var currCollId = cosmo.app.pim.getSelectedCollectionId();
 
         // Set EventStamp start and end calculated from click position
         // --------

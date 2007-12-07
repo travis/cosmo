@@ -144,7 +144,10 @@ cosmo.view.cal.loadItems = function (p) {
         var handleErr = function (e) {
             var reloadDeferred = null;
             if (e instanceof cosmo.service.exception.ResourceNotFoundException){
-                reloadDeferred = cosmo.app.pim.reloadCollections();
+                reloadDeferred = cosmo.app.pim.reloadCollections({
+                    removedCollection: collection,
+                    removedByThisUser: false
+                });
             }
             cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
             return reloadDeferred;
@@ -204,7 +207,7 @@ cosmo.view.cal.createItemRegistryFromCollections = function () {
     if (cosmo.app.pim.getSelectedCollection()){
         var collectionReg = cosmo.view.cal.collectionItemRegistries;
         var currCollId = '';
-        var selCollId = cosmo.app.pim.getSelectedCollection().getUid();
+        var selCollId = cosmo.app.pim.getSelectedCollectionId();
         // Do something sensible with duplicate items when
         // building the consolidated itemRegistry
         var fillInItem = function (id, item) {

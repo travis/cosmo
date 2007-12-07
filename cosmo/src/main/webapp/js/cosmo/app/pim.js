@@ -123,7 +123,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         // Load collections for this user
         var loadCollectionsDeferred = this.loadCollections(params);
         loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
-
+            this.setDefaultSelectedCollection(params);
             // Base layout
             // ===============================
             this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
@@ -319,6 +319,9 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             collections.sort(f);
             var c = collections;
             var hues = this.collectionHues;
+
+            // Create the new list of collections
+            this.collections = new cosmo.util.hash.Hash();
             for (var i = 0; i < c.length; i++) {
                 var coll = c[i];
                 coll.isDisplayed = false;
@@ -330,20 +333,22 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                 coll.colors = calcColors(hue);
                 this.collections.addItem(coll.getUid(), coll);
             }
-
-            if (params.collectionUid){
-                this._selectedCollection =
-                    this.collections.getItem(params.collectionUid);
-            }
-            else {
-                this._selectedCollection = collections[0];
-            }
-            if (this._selectedCollection){
-                this._selectedCollection.doDisplay = true;
-            }
         }));
         return collectionsLoadedDeferred;
 
+    };
+    this.setDefaultSelectedCollection = function (p) {
+        var params = p || {};
+        if (params.collectionUid){
+            this._selectedCollection =
+                this.collections.getItem(params.collectionUid);
+        }
+        else {
+            this._selectedCollection = this.collections.getAtPos(0);
+        }
+        if (this._selectedCollection) {
+            this._selectedCollection.doDisplay = true;
+        }
     };
     this.setSelectedCollection = function (collection) {
         this._selectedCollection = collection || null;
@@ -374,12 +379,15 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         });
         return [filteredSubscriptions, deletedSubscriptions];
     };
-    this.reloadCollections = function (removedCollection) {
+    this.reloadCollections = function (o) {
+        var opts = o || {};
+        var removedCollection = opts.removedCollection || null;
+        var removedByThisUser = opts.removedByThisUser || false;
         var selectedCollection = this._selectedCollection;
         var loadCollectionsDeferred;
         // Don't bother saving state and reloading from
         // the server if it's a removal
-        if (removedCollection) {
+        if (removedCollection && removedByThisUser) {
             loadCollectionsDeferred = new dojo.Deferred();
             loadCollectionsDeferred.callback();
         }
@@ -407,35 +415,59 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
                     }
                 }
             }));
-        } 
+        }
 
         loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
             // If we had an originally selected collection
+            var selCollId = this.getSelectedCollectionId();
+            var newSel = this.collections.getItem(selCollId);
             if (selectedCollection) {
-                var selCollId = selectedCollection.getUid();
-                var newSel = this.collections.getItem(selCollId);
-                // If the originally selected collection is in
-                // the new set, point to the one in the new set
-                if (newSel) {
-                    this._selectedCollection = newSel;
-                    newSel.doDisplay = true;
-                }
-                // If the originally selected collection is gone,
-                // and was not the one removed by the user,
-                // show the user a nice error message
-                else {
-                    if (selectedCollection != removedCollection) {
+                if (removedCollection) {
+                    // If the originally selected collection is gone,
+                    // and was not the one removed by the user,
+                    // show the user a nice error message
+                    if (!removedByThisUser) {
                         cosmo.app.showErr(_("Main.Error.CollectionRemoved",
                                             selectedCollection.getDisplayName()));
                     }
+                    if (newSel) {
+                        this._selectedCollection = newSel;
+                        newSel.doDisplay = true;
+                    }
                     // Default new selection is the first collection
                     // in the list
-                    this._selectedCollection = this.collections.getAtPos(0);
-                    this._selectedCollection.doDisplay = true;
+                    else {
+                        if (this.collections.length) {
+                            newSel = this.collections.getAtPos(0);
+                        }
+                    }
                 }
-                cosmo.view.displayViewFromCollections(
-                    this._selectedCollection);
+                // If the originally selected collection is in
+                // the new set, point to the one in the new set
+                else {
+                    if (newSel) {
+                        this._selectedCollection = newSel;
+                        newSel.doDisplay = true;
+                    }
+                }
+
             }
+            // User had no collections loaded, no selected collection
+            else {
+                // The new selection is the first (and only) one
+                if (this.collections.length) {
+                    newSel = this.collections.getAtPos(0);
+                }
+            }
+            // If there's a selected collection, display its data
+            if (newSel) {
+                this._selectedCollection = newSel;
+                this._selectedCollection.doDisplay = true;
+            }
+            else {
+                this._selectedCollection = null;
+            }
+            cosmo.view.displayViewFromCollections(this._selectedCollection);
         }));
         return loadCollectionsDeferred;
     };

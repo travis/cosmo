@@ -336,7 +336,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
         }
     }
     this.byline.updateFromItem(data);
-    var writeable = cosmo.app.pim.getSelectedCollection().getWriteable();
+    var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
     this.buttonSection.setButtons(writeable);
 };
 
@@ -378,7 +378,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
 
     this.renderSelf = function () {
         var d = this.domNode;
-        var writeable = cosmo.app.pim.getSelectedCollection().getWriteable();
+        var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
         var item = cosmo.ui.detail.item;
         var enabled = !!(item);
 
@@ -408,7 +408,8 @@ cosmo.ui.detail.MarkupBar = function (p) {
             var doEMail = function () {
                 var data = item.data;
                 var timeFormat = _("Sidebar.Email.TimeFormat");
-                var subject = cosmo.app.pim.getSelectedCollection().getDisplayName() + ": " + data.getDisplayName();
+                var collection = cosmo.app.pim.getSelectedCollection();
+                var subject = collection.getDisplayName() + ": " + data.getDisplayName();
                 var body = [_("Sidebar.Email.Title") , data.getDisplayName() , "%0d%0a"];
                 var eventStamp = data.getEventStamp();
                 if (eventStamp){

@@ -70,7 +70,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 else {
                     // Don't apply rollover fu to selected item
                     var id = targ.id.replace('collectionSelectorItemSel_', '');
-                    if (id == cosmo.app.pim.getSelectedCollection().getUid()) {
+                    if (id == cosmo.app.pim.getSelectedCollectionId()) {
                         return false;
                     }
                     var addRemoveKey = isOver ? 'add' : 'remove';

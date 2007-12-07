@@ -366,11 +366,13 @@ cosmo.view.service = new function () {
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
                 //itself.
-                var deferred = cosmo.app.pim.serv.getCollection(cosmo.app.pim.getSelectedCollection().getUrls().self);
+                var collection = cosmo.app.pim.getSelectedCollection();
+                var deferred = cosmo.app.pim.serv.getCollection(collection.getUrls().self);
                 deferred.addErrback(function (){
                     //reload collections will handle showing the error message, as it will try and load the 
                     //original collection
-                    return cosmo.app.pim.reloadCollections();
+                    return cosmo.app.pim.reloadCollections({ removedCollection: collection,
+                        removedByThisUser: false });
                 } );
                 deferred.addCallback(function (){
                     errMsg = _('Main.Error.EventEditSaveFailed.EventRemoved');

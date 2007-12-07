@@ -188,7 +188,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     };
     this.handleSelectionChange = function (e, target, discardUnsavedChanges) {
         var args = Array.prototype.slice.call(arguments);
-        var writeable = cosmo.app.pim.getSelectedCollection().isWriteable();
+        var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
         // Original selection
         var origSelection = self.getSelectedItem();
         // Paranoia check -- bail if there's no target, or the target
@@ -441,14 +441,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
         return true;
     };
     this.initListProps = function () {
-        var items = cosmo.view.list.itemRegistry.length;
-        var pages = parseInt(items/this.itemsPerPage);
-        if (items % this.itemsPerPage > 0) {
-            pages++;
-        }
-        this.itemCount =  items;
-        this.pageCount = pages;
+        this.itemCount =  cosmo.view.list.itemRegistry.length;
         this.currPageNum = 1;
+        this._calcPageCount();
     };
     this.goNextPage = function () {
         self.currPageNum++;
@@ -459,8 +454,15 @@ cosmo.view.list.canvas.Canvas = function (p) {
         self.displayListViewTable();
     };
 
-
     // Private methods
+    this._calcPageCount = function () {
+        var items = cosmo.view.list.itemRegistry.length;
+        var pages = parseInt(items/this.itemsPerPage);
+        if (items % this.itemsPerPage > 0) {
+            pages++;
+        }
+        this.pageCount = pages; 
+    };
     this._updateSize = function () {
         if (this.parent) {
             this.width = this.parent.width - 2; // 2px for borders
@@ -587,7 +589,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         deferred = deferred || cosmo.util.deferred.getFiredDeferred()
         deferred.addCallback(updateEventsCallback);
-        deferred.addCallback(function(){self._doSortAndDisplay()});
+        deferred.addCallback(function (){ 
+            self._calcPageCount();
+            self._doSortAndDisplay();
+        });
         return deferred;
     };
     this._removeSuccess = function (cmd) {

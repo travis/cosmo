@@ -1043,8 +1043,25 @@ cosmo.ui.detail.EventFormElements= function () {
     setDefaultElemState();
     addBehaviors();
 
-    function addToHashAndReturn(elem){
-        formElements[elem.name] = elem;
+    // Manually add elements to a fake form collection
+    // we can use before appending to DOM
+    function addToHashAndReturn (elem) {
+        var name = elem.name;
+        var type = elem.type;
+        if (type == 'radio' || type == 'checkbox') {
+            if (typeof formElements[name] != 'undefined') {
+                if (!formElements[name].length) {
+                    formElements[name] = [formElements[name]];
+                }
+                formElements[name].push(elem);
+            }
+            else {
+                formElements[name] = elem;
+            }
+        }
+        else {
+            formElements[name] = elem;
+        }
         return elem;
     }
 
@@ -1302,12 +1319,19 @@ cosmo.ui.detail.EventFormElements= function () {
         // event, adding a start/end time would create a timed event item
         var func = function (e) {
             var allDay = e.target.checked;
+            var handlerFunc;
             if (allDay) {
-                cosmo.util.html.clearFormElem(formElements.startTime, 'text');
-                cosmo.util.html.clearFormElem(formElements.endTime, 'text');
-                cosmo.util.html.clearFormElem(formElements.startMeridian, 'radio');
-                cosmo.util.html.clearFormElem(formElements.endMeridian, 'radio');
+                handlerFunc = cosmo.util.html.clearAndDisableFormElem;
             }
+            else {
+                handlerFunc = cosmo.util.html.enableFormElem;
+            }
+            handlerFunc(formElements.startTime, 'text');
+            handlerFunc(formElements.endTime, 'text');
+            handlerFunc(formElements.startMeridian, 'radio');
+            handlerFunc(formElements.endMeridian, 'radio');
+            handlerFunc(formElements.tzRegion, 'select');
+            handlerFunc(formElements.tzId, 'select');
         };
         // All-day event / normal event toggling
         dojo.event.connect(formElements.eventAllDay, 'onclick', func);
@@ -1354,7 +1378,7 @@ cosmo.ui.detail.EventFormElements= function () {
     // Interface methods
     // -------
     this.updateFromStamp = function (stamp) {
-        var setTimeElem = function (form, name, dt, untimed) {
+        var setTimeElem = function (form, name, dt, untimed, allDay) {
             var timeElem = null;
             var meridianElem = null;
             var str = '';
@@ -1380,6 +1404,9 @@ cosmo.ui.detail.EventFormElements= function () {
                 meridianElem[0].checked = false;
                 timeElem.value = '';
             }
+            meridianElem[1].disabled = allDay
+            meridianElem[0].disabled = allDay;
+            timeElem.disabled = allDay
         };
         var allDay = stamp.getAllDay();
         var anyTime = stamp.getAnyTime();
@@ -1388,10 +1415,10 @@ cosmo.ui.detail.EventFormElements= function () {
         _html.setTextInput(f.eventLocation, stamp.getLocation() || '');
         var start = stamp.getStartDate();
         _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
-        setTimeElem(f, 'start', start, untimed);
+        setTimeElem(f, 'start', start, untimed, allDay);
         var end = stamp.getEndDate();
         _html.setTextInput(f.endDate, end.strftime('%m/%d/%Y'));
-        setTimeElem(f, 'end', end, untimed);
+        setTimeElem(f, 'end', end, untimed, allDay);
         if (start.tzId){
             var tz = cosmo.datetime.timezone.getTimezone(start.tzId);
             if (!tz){
@@ -1413,6 +1440,8 @@ cosmo.ui.detail.EventFormElements= function () {
         }
         else {
             clearTimezone();
+            f.tzRegion.disabled = allDay;
+            f.tzId.disabled = allDay;
         }
         var stat = stamp.getStatus();
         if (stat) {

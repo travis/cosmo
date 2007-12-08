@@ -304,6 +304,7 @@ cosmo.util.html.clearFormElem = function (elem, elemType) {
             elem.value = '';
             break;
 
+        case 'select':
         case 'select-one':
         case 'select-multiple':
             elem.selectedIndex = 0;

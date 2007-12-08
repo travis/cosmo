@@ -28,6 +28,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("dojo.validate.web");
 dojo.require("dojo.event");
+dojo.require("dojo.lang");
 dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWidget,
@@ -37,7 +38,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
         // Programmatic widget creation disabled because of problems in safari. Reenable when
         // this is fixed
-        //widgetsInTemplate:true,
+        widgetsInTemplate:true,
 
         // Set in user HTML
         header : "",
@@ -100,22 +101,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             for (i = 0; i < inputs.length; i++){
                 this.enabledInputs[inputs[i]] = false;
 
-                this[inputs[i] + "Input"].style.visibility = 'hidden';
+                this[inputs[i] + "InputRow"].style.visibility = 'hidden';
             }
         },
 
         setupButtons : function(){
 
             // Programmatic subwidget creation should be phased out once safari supports it.
-            var button = dojo.widget.createWidget("cosmo:Button",
-                    {text:this.submitButtonText,
-                     small:true,
-                     widgetId: this.widgetId + "SubmitButton"});
+//            var button = dojo.widget.createWidget("cosmo:Button",
+//                    {text:this.submitButtonText,
+//                     small:true,
+//                     widgetId: this.widgetId + "SubmitButton"});
+//
 
-
-            dojo.dom.prependChild(button.domNode, this.submitButton.parentNode);
-            dojo.dom.removeNode(this.submitButton);
-            this.submitButton = button;
+//            dojo.dom.prependChild(button.domNode, this.submitButton.parentNode);
+//            dojo.dom.removeNode(this.submitButton);
+//            this.submitButton = button;
 
 
             if (this.createNew) {
@@ -140,15 +141,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             if (this.disableCancel) {
                 dojo.dom.removeNode(this.cancelButton);
             } else {
-                var button = dojo.widget.createWidget("cosmo:Button",
-                        {text:this.cancelButtonText,
-                         small:true,
-                         widgetId: this.widgetId + "CancelButton"});
+//                var button = dojo.widget.createWidget("cosmo:Button",
+//                        {text:this.cancelButtonText,
+//                         small:true,
+//                         widgetId: this.widgetId + "CancelButton"});
 
-                dojo.dom.prependChild(button.domNode, this.cancelButton.parentNode);
-                dojo.dom.removeNode(this.cancelButton);
+//                dojo.dom.prependChild(button.domNode, this.cancelButton.parentNode);
+//                dojo.dom.removeNode(this.cancelButton);
 
-                this.cancelButton = button;
+//                this.cancelButton = button;
 
                 dojo.event.connect(this.cancelButton, "handleOnClick", this, "cancelAction");
             }
@@ -194,47 +195,39 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         populateFields : function(populateUsername){
             // username only needed if logged in as administrator
 
-            var self = this;
-            
-            var handle = function(type, data, evt){
-
-                    if (evt.status == 200){
-
-                        var user = data;
-
-                        self.editingUser = user
-
-                        form = self.form;
-
-                        form.username.value = user.username;
-
-                        form.firstName.value = user.firstName;
-                        form.lastName.value = user.lastName;
-                        form.email.value = user.email;
-
-                        form.admin.checked = user.administrator;
-                        form.locked.checked = user.locked;
-
-                        overlord = (user.username == cosmo.env.OVERLORD_USERNAME)
-                        form.username.disabled = overlord;
-                        form.firstName.disabled = overlord;
-                        form.lastName.disabled = overlord;
-                        form.admin.disabled = overlord;
-                        form.locked.disabled = overlord;
-
-
-                    } else if (evt.status == 404){
-                        alert("User does not exist");
-                    }
-			}
-			
             var handlerDict = {
-                load: handle,
-                error: handle
+                load: dojo.lang.hitch(this, function(type, data, evt){
+                    
+                    if (evt.status == 200){
+                        var user = data;
+                        this.editingUser = user
+                        this.usernameInput.value = user.username;
+                        
+                        this.firstNameInput.value = user.firstName;
+                        this.lastNameInput.value = user.lastName;
+                        this.emailInput.value = user.email;
+                        
+                        this.adminInput.checked = user.administrator;
+                        this.lockedInput.checked = user.locked;
+                        
+                        var overlord = (user.username == cosmo.env.OVERLORD_USERNAME)
+                        this.usernameInput.disabled = overlord;
+                        this.firstNameInput.disabled = overlord;
+                        this.lastNameInput.disabled = overlord;
+                        this.adminInput.disabled = overlord;
+                        this.lockedInput.disabled = overlord;
+                    }
+			    }),
+                
+                error:  function(type, data, evt){
+                    if (evt.status == 404){
+                        alert("User does not exist");
+                    } else {
+                        throw new Error(data);
+                    }
                 }
-
-
-
+            }
+			
             if (populateUsername){
                    cosmo.cmp.getUser(populateUsername, handlerDict);
             } else {
@@ -268,7 +261,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    },
 	    
 	    validateUsername : function(){
-	    	var username = this.form.username.value;
+	    	var username = this.usernameInput.value;
 	    	if (username == ""){
 	    		this.usernameError.innerHTML = _("Signup.Error.RequiredField");
 	    		return false;
@@ -281,7 +274,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    },
 
 	    validateFirstName : function(){
-	    	var firstName = this.form.firstName.value;
+	    	var firstName = this.firstNameInput.value;
 	    	if (firstName == ""){
 	    		this.firstNameError.innerHTML = _("Signup.Error.RequiredField");
 	    		return false;
@@ -294,7 +287,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    },
 
 	    validateLastName : function(){
-	    	var lastName = this.form.lastName.value;
+	    	var lastName = this.lastNameInput.value;
 	    	if (lastName == ""){
 	    		this.lastNameError.innerHTML = _("Signup.Error.RequiredField");
 	    		return false;
@@ -307,7 +300,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    },
 
 	    validateEmail : function(){
-	    	var email = this.form.email.value;
+	    	var email = this.emailInput.value;
 	    	if (email == ""){
 	    		this.emailError.innerHTML = _("Signup.Error.RequiredField");
 	    		return false;
@@ -320,7 +313,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    },
 
 	    validatePassword : function(){
-	    	var password = this.form.password.value;
+	    	var password = this.passwordInput.value;
 	    	if ((password.length < 5 || password.length > 16)
 	    		&& password != ""){
 	    		this.passwordError.innerHTML = _("Signup.Error.PasswordInvalidLength");
@@ -330,8 +323,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 	    },
 
 	    validateConfirm : function(){
-	    	var password = this.form.password.value;
-	    	var confirm = this.form.confirm.value;
+	    	var password = this.passwordInput.value;
+	    	var confirm = this.confirmInput.value;
 	    	if (password != confirm){
 	    		this.confirmError.innerHTML = _("Signup.Error.MatchPassword");
 	    		return false;
@@ -344,43 +337,38 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         		return;
         	}
 
-            var form = this.form;
-
             var userHash = {};
             var user = this.editingUser;
 
-            if (user.username != form.username.value
+            if (user.username != this.usernameInput.value
                 && this.enabledInputs.username
                 && this.role == cosmo.ROLE_ADMINISTRATOR){
-                userHash.username = form.username.value;
+                userHash.username = this.usernameInput.value;
             }
-            if (user.firstName != form.firstName.value
+            if (user.firstName != this.firstNameInput.value
                 && this.enabledInputs.firstName){
-                userHash.firstName = form.firstName.value;
+                userHash.firstName = this.firstNameInput.value;
             }
-            if (user.lastName != form.lastName.value
+            if (user.lastName != this.lastNameInput.value
                 && this.enabledInputs.lastName){
-                userHash.lastName = form.lastName.value;
+                userHash.lastName = this.lastNameInput.value;
             }
-            if (user.email != form.email.value
+            if (user.email != this.emailInput.value
                 && this.enabledInputs.email){
-                userHash.email = form.email.value;
+                userHash.email = this.emailInput.value;
             }
-            if (form.password.value != ""
+            if (this.passwordInput.value != ""
                 && this.enabledInputs.password){
-                userHash.password = form.password.value;
+                userHash.password = this.passwordInput.value;
             }
-
-            if (user.administrator != form.admin.checked
+            if (user.administrator != this.adminInput.checked
             	&& this.enabledInputs.admin){
-            	userHash.administrator = form.admin.checked;
+            	userHash.administrator = this.adminInput.checked;
           	}
-
-            if (user.locked != form.locked.checked
+            if (user.locked != this.lockedInput.checked
             	&& this.enabledInputs.locked){
-            	userHash.locked = form.locked.checked;
+            	userHash.locked = this.lockedInput.checked;
           	}
-
             if (this.role == cosmo.ROLE_ADMINISTRATOR){
                 cosmo.cmp.modifyUser(this.editingUser.username, userHash, this.postActionHandlerDict)
             } else if (this.role == cosmo.ROLE_AUTHENTICATED){
@@ -389,14 +377,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         },
 
         userHashFromForm : function(form){
-            var userHash = {username : form.username.value,
-                        password : form.password.value,
-                        firstName : form.firstName.value,
-                        lastName : form.lastName.value,
-                        email : form.email.value};
+            var userHash = {username : this.usernameInput.value,
+                        password : this.passwordInput.value,
+                        firstName : this.firstNameInput.value,
+                        lastName : this.lastNameInput.value,
+                        email : this.emailInput.value};
 
-            userHash.administrator = form.admin.checked;
-            userHash.locked = form.locked.checked;
+            userHash.administrator = this.adminInput.checked;
+            userHash.locked = this.lockedInput.checked;
             return userHash;
         },
 
@@ -405,12 +393,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         		return;
         	}
         	
-            userHash = this.userHashFromForm(this.form)
+            userHash = this.userHashFromForm(this.form);
 
             cosmo.cmp.signup(
-                        userHash,
-                        this.postActionHandlerDict
-                        )
+                userHash,
+                this.postActionHandlerDict
+            );
 
         },
 
@@ -418,11 +406,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
          	if (!this.validateFields()){
         		return;
         	}
- 
-            var self = this
+            
+            var self = this;
 
             //Check if user exists
-            cosmo.cmp.headUser(this.form.username.value,
+            cosmo.cmp.headUser(this.usernameInput.value,
                 {handle : function(type, data, evt){
 
                     // a 404 means the user does not exist, so let's create it

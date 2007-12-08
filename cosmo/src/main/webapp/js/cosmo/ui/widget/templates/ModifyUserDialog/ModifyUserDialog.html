@@ -7,14 +7,14 @@
 
   <table cellpadding="3" cellspacing="1" border="0">
 
-    <tr dojoAttachPoint="usernameInput">
+    <tr dojoAttachPoint="usernameInputRow">
       <td class="labelTextCell">
           ${this.usernameLabel}
       </td>
       <td>
           <div class="smData"></div>
           <div>
-          <input id="username" size="32" maxlength="32" id="modifyUsername" class="inputText"/>
+          <input id="${this.widgetId}Username" size="32" maxlength="32" class="inputText" dojoAttachPoint="usernameInput"/>
 
           </div>
 	      <span class="inputError" dojoAttachPoint="usernameError">
@@ -22,14 +22,14 @@
     	  </span>
       </td>
     </tr>
-    <tr dojoAttachPoint="firstNameInput">
+    <tr dojoAttachPoint="firstNameInputRow">
       <td class="labelTextCell">
           ${this.firstNameLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div>
-          <input property="firstName" id="firstName" size="32" maxlength="128" class="inputText"/>
+          <input property="firstName" id="${this.widgetId}FirstName" size="32" maxlength="128" class="inputText" dojoAttachPoint="firstNameInput"/>
 
           </div>
 	      <span class="inputError" dojoAttachPoint="firstNameError">
@@ -37,14 +37,14 @@
     	  </span>
       </td>
     </tr>
-    <tr dojoAttachPoint="lastNameInput">
+    <tr dojoAttachPoint="lastNameInputRow">
       <td class="labelTextCell">
           ${this.lastNameLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div>
-          <input id="lastName" size="32" maxlength="128" class="inputText"/>
+          <input id="${this.widgetId}LastName" size="32" maxlength="128" class="inputText" dojoAttachPoint="lastNameInput"/>
 
           </div>
     	  <span class="inputError" dojoAttachPoint="lastNameError">
@@ -52,14 +52,14 @@
 	      </span>
       </td>
     </tr>
-    <tr dojoAttachPoint="emailInput">
+    <tr dojoAttachPoint="emailInputRow">
       <td class="labelTextCell">
           ${this.emailLabel}
       </td>
       <td>
         <div class="smData"></div>
         <div>
-        	<input id="email" size="32" maxlength="128" class="inputText">
+        	<input id="${this.widgetId}Email" size="32" maxlength="128" class="inputText" dojoAttachPoint="emailInput">
         </div>
    	    <span class="inputError" dojoAttachPoint="emailError">
 		
@@ -74,46 +74,46 @@
         <span class="sm">${this.passwordBlurb}</span>
       </td>
     </tr>
-    <tr dojoAttachPoint="passwordInput">
+    <tr dojoAttachPoint="passwordInputRow">
       <td class="labelTextCell">
            ${this.passwordLabel}
       </td>
       <td>
         <div class="smData"></div>
-        <div><input type="password" id="password" size="16" maxlength="16"
-                     class="inputText"/></div>
+        <div><input type="password" id="${this.widgetId}Password" size="16" maxlength="16"
+                     class="inputText" dojoAttachPoint="passwordInput"/></div>
 	      <span class="inputError" dojoAttachPoint="passwordError">
 		
     	  </span>
       </td>
     </tr>
-    <tr dojoAttachPoint="confirmInput">
+    <tr dojoAttachPoint="confirmInputRow">
       <td class="labelTextCell">
            ${this.confirmLabel}
       </td>
       <td>
         <div class="smData"></div>
-        <div><input type="password" id="confirm" size="16" maxlength="16"
-                     class="inputText"/></div>
+        <div><input type="password" id="${this.widgetId}Confirm" size="16" maxlength="16"
+                     class="inputText" dojoAttachPoint="confirmInput"/></div>
 	      <span class="inputError" dojoAttachPoint="confirmError">
 		
     	  </span>
       </td>
     </tr>
-    <tr dojoAttachPoint="adminInput">
+    <tr dojoAttachPoint="adminInputRow">
      <td class="labelTextCell">&nbsp;</td>
       <td>
         <div style="margin-top:8px;">
-          <input type="checkbox" id="admin"/>
+          <input type="checkbox" id="${this.widgetId}Admin" dojoAttachPoint="adminInput"/>
              ${this.adminLabel}
         </div>
       </td>
     </tr>
-    <tr dojoAttachPoint="lockedInput">
+    <tr dojoAttachPoint="lockedInputRow">
      <td class="labelTextCell">&nbsp;</td>
       <td>
         <div style="margin-top:8px;">
-          <input type="checkbox" id="locked"/>
+          <input type="checkbox" id="${this.widgetId}Locked" dojoAttachPoint="lockedInput"/>
              ${this.lockedLabel}
         </div>
       </td>
@@ -125,13 +125,13 @@
   <div class="cancelButtonContainer" style="margin-top:12px;">
     <div style="float:left;" >
         <button dojoType="cosmo:Button" dojoAttachPoint="cancelButton"
-            text="${this.cancelButtonText}" small="true">
+            text="${this.cancelButtonText}" small="true" widgetId="${this.widgetId}CancelButton">
             ${this.cancelButtonText}
         </button>
     </div>
     <div style="float:right;">
         <button dojoType="cosmo:Button" dojoAttachPoint="submitButton"
-               text="${this.submitButtonText}" small="true">
+               text="${this.submitButtonText}" small="true" widgetId="${this.widgetId}SubmitButton">
                ${this.submitButtonText}
         </button>
     </div>

@@ -182,41 +182,38 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              the values in <code>userHash</code>
          */
         modifyUser: function (username, userHash, handlerDict, sync) {
-                // If the user to be modified is the current user and
-                // we're changing username or password, make
-                // sure the current credentials will be changed on success
-
-                if (username == cosmo.util.auth.getUsername() &&
-                    (userHash.password || userHash.username)){
-
-                    var newCred = {};
-                    if (userHash.password){
-                        newCred.password = userHash.password;
-                    }
-                    if (userHash.username){
-                        newCred.username = userHash.username;
-                    }
-
-                    handlerDict = this._wrapChangeCredentialFunctions(
-                        handlerDict, [204], newCred);
+            // If the user to be modified is the current user and
+            // we're changing username or password, make
+            // sure the current credentials will be changed on success
+            if (username == cosmo.util.auth.getUsername() &&
+                (userHash.password || userHash.username)){
+                
+                var newCred = {};
+                if (userHash.password){
+                    newCred.password = userHash.password;
                 }
-
-                // Safari and IE don't understand 204s. Boo.
-                if (navigator.userAgent.indexOf('Safari') > -1 ||
-                    document.all){
-                    handlerDict = this._wrap204Bandaid(handlerDict);
+                if (userHash.username){
+                    newCred.username = userHash.username;
                 }
-
-                var request_content = this.userHashToXML(userHash);
-
-                var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-                requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
-                                    encodeURIComponent(dojo.string.trim(username));
-                requestDict.method = "POST";
-                requestDict.headers['X-Http-Method-Override'] = "PUT";
-                requestDict.postContent = request_content;
-
-                dojo.io.bind(requestDict);
+                
+                handlerDict = this._wrapChangeCredentialFunctions(
+                    handlerDict, [204], newCred);
+            }
+            
+            // Safari and IE don't understand 204s. Boo.
+            if (navigator.userAgent.indexOf('Safari') > -1 ||
+                document.all){
+                handlerDict = this._wrap204Bandaid(handlerDict);
+            }
+            
+            var request_content = this.userHashToXML(userHash);
+            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
+                encodeURIComponent(dojo.string.trim(username));
+            requestDict.method = "POST";
+            requestDict.headers['X-Http-Method-Override'] = "PUT";
+            requestDict.postContent = request_content;
+            dojo.io.bind(requestDict);
 
         },
 
@@ -429,11 +426,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
         userHashToXML: function(/*Object*/ userHash){
             return '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                 '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
-                '<username>' + dojo.string.escapeXml(userHash.username) + '</username>' +
-                '<password>' + dojo.string.escapeXml(userHash.password) + '</password>' +
-                '<firstName>' + dojo.string.escapeXml(userHash.firstName) + '</firstName>' +
-                '<lastName>' + dojo.string.escapeXml(userHash.lastName) + '</lastName>' +
-                '<email>' + dojo.string.escapeXml(userHash.email) + '</email>' +
+                (userHash.username? '<username>' + dojo.string.escapeXml(userHash.username) + '</username>' : "") +
+                (userHash.password? '<password>' + dojo.string.escapeXml(userHash.password) + '</password>' : "") +
+                (userHash.firstName? '<firstName>' + dojo.string.escapeXml(userHash.firstName) + '</firstName>' : "") +
+                (userHash.lastName? '<lastName>' + dojo.string.escapeXml(userHash.lastName) + '</lastName>': "") +
+                (userHash.email? '<email>' + dojo.string.escapeXml(userHash.email) + '</email>': "") +
                 (userHash.subscription? this._subscriptionToXML(userHash.subscription) : "") +
                 (userHash.administrator? '<' + EL_ADMINISTRATOR + ' >true</' + EL_ADMINISTRATOR + '>' : "") +
                 (userHash.locked?'<locked>true</locked>' : "") +

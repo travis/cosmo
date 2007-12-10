@@ -490,6 +490,14 @@
                                 <include>urlrewrite.xml</include>
                             </includes>
                         </resource>
+                        <resource>
+                            <directory>${basedir}/build</directory>
+                            <targetPath>META-INF</targetPath>
+                            <filtering>false</filtering>
+                            <includes>
+                                <include>context.xml</include>
+                            </includes>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>

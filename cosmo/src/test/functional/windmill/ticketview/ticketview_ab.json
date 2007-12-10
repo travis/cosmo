@@ -1,4 +1,0 @@
-{"params": {"milliseconds": 4000},  "method": "waits.sleep"}
-{"params": {"link": "Account Browser"},  "method": "storeURL"}
-{"params": {"url": "{$Account Browser}"},  "method": "open"}
-{"params": {"milliseconds": 3000},  "method": "waits.sleep"}

@@ -1,6 +1,0 @@
-{"params": {"url": "{$baseUrl}\/logout"},  "method": "open"}
-{"params": {"url": "\/chandler\/login"},  "method": "open"}
-{"params": {"id": "loginDialogUsernameInput"},  "method": "click"}
-{"params": {"text": "root", "id": "loginDialogUsernameInput"},  "method": "type"}
-{"params": {"text": "cosmo", "id": "loginDialogPasswordInput"},  "method": "type"}
-{"params": {"id": "loginSubmitButton"},  "method": "click"}

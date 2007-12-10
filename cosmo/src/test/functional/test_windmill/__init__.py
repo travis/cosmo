@@ -15,6 +15,7 @@
 from windmill.authoring import setup_module as windmill_setup
 from windmill.authoring import teardown_module as windmill_teardown
 from windmill.authoring import enable_collector, RunJsonFile
+import os
 
 enable_collector()
 
@@ -22,6 +23,8 @@ registry_line = '{"method": "commands.createVariables", "params":{"variables":["
 
 def setup_module(module):
     windmill_setup(module)
+    from windmill.bin import shell_objects
+    shell_objects.load_extensions_dir(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'extensions'))
     RunJsonFile('create_registry.json', lines=[registry_line])()
     
 

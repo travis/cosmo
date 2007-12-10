@@ -24,13 +24,11 @@ logout = """{"method": "click", "params": {"link" : "Log out"}}
 """
 
 from windmill.authoring import RunJsonFile
-from windmill.bin import shell_objects
 import windmill
 
 lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us']
 
 def setup_module(module):
-    shell_objects.load_extensions_dir(os.path.join(os.path.dirname(__file__), 'extensions'))
     if windmill.settings['TEST_URL'] in lab_urls:
         json = login_with_root_lab_json
     else:

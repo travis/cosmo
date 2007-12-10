@@ -91,6 +91,56 @@ public class ZeroPointSixOneToZeroPointSevenMigration extends AbstractMigration 
         log.debug("starting migrateData()");
         migrateTimeRangeIndexes(conn);
         migrateModifications(conn);
+        
+        if("Derby".equals(dialect))
+            migrateUserPreferences(conn);
+        
+    }
+    
+    /**
+     * Add id to preferences
+     */
+    private void migrateUserPreferences(Connection conn) throws Exception {
+        
+        PreparedStatement stmt = null;
+        PreparedStatement insertStmt = null;
+        HibernateHelper hibernateHelper = new HibernateHelper();
+        
+        ResultSet rs = null;
+        
+        long count = 0;
+        
+        log.debug("starting migrateUserPreferences()");
+        
+        try {
+            // get all stamp/item data to migrate
+            stmt = conn.prepareStatement("select userid, preferencename, preferencevalue from x_user_preferences");
+            // migration statment
+            insertStmt = conn.prepareStatement("insert into user_preferences (id, userid, preferencename, preferencevalue, createdate, modifydate) values (?,?,?,?,?,?)");
+            insertStmt.setLong(5, new Date().getTime());
+            insertStmt.setLong(6, new Date().getTime());
+            
+            rs = stmt.executeQuery();
+            
+            // migrate each event_stamp row
+            while(rs.next()) {
+                insertStmt.setLong(1, hibernateHelper.getNexIdUsingHiLoGenerator(conn));
+                insertStmt.setLong(2, rs.getLong(1));
+                insertStmt.setString(3, rs.getString(2));
+                insertStmt.setString(4, rs.getString(3));
+                
+                if(insertStmt.executeUpdate()!=1)
+                    throw new RuntimeException("migrate of user pref failed (could not insert new row)!");
+                count++;
+            }
+            
+            
+        } finally {
+            close(stmt);
+            close(insertStmt);
+        }
+        
+        log.debug("processed " + count + " user perferences");
     }
     
     

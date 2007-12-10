@@ -8,6 +8,10 @@ alter table subscription add column modifydate bigint
 # users
 alter table users add column locked smallint
 
+# remove old indexes
+drop index idx_startdt
+drop index idx_enddt
+
 # event_stamp
 alter table event_stamp add column isfloating smallint
 alter table event_stamp add column isrecurring smallint
@@ -22,11 +26,7 @@ create index idx_recurring on event_stamp (isrecurring)
 rename table user_preferences to x_user_preferences
 create table user_preferences (id bigint not null, createdate bigint, modifydate bigint, preferencename varchar(255) not null, preferencevalue varchar(255) not null, userid bigint not null, primary key (id), unique (userid, preferencename))
 
-
 # migrate data
 update item set itemtype='file' where itemtype='content'
 update subscription set createdate=1181239766000, modifydate=1181239766000
 update users set locked=0
-insert into user_preferences (userid, preferencename, preferencevalue, createdate, modifydate) select userid, preferencename, preferencevalue, 1181239766000, 1181239766000 from x_user_preferences
-drop table x_user_preferences
-alter table user_preferences add constraint FK199BD08467D36616 foreign key (userid) references users

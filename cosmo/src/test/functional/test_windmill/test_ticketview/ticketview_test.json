@@ -10,6 +10,7 @@
 {"params": {"text": "{$random2}@example.com", "id": "email"}, "method": "type"}
 {"params": {"text": "signup", "id": "password"}, "method": "type"}
 {"params": {"text": "signup", "id": "confirm"}, "method": "type"}
+{"params": {"id": "tos"},  "method": "check"}
 {"params": {"id": "signupSubmit"}, "method": "click"}
 {"method": "waits.forElement", "params": {"id": "signupClose", "timeout": 40000}}
 {"params": {"id": "signupClose"}, "method": "click"}

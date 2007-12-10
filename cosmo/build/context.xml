@@ -13,3 +13,61 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
+
+<Context path="/chandler" reloadable="false">
+
+  <!-- Location of Cosmo configuration properties file
+       Must be in one of the following forms:
+        o "file:etc/cosmo.properties" - specifies a filesystem location,
+          either absolute or relative to Tomcat's current working directory
+          (usually $CATALINA_HOME)
+        o "classpath:cosmo.properties" - specifies a classpath location
+          (deployer must add the properties file to the classpath manually)
+  -->
+  <Environment name="cosmo/config" value="file:etc/cosmo.properties"
+               type="java.lang.String" override="false" />
+
+  <!-- Storage configuration
+       Data is stored in an RDBMS and accessed through a JDBC DataSource.
+       Supported RDBMSes: Derby, MySQL, PostgreSQL
+       Default configuration is an embedded Derby database. To use another
+       system, comment out the Derby configuration and uncomment the
+       appropriate one.
+  -->
+
+	<!-- Derby -->
+	<Resource name="jdbc/cosmo" type="javax.sql.DataSource" maxActive="100"
+	          maxIdle="30" maxWait="10000" username="sa" password=""
+		        driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
+		        url="jdbc:derby:db;create=true" />
+
+	<!-- MySQL -->
+  <!--
+  <Resource name="jdbc/cosmo" type="javax.sql.DataSource" maxActive="100"
+            maxIdle="30" maxWait="10000" username="[user]"
+            password="[pass]" defaultAutoCommit="false"
+		        driverClassName="com.mysql.jdbc.Driver"
+		        url="jdbc:mysql://[server]:3306/[db]?useUnicode=true&amp;characterEncoding=UTF-8" />
+	-->          
+
+	<!-- PostgreSQL -->
+  <!--
+  <Resource name="jdbc/cosmo" type="javax.sql.DataSource" maxActive="100"
+            maxIdle="30" maxWait="10000" username="[user]"
+            password="[pass]" defaultAutoCommit="false"
+            driverClassName="org.postgresql.Driver"
+            url="jdbc:postgresql://[server]:5432/[db]" />
+  -->          
+
+  <!-- Mail configuration
+       An outbound SMTP server is required to send notification messages for
+       account activation and other system events. Messages are delivered
+       through a JavaMail Session.
+  -->
+  	<Resource name="mail/cosmo" type="javax.mail.Session"
+  	          mail.transport.protocol="smtp"
+		          mail.smtp.host="localhost"
+		          mail.smtps.host="localhost"
+		          mail.smtp.starttls.enable="false" />
+
+</Context>

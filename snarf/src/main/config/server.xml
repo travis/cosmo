@@ -1,5 +1,5 @@
 <!--
-    Copyright 2005-2006 Open Source Applications Foundation
+    Copyright 2005-2007 Open Source Applications Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,58 +15,6 @@
 -->
 
 <Server port="8005" shutdown="SHUTDOWN">
-  <GlobalNamingResources>
-    <!-- Derby configuration 
-         The default configuration has Cosmo running against
-         and embedded Derby database -->
-    <Resource name="osafsrv/db"
-              type="javax.sql.DataSource"
-              maxActive="100"
-              maxIdle="30"
-              maxWait="10000"
-              username="sa"
-              password=""
-              driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
-              url="jdbc:derby:db;create=true"/>
-    
-    <!-- MySQL configuration 
-         Comment the above Resource and uncomment the following
-         Resource to configure Cosmo to run against a MySQL DB   -->
-    <!-- 
-        <Resource name="osafsrv/db"
-             type="javax.sql.DataSource"
-             maxActive="100"
-             maxIdle="30"
-             maxWait="10000"
-             username="[user]"
-             password="[pass]"
-             defaultAutoCommit="false"
-             driverClassName="com.mysql.jdbc.Driver"
-             url="jdbc:mysql://[server]:3306/[db]?useUnicode=true&amp;characterEncoding=UTF-8"/>
-    -->
-    <!-- PostgreSQL configuration 
-         Comment the above Resource and uncomment the following
-         Resource to configure Cosmo to run against a PostgreSQL DB   -->
-    <!-- 
-        <Resource name="osafsrv/db"
-             type="javax.sql.DataSource"
-             maxActive="100"
-             maxIdle="30"
-             maxWait="10000"
-             username="[user]"
-             password="[pass]"
-             defaultAutoCommit="false"
-             driverClassName="org.postgresql.Driver"
-             url="jdbc:postgresql://[server]:5432/[db]"/>
-    -->
-
-    <Resource name="osafsrv/mail"
-              type="javax.mail.Session"
-              mail.transport.protocol="smtp"
-              mail.smtp.host="localhost"
-              mail.smtps.host="localhost"
-              mail.smtp.starttls.enable="false"/>
-  </GlobalNamingResources>
   <Service name="Catalina">
     <Connector port="8080" enableLookups="false"
                minSpareThreads="4" maxSpareThreads="50"
@@ -80,7 +28,7 @@
 -->
     <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" autoDeploy="false"
-            deployOnStartup="false">
+            deployOnStartup="true">
             
 <!--  
 	Access log valve uses pattern equivalent to "combined" format, with our custom
@@ -93,23 +41,6 @@
                directory="../logs" prefix="access." suffix=".log"
                pattern="%h %l %{COSMO_PRINCIPAL}r %t &quot;%r&quot; %s %b &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"
                resolveHosts="false"/>
-               
-        <Context path="" docBase="ROOT" reloadable="false"/>
-<!--
-        <Context path="/cosmo-docs" docBase="cosmo-docs-${pom.version}.war" 
-               reloadable="false"/>
- -->
-        <Context path="/chandler" docBase="cosmo-${pom.version}.war"
-                 reloadable="false">
-          <Environment name="cosmo/config" value="file:etc/cosmo.properties"
-                       type="java.lang.String" override="false"/>
-          <ResourceLink name="jdbc/cosmo"
-                        global="osafsrv/db"
-                        type="javax.sql.DataSource"/>
-          <ResourceLink name="mail/cosmo"
-                        global="osafsrv/mail"
-                        type="javax.mail.Session"/>
-        </Context>
       </Host>
     </Engine>
   </Service>

@@ -18,7 +18,7 @@
   <Service name="Catalina">
     <Connector port="8080" enableLookups="false"
                minSpareThreads="4" maxSpareThreads="50"
-               maxThreads="200" URIEncoding="UTF-8"/>
+               maxThreads="200" URIEncoding="UTF-8" />
 <!--
     <Connector port="8443" enableLookups="false" secure="true"
                minSpareThreads="4" maxSpareThreads="50"
@@ -28,20 +28,7 @@
 -->
     <Engine name="Catalina" defaultHost="localhost">
       <Host name="localhost" appBase="webapps" autoDeploy="false"
-            deployOnStartup="true">
-            
-<!--  
-	Access log valve uses pattern equivalent to "combined" format, with our custom
-	principal name information substituted for "remote user".
-	
-	Pattern taken from AccessLogValve javadocs here:
-	http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html
--->
-        <Valve className="org.apache.catalina.valves.AccessLogValve"
-               directory="../logs" prefix="access." suffix=".log"
-               pattern="%h %l %{COSMO_PRINCIPAL}r %t &quot;%r&quot; %s %b &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"
-               resolveHosts="false"/>
-      </Host>
+            deployOnStartup="true" />
     </Engine>
   </Service>
 </Server>

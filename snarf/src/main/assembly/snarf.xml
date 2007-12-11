@@ -45,13 +45,6 @@
             <directory>src/webapp/</directory>
             <outputDirectory>tomcat/webapps/ROOT/</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>../cosmo/target/</directory>
-            <outputDirectory>tomcat/webapps/</outputDirectory>
-            <includes>
-                <include>cosmo-${pom.version}.war</include>
-            </includes>
-        </fileSet>
         <!-- Include cosmo-migration files -->
         <fileSet>
             <directory>../migration/src/main/config</directory>
@@ -79,7 +72,13 @@
         <file>
             <source>${basedir}/src/main/config/server.xml</source>
             <outputDirectory>tomcat/conf/</outputDirectory>
-            <filtered>True</filtered>
+            <fileMode>420</fileMode>
+        </file>
+        <file>
+            <source>${basedir}/../cosmo/target/cosmo-${pom.version}.war</source>
+            <outputDirectory>tomcat/webapps/</outputDirectory>
+            <destName>chandler.war</destName>
+            <filtered>false</filtered>
             <fileMode>420</fileMode>
         </file>
     </files>

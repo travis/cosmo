@@ -14,7 +14,7 @@
     limitations under the License.
 -->
 
-<Context path="/chandler" reloadable="false">
+<Context reloadable="false">
 
   <!-- Location of Cosmo configuration properties file
        Must be in one of the following forms:

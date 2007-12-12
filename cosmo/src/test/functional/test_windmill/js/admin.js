@@ -44,6 +44,5 @@ adminTests.test_users = (function(){
                      ]);
     }
     tests.push({params: {"link": "Log out"}, method: "click"});
-    alert(fleegix.json.serialize(tests));
     return tests;
 })();

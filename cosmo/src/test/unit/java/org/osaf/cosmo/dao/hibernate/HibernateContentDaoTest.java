@@ -1281,11 +1281,6 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         newItem.setName("test");
         newItem.setIcalUid("icaluid");
         
-        // get ical4j to parse VAVAILABILITY
-        System.setProperty("ical4j.unfolding.relaxed", "true");
-        System.setProperty("ical4j.parsing.relaxed", "true");
-        System.setProperty("ical4j.validation.relaxed", "true");
-        
         CalendarBuilder cb = new CalendarBuilder();
         net.fortuna.ical4j.model.Calendar calendar = cb.build(helper.getInputStream("vavailability.ics"));
         

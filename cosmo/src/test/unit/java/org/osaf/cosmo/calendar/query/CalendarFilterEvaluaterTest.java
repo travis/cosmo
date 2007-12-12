@@ -37,6 +37,14 @@ public class CalendarFilterEvaluaterTest extends TestCase {
         System.setProperty("ical4j.validation.relaxed", "true");
     }
 
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        System.clearProperty("ical4j.unfolding.relaxed");
+        System.clearProperty("ical4j.parsing.relaxed");
+        System.clearProperty("ical4j.validation.relaxed");
+    }
+
     public void testEvaluateFilterPropFilter() throws Exception {
         
         CalendarFilterEvaluater evaluater = new CalendarFilterEvaluater();

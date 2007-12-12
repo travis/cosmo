@@ -488,6 +488,29 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>build/assembly.xml</descriptor>
+                    </descriptors>
+                    <finalName>chandler-webapp-${pom.version}</finalName>
+                    <outputDirectory>dist</outputDirectory>
+                    <workDirectory>${basedir}/target/assembly/work</workDirectory>
+                    <appendAssemblyId>False</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>

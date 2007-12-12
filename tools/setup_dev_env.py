@@ -2,6 +2,7 @@
 import os
 import subprocess
 import sys
+import shutil
 from xml.etree import ElementTree as etree
 
 def main():
@@ -15,10 +16,10 @@ def main():
     * 
     """
     initialize()    
+    setup_app()
     setup_snarf()
     setup_eclipse()
-    setup_app()
-
+   
 def initialize():
     """
     set up some useful globals.
@@ -38,11 +39,13 @@ def setup_snarf():
     os.chdir(get_snarf_path())
     # run maven
     output = subprocess.Popen(["mvn", "assembly:directory"], stdout=subprocess.PIPE).communicate()[0]
-    # edit the server.xml file
-    doc = etree.parse(get_serverxml_path())
+    # copy over the context file
+    shutil.copy(get_contextxml_path(), get_chandlerxml_path())
+    # edit the chandler.xml file
+    doc = etree.parse(get_chandlerxml_path())
     context = _get_context_element(doc)
     context.set("docBase", get_cosmo_webapp_path())
-    doc.write(get_serverxml_path())
+    doc.write(get_chandlerxml_path())
 
 def setup_eclipse():
     os.chdir(get_cosmo_app_path());
@@ -54,12 +57,10 @@ def setup_eclipse():
  
 def setup_app():
     os.chdir(get_cosmo_app_path());
-    output = subprocess.Popen(["mvn", "clean", "compile", "war:inplace"], stdout=subprocess.PIPE).communicate()[0]
+    output = subprocess.Popen(["mvn", "clean", "compile", "war:inplace", "package"], stdout=subprocess.PIPE).communicate()[0]
 
 def _get_context_element(doc):
-    for context in doc.getiterator("Context"):
-        if context.get("path") == "/chandler":
-            return context
+    return doc.getiterator("Context")[0]
 
 def get_script_path():
     return scriptpath
@@ -83,11 +84,14 @@ def get_snarf_dist_path():
     dirname = "osaf-server-bundle-" + version + "/"
     return get_snarf_path() + "dist/" + dirname + dirname
 
-def get_serverxml_path():
-    return get_snarf_dist_path() + "tomcat/conf/server.xml"
-
 def get_dot_project_path():
     return get_cosmo_app_path() + ".project"
+
+def get_contextxml_path():
+    return get_cosmo_webapp_path() + "/META-INF/context.xml"
+
+def get_chandlerxml_path():
+    return get_snarf_dist_path() + "tomcat/conf/Catalina/localhost/chandler.xml"
 
 if __name__ == "__main__":
     main()

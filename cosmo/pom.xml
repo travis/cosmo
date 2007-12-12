@@ -250,24 +250,6 @@
             <version>2.6.0</version>
         </dependency>
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.7.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>2.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate</artifactId>
             <version>3.2.5.ga</version>
@@ -363,6 +345,11 @@
             <groupId>woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
             <version>3.2.1</version>
+        </dependency>
+        <dependency>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+          <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

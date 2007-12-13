@@ -44,22 +44,22 @@
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
-            <version>0.4.0-incubating-SNAPSHOT</version>
+            <version>0.4.0-incubating-20071114.192534-3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
-            <version>0.4.0-incubating-SNAPSHOT</version>
+            <version>0.4.0-incubating-20071114.192534-3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-server</artifactId>
-            <version>0.4.0-incubating-SNAPSHOT</version>
+            <version>0.4.0-incubating-20071114.192534-3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-protocol</artifactId>
-            <version>0.4.0-incubating-SNAPSHOT</version>
+            <version>0.4.0-incubating-20071114.192534-3</version>
         </dependency>
         <!-- runtime dependency of abdera -->
         <dependency>

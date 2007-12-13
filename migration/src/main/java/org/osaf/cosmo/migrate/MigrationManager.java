@@ -87,7 +87,7 @@ public class MigrationManager {
             List<Migration> toApply = getMigrationsToApply(currentVersion);
             
             if(toApply.size()==0)
-                log.info("Cosmo database is up to date.  No migrations applied.");
+                log.info("No migrations found for version " + currentVersion + " and dialect " + dialect);
             else
                 log.info("Found " + toApply.size() + " migrations using dialect: " + dialect);
             

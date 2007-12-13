@@ -19,22 +19,6 @@
 -->
 
 <beans>
-    
-    <bean id="dataSource"
-        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName">
-            <value>${migration.datasource.driverClassName}</value>
-        </property>
-        <property name="url">
-            <value>${migration.datasource.url}</value>
-        </property>
-        <property name="username">
-            <value>${migration.datasource.username}</value>
-        </property>
-        <property name="password">
-            <value>${migration.datasource.password}</value>
-        </property>
-    </bean>
 
     <bean id="zeroPointFiveToZeroPointSix"
         class="org.osaf.cosmo.migrate.ZeroPointFiveToZeroPointSixMigration">
@@ -74,30 +58,6 @@
     
      <bean id="zeroPointNineToZeroPointTen"
          class="org.osaf.cosmo.migrate.ZeroPointNineToZeroPointTenMigration">
-    </bean>
-    
-    <bean id="propertyPlaceHolderConfigurer"
-        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    </bean>
-	
-    <bean id="migrationManager"
-        class="org.osaf.cosmo.migrate.MigrationManager">
-
-        <property name="dialect">
-            <value>${migration.dialect}</value>
-        </property>
-        <property name="datasource" ref="dataSource"/>
-        <property name="migrations">
-            <list>
-                <ref local="zeroPointFiveToZeroPointSix"/>
-                <ref local="zeroPointSixToZeroPointSixZeroOne"/>
-                <ref local="zeroPointSixZeroOneToZeroPointSixOne"/>
-                <ref local="zeroPointSixOneToZeroPointSeven"/>
-                <ref local="zeroPointSevenToZeroPointEight"/>
-                <ref local="zeroPointEightToZeroPointNine"/>
-                <ref local="zeroPointNineToZeroPointTen"/>
-            </list>
-        </property>
     </bean>
 
 </beans>

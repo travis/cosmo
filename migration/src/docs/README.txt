@@ -4,9 +4,9 @@ Overview
 ---------
 This directory contains the source for the Chandler Server
 Migration Manager.  The Migration Manager allows a previous
-version of the Chandler Server database to be migragted
+version of the Chandler Server database to be migrated
 to the most recent version.  It supports Derby and 
-MySQL5 databases.
+MySQL5 databases, but can be extended to support others.
 
 Disclaimer
 -----------
@@ -66,3 +66,52 @@ migration manager is already built. To run:
    to run against the migrated database and start up normally.  If using Derby, copy
    $OSAFSRV_HOME/db from the old version of Cosmo to $OSAFSRV_HOME/db of the
    new version.
+   
+Adding Support for additional databases
+---------------------------------------
+The migration manager can be extended to support other databases.
+By default, it searches for all jar files in the current directory with
+the name "migration-extension*.jar" and attempts to load the extension jar.
+
+A migration extension jar is a regular java archive containing one or
+more Migration implementations, along with a spring configuration file
+defining the implementations.  The configuration file must be located
+at the top level in the jar and must be named migration-context.xml.  See
+the migration-context.xml example in src/main/resources.
+
+So for example, to create an extension jar to support a simple Postgres 
+migration from schema ver 100 to 110 the following can be done:
+
+1. create project for Postgres migration
+2. create migration-context.xml
+   add the following bean def:
+   <bean id="postgres100To110Migration"
+        class="org.osaf.cosmo.migrate.BasicSqlScriptMigration">
+        <property name="fromVersion">
+            <value>100</value>
+        </property>
+        <property name="toVersion">
+            <value>110</value>
+        </property>
+        <property name="supportedDialects">
+            <set>
+                <value>Postgres</value>
+            </set>
+        </property>
+    </bean>
+3. create migration scripts that BasicSqlScriptMigration look for:
+   100-to-110-Postgres-pre.sql
+   100-to-110-Postgres-post.sql
+4. create migration-extension-postgres-100-110.jar that looks like:
+   /migration-context.xml
+   /100-to-110-Postgres-pre.sql
+   /100-to-110-Postgres-post.sql
+5. copy migration-extension-postgres-100-110.jar to same directory as 
+   the migration manager jar
+6. configure migration.properties, setting the correct db/dialect properties
+7. execute migration manager as specified above and the extension jar should
+   be loaded
+   
+More complicated migrations can be defined by implementing a custom
+Migration and including in the extension jar.  If you implement a 
+migration extension please share it with the community.

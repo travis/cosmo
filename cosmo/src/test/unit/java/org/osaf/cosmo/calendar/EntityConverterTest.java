@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.ICalendarItem;
+import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.mock.MockEntityFactory;
@@ -71,6 +72,11 @@ public class EntityConverterTest extends TestCase {
         // get mod
         NoteItem mod = it.next();
         
+        ModificationUid uid = new ModificationUid(mod.getUid());
+        
+        Assert.assertEquals(master.getUid(), uid.getParentUid());
+        Assert.assertEquals("20060104T190000Z", uid.getRecurrenceId().toString());
+        
         Assert.assertTrue(mod.getModifies()==master);
         EventExceptionStamp ees = StampUtils.getEventExceptionStamp(mod);
         Assert.assertNotNull(ees);
@@ -79,6 +85,38 @@ public class EntityConverterTest extends TestCase {
         Calendar eventCal = ees.getEventCalendar();
         ComponentList vtimezones = eventCal.getComponents(Component.VTIMEZONE);
         Assert.assertEquals(1, vtimezones.size());
+        
+        
+        // update event (change mod and add mod)
+        calendar = getCalendar("event_with_exception2.ics");
+        items = converter.convertEventCalendar(master, calendar);
+        
+        // should be master and 2 mods
+        Assert.assertEquals(3, items.size());
+        
+        mod = findModByRecurrenceId(items, "20060104T190000Z");
+        Assert.assertNotNull(mod);
+        Assert.assertEquals("event 6 mod 1 changed", mod.getDisplayName());
+        
+        mod = findModByRecurrenceId(items, "20060105T190000Z");
+        Assert.assertNotNull(mod);
+        Assert.assertEquals("event 6 mod 2", mod.getDisplayName());
+        
+        // update event again (remove mod)
+        calendar = getCalendar("event_with_exception3.ics");
+        items = converter.convertEventCalendar(master, calendar);
+        
+        // should be master and 1 active mod/ 1 deleted mod
+        Assert.assertEquals(3, items.size());
+        
+        mod = findModByRecurrenceId(items, "20060104T190000Z");
+        Assert.assertNotNull(mod);
+        Assert.assertFalse(mod.getIsActive().booleanValue());
+        
+        mod = findModByRecurrenceId(items, "20060105T190000Z");
+        Assert.assertNotNull(mod);
+        Assert.assertEquals("event 6 mod 2 changed", mod.getDisplayName());
+        
     }
     
     public void testEntityConverterMultiComponentCalendar() throws Exception {
@@ -157,6 +195,15 @@ public class EntityConverterTest extends TestCase {
                 if(note.getModifies()!=null && note.getUid().contains(rid))
                     return note;
             }
+        
+        return null;
+    }
+    
+    private NoteItem findModByRecurrenceId(Set<NoteItem> items, String rid) {
+        for(NoteItem note: items)
+            if(note.getModifies()!=null && note.getUid().contains(rid))
+                return note;
+            
         
         return null;
     }

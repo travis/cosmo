@@ -47,9 +47,8 @@ cosmo.ui.button.Button = function(elemId, width, onClickHandler,
     }
     // Normal params in order
     else {
-        // Note: This throws away elemId in favor of the
-        // incremented widget ID
         widget =  dojo.widget.createWidget("cosmo:Button", {
+            widgetId: elemId,
             text: displayText, 'width':width,
             handleOnClick: onClickHandler, small: isSmall,
             enabled: enabled }, dummyDom, 'last');

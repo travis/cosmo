@@ -19,6 +19,7 @@ dojo.provide('cosmo.view.dialog');
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.ui.button");
 
 cosmo.view.dialog = new function () {
     dojo.event.topic.subscribe('/calEvent', this, 'handlePub');
@@ -158,9 +159,9 @@ cosmo.view.dialog.RecurrenceDialog = function () {
         dojo.debug("removeConfirm dialog called.");
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
+            'btnsLeft': [new Button('removeConfirmCancelButton', 74, cosmo.app.hideDialog,
                 _('App.Button.Cancel'), true)],
-            'btnsRight': [new Button('removeButtonDialog', 74, function () { self.doPublishRemove(); },
+            'btnsRight': [new Button('removeConfirmRemoveButton', 74, function () { self.doPublishRemove(); },
                 _('App.Button.Remove'), true)],
             'defaultAction': function () { self.doPublishRemove(); },
             'content': _('Main.Prompt.ItemRemoveConfirm')
@@ -170,7 +171,7 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.removeRecurConfirm = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('cancelButtonDialog', 74, cosmo.app.hideDialog,
+            'btnsLeft': [new Button('removeRecurrenceCancelButton', 74, cosmo.app.hideDialog,
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
             'defaultAction': function () {},
@@ -182,7 +183,7 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.saveRecurConfirm = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('cancelButtonDialog', 74,
+            'btnsLeft': [new Button('saveRecurConfirmSaveButton', 74,
                 function () { self.doCancelSave.apply(self) },
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
@@ -195,7 +196,7 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.saveRecurConfirmAllEventsOnly = function () {
          return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('cancelButtonDialog', 74,
+            'btnsLeft': [new Button('saveRecurConfirmAllEventsCancelButton', 74,
                 function () { self.doCancelSave.apply(self) },
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
@@ -208,7 +209,7 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.removeRecurConfirmAllEventsOnly = function () {
          return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('cancelButtonDialog', 74,
+            'btnsLeft': [new Button('removeRecurConfirmAllEventsCancelButton', 74,
                 function () { self.doCancelSave.apply(self) },
                 _('App.Button.Cancel'), true)],
             'btnsRight': [],
@@ -288,6 +289,7 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [
                 new Button({
+                    widgetId: "unsavedChangesDialogCancelButton",
                     text: strings.cancelButtonText, 
                     width: btnWidth,
                     handleOnClick: opts.cancelFunc, 
@@ -296,12 +298,14 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             ],
             'btnsRight': [
                 new cosmo.ui.button.Button({ 
+                    widgetId: "unsavedChangesDialogDiscardButton",
                     text: strings.discardButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.discardFunc,
                     small: true,
                     enabled: true }),
                 new cosmo.ui.button.Button({ 
+                    widgetId: "unsavedChangesDialogSaveButton",
                     text: strings.saveButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.saveFunc,

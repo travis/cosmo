@@ -243,7 +243,9 @@ cosmo.ui.navbar.Bar = function (p) {
         t.className = 'floatLeft';
         this.viewToggleNode = t;
         var vT =  dojo.widget.createWidget("cosmo:GraphicRadioButtonSet", {
-            selectedButtonIndex: selButtonIndex, height: 35, buttons: btns }, t, 'last');
+            selectedButtonIndex: selButtonIndex, height: 35, buttons: btns,
+            widgetId: "viewToggle"
+        }, t, 'last');
         this.viewToggle = vT;
         d.appendChild(t);
     };
@@ -464,7 +466,8 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             handleOnClick: createItem,
             small: true,
             width: 52,
-            enabled: true },
+            enabled: true,
+            widgetId: "quickEntryCreate"},
             dummy, 'last');
         dummy.removeChild(dummy.firstChild);
         var dummy = _createElem('span');

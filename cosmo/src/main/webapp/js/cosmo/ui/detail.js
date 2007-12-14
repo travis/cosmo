@@ -1180,13 +1180,13 @@ cosmo.ui.detail.EventFormElements= function () {
         var str = '';
 
         opt = new Object();
-        opt.text = 'Once';
+        opt.text = _("Main.DetailForm.RecurrenceInterval.Once");
         opt.value = '';
         recurOpt.push(opt);
         for (var i in cosmo.model.RRULE_FREQUENCIES) {
             opt = new Object();
             str = cosmo.model.RRULE_FREQUENCIES[i];
-            opt.text = dojo.string.capitalize(str);
+            opt.text = _("Main.DetailForm.RecurrenceInterval." + dojo.string.capitalize(str));
             opt.value = str;
             recurOpt.push(opt);
         }
@@ -1584,6 +1584,7 @@ cosmo.ui.detail.ButtonSection = function () {
             var func = enabled ? dojo.lang.hitch(cosmo.ui.detail,cosmo.ui.detail[key + 'Item']) : null;
             this[key + 'Button'] = dojo.widget.createWidget("cosmo:Button", {
                 text: _("App.Button." + btns[i]),
+                id: "detail" + btns[i] + "Button",
                 handleOnClick: func,
                 enabled: enabled },
                 this[key + 'ButtonNode'], 'last');

@@ -130,6 +130,7 @@ public class EntityConverter {
     public Set<NoteItem> convertEventCalendar(NoteItem note,
                                               Calendar calendar) {
         EventStamp eventStamp = (EventStamp) note.getStamp(EventStamp.class);
+        
         if (eventStamp == null) {
             eventStamp = entityFactory.createEventStamp(note);
             note.addStamp(eventStamp);
@@ -167,12 +168,23 @@ public class EntityConverter {
      */
     public NoteItem convertJournalCalendar(Calendar calendar) {
         NoteItem note = entityFactory.createNote();
+        note.setUid(entityFactory.generateUid());
+        setBaseContentAttributes(note);
+        return convertJournalCalendar(note, calendar);
+    }
+    
+    /**
+     * Update existing NoteItem with calendar containing single VJOURNAL
+     * @param note note to update
+     * @param calendar calendar containing VJOURNAL
+     * @return NoteItem representation of VJOURNAL
+     */
+    public NoteItem convertJournalCalendar(NoteItem  note, Calendar calendar) {
+        
         note.setJournalCalendar(calendar);
         
         VJournal vj = (VJournal) getMasterComponent(calendar.getComponents(Component.VJOURNAL));
         
-        note.setUid(entityFactory.generateUid());
-        setBaseContentAttributes(note);
         setCalendarAttributes(note, vj);
         
         return note;
@@ -185,14 +197,28 @@ public class EntityConverter {
      */
     public NoteItem convertTaskCalendar(Calendar calendar) {
         NoteItem note = entityFactory.createNote();
-        TaskStamp task = entityFactory.createTaskStamp();
+        note.setUid(entityFactory.generateUid());
+        setBaseContentAttributes(note);
+        return convertTaskCalendar(note, calendar);
+    }
+    
+    /**
+     * Convert calendar containing single VTODO into NoteItem
+     * @param note note to update
+     * @param calendar calendar containing VTODO
+     * @return NoteItem representation of VTODO
+     */
+    public NoteItem convertTaskCalendar(NoteItem  note, Calendar calendar) {
         
-        note.addStamp(task);
+        TaskStamp task = StampUtils.getTaskStamp(note);
+        if(task==null) {
+            task = entityFactory.createTaskStamp();
+            note.addStamp(task);
+        }
+        
         task.setTaskCalendar(calendar);
         VToDo todo = (VToDo) getMasterComponent(calendar.getComponents(Component.VTODO));
         
-        note.setUid(entityFactory.generateUid());
-        setBaseContentAttributes(note);
         setCalendarAttributes(note, todo);
         
         return note;
@@ -205,11 +231,21 @@ public class EntityConverter {
      */
     public FreeBusyItem convertFreeBusyCalendar(Calendar calendar) {
         FreeBusyItem freeBusy = entityFactory.createFreeBusy();
-        freeBusy.setFreeBusyCalendar(calendar);
-        
-        VFreeBusy vfb = (VFreeBusy) getMasterComponent(calendar.getComponents(Component.VFREEBUSY));
-        
         freeBusy.setUid(entityFactory.generateUid());
+        setBaseContentAttributes(freeBusy);
+        return convertFreeBusyCalendar(freeBusy, calendar);
+    }
+    
+    /**
+     * Convert calendar containing single VFREEBUSY into FreeBusyItem
+     * @param freebusy freebusy to update
+     * @param calendar calendar containing VFREEBUSY
+     * @return FreeBusyItem representation of VFREEBUSY
+     */
+    public FreeBusyItem convertFreeBusyCalendar(FreeBusyItem freeBusy, Calendar calendar) {
+       
+        freeBusy.setFreeBusyCalendar(calendar);
+        VFreeBusy vfb = (VFreeBusy) getMasterComponent(calendar.getComponents(Component.VFREEBUSY));
         setCalendarAttributes(freeBusy, vfb);
         
         return freeBusy;
@@ -413,6 +449,7 @@ public class EntityConverter {
     }
     
     private void setBaseContentAttributes(ContentItem item) {
+        
         TriageStatus ts = entityFactory.createTriageStatus();
         TriageStatusUtil.initialize(ts);
 
@@ -423,7 +460,8 @@ public class EntityConverter {
         
         item.setSent(Boolean.FALSE);
         item.setNeedsReply(Boolean.FALSE);
-    }
+    }    
+
     
     private void setCalendarAttributes(NoteItem note,
                                        VEvent event) {

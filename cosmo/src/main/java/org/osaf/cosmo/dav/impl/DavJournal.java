@@ -18,11 +18,10 @@ package org.osaf.cosmo.dav.impl;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
-import net.fortuna.ical4j.model.component.VJournal;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
@@ -92,39 +91,12 @@ public class DavJournal extends DavCalendarResource {
     public void setCalendar(Calendar cal)
         throws DavException {
         NoteItem note = (NoteItem) getItem();
-        String val = null;
-
-        note.setJournalCalendar(cal);
-        
+      
         ComponentList vjournals = cal.getComponents(Component.VJOURNAL);
         if (vjournals.isEmpty())
             throw new UnprocessableEntityException("VCALENDAR does not contain any VJOURNALS");
 
-        VJournal vjournal = (VJournal) vjournals.get(0);
-
-        val = null;
-        if (vjournal.getSummary() != null)
-            val = StringUtils.substring(vjournal.getSummary().getValue(), 0, 1024);
-        if (StringUtils.isBlank(val))
-            val = note.getName();
-        note.setDisplayName(val);
-
-        val = null;
-        if (vjournal.getUid() != null)
-            val = vjournal.getUid().getValue();
-        if (StringUtils.isBlank(val))
-            throw new UnprocessableEntityException("VJOURNAL does not contain a UID");
-        note.setIcalUid(val);
-
-        val = null;
-        if (vjournal.getDescription() != null)
-            val = vjournal.getDescription().getValue();
-        if (val == null)
-            val = "";
-        note.setBody(val);
-        
-        // look for DTSTAMP
-        if(vjournal.getDateStamp()!=null)
-            note.setClientModifiedDate(vjournal.getDateStamp().getDate());
+        EntityConverter converter = new EntityConverter(getEntityFactory());
+        converter.convertJournalCalendar(note, cal);
     }
 }

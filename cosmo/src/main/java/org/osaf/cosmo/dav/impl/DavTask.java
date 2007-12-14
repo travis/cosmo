@@ -18,14 +18,10 @@ package org.osaf.cosmo.dav.impl;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
-import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.component.VAlarm;
-import net.fortuna.ical4j.model.component.VToDo;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.osaf.cosmo.calendar.ICalendarUtils;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
@@ -103,50 +99,12 @@ public class DavTask extends DavCalendarResource {
     public void setCalendar(Calendar cal)
         throws DavException {
         NoteItem note = (NoteItem) getItem();
-        String val = null;
-
-        // Store calendar in task stamp
-        getTaskStamp().setTaskCalendar(cal);
         
         ComponentList vtodos = cal.getComponents(Component.VTODO);
         if (vtodos.isEmpty())
             throw new UnprocessableEntityException("VCALENDAR does not contain any VTODOS");
 
-        // Pull out relevent data (displayName, body, etc) from icalendar data
-        VToDo vtodo = (VToDo) vtodos.get(0);
-
-        val = null;
-        if (vtodo.getSummary() != null)
-            val = StringUtils.substring(vtodo.getSummary().getValue(), 0, 1024);
-        if (StringUtils.isBlank(val))
-            val = note.getName();
-        note.setDisplayName(val);
-
-        val = null;
-        if (vtodo.getUid() != null)
-            val = vtodo.getUid().getValue();
-        if (StringUtils.isBlank(val))
-            throw new UnprocessableEntityException("VTODO does not contain a UID");
-        note.setIcalUid(val);
-
-        val = null;
-        if (vtodo.getDescription() != null)
-            val = vtodo.getDescription().getValue();
-        if (val == null)
-            val = "";
-        note.setBody(val);
-        
-        // look for DTSTAMP
-        if(vtodo.getDateStamp()!=null)
-            note.setClientModifiedDate(vtodo.getDateStamp().getDate());
-        
-        // look for VALARM
-        VAlarm va = ICalendarUtils.getDisplayAlarm(vtodo);
-        if (va != null) {
-            Date reminderTime = ICalendarUtils.getTriggerDate(va.getTrigger(),
-                    vtodo);
-            if (reminderTime != null)
-                note.setReminderTime(reminderTime);
-        }
+        EntityConverter converter = new EntityConverter(getEntityFactory());
+        converter.convertTaskCalendar(note, cal);
     }
 }

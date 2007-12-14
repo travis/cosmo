@@ -16,13 +16,15 @@
 package org.osaf.cosmo.dav.impl;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
@@ -73,6 +75,11 @@ public class DavEvent extends DavCalendarResource {
 
     protected void setCalendar(Calendar calendar)
         throws DavException {
+        
+        ComponentList vevents = calendar.getComponents(Component.VEVENT);
+        if (vevents.isEmpty())
+            throw new UnprocessableEntityException("VCALENDAR does not contain any VEVENTs");
+
         getEventStamp().setEventCalendar(calendar);
     }    
 }

@@ -38,9 +38,13 @@ def setup_snarf():
     # cd into proper directory
     os.chdir(get_snarf_path())
     # run maven
-    output = subprocess.Popen(["mvn", "assembly:directory"], stdout=subprocess.PIPE).communicate()[0]
+    print("    building snarf...")
+    run_command(["mvn", "assembly:directory"])
+
     # copy over the context file
+    print("    customizing chandler.xml...");
     shutil.copy(get_contextxml_path(), get_chandlerxml_path())
+
     # edit the chandler.xml file
     doc = etree.parse(get_chandlerxml_path())
     context = _get_context_element(doc)
@@ -48,19 +52,35 @@ def setup_snarf():
     doc.write(get_chandlerxml_path())
 
 def setup_eclipse():
+    print("Setting up project for eclipse...")
     os.chdir(get_cosmo_app_path());
-    output = subprocess.Popen(["mvn", "eclipse:eclipse"], stdout=subprocess.PIPE).communicate()[0]
+    print("    creating eclipse project files...")
+    run_command(["mvn", "eclipse:eclipse"])
+    print("    customizing .project file...");
     doc = etree.parse(get_dot_project_path())
     name = doc.find("name")
     name.text = "Cosmo "+ version
     doc.write(get_dot_project_path())
  
 def setup_app():
-    os.chdir(get_cosmo_app_path());
-    output = subprocess.Popen(["mvn", "clean", "compile", "war:inplace", "package"], stdout=subprocess.PIPE).communicate()[0]
+    print("Setting up webapp...")
+    print("    building cosmo")
+    os.chdir(get_cosmo_app_path())
+    run_command(["mvn", "clean", "compile", "war:inplace", "package"])
 
 def _get_context_element(doc):
     return doc.getiterator("Context")[0]
+
+def run_command(cmd, exitOnError=True):
+    s = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output = s.communicate()[0]
+    success = s.returncode == 0
+    
+    if (not success and exitOnError):
+        print("ERROR: \n" + output)
+        sys.exit(1)
+
+    return success, output
 
 def get_script_path():
     return scriptpath

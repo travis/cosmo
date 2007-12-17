@@ -60,14 +60,12 @@
                     searchIds: searchIds}
 </script>
 
-<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo"/>
+<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <script type="text/javascript">
 (function (){
-    dojo.require("dojo.widget.*");
-    dojo.require("dojo.debug.console");
-    dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
-    dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
+    dojo.registerModulePath("cosmo", "${baseUrl}/js/cosmo");
+    dojo.require("cosmo.util.debug");
 })();
 </script>
 <c:forEach var="layerName" items="${dojoLayers}">

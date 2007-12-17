@@ -65,6 +65,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.Recoverer", dojo.widget.HtmlWidget,
         sendButtonContainer: null,
         sendButton: null,
 
+        orText: _("Account.Recoverer.Or"),
+
         recoverFunction: function(){},
 
         setError: function(message){

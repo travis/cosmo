@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!--
+For use with the JsUnit from www.jsunit.net
+-->
+<head>
+
+  <title>Detail View Tests</title>
+
+  <!-- JsUnit -->
+  <link rel="stylesheet" type="text/css" href="../../jsunit/css/jsUnitStyle.css">
+  <!-- hack so we can get somewhere loading this file standalone without error -->
+  <script language="JavaScript" type="text/javascript">
+      var xbDEBUG = ''; xbDEBUG.on = false;
+      var djConfig = {isDebug: true};
+  </script>
+
+
+  <link rel="stylesheet" type="text/css" href="../../../../../main/webapp/templates/default/global.css">
+  <script src="../../../../../main/webapp/js/lib/dojo/dojo.js" language="JavaScript" type="text/javascript"></script>
+  <script src="../../../../../main/webapp/js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
+
+  <!-- dojo setup stuff -->
+  <script language="JavaScript" type="text/javascript">
+      dojo.require("dojo.widget.*");
+      dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
+      dojo.require("cosmo.env");
+      cosmo.env.setBaseUrl("../../../../../../main/webapp/");
+  </script>
+
+  <!--  bare minimum amount of stuff to display dialogs.  -->
+  <script language="JavaScript" type="text/javascript">
+      /* This is to trick cosmo into thinking we have a i18n lib loaded */
+      dojo.require("cosmo.util.jsi18n");
+      cosmo.util.jsi18n.init(dojo.hostenv.getBaseScriptUri() + "../../../../resources/PimMessageResources.properties");
+
+      dojo.require("cosmo.ui.conf");
+      dojo.require("cosmo.app");
+      dojo.require("cosmo.ui.detail");
+      dojo.require("dojo.debug");
+  </script>
+
+  <script language="JavaScript" type="text/javascript">
+    function showDialog(){
+        var detailDiv = _createElem('div');
+        detailDiv.id = 'detailViewForm';
+
+        var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: detailDiv,
+            id: detailDiv.id, top: 0, windowHeight: 400});
+        document.getElementById("container").appendChild(detailDiv);
+        cB.render()
+    }
+  </script>
+
+
+
+</head>
+<body>
+  <div id="container"/>
+  <br/>
+  <br/>
+  <div id="button"/>
+
+  <script language="JavaScript" type="text/javascript">
+       cosmo.app.init();
+       dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
+        dojo.widget.createWidget("cosmo:Button",
+                  { text: "Show CollectionDetails Dialog",
+                    width: "250px",
+                    handleOnClick: showDialog,
+                    small: false }, dojo.byId("button"), 'last');
+  </script>
+
+</body>
+</html>

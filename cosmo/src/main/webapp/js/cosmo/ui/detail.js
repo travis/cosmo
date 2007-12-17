@@ -173,7 +173,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.mainSection = c;
-
     // Stamp sections
     var stamps = this.stamps;
     for (var i = 0; i < stamps.length; i++) {
@@ -188,7 +187,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         this.domNode.appendChild(c.domNode);
         this[st.stampType.toLowerCase() + 'Section'] = c;
     }
-
     var c = new cosmo.ui.detail.Byline();
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
@@ -198,7 +196,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.buttonSection = c;
-
     this.renderSelf = function () {
         // Get the real, full height -- with all sections expanded
         // the first time the detail-view form renders
@@ -209,7 +206,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         // Turn on accordion mode if height is too tall
         // Also check to see if we need to hide all the sections
         // to make sure the buttons show
-        var winHeight = cosmo.app.pim.layout.baseLayout.height;
+        var winHeight = this.windowHeight || cosmo.app.pim.layout.baseLayout.height;
         if (this.height > winHeight) {
             this.accordionMode = true;
             // If the current height of the detail-view form (perhaps with
@@ -568,7 +565,6 @@ cosmo.ui.detail.StampSection = function (p) {
     // Use the stamp type as a basis for the DOM node ids
     // e.g., 'mailSectionExpander', 'eventSectionBody', etc.
     this.id = 'section' + this.stampType;
-
     setUpDOM();
     addBehaviors();
     this.toggleEnabled(false);
@@ -644,7 +640,6 @@ cosmo.ui.detail.StampSection = function (p) {
         header.appendChild(d);
         self.headerNode = header;
         self.domNode.appendChild(header);
-
         // Body
         // ------------------------
         if (self.hasBody) {
@@ -1308,12 +1303,11 @@ cosmo.ui.detail.EventFormElements= function () {
     function addBehaviors() {
         // Make hint text in text inputs disappear on focus
         var func = cosmo.util.html.handleTextInputFocus;
-        var txtIn = ['noteTitle', 'eventLocation', 'startDate',
+        var txtIn = ['eventLocation', 'startDate',
             'startTime', 'endDate', 'endTime', 'recurrenceEnd'];
         for (var el in txtIn) {
             dojo.event.connect(formElements[txtIn[el]], 'onfocus', func);
         }
-
         // Clear out time inputs if All-day checkbox is checked
         // Unchecking does nothing -- this would create an anytime
         // event, adding a start/end time would create a timed event item
@@ -1335,7 +1329,6 @@ cosmo.ui.detail.EventFormElements= function () {
         };
         // All-day event / normal event toggling
         dojo.event.connect(formElements.eventAllDay, 'onclick', func);
-
         // Recurrence -- disable 'ending' text box if event
         // does not recur
         var elem = formElements.recurrenceInterval;

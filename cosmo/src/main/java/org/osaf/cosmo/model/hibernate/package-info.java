@@ -76,7 +76,7 @@
     @NamedQuery(name="contentItem.by.parent", query="select item from HibContentItem item left join fetch item.stamps left join fetch item.attributes left join fetch item.tombstones join item.parents parent where parent=:parent"),
     @NamedQuery(name="noteItemId.by.parent.icaluid", query="select item.id from HibNoteItem item join item.parents parent where parent.id=:parentid and item.icalUid=:icaluid and item.modifies is null"),
     @NamedQuery(name="icalendarItem.by.parent.icaluid", query="select item.id from HibICalendarItem item join item.parents parent where parent.id=:parentid and item.icalUid=:icaluid"),
-    
+    @NamedQuery(name="contentItem.by.owner", query="from HibContentItem i where i.owner=:owner"),
     
     // User Queries
     @NamedQuery(name="user.byUsername", query="from HibUser where username=:username"),

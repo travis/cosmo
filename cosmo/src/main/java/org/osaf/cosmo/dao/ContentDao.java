@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.User;
 
 /**
  * Interface for DAO that provides base operations for content items.
@@ -142,6 +143,14 @@ public interface ContentDao extends ItemDao {
      *            content item to remove
      */
     public void removeContent(ContentItem content);
+    
+    /**
+     * Remove all content owned by a user
+     * 
+     * @param user
+     *            user to remove content for
+     */
+    public void removeUserContent(User user);
 
     /**
      * Remove collection item

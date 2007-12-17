@@ -37,6 +37,7 @@ import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.hibernate.HibCollectionItem;
 import org.osaf.cosmo.model.hibernate.HibItem;
 import org.osaf.cosmo.model.hibernate.HibItemTombstone;
@@ -364,6 +365,24 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     }
     
     
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ContentDao#removeUserContent(org.osaf.cosmo.model.User)
+     */
+    public void removeUserContent(User user) {
+        try {
+            Query query = getSession().getNamedQuery("contentItem.by.owner")
+                .setParameter("owner", user);
+            
+            List<ContentItem> results = query.list();
+            for(ContentItem content: results)
+                removeContentRecursive(content);
+            getSession().flush();
+        } catch (HibernateException e) {
+            throw convertHibernateAccessException(e);
+        }
+    }
+
+
     /* (non-Javadoc)
      * @see org.osaf.cosmo.dao.ContentDao#loadChildren(org.osaf.cosmo.model.CollectionItem, java.util.Date)
      */

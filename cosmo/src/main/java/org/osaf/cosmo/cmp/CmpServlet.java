@@ -1242,8 +1242,8 @@ public class CmpServlet extends HttpServlet {
         buf.append(req.getScheme()).
             append("://").
             append(req.getServerName());
-        if ((req.isSecure() && req.getServerPort() != 443) ||
-            (req.getServerPort() != 80)) {
+        if ((req.getScheme().equals("https") && req.getServerPort() != 443) ||
+            (req.getScheme().equals("http") && req.getServerPort() != 80)) {
             buf.append(":").append(req.getServerPort());
         }
         if (! req.getContextPath().equals("/")) {

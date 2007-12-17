@@ -5,6 +5,7 @@ if [ ! -d "$DOJO_VERSION" ]; then
     cd $DOJO_VERSION/buildscripts
     patch -p0 < ../../0.4.3-buildUtil.js.patch
     ant fix-config
+    cd ../../
 fi
 cp cosmo-pim.js $DOJO_VERSION/src/
 cp cosmo-login.js $DOJO_VERSION/src/

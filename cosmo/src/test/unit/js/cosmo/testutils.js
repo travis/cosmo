@@ -16,28 +16,46 @@
 
 dojo.provide("cosmotest.testutils");
 
-dojo.require("cosmo.cmp");
+/*dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
-
+*/
 cosmotest.testutils = {
     init: function initCosmoTests(/*Array*/ testModules){
-        var alltests = jum_new_alltests();
-        for (var x = 0; x < testModules.length; x++){
-            var moduleName = testModules[x];
+
+        for (var i = 0; i < testModules.length; i++){
+            var moduleName = testModules[i];
             dojo.require(moduleName);
-            var module = dojo.evalObjPath(moduleName);
+            var module = dojo.getObject(moduleName);
             var functionNames = this.getFunctionNames(module);
-            for (var y = 0; y < functionNames.length; y++){
-                var functionName = functionNames[y];
-                jum_add_test(alltests, moduleName, functionName.split("_")[1], functionName, dojo.evalObjPath(moduleName +"." +functionName) );
-            }         
             
+            var testFunctions = [];
+            for (var i in functionNames){
+                var name = functionNames[i];
+                testFunctions.push(
+                    {
+                        name: name,
+			            setUp: function(){
+			            },
+			            runTest: module[name],
+			            tearDown: function(){
+			            }
+                    }
+                );
+            }
+            doh.register("tests.moduleToBeTested", testFunctions);
         }
-        jum.setTests(alltests);
+
+        dojo.global.jum = doh;
     },
     
     getFunctionNames: function getFunctionNames(scope){
-        return jum_get_object_function_names(scope);
+        var fNames = [];
+        for (var name in scope){
+            if (name.indexOf("test_") == 0 && typeof scope[name] == "function"){
+                fNames.push(name);
+            }
+        }
+        return fNames; 
     },
 
     createTestAccount: function(){

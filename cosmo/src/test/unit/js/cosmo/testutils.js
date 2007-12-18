@@ -16,6 +16,29 @@
 
 dojo.provide("cosmotest.testutils");
 
+
+// Object to provide compatibility with old jum framework
+JUM = function(){
+}
+
+function _JUM_first_arg_string_func(n, name){
+    return function(){
+        var args = null;
+        if (arguments.length == n){
+            args = arguments;
+        } else if (arguments.length == n + 1){
+            args = Array.prototype.slice.apply(arguments, [1]);
+        }
+        return doh[name].apply(doh, args);
+    }
+}
+
+JUM.prototype = {
+    assertTrue: _JUM_first_arg_string_func(1, "assertTrue"),
+    assertFalse: _JUM_first_arg_string_func(1, "assertFalse"),
+    assertEquals: _JUM_first_arg_string_func(2, "assertEqual")
+}
+
 /*dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
 */
@@ -53,8 +76,8 @@ cosmotest.testutils = {
 
             doh.register(moduleName, testFunctions);
         }
+        jum = new JUM();
 
-        dojo.global.jum = doh;
     },
     
     getFunctionNames: function getFunctionNames(scope){

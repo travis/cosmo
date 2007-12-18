@@ -24,12 +24,19 @@ JUM = function(){
 function _JUM_first_arg_string_func(n, name){
     return function(){
         var args = null;
+        var s = null;
         if (arguments.length == n){
             args = arguments;
         } else if (arguments.length == n + 1){
+            s = arguments[0];
             args = Array.prototype.slice.apply(arguments, [1]);
+        } 
+        try {
+            return doh[name].apply(doh, args);
+        } catch (e){
+            console.log("Test failure message was: " + s);
+            throw e;
         }
-        return doh[name].apply(doh, args);
     }
 }
 

@@ -24,25 +24,34 @@ cosmotest.testutils = {
 
         for (var i = 0; i < testModules.length; i++){
             var moduleName = testModules[i];
-            dojo.require(moduleName);
-            var module = dojo.getObject(moduleName);
-            var functionNames = this.getFunctionNames(module);
-            
-            var testFunctions = [];
-            for (var i in functionNames){
-                var name = functionNames[i];
-                testFunctions.push(
-                    {
-                        name: name,
-			            setUp: function(){
-			            },
-			            runTest: module[name],
-			            tearDown: function(){
-			            }
-                    }
-                );
+            try {
+                dojo.require(moduleName);
+                var module = dojo.getObject(moduleName);
+                var functionNames = this.getFunctionNames(module);
+                
+                var testFunctions = [];
+                for (var i in functionNames){
+                    var name = functionNames[i];
+                    testFunctions.push(
+                        {
+                            name: name,
+			    setUp: function(){
+			    },
+			    runTest: module[name],
+			    tearDown: function(){
+			    }
+                        }
+                    );
+                }
+            } catch (error){
+                doh.register(moduleName, 
+                             [function failure(){
+                                 throw(error);
+                             }]);
+                continue;
             }
-            doh.register("tests.moduleToBeTested", testFunctions);
+
+            doh.register(moduleName, testFunctions);
         }
 
         dojo.global.jum = doh;

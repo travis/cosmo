@@ -29,9 +29,8 @@
  */
 dojo.provide("cosmo.datetime.Date");
 
-dojo.require("dojo.date.serialize");
-dojo.require("dojo.date.common");
-dojo.require("dojo.date.format");
+dojo.require("dojox.date.posix");
+
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
@@ -359,7 +358,7 @@ cosmo.datetime.Date.prototype.strftime = function strftime(formatString){
         return cached;
     }
 
-    var formatted = dojo.date.strftime(this, formatString);
+    var formatted = dojox.date.posix.strftime(this, formatString);
 
     this._setStrftimeCached(formatString, formatted);
     return formatted;
@@ -427,7 +426,7 @@ cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ du
  */
 cosmo.datetime.Date.prototype.strftimeLocalTimezone = function(/* String */ format){
     var local = new Date(this.toUTC());
-    return dojo.date.strftime(local, format);
+    return dojox.date.posix.strftime(local, format);
 };
 
 /**

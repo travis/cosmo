@@ -29,7 +29,7 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry = function(timezoneFileRoot){
 };
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.init = function(files){
-   dojo.lang.map(files, dojo.lang.hitch(this,this._parseUri));
+   dojo.map(files, dojo.hitch(this,this._parseUri));
 };
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype.addTimezone = function(timezone){
@@ -84,6 +84,8 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._initTzsByRegion = func
 }
 
 cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._parseUri = function(uri){
-    var content = dojo.hostenv.getText(this.timezoneFileRoot + "/" + uri);
-    cosmo.datetime.timezone.parse(content, dojo.lang.hitch(this, this.addTimezone), dojo.lang.hitch(this, this.addRuleSet), dojo.lang.hitch(this, this.addLink));
+    console.log(this.timezoneFileRoot + "/" + uri);
+
+    var content = dojo._getText(this.timezoneFileRoot + "/" + uri);
+    cosmo.datetime.timezone.parse(content, dojo.hitch(this, this.addTimezone), dojo.hitch(this, this.addRuleSet), dojo.hitch(this, this.addLink));
 };

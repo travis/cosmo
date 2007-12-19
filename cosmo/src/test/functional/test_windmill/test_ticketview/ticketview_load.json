@@ -1,7 +1,7 @@
 {"method": "waits.sleep", "params": {"milliseconds" : 4000}}
-{"params": {"id": "grantTicketButton"},  "method": "waits.forElement"}
+{"params": {"id": "newTicketWidgetGrantTicketButton"},  "method": "waits.forElement"}
 {"params": {"xpath": "/html/body/div[2]/div/form/span[4]/span/input[2]"}, "method": "click"}
-{"params": {"id": "grantTicketButton"},  "method": "click"}
+{"params": {"id": "newTicketWidgetGrantTicketButton"},  "method": "click"}
 {"method": "waits.forElement", "params": {"link" : "[Chandler]"}}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 {"params": {"link": "[Chandler]"},  "method": "storeURL"}

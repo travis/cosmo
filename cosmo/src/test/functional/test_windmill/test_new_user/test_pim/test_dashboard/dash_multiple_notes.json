@@ -1,4 +1,6 @@
+{"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": "40000"}}
 {"method": "click", "params": {"jsid": "{$listView}"}}
+{"params": {"milliseconds": 3000},  "method": "waits.sleep"}
 {"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": "40000"}}
 {"params": {"id": "listViewQuickItemEntry"},  "method": "click"}
 {"params": {"text": "Testing lots of notes, this is number one", "id": "listViewQuickItemEntry"},  "method": "type"}

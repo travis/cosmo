@@ -22,7 +22,7 @@
 {"params": {"jsid": "{$listView}"}, "method": "click"}
 
 //select it
-{"params": {"jsid": "cosmo ? 'listView_item'  windmill['testWindow'].cosmo.view.list.itemRegistry.getAtPos(1).id : ''"}, "method": "click"}
+{"params": {"jsid": "'listView_item' + windmill.testWindow.cosmo.view.list.itemRegistry.getAtPos(1).id"}, "method": "click"}
 
 //unstamp event
 {"params": {"id": "sectionEventEnableToggle"}, "method": "check"}

@@ -23,7 +23,7 @@ JUM = function(){
 
 function _JUM_first_arg_string_func(n, name){
     return function(){
-        var args = null;
+        var args = arguments;
         var s = null;
         if (arguments.length == n){
             args = arguments;

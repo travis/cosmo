@@ -1,5 +1,6 @@
 
-cal_cavas_setup_json = """{"method": "click", "params": {"jsid": "{$calView}"}}"""
+cal_cavas_setup_json = """{"method": "waits.sleep", "params": {"milliseconds" : 1000}}
+{"method": "click", "params": {"jsid": "{$calView}"}}"""
 
 from windmill.authoring import RunJsonFile
 

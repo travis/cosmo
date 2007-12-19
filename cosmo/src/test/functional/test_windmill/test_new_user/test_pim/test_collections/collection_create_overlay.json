@@ -67,4 +67,4 @@
 {"params": {"milliseconds": 1000}, "method": "waits.sleep"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(2).getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 1000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.app.pim.collections.getAtPost(3).getUid()"}, "method": "extensions.clickCollection"}
+{"params": {"jsid": "cosmo.app.pim.collections.getLast().getUid()"}, "method": "extensions.clickCollection"}

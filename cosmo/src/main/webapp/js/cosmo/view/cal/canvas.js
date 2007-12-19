@@ -1303,7 +1303,7 @@ cosmo.view.cal.canvas = new function () {
         var qual = cmd.qualifier;
         var eventStamp = ev.data.getEventStamp();
 
-        function doProcessing() {
+        function doProcessing(rrule) {
             ev.lozenge.setInputDisabled(true);
             ev.lozenge.showProcessing();
             if (rrule) {

@@ -18,11 +18,25 @@ dojo.provide("cosmo.datetime.util");
 
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
-dojo.require("dojo.date.common");
 
 cosmo.datetime.util = new function () {
 
     var stripZeroPat = /^0/;
+
+    //note that these are now strings instead of int's
+    this.dateParts = {
+        YEAR:        'year', 
+        MONTH:       'month', 
+        DAY:         'day', 
+        HOUR:        'hour', 
+        MINUTE:      'minute', 
+        SECOND:      'second', 
+        MILLISECOND: 'millisecond', 
+        QUARTER:     'quarter', 
+        WEEK:        'week', 
+        WEEKDAY:     'weekday'
+    };
+
     this.parseTimeString = function (str, opts) {
         var stripLeadingZero = function (s) {
             return s.replace(stripZeroPat, '');
@@ -100,7 +114,7 @@ cosmo.datetime.util = new function () {
         var diff = dt.getDay();
         var sun = new Date(dt.getTime());
         diff = 0 - diff;
-        sun = cosmo.datetime.Date.add(sun, dojo.date.dateParts.DAY, diff);
+        sun = cosmo.datetime.Date.add(sun, this.dateParts.DAY, diff);
         var ret = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate());
         return ret;
     };
@@ -111,7 +125,7 @@ cosmo.datetime.util = new function () {
     this.getWeekEnd = function (dt) {
         var diff = 6-dt.getDay();
         var sat = new Date(dt.getTime());
-        sat = cosmo.datetime.Date.add(sat, dojo.date.dateParts.DAY, diff);
+        sat = cosmo.datetime.Date.add(sat, this.dateParts.DAY, diff);
          // Make time of day 11:59:99 to get the entire day's events
         var ret = new Date(sat.getFullYear(), sat.getMonth(), sat.getDate(), 23, 59, 59);
         return ret;

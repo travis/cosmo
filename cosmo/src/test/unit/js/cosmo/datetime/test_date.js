@@ -16,6 +16,7 @@
 dojo.provide("cosmotest.datetime.test_date");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
+dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.datetime.timezone.SimpleTimezoneRegistry");
 dojo.require("cosmo.env");
 
@@ -260,7 +261,7 @@ test_dateUTCSetters: function () {
        //we monkey-patched dojo.date.fromIso8601 to fix a bug that occurs when 
        //parsing dates near DST switchover time. This verifies that patch.
        var string = "20071104T190000Z";
-       var jsDate = dojo.date.stamp.fromISOString(string);
+       var jsDate = cosmo.datetime.util.parseISO8601(string);
        //should be 19, but unpatched gives 20!
        jum.assertEquals("Should be 19", 19,jsDate.getUTCHours())
    }

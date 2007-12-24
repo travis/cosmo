@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 dojo.provide("cosmo.model.util");
 
 cosmo.model.util._upperFirstChar = function(str){
@@ -69,7 +69,7 @@ cosmo.model.util.BasePropertyApplicator.prototype = {
 dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BasePropertyApplicator, {
     addProperty: function(ctr, propertyName, kwArgs){
         kwArgs = kwArgs || {};
-        this._inherited("addProperty", arguments);
+        this.inherited("addProperty", arguments);
         ctr.prototype.__propertyNames.push(propertyName);
         ctr.prototype.__defaults[propertyName] = kwArgs["default"];
     },
@@ -87,13 +87,13 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
     },
 
     initializeClass: function(ctr, kwArgs){
-               if (ctr.prototype["__enhanced"]){
+        if (ctr.prototype["__enhanced"]){
             //it's already been enhanced, which usually means that this is a subclass.
             //so let's just copy the arrays/objects to the new prototype 
             //since we'll be adding to them and don't want to add to the parent's arrays/objects!
             ctr.prototype.__propertyNames = ctr.prototype.__propertyNames.slice();
             var newDefaults = {};
-            dojo.lang.mixin(newDefaults,ctr.prototype.__defaults);
+            dojo.mixin(newDefaults,ctr.prototype.__defaults);
             ctr.prototype.__defaults = newDefaults;
             return;
         }
@@ -114,7 +114,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         ctr.prototype.isChanged = this._genericIsChanged;
         
         if (kwArgs["enhanceInitializer"]){
-            var oldInitter = ctr.prototype.initializer;
+            var oldInitter = ctr.prototype._constructor;
             var when = kwArgs["enhanceInitializer"];
             //TODO use dojo AOP
             function newInitializer(){
@@ -128,7 +128,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
                     this.initializeProperties(arguments[0]);
                 }
             }
-            ctr.prototype.initializer = newInitializer;
+            ctr.prototype._constructor = newInitializer;
         }    
     },
     
@@ -141,7 +141,7 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         if (kwProps){
             for (var x = 0; x < this.__propertyNames.length; x++){
                 var propertyName = this.__propertyNames[x];
-                if (dojo.lang.has(kwProps, propertyName)){
+                if (cosmo.util.lang.has(kwProps, propertyName)){
                     this.__setProperty(propertyName, kwProps[propertyName]);
                 } else if (!kwArgs.noDefaults){
                     this.__setProperty(propertyName, this.__getDefault(propertyName));
@@ -275,12 +275,12 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
     }
 	
 	// Work around IE sticking in Windows line breaks in for regular ones.
-	if (dojo.render.html.ie && type == "string"){
+    if (dojo.isIE() && type == "string"){
 	    var lineBreakRegex = /\r\n/g;
 	    var replacement = "\n";
         a = a.replace(lineBreakRegex, replacement);
         b = b.replace(lineBreakRegex, replacement);
-	}  
+    }  
     
     return a == b;
 }   
@@ -355,7 +355,7 @@ cosmo.model.clone = function (thing){
         return thing;
     }
 
-    if (dojo.lang.isArray(thing)){
+    if (dojo.isArray(thing)){
         var clone = [];
         for (var x = 0; x < thing.length; x++){
             clone[x] = cosmo.model.clone(thing[x]);
@@ -363,7 +363,7 @@ cosmo.model.clone = function (thing){
         return thing;
     }
     
-   if (dojo.lang.isObject(thing)){
+   if (dojo.isObject(thing)){
         if (thing.clone){
             return thing.clone();
         }

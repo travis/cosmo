@@ -60,7 +60,7 @@ cosmotest.testutils = {
                 var functionNames = this.getFunctionNames(module);
                 
                 var testFunctions = [];
-                for (var i in functionNames){
+                for (var j in functionNames){
                     var name = functionNames[i];
                     testFunctions.push(
                         {
@@ -80,7 +80,6 @@ cosmotest.testutils = {
                              }]);
                 continue;
             }
-
             doh.register(moduleName, testFunctions);
         }
         jum = new JUM();

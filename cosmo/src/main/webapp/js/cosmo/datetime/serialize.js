@@ -16,7 +16,10 @@
 
 dojo.provide("cosmo.datetime.serialize");
 
-dojo.require("dojo.date.serialize");
+dojo.require("cosmo.datetime.util")
+//for iso8601 parsing
+cosmo.datetime._iso8601DateFormatString = "yyyyMMdd";
+cosmo.datetime._iso8601TimeFormatString = "HHmmss";
 
 cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
     // summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
@@ -25,6 +28,7 @@ cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
 };
 
 cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
+    var parts = cosmo.datetime.util.dateParts;
     var date = new cosmo.datetime.Date();
     if (timezone){
         date.tzId = timezone;
@@ -32,15 +36,43 @@ cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
     else if (formattedString.substring(formattedString.length - 1).toLowerCase() == "z"){
         date.utc = true;
     }
+    
+    var dateProps = cosmo.datetime.parseIso8601(formattedString);
+    date.setYear(parts.YEAR);
+    date.setMonth(parts.MONTH);
+    date.setDate(parts.DAY);
+    date.setHour(parts.HOUR);
+    date.setMinutes(parts.MINUTE);
+    date.setSeconds(parts.SECOND);
 
-    date.updateFromUTC(dojo.date.fromIso8601(formattedString).getTime());
     return date;
 };
 
-cosmo.datetime.fromRfc3339 = function(/*String*/rfcDate){
-    return new cosmo.datetime.Date(dojo.date.fromRfc3339(rfcDate));
-}
+//summary: parses a date or datetime and returns an object set with the 
+//various date properties.
+cosmo.datetime.parseIso8601 = function(str) {
+    var parts = cosmo.datetime.util.dateParts;
 
+    //eg. 20071104T190000Z
+    var hasTime = str.indexof("T") > -1;
+    var o = {};
+
+    o[parts.YEAR] = parseInt(str.substring(0,4));
+    o[parts.MONTH] = parseInt(str.substring(4,6));
+    o[parts.DAY] = parseInt(str.substring(6,8));
+    
+    if (hasTime){
+        o[parts.HOUR] = parseInt(str.substring(9,11));
+        o[parts.MINUTE] = parseInt(str.substring(11,13));
+        o[parts.SECOND] = parseInt(str.substring(13,15));
+    } else {
+        o[parts.HOUR] = 0;
+        o[parts.MINUTE] = 0;
+        o[parts.SECOND] = 0;
+    }
+
+    return o;
+}
 
 cosmo.datetime.parseIso8601Duration = 
 function parseIso8601Duration(/*String*/duration){
@@ -70,7 +102,7 @@ function addIso8601Duration(/*cosmo.datetime.Date*/date,
         dHash = duration;
     }
     
-    with (dojo.date.dateParts){
+    with (cosmo.datetime.util.dateParts){
         if (dHash.year) date.add(YEAR, dHash.year);
         if (dHash.month) date.add(MONTH, dHash.month);
         if (dHash.day) date.add(DAY, dHash.day);
@@ -94,7 +126,8 @@ cosmo.datetime.getDuration = function getDuration(dt1, dt2){
     var dur = {}
     with (cosmo.datetime.durationsInSeconds){
         var multiplier = 1;
-        var secs = cosmo.datetime.Date.diff(dojo.date.dateParts.SECOND, dt1, dt2);
+        var secs = cosmo.datetime.Date.diff(
+            cosmo.datetime.util.datepart.SECOND, dt1, dt2);
         if (secs < 0) {
             multiplier = -1;
             secs *= -1;

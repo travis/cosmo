@@ -93,6 +93,14 @@ cosmotest.datetime.test_serialize = {
         cosmotest.datetime.test_serialize.durationsEqual("4", d1, d2);
     },
     
+   test_dojoFromIso8601: function(){
+       //we monkey-patched dojo.date.fromIso8601 to fix a bug that occurs when 
+       //parsing dates near DST switchover time. This verifies that patch.
+       var string = "20071104T190000Z";
+       var jsDate = cosmo.datetime.util.parseISO8601(string);
+       //should be 19, but unpatched gives 20!
+       jum.assertEquals("Should be 19", 19,jsDate.getUTCHours())
+   },
     
     /* Makes sure properties specified in the expected match the actual.
      * Also, makes sure properties not specified in the expected

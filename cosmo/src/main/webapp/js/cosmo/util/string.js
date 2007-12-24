@@ -18,6 +18,13 @@ cosmo.util.string.startsWith = function(str, substring){
     return str.indexOf(substring) == 0;
 }
 
+cosmo.util.string.endsWith = function(str, substring){
+    if (str.length - substring.length < 0) { 
+        return false; 
+    } 
+    return str.lastIndexOf(substring) == str.length - substring.length;
+}
+
 cosmo.util.string.escapeXml = function(/*string*/str){
 //summary:
 //	Adds escape sequences for special characters in XML: &<>"'

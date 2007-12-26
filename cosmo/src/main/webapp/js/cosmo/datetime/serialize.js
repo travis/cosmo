@@ -128,7 +128,7 @@ cosmo.datetime.getDuration = function getDuration(dt1, dt2){
     with (cosmo.datetime.durationsInSeconds){
         var multiplier = 1;
         var secs = cosmo.datetime.Date.diff(
-            cosmo.datetime.util.dateparts.SECOND, dt1, dt2);
+            cosmo.datetime.util.dateParts.SECOND, dt1, dt2);
         if (secs < 0) {
             multiplier = -1;
             secs *= -1;

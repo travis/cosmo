@@ -95,10 +95,6 @@ cosmo.datetime.Date = function () {
     this._strftimeCache = [null, null];
 }
 
-//This is just an alias from ScoobyDate to comso.datetime.Date for use while we
-//ferrett out all remaining ScoobyDates
-cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date, "ScoobyDate", "0.6");
-
 cosmo.datetime.Date.prototype.getFullYear = function() {
     return this.year;
 };
@@ -328,7 +324,7 @@ cosmo.datetime.Date.prototype.getTimezoneOffsetMsForGivenDate = function(date) {
 
 /**
   * One place to go to get the user-pref timezone offset for a cosmo.datetime.Date
-  * This should ultimately work with the Scooby app's user prefs
+  * This should ultimately work with the app's user prefs
   * Or independently with fallback to the normal browser local offset
   */
 cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
@@ -551,8 +547,6 @@ cosmo.datetime.Date.clone = function(sdt) {
 
     return ret;
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.clone, "ScoobyDate.clone", "0.6");
 
 /**
  * Returns the UTC offset (in milliseconds) for a particular date for the user's
@@ -564,19 +558,13 @@ cosmo.datetime.Date.getBrowserTimezoneOffset = function(year, month, day, hours,
     var date = new Date(year, month, day, hours, minutes, seconds, 0);
     return date.getTimezoneOffset();
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.getBrowserTimezoneOffset,
-    "ScoobyDate.getBrowserTimezoneOffset", "0.6");
 
 /**
  * Returns the difference in specified units between two Date
  */
 cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
-        return dojo.date.diff(sdt1.getTime(), sdt2.getTime(), interv);
+    return dojo.date.difference(sdt1, sdt2, interv);
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
-
 
 /**
  * Returns a new Date incremented the desired number of units

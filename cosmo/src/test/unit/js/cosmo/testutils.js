@@ -61,7 +61,7 @@ cosmotest.testutils = {
                 
                 var testFunctions = [];
                 for (var j in functionNames){
-                    var name = functionNames[i];
+                    var name = functionNames[j];
                     testFunctions.push(
                         {
                             name: name,

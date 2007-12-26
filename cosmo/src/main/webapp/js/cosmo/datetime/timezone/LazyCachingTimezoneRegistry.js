@@ -23,8 +23,10 @@ dojo.require("cosmo.datetime.timezone.SimpleTimezoneRegistry");
 
 dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
     cosmo.datetime.timezone.SimpleTimezoneRegistry,
-    function(timezoneFileRoot){
-    this.timezoneFileRoot = timezoneFileRoot || null;
+    {
+
+    constructor: function(timezoneFileRoot){
+        this.timezoneFileRoot = timezoneFileRoot || null;
         var tzsByRegion = {};
         this._tzsByRegion = tzsByRegion;
         var regions = cosmo.datetime.timezone.REGIONS;
@@ -33,7 +35,6 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
             tzsByRegion[region] = [];
         }
     },
-    {
 
     _prefixToFileMap: {"EST":"northamerica","MST":"northamerica","HST":"northamerica","EST5EDT":"northamerica","CST6CDT":"northamerica","MST7MDT":"northamerica","PST8PDT":"northamerica","America":"northamerica","Pacific":"australasia","Atlantic":"europe","Africa":"africa","Indian":"africa","Antarctica":"antarctica","Asia":"asia","Australia":"australasia","Europe":"europe","WET":"europe","CET":"europe","MET":"europe","EET":"europe"},
     _exceptionsMap: {"Pacific/Honolulu":"northamerica","Atlantic/Bermuda":"northamerica","Atlantic/Cape_Verde":"africa","Atlantic/St_Helena":"africa","Indian/Kerguelen":"antarctica","Indian/Chagos":"asia","Indian/Maldives":"asia","Indian/Christmas":"australasia","Indian/Cocos":"australasia","America/Danmarkshavn":"europe","America/Scoresbysund":"europe","America/Godthab":"europe","America/Thule":"europe","Asia/Yekaterinburg":"europe","Asia/Omsk":"europe","Asia/Novosibirsk":"europe","Asia/Krasnoyarsk":"europe","Asia/Irkutsk":"europe","Asia/Yakutsk":"europe","Asia/Vladivostok":"europe","Asia/Sakhalin":"europe","Asia/Magadan":"europe","Asia/Kamchatka":"europe","Asia/Anadyr":"europe","Africa/Ceuta":"europe","America/Argentina/Buenos_Aires":"southamerica","America/Argentina/Cordoba":"southamerica","America/Argentina/Tucuman":"southamerica","America/Argentina/La_Rioja":"southamerica","America/Argentina/San_Juan":"southamerica","America/Argentina/Jujuy":"southamerica","America/Argentina/Catamarca":"southamerica","America/Argentina/Mendoza":"southamerica","America/Argentina/Rio_Gallegos":"southamerica","America/Argentina/Ushuaia":"southamerica","America/Aruba":"southamerica","America/La_Paz":"southamerica","America/Noronha":"southamerica","America/Belem":"southamerica","America/Fortaleza":"southamerica","America/Recife":"southamerica","America/Araguaina":"southamerica","America/Maceio":"southamerica","America/Bahia":"southamerica","America/Sao_Paulo":"southamerica","America/Campo_Grande":"southamerica","America/Cuiaba":"southamerica","America/Porto_Velho":"southamerica","America/Boa_Vista":"southamerica","America/Manaus":"southamerica","America/Eirunepe":"southamerica","America/Rio_Branco":"southamerica","America/Santiago":"southamerica","Pacific/Easter":"southamerica","America/Bogota":"southamerica","America/Curacao":"southamerica","America/Guayaquil":"southamerica","Pacific/Galapagos":"southamerica","Atlantic/Stanley":"southamerica","America/Cayenne":"southamerica","America/Guyana":"southamerica","America/Asuncion":"southamerica","America/Lima":"southamerica","Atlantic/South_Georgia":"southamerica","America/Paramaribo":"southamerica","America/Port_of_Spain":"southamerica","America/Montevideo":"southamerica","America/Caracas":"southamerica"},
@@ -55,7 +56,7 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
         if (file && this.loadFile(file)){
             return this.getTimezone(tzid);
         }
-
+        
         var link = this.getLink(tzid);
 
         if (link){
@@ -83,7 +84,7 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
         if (!this._loadedRegions[region]){
             this.loadFile(this._prefixToFileMap[region]);
             for (var exception in this._exceptionsMap){
-                if (dojo.string.startsWith(exception, region)){
+                if (cosmo.util.string.startsWith(exception, region)){
                     this.loadFile(this._exceptionsMap[exception]);
                 }
             }

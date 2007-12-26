@@ -21,10 +21,6 @@ dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.util.string");
 cosmo.datetime.util = new function () {
 
-    //for iso8601 parsing
-    this._dateFormatString = "yyyyMMdd";
-    this._timeFormatString = "HHmmss";
-
     var stripZeroPat = /^0/;
 
     //note that these are now strings instead of int's
@@ -136,46 +132,6 @@ cosmo.datetime.util = new function () {
         return ret;
     };
 
-  this.parseISO8601 = function(str) {
-      //20071104T190000Z
-      var arr = str.split("T");
-      var datePart = arr[0];
-      var timePart = arr[1] || null;
-
-      if (timePart){
-          var utc = cosmo.util.string.endsWith(timePart, "Z");
-          if (utc){
-              timePart = timePart.substring(0, timePart.length - 1);
-          }
-          var date = dojo.date.locale.parse(datePart + " "+ timePart,
-              { datePattern: this._dateFormatString,
-              timePattern: this._timeFormatString});
-          
-          if (utc){
-              var year  = date.getFullYear(); 
-              var month = date.getMonth();
-              var day = date.getDate();
-              var hours = date.getHours();
-              var minutes = date.getMinutes();
-              var seconds = date.getSeconds();
-              var millis = date.getMilliseconds();
-
-              date = new Date();
-              date.setFullYear(year);
-              date.setUTCMonth(month);
-              date.setUTCDate(day);
-              date.setUTCHours(hours);
-              date.setUTCMinutes(minutes);
-              date.setUTCSeconds(seconds);
-              date.setUTCMilliseconds(millis);
-          }
-          return date;
-      } else {
-          return dojo.date.locale.parse(datePart,
-                                   { selector: 'date',
-                                     datePattern: this._dateFormatString});
-      }
-  }
 
 };
 

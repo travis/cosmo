@@ -95,9 +95,11 @@ cosmotest.datetime.test_serialize = {
     
    test_dojoFromIso8601: function(){
        //we monkey-patched dojo.date.fromIso8601 to fix a bug that occurs when 
-       //parsing dates near DST switchover time. This verifies that patch.
+       //parsing dates near DST switchover time. But then we switched over to dojo
+       //1.0 which didn't have quite the same function, so we wrote our own. 
+       //This verifies that this is no longer a problem.
        var string = "20071104T190000Z";
-       var jsDate = cosmo.datetime.util.parseISO8601(string);
+       var jsDate = cosmo.datetime.fromIso8601(string);
        //should be 19, but unpatched gives 20!
        jum.assertEquals("Should be 19", 19,jsDate.getUTCHours())
    },

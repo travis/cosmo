@@ -390,7 +390,7 @@ cosmo.datetime.Date.prototype.add = function(interv, incr) {
 
 cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ duration){
     var utc = this.toUTC();
-    with(dojo.date.dateParts){
+    with(cosmo.datetime.util.dateParts){
         if (duration.getYear()){
             utc = dojo.date.add(utc, YEAR, duration.getYear()).getTime();
         }

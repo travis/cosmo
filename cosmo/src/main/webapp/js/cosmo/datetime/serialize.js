@@ -34,16 +34,17 @@ cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
         date.tzId = timezone;
     }
     else if (formattedString.substring(formattedString.length - 1).toLowerCase() == "z"){
+
         date.utc = true;
     }
-    
+
     var dateProps = cosmo.datetime.parseIso8601(formattedString);
-    date.setYear(parts.YEAR);
-    date.setMonth(parts.MONTH);
-    date.setDate(parts.DAY);
-    date.setHour(parts.HOUR);
-    date.setMinutes(parts.MINUTE);
-    date.setSeconds(parts.SECOND);
+    date.setYear(dateProps[ parts.YEAR]);
+    date.setMonth(dateProps[parts.MONTH]);
+    date.setDate(dateProps[parts.DAY]);
+    date.setHours(dateProps[parts.HOUR]);
+    date.setMinutes(dateProps[parts.MINUTE]);
+    date.setSeconds(dateProps[parts.SECOND]);
 
     return date;
 };
@@ -54,7 +55,7 @@ cosmo.datetime.parseIso8601 = function(str) {
     var parts = cosmo.datetime.util.dateParts;
 
     //eg. 20071104T190000Z
-    var hasTime = str.indexof("T") > -1;
+    var hasTime = str.indexOf("T") > -1;
     var o = {};
 
     o[parts.YEAR] = parseInt(str.substring(0,4));

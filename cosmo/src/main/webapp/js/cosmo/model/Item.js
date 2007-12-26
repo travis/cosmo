@@ -16,8 +16,10 @@
 dojo.provide("cosmo.model.Item");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.model.util");
-dojo.require("cosmo.model.Delta");
-dojo.require("dojo.uuid.TimeBasedGenerator");
+
+dojo.require("dojox.uuid");
+dojo.require("dojox.uuid.generateTimeBasedUuid");
+
 
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
 cosmo.model.NEW_OBJECT = function(){return {}};
@@ -37,7 +39,12 @@ cosmo.model.ACTION_CREATED = 500;
 
 cosmo.model._stampRegistry = {};
 
-cosmo.model.uuidGenerator = dojo.uuid.TimeBasedGenerator;
+cosmo.model.uuidGenerator = {
+    generate: dojo.hitch(dojox.uuid.generateTimeBasedUuid, dojox.uuid.generateTimeBasedUuid)
+}
+
+
+
 
 cosmo.model.getStampMetaData = function(stampName){
     return this._stampRegistry[stampName].constructor.prototype.stampMetaData;
@@ -64,7 +71,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, at
     var stampOccurrenceCtr = dojo.declare(ctrName+"Occurrence", newCtr, {
         __noOverride:{},
 
-        initializer: function (noteOccurrence){
+        constructor: function (noteOccurrence){
            this._master = noteOccurrence._master;
            this.recurrenceId = noteOccurrence.recurrenceId; 
            this.item = noteOccurrence;
@@ -117,7 +124,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, at
         }
 });
 
-    dojo.lang.mixin(stampOccurrenceCtr.prototype, occurrenceDeclarations || {});
+    dojo.mixin(stampOccurrenceCtr.prototype, occurrenceDeclarations || {});
     
     
     cosmo.model._stampRegistry[stampName] 
@@ -128,7 +135,7 @@ cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, at
 
 cosmo.model.declare("cosmo.model.Item", null, 
     //declare the dynamically generated properties
-   [["uid", {"default": dojo.lang.hitch(cosmo.model.uuidGenerator, cosmo.model.uuidGenerator.generate)}],
+   [["uid", {"default": dojo.hitch(cosmo.model.uuidGenerator, cosmo.model.uuidGenerator.generate)}],
     ["displayName", {"default": null} ],
     ["version", {"default": null} ],
     ["creationDate", {"default": cosmo.model.NEW_DATESTAMP}],
@@ -139,7 +146,7 @@ cosmo.model.declare("cosmo.model.Item", null,
    ],
    //declare other properties
   {
-      initializer: function(kwArgs){
+      constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
       }
   });
@@ -159,7 +166,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
         _stamps: null,
         _stampsToDelete: null,
         
-        initializer: function(){
+        constructor: function(){
             this._stamps = {};
             this._modifications = {};
             this._stampsToDelete = {};
@@ -175,7 +182,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
            
            if (createIfDoesntExist){
                var ctr = cosmo.model._stampRegistry[stampName]["constructor"];
-               var stamp =  new ctr(dojo.lang.mixin({item:this}, initialProps));
+               var stamp =  new ctr(dojo.mixin({item:this}, initialProps));
                this._stamps[stampName] = stamp;
                return stamp;
            }          
@@ -367,7 +374,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
 dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     __noOverride:{uid:1,version:1},
     
-    initializer: function (master, recurrenceId){
+    constructor: function (master, recurrenceId){
         this._master = master;
         this.recurrenceId = recurrenceId;
     },
@@ -547,11 +554,11 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     getTriageStatus: function(){
         //triage status is not inherited from the master. In fact, the triage status of master events should 
         //never really be used. 
-        return this._getNonInheritableProperty("triageStatus", dojo.lang.hitch(this, this._getImplicitTriageStatus))
+        return this._getNonInheritableProperty("triageStatus", dojo.hitch(this, this._getImplicitTriageStatus))
     },
     
     getAutoTriage: function(){
-        return this._getNonInheritableProperty("autoTriage", dojo.lang.hitch(this, function(){return true}))
+        return this._getNonInheritableProperty("autoTriage", dojo.hitch(this, function(){return true}))
     },
 
     setTriageStatus: function(triageStatus){
@@ -611,7 +618,7 @@ cosmo.model.declare("cosmo.model.Modification", null,
     ["deletedStamps", {"default": cosmo.model.NEW_OBJECT}]
     ],
     {
-        initializer: function(kwArgs){
+        constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
         }
     });
@@ -651,7 +658,7 @@ dojo.declare("cosmo.model.StampMetaData", null,{
     //if this stamp only can apply to the entire series, this is true
     seriesOnly: false,
     
-    initializer: function(stampName, namespace,stampAttributesArray, seriesOnly){
+    constructor: function(stampName, namespace,stampAttributesArray, seriesOnly){
         this.attributes = [];
         this.stampName = stampName || null;
         this.namespace = namespace;
@@ -688,7 +695,7 @@ dojo.declare("cosmo.model.StampAttribute", null, {
     name: null,
     type: null,  /*Function*/
     
-    initializer: function(name, type, kwArgs){
+    constructor: function(name, type, kwArgs){
         this.name = name;
         this.type = type;            
     },
@@ -702,7 +709,7 @@ dojo.declare("cosmo.model.StampAttribute", null, {
 dojo.declare("cosmo.model.BaseStamp", null, {
     stampMetaData: null,
     item: null,
-    initializer: function (kwArgs){
+    constructor: function (kwArgs){
         if (kwArgs){
             this.item = kwArgs.item;
         }
@@ -717,7 +724,7 @@ dojo.declare("cosmo.model.BaseStamp", null, {
 cosmo.model.declareStamp("cosmo.model.TaskStamp", "task", "http://osafoundation.org/eim/task/0",
     [ ],
     {
-        initializer: function(kwArgs){
+        constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
         }
     });
@@ -735,7 +742,7 @@ cosmo.model.declareStamp("cosmo.model.MailStamp", "mail", "http://osafoundation.
      [ "references", String, {}]
      ],
     {
-        initializer: function(kwArgs){
+        constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
         }
     },{},true);
@@ -748,7 +755,7 @@ cosmo.model.declare("cosmo.model.ModifiedBy", null,
    ],
    //declare other properties
   {
-      initializer: function(kwArgs){
+      constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
       }
   });  
@@ -826,9 +833,9 @@ cosmo.model._deletedStampsMixin = {
     
 }
 
-dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._noteStampCommon);
-dojo.lang.mixin(cosmo.model.BaseStamp.prototype, cosmo.model._noteStampCommon);
-dojo.lang.mixin(cosmo.model.Item.prototype, cosmo.model._urlsMixin);
-dojo.lang.mixin(cosmo.model.Note.prototype, cosmo.model._deletedStampsMixin);
-dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._urlsMixin);
-dojo.lang.mixin(cosmo.model.Modification.prototype, cosmo.model._deletedStampsMixin);
+dojo.mixin(cosmo.model.Note.prototype, cosmo.model._noteStampCommon);
+dojo.mixin(cosmo.model.BaseStamp.prototype, cosmo.model._noteStampCommon);
+dojo.mixin(cosmo.model.Item.prototype, cosmo.model._urlsMixin);
+dojo.mixin(cosmo.model.Note.prototype, cosmo.model._deletedStampsMixin);
+dojo.mixin(cosmo.model.Modification.prototype, cosmo.model._urlsMixin);
+dojo.mixin(cosmo.model.Modification.prototype, cosmo.model._deletedStampsMixin);

@@ -275,7 +275,7 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
     }
 	
 	// Work around IE sticking in Windows line breaks in for regular ones.
-    if (dojo.isIE() && type == "string"){
+    if (dojo.isIE && type == "string"){
 	    var lineBreakRegex = /\r\n/g;
 	    var replacement = "\n";
         a = a.replace(lineBreakRegex, replacement);

@@ -44,13 +44,13 @@ cosmotest.datetime.test_timezone = {
 
     test_getDateField: function (){
         var getDateField = cosmo.datetime.timezone._getDateField;
-        var scoobyDate = new ScoobyDate(2006, 11, 10, 12, 33, 30);
-        jum.assertEquals(2006, getDateField(scoobyDate, "year"));
-        jum.assertEquals(11, getDateField(scoobyDate, "month"));
-        jum.assertEquals(10, getDateField(scoobyDate, "date"));
-        jum.assertEquals(12, getDateField(scoobyDate, "hours"));
-        jum.assertEquals(33, getDateField(scoobyDate, "minutes"));
-        jum.assertEquals(30, getDateField(scoobyDate, "seconds"));
+        var cosmoDate = new cosmo.datetime.Date(2006, 11, 10, 12, 33, 30);
+        jum.assertEquals(2006, getDateField(cosmoDate, "year"));
+        jum.assertEquals(11, getDateField(cosmoDate, "month"));
+        jum.assertEquals(10, getDateField(cosmoDate, "date"));
+        jum.assertEquals(12, getDateField(cosmoDate, "hours"));
+        jum.assertEquals(33, getDateField(cosmoDate, "minutes"));
+        jum.assertEquals(30, getDateField(cosmoDate, "seconds"));
     
         var jsDate = new Date(2006, 11, 10, 12, 33, 30);
         jum.assertEquals(2006, getDateField(jsDate, "year"));

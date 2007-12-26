@@ -15,5 +15,5 @@
 */
 dojo.provide("cosmo.model.exception");
 
-dojo.declare("cosmo.model.exception.DetailItemNotDeltaItemException", Error,
-function(){}, {           });
+dojo.declare("cosmo.model.exception.DetailItemNotDeltaItemException", Error, {
+});

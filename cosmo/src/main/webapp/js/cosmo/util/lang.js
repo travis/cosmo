@@ -23,3 +23,21 @@ cosmo.util.lang.has = function(obj, name){
         return false; 
     } 
 }
+
+cosmo.util.lang.isEmpty = function (obj) { 
+    if (dojo.isObject(obj)) { 
+        var tmp = {}; 
+        var count = 0;
+        for (var x in obj) { 
+            if (obj[x] && !tmp[x]) { 
+                count++; 
+                break; 
+            }
+        } 
+        return count == 0; 
+    } else { 
+        if (dojo.isArrayLike(obj) || dojo.isString(obj)) { 
+            return obj.length == 0; 
+        } 
+    } 
+}

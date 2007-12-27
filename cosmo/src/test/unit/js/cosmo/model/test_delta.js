@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
 dojo.provide("cosmotest.model.test_delta");
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Item");
+dojo.require("cosmo.model.Delta");
 dojo.require("cosmo.model.EventStamp");
 
 
-dojo.lang.mixin(cosmotest.model.test_delta, {
+dojo.mixin(cosmotest.model.test_delta, {
     test_simpleDelta : function(){
         var note = getSimpleEventNote();
         var delta = new cosmo.model.Delta(note);
@@ -191,19 +191,28 @@ dojo.lang.mixin(cosmotest.model.test_delta, {
    },
    
    test_applyDeltaToOccurrenceTimeChanges: function(){
+       console.debug("!!!!!");
         var getBaseNote = cosmotest.model.test_delta.getBaseNote;
        //let's try changing start date AND end date on an occurrence
        var note = getBaseNote();
+       console.debug("!!!!! 2");
        var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date(2000,0,10,12,0));
-       
+              console.debug("!!!!! 3");
        //we'll move it up one hour.
        var newStartDate = new cosmo.datetime.Date(2000,0,10,13,0);
+       console.debug("!!!!! 4");
        var newEndDate = new cosmo.datetime.Date(2000,0,10,14,0);  
+       console.debug("!!!!! 5");
        var delta = new cosmo.model.Delta(occurrence);
+       console.debug("!!!!! 6");
        delta.addStampProperty("event", "startDate", newStartDate);
+       console.debug("!!!!! 7");
        delta.addStampProperty("event", "endDate", newEndDate);
+       console.debug("!!!!! 8");
        delta.deltafy();
+       console.debug("!!!!! 9");
        delta.applyToOccurrence();
+       console.debug("!!!!! 10");
        jum.assertEquals("Start date, set correctly",
          occurrence.getEventStamp().getStartDate(), new cosmo.datetime.Date(2000,0,10,13,0));
        jum.assertEquals("End Date, set correctly",

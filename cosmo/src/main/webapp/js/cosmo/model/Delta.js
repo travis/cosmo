@@ -16,8 +16,10 @@
 
 dojo.provide("cosmo.model.Delta");
 
+dojo.require("cosmo.datetime.util")
+
 dojo.declare("cosmo.model.Delta", null, {
-    initializer: function(/*cosmo.model.Note | cosmo.model.NoteOccurrence */ note){
+    constructor: function(/*cosmo.model.Note | cosmo.model.NoteOccurrence */ note){
         this._stampProps = {}
         this._propertyProps = {};
         this._addedStamps = {};
@@ -153,7 +155,7 @@ dojo.declare("cosmo.model.Delta", null, {
                 doAddOneDayToDuration = resultantAllDay || resultantAnyTime;                              
 
                 if (doAddOneDayToDuration){
-                    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+                    var diff = cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.DAY,
                         eventStamp["startDate"], eventStamp["endDate"]) + 1;
                     duration = new cosmo.model.Duration({day:diff} );
                 } else {
@@ -308,7 +310,7 @@ dojo.declare("cosmo.model.Delta", null, {
         
         //set the old note's rrule end date to just before the break.
         var newEndDate = occurrence.getEventStamp().getStartDate().clone();
-        newEndDate.add(dojo.date.dateParts.DAY, -1);
+        newEndDate.add(cosmo.datetime.util.dateParts.DAY, -1);
         var oldRrule = master.getEventStamp().getRrule();
 
         //we have to make a new RRule object, since we can't change them, since they
@@ -407,7 +409,7 @@ dojo.declare("cosmo.model.Delta", null, {
         
         //if any of these properties change. we need to try autotriaging.
         var delta = this;
-        return dojo.lang.some([
+        return dojo.some([
             ["event", "startDate"],
             ["event", "endDate"],
             ["event", "duration"],
@@ -467,7 +469,7 @@ dojo.declare("cosmo.model.Delta", null, {
     _applyPropertiesToEventStamp: function(original, changes, type){
         //start date must be applied first so that duration can be calculated
         //properly
-        changes = dojo.lang.shallowCopy(changes, false);
+        changes = cosmo.util.lang.shallowCopy(changes, false);
         if (changes["startDate"]){
            var changeValue = changes["startDate"];
            original.applyChange("startDate", changeValue, type);
@@ -523,7 +525,7 @@ dojo.declare("cosmo.model.Delta", null, {
 
     _hasSeriesOnlyStampChange: function(){
         var result = false;
-        dojo.lang.map([this._addedStamps, this._deletedStamps, this._stampProps],
+        dojo.map([this._addedStamps, this._deletedStamps, this._stampProps],
                       function(list){
                           for (var stampName in list){
                               if (cosmo.model.getStampMetaData(stampName).seriesOnly){
@@ -533,10 +535,10 @@ dojo.declare("cosmo.model.Delta", null, {
     },
     
     _ranges: {
-            'daily': [dojo.date.dateParts.DAY, 1],
-            'weekly': [dojo.date.dateParts.WEEK, 1],
-            'biweekly': [dojo.date.dateParts.WEEK, 2],
-            'monthly': [dojo.date.dateParts.MONTH, 1],
-            'yearly': [dojo.date.dateParts.YEAR, 1]
+            'daily': [cosmo.datetime.util.dateParts.DAY, 1],
+            'weekly': [cosmo.datetime.util.dateParts.WEEK, 1],
+            'biweekly': [cosmo.datetime.util.dateParts.WEEK, 2],
+            'monthly': [cosmo.datetime.util.dateParts.MONTH, 1],
+            'yearly': [cosmo.datetime.util.dateParts.YEAR, 1]
     }
 });

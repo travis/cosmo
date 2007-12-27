@@ -345,7 +345,7 @@ cosmo.model.declare("cosmo.model.Note", cosmo.model.Item,
           //summary: creates a deep copy of all the properties of this Item. 
           //description: Copies all the properties of the Note, making copies
           //             of all mutable objects
-          var clone = this._inherited("clone");
+            var clone = this.inherited("clone", arguments);
           if (this._stamps){
               clone._stamps = cosmo.model.clone(this._stamps);
               for (var stampName in clone._stamps){
@@ -394,7 +394,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     autoTriage: function(){
         var modification = this._getThisModification();
         if (modification){
-            return this._inherited("autoTriage");
+            return this.inherited("autoTriage",arguments);
         } else {
             return false;
         }
@@ -403,7 +403,7 @@ dojo.declare("cosmo.model.NoteOccurrence", cosmo.model.Note, {
     tickle: function(){
         var modification = this._getThisModification();
         if (modification){
-            return this._inherited("tickle");
+            return this.inherited("tickle", arguments);
         } else {
             return false;
         }

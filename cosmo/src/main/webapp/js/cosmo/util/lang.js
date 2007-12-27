@@ -24,6 +24,7 @@ cosmo.util.lang.has = function(obj, name){
     } 
 }
 
+//from dojo 0.4
 cosmo.util.lang.isEmpty = function (obj) { 
     if (dojo.isObject(obj)) { 
         var tmp = {}; 
@@ -40,4 +41,35 @@ cosmo.util.lang.isEmpty = function (obj) {
             return obj.length == 0; 
         } 
     } 
+}
+
+//from dojo0.4
+cosmo.util.lang.shallowCopy = function (obj, deep) { 
+    var i, ret; 
+    if (obj === null) { 
+        return null; 
+    } 
+
+    if (dojo.isObject(obj)) { 
+        ret = new obj.constructor; 
+        for (i in obj) { 
+            if (cosmo.util.lang.isUndefined(ret[i])) { 
+                ret[i] = deep ? cosmo.util.lang.shallowCopy(obj[i], deep) : obj[i]; 
+            } 
+        } 
+    } else { 
+        if (dojo.isArray(obj)) { 
+            ret = []; for (i = 0; i < obj.length; i++) { 
+                ret[i] = deep ? cosmo.util.lang.shallowCopy(obj[i], deep) : obj[i]; 
+            } 
+        } else { 
+            ret = obj; 
+        } 
+    } 
+    return ret; 
+}
+
+//from dojo 0.4
+cosmo.util.lang.isUndefined = function(it){
+    return typeof it == "undefined" && it == undefined; 
 }

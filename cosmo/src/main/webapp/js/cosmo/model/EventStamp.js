@@ -143,7 +143,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 }
                 return;  
             }
-            this._inherited("applyChange", arguments);
+            this.inherited("applyChange", arguments);
         }
     },
     //mixins for occurrence stamps

@@ -19,7 +19,7 @@ dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
 
-dojo.lang.mixin(cosmotest.model.test_modelTriage,{
+dojo.mixin(cosmotest.model.test_modelTriage,{
     test_getSetTriage : function(){
         var note = new cosmo.model.Note();
         note.setTriageStatus(cosmo.model.TRIAGE_LATER);

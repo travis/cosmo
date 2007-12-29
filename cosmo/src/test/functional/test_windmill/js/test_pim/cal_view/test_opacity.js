@@ -1,6 +1,10 @@
 windmill.jsTest.require('shared/test_nav_to_cal_view.js');
+windmill.jsTest.require('shared/utilities.js');
 
 pimTest.calView.test_opacity= new function () {
+  var doLozengeClickByRegistryIndex =
+    pimTest.shared.utilities.doLozengeClickByRegistryIndex; 
+
   this.setup = new function () {
     this.test_navToCalView = pimTest.shared.test_navToCalView;
     this.test_createCalEvents = [
@@ -11,8 +15,8 @@ pimTest.calView.test_opacity= new function () {
   };
 
   this.test_modalDialogMask = [
-    // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
+    // Select the first event
+    function () { doLozengeClickByRegistryIndex(0); },
     // Click the Remove button
     { method: "click", params: { id: "detailRemoveButton" } },
     { method: "waits.forElement", params: { id: "removeConfirmRemoveButton", "timeout": 40000} },

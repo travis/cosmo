@@ -6,8 +6,7 @@ pimTest.shared.test_logout = new function () {
   ];
   // Tests have to reload
   this.test_loggedOut = [
-    { method: "waits.sleep", params: {"milliseconds": 6000 } },
-    { method: "waits.forElement", params: { id: "loginSubmitButton", "timeout": 40000} }
+    { method: "waits.forElement", params: { id: "loginSubmitButton", "timeout": 40000 } }
   ];
 };
 

@@ -16,7 +16,7 @@ pimTest.shared.test_newUserLogin = new function () {
       // Click for 'required field' error, click submit with no form imput
       { method: "click", params: { id: "signupSubmit"} },
       { method: "waits.sleep", params: { milliseconds : 2000 } },
-      { method: "asserts.assertText", params: {"validator":
+      { method: "asserts.assertText", params: {validator:
         _('Signup.Error.RequiredField'), id: "modalDialogContent" } },
       // Input user info
       { method: "type", params: { text: "{$random}", id: "username" } },
@@ -28,7 +28,7 @@ pimTest.shared.test_newUserLogin = new function () {
       { method: "type",params: { text: "12345678901234567890", id: "confirm" } },
       { method: "click", params: { id: "signupSubmit" } },
       { method: "waits.sleep", params: {"milliseconds": 2000 } },
-      { method: "asserts.assertText", params: {"validator":
+      { method: "asserts.assertText", params: {validator:
         _('Signup.Error.MaxLength') + " (16)", id: "modalDialogContent" } },
       // Check for error from confirmation not matching initial password input
       { method: "type",params: { text: "testers", id: "password" } },
@@ -40,9 +40,9 @@ pimTest.shared.test_newUserLogin = new function () {
       // Correct pass/confirm, submit form
       { method: "type", params: { text: "tester", id: "password" } },
       { method: "click", params: { id: "signupSubmit" } },
-      { method: "waits.forElement", params: { id: "modalDialogPrompt", "timeout": 40000 } },
+      { method: "waits.forElement", params: { id: "signupClose", "timeout": 40000 } },
       // Check for the account-creation success message
-      { method: "asserts.assertText", params: {"validator":
+      { method: "asserts.assertText", params: {validator:
         _('Signup.Prompt.Success'), id: "modalDialogPrompt" } },
       { method: "click", params: { id: "signupClose" } }
     ]
@@ -56,13 +56,7 @@ pimTest.shared.test_newUserLogin = new function () {
     { method: "click", params: {  id: "loginSubmitButton" } },
     { method: "waits.sleep", params: { milliseconds : 500 } },
     { method: "type", params: {  id: "loginDialogPasswordInput", text: "tester" } },
-    { method: "click", params: {  id: "loginSubmitButton" } }
-  ];
-  // Make logged-in test a separate set of actions because tests
-  // have to reload when window location changes
-  this.test_loggedIn = [
-    // Give the app some time to load
-    { method: "waits.sleep", params: {"milliseconds": 6000 } },
+    { method: "click", params: {  id: "loginSubmitButton" } },
     { method: "waits.forElement", params: { id: "mainLogoContainer", "timeout": 40000} }
   ];
 };

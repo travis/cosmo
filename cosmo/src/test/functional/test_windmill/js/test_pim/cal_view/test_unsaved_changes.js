@@ -1,6 +1,10 @@
 windmill.jsTest.require('shared/test_nav_to_cal_view.js');
+windmill.jsTest.require('shared/utilities.js');
 
 pimTest.calView.test_unsavedChanges = new function () {
+  var doLozengeClickByRegistryIndex =
+    pimTest.shared.utilities.doLozengeClickByRegistryIndex; 
+
   this.setup = new function () {
     // Make sure cal view is displayed
     this.test_navToCalView = pimTest.shared.test_navToCalView;
@@ -17,20 +21,18 @@ pimTest.calView.test_unsavedChanges = new function () {
 
   this.test_clickLozengeDiscard = [
     // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+    function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
     { method: "type", params: { id: "noteTitle", text: "Unsaved: Click Lozenge" } },
     // Click back to the first event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    function () { doLozengeClickByRegistryIndex(0); },
     // Verify that the Unsaved Changes dialog appears
-    function () {
-      var dialogText = $('modalDialogContent').innerHTML;
-      jum.assertEquals(dialogText, "You have unsaved changes in the item-detail form. What do you want to do?");
-    },
+    { method: "waits.forElement", params: { id: "modalDialogContent" } },
+    { method: "asserts.assertText", params: { validator:
+      _('Main.Prompt.UnsavedChangesConfirm'), id: "modalDialogContent" } },
     // Click Discard Changes button
     { method: "click", params: { id: "unsavedChangesDialogDiscardButton" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the event title didn't change
     function () {
       var summaryText = $('noteTitle').value;
@@ -41,20 +43,18 @@ pimTest.calView.test_unsavedChanges = new function () {
   this.test_clickLozengeSave = [
     { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+    function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
     { method: "type", params: { id: "noteTitle", text: "Unsaved: Click Lozenge" } },
     // Click back to the first event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    function () { doLozengeClickByRegistryIndex(0); },
     // Verify that the Unsaved Changes dialog appears
-    function () {
-      var dialogText = $('modalDialogContent').innerHTML;
-      jum.assertEquals(dialogText, "You have unsaved changes in the item-detail form. What do you want to do?");
-    },
+    { method: "waits.forElement", params: { id: "modalDialogContent" } },
+    { method: "asserts.assertText", params: { validator:
+      _('Main.Prompt.UnsavedChangesConfirm'), id: "modalDialogContent" } },
     // Click Save button
     { method: "click", params: { id: "unsavedChangesDialogSaveButton" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the event title changed
     function () {
       var summaryText = $('noteTitle').value;
@@ -65,20 +65,18 @@ pimTest.calView.test_unsavedChanges = new function () {
   this.test_viewChangeDiscard = [
     { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+    function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
     { method: "type", params: { id: "noteTitle", text: "Unsaved: Change View" } },
     // Change to list view
     { method: "click", params: { id: "viewToggle_button0" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Verify that the Unsaved Changes dialog appears
-    function () {
-      var dialogText = $('modalDialogContent').innerHTML;
-      jum.assertEquals(dialogText, "You have unsaved changes in the item-detail form. What do you want to do?");
-    },
+    { method: "waits.forElement", params: { id: "modalDialogContent" } },
+    { method: "asserts.assertText", params: { validator:
+      _('Main.Prompt.UnsavedChangesConfirm'), id: "modalDialogContent" } },
     // Click Discard Changes button
     { method: "click", params: { id: "unsavedChangesDialogDiscardButton" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the view switched to list view
     function () {
       var listContainer = $('listViewContainer');
@@ -90,9 +88,9 @@ pimTest.calView.test_unsavedChanges = new function () {
     },
     // Change back to cal view
     { method: "click", params: { id: "viewToggle_button1" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    { method: "waits.forElement", params: { id: "calViewNav" } },
     // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+    function () { doLozengeClickByRegistryIndex(1); },
     // Verify the event title didn't change
     function () {
       var summaryText = $('noteTitle').value;
@@ -103,20 +101,18 @@ pimTest.calView.test_unsavedChanges = new function () {
   this.test_viewChangeSave = [
     { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+    function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
     { method: "type", params: { id: "noteTitle", text: "Unsaved: Change View" } },
     // Change to list view
-    { method: "click", params: { jsid: "viewToggle_button0" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    { method: "click", params: { id: "viewToggle_button0" } },
     // Verify that the Unsaved Changes dialog appears
-    function () {
-      var dialogText = $('modalDialogContent').innerHTML;
-      jum.assertEquals(dialogText, "You have unsaved changes in the item-detail form. What do you want to do?");
-    },
+    { method: "waits.forElement", params: { id: "modalDialogContent" } },
+    { method: "asserts.assertText", params: { validator:
+      _('Main.Prompt.UnsavedChangesConfirm'), id: "modalDialogContent" } },
     // Click Save button
     { method: "click", params: { id: "unsavedChangesDialogSaveButton" } },
-    { method: "waits.sleep", params: { milliseconds: 4000 } },
+    { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the event title changed
     function () {
       var summaryText = $('noteTitle').value;
@@ -126,7 +122,7 @@ pimTest.calView.test_unsavedChanges = new function () {
 
   this.teardown = [
     // Select the second event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(1).id" } },
+    function () { doLozengeClickByRegistryIndex(1); },
     // Click the Remove button
     { method: "click", params: { id: "detailRemoveButton" } },
     { method: "waits.sleep", params: { milliseconds: 4000 } },
@@ -134,7 +130,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     { method: "click", params: { id: "removeConfirmRemoveButton" } },
     { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Select the first event
-    { method: 'extensions.clickLozenge', params: { jsid: "cosmo.view.cal.itemRegistry.getAtPos(0).id" } },
+    function () { doLozengeClickByRegistryIndex(0); },
     // Click the Remove button
     { method: "click", params: { id: "detailRemoveButton" } },
     { method: "waits.sleep", params: { milliseconds: 4000 } },

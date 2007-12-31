@@ -45,20 +45,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
         /**
          * summary: Return request populated with attributes common to all CMP calls.
          */
-        getDefaultCMPRequest: function (/*Object*/ handlerDict,
-                                        /*boolean?*/ sync){
-
+        getDefaultCMPRequest: function (/*Object*/ ioArgs){
+            ioArgs = ioArgs || {};
             var request = cosmo.util.auth.getAuthorizedRequest()
-
-            request.load = handlerDict.load;
-            request.handle =  handlerDict.handle;
-            request.error = handlerDict.error;
-            request.transport = "XMLHTTPTransport";
+            request.load = ioArgs.load;
+            request.handle =  ioArgs.handle;
+            request.error = ioArgs.error;
             request.contentType =  'text/xml';
-            request.sync = sync;
-            request.handleAs = "xml";
+            request.sync = ioArgs.sync;
             // TODO: is this still needed?
-            if (document.all) {
+            if (dojo.isIE) {
                 request.preventCache = true;
             }
 
@@ -80,16 +76,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              <code>pageSize</code>, <code>sortOrder</code> and
          *              <code>sortType</code>.
          */
-        getUsers: function (/*Object*/ handlerDict,
-                            /*int*/ pageNumber,
+        getUsers: function (/*int*/ pageNumber,
                             /*int*/ pageSize,
                             /*String*/ sortOrder,
                             /*String*/ sortType,
                             /*String*/ query,
-                            /*boolean?*/ sync) {
-            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUsersXMLToJSON);
+                            /*Object?*/ ioArgs) {
+            ioArgs = this._wrapXMLHandlerFunctions(ioArgs, this.cmpUsersXMLToJSON);
 
-            this.getUsersXML(handlerDict, pageNumber, pageSize, sortOrder, sortType, query, sync);
+            return this.getUsersXML(pageNumber, pageSize, sortOrder, sortType, query, ioArgs);
         },
 
         /**
@@ -101,15 +96,14 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              <code>pageSize</code>, <code>sortOrder</code> and
          *              <code>sortType</code>.
          */
-        getUsersXML: function (/*Object*/ handlerDict,
-                               /*int*/ pageNumber,
+        getUsersXML: function (/*int*/ pageNumber,
                                /*int*/ pageSize,
                                /*String*/ sortOrder,
                                /*String*/ sortType,
                                /*String*/ query,
-                               /*boolean?*/ sync) {
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users";
+                               /*Object?*/ ioArgs) {
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/users";
 
             if (pageNumber || pageSize || sortOrder || sortType){
                 requestDict.url +=
@@ -121,7 +115,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
             if (query) {
                 requestDict.url += "&q=" + escape(query);
             }
-
             return dojo.xhrGet(requestDict);
         },
 
@@ -130,11 +123,10 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * description: Return an Object representation of <code>username</code>.
          */
         getUser: function(/*String*/ username,
-                          /*Object*/ handlerDict,
-                          /*boolean?*/ sync) {
-            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+                          /*Object*/ ioArgs){
+            ioArgs = this._wrapXMLHandlerFunctions(ioArgs, this.cmpUserXMLToJSON);
 
-            this.getUserXML(username, handlerDict, sync);
+            return this.getUserXML(username, ioArgs);
         },
 
         /**
@@ -142,11 +134,10 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * description: Return an XML representation of <code>username</code>.
          */
         getUserXML: function (/*String*/ username,
-                              /*Object*/ handlerDict,
-                              /*boolean?*/ sync) {
+            /*Object*/ ioArgs){
 
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(username);
 
             return dojo.xhrGet(requestDict);
@@ -156,16 +147,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * summary: Create the user described by <code>userHash</code>
          * description: Create the user described by <code>userHash</code>.
          */
-        createUser: function (userHash, handlerDict, sync) {
+        createUser: function (userHash, ioArgs){
             var request_content = this.userHashToXML(userHash);
             
 
-            requestDict = this.getDefaultCMPRequest(handlerDict, sync)
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
+            requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(userHash.username);
 
             requestDict.putData = request_content;
-            
             return dojo.rawXhrPut(requestDict);
         },
 
@@ -174,7 +164,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * description: Update <code>username</code>'s account with
          *              the values in <code>userHash</code>
          */
-        modifyUser: function (username, userHash, handlerDict, sync) {
+        modifyUser: function (username, userHash, ioArgs){
             // If the user to be modified is the current user and
             // we're changing username or password, make
             // sure the current credentials will be changed on success
@@ -189,19 +179,17 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     newCred.username = userHash.username;
                 }
                 
-                handlerDict = this._wrapChangeCredentialFunctions(
-                    handlerDict, [204], newCred);
+                ioArgs = this._wrapChangeCredentialFunctions(
+                    ioArgs, [204], newCred);
             }
             
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
             
             var request_content = this.userHashToXML(userHash);
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(username);
             requestDict.putData = request_content;
             return dojo.rawXhrPut(requestDict);
@@ -214,18 +202,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *
          */
         deleteUser: function (/*String*/ username,
-                              /*Object*/ handlerDict,
-                              /*boolean?*/ sync) {
+            /*Object*/ ioArgs){
 
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
             
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
             
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(username);
             return dojo.xhrDelete(requestDict);
 
@@ -238,16 +223,14 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *
          */
         deleteUsers: function (/*String[]*/ usernames,
-            /*Object*/ handlerDict,
-            /*boolean?*/ sync) {
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+            /*Object*/ ioArgs){
+
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
             
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/delete";
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/delete";
             
             for (var i = 0; i < usernames.length; i++){
                 usernames[i] = "user=" +
@@ -265,18 +248,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * description: Activate <code>username</code>'s account
          */
         activate: function (/*String*/ username,
-                            /*Object*/ handlerDict,
-                            /*boolean?*/ sync) {
+            /*Object*/ ioArgs){
 
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
 
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
 
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/activate/" + username;
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/activate/" + username;
             requestDict.postData = "id="+username;
             return dojo.rawXhrPost(requestDict);
         },
@@ -285,10 +265,9 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * summary: Return the number of users on this server.
          * description: Return the number of users on this server.
          */
-        getUserCount: function (/*Object*/ handlerDict,
-                                /*boolean?*/ sync){
-        	var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-        	requestDict.url = cosmo.env.getBaseUrl() + "/cmp/users/count";
+        getUserCount: function (/*Object*/ ioArgs){
+        	var requestDict = this.getDefaultCMPRequest(ioArgs);
+        	requestDict.url = cosmo.env.getFullUrl("Cmp") + "/users/count";
 			return dojo.xhrGet(requestDict);
         },
 
@@ -301,15 +280,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         //TODO: fix HEAD
         headUser: function (/*String*/ username,
-                            /*Object*/ handlerDict,
-                            /*boolean?*/ sync){
-            var requestDict = this.getDefaultCMPRequest(handlerDict, true)
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/user/" +
+            /*Object*/ ioArgs){
+            var requestDict = this.getDefaultCMPRequest(ioArgs, true)
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(username);
             requestDict.method = "HEAD"
-            if (sync){
-                requestDict.async = false;
-            }
 
             return dojo.io.bind(requestDict);
         },
@@ -320,21 +295,19 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *     these operations
          *
          */
-        getAccount: function (/*Object*/ handlerDict,
-                              /*boolean?*/ sync) {
-            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+        getAccount: function (/*Object*/ ioArgs){
+            ioArgs = this._wrapXMLHandlerFunctions(ioArgs, this.cmpUserXMLToJSON);
 
-            this.getAccountXML(handlerDict, sync);
+            return this.getAccountXML(ioArgs);
         },
 
         /**
          * summary: Get the user representation for the current user.
          * description: Return an XML representation of the current user.
          */
-        getAccountXML: function(/*Object*/ handlerDict,
-            /*boolean?*/ sync) {
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account";
+        getAccountXML: function(/*Object*/ ioArgs){
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account";
             
             return dojo.xhrGet(requestDict);
         },
@@ -344,27 +317,24 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * description: Return an Object representation of the current user.
          */
         modifyAccount: function (/*Object*/ userHash,
-                                 /*Object*/ handlerDict,
-                                 /*boolean?*/ sync) {
+            /*Object*/ ioArgs){
             // If the user is changing his password,
             // make sure to wrap this in the credential
             // change-on-success function
             if (userHash.password){
-                handlerDict = this._wrapChangeCredentialFunctions(handlerDict,
+                ioArgs = this._wrapChangeCredentialFunctions(ioArgs,
                                                                   [204],
                                                                   {password:userHash.password});
             }
             
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
             
             var requestContent = this.userHashToXML(userHash)
             
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account";
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account";
             requestDict.putData = requestContent;
             
             return dojo.xhrPut(requestDict);
@@ -380,12 +350,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              and return an Object representation of that user.
          */
         signup: function (/*Object*/ userHash,
-                          /*Object*/ handlerDict,
-                          /*boolean?*/ sync) {
+            /*Object*/ ioArgs){
             var self = this;
-            handlerDict = this._wrapXMLHandlerFunctions(handlerDict, this.cmpUserXMLToJSON);
+            ioArgs = this._wrapXMLHandlerFunctions(ioArgs, this.cmpUserXMLToJSON);
 
-            return this.getSignupXML(userHash, handlerDict, sync);
+            return this.getSignupXML(userHash, ioArgs);
         },
 
         /**
@@ -394,10 +363,9 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              and return an XML representation of that user.
          */
         getSignupXML: function(/*Object*/ userHash,
-                               /*Object*/ handlerDict,
-                               /*boolean?*/ sync) {
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/signup";
+            /*Object*/ ioArgs){
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/signup";
             requestDict.putData = this.userHashToXML(userHash);
             return dojo.rawXhrPut(requestDict);
         },
@@ -429,21 +397,19 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 uuid + '</subscription>';
         },
 
-        sendActivation: function(username, email, handlerDict, sync){
+        sendActivation: function(username, email, ioArgs){
             this._recover(cosmo.env.getFullUrl("Cmp") + "/account/activation/send", 
-                         username, email, handlerDict, sync)
+                          username, email, ioArgs);
         },
 
-        recoverPassword: function(username, email, handlerDict, sync){
-            this._recover(cosmo.env.getFullUrl("Cmp") + "/account/password/recover", 
-                         username, email, handlerDict, sync)
+        recoverPassword: function(username, email, ioArgs){
+            return this._recover(cosmo.env.getFullUrl("Cmp") + "/account/password/recover", 
+                                 username, email, ioArgs);
         },
 
-        _recover: function(url, username, email, handlerDict, sync){
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+        _recover: function(url, username, email, ioArgs){
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
 
             var requestContent =
@@ -451,25 +417,23 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 username && email? "&" : "" +
                 email? "email=" + email : "";
 
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = url;
             requestDict.postData = requestContent;
 
             return dojo.rawXhrPost(requestDict);
         },
 
-        resetPassword: function(key, password, handlerDict, sync){
+        resetPassword: function(key, password, ioArgs){
 
             var requestContent = "password=" + password;
 
-            // Safari and IE don't understand 204s. Boo.
-            if (navigator.userAgent.indexOf('Safari') > -1 ||
-                document.all){
-                handlerDict = this._wrap204Bandaid(handlerDict);
+            if (dojo.isIE){
+                ioArgs = this._wrap204Bandaid(ioArgs);
             }
 
-            var requestDict = this.getDefaultCMPRequest(handlerDict, sync);
-            requestDict.url = cosmo.env.getBaseUrl() + "/cmp/account/password/reset/" + key;
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account/password/reset/" + key;
             requestDict.contentType = "application/x-www-form-urlencoded";
             requestDict.postData = requestContent;
 
@@ -510,19 +474,18 @@ dojo.declare("cosmo.cmp.Cmp", null,
             for (i = 0; i < users.length; i++){
                 userList[i] = this.cmpUserXMLToJSON(users[i]);
             }
-
             return userList;
         },
 
         _wrapXMLHandlerFunctions: function (/*Object*/ hDict,
                                             /*function*/ xmlParseFunc){
             var self = this;
-            var handlerDict = dojo.clone(hDict);
-            if (handlerDict.load){
+            var handlerDict = dojo.clone(hDict) || {};
+            if (handlerDict.load || !(handlerDict.load || handlerDict.handle)){
                 var old_load = handlerDict.load;
-                handlerDict.load = function(type, data, evt){
-                    var parsedCMPXML = xmlParseFunc.apply(self, [evt.responseXML])
-                    old_load(type, parsedCMPXML, evt);
+                handlerDict.load = function(response, ioArgs){
+                    var parsedCMPXML = xmlParseFunc.apply(self, [ioArgs.xhr.responseXML])
+                    return old_load? old_load(parsedCMPXML, ioArgs) : parsedCMPXML;
                 }
             }
 			// Don't mess with "error". These responses shouldn't be XML.
@@ -538,22 +501,22 @@ dojo.declare("cosmo.cmp.Cmp", null,
                                                  /*int[]*/ statusCodes,
                                                  /*Object*/ newCred){
             var self = this;
-            var handlerDict = dojo.clone(hDict);
+            var handlerDict = dojo.clone(hDict) || {};
             if (handlerDict.load){
                 var oldLoad = handlerDict.load;
-                handlerDict.load = function(type, data, evt){
+                handlerDict.load = function(response, ioArgs){
                     self._changeCredIfStatusMatches(
-                        evt.status, statusCodes, newCred);
-                    oldLoad(type, data, evt);
+                        ioArgs.xhr.status, statusCodes, newCred);
+                    return oldLoad(response, io);
                 }
             }
 
             if (handlerDict.handle){
                 var oldHandle = handlerDict.handle;
-                handlerDict.handle = function(type, data, evt){
+                handlerDict.handle = function(response, ioArgs){
                     self._changeCredIfStatusMatches(
-                        evt.status, statusCodes, newCred);
-                    oldHandle(type, data, evt);
+                        ioArgs.xhr.status, statusCodes, newCred);
+                    oldHandle(response, ioArgs);
                 }
 
             }
@@ -563,7 +526,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         _wrap204Bandaid: function(hDict){
-            var handlerDict = dojo.clone(hDict);
+            var handlerDict = dojo.clone(hDict) || {};
 
             if (handlerDict.load){
                 handlerDict.load = this._204Bandaid(handlerDict.load);
@@ -582,28 +545,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
         _204Bandaid: function(originalFunc, handle204Func){
             // Use original function if handle204Func is not specified.
             handle204Func = handle204Func? handle204Func: originalFunc;
-            return function(type, data, evt){
-                if (navigator.userAgent.indexOf('Safari') > -1 &&
-                    !evt.status) {
-
-                    var newEvt = dojo.clone(evt);
-                    newEvt.status = 204;
-                    newEvt.statusText = "No Content";
-                    handle204Func('load', '', newEvt);
-
-                }
-
-                // If we're Internet Explorer
-                else if (document.all &&
-                         evt.status == 1223){
-                    // apparently, shallow copying the XHR object in ie
-                    // causes problems.
-                    var newEvt = {};
-                    newEvt.status = 204;
-                    newEvt.statusText = "No Content";
-                    handle204Func('load', '', newEvt);
+            return function(response, ioArgs){
+                if (dojo.isIE &&
+                    evt.status == 1223){
+                    ioArgs.xhr = {
+                        status: 204,
+                        statusText: "No Content"
+                    };
+                    handle204Func(response, ioArgs);
                 } else {
-                    originalFunc(type, data, evt);
+                    originalFunc(response, ioArgs);
                 }
             }
         },
@@ -617,7 +568,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     cosmo.util.auth.setPassword(newCred.password);
                 }
             }
-        }
+        } 
     }
 );
 

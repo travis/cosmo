@@ -20,7 +20,6 @@
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"id": "endMeridianPM"},  "method": "radio"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "eventStatus"},  "method": "click"}
 {"params": {"option": "Tentative", "id": "eventStatus"},  "method": "select"}
 {"params": {"id": "sectionTaskEnableToggle"},  "method": "check"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}

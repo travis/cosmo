@@ -72,7 +72,6 @@
 {"params": {"validator": "disabled|false", "id": "eventStatus"}, "method": "asserts.assertProperty"}
 {"params": {"validator": "disabled|false", "id": "recurrenceInterval"}, "method": "asserts.assertProperty"}
 {"params": {"validator": "disabled|true", "id": "recurrenceEnd"}, "method": "asserts.assertProperty"}
-{"params": {"id": "recurrenceInterval"}, "method": "click"}
 {"params": {"option": "Daily", "id": "recurrenceInterval"}, "method": "select"}
 {"params": {"validator": "disabled|false", "id": "recurrenceEnd"}, "method": "asserts.assertProperty"}
 {"params": {"id": "sectionEventEnableToggle"}, "method": "click"}

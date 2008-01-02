@@ -16,6 +16,16 @@
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.removeButton.widgetId"}, "method": "click"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}
 {"params": {"id": "removeConfirmRemoveButton"}, "method": "click"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getLast().id"}, "method": "extensions.clickLozenge"}
+{"params": {"milliseconds": 3000}, "method": "waits.sleep"}
+{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.removeButton.widgetId"}, "method": "click"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"id": "removeConfirmRemoveButton"}, "method": "click"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getLast().id"}, "method": "extensions.clickLozenge"}
+{"params": {"milliseconds": 3000}, "method": "waits.sleep"}
+{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.removeButton.widgetId"}, "method": "click"}
+{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
+{"params": {"id": "removeConfirmRemoveButton"}, "method": "click"}
 {"params": {"id": "hourDiv3-1200"}, "method": "doubleClick"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}
 {"params": {"text": "refresh", "id": "noteTitle"}, "method": "type"}

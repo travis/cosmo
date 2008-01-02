@@ -8,9 +8,7 @@
 
 
 {"params": {"id": "eventAllDay"}, "method": "check"}
-{"params": {"id": "recurrenceInterval"}, "method": "click"}
 {"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
-//{"params": {"xpath": "\/html\/body\/div\/div\/div\/div\/div\/div\/div\/form\/div\/select\/option"}, "method": "click"}
 {"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}
 

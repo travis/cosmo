@@ -15,13 +15,14 @@
 
 //save it
 {"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
-{"method": "waits.sleep", "params": {"milliseconds" : 1100}}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 
 //go to list view
 {"params": {"jsid": "{$listView}"}, "method": "click"}
+{"method": "waits.forElement", "params": {"id": "listViewQuickItemEntry", "timeout": "40000"}}
 
 //select it
-{"params": {"jsid": "'listView_item' + windmill.testWindow.cosmo.view.list.itemRegistry.getAtPos(1).id"}, "method": "click"}
+{"params": {"jsid": "'listView_item' + windmill.testWindow.cosmo.view.list.itemRegistry.getLast().id"}, "method": "click"}
 
 //unstamp event
 {"params": {"id": "sectionEventEnableToggle"}, "method": "check"}

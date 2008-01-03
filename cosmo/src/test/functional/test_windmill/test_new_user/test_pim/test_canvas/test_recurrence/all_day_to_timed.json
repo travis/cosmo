@@ -10,10 +10,10 @@
 {"params": {"id": "eventAllDay"}, "method": "check"}
 {"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
 {"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
-{"method": "waits.sleep", "params": {"milliseconds" : 2000}}
+{"method": "waits.sleep", "params": {"milliseconds" : 5000}}
 
 //select the event
-{"params": {"jsid": "'eventDivAllDay__' + windmill.testWindow.cosmo.view.cal.itemRegistry.getAtPos(0).id"}, "method": "click"}
+{"params": {"jsid": "'eventDivAllDay__' + windmill.testWindow.cosmo.view.cal.itemRegistry.getLast().id"}, "method": "click"}
 
 //uncheck all day
 {"params": {"id": "eventAllDay"}, "method": "check"}

@@ -1,3 +1,4 @@
+{"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": "40000"}}
 {"params": {"link": "Settings"}, "method": "click"}
 {"params": {"id": "modalDialogContent"}, "method": "waits.forElement"}
 {"params": {"id": "password"}, "method": "click"}

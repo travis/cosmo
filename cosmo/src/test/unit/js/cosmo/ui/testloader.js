@@ -3,7 +3,10 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 
 cosmotest.ui.button = function(output){
-    output.appendChild(document.createTextNode("HI!"));
+    dojo.require("cosmo.ui.widget.Button");
+    var button = new cosmo.ui.widget.Button({
+        text: "Test Button"
+    },output);
 }
 
 cosmotest.ui.testloader.tests = [
@@ -76,13 +79,13 @@ cosmotest.ui.testloader.runTests = function(){
         
         testDiv.id = test[0] + "_div";
         testDivLabel.id = test[0] + "_label";
-        testDivLabel.id = test[0] + "_output";
+        testDivOutput.id = test[0] + "_output";
         testDiv.appendChild(testDivLabel);
         testDiv.appendChild(testDivOutput);
 
         testDivLabel.appendChild(document.createTextNode(test[0] + ":"))
         this._output.appendChild(testDiv);
-        test[1](this._output);
+        test[1](testDivOutput);
     }
 }
 

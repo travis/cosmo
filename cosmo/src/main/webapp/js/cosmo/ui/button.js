@@ -22,8 +22,6 @@
 dojo.provide("cosmo.ui.button");
 dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.env");
-dojo.require("dojo.event");
-dojo.require("dojo.widget.*");
 dojo.require("cosmo.ui.widget.Button");
 
 /**
@@ -125,11 +123,11 @@ cosmo.ui.button.NavButtonSet = function(id, leftHandler, rightHandler) {
         }
         nbData.appendChild(nbImg);
 
-        dojo.event.connect(nbData, 'onmouseover', self, '_morphButton');
-        dojo.event.connect(nbData, 'onmouseout', self, '_morphButton');
-        dojo.event.connect(nbData, 'onmousedown', self, '_morphButton');
-        dojo.event.connect(nbData, 'onmouseup', self, '_morphButton');
-        dojo.event.connect(nbData, 'onclick', clickHandler);
+        dojo.connect(nbData, 'onmouseover', self, '_morphButton');
+        dojo.connect(nbData, 'onmouseout', self, '_morphButton');
+        dojo.connect(nbData, 'onmousedown', self, '_morphButton');
+        dojo.connect(nbData, 'onmouseup', self, '_morphButton');
+        dojo.connect(nbData, 'onclick', clickHandler);
         return nbData;
     }
 

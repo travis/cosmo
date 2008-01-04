@@ -123,5 +123,14 @@ cosmotest.testutils = {
         cosmo.util.auth.setCred("root", "cosmo");
         cosmo.cmp.deleteUser(user.username, {handle: function(){}}, true);
         cosmo.util.auth.clearAuth();
+    },
+ 
+    // convert dojo.Deferred into doh.Deferred in able to return from test
+    defcon: function(dojoDeferred){
+        var d2 = new doh.Deferred()
+        dojoDeferred.addCallbacks(
+            dojo.hitch(d2, d2.callback), 
+            dojo.hitch(d2, d2.errback));
+        return d2;
     }
 }

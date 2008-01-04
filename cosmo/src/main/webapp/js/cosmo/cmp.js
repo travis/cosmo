@@ -168,21 +168,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
             // If the user to be modified is the current user and
             // we're changing username or password, make
             // sure the current credentials will be changed on success
-            if (username == cosmo.util.auth.getUsername() &&
-                (userHash.password || userHash.username)){
-                
-                var newCred = {};
-                if (userHash.password){
-                    newCred.password = userHash.password;
-                }
-                if (userHash.username){
-                    newCred.username = userHash.username;
-                }
-                
-                ioArgs = this._wrapChangeCredentialFunctions(
-                    ioArgs, [204], newCred);
-            }
-            
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
@@ -192,7 +177,12 @@ dojo.declare("cosmo.cmp.Cmp", null,
             requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(username);
             requestDict.putData = request_content;
-            return dojo.rawXhrPut(requestDict);
+            var d = dojo.rawXhrPut(requestDict);
+            if (username == cosmo.util.auth.getUsername() &&
+                (userHash.password || userHash.username)){
+                d.addCallback(this._changeCredCB(userHash.username, userHash.password));
+            }
+            return d;
 
         },
 
@@ -268,7 +258,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
         getUserCount: function (/*Object*/ ioArgs){
         	var requestDict = this.getDefaultCMPRequest(ioArgs);
         	requestDict.url = cosmo.env.getFullUrl("Cmp") + "/users/count";
-			return dojo.xhrGet(requestDict);
+			var d = dojo.xhrGet(requestDict);
+            d.addCallback(function(countString){
+                return parseInt(countString);
+            });
+            return d;
         },
 
         /**
@@ -321,12 +315,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             // If the user is changing his password,
             // make sure to wrap this in the credential
             // change-on-success function
-            if (userHash.password){
-                ioArgs = this._wrapChangeCredentialFunctions(ioArgs,
-                                                                  [204],
-                                                                  {password:userHash.password});
-            }
-            
+         
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
@@ -337,7 +326,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
             requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account";
             requestDict.putData = requestContent;
             
-            return dojo.xhrPut(requestDict);
+            var d = dojo.rawXhrPut(requestDict);
+            if (userHash.password){
+                d.addCallback(this._changeCredCB(null, userHash.password));
+            }
+            return d;
         },
 
         /*
@@ -481,7 +474,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                                             /*function*/ xmlParseFunc){
             var self = this;
             var handlerDict = dojo.clone(hDict) || {};
-            if (handlerDict.load || !(handlerDict.load || handlerDict.handle)){
+            if (handlerDict.load || !(handlerDict.load && handlerDict.handle)){
                 var old_load = handlerDict.load;
                 handlerDict.load = function(response, ioArgs){
                     var parsedCMPXML = xmlParseFunc.apply(self, [ioArgs.xhr.responseXML])
@@ -491,38 +484,6 @@ dojo.declare("cosmo.cmp.Cmp", null,
 			// Don't mess with "error". These responses shouldn't be XML.
 			// Don't mess with "handle". This is a "don't mess with my stuff" handler.
 			return handlerDict;
-        },
-
-        /*
-         * statusCodes is a list of status codes to
-         * call the cred change function on.
-         */
-        _wrapChangeCredentialFunctions: function(/*Object*/ hDict,
-                                                 /*int[]*/ statusCodes,
-                                                 /*Object*/ newCred){
-            var self = this;
-            var handlerDict = dojo.clone(hDict) || {};
-            if (handlerDict.load){
-                var oldLoad = handlerDict.load;
-                handlerDict.load = function(response, ioArgs){
-                    self._changeCredIfStatusMatches(
-                        ioArgs.xhr.status, statusCodes, newCred);
-                    return oldLoad(response, io);
-                }
-            }
-
-            if (handlerDict.handle){
-                var oldHandle = handlerDict.handle;
-                handlerDict.handle = function(response, ioArgs){
-                    self._changeCredIfStatusMatches(
-                        ioArgs.xhr.status, statusCodes, newCred);
-                    oldHandle(response, ioArgs);
-                }
-
-            }
-
-            return handlerDict;
-
         },
 
         _wrap204Bandaid: function(hDict){
@@ -559,14 +520,15 @@ dojo.declare("cosmo.cmp.Cmp", null,
             }
         },
 
-        _changeCredIfStatusMatches: function (stat, statusCodes, newCred){
-            for (var i = 0; i < statusCodes.length; i++){
-                if (newCred.username){
-                    cosmo.util.auth.setUsername(newCred.username);
+        _changeCredCB: function (username, password){
+            return function(result){
+                if (username){
+                    cosmo.util.auth.setUsername(username);
                 }
-                if (newCred.password){
-                    cosmo.util.auth.setPassword(newCred.password);
+                if (password){
+                    cosmo.util.auth.setPassword(password);
                 }
+                return result;
             }
         } 
     }

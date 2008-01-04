@@ -107,15 +107,15 @@ cosmotest.testutils = {
             username: username,
             firstName: username,
             lastName: username,
-            email: (email || username) + "@cosmotesting.osafoundation.org"
+            email: email || username + "@cosmotesting.osafoundation.org"
         };
-        cosmo.cmp.signup(user, {
-            load: function(type, data, evt){
-                cosmo.util.auth.setCred(user.username, user.password);
-            },
-            error: function(e){
-                dojo.debug(e);
-            }}, true);
+        var d = cosmo.cmp.signup(user, {sync: true});
+        d.addCallback(function(type, data, evt){
+            cosmo.util.auth.setCred(user.username, user.password);
+        });
+        d.addErrback(function(e){
+            dojo.debug(e);
+        });
         return user;
     },
     

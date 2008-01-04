@@ -97,10 +97,11 @@ cosmo.account.create = new function () {
             cosmo.app.modalDialog.setPrompt(err);
         }
         else {
-            var hand = { load: handleCreateResult, error: handleCreateResult };
             var user = this.formToUserHash();
             // Hand off to CMP
-            cosmo.cmp.signup(user, hand);
+            var d = cosmo.cmp.signup(user, {error: handleCreateError});
+            d.addCallback(handleCreateSuccess);
+            return d;
         }
     };
 
@@ -150,37 +151,34 @@ cosmo.account.create = new function () {
      * table with external client config on success.
      * @return Boolean, true on success, false on failure
      */
-    function handleCreateResult(type, data, resp) {
+    function handleCreateError(data, ioArgs) {
         var err = '';
-        if (type == 'error') {
-            if (resp.status && (resp.status > 399)) {
-                switch (resp.status) {
-                    case 403:
-                        err = _('Signup.Error.AlreadyLoggedIn');
-                        break;
-                    case 431:
-                        err = _('Signup.Error.UsernameInUse');
-                        break;
-                    case 432:
-                        err = _('Signup.Error.EMailInUse');
-                        break;
-                    default:
-                        err = _('Signup.Error.Generic') + ' (error code ' +
-                            resp.status + ')';
-                        break;
-                }
+        if (ioArgs.xhr.status && (ioArgs.xhr.status > 399)) {
+            switch (ioArgs.xhr.status) {
+            case 403:
+                err = _('Signup.Error.AlreadyLoggedIn');
+                break;
+            case 431:
+                err = _('Signup.Error.UsernameInUse');
+                break;
+            case 432:
+                err = _('Signup.Error.EMailInUse');
+                break;
+            default:
+                err = _('Signup.Error.Generic') + ' (error code ' +
+                    ioArgs.xhr.status + ')';
+                break;
             }
-            else {
-                err = _('Signup.Error.Generic') + ' (' + data.message + ')';
-            }
-            cosmo.app.modalDialog.setPrompt(err);
-            return false;
         }
         else {
-            accountUser = data;
-            self.showResultsTable(data);
-            return true;
+            err = _('Signup.Error.Generic') + ' (' + data.message + ')';
         }
+        cosmo.app.modalDialog.setPrompt(err);
+        return false;
+    }
+    function handleCreateSuccess(user) {
+            self.showResultsTable(user);
+            return true;
     }
     /**
      * Sets up a hash of data for the info needed to configure an

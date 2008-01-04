@@ -124,11 +124,10 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             }
             var self = this;
 
-            cosmo.cmp.deleteUsers(usernames,
-                {load: function(type, data, evt){self.updateUserList();},
-                 error: function(type, error){alert("Could not delete user:" + error)}
-                }
-                );
+            var d = cosmo.cmp.deleteUsers(usernames);
+            d.addCallback(function(data){self.updateUserList();});
+            d.addErrback(function(type, error){alert("Could not delete user:" + error)});
+            return d;
         },
 
         loadCMPPage:function(cmpUrl){
@@ -347,17 +346,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
         updateTotalUserCount: function(){
         	var self = this;
-	       	var setCountCallback = function (type, data, evt){
+        	var d = cosmo.cmp.getUserCount();
+            d.addCallback(function (data){
 				self.userCountIndicator.innerHTML = data;
-    	   	}
-
-        	cosmo.cmp.getUserCount({
-        		load: setCountCallback,
-        		error: function(type, error){
-        			alert('Could not get user count: ' + error.message);
-        		}
+    	   	});
+            d.addCallback(function(error){
+        		alert('Could not get user count: ' + error.message);
         	});
-
+            return d;
         },
 
         loadFirstPage:function(){
@@ -413,8 +409,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
         },
 
-        updateUserListCallback:function(data, evt){
-            var cmpXml = evt.responseXML;
+        updateUserListCallback:function(data, xhr){
+            var cmpXml = xhr.responseXML;
 
             this.updateControlsView();
 
@@ -530,15 +526,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
             var self = this;
 
-            cosmo.cmp.getUsers({
-                load: function(type, data, evt){self.updateUserListCallback(data, evt)},
-                 error: function(type, error){alert("Could not update user list:" + error.message)}
-                 },
-                 this.pageNumber,
-                 this.pageSize,
-                 this.sortOrder,
-                 this.sortType,
-                 this.query);
+            var d = cosmo.cmp.getUsers(
+                this.pageNumber,
+                this.pageSize,
+                this.sortOrder,
+                this.sortType,
+                this.query);
+            d.addCallback(function(data){self.updateUserListCallback(data, d.ioArgs.xhr)});
+            d.addCallback(function(error){alert("Could not update user list:" + error.message)});
         },
 
         // These two functions will disable client side sorting.

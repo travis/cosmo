@@ -73,43 +73,45 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
             var self = this;
             self.activationId = id;
 
-            var setActivationIdHandlerDict = {
-                handle: function(type, user, evt){
-                    if (evt.status == 200){
-                        self.usernameText.innerHTML = user.username;
-                        self.nameText.innerHTML = user.firstName + " " + user.lastName;
-                        self.emailText.innerHTML = user.email;
-                        self.urlText.innerHTML = user.url;
-                        self.homedirUrlText.innerHTML = user.homedirUrl;
-                    } else if (evt.status == 403){
-                        alert("couldn't find user");
-                    } else {
-                        alert(evt.status);
-                    }
-                }
-            }
+            var d = cosmo.cmp.getUserByActivationId(id, setActivationIdHandlerDict);
+            d.addCallback(function(){
+                self.usernameText.innerHTML = user.username;
+                self.nameText.innerHTML = user.firstName + " " + user.lastName;
+                self.emailText.innerHTML = user.email;
+                self.urlText.innerHTML = user.url;
+                self.homedirUrlText.innerHTML = user.homedirUrl;
+            });
 
-            cosmo.cmp.getUserByActivationId(id, setActivationIdHandlerDict);
+            d.addErrback(function(){
+                if (d.ioArgs.xhr.status == 403){
+                    alert(_("Account.Activate.UserNotFound"));
+                } else {
+                    alert(_("Account.Activate.UserNotFound") + ": " + 
+                          evt.status);
+                }
+            });
+            
 
 
         },
 
         _activateEventHandler: function(){
-            this.activate({load: this.activateSuccess,
-                           error: this.activateFailure})
+            var d = this.activate();
+            d.addCallback(dojo.hitch(this, this.activateSuccess));
+            d.addErrback(dojo.hitch(this, this.activateFailure));
         },
 
-        activateSuccess: function(type, data, evt){},
+        activateSuccess: function(data){},
 
-        activateFailure: function(type, data, evt){},
+        activateFailure: function(err){},
 
-        activate: function (activateHandlerDict, id){
+        activate: function (id){
             var activationId = (id == undefined) ? this.activationId : id;
 
             if (activationId == "" || activationId == undefined){
                 throw new Error("Activation id not specified");
             } else {
-                cosmo.cmp.activate(activationId, activateHandlerDict);
+                cosmo.cmp.activate(activationId);
             }
         }
 

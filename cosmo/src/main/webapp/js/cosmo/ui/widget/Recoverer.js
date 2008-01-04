@@ -29,7 +29,6 @@ dojo.require("dojo.widget.*");
 dojo.require("dojo.event.*");
 dojo.require("dojo.dom");
 dojo.require("cosmo.env");
-dojo.require("cosmo.cmp");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.i18n");
 
@@ -67,6 +66,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Recoverer", dojo.widget.HtmlWidget,
 
         orText: _("Account.Recoverer.Or"),
 
+        // Must return instance of dojo.Deferred
         recoverFunction: function(){},
 
         setError: function(message){
@@ -80,19 +80,18 @@ dojo.widget.defineWidget("cosmo.ui.widget.Recoverer", dojo.widget.HtmlWidget,
         recover: function(){
             var self = this;
             this.setError("");
-            this.recoverFunction(this.usernameInput.value, this.emailInput.value,
-                {error: function(type, data, xhr){
-                    if (xhr.status == "404"){
-                       self.setError(_(self.i18nPrefix + "Error.404"));
-                    } else {
-                       self.setError(xhr.message);
-                    }
-                },
-                 load: function(type, data, xhr){
+            var d = this.recoverFunction(this.usernameInput.value, this.emailInput.value);
+            d.addCallback(function(data){
                     self.setInfo(_(self.i18nPrefix + "Success"));
                     self.tableContainer.style.visibility = "hidden";
+            });
+            d.addErrback(function(error){
+                if (d.ioArgs.xhr.status == "404"){
+                    self.setError(_(self.i18nPrefix + "Error.404"));
+                } else {
+                    self.setError(xhr.message);
                 }
-                });
+            });
         },
 
         fillInTemplate: function(){

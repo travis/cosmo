@@ -68,7 +68,7 @@ cosmo.account.settings = new function () {
      * @param data Object, a hash of account properties
      * @param resp Object, the XHR obj
      */
-    this.accountInfoLoadSuccess = function (type, data, resp) {
+    this.accountInfoLoadSuccess = function (data) {
         this.accountInfo = data;
         this.showDialog();
     };
@@ -79,7 +79,7 @@ cosmo.account.settings = new function () {
      *     actual error message text
      * @param resp Object, the XHR obj
      */
-    this.accountInfoLoadError = function (type, data, resp) {
+    this.accountInfoLoadError = function (data) {
         var err = strings['settingsErrorLoad'];
         cosmo.app.showErr(err, data);
     };
@@ -104,14 +104,10 @@ cosmo.account.settings = new function () {
         // No user account data cached -- grab it from the server
         // and bail out
         if (!this.accountInfo) {
-            var self = this;
-            var success = function (type, data, resp) {
-                self.accountInfoLoadSuccess(type, data, resp); };
-            var error = function (type, data, resp) {
-                self.accountInfoLoadError(type, data, resp); };
-            var hand = { load: success, error: error };
-            cosmo.cmp.getAccount(hand, true);
-            return;
+            var d = cosmo.cmp.getAccount();
+            d.addCallback(dojo.hitch(this, this.accountInfoLoadSuccess));
+            d.addErrback(dojo.hitch(this, this.accountInfoLoadError));
+            return d;
         }
 
         // Build the list of fields based on the account info
@@ -231,13 +227,6 @@ cosmo.account.settings = new function () {
             // No error -- submit updated account info via CMP
             if (!err) {
                 var self = this;
-                // Same handler for both success and error -- IE throws a
-                // freakish '1223' HTTP code when server returns a successful
-                // 204 'No content'. Dojo's io.bind doesn't recognize that as
-                // success, so we have to examine status codes manually
-                var f = function (type, data, resp) {
-                    self.handleAccountSave(type, data, resp); };
-                var hand = { handle: f };
                 var account = {};
                 // Create a hash from the form field values
                 for (var i = 0; i < fieldList.length; i++) {
@@ -250,49 +239,25 @@ cosmo.account.settings = new function () {
                     }
                 }
                 // Hand off to CMP
-                cosmo.cmp.modifyAccount(account, hand);
+                var d = cosmo.cmp.modifyAccount(account);
+                d.addCallback(dojo.hitch(this, this.handleAccountSaveSuccess));
+                d.addErrback(dojo.hitch(this, this.handleAccountSaveError));
+                return d;
             }
         }));
         
         cosmo.util.deferred.addStdErrback(setPreferencesDeferred, _("Error.SaveSettings"), "");
     };
-    /**
-     * Handle both success and error responses from the CMP call
-     * @param type String, may be 'load' or 'error' -- if type is
-     *     'error,' this may be bogus result from weird IE 1223
-     *     HTTP response code
-     * @param data Object, May be data or error object
-     * @param resp Object, the XHR obj
-     */
-    this.handleAccountSave = function (type, data, resp) {
-        var stat = resp.status;
-        var err = '';
-        // BANDAID: Hack to get Safari a valid status code --
-        // any success codes other than 200 result in resp.status
-        // of 'undefined'
-        if (navigator.userAgent.indexOf('Safari') > -1) {
-            if (!stat) {
-                stat = 200;
-            }
-        }
-        // Add bogus 1223 HTTP status from 204s in IE as a success code
-        if ((stat > 199 && stat < 300) || (stat == 1223)) {
-            // Success
-        }
-        else {
-            err = strings.settingsErrorUpdate;
-        }
-        // Flush the account data cache -- get the updated stuff
-        // from the server if the user invokes the box again
+
+    this.handleAccountSaveSuccess = function (data) {
         this.accountInfo = null;
-
-        // Both error & success -- the dialog goes poof
         cosmo.app.hideDialog();
+    };
 
-        // Errors, spawn a new dialog to report the error
-        if (err) {
-            cosmo.app.showErr(err, data);
-        }
+    this.handleAccountSaveError = function (err){
+        this.accountInfo = null;
+        cosmo.app.hideDialog();
+        cosmo.app.showErr(strings.settingsErrorUpdate, data);
     };
     /**
      * The form with advanced account settings displayed in the

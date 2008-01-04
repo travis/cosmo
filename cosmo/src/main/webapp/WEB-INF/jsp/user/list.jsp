@@ -107,79 +107,72 @@ function showModifySelectedUser(){
     }
 
 function browseSelectedUser(){
-
     var username = dojo.widget.byId("userList").getSelectedData()[0].username;
 
     location = cosmo.env.getBaseUrl() + "/browse/" + username;
-    }
-
-function activateSelectedUser(){
-
-	var username = dojo.widget.byId("userList").getSelectedData()[0].userObject.username;
-
-	var activateHandlerDict = { 
-		load: function (type, data, evt){
-            dojo.widget.byId('userList').updateUserList();
-		},
-		error: function(type, data, evt){
-			alert("Error activating user");
-			// TODO: Remove alert messages
-		}
-	}
-
-	cosmo.cmp.activate(username, activateHandlerDict);
-
 }
 
+function activateSelectedUser(){
+	var username = dojo.widget.byId("userList").getSelectedData()[0].userObject.username;
 
+	var d = cosmo.cmp.activate(username);
+    d.addCallback(function (data){
+        dojo.widget.byId('userList').updateUserList();
+	});
+    d.addErrback(function(error){
+			alert("Error activating user");
+			// TODO: Remove alert messages
+	});
+}
 
-var modifyHandlerDict= {
-    handle : function(type, data, evt){
+var modifyHandlerDict = {
+    load: function(data, ioArgs){
         var modifyDialog = dojo.widget.byId("modifyUserDialog")
-	    if (evt.status == 204){
+	    if (ioArgs.xhr.status == 204){
             modifyDialog.hide();
             modifyDialog.form.reset();
-            
             dojo.widget.byId('userList').updateUserList();
-
         }
-        else if (evt.status == 431){
+    },
+
+    error: function(error, ioArgs){
+        var modifyDialog = dojo.widget.byId("modifyUserDialog")
+        if (ioArgs.xhr.status == 431){
             //TODO: username in use stuff
             modifyDialog.usernameError.innerHTML = "Username in use";
         }
-        else if (evt.status == 432){
+        else if (ioArgs.xhr.status == 432){
             //TODO: email in use stuff
             modifyDialog.emailError.innerHTML = "Email in use";
         } else {
-        	alert("Problem handling modify result: " + evt.status);
+        	alert("Problem handling modify result: " + ioArgs.xhr.status);
         }
     }
 }
 
 var createHandlerDict = {
-
-    handle : function(type, data, evt){
-
+    load : function(data, ioArgs){
         var createDialog = dojo.widget.byId("createUserDialog");
-        if (evt.status == 201){
+        if (ioArgs.xhr.status == 201){
             createDialog.hide();
             createDialog.form.reset();
 
             dojo.widget.byId('userList').updateUserList();
-
         }
-        else if (evt.status == 431){
+    },
+    
+    error: function(error, ioArgs){
+        var createDialog = dojo.widget.byId("createUserDialog");
+        if (ioArgs.xhr.status == 431){
             //TODO: username in use stuff
             createDialog.usernameError.innerHTML = "Username in use";
         }
-        else if (evt.status == 432){
+        else if (ioArgs.xhr.status == 432){
             //TODO: email in use stuff
             createDialog.emailError.innerHTML = "Email in use";
         } else {
-        	alert("Problem handling create result: " + evt.status);
+        	alert("Problem handling create result: " + ioArgs.xhr.status);
         }
-        
-
     }
 }
 

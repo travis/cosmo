@@ -193,46 +193,40 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
         },
         
         populateFields : function(populateUsername){
+            var d;
             // username only needed if logged in as administrator
-
-            var handlerDict = {
-                load: dojo.lang.hitch(this, function(type, data, evt){
-                    
-                    if (evt.status == 200){
-                        var user = data;
-                        this.editingUser = user
-                        this.usernameInput.value = user.username;
-                        
-                        this.firstNameInput.value = user.firstName;
-                        this.lastNameInput.value = user.lastName;
-                        this.emailInput.value = user.email;
-                        
-                        this.adminInput.checked = user.administrator;
-                        this.lockedInput.checked = user.locked;
-                        
-                        var overlord = (user.username == cosmo.env.OVERLORD_USERNAME)
-                        this.usernameInput.disabled = overlord;
-                        this.firstNameInput.disabled = overlord;
-                        this.lastNameInput.disabled = overlord;
-                        this.adminInput.disabled = overlord;
-                        this.lockedInput.disabled = overlord;
-                    }
-			    }),
-                
-                error:  function(type, data, evt){
-                    if (evt.status == 404){
-                        alert("User does not exist");
-                    } else {
-                        throw new Error(data);
-                    }
-                }
-            }
-			
             if (populateUsername){
-                   cosmo.cmp.getUser(populateUsername, handlerDict);
+                d = cosmo.cmp.getUser(populateUsername);
             } else {
-                cosmo.cmp.getAccount(handlerDict);
+                d = cosmo.cmp.getAccount();
             }
+            d.addCallback(dojo.lang.hitch(this, function(user){
+                if (d.ioArgs.xhr.status == 200){
+                    this.editingUser = user
+                    this.usernameInput.value = user.username;
+                    
+                    this.firstNameInput.value = user.firstName;
+                    this.lastNameInput.value = user.lastName;
+                    this.emailInput.value = user.email;
+                    
+                    this.adminInput.checked = user.administrator;
+                    this.lockedInput.checked = user.locked;
+                    
+                    var overlord = (user.username == cosmo.env.OVERLORD_USERNAME)
+                    this.usernameInput.disabled = overlord;
+                    this.firstNameInput.disabled = overlord;
+                    this.lastNameInput.disabled = overlord;
+                    this.adminInput.disabled = overlord;
+                    this.lockedInput.disabled = overlord;
+                }
+			}));
+            d.addErrback(function(data){
+                if (d.ioArgs.xhr.status == 404){
+                    alert("User does not exist");
+                } else {
+                    throw new Error(data);
+                }
+            });
         },
         
         validateFields : function(){
@@ -406,30 +400,24 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
          	if (!this.validateFields()){
         		return;
         	}
-            
             var self = this;
-
             //Check if user exists
-            cosmo.cmp.headUser(this.usernameInput.value,
-                {handle : function(type, data, evt){
-
-                    // a 404 means the user does not exist, so let's create it
-                    if (evt.status == 404){
-
-                        userHash = self.userHashFromForm(self.form)
-
-                        cosmo.cmp.createUser(
-                                    userHash,
-                                    self.postActionHandlerDict
-                                    )
-
-                    // A 200 means the user exists
-                    } else if (evt.status == 200){
-
-                        self.usernameError.innerHTML = _("ModifyUser.Error.UsernameInUse");
-                    }
-                 }
-                 })
+            var d = cosmo.cmp.headUser(this.usernameInput.value);
+            d.addCallback(function(data){
+                    self.usernameError.innerHTML = _("ModifyUser.Error.UsernameInUse");
+            });
+            d.addErrback(function(error){
+                if (d.ioArgs.xhr.status == 404){
+                    
+                    userHash = self.userHashFromForm(self.form)
+                    
+                    cosmo.cmp.createUser(
+                        userHash,
+                        self.postActionHandlerDict
+                    )
+                }
+            });
+            return d;
         }
     },
     "html" ,

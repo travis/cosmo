@@ -1,0 +1,19 @@
+Index: dojo/_base/xhr.js
+===================================================================
+--- dojo/_base/xhr.js	(revision 11847)
++++ dojo/_base/xhr.js	(working copy)
+@@ -677,6 +677,14 @@
+ 		return _doIt("DELETE", dfd); // dojo.Deferred
+ 	}
+ 
++	dojo.xhrHead = function(/*dojo.__xhrArgs*/ args){
++		//	summary: 
++		//		Sends an HTTP HEAD request to the server.
++		var dfd = _makeXhrDeferred(args);
++		_d._ioAddQueryToUrl(dfd.ioArgs);
++		return _doIt("HEAD", dfd); // dojo.Deferred
++	}
++
+ 	/*
+ 	dojo.wrapForm = function(formNode){
+ 		//summary:

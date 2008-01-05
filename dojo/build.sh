@@ -2,8 +2,7 @@
 DOJO_VERSION="release-1.0.2"
 if [ ! -d "$DOJO_VERSION" ]; then
     svn co http://svn.dojotoolkit.org/dojo/tags/$DOJO_VERSION
-#    cd $DOJO_VERSION/buildscripts
-#    patch -p0 < ../../0.4.3-buildUtil.js.patch
+    patch -p0 -d release-1.0.2 < dojoXhrHead.patch 
     ant fix-config
 fi
 

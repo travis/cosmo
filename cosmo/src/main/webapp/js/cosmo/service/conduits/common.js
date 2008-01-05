@@ -28,6 +28,7 @@ dojo.provide("cosmo.service.conduits.common");
 
 //TODO: remove once we move create/delete into Atom
 dojo.require("cosmo.caldav");
+dojo.require("dojo.DeferredList");
 
 dojo.declare("cosmo.service.conduits.Conduit", null, {
 
@@ -35,20 +36,19 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     _translator: null,
 
-    initializer: function (transport, translator){
+    constructor: function (transport, translator){
         this._transport = transport;
         this._translator = translator;
     },
 
     getCollections: function (kwArgs){
         kwArgs = kwArgs || {};
-
+        nnn = this._transport
         var deferred = this._transport.getCollections(kwArgs);
-
         this._addTranslation(deferred, "translateGetCollections");
 
         // Flesh out each collection
-        deferred.addCallback(dojo.lang.hitch(this, function(collections){
+        deferred.addCallback(dojo.hitch(this, function(collections){
             var collectionDetailDeferreds = [];
             for (var i = 0; i < collections.length; i++){
                 collectionDetailDeferreds.push(
@@ -83,11 +83,11 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         this._addTranslation(deferred, "translateGetSubscriptions");
 
         // Flesh out each collection
-        deferred.addCallback(dojo.lang.hitch(this, function(subscriptions){
+        deferred.addCallback(dojo.hitch(this, function(subscriptions){
             collectionDetailDeferreds = [];
             for (var i = 0; i < subscriptions.length; i++){
                 //capturing scope
-                (dojo.lang.hitch(this, function (){
+                (dojo.hitch(this, function (){
                     var subscription = subscriptions[i];
                     var deferred = this.getCollection(subscription.getCollection().href, kwArgs);
                     deferred.addCallback(function(collection){
@@ -302,14 +302,14 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     _addTranslation: function (deferred, translationFunction, kwArgs){
         deferred.addCallback(
-            dojo.lang.hitch(this._translator, function (obj, xhr){
+            dojo.hitch(this._translator, function (obj, xhr){
                 return this[translationFunction](obj, kwArgs);
             })
         );
         
         deferred.addErrback(function (e, xhr){
-            dojo.debug("Translation error:")
-            dojo.debug(e);
+            console.debug("Translation error:")
+            console.debug(e);
             return e;
         });
         

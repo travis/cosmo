@@ -20,9 +20,12 @@
  */
 dojo.provide("cosmo.service.translators.eim");
 
+dojo.require("dojo.date.stamp");
 dojo.require("cosmo.util.string");
 dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model");
+dojo.require("cosmo.model.common");
+dojo.require("cosmo.model.EventStamp");
 dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.service.common");
 dojo.require("cosmo.datetime.serialize");
@@ -31,7 +34,7 @@ dojo.require("cosmo.util.html");
 dojo.declare("cosmo.service.translators.Eim", null, {
     COSMO_NS: "http://osafoundation.org/cosmo/Atom",
     
-    initializer: function (urlCache){
+    constructor: function (urlCache){
         this.urlCache = urlCache;
         
         with (this.rruleConstants) {
@@ -108,7 +111,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     getTicketType: function (ticketEl){
-        if (!(dojo.render.html.ie  && dojo.render.ver < 7)){
+        if (!(!!dojo.isIE && dojo.isIE < 7)){
             return ticketEl.getAttributeNS(this.COSMO_NS, "type");
         } else {
             return ticketEl.getAttribute("cosmo:type");
@@ -336,7 +339,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             
             // Per Jeffrey's suggestion, fail silently here, logging 
             // an error message to the debug console.
-            if (!masterItem) dojo.debug(
+            if (!masterItem) console.debug(
               "Could not find master event for modification " +
               "with uuid " + uuid);
 
@@ -559,9 +562,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          return ['<entry xmlns="http://www.w3.org/2005/Atom">',
                  '<title>', cosmo.util.string.escapeXml(object.getDisplayName()), '</title>',
                  '<id>urn:uuid:', cosmo.util.string.escapeXml(this.getUid(object)), '</id>',
-                 '<updated>', cosmo.util.string.escapeXml(dojo.date.toRfc3339(new Date())), '</updated>',
+                 '<updated>', cosmo.util.string.escapeXml(dojo.date.stamp.toISOString(new Date())), '</updated>',
                  '<author><name>', cosmo.util.string.escapeXml(cosmo.util.auth.getUsername()), '</name></author>',
-                 '<content type="text/eim+json"><![CDATA[', dojo.toJson(this.objectToRecordSet(object)), ']]></content>',
+                 '<content type="text/eim+json">', dojo.toJson(this.objectToRecordSet(object)), '</content>',
                  '</entry>'].join("");
     },
     
@@ -1043,19 +1046,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var keyValue = dateParamList[i].split("=");
             dateParams[keyValue[0].toLowerCase()] = keyValue[1];
         }
-        var tzId = dateParams['tzid'] || null;
-        var jsDate = dojo.date.fromIso8601(dateParts[1]);
-        var date = new cosmo.datetime.Date(2000,0,1);
-        date.tzId = tzId;
-
-        date.setYear(jsDate.getFullYear());
-        date.setMonth(jsDate.getMonth());
-        date.setDate(jsDate.getDate());
-        date.setHours(jsDate.getHours());
-        date.setMinutes(jsDate.getMinutes());
-        date.setSeconds(jsDate.getSeconds());
-        date.setMilliseconds(0);
-        return date;
+        return cosmo.datetime.fromIso8601(dateParts[1], dateParams['tzid'] || null);
     },
 
     addTriageStringToItemProps: function (triageString, props){

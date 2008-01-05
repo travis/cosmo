@@ -38,7 +38,6 @@ cosmotest.integration.service.conduits.test_conduits = {
             
             collections = conduit.getCollections({sync: true}).results[0];
             c0 = collections[0];
-            
             c0.setDisplayName("bork bork bork");
             jum.assertEquals("lazy loading before set broken", "bork bork bork", c0.getDisplayName());
             
@@ -191,7 +190,7 @@ cosmotest.integration.service.conduits.test_conduits = {
             }
             );
             
-            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45);
+            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45, 0);
             startDate.setMilliseconds(0);
 
             var duration = new cosmo.model.Duration({hour: 1});
@@ -381,9 +380,8 @@ cosmotest.integration.service.conduits.test_conduits = {
             var newMaster = occurrenceToBreakOn.getMaster().clone();
             newMaster.setDisplayName("Bop bop a lee bop");
             newMaster.getEventStamp().setStartDate(occurrenceToBreakOn.getEventStamp().getStartDate());
-            dojo.require("cosmo.util.uuid");
-            var gen = new cosmo.util.uuid.RandomGenerator()
-            var newUid = gen.generate();
+            dojo.require("dojox.uuid.generateTimeBasedUuid");
+            var newUid = dojox.uuid.generateTimeBasedUuid();
             newMaster.setUid(newUid);
             conduit.saveThisAndFuture(occurrenceToBreakOn, newMaster, {sync: true})
             
@@ -445,9 +443,8 @@ cosmotest.integration.service.conduits.test_conduits = {
             var newMaster = item.getMaster().clone();
             newMaster.setDisplayName("Bop bop a lee bop");
             newMaster.getEventStamp().setStartDate(item.getEventStamp().getStartDate());
-            dojo.require("cosmo.util.uuid");
-            var gen = new cosmo.util.uuid.RandomGenerator()
-            var newUid = gen.generate();
+            dojo.require("dojox.uuid.generateTimeBasedUuid");
+            var newUid = dojox.uuid.generateTimeBasedUuid();
             newMaster.setUid(newUid);
             conduit.saveThisAndFuture(item, newMaster, {sync: true});
             conduit.getDashboardItems(newMaster);
@@ -566,40 +563,6 @@ cosmotest.integration.service.conduits.test_conduits = {
         } finally {
            cosmotest.testutils.cleanupUser(user);            
         }
-    },
-    
-    createTestAccount: function(){
-       cosmo.util.auth.clearAuth();
-       var user = {
-           password: "testing"
-       };
-       var success = false;
-       
-       var i = 0;
-       while (!success && i < 10){
-           var un = "user0";
-           user.username = un;
-           user.firstName = un;
-           user.lastName = un;
-           user.email = un + "@cosmotesting.osafoundation.org";
-           
-           var d = cosmo.cmp.signup(user, {sync: true});
-           d.addCallback(function(){success = true});
-           d.addErrback(function(){
-               cosmotest.testutils.cleanupUser(user);
-               i++;
-           });
-       }
-       cosmo.util.auth.setCred(user.username, user.password);
-       
-       return user;
-       
-    },
-    
-    cleanup: function(user){
-        cosmo.util.auth.setCred("root", "cosmo");
-        cosmo.cmp.deleteUser(user.username, {handle: function(){}}, true);
-        cosmo.util.auth.clearAuth();
     }
 };
 

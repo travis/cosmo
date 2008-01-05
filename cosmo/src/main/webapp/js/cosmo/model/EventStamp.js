@@ -31,7 +31,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
     ],
     //mixins for master item stamps		 
     {
-        initializer: function(kwArgs){
+        constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
 

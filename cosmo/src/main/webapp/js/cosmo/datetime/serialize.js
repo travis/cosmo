@@ -29,7 +29,7 @@ cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
 
 cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
     var parts = cosmo.datetime.util.dateParts;
-    var date = new cosmo.datetime.Date();
+    var date = new cosmo.datetime.Date(2000,0,1);
     if (timezone){
         date.tzId = timezone;
     }
@@ -59,7 +59,7 @@ cosmo.datetime.parseIso8601 = function(str) {
     var o = {};
 
     o[parts.YEAR] = parseInt(str.substring(0,4));
-    o[parts.MONTH] = parseInt(str.substring(4,6));
+    o[parts.MONTH] = parseInt(str.substring(4,6)) - 1;
     o[parts.DAY] = parseInt(str.substring(6,8));
     
     if (hasTime){

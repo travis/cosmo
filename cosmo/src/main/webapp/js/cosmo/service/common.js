@@ -19,7 +19,7 @@ dojo.require("cosmo.model.Item");
 
 dojo.declare("cosmo.service.UrlCache", null, 
    {
-       initializer: function(){
+       constructor: function(){
            this.urlCache = {};    
        },
        

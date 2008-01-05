@@ -15,7 +15,7 @@
 */
 
 dojo.provide("cosmotest.testutils");
-
+dojo.require("dojox.uuid.generateRandomUuid");
 
 // Object to provide compatibility with old jum framework
 JUM = function(){
@@ -97,7 +97,9 @@ cosmotest.testutils = {
     },
 
     createTestAccount: function(){
-        return cosmotest.testutils.createUser("User0");
+        return cosmotest.testutils.createUser(
+            dojox.uuid.generateRandomUuid().slice(0, 8)
+        );
     },
 
     createUser: function(username, email){
@@ -110,11 +112,11 @@ cosmotest.testutils = {
             email: email || username + "@cosmotesting.osafoundation.org"
         };
         var d = cosmo.cmp.signup(user, {sync: true});
-        d.addCallback(function(type, data, evt){
+        d.addCallback(function(data){
             cosmo.util.auth.setCred(user.username, user.password);
         });
         d.addErrback(function(e){
-            dojo.debug(e);
+            console.debug(e);
         });
         return user;
     },

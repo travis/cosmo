@@ -43,9 +43,6 @@ cosmo.model.uuidGenerator = {
     generate: dojo.hitch(dojox.uuid.generateTimeBasedUuid, dojox.uuid.generateTimeBasedUuid)
 }
 
-
-
-
 cosmo.model.getStampMetaData = function(stampName){
     return this._stampRegistry[stampName].constructor.prototype.stampMetaData;
 }

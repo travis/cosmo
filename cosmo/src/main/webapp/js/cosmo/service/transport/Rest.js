@@ -26,7 +26,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
     {
         translator: null,
 
-        initializer: function (translator){
+        constructor: function (translator){
 
         },
         
@@ -54,9 +54,10 @@ dojo.declare("cosmo.service.transport.Rest", null,
             }
             // Add error fo transport layer problems
             
-            var request = cosmo.util.auth.getAuthorizedRequest(r, kwArgs);
+            var request = cosmo.util.auth.getAuthorizedRequest({}, kwArgs);
             
-            if (deferred){
+            //FIXME
+            if (false){
                 if (!kwArgs.noErr){
                     deferred.addErrback(function(e) { console.debug("Transport Error: "); 
                                                       console.debug(e);
@@ -67,22 +68,17 @@ dojo.declare("cosmo.service.transport.Rest", null,
             }
             request.transport = request.transport || "XMLHTTPTransport";
             request.contentType = request.contentType || 'text/xml';
-            request.sync = kwArgs.sync || r.sync || false;
+            request.sync = kwArgs.sync || false;
             request.headers = request.headers || {};
-            if (request.method){
-                if (!this.methodIsSupported[request.method.toLowerCase()]){
-                    request.headers['X-Http-Method-Override'] = request.method;
-                    request.method = 'POST';
-                }
-            }
-
+            request.url = url;
+            request.handleAs = "xml";
             return request
         },
 
         errorCallback: function(/* dojo.Deferred */ deferredRequestHandler){
             // summary
             // create callback that calls the Deferreds errback method
-            return function(type, e, xhr){
+            return function(){
                 // Workaround to not choke on 204s
                 if ((dojo.render.html.safari &&
                     !xhr.status) || (dojo.render.html.ie &&

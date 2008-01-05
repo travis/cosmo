@@ -20,13 +20,9 @@
  */
 dojo.provide("cosmo.service.translators.eim");
 
-dojo.require("dojo.date.serialize");
-dojo.require("dojo.lang.*");
-dojo.require("dojo.json");
-dojo.require("dojo.string");
-
+dojo.require("cosmo.util.string");
 dojo.require("cosmo.service.eim");
-dojo.require("cosmo.model.*");
+dojo.require("cosmo.model");
 dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.service.common");
 dojo.require("cosmo.datetime.serialize");
@@ -49,7 +45,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }}
     },
     
-    getDateFormatString: dojo.lang.hitch(cosmo.service, cosmo.service.getDateFormatString),
+    getDateFormatString: dojo.hitch(cosmo.service, cosmo.service.getDateFormatString),
     
     // a hash from link rels to useful url names
     urlNameHash: {
@@ -261,7 +257,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         var content = cosmo.util.html.getElementTextContent(contentEl);
         
-        var recordSets = dojo.json.evalJson(content);
+        var recordSets = dojo.fromJson(content);
 
         var masterItem = this.recordSetToObject(recordSets[0]);
         var urls = this.getUrls(entry)
@@ -375,10 +371,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
             if (masterItem){
-                item = this.recordSetToModification(dojo.json.evalJson(content), masterItem, kwArgs); 
+                item = this.recordSetToModification(dojo.fromJson(content), masterItem, kwArgs); 
             }
             else {
-                item = this.recordSetToObject(dojo.json.evalJson(content), kwArgs);
+                item = this.recordSetToObject(dojo.fromJson(content), kwArgs);
             }
             var urls = this.getUrls(entry)
             if (item.isMaster() || (item.isOccurrence() && item.hasModification())){
@@ -457,10 +453,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                switch(recordName){
     
                case prefix.ITEM:
-                   dojo.lang.mixin(modifiedProperties, this.itemRecordToItemProps(record));
+                   dojo.mixin(modifiedProperties, this.itemRecordToItemProps(record));
                    break;
                case prefix.NOTE:
-                    dojo.lang.mixin(modifiedProperties, this.noteRecordToNoteProps(record));
+                    dojo.mixin(modifiedProperties, this.noteRecordToNoteProps(record));
                    break;
                case prefix.MODBY:
                     modifiedProperties.modifiedBy = new cosmo.model.ModifiedBy(this.modbyRecordToModbyProps(record));
@@ -479,8 +475,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         var recurrenceId = this.recurrenceIdToDate(uidParts[1], masterItem.getEventStamp().getStartDate());
         
-        if (!dojo.lang.isEmpty(modifiedProperties)
-            || !dojo.lang.isEmpty(modifiedStamps)){
+        if (!cosmo.util.lang.isEmpty(modifiedProperties)
+            || !cosmo.util.lang.isEmpty(modifiedStamps)){
             
             var mod = new cosmo.model.Modification(
                 {
@@ -505,12 +501,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '<content type="xhtml">',
           '<div xmlns="http://www.w3.org/1999/xhtml">',
             '<div class="local-subscription">',
-                 '<span class="name">', dojo.string.escapeXml(subscription.getDisplayName()), '</span>', 
+                 '<span class="name">', cosmo.util.string.escapeXml(subscription.getDisplayName()), '</span>', 
               '<div class="collection">',
-                 '<span class="uuid">', dojo.string.escapeXml(subscription.getUid()), '</span>',
+                 '<span class="uuid">', cosmo.util.string.escapeXml(subscription.getUid()), '</span>',
               '</div>',
               '<div class="ticket">',
-                 '<span class="key">', dojo.string.escapeXml(subscription.getTicketKey()), '</span>',
+                 '<span class="key">', cosmo.util.string.escapeXml(subscription.getTicketKey()), '</span>',
               '</div>',
             '</div>',
           '</div>',
@@ -523,7 +519,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '<content type="xhtml">',
           '<div xmlns="http://www.w3.org/1999/xhtml">',
             '<div class="collection">',
-                 '<span class="name">', dojo.string.escapeXml(collection.getDisplayName()), '</span>', 
+                 '<span class="name">', cosmo.util.string.escapeXml(collection.getDisplayName()), '</span>', 
             '</div>',
           '</div>',
          '</content>',
@@ -561,17 +557,17 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     itemToAtomEntry: function (object){
          return ['<entry xmlns="http://www.w3.org/2005/Atom">',
-                 '<title>', dojo.string.escapeXml(object.getDisplayName()), '</title>',
-                 '<id>urn:uuid:', dojo.string.escapeXml(this.getUid(object)), '</id>',
-                 '<updated>', dojo.string.escapeXml(dojo.date.toRfc3339(new Date())), '</updated>',
-                 '<author><name>', dojo.string.escapeXml(cosmo.util.auth.getUsername()), '</name></author>',
-                 '<content type="text/eim+json"><![CDATA[', dojo.json.serialize(this.objectToRecordSet(object)), ']]></content>',
+                 '<title>', cosmo.util.string.escapeXml(object.getDisplayName()), '</title>',
+                 '<id>urn:uuid:', cosmo.util.string.escapeXml(this.getUid(object)), '</id>',
+                 '<updated>', cosmo.util.string.escapeXml(dojo.date.toRfc3339(new Date())), '</updated>',
+                 '<author><name>', cosmo.util.string.escapeXml(cosmo.util.auth.getUsername()), '</name></author>',
+                 '<content type="text/eim+json"><![CDATA[', dojo.toJson(this.objectToRecordSet(object)), ']]></content>',
                  '</entry>'].join("");
     },
     
-    getUid: dojo.lang.hitch(cosmo.service, cosmo.service.getUid),
+    getUid: dojo.hitch(cosmo.service, cosmo.service.getUid),
     
-    getRid: dojo.lang.hitch(cosmo.service, cosmo.service.getRid),
+    getRid: dojo.hitch(cosmo.service, cosmo.service.getRid),
 
     objectToRecordSet: function (note){
         if (note instanceof cosmo.model.NoteOccurrence){
@@ -910,7 +906,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 ((allDay || anyTime)? "DATE" : "DATE-TIME"),
                 ":"].join("");
           var formatString = this.getDateFormatString(allDay, anyTime);
-          date += dojo.lang.map(
+          date += dojo.map(
                   dates,
                   function(date){
                       return date.strftime(formatString);
@@ -1063,7 +1059,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     addTriageStringToItemProps: function (triageString, props){
-        if (dojo.string.trim(triageString) == "" || triageString == null){
+        if (dojo.trim(triageString) == "" || triageString == null){
             props.autoTriage = true;
             props.triageStatus = null;
             return;
@@ -1132,7 +1128,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var key in rProps){
             iCalProps.push(key);
             iCalProps.push("=")
-            if (dojo.lang.isArray(rProps[key])){
+            if (dojo.isArray(rProps[key])){
                 iCalProps.push(rProps[key].join());
             }
             else if (rProps[key] instanceof cosmo.datetime.Date){
@@ -1156,7 +1152,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     
     parseExdate: function (exdate){
         if (!exdate) return null;
-        return dojo.lang.map(
+        return dojo.map(
                 exdate.split(":")[1].split(","),
                 function (exdate, index) {return cosmo.datetime.fromIso8601(exdate)}
          );

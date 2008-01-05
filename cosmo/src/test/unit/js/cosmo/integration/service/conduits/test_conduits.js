@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-dojo.provide("cosmotest.service.conduits.test_conduits");
+dojo.provide("cosmotest.integration.service.conduits.test_conduits");
 
 dojo.require("cosmotest.testutils");
 dojo.require("cosmo.service.conduits.common");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
-dojo.require("dojo.lang.*");
 
-cosmotest.service.conduits.test_conduits = {
+cosmotest.integration.service.conduits.test_conduits = {
     test_Note: function(){
         try{
             var user = cosmotest.testutils.createTestAccount();
@@ -441,8 +440,8 @@ cosmotest.service.conduits.test_conduits = {
             var c0Occurrences = conduit.getDashboardItems(c0, 
                {sync: true}
             ).results[0];
-            var items = dojo.lang.filter(c0Occurrences, function(item){return item.getUid() == newItem.getUid()});
-            var item = dojo.lang.filter(items, function(item){return item.getTriageStatus() == 200})[0];
+            var items = dojo.filter(c0Occurrences, function(item){return item.getUid() == newItem.getUid()});
+            var item = dojo.filter(items, function(item){return item.getTriageStatus() == 200})[0];
             var newMaster = item.getMaster().clone();
             newMaster.setDisplayName("Bop bop a lee bop");
             newMaster.getEventStamp().setStartDate(item.getEventStamp().getStartDate());
@@ -524,7 +523,7 @@ cosmotest.service.conduits.test_conduits = {
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             
             var preferences = conduit.getPreferences({sync: true}).results[0];
-            jum.assertTrue("preferences object not starting empty", dojo.lang.isEmpty(preferences));
+            jum.assertTrue("preferences object not starting empty", cosmo.util.lang.isEmpty(preferences));
             
             conduit.setPreference("foo", "bar", {sync: true});
             
@@ -542,7 +541,7 @@ cosmotest.service.conduits.test_conduits = {
             conduit.deletePreference("foo", {sync: true});
             
             var preferences = conduit.getPreferences({sync: true}).results[0];
-            jum.assertTrue("deletePreference failed", dojo.lang.isEmpty(preferences));
+            jum.assertTrue("deletePreference failed", cosmo.util.lang.isEmpty(preferences));
             
     
         } finally {
@@ -584,12 +583,12 @@ cosmotest.service.conduits.test_conduits = {
            user.lastName = un;
            user.email = un + "@cosmotesting.osafoundation.org";
            
-           cosmo.cmp.signup(user, {
-               load: function(){success = true}, 
-               error: function(){
-                  cosmotest.testutils.cleanupUser(user);
-                  i++;
-           }}, true);
+           var d = cosmo.cmp.signup(user, {sync: true});
+           d.addCallback(function(){success = true});
+           d.addErrback(function(){
+               cosmotest.testutils.cleanupUser(user);
+               i++;
+           });
        }
        cosmo.util.auth.setCred(user.username, user.password);
        

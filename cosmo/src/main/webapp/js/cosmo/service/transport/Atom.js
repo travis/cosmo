@@ -26,8 +26,6 @@
 
 dojo.provide("cosmo.service.transport.Atom");
 
-dojo.require("dojo.io.*");
-dojo.require("dojo.string");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.util.uri");
@@ -86,171 +84,117 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     getCollection: function(collectionUrl, kwArgs){
-        kwArgs = kwArgs || {};
-
-        var r = {};
-        r.url = this.generateUri(this.getAtomBase() + "/" + collectionUrl , "/details", {});
-        return this.bind(r, kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.generateUri(this.getAtomBase() + "/" + collectionUrl , "/details", {}), 
+            kwArgs
+        ));
     },
 
     getCollections: function(kwArgs){
-        kwArgs = kwArgs || {};
-        
-        var r = {};
-        r.url = this.getAtomBase() + "/user/" + this._getUsernameForURI();
-        
-        return this.bind(r, kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.getAtomBase() + "/user/" + this._getUsernameForURI(),
+            kwArgs
+        ));
     },
     
     getSubscriptions: function (kwArgs){
-        kwArgs = kwArgs || {};
-        
-        var r = {};
-        r.url = this.getAtomBase() + "/user/" + 
-                this._getUsernameForURI() + "/subscriptions";
-
-        return this.bind(r, kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.getAtomBase() + "/user/" + 
+                this._getUsernameForURI() + "/subscriptions",
+            kwArgs
+        ));
     },
     
     getItems: function (collection, searchCrit, kwArgs){
-        kwArgs = kwArgs || {};
-
         if (collection instanceof cosmo.model.Subscription){
             collection = collection.getCollection();
         }
 
         var query = this._generateSearchQuery(searchCrit);
         var editLink = this.getAndCheckEditLink(collection, searchCrit);
-        
-        var r = {};
 
-        r.url = this.generateUri(this.getAtomBase() + "/" + editLink, "", query);
-
-        return this.bind(r, kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.generateUri(this.getAtomBase() + "/" + editLink, "", query),
+            kwArgs
+        ));
     },
 
     saveItem: function (item, postContent, kwArgs){
         kwArgs = kwArgs || {};
         var editLink = kwArgs.editLink || this.getAndCheckEditLink(item);
-
-        var r = {};
-        r.url = this.getAtomBase() + "/" + editLink;
-        r.contentType = this.CONTENT_TYPE_ATOM;
-        r.postContent = postContent;
-        r.method = kwArgs.method || this.METHOD_PUT;
-        var deferred = this.bind(r, kwArgs);
+        var r = this.getDefaultRequest(this.getAtomBase() + "/" + editLink, kwArgs)
+        r.putData = postContent;
+        var deferred = dojo.rawXhrPut(r);
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
  
         return deferred;
     },
     
     saveThisAndFuture: function (oldOccurrence, postContent, kwArgs){
-        kwArgs = kwArgs || {};
         kwArgs.editLink =  this.urlCache.getUrl(oldOccurrence, this.DETACHED_LINK);
         kwArgs.method =  this.METHOD_POST;
         return this.saveItem(oldOccurrence, postContent, kwArgs);
     },
     
     getItem: function(uid, kwArgs){
-        kwArgs = kwArgs || {};
-        
         var query = this._generateSearchQuery(kwArgs);
-
-        var r = {};
-        r.url = this.getAtomBase() + "/item/" + 
-                uid + "/full/eim-json" + this.queryHashToString(query);
-        r.method = this.METHOD_GET;
-        
-        return this.bind(r, kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.getAtomBase() + "/item/" + 
+                uid + "/full/eim-json" + this.queryHashToString(query),
+            kwArgs
+        ));
 
     },
     
     expandRecurringItem: function(item, searchCrit, kwArgs){
-        kwArgs = kwArgs || {};
-
         var query = this._generateSearchQuery(searchCrit);
-
         var projection = searchCrit.projection || "/full/eim-json";
-        var r = {};
-        
         var expandedLink = item.getUrls()['expanded'];
-
-        r.url = this.generateUri(cosmo.env.getBaseUrl() +
-          "/atom/" + expandedLink, "", query);
-
-        r.method = this.METHOD_GET;
-        
-        return this.bind(r, kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.generateUri(cosmo.env.getBaseUrl() +
+                             "/atom/" + expandedLink, "", query),
+            kwArgs
+        ));
     },
     
     createItem: function(item, postContent, collection, kwArgs){
-        kwArgs = kwArgs || {};
         if (collection instanceof cosmo.model.Subscription){
             collection = collection.getCollection();
         }
-        
         var editLink = this.getAndCheckEditLink(collection);
-
-        var r = {};
-        r.url = this.getAtomBase() + "/" + editLink;
-        r.contentType = this.CONTENT_TYPE_ATOM;
-        r.postContent = postContent;
-        r.method = this.METHOD_POST;
-        
-        var deferred = this.bind(r, kwArgs);
+        var r = this.getDefaultRequest(this.getAtomBase() + "/" + editLink, kwArgs);
+        r.postData = postContent;
+        var deferred = dojo.rawXhrPost(r);
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
-        
         return deferred;
     },
 
     createSubscription: function(subscription, postContent, kwArgs){
-        kwArgs = kwArgs || {};
-
-        var r = {};
-        r.url = this.getAtomBase() + "/user/" + 
-            this._getUsernameForURI() + "/subscriptions";
-        r.contentType = this.CONTENT_TYPE_ATOM;
-        r.postContent = postContent;
-        r.method = this.METHOD_POST;
-        
-        var deferred = this.bind(r, kwArgs)
+        var r = this.getDefaultRequest(this.getAtomBase() + "/user/" + 
+                                       this._getUsernameForURI() + "/subscriptions", kwArgs);
+        r.postData = postContent;
+        var deferred = dojo.rawXhrPost(r);
         this.addErrorCodeToExceptionErrback(deferred, 409, cosmo.service.exception.ConflictException);
-        
         return deferred;
     },
 
     saveSubscription: function(subscription, postContent, kwArgs){
-        kwArgs = kwArgs || {};
-
-        var r = {};
-        r.url = this.getAtomBase() + "/" + this.getAndCheckEditLink(subscription);
-        r.contentType = this.CONTENT_TYPE_ATOM;
-        r.postContent = postContent;
-        r.method = this.METHOD_PUT;
-        
-        return this.bind(r, kwArgs);
+        var r = this.getDefaultRequest(this.getAtomBase() + "/" + this.getAndCheckEditLink(subscription), kwArgs);
+        r.putData = postContent;
+        return dojo.rawXhrPut(r);
     },
     
     saveCollection: function(collection, postContent, kwArgs){
-        kwArgs = kwArgs || {};
-
-        var r = {};
-        r.url = this.getAtomBase() + "/" + this.getAndCheckEditLink(collection);
+        var r = this.getDefaultRequest(this.getAtomBase() + "/" + this.getAndCheckEditLink(collection), kwArgs);
         r.contentType = "application/xhtml+xml";
-        r.postContent = postContent;
-        r.method = this.METHOD_PUT;
-        return this.bind(r, kwArgs);
+        r.putData = postContent;
+        return dojo.rawXhrPut(r, kwArgs);
     },
 
     deleteItem: function(item, kwArgs){
-        kwArgs = kwArgs || {};
         var editLink = this.getAndCheckEditLink(item, kwArgs);
-        var r = {};
-        r.url = this.getAtomBase() + "/" + editLink;
-        r.method = this.METHOD_DELETE;
-        var deferred = this.bind(r, kwArgs);
+        var deferred = dojo.xhrDelete(this.getDefaultRequest(this.getAtomBase() + "/" + editLink, kwArgs));
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
-         
         return deferred;
     },
 
@@ -261,19 +205,17 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     },
 
     removeItem: function(item, collection, kwArgs){
-        kwArgs = kwArgs || {};
         var editLink = this.getAndCheckEditLink(item);
-        var r = {};
         var query = {uuid: collection.getUid()};
-
-        r.url = this.generateUri(this.getAtomBase() + "/" + editLink, "", query);          
-        r.method = this.METHOD_DELETE;
-        var deferred = this.bind(r, kwArgs);
+        var deferred = dojo.xhrDelete(this.getDefaultRequest(
+            this.generateUri(this.getAtomBase() + "/" + editLink, "", query),
+            kwArgs
+        ));
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
-         
         return deferred;
     },
 
+        //TODO: HEADFIX
     checkIfPrefExists: function (key, kwArgs){
         kwArgs = kwArgs || {}
         kwArgs = dojo.lang.shallowCopy(kwArgs);
@@ -292,52 +234,49 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest,
     // Once this layer is redesigned, we should redo this. If we get a chance, this might be something
     // to improve before preview.
     setPreference: function (key, val, postContent, kwArgs){
-        var request = {
-                contentType: this.CONTENT_TYPE_ATOM,
+        var request =                 contentType: this.CONTENT_TYPE_ATOM,
                 postContent: postContent
             }
         var existsDeferred = this.checkIfPrefExists(key, kwArgs);
         
         // If exists returned a 200
         existsDeferred.addCallback(dojo.lang.hitch(this, function (){
-            request.method = this.METHOD_PUT
-            request.url = this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key;
-            return this.bind(request, kwArgs);
+            var r = this.getDefaultRequest(
+                this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
+                kwArgs
+            );
+            r.putData = postContent;
+            return dojo.rawXhrPut(r);
         }));
         
         // If exists returned a 404
         existsDeferred.addErrback(dojo.lang.hitch(this, function (){
-            request.method = this.METHOD_POST;
-            request.url = this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences";
-
-            return this.bind(request, kwArgs);
+            var r = this.getDefaultRequest(
+                this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences",
+                kwArgs
+            );
+            r.postData = postContent;
+            return dojo.rawXhrPost(r);
         }));
        return existsDeferred;
     },
 
     getPreferences: function (kwArgs){
-        return this.bind(
-            {url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences"
-            }, 
-            kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preferences",
+            kwArgs));
     },
     
     getPreference: function (key, kwArgs){
-        return this.bind(
-            {
-                url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
-                method: this.METHOD_GET
-            },
-            kwArgs);
+        return dojo.xhrGet(this.getDefaultRequest(
+            this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
+            kwArgs));
     },
     
     deletePreference: function(key, kwArgs){
-        return this.bind(
-            {
-                url: this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
-                method: this.METHOD_DELETE
-            },
-            kwArgs);
+        return dojo.xhrDelete(this.getDefaultRequest(
+            this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/" + key,
+            kwArgs));
     },
     
     _generateSearchQuery: function(/*Object*/searchCrit){

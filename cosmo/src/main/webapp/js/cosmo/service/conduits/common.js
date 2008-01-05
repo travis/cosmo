@@ -43,7 +43,6 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     getCollections: function (kwArgs){
         kwArgs = kwArgs || {};
-        nnn = this._transport
         var deferred = this._transport.getCollections(kwArgs);
         this._addTranslation(deferred, "translateGetCollections");
 

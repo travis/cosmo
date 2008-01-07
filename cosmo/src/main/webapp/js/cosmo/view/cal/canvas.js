@@ -125,38 +125,7 @@ cosmo.view.cal.canvas = new function () {
             var str = '';
             var start = HOUR_LISTING_WIDTH + 1;
             var idstr = '';
-            var startdate = viewStart.getDate();
-            var startmon = viewStart.getMonth();
-            var daymax = daysInMonth(startmon+1);
             var calcDay = null;
-            var cd = currDate;
-            var currDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate());
-
-             // Returns the number of days in a specific month of a specific year --
-             // the year is necessary to handle leap years' Feb. 29
-             function daysInMonth(month, year){
-                var days = 0;
-                switch (month) {
-                    case 4:
-                    case 6:
-                    case 9:
-                    case 11:
-                        days = 30;
-                        break;
-                    case 2:
-                        if (year % 4 == 0){
-                               days = 29;
-                           }
-                           else{
-                               days = 28;
-                          }
-                          break;
-                      default:
-                          days = 31;
-                          break;
-                }
-                return days;
-            }
 
             // Spacer to align with the timeline that displays hours below
             // for the timed event canvas
@@ -169,16 +138,14 @@ cosmo.view.cal.canvas = new function () {
             // Do a week's worth of day cols with day name and date
             for (var i = 0; i < 7; i++) {
                 calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
-                startdate = startdate > daymax ? 1 : startdate;
                 // Subtract one pixel of height for 1px border per retarded CSS spec
                 str += '<div class="dayListDayDiv" id="dayListDiv' + i +
                     '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
                     'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
                 str += '">';
-                str += cosmo.datetime.abbrWeekday[i] + '&nbsp;' + startdate;
+                str += cosmo.datetime.abbrWeekday[i] + '&nbsp;' + calcDay.getDate();
                 str += '</div>\n';
                 start += self.dayUnitWidth;
-                startdate++;
             }
             dayNameHeadersNode.innerHTML = str;
             return true;

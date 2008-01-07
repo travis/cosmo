@@ -80,9 +80,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
             // create callback that calls the Deferreds errback method
             return function(){
                 // Workaround to not choke on 204s
-                if ((dojo.render.html.safari &&
-                    !xhr.status) || (dojo.render.html.ie &&
-                         xhr.status == 1223)){
+                if (dojo.isIE &&
+                    xhr.status == 1223){
                     xhr = {};
                     xhr.status = 204;
                     xhr.statusText = "No Content";
@@ -111,7 +110,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
         resultCallback: function(/* dojo.Deferred */ deferredRequestHandler){
             // summary
             // create callback that calls the Deferred's callback method
-            var tf = dojo.lang.hitch(this,
+            var tf = dojo.hitch(this,
                 function(type, obj, xhr){
                     if (obj && obj["error"] != null) {
                         var err = new Error(obj.error);
@@ -137,17 +136,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             }
             else return "";
         },
-        
-        bind: function (r, kwArgs) {
-            kwArgs = kwArgs || {};
-            var deferred = new dojo.Deferred();
-            var request = this.getDefaultRequest(deferred, r, kwArgs);
-            dojo.lang.mixin(request, r);
-            this.addStandardErrorHandling(deferred, request.url, request.postContent, request.method);
-            dojo.io.bind(request);
-            return deferred;
-        },
-        
+
         addErrorCodeToExceptionErrback: function(deferred, responseCode, exception){
             deferred.addErrback(function (err){
                 if (err.statusCode == responseCode){

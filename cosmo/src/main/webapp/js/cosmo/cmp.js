@@ -271,16 +271,13 @@ dojo.declare("cosmo.cmp.Cmp", null,
          *              a 404 if the user does not exist, and a 200
          *              if it does.
          */
-
-        //TODO: fix HEAD
         headUser: function (/*String*/ username,
             /*Object*/ ioArgs){
             var requestDict = this.getDefaultCMPRequest(ioArgs, true)
             requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
                 encodeURIComponent(username);
-            requestDict.method = "HEAD"
 
-            return dojo.io.bind(requestDict);
+            return dojo.xhrHead(requestDict);
         },
 
         /*

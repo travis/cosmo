@@ -43,6 +43,12 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
     
     CONTENT_TYPE_ATOM: "application/atom+xml",
 
+    getDefaultRequest: function (){
+        var r = cosmo.service.transport.Rest.prototype.getDefaultRequest.apply(this, arguments);
+        r.handleAs = this.CONTENT_TYPE_ATOM;
+        return r;
+    },
+
     _getUsernameForURI: function(){
         return encodeURIComponent(cosmo.util.auth.getUsername());
     },
@@ -94,6 +100,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
             this.getAtomBase() + "/user/" + this._getUsernameForURI(),
             kwArgs
         )
+        r.handleAs = "application/atomsvc+xml";
         return dojo.xhrGet(r);
     },
     
@@ -292,3 +299,24 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         return ret;
     }
 });
+
+dojo._contentHandlers["application/atom+xml"] = function(xhr){
+    var xml = xhr.responseXML;
+//    var entry = xml.getElementsByTagName("entry")[0];
+//    var contentEl = entry.getElementsByTagName("content")[0];
+//    var content = cosmo.util.html.getElementTextContent(contentEl);
+
+    return xml;
+}
+
+dojo._contentHandlers["application/atomsvc+xml"] = function(xhr){
+    var xml = xhr.responseXML;
+    return xml;
+}
+
+dojo._contentHandlers["application/atom+xml"]._contentHandlers = {
+    "text/eim+json": function(content){
+        var recordSet = dojo.fromJson(content);
+        
+    }
+}

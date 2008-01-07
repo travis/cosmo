@@ -247,39 +247,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         );
     },
     
-    translateExpandRecurringItem: function(atomXml){
-        if (!atomXml){
-            throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
-        }
-        var entry = atomXml.getElementsByTagName("entry")[0];
-        try {
-            var contentEl = entry.getElementsByTagName("content")[0];
-        } catch (e){
-            throw new cosmo.service.translators.
-               ParseError("Could not find content element for entry " + (i+1));
-        }
-        var content = cosmo.util.html.getElementTextContent(contentEl);
-        
-        var recordSets = dojo.fromJson(content);
-
-        var masterItem = this.recordSetToObject(recordSets[0]);
-        var urls = this.getUrls(entry)
-        masterItem.setUrls(urls);
-        this.urlCache.setUrls(masterItem, urls);
-
-        var items = [];
-        // All record sets after the first are occurrences
-        for (var i = 1; i < recordSets.length; i++){
-           var item = this.recordSetToModification(recordSets[i], masterItem)
-           //TODO: remove this hack to get edit urls into modifications
-           if (item.hasModification()){
-              item.setUrls({"atom-edit": "item/" + this.getUid(item)});
-           }
-           items.push(item); 
-        }
-        return items;
-    },
-    
     translateGetItem: function(atomXml, kwArgs){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");

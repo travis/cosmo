@@ -453,7 +453,7 @@ public abstract class BaseItemFeedGenerator
      * @param item the item
      */
     protected String selfIri(Item item) {
-        return selfIri(item, true);
+        return selfIri(item, false);
     }
 
     /**

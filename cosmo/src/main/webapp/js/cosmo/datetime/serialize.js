@@ -45,7 +45,6 @@ cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
     date.setHours(dateProps[parts.HOUR]);
     date.setMinutes(dateProps[parts.MINUTE]);
     date.setSeconds(dateProps[parts.SECOND]);
-
     return date;
 };
 
@@ -58,14 +57,14 @@ cosmo.datetime.parseIso8601 = function(str) {
     var hasTime = str.indexOf("T") > -1;
     var o = {};
 
-    o[parts.YEAR] = parseInt(str.substring(0,4));
-    o[parts.MONTH] = parseInt(str.substring(4,6)) - 1;
-    o[parts.DAY] = parseInt(str.substring(6,8));
+    o[parts.YEAR] = parseInt(str.substring(0,4), 10);
+    o[parts.MONTH] = parseInt(str.substring(4,6), 10) - 1;
+    o[parts.DAY] = parseInt(str.substring(6,8), 10);
     
     if (hasTime){
-        o[parts.HOUR] = parseInt(str.substring(9,11));
-        o[parts.MINUTE] = parseInt(str.substring(11,13));
-        o[parts.SECOND] = parseInt(str.substring(13,15));
+        o[parts.HOUR] = parseInt(str.substring(9,11), 10);
+        o[parts.MINUTE] = parseInt(str.substring(11,13), 10);
+        o[parts.SECOND] = parseInt(str.substring(13,15), 10);
     } else {
         o[parts.HOUR] = 0;
         o[parts.MINUTE] = 0;

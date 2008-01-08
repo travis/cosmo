@@ -417,8 +417,8 @@ cosmotest.integration.service.conduits.test_conduits = {
                 displayName: "Blah blah blah"
             }
             );
-            
-            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45);
+            var now = new Date();
+            var startDate = new cosmo.datetime.Date(2007, 5, 10, 12, 30, 45);//now.getHours(), now.getMinutes(), now.getSeconds());
             startDate.setMilliseconds(0);
 
             var duration = new cosmo.model.Duration({hour: 1});
@@ -430,7 +430,7 @@ cosmotest.integration.service.conduits.test_conduits = {
                 location: loc,
                 status: stat,
                 rrule: new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY})
-            });
+             });
 
             conduit.createItem(newItem, c0, {sync: true});
 
@@ -470,11 +470,11 @@ cosmotest.integration.service.conduits.test_conduits = {
             );
             var messageId = "12345";
             var heads = "headers headers headers";
-            var to = ["foo@bar.com","bar@foo.com"];
-            var cc = ["moo@cow.com"];
-            var bcc = ["loo@loo.net"];
-            var from = ["mom@mom.com"];
-            var originators = ["me", "mom"];
+            var to = "foo@bar.com, bar@foo.com";
+            var cc = "moo@cow.com";
+            var bcc = "loo@loo.net";
+            var from = "mom@mom.com";
+            var originators = "me, mom";
             var dateSent = "date foo";
             var inReplyTo = "nothing";
             var references = "farf";
@@ -499,11 +499,11 @@ cosmotest.integration.service.conduits.test_conduits = {
             jum.assertEquals("headers doesn't match", heads, mStamp.getHeaders());
             //TODO
             //failing in ie, apparently lists that look the same aren't enough there
-/*            jum.assertEquals("to doesn't match", to, mStamp.getToAddress());
+            jum.assertEquals("to doesn't match", to, mStamp.getToAddress());
             jum.assertEquals("cc doesn't match", cc, mStamp.getCcAddress());
             jum.assertEquals("bcc doesn't match", bcc, mStamp.getBccAddress());
             jum.assertEquals("from doesn't match", from, mStamp.getFromAddress());
-            jum.assertEquals("originators doesn't match", originators, mStamp.getOriginators());*/
+            jum.assertEquals("originators doesn't match", originators, mStamp.getOriginators());
             jum.assertEquals("dateSent doesn't match", dateSent, mStamp.getDateSent());
             jum.assertEquals("inReplyTo doesn't match", inReplyTo, mStamp.getInReplyTo());
             jum.assertEquals("references doesn't match", references, mStamp.getReferences());

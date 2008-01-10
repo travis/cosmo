@@ -15,21 +15,48 @@
  */
 dojo.provide("cosmo.model.util");
 
+// summmary: this module contains most of the Cosmo model meta-programming magic
+// description: the functions and classes here enable the declaration of Cosmo's
+//              model classes, but none are declared themselves here.
+
 cosmo.model.util._upperFirstChar = function(str){
+    //summary: given a string, return a string that is similar but
+    //         has its first character upper-cased
     return str.charAt(0).toUpperCase() + str.substr(1,str.length -1 );
 }
 
 cosmo.model.util.getGetterAndSetterName = function(propertyName){
-        var upProp = cosmo.model.util._upperFirstChar(propertyName);
-        var setterName = "set" + upProp;
-        var getterName = "get" + upProp;
-        return [getterName, setterName];
+    // summary: returns the getter and setter name for a given property name
+    //          using standard JavaBean conventions
+    // description: returns a two element array, the getter name is in the
+    //              first slot, and the setter is in the second
+    var upProp = cosmo.model.util._upperFirstChar(propertyName);
+    var setterName = "set" + upProp;
+    var getterName = "get" + upProp;
+    return [getterName, setterName];
 }
 
 cosmo.model.util.BasePropertyApplicator = function(){}   
 cosmo.model.util.BasePropertyApplicator.prototype = {
-    
+    // summmary: the abstract base for PropertyApplicator. 
+    // description: The property applicator takes a constructor and adds getter
+    //              and setter methods to it's class.
+
     enhanceClass: function(ctr, propertyArray, kwArgs){
+        // summary: This is function that adds the properties to the class and
+        //          performs any necessary initialization via initializeClass
+        //    ctr:  
+        //        this is the constructor of the class to be enhanced
+        //
+        //    propertyArray:
+        //        an array of property arguments to pass to add property. The
+        //        first element should be the property name, the second element
+        //        is kwArgs for that property.See the implementing "addProperty"
+        //        for kwArgs details
+        //
+        //    kwArgs:
+        //        keyword arguments to pass to initializeClass() - see that method
+        //        for more details
         this.initializeClass(ctr, kwArgs);
         for (var x = 0; x < propertyArray.length; x++){
             this.addProperty.apply(this, [ctr, propertyArray[x][0], propertyArray[x][1]]);
@@ -37,6 +64,15 @@ cosmo.model.util.BasePropertyApplicator.prototype = {
     },
     
     addProperty: function(ctr, propertyName, kwArgs){
+        // summary: adds a property to the construtor's class
+        //    ctr:
+        //        the constructor to enhance
+        //    propertyName:
+        //        the property name of the property to be added
+        //    kwArgs:
+        //        kwArgs for specialized behavior of a property (see implementors 
+        //        for details)
+        
         kwArgs = kwArgs || {};
         var getterAndSetter = cosmo.model.util.getGetterAndSetterName(propertyName);
         var setterName = getterAndSetter[1];
@@ -52,25 +88,69 @@ cosmo.model.util.BasePropertyApplicator.prototype = {
     },
     
     initializeClass: function(ctr, kwArgs){
-        //implementers should override this.
+        // summary: implementers should override this to perform any operations
+        //          on the class that need to happen before properties are added
     },
     
     getSetter: function(ctr, propertyName, kwArgs){
-        //implementers should override this.
+        // sumamry: implementers should override this to return a getter method for
+        //          the class being enhanced. Use kwArgs to allow for different 
+        //          options for a particular property
         return null;
     },
 
     getGetter: function(ctr, propertyName, kwArgs){
-        //implementers should override this.
+        // sumamry: implementers should override this to return a setter method for
+        //          the class being enhanced. Use kwArgs to allow for different 
+        //          options for a particular property
         return null;
     }
 }
 
 dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BasePropertyApplicator, {
+    // summary: an implementation of BasePropertyApplicator
+    // description:
+    //     When calling enhanceClass(ctr, propertyArray, kwArgs), kwArgs is
+    //     passed to initializeClass(ctr, kwArgs) - let's call that the "class-wide"
+    //     keyword arguments.
+    //
+    //     Similarly, when calling enhanceClass(), the second element of each 
+    //     element in the property array is a kwArgs which is passed to addProperty -
+    //     let's call that "per-property" keyword arguments.
+    //
+    //     Here follows a decription of the options which can be set with those
+    //     arguments.
+    //     
+    //     class-wide kwArgs:
+    //         immutable: if this value is set to true, instances of the enhanced 
+    //                    class cannot have their properties changed after
+    //                    instantiation. In other words, the only way to set the 
+    //                    properties is through the constructor
+    //         enhanceInitializer:
+    //                    if this value is set, the initializer of the class
+    //                    will be modified so that, in addition to doing whatever
+    //                    it normally does, it will also use the first argument
+    //                    to populate the properties of the class. This argument
+    //                    should be a hash (JavaScript object) whose keys are 
+    //                    property names and whose values are what the properties
+    //                    are to be set to.
+    // 
+    //                    if it is set to "before" the properties are set before
+    //                    whatever other initializer stuff happens. Otherwise,
+    //                    it happens after.
+    //
+    //     per-property kwArgs:
+    //         default: 
+    //                    if set, the property defaults to this value unless
+    //                    explicitly set to something else later
+    //         
+
     addProperty: function(ctr, propertyName, kwArgs){
         kwArgs = kwArgs || {};
         this.inherited("addProperty", arguments);
+        // maintain a list of propertyNames
         ctr.prototype.__propertyNames.push(propertyName);
+        // maintain a defaults map
         ctr.prototype.__defaults[propertyName] = kwArgs["default"];
     },
     
@@ -90,7 +170,8 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         if (ctr.prototype["__enhanced"]){
             //it's already been enhanced, which usually means that this is a subclass.
             //so let's just copy the arrays/objects to the new prototype 
-            //since we'll be adding to them and don't want to add to the parent's arrays/objects!
+            //since we'll be adding to them and don't want to add to the 
+            //parent's arrays/objects!
             ctr.prototype.__propertyNames = ctr.prototype.__propertyNames.slice();
             var newDefaults = {};
             dojo.mixin(newDefaults,ctr.prototype.__defaults);
@@ -100,6 +181,8 @@ dojo.declare("cosmo.model.util.SimplePropertyApplicator", cosmo.model.util.BaseP
         if (!kwArgs){
             kwArgs = {};
         }
+        // let's subclasses know that this class is already enhanced so that
+        // initializeClass doesn't get called again on it
         ctr.prototype.__enhanced = true;
         ctr.prototype.__getProperty = this._genericGetter;
         ctr.prototype.__setProperty = this._genericSetter;
@@ -286,6 +369,12 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
 }   
 
   cosmo.model._occurrenceGetProperty = function (propertyName){
+      // summary: this is the get property method for occurences of recurring
+      //          events
+      // description: this does all the "right stuff" in that it first checks to 
+      //              see if the occurence has this property set, and if not
+      //              checks the master
+
         //get the master version
         var master = this.getMaster();
         var masterProperty = this._getMasterProperty(propertyName);
@@ -314,6 +403,8 @@ cosmo.model.util.equals = function (a, b, looseStringComparisons){
 }
 
 cosmo.model._occurrenceSetProperty = function (propertyName, value){
+    // summmary: This is the setter for recurrence occurrences.
+    // description: sets the property for a given occurrence
     if (this.__noOverride[propertyName]){
         throw new Error("You can not override property '" + propertyName +"'");
     }

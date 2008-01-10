@@ -1,8 +1,7 @@
 dojo.provide("cosmo.ui.widget.AuthBox");
 
-dojo.require("dojo.io.*");
-dojo.require("dojo.widget.*");
-dojo.require("dojo.html.common");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
@@ -11,7 +10,9 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.account.login");
 
-dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
+dojo.declare(
+    "cosmo.ui.widget.AuthBox", 
+    [dijit._Widget, dijit._Templated],
     {
         templateString: '<span></span>',
 
@@ -41,13 +42,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             cosmo.app.modalDialog.setPrompt(str, type);
         },
 
-        _authSuccessCB: function(type, data, obj){
+        _authSuccessCB: function(data){
             this.deferred.callback(data);
         },
 
-        _authErrorCB: function(type, str, obj){
-            this._handleError(str);
-            return false;
+        _authErrorCB: function(err){
+            this._handleError(err);
+            return err;
         },
 
         _handleError: function(msg){
@@ -79,15 +80,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
                 else {
                     this._showPrompt(_('Login.Prompt.Processing'));
                 }
-                cosmo.account.login.doLogin(
-                    un, pw, {load: dojo.lang.hitch(this, "_authSuccessCB"),
-                             error: dojo.lang.hitch(this, "_authErrorCB")}
-                );
+                var d = cosmo.account.login.doLogin(un, pw);
+                d.addCallback(dojo.hitch(this, "_authSuccessCB"));
+                d.addErrback(dojo.hitch(this, "_authErrorCB"));
+
             }
             return false;
         },
 
-        fillInTemplate: function () {
+        buildRendering: function () {
             var table = _createElem('table');
             var tbody = _createElem('tbody');
             var tr = null;
@@ -151,8 +152,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
 
             var signupLink = _createElem("a");
             signupLink.appendChild(_createText(_("AuthBox.CreateClickHere")));
-            dojo.event.connect(signupLink, "onclick",  
-                               dojo.lang.hitch(this, function(){
+            dojo.connect(signupLink, "onclick",  
+                               dojo.hitch(this, function(){
                                    cosmo.account.create.showForm(this.subscription);
                                    return false;
                                })
@@ -161,14 +162,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.AuthBox", dojo.widget.HtmlWidget,
             this.domNode.appendChild(signupLinkDiv);
         },
         
-        initializer: function(){
+        constructor: function(){
             this.deferred = new dojo.Deferred();
         },
 
         postCreate: function () {
         }
-    },
-    "html");
+    }
+);
+
 
 cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) {
     var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')

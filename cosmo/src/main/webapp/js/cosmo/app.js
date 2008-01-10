@@ -16,8 +16,6 @@
 
 dojo.provide('cosmo.app');
 
-dojo.require("dojo.event.*");
-dojo.require("dojo.io.*");
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.timeout");
@@ -51,15 +49,18 @@ cosmo.app = new function () {
         self.maskNode = $('maskDiv');
         self.showMask();
         // Set up the modal dialog box for the app
-        self.modalDialog = dojo.widget.createWidget(
-            'cosmo:ModalDialog', {}, document.body, 'last');
-        dojo.event.topic.subscribe(
+        self.modalDialog = new cosmo.ui.widget.ModalDialog({}, document.body);
+        console.log(self)
+        dojo.subscribe(
             cosmo.topics.PreferencesUpdatedMessage.topicName, self, 'updateUIFromPrefs');
+        console.log("foo")
         // Initialize the default view
         if (typeof self.initObj.init == 'function') { 
             self.initObj.init(self.initParams);
         };
     };
+    
+    this.updateUIFromPrefs = function(){};
 
     // ==========================
     // Modal dialog boxes
@@ -125,7 +126,7 @@ cosmo.app = new function () {
                     // Avoid use of the ugly hack of '#' href prop 
                     // Give the anchor some help to act like a real link
                     a.className = 'jsLink'; 
-                    dojo.event.connect(a, 'onclick', f);
+                    dojo.connect(a, 'onclick', f);
                     a.appendChild(_createText('Click here for details ...'));
                     d.appendChild(a);
                     msg.appendChild(d);
@@ -190,7 +191,7 @@ cosmo.app = new function () {
         // This is done app-wide right here instead of delegating
         // to individual widgets since select elements can be grabbed
         // for the entire DOM tree at one time
-        if (dojo.render.html.ie && dojo.render.ver < 7) {
+        if (dojo.isIE && dojo.isIE < 7) {
             self.showHideSelectBoxes(false);
         }
         // Publish message to individual widgets as well -- allow
@@ -214,7 +215,7 @@ cosmo.app = new function () {
         valueInput.className = "inputText";
         retryConditions = retryConditions || [];
         var deferred = new dojo.Deferred();
-        var submitFunc = dojo.lang.hitch(this, function () { 
+        var submitFunc = dojo.hitch(this, function () { 
                                     var displayName = valueInput.value;
                                     for (var i = 0; i < retryConditions.length; i++){
                                         var valueErrorMessage = retryConditions[i](displayName);
@@ -246,7 +247,7 @@ cosmo.app = new function () {
                     { text: _('App.Button.Cancel'),
                       id: "getValueCancel",
                       width: 74,
-                      handleOnClick: dojo.lang.hitch(this, "hideDialog")
+                      handleOnClick: dojo.hitch(this, "hideDialog")
                     }
                 )
             ]
@@ -259,7 +260,7 @@ cosmo.app = new function () {
     };
     this.showAndWait = function (message, returnValue){
         var deferred = new dojo.Deferred();
-        var submitFunc = dojo.lang.hitch(this, function () { 
+        var submitFunc = dojo.hitch(this, function () { 
             this.hideDialog();
             deferred.callback(returnValue);
         })
@@ -286,11 +287,11 @@ cosmo.app = new function () {
     this.confirm = function (message, kwArgs){
         kwArgs = kwArgs || {};
         var deferred = new dojo.Deferred();
-        var yesFunc = dojo.lang.hitch(this, function () { 
+        var yesFunc = dojo.hitch(this, function () { 
             this.hideDialog();
             deferred.callback(true);
         })
-        var noFunc = dojo.lang.hitch(this, function () { 
+        var noFunc = dojo.hitch(this, function () { 
             this.hideDialog();
             deferred.callback(false);
         })
@@ -325,7 +326,7 @@ cosmo.app = new function () {
         // This is done app-wide right here instead of delegating
         // to individual widgets since select elements can be grabbed
         // for the entire DOM tree at one time
-        if (dojo.render.html.ie && dojo.render.ver < 7) {
+        if (dojo.isIE && dojo.isIE < 7) {
             self.showHideSelectBoxes(true);
         }
         // Publish to individual widgets as well -- allow
@@ -363,7 +364,7 @@ cosmo.app = new function () {
     this.showHideSelectBoxes = function (show) {
         var selects = document.body.getElementsByTagName('select');
         var vis = show ? 'visible' : 'hidden';
-        dojo.lang.map(selects, function (sel, show){
+        dojo.map(selects, function (sel, show){
             if (sel.style) {
                 // Storing state, or state has been stored
                 if (sel.id && sel.style.visibility) {
@@ -399,14 +400,14 @@ cosmo.app = new function () {
         }
         
         var autoLogoutTimeout = 
-            dojo.lang.setTimeout(logoutFunction,
-                cosmo.ui.conf.timeoutDialogAutoLogout * 1000)
+            setTimeout(logoutFunction,
+                       cosmo.ui.conf.timeoutDialogAutoLogout * 1000)
         
         var dialogHash = {};
         var cancelLogoutButton = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
             handleOnClick: function () { 
                 cosmo.app.hideDialog();
-                dojo.lang.clearTimeout(autoLogoutTimeout)
+                clearTimeout(autoLogoutTimeout)
                 cosmo.ui.timeout.updateLastActionTime() 
             } });
         dialogHash.btnsLeft = [cancelLogoutButton];

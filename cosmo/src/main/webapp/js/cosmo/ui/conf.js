@@ -71,12 +71,15 @@ cosmo.ui.conf.preventDataCaching = "true";
 //****************** End Overidable Defaults. *********************************
 
 cosmo.ui.conf.load = function (uri){
-    var s = dojo.hostenv.getText(uri);
-    var propertymaps = eval("(" + s + ")");
-    cosmo.ui.conf._localtext = propertymaps[0];
+    var d = dojo.xhrGet({url: uri, sync: true});
+    d.addCallback(function(s){
+        var propertymaps = eval("(" + s + ")");
+        cosmo.ui.conf._localtext = propertymaps[0];
         
-    var configProperties = propertymaps[1];
-    dojo.lang.mixin(cosmo.ui.conf, configProperties);
+        var configProperties = propertymaps[1];
+        dojo.mixin(cosmo.ui.conf, configProperties);
+    });
+    return d;
 }
 
 // Return the hash of localization keys to localized strings

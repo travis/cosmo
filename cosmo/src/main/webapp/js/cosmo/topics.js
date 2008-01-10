@@ -20,8 +20,6 @@
  */
 dojo.provide("cosmo.topics");
 
-dojo.require("dojo.event.topic");
-
 cosmo.topics.declareMessage = function (/*string*/ className,
                                        /*string*/ topicName,
                                        /*Function|Array*/ superclass,
@@ -48,12 +46,11 @@ cosmo.topics.declareMessage = function (/*string*/ className,
         o.className = className;
         o.topicName = topicName;
         o.superclass = superclass;
-        o.initializer = initializer;
+        o.constructor = initializer;
         o.props = props;
     }
     var con = dojo.declare(o.className,
         o.superclass || cosmo.topics.Message,
-        o.initializer || null,
         o.props || null);
     con.topicName = o.topicName;
     con.prototype.topicName = o.topicName;
@@ -175,5 +172,5 @@ cosmo.topics.publish = function (/*Function*/messageConstructor,
     else {
         message = new messageConstructor(initializerArg);
     }
-    dojo.event.topic.publish(message.topicName, message);
+    dojo.publish(message.topicName, message);
 }

@@ -25,9 +25,24 @@ cosmo.util.string.endsWith = function(str, substring){
     return str.lastIndexOf(substring) == str.length - substring.length;
 }
 
+cosmo.util.string.capitalize = function (str) { 
+    // Ported from dojo 0.4.3 because it does not exist in Dojo 1.0
+    if (!dojo.isString(str)) { 
+        return ""; 
+    } 
+    if (arguments.length == 0) { 
+        str = this; 
+    } 
+    var words = str.split(" "); 
+    for (var i = 0; i < words.length; i++) { 
+        words[i] = words[i].charAt(0).toUpperCase() + _1ca[i].substring(1); 
+    } 
+    return words.join(" "); 
+}
+
 cosmo.util.string.escapeXml = function(/*string*/str){
-//summary:
-//	Adds escape sequences for special characters in XML: &<>"'
+    //summary:
+    //	Adds escape sequences for special characters in XML: &<>"'
 	str = str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;")
 		.replace(/>/gm, "&gt;").replace(/"/gm, "&quot;")
         .replace(/'/gm, "&#39;");

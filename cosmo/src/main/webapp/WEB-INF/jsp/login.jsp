@@ -53,18 +53,16 @@
         dojo.require("cosmo.convenience");
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");
-        dojo.require("cosmo.util.uri");
         
-        dojo.event.browser.addListener(window, "onload", init, false);
+        dojo.addOnLoad(init);
 
         function init() {
             cosmo.util.cookie.destroy('JSESSIONID', '${staticBaseUrl}');
             cosmo.util.cookie.destroy('inputTimestamp');
             cosmo.util.cookie.destroy('username');
             cosmo.util.auth.clearAuth();
-            
             cosmo.app.init();
-            if (cosmo.util.uri.parseQueryString(location.search)['signup']
+            if (dojo.queryToObject(location.search)['signup']
                 == 'true'){
                 cosmo.account.create.showForm();
             }

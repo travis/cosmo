@@ -78,7 +78,7 @@ if (collectionUrlIndex >= 0){
 	cosmo.app.initParams.collectionUid = 
 		location.pathname.substring(collectionUrlIndex + 11);
 }
-var params = (location.search)? cosmo.util.uri.parseQueryString(location.search) : {};
+var params = (location.search)? dojo.queryToObject(location.search) : {};
 
 if (params.ticket) 
     cosmo.app.initParams.ticketKey = params.ticket[0];

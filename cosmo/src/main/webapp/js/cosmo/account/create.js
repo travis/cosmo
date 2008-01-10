@@ -16,8 +16,6 @@
 
 dojo.provide('cosmo.account.create');
 
-dojo.require("dojo.uri.Uri");
-dojo.require("dojo.widget.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
@@ -33,7 +31,7 @@ cosmo.account.create = new function () {
 
     this.fieldList = null;
 
-    dojo.lang.mixin(this, cosmo.account.accountBase);
+    dojo.mixin(this, cosmo.account.accountBase);
 
     // Public members
     // =============================
@@ -192,7 +190,7 @@ cosmo.account.create = new function () {
 
         var cfg = {};
         var username = user.username;
-        var homedirUrl = new dojo.uri.Uri(user.homedirUrl);
+        var homedirUrl = new dojo._Url(user.homedirUrl);
         // Server settings
         var isSSL = homedirUrl.scheme == 'https';
 

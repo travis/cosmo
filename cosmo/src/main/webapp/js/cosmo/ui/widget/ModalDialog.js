@@ -29,16 +29,18 @@
 
 dojo.provide("cosmo.ui.widget.ModalDialog");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.html.common");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");
 
-dojo.widget.defineWidget("cosmo.ui.widget.ModalDialog", 
-dojo.widget.HtmlWidget, {
+dojo.declare(
+    "cosmo.ui.widget.ModalDialog", 
+    [dijit._Widget, dijit._Templated],
+    {
         // Template stuff
         templateString: '<div id="modalDialog"></div>',
         
@@ -175,10 +177,11 @@ dojo.widget.HtmlWidget, {
             // Content area
             if (typeof this.content == 'string') {
                 this.contentNode.innerHTML = this.content;
-            } else if (dojo.html.isNode(this.content)) {
+            } else if (!isNaN(this.content.nodeType)) {
+                // if this.content is a dom node
                 this._removeChildren(this.contentNode);
                 this.contentNode.appendChild(this.content);
-            } else if (this.content instanceof dojo.widget.HtmlWidget){
+            } else if (this.content instanceof dijit._Widget){
                 this._removeChildren(this.contentNode);
                 this.contentNode.appendChild(this.content.domNode);
             }
@@ -218,8 +221,8 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         center: function () {
-            var w = dojo.html.getViewport().width;
-            var h = dojo.html.getViewport().height;
+            var w = dijit.getViewport().w;
+            var h = dijit.getViewport().h;
             this.setLeft(parseInt((w - this.width)/2));
             this.setTop(parseInt((h - this.height)/2));
             return true;
@@ -355,9 +358,6 @@ dojo.widget.HtmlWidget, {
         
         // Lifecycle functions
         postMixInProperties: function () {
-            this.toggleObj =
-                dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;
-                
             // reference to original show method
             this.showOrig = this.show;
             
@@ -406,7 +406,7 @@ dojo.widget.HtmlWidget, {
                 this.setHeight()) {
                 this.setContentAreaHeight();
                 }
-                if (this.content instanceof dojo.widget.HtmlWidget 
+                if (this.content instanceof dijit._Widget
                     && this.content.appendedToParent){
                     this.content.appendedToParent(this);
                 }
@@ -439,7 +439,7 @@ dojo.widget.HtmlWidget, {
                 this.height = null;
                 this.uiFullMask.style.display = 'none';
                 this.isDisplayed = false;
-                if (this.content instanceof dojo.widget.HtmlWidget) {
+                if (this.content instanceof dijit._Widget) {
                     this.content.destroy();
                 }
                 this.content = null;

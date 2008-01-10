@@ -1,14 +1,13 @@
 <div id="loginDialog">
     <div id="loginDialogLogo" dojoattachpoint="logoContainer"></div>
     <div id="loginDialogLoginPrompt" class="promptText"
-        dojoattachpoint="loginPromptContainer">${this.loginPrompt}</div>
+        dojoattachpoint="loginPromptContainer">${loginPrompt}</div>
     <div id="loginDialogFormContainer">
-    <form id="loginDialogForm" dojoattachpoint="loginForm" 
-        onsubmit="return false;" dojoAttachEvent="onsubmit:return false;">
+    <form id="loginDialogForm" dojoattachpoint="loginForm" >
         <table id="loginDialogInputsBox">
             <tr id="loginDialogUsernameWidget">
                 <td id="loginDialogUsernameLabel" class="labelTextHoriz labelTextCell"
-                    dojoattachpoint="usernameLabelContainer">${this.usernameLabel}</td>
+                    dojoattachpoint="usernameLabelContainer">${usernameLabel}</td>
                 <td id="loginDialogUsernameInputContainer">
                     <input type="text" id="loginDialogUsernameInput" class="inputText"
                         dojoAttachPoint="usernameInput" />
@@ -16,7 +15,7 @@
             </tr>
             <tr id="loginDialogPasswordWidget">
                 <td id="loginDialogPasswordLabel" class="labelTextHoriz labelTextCell"
-                    dojoattachpoint="passwordLabelContainer">${this.passwordLabel}</td>
+                    dojoattachpoint="passwordLabelContainer">${passwordLabel}</td>
                 <td id="loginDialogPasswordInputContainer">
                 <input type="password" id="loginDialogPasswordInput" class="inputText"
                     dojoAttachPoint="passwordInput"/>

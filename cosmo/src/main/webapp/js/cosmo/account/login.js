@@ -27,8 +27,7 @@ cosmo.account.login.doLogin = function(un, pw){
 
     var d = dojo.xhrPost({
         url: cosmo.env.getFullUrl("Auth"),
-        postData: postData
-//        contentType: "application/x-www-form-urlencoded; charset=utf-8"
+        content: postData
     });
     d.addCallback(function(url){
         if (url == cosmo.env.getBaseUrl() + "/loginfailed"){

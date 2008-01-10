@@ -15,10 +15,9 @@ dojo.declare(
     [dijit._Widget, dijit._Templated],
     {
         stylesheet: "",
-        templatePath: dojo.moduleUrl("cosmo", "../../cosmo/ui/widget/templates/LoginDialog/LoginDialog.html"),
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/LoginDialog/LoginDialog.html"),
 
         // Props from template or set in constructor
-        authProc: cosmo.env.getAuthProc(),
         passwordLabel: _("Login.Password"),
         usernameLabel: _("Login.Username"),
         loginPrompt: _("Login.Prompt.Init"),
@@ -69,11 +68,11 @@ dojo.declare(
                 var d = cosmo.account.login.doLogin(
                     un, pw 
                     );
-                d.addCallback(dojo.hitch(this, this.handleLoginSuccess));
-                d.addErrback(dojo.hitch(this, this.handleLoginError)); 
+                d.addCallback(dojo.hitch(self, self.handleLoginSuccess));
+                d.addErrback(dojo.hitch(self, self.handleLoginError)); 
 
             }
-            return false;
+            return d;
         },
         showErr: function (str) {
             this.showPrompt('error', str);
@@ -113,10 +112,11 @@ dojo.declare(
                 this['_' + t + 'Focus'] = f;
             }
         },
-        postCreate: function () {
+
+        startup: function () {
             var self = this;
-            var button = dojo.widget.createWidget("cosmo:Button",
-                { text: _("Login.Button.Ok"), width: 74, widgetId: "loginSubmitButton" } );
+            var button = new cosmo.ui.widget.Button(
+                { text: _("Login.Button.Ok"), width: 74, id: "loginSubmitButton" } );
             var logo = document.createElement('img');
 
             this.submitButtonContainer.appendChild(button.domNode);
@@ -131,11 +131,7 @@ dojo.declare(
             dojo.connect(this.submitButton, "handleOnClick", this, "doLogin");
             dojo.addOnLoad(function(){self.usernameInput.focus()})
         },
-        setStyle: function (){
-            var stylesheetName = cosmo.util.string.capitalize(this.widgetId);
-        },
         constructor: function (){
-            dojo.connect(this, "mixInProperties", this, "setStyle");
             dojo.connect(document, "onkeyup", this, "keyUpHandler");
         }
     }

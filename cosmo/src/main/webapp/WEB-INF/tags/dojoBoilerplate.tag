@@ -55,8 +55,9 @@
                     i18nLocation: "${baseUrl}/i18n.js",
                     confLocation: "${baseUrl}/webui.conf",
                     templateName: "${templateName}",
-                    parseWidgets: ${parseWidgets},
-                    searchIds: searchIds}
+                    parseOnLoad: ${parseWidgets},
+                    searchIds: searchIds,
+                    serverBaseUrl: "${baseUrl}"}
 </script>
 
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>

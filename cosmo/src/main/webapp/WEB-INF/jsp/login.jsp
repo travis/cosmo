@@ -72,7 +72,7 @@
   </head>
   <body>
     <div>
-      <div dojoType="cosmo:LoginDialog" widgetId="loginDialog">
+      <div dojoType="cosmo.ui.widget.LoginDialog" id="loginDialog">
       </div>
       <div style="padding-top:24px; text-align:center">
         <fmt:message key="Login.CreateAccount"/>

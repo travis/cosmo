@@ -49,11 +49,11 @@ cosmo.app = new function () {
         self.maskNode = $('maskDiv');
         self.showMask();
         // Set up the modal dialog box for the app
-        self.modalDialog = new cosmo.ui.widget.ModalDialog({}, document.body);
-        console.log(self)
+        
+        self.modalDialog = new cosmo.ui.widget.ModalDialog({id: "modalDialog"});
+        self.modalDialog.startup();
         dojo.subscribe(
             cosmo.topics.PreferencesUpdatedMessage.topicName, self, 'updateUIFromPrefs');
-        console.log("foo")
         // Initialize the default view
         if (typeof self.initObj.init == 'function') { 
             self.initObj.init(self.initParams);

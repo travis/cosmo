@@ -208,9 +208,10 @@ dojo.declare(
             // a parent element to append to, the widget parser uses document.body,
             // which causes the doc to reflow -- and
             // scrolling canvas scrollOffset gets reset
-            this.btnPanel = dojo.widget.createWidget(
-                'cosmo:ButtonPanel', { btnsLeft: this.btnsLeft, btnsCenter: this.btnsCenter,
-                btnsRight: this.btnsRight }, bDiv, 'last');
+            this.btnPanel = new cosmo.ui.widget.ButtonPanel(
+                { btnsLeft: this.btnsLeft, 
+                  btnsCenter: this.btnsCenter,
+                  btnsRight: this.btnsRight }, bDiv);
             return true;
         },
         render: function () {
@@ -449,5 +450,12 @@ dojo.declare(
             };
         },
         
+        postCreate: function(){
+            dojo.body().appendChild(this.domNode);
+			this.inherited("postCreate", arguments);
+        },
+        
         // Toggling visibility
-        toggle: 'plain' } );
+        toggle: 'plain' 
+    } 
+);

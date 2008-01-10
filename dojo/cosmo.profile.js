@@ -32,7 +32,9 @@ dependencies.layers = [
 	}
 ];
 dependencies.prefixes = [
-   ["cosmo", "../../cosmo/src/main/webapp/js/cosmo"]
+                         [ "dijit", "../dijit" ],
+                         [ "dojox", "../dojox" ],
+                         ["cosmo", "../../cosmo/src/main/webapp/js/cosmo"]
 ];
 
 load("getDependencyList.js");

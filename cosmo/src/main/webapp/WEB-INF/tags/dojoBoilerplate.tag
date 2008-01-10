@@ -49,8 +49,7 @@
     var searchIds = [<c:forEach var="searchId" items="${searchIds}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>
                      "${searchId}"</c:forEach>];
 
-    var djConfig = {isDebug: false, 
-                    baseUrl: "${baseUrl}",
+    var djConfig = {isDebug: true, 
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
                     i18nLocation: "${baseUrl}/i18n.js",
@@ -64,7 +63,7 @@
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <script type="text/javascript">
 (function (){
-    dojo.registerModulePath("cosmo", "${baseUrl}/js/cosmo");
+    dojo.registerModulePath("cosmo", "../../../cosmo");
     dojo.require("cosmo.util.debug");
 })();
 </script>

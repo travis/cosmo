@@ -3,7 +3,8 @@ DOJO_VERSION="release-1.0.2"
 if [ ! -d "$DOJO_VERSION" ]; then
     svn co http://svn.dojotoolkit.org/dojo/tags/$DOJO_VERSION
     patch -p0 -d release-1.0.2 < dojoXhrHead.patch 
-    ant fix-config
+#    cp cosmo.profile.js $DOJO_VERSI0N/util/buildscripts/profiles/
+#    cp cosmo-dev.profile.js $DOJO_VERSI0N/util/buildscripts/profiles/
 fi
 
 cp cosmo-pim.js $DOJO_VERSION/dojo
@@ -11,10 +12,9 @@ cp cosmo-login.js $DOJO_VERSION/dojo/
 
 cd $DOJO_VERSION/util/buildscripts
 if [ "$1" == "release" ]; then
-    ant -Ddocless=true -Dprofile=../../../cosmo clean release
+    ant -Ddocless=true -Dprofile=cosmo clean release
 else
-    ./build.sh profile=standard action=clean,release
-#    ant -Ddocless=true -Dprofile=core clean release
+    ./build.sh profile=../../../../cosmo-dev action=clean,release
 fi
 
 cd ..

@@ -44,15 +44,44 @@ cosmo.model.uuidGenerator = {
 }
 
 cosmo.model.getStampMetaData = function(stampName){
+    // summary: returns the stamp metadata for any stamp that been declared, 
+    //          given a stamp name
     return this._stampRegistry[stampName].constructor.prototype.stampMetaData;
 }
+
 cosmo.model.declare = function(/*String*/ ctrName, /*Function*/ parentCtr, propertiesArray, otherDeclarations, kwArgs){
+    // summary: convienient way to declare a class enhanced with the 
+    //          cosmo.model.util.SimplePropertyApplicator
+    //     ctrName:
+    //          the (fully qualified) name of the new class
+    //     parentCtr:
+    //          the constructor of the class to extend, or null if none.
+    //     propertiesArray:
+    //          the array describing the properties to add to the class 
+    //          as specified in the documentation for
+    //          cosmo.model.util.SimplePropertyApplicator
+    //     otherDeclarations:
+    //          a hash of values to mix in to the class's prototype
+    //     kwArgs:
+    //          class-wide key word arguments (again, specified by 
+    //          cosmo.model.util.SimplePropertyApplicator)
     var newCtr = dojo.declare(ctrName, parentCtr, otherDeclarations);
     cosmo.model.util.simplePropertyApplicator.enhanceClass(newCtr, propertiesArray, kwArgs || {});
     return newCtr;
 }
 
 cosmo.model.declareStamp = function(/*String*/ ctrName, stampName, namespace, attributesArray, otherDeclarations, occurrenceDeclarations, seriesOnly){
+    // summary: declares a new stamp class and adds it to the registry. Also
+    //          creates a version of the class for Occurrences
+    //     ctrName: 
+    //          the name of the constructor 
+    //     stampName:
+    //          the short name of the stamp
+    //     namespace:
+    //          the namespace of the stamp as required by the EIM
+    //     attributesArray:
+    //          the attributes array as specified by the constructor for 
+    //          cosmo.model.StampMetaData
     var newCtr = dojo.declare(ctrName, cosmo.model.BaseStamp, otherDeclarations);
     var meta = new cosmo.model.StampMetaData(stampName, namespace, attributesArray, seriesOnly);
     newCtr.prototype.stampMetaData = meta;

@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-          "http://www.springframework.org/dtd/spring-beans.dtd">
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright 2005-2006 Open Source Applications Foundation
 
@@ -18,7 +15,15 @@
     limitations under the License.
 -->
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
   <bean id="messageSource"
         class="org.springframework.context.support.ResourceBundleMessageSource">
     <property name="basename">
@@ -203,8 +208,8 @@
     </property>
   </bean>
   
+  <!--  Transaction Definitions -->
   
-
   <!-- Transaction manager for a single Hibernate SessionFactory
        (alternative to JTA) -->
   <bean id="transactionManager"
@@ -213,40 +218,42 @@
       <ref local="sessionFactory" />
     </property>
   </bean>
+  
+  <!-- the transactional advice -->
+  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <!-- the transactional semantics... -->
+    <tx:attributes>
+      <!-- getPasswordRecovery is only 'get' thats not read-only -->
+      <tx:method name="getPasswordRecovery"/>
+      
+      <!--  checked exception OverlordDeletionException should cause rollback  -->
+      <tx:method name="remove*" rollback-for="OverlordDeletionException"/>
 
-  <!--  Interceptor for measuring performance of dao methods -->
+      <!-- all methods starting with 'get', 'load', and 'find' are read-only -->
+      <tx:method name="get*" read-only="true"/>
+      <tx:method name="load*" read-only="true"/>
+      <tx:method name="find*" read-only="true"/>
+      
+      <!-- other methods use the default transaction settings -->
+      <tx:method name="*"/>
+    </tx:attributes>
+  </tx:advice>
+  
+  <!--  pointcut for all service methods -->
+  <aop:config>
+      <aop:pointcut id="serviceOperation"
+                  expression="execution(* org.osaf.cosmo.service.*Service.*(..))"/>
+    
+      <aop:advisor pointcut-ref="serviceOperation" advice-ref="txAdvice"/>
+  </aop:config>
+  
+  
+  <!--  Interceptor for measuring performance of dao methods 
   <bean id="performanceInterceptor"
         class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
     <property name="loggerName" value="org.osaf.cosmo.perf" />
   </bean>
-
-  <!-- This is the base transaction proxy factory bean, all
-       transactional managers use this bean definition. -->
-  <bean id="txProxyTemplate" abstract="true"
-        class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-    <property name="transactionManager">
-      <ref bean="transactionManager" />
-    </property>
-    <property name="transactionAttributes">
-      <props>
-        <prop key="save*">PROPAGATION_REQUIRED</prop>
-        <prop key="store*">PROPAGATION_REQUIRED</prop>
-        <prop key="remove*">PROPAGATION_REQUIRED,-OverlordDeletionException</prop>
-        <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
-        <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
-        <prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
-        <prop key="*">PROPAGATION_REQUIRED</prop>
-      </props>
-    </property>
-    <property name="preInterceptors">
-      <list>
-        <ref local="performanceInterceptor" />
-      </list>
-    </property>
-    <property name="postInterceptors">
-      <list></list>
-    </property>
-  </bean>
+-->
 
   <!-- data access objects -->
 
@@ -378,28 +385,7 @@
   </bean>
   
 
-  <bean id="userService" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.service.UserService</value>
-    </property>
-    <property name="transactionAttributes">
-      <props>
-        <prop key="save*">PROPAGATION_REQUIRED</prop>
-        <prop key="store*">PROPAGATION_REQUIRED</prop>
-        <prop key="remove*">PROPAGATION_REQUIRED,-OverlordDeletionException</prop>
-        <prop key="getPasswordRecovery">PROPAGATION_REQUIRED</prop>
-        <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
-        <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
-        <prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
-        <prop key="*">PROPAGATION_REQUIRED</prop>
-      </props>
-    </property>
-    <property name="target">
-      <ref local="userServiceTarget" />
-    </property>
-  </bean>
-
-  <bean id="userServiceTarget"
+  <bean id="userService"
         class="org.osaf.cosmo.service.impl.StandardUserService"
         init-method="init"
         destroy-method="destroy">
@@ -417,16 +403,7 @@
   <bean id="contentLockManager"
         class="org.osaf.cosmo.service.lock.SingleVMLockManager"/>
 
-  <bean id="contentService" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.service.ContentService</value>
-    </property>
-    <property name="target">
-      <ref local="contentServiceTarget" />
-    </property>
-  </bean>
-
-  <bean id="contentServiceTarget"
+  <bean id="contentService"
         class="org.osaf.cosmo.service.impl.StandardContentService"
         init-method="init"
         destroy-method="destroy">
@@ -444,16 +421,7 @@
     </property>
   </bean>
 
-  <bean id="serverPropertyService" parent="txProxyTemplate">
-    <property name="proxyInterfaces">
-      <value>org.osaf.cosmo.service.ServerPropertyService</value>
-    </property>
-    <property name="target">
-      <ref local="serverPropertyServiceTarget" />
-    </property>
-  </bean>
-
-  <bean id="serverPropertyServiceTarget"
+  <bean id="serverPropertyService"
         class="org.osaf.cosmo.service.impl.StandardServerPropertyService"
         init-method="init"
         destroy-method="destroy">

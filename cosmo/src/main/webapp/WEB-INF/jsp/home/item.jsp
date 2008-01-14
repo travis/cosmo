@@ -155,7 +155,7 @@
         <fmt:formatDate value="${Item.modifiedDate}" type="both"/>
       </td>
     </tr>
-<c:if test="${!cosmoui:instanceOf('org.osaf.cosmo.model.NoteItem', Item)}">
+<c:if test="${cosmoui:instanceOf('org.osaf.cosmo.model.NoteItem', Item)}">
     <tr>
       <td class="mdLabel" style="text-align:right;">
         iCalendar UID:

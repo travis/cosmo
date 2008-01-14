@@ -239,22 +239,21 @@
     </tx:attributes>
   </tx:advice>
   
-  <!--  pointcut for all service methods -->
+  <!-- Timing advice, useful for timing operations -->
+  <bean id="timingAdvice" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+    <property name="loggerName" value="org.osaf.cosmo.perf" />
+  </bean>
+ 
+  <!--  define advice for all service methods -->
   <aop:config>
       <aop:pointcut id="serviceOperation"
                   expression="execution(* org.osaf.cosmo.service.*Service.*(..))"/>
     
-      <aop:advisor pointcut-ref="serviceOperation" advice-ref="txAdvice"/>
+      <aop:advisor pointcut-ref="serviceOperation" order="1" advice-ref="timingAdvice"/>
+      <aop:advisor pointcut-ref="serviceOperation" order="2" advice-ref="txAdvice"/>
   </aop:config>
   
-  
-  <!--  Interceptor for measuring performance of dao methods 
-  <bean id="performanceInterceptor"
-        class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
-    <property name="loggerName" value="org.osaf.cosmo.perf" />
-  </bean>
--->
-
+ 
   <!-- data access objects -->
 
   <bean id="hibernateTemplate"

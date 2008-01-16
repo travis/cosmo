@@ -103,6 +103,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             
             return results;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -128,6 +129,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             Set results = itemFilterProcessor.processFilter(getSession(), itemFilter);
             return (Set<ContentItem>) results;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -149,6 +151,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
             hibQuery.setParameter("uid", uid);
             return (ContentItem) hibQuery.uniqueResult();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }

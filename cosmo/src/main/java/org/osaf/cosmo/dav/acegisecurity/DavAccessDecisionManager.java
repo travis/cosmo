@@ -193,11 +193,17 @@ public class DavAccessDecisionManager
             return;
         }
 
-        // Note from Brian Moseley:  this only works in absence of access controls that
-        // user B create a collection in user A's home collection.
-        CollectionItem home = findHomeCollection(collection.getOwner());
-
-        evaluateItemAcl(collection, home, method, evaluator);
+        CollectionItem parent = null;
+        
+        // If collection doesn't exist, then the parent must be
+        // the principal's home collection, otherwise use the parent
+        // of the collection (there should only be one)
+        if(collection==null)
+            parent = findHomeCollection(collection.getOwner());
+        else 
+            parent = collection.getParents().iterator().next();
+        
+        evaluateItemAcl(collection, parent, method, evaluator);
     }
 
     protected void evaluateItem(UriTemplate.Match match,

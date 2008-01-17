@@ -199,7 +199,7 @@ public class DavAccessDecisionManager
         // the principal's home collection, otherwise use the parent
         // of the collection (there should only be one)
         if(collection==null)
-            parent = findHomeCollection(collection.getOwner());
+            parent = findHomeCollection(evaluator.getPrincipal());
         else 
             parent = collection.getParents().iterator().next();
         

@@ -173,6 +173,7 @@ public class MorseCodeAccessDecisionManager
             CollectionItem home = contentService.getRootItem(details.getUser());
             if (!hasWriteAccess(home, authentication))
                 throw new AclEvaluationException(home);
+            return;
         } 
 
         // otherwise evaluate collection permissions

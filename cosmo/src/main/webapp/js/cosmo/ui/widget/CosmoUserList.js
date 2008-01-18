@@ -22,11 +22,10 @@
 
 dojo.provide("cosmo.ui.widget.CosmoUserList");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("dojo.dom");
 dojo.require("dojo.date.serialize");
-dojo.require("dojo.uri.Uri");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
@@ -35,6 +34,9 @@ dojo.require("cosmo.convenience");
 dojo.require("dojo.widget.FilteringTable");
 
 
+dojo.declare(
+    "cosmo.ui.widget.CosmoUserList", 
+    [dijit._Widget, dijit._Templated],
 dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringTable,
     {
         resourceDirectory : cosmo.env.getTemplateBase() + "CosmoUserList/",
@@ -132,7 +134,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
 
         loadCMPPage:function(cmpUrl){
             if (cmpUrl){
-                var documentAddress = new dojo.uri.Uri(cmpUrl);
+                var documentAddress = new dojo._Url(cmpUrl);
     
                 var query = documentAddress.query;
     

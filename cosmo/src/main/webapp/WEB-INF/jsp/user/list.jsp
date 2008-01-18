@@ -27,8 +27,6 @@
 
 <script type="text/javascript">
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.widget.Button");
 dojo.require("cosmo.env");
 </script>
 
@@ -45,7 +43,7 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 
 <cosmo:cnfmsg/>
 
-<table dojoType="cosmo:CosmoUserList" id="userList"
+<table dojoType="cosmo.ui.widget.CosmoUserList" id="userList"
        widgetId="userList" headClass="userListHead" tbodyClass="userListBody" enableMultipleSelect="true"
        enableAlternateRows="true" rowAlternateClass="alternateRow" multiple="true"
        valueField = "username">
@@ -80,7 +78,7 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 	href="javascript:activateSelectedUser()" 
 	style="display:none;">Activate Selected User</a>
 <a 	id="deleteSelectedUsersLink" 
-	href="javascript:dojo.widget.byId('userList').deleteSelectedUsers()" 
+	href="javascript:dijit.byId('userList').deleteSelectedUsers()" 
 	style="display:none;">Delete Selected Users</a>
 </div>
 
@@ -90,16 +88,16 @@ dojo.require("cosmo.ui.widget.ModifyUserDialog");
 
 
 function showNewUser(){
-    var createUserDialog = dojo.widget.byId("createUserDialog")
+    var createUserDialog = dijit.byId("createUserDialog")
     createUserDialog.show();
 
     void(0);
 }
 
 function showModifySelectedUser(){
-    var modifyDialog = dojo.widget.byId("modifyUserDialog");
+    var modifyDialog = dijit.byId("modifyUserDialog");
 
-    var username = dojo.widget.byId("userList").getSelectedData()[0].username;
+    var username = dijit.byId("userList").getSelectedData()[0].username;
 
     modifyDialog.populateFields(username);
     modifyDialog.show();
@@ -107,17 +105,17 @@ function showModifySelectedUser(){
     }
 
 function browseSelectedUser(){
-    var username = dojo.widget.byId("userList").getSelectedData()[0].username;
+    var username = dijit.byId("userList").getSelectedData()[0].username;
 
     location = cosmo.env.getBaseUrl() + "/browse/" + username;
 }
 
 function activateSelectedUser(){
-	var username = dojo.widget.byId("userList").getSelectedData()[0].userObject.username;
+	var username = dijit.byId("userList").getSelectedData()[0].userObject.username;
 
 	var d = cosmo.cmp.activate(username);
     d.addCallback(function (data){
-        dojo.widget.byId('userList').updateUserList();
+        dijit.byId('userList').updateUserList();
 	});
     d.addErrback(function(error){
 			alert("Error activating user");
@@ -127,16 +125,16 @@ function activateSelectedUser(){
 
 var modifyHandlerDict = {
     load: function(data, ioArgs){
-        var modifyDialog = dojo.widget.byId("modifyUserDialog")
+        var modifyDialog = dijit.byId("modifyUserDialog")
 	    if (ioArgs.xhr.status == 204){
             modifyDialog.hide();
             modifyDialog.form.reset();
-            dojo.widget.byId('userList').updateUserList();
+            dijit.byId('userList').updateUserList();
         }
     },
 
     error: function(error, ioArgs){
-        var modifyDialog = dojo.widget.byId("modifyUserDialog")
+        var modifyDialog = dijit.byId("modifyUserDialog")
         if (ioArgs.xhr.status == 431){
             //TODO: username in use stuff
             modifyDialog.usernameError.innerHTML = "Username in use";
@@ -152,17 +150,17 @@ var modifyHandlerDict = {
 
 var createHandlerDict = {
     load : function(data, ioArgs){
-        var createDialog = dojo.widget.byId("createUserDialog");
+        var createDialog = dijit.byId("createUserDialog");
         if (ioArgs.xhr.status == 201){
             createDialog.hide();
             createDialog.form.reset();
 
-            dojo.widget.byId('userList').updateUserList();
+            dijit.byId('userList').updateUserList();
         }
     },
     
     error: function(error, ioArgs){
-        var createDialog = dojo.widget.byId("createUserDialog");
+        var createDialog = dijit.byId("createUserDialog");
         if (ioArgs.xhr.status == 431){
             //TODO: username in use stuff
             createDialog.usernameError.innerHTML = "Username in use";
@@ -178,10 +176,10 @@ var createHandlerDict = {
 
 
 dojo.addOnLoad(function (){
-	dojo.widget.byId("modifyUserDialog").hide();
-	dojo.widget.byId("createUserDialog").hide();
+	dijit.byId("modifyUserDialog").hide();
+	dijit.byId("createUserDialog").hide();
 
-    var userList = dojo.widget.byId("userList");
+    var userList = dijit.byId("userList");
     var modifyLink = document.getElementById("modifySelectedUserLink");
     var browseLink = document.getElementById("browseSelectedUserLink");
     var activateLink = document.getElementById("activateSelectedUserLink");
@@ -196,7 +194,7 @@ dojo.addOnLoad(function (){
 
         var selection = userList.getSelectedData()
 
-        if (dojo.lang.isArray(selection) &&
+        if (dojo.isArray(selection) &&
             selection.length != 1){
             this.style.display = 'none';
 
@@ -245,8 +243,8 @@ dojo.addOnLoad(function (){
 			? 'inline':'none';
     }
 
-    dojo.event.connect("after", userList, "renderSelections", refreshControlLinks);
-    dojo.event.connect("after", userList, "updateUserListCallback", refreshControlLinks);
+    dojo.connect("after", userList, "renderSelections", refreshControlLinks);
+    dojo.connect("after", userList, "updateUserListCallback", refreshControlLinks);
     
     refreshControlLinks();
 
@@ -258,7 +256,7 @@ dojo.addOnLoad(function (){
 
 
 
-<div 	dojoType="cosmo:ModifyUserDialog" widgetId="createUserDialog"
+<div 	dojoType="cosmo.ui.widget.ModifyUserDialog" widgetId="createUserDialog"
 
         createNew="true"
         postActionHandler="createHandlerDict"
@@ -267,7 +265,7 @@ dojo.addOnLoad(function (){
 		title='<fmt:message key="User.List.NewUser"/>'
         > </div>
 
-<div 	dojoType="cosmo:ModifyUserDialog" widgetId="modifyUserDialog"
+<div 	dojoType="cosmo.ui.widget.ModifyUserDialog" widgetId="modifyUserDialog"
         postActionHandler="modifyHandlerDict"
         role="cosmo.ROLE_ADMINISTRATOR"
 		classes='floating'

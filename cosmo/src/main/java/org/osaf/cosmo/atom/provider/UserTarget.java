@@ -17,8 +17,7 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.AbstractTarget;
-
+import org.apache.abdera.protocol.server.impl.DefaultTarget;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -26,7 +25,7 @@ import org.osaf.cosmo.model.User;
  * A target that identifies a particular user.
  * </p>
  */
-public class UserTarget extends AbstractTarget {
+public class UserTarget extends DefaultTarget {
 
     private User user;
 

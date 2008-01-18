@@ -60,20 +60,18 @@ cosmo.account.create = new function () {
         o.prompt = _('Signup.Prompt.AllFieldsRequired');
         form = cosmo.account.getFormTable(this.fieldList, this);
         o.content = form;
-
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+        b = new cosmo.ui.widget.Button({ text:_('App.Button.Cancel'), width:74,
                                          id: "signupCancel",
             handleOnClick: function () { cosmo.app.modalDialog.hide(); } });
         o.btnsLeft = [b];
         // Have to set empty center set of buttons -- showForm will be called
         // without buttons getting cleared by 'hide.'
         o.btnsCenter = [];
-        b = new cosmo.ui.button.Button({ text:_('App.Button.Submit'), width:74,
+        b = new cosmo.ui.widget.Button({ text:_('App.Button.Submit'), width:74,
                                          id: "signupSubmit",
             handleOnClick: function () { self.submitCreate(); } });
         o.btnsRight = [b];
         o.defaultAction = function () { self.submitCreate(); };
-
         cosmo.app.showDialog(o);
 		form.username.focus();
     };
@@ -130,7 +128,7 @@ cosmo.account.create = new function () {
         var content = getResultsTable(user, cfg);
         var prompt = _('Signup.Prompt.Success');
         var d = cosmo.app.modalDialog;
-        var btnsCenter = [dojo.widget.createWidget("cosmo:Button",
+        var btnsCenter = [new cosmo.ui.widget.Button(
             { text:_('App.Button.Close'), width:74, id: "signupClose",
             handleOnClick: function () { cosmo.app.hideDialog(); } })];
 
@@ -150,8 +148,9 @@ cosmo.account.create = new function () {
      * @return Boolean, true on success, false on failure
      */
     function handleCreateError(data, ioArgs) {
+        ioArgs = ioArgs || {};
         var err = '';
-        if (ioArgs.xhr.status && (ioArgs.xhr.status > 399)) {
+        if (ioArgs.xhr && ioArgs.xhr.status && (ioArgs.xhr.status > 399)) {
             switch (ioArgs.xhr.status) {
             case 403:
                 err = _('Signup.Error.AlreadyLoggedIn');

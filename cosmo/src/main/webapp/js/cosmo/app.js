@@ -199,6 +199,7 @@ cosmo.app = new function () {
         // e.g., hide scrollbars, turn off overflow to avoid
         // disappearing cursor, etc.
         cosmo.topics.publish(cosmo.topics.ModalDialogToggle, { isDisplayed: true });
+
         self.modalDialog.show();
         if (props) return props.deferred;
     };

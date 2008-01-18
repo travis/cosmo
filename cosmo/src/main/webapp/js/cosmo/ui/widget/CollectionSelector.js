@@ -52,7 +52,7 @@ dojo.declare(
         //references to various DOM nodes
         displayNameText: null, 
 
-        buildRendering: function () {
+        postCreate: function () {
             var self = this;
             var collection = cosmo.app.pim.getSelectedCollection();
             var passedKey = this.ticketKey; // Indicates we're in ticket view

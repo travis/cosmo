@@ -39,6 +39,7 @@ dojo.declare(
     leftContainer: null,
     centerContainer: null,
     rightContainer: null,
+    panelContainer: null,
     btnsLeft: [],
     btnsCenter: [],
     btnsRight: [],
@@ -46,7 +47,7 @@ dojo.declare(
     // Props set by tag or constructor
     width: null,
 
-    buildRendering: function () {
+    postCreate: function () {
         function sectionCell(area, btns) {
             // Insert table of buttons for this section
             if (btns.length) {
@@ -81,14 +82,6 @@ dojo.declare(
         sectionCell.apply(this, ['right', this.btnsRight]);
     },
 
-    destroyButtons: function(){
-         dojo.map([this.btnsLeft, this.btnsCenter, this.btnsRight], function(widgets){
-             dojo.map(widgets, function(widget){
-                widget.destroy();
-             })
-         });
-    },
-
     setWidth: function (width) {
         this.width = width;
         if (width) {
@@ -96,11 +89,6 @@ dojo.declare(
         } else {
             this.panelContainer.style.width = '100%';
         }
-    },
-
-    destroy: function(){
-        this.destroyButtons();
     }
-
-
-  } );
+  } 
+);

@@ -188,19 +188,18 @@ dojo.declare(
             return true;
         },
         setButtons: function (l, c, r) {
-            var bDiv = this.buttonPanelNode;
             // Reset buttons if needed
             this.btnsLeft = l || this.btnsLeft;
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
             
-            // Clean up previous panel if any
-            if (this.btnPanel) {
-                this.btnPanel.destroyButtons();
-                if (bDiv.firstChild) {
-                    bDiv.removeChild(bDiv.firstChild);
+            if (this.btnPanel){
+                // Only clean up if btnPanel.domNode exists
+                // otherwise cleanup already occurred
+                if (this.btnPanel.domNode){
+                    this.btnPanel.destroyRecursive()
                 }
-                this.btnPanel.destroy();
+                this.btnPanel = null;
             }
            
             // Create and append the panel
@@ -211,7 +210,8 @@ dojo.declare(
             this.btnPanel = new cosmo.ui.widget.ButtonPanel(
                 { btnsLeft: this.btnsLeft, 
                   btnsCenter: this.btnsCenter,
-                  btnsRight: this.btnsRight }, bDiv);
+                  btnsRight: this.btnsRight });
+            this.buttonPanelNode.appendChild(this.btnPanel.domNode);
             return true;
         },
         render: function () {
@@ -365,7 +365,6 @@ dojo.declare(
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
-                
                 // Set style visibility to hidden -- display needs to be
                 // block in order to do sizing/positioning, but we don't
                 // want to see stuff shifting around after we can see the
@@ -394,14 +393,11 @@ dojo.declare(
                 // Sizing
                 this.width = this.width || DIALOG_BOX_WIDTH;
                 this.height = this.height || DIALOG_BOX_HEIGHT;                
-                
                 this._setUpDialog();
-                
                 var waitForIt = this.render() && this.center();
                 this.renderUiMask();
                 this.domNode.style.display = 'block';
                 this.domNode.style.zIndex = 2000;
-
                 // Have to measure for content area height once div is actually on the page
                 if (this.setWidth() &&
                 this.setHeight()) {
@@ -425,10 +421,8 @@ dojo.declare(
 
                 // Clean up previous panel if any
                 if (this.btnPanel) {
-                    if (bDiv.firstChild) {
-                        bDiv.removeChild(bDiv.firstChild);
-                    }
-                    this.btnPanel.destroy();
+                    this.btnPanel.destroyRecursive();
+                    this.btnPanel = null;
                 }
  
                 this.title = '';
@@ -441,7 +435,7 @@ dojo.declare(
                 this.uiFullMask.style.display = 'none';
                 this.isDisplayed = false;
                 if (this.content instanceof dijit._Widget) {
-                    this.content.destroy();
+                    this.content.destroyRecursive();
                 }
                 this.content = null;
                 // Cleanup -- wipe DOM inside container

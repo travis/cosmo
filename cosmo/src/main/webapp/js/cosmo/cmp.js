@@ -27,6 +27,7 @@ dojo.provide("cosmo.cmp");
 dojo.require("cosmo.util.string");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
+dojo.require("cosmo.util.lang");
 
 DEFAULT_PAGE_NUMBER = 1;
 DEFAULT_PAGE_SIZE = 25;
@@ -470,7 +471,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         _wrapXMLHandlerFunctions: function (/*Object*/ hDict,
                                             /*function*/ xmlParseFunc){
             var self = this;
-            var handlerDict = dojo.clone(hDict) || {};
+            var handlerDict = cosmo.util.lang.shallowCopy(hDict) || {};
             if (handlerDict.load || !(handlerDict.load && handlerDict.handle)){
                 var old_load = handlerDict.load;
                 handlerDict.load = function(response, ioArgs){
@@ -484,7 +485,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         _wrap204Bandaid: function(hDict){
-            var handlerDict = dojo.clone(hDict) || {};
+            var handlerDict = cosmo.util.lang.shallowCopy(hDict) || {};
 
             if (handlerDict.load){
                 handlerDict.load = this._204Bandaid(handlerDict.load);

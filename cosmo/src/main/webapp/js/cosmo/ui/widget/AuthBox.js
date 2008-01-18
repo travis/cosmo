@@ -88,7 +88,7 @@ dojo.declare(
             return false;
         },
 
-        buildRendering: function () {
+        postCreate: function () {
             var table = _createElem('table');
             var tbody = _createElem('tbody');
             var tr = null;
@@ -164,9 +164,6 @@ dojo.declare(
         
         constructor: function(){
             this.deferred = new dojo.Deferred();
-        },
-
-        postCreate: function () {
         }
     }
 );

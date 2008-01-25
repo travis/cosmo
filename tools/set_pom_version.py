@@ -22,7 +22,9 @@ def add_base(path):
     return os.path.join(base_dir, path)
 
 def usage():
-    print "Usage"
+    print """Usage:
+    %s -v cosmo_version -d dojo_version [-b base_directory]
+""" % sys.argv[0]
 
 def get_new_versions():
     version = None
@@ -53,6 +55,15 @@ def get_old_versions():
     except AttributeError, e:
         print "Could not figure out old version number."
 
+def replace_string(filename, find, replace):
+    old_file = open(filename)
+    content = old_file.read()
+    old_file.close()
+    
+    new_file = open(filename, 'w')
+    new_file.write(content.replace(find, replace))
+    new_file.close()
+
 if __name__ == "__main__":
     
     required_files = [parent_pom] + [dojo_pom] + set_cosmo_poms + set_dojo_poms
@@ -65,15 +76,19 @@ if __name__ == "__main__":
     version, dojo_version = get_new_versions()
     old_version, old_dojo_version = get_old_versions()
 
-    print version
-    print dojo_version
-    print old_version
-    print old_dojo_version
-    
     if version == None or dojo_version == None:
+        print "Error: need both version numbers."
         usage()
         sys.exit(1)
 
+    for filename in set_cosmo_poms:
+        replace_string(filename, old_version, version)
+
+    for filename in set_dojo_poms:
+        replace_string(filename, old_dojo_version, dojo_version)
+        
+        
+    
     
 
     

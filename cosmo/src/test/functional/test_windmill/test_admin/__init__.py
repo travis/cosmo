@@ -26,17 +26,20 @@ logout = """{"method": "click", "params": {"link" : "Log out"}}
 from windmill.authoring import RunJsonFile
 import windmill
 
-lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us']
+lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://trunk.osaf.us']
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:
-        json = login_with_root_lab_json
+        json = ""
     else:
         json = login_with_root_snarf_json
-    RunJsonFile('login_with_user_json.json', lines=json.splitlines())()
+    RunJsonFile('login_with_root_user.json', lines=json.splitlines())()
     
 def teardown_module(module):
-    RunJsonFile('log_out.json', lines=logout.splitlines())()
+  if windmill.settings['TEST_URL'] in lab_urls:
+        json = ""
+  else:
+        RunJsonFile('log_out.json', lines=logout.splitlines())()
 
     
     

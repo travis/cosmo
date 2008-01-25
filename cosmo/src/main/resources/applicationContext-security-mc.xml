@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+          "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-    Copyright 2005-2007 Open Source Applications Foundation
+    Copyright 2005-2008 Open Source Applications Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,22 +18,19 @@
     limitations under the License.
 -->
 
-<!-- Security configuration for WebDAV -->
+<!-- Security configuration for morse code -->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+<beans>
 
-  <!-- interceptor which performs authorization for DAV requests -->
+  <!-- interceptor which performs authorization for morse code requests -->
 
-  <bean id="davFilterInvocationInterceptor"
+  <bean id="mcFilterInvocationInterceptor"
         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
     <property name="accessDecisionManager">
-      <bean class="org.osaf.cosmo.dav.acegisecurity.DavAccessDecisionManager">
+      <bean class="org.osaf.cosmo.mc.acegisecurity.MorseCodeAccessDecisionManager">
          <constructor-arg><ref bean="userService"/></constructor-arg>
          <constructor-arg><ref bean="contentService"/></constructor-arg>
       </bean>
@@ -45,26 +44,15 @@
      </property>
   </bean>
 
-  <bean id="davExceptionTranslationFilter"
-        class="org.acegisecurity.ui.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint">
-      <ref bean="protocolAuthenticationEntryPoint"/>
-    </property>
-    <property name="accessDeniedHandler">
-      <bean class="org.osaf.cosmo.dav.acegisecurity.DavAccessDeniedHandler"/>
-    </property>
-    <property name="createSessionAllowed" value="false"/>
-  </bean>
-
   <!-- filter chain that kicks off request-time processing -->
 
-  <bean id="davFilterChainProxy"
+  <bean id="mcFilterChainProxy"
         class="org.acegisecurity.util.FilterChainProxy">
     <property name="filterInvocationDefinitionSource">
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,davExceptionTranslationFilter,davFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,mcFilterInvocationInterceptor
       </value>
     </property>
   </bean>

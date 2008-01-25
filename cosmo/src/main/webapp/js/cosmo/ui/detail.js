@@ -1593,12 +1593,12 @@ cosmo.ui.detail.ButtonSection = function () {
         var d = self.domNode;
         d.style.padding = '6px';
         var t = _createElem('div');
-        t.id = 'detailRemoveButton';
+        t.id = 'detailRemoveButtonContainer';
         t.className = 'floatLeft';
         self.removeButtonNode = t;
         d.appendChild(t);
         var t = _createElem('div');
-        t.id = 'detailSaveButton';
+        t.id = 'detailSaveButtonContainer';
         t.className = 'floatRight';
         self.saveButtonNode = t;
         d.appendChild(t);

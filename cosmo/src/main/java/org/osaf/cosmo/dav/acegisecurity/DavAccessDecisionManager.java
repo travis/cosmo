@@ -193,9 +193,17 @@ public class DavAccessDecisionManager
             return;
         }
 
-        CollectionItem home = findHomeCollection(evaluator.getPrincipal());
-
-        evaluateItemAcl(collection, home, method, evaluator);
+        CollectionItem parent = null;
+        
+        // If collection doesn't exist, then the parent must be
+        // the principal's home collection, otherwise use the parent
+        // of the collection (there should only be one)
+        if(collection==null)
+            parent = findHomeCollection(evaluator.getPrincipal());
+        else 
+            parent = collection.getParents().iterator().next();
+        
+        evaluateItemAcl(collection, parent, method, evaluator);
     }
 
     protected void evaluateItem(UriTemplate.Match match,

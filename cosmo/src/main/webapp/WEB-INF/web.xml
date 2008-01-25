@@ -27,6 +27,7 @@
       classpath:applicationContext.xml
       classpath:applicationContext-security-cmp.xml
       classpath:applicationContext-security-dav.xml
+      classpath:applicationContext-security-mc.xml
       classpath:applicationContext-security-webcal.xml
       classpath:applicationContext-security-feed.xml
       classpath:applicationContext-security-pim.xml
@@ -93,6 +94,14 @@
     </init-param>
   </filter>
   <filter>
+    <filter-name>mc-security</filter-name>
+    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <init-param>
+      <param-name>targetBean</param-name>
+      <param-value>mcFilterChainProxy</param-value>
+    </init-param>
+  </filter>
+  <filter>
     <filter-name>webcal-security</filter-name>
     <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
     <init-param>
@@ -155,8 +164,8 @@
   	<filter-class>org.osaf.cosmo.filters.HttpOverrideFilter</filter-class>
   </filter>
   <filter>
-    <filter-name>deadlock-retry-filter</filter-name>
-    <filter-class>org.osaf.cosmo.filters.DeadlockRetryFilter</filter-class>
+    <filter-name>retry-filter</filter-name>
+    <filter-class>org.osaf.cosmo.filters.RetryFilter</filter-class>
     <init-param>
       <param-name>retries</param-name>
       <param-value>10</param-value>
@@ -187,7 +196,7 @@
     <url-pattern>/dav/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>deadlock-retry-filter</filter-name>
+    <filter-name>retry-filter</filter-name>
     <url-pattern>/dav/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -195,7 +204,7 @@
     <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>deadlock-retry-filter</filter-name>
+    <filter-name>retry-filter</filter-name>
     <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -203,11 +212,11 @@
     <url-pattern>/atom/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>dav-security</filter-name>
+    <filter-name>mc-security</filter-name>
     <url-pattern>/mc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>deadlock-retry-filter</filter-name>
+    <filter-name>retry-filter</filter-name>
     <url-pattern>/mc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>

@@ -81,6 +81,13 @@
             <filtered>false</filtered>
             <fileMode>420</fileMode>
         </file>
+        <file>
+            <source>${basedir}/../cosmo/build/context.xml</source>
+            <outputDirectory>tomcat/conf/Catalina/localhost</outputDirectory>
+            <destName>chandler.xml</destName>
+            <filtered>false</filtered>
+            <fileMode>420</fileMode>
+        </file>
     </files>
     <dependencySets>
         <dependencySet>

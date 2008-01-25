@@ -17,19 +17,25 @@ package org.osaf.cosmo.filters;
 
 import java.io.IOException;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.commons.io.IOUtils;
+import org.osaf.cosmo.util.BufferedServletOutputStream;
+
 /**
- * HttpServletResponseWrapper that catchs calls to sendError() and
- * delays invoking sendError on the wrapped response until
- * flushError() is called.  This allows a call to sendError() to
- * be voided.
+ * HttpServletResponseWrapper that catches INTERNAL_SERVER_ERROR
+ * responses (status code 500) and allows the error to be flushed
+ * or cleared.  This allows an error response to be voided, which
+ * is useful for servlet filters that may want to retry the request
+ * before returning an error to the client.
  */
 public class ResponseErrorWrapper extends HttpServletResponseWrapper {
     
-    private String msg = null;
-    private Integer code = null;
+    private String errorMsg = null;
+    private BufferedServletOutputStream bufferedOutput = null;
+    private boolean hasError = false;
     
     public ResponseErrorWrapper(HttpServletResponse response) throws IOException {
         super(response);
@@ -37,40 +43,104 @@ public class ResponseErrorWrapper extends HttpServletResponseWrapper {
 
     @Override
     public void sendError(int code, String msg) throws IOException {
-        this.code = code;
-        this.msg = msg;
+        // Trap 500's
+        if(code==SC_INTERNAL_SERVER_ERROR) {
+            hasError = true;
+            errorMsg = msg;
+        } else {
+            super.sendError(code, msg);
+        }
     }
 
     @Override
     public void sendError(int code) throws IOException {
-        this.code = code;
+        // Trap 500's
+        if(code==SC_INTERNAL_SERVER_ERROR) {
+            hasError = true;
+        } else {
+            super.sendError(code);
+        }
     }
     
     /**
-     * Invoke sendError() on wrapped response if sendError() was
-     * invoked on wrapper.
+     * If a 500 error was trapped, then flush it.  This can involve invoking
+     * sendError() or setStatus() along with writing any data that
+     * was buffered.
      * @returns true if an error was flushed, otherwise false
      * @throws IOException
      */
     public boolean flushError() throws IOException {
-        if(code!=null && msg!=null) {
-            super.sendError(code, msg);
+        if(hasError) {
+            if(bufferedOutput!=null && !bufferedOutput.isEmpty()) {
+                super.setStatus(SC_INTERNAL_SERVER_ERROR);
+                IOUtils.copy(bufferedOutput.getBufferInputStream(), super.getOutputStream()); 
+            }
+            else if (errorMsg!=null) {
+                super.sendError(SC_INTERNAL_SERVER_ERROR, errorMsg);
+            }
+            else
+                super.sendError(SC_INTERNAL_SERVER_ERROR);
+            
             clearError();
             return true;
         }
-        else if(code!=null) {
-            super.sendError(code);
-            clearError();
-            return true;
-        }
+        
         return false;
     }
     
     /**
-     * Clear error, voiding sendError().
+     * Clear error, voiding any 500 response sent.
      */
     public void clearError() {
-        code = null;
-        msg = null;
+        bufferedOutput = null;
+        errorMsg = null;
+        hasError = false;
+    }
+
+    @Override
+    public ServletOutputStream getOutputStream() throws IOException {
+        
+        // If an error was trapped, then return our custom outputstream
+        // so that we can buffer any data sent and be able to send
+        // it later on.
+        if(hasError) {
+            if(bufferedOutput==null)
+                bufferedOutput = new BufferedServletOutputStream();
+            
+            return bufferedOutput;
+        }
+        
+        return super.getOutputStream();
+    }
+
+    @Override
+    public void setStatus(int sc, String sm) {
+        // trap 500 server errors
+        if(sc==SC_INTERNAL_SERVER_ERROR) {
+            hasError = true;
+            errorMsg = sm;
+        } else {
+            super.setStatus(sc, sm);
+        }
+    }
+
+    @Override
+    public void setStatus(int sc) {
+        // trap 500 server errors
+        if(sc==this.SC_INTERNAL_SERVER_ERROR) {
+            hasError = true;
+        } else {
+            super.setStatus(sc);
+        }
+    }
+    
+    /**
+     * @return buffered outputstream, only has a value if
+     *         an error has been trapped and getOutputStream()
+     *         was called, meaning the request handler was
+     *         trying to send error data.
+     */
+    public BufferedServletOutputStream getBufferedOutputStream() {
+        return bufferedOutput;
     }
 }

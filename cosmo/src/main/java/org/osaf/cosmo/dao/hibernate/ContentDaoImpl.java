@@ -84,6 +84,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             return collection;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -162,6 +163,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             return collection;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -184,6 +186,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             getSession().flush();
             return content;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -202,6 +205,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             getSession().flush();
             return content;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -221,6 +225,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             hibQuery.setFlushMode(FlushMode.MANUAL);
             return (CollectionItem) hibQuery.uniqueResult();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -238,6 +243,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
             return (CollectionItem) item;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -255,6 +261,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
 
             return (ContentItem) item;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } 
     }
@@ -271,6 +278,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             hibQuery.setFlushMode(FlushMode.MANUAL);
             return (ContentItem) hibQuery.uniqueResult();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -283,6 +291,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             getSession().flush();
             return collection;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -301,6 +310,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             
             return collection;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -319,6 +329,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             getSession().flush();
             return content;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -341,6 +352,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             removeCollectionRecursive(collection);
             getSession().flush();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -360,6 +372,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             removeContentRecursive(content);
             getSession().flush();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -378,6 +391,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 removeContentRecursive(content);
             getSession().flush();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -411,6 +425,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             return children;
             
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -430,6 +445,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                }
            }
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
         

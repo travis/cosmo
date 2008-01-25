@@ -15,15 +15,11 @@
  */
 package org.osaf.cosmo.ui;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 /**
@@ -36,11 +32,14 @@ public class ExceptionResolver extends SimpleMappingExceptionResolver {
     // SimpleMappingExceptionResolver methods
 
     /**
-     * Overrides the superclass method to log the exception at the error
-     * level.
+     * Overrides the superclass method to log the exception at the error level.
      */
-	protected void logException(Exception e,
-	                            HttpServletRequest request) {
-	    log.error("Internal UI error", e);
-	}
+    protected void logException(Exception e, HttpServletRequest request) {
+        // log at info instead of error for things like unsupported method
+        if (e instanceof HttpRequestMethodNotSupportedException)
+            log.info("Unsupported Method " + request.getMethod() + " for "
+                    + request.getRequestURI());
+        else
+            log.error("Internal UI error", e);
+    }
 }

@@ -22,7 +22,6 @@ create_user_json = """{"method": "click", "params": {"link" : "Create a new acco
 {"params": {"text": "tester", "id": "password"},  "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
 {"method": "waits.forElement", "params": {"id": "modalDialogPrompt", "timeout": 40000}}
-{"method": "waits.forElement", "params": {"id": "modalDialogPrompt"}}
 {"params": {"validator": "You have successfully created your Chandler Server account.", "id": "modalDialogPrompt"},  "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"},  "method": "click"}"""
 
@@ -45,7 +44,7 @@ create_user_json_lab = """{"params": {"link": "Sign up."},  "method": "click"}
 {"params": {"validator": "Passwords do not match.", "id": "modalDialogContent"},  "method": "asserts.assertText"}
 {"params": {"text": "tester", "id": "password"},  "method": "type"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
-{"method": "waits.forElement", "params": {"id": "modalDialogPrompt"}}
+{"method": "waits.forElement", "params": {"id": "modalDialogPrompt", "timeout": 40000}}
 {"params": {"validator": "You have successfully created your Chandler Hub account.", "id": "modalDialogPrompt"},  "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"},  "method": "click"}"""
 
@@ -62,7 +61,7 @@ login_with_user_json = """{"method": "type", "params": {"id" : "loginDialogUsern
 from windmill.authoring import RunJsonFile
 import windmill
 
-lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us']
+lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://trunk.osaf.us']
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:

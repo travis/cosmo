@@ -76,6 +76,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             getSession().flush();
             return user;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -88,6 +89,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         try {
             return findUserByUsername(username);
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -99,6 +101,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         try {
             return findUserByUid(uid);
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -110,6 +113,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         try {
             return findUserByActivationId(id);
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -121,6 +125,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         try {
             return findUserByEmail(email);
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -134,6 +139,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
             return users;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -150,6 +156,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
             return new ArrayPagedList<User, User.SortType>(pageCriteria, results, size.intValue());
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -161,6 +168,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             if (user != null)
                 removeUser(user);
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -174,6 +182,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             getSession().delete(user);
             getSession().flush();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -199,6 +208,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
             return user;
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } catch (InvalidStateException ise) {
             logInvalidStateException(ise);
@@ -211,6 +221,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             getSession().save(passwordRecovery);
             getSession().flush();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         } 
     }
@@ -222,6 +233,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             hibQuery.setCacheable(true);
             return (PasswordRecovery) hibQuery.uniqueResult();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }
@@ -231,6 +243,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             getSession().delete(passwordRecovery);
             getSession().flush();
         } catch (HibernateException e) {
+            getSession().clear();
             throw convertHibernateAccessException(e);
         }
     }

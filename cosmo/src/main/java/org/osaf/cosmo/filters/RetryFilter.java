@@ -28,27 +28,26 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.server.ServerConstants;
 
-import org.springframework.dao.ConcurrencyFailureException;
-
 /**
- * Filter that detects database deadlocks 
- * (catches ConcurrencyFailureException) and retries
- * the request a number of times before failing.  The filter
- * only applies to "update" operations, that is PUT, POST, DELETE.
+ * Filter that searches for known exception types (either caught
+ * as runtime exceptions or stored in a request attribute), and 
+ * retries the request a number of times before failing.  
  * 
- * The filter can also be configured to catch other exception
- * types and be applied to other methods using filter init
- * parameters.
+ * The filter can be configured watch any HTTP method (PUT,POST,DELETE, etc)
+ * and search for any exception type and retry any number of times.
+ * 
+ * This filter is useful for catching runtime exceptions such as
+ * database deadlocks and other concurrency issues and retrying the 
+ * request a number of times.
  */
-public class DeadlockRetryFilter implements Filter, ServerConstants {
+public class RetryFilter implements Filter, ServerConstants {
     
-    private static final Log log = LogFactory.getLog(DeadlockRetryFilter.class);
+    private static final Log log = LogFactory.getLog(RetryFilter.class);
     private int maxRetries = 10;
     private int maxMemoryBuffer = 1024*256;
-    private Class[] exceptions = new Class[] {ConcurrencyFailureException.class};
+    private Class[] exceptions = new Class[] {};
     private String[] methods = new String[] {"PUT", "POST", "DELETE", "MKCALENDAR" };
     
     private static final String PARAM_RETRIES = "retries";
@@ -68,11 +67,13 @@ public class DeadlockRetryFilter implements Filter, ServerConstants {
 
         // only care about certain methods
         if(isFilterMethod(method)) {
-            // wrap request so we can utilize buffered content
+            // Wrap request so we can buffer the request in the event
+            // it needs to be retried.  If the request isn't buffered,
+            // then we can't consume the servlet inputstream again.
             request = new BufferedRequestWrapper((HttpServletRequest) request, maxMemoryBuffer);
             
-            // Wrap response so we can veto a sendError() set by the
-            // abdera RequestProcessor
+            // Wrap response so we can trap any 500 responses before they
+            // get to the client
             response = new ResponseErrorWrapper((HttpServletResponse) response);
             
             int attempts = 0;
@@ -83,10 +84,8 @@ public class DeadlockRetryFilter implements Filter, ServerConstants {
                 
                 try {
                     chain.doFilter(request, response);
-                } catch (Exception e) {
-                    // Shouldn't happen but this filter supports
-                    // catching the exception and looking for it
-                    // in the request.
+                } catch (RuntimeException e) {
+                    // Catch runtime exceptions
                     if(isFilterException(e)) {
                         ex = e;
                     } else {
@@ -96,29 +95,30 @@ public class DeadlockRetryFilter implements Filter, ServerConstants {
                 }
                 
                 // If we didn't catch it, then look for the exception
-                // in the request
+                // in the request attributes
                 if(ex==null)
                     ex = findFilterException(httpRequest);
                 
                 // If there was an exception that we were looking for
-                // (either caught or found in the request, then prepare
+                // (either caught or found in the request), then prepare
                 // to retry.
                 if (ex != null) {
                     attempts++;
-                    ((ResponseErrorWrapper) response).clearError();
-                    log.warn("caught: " + ex.getMessage() + " : retrying request " + httpRequest.getMethod()
-                        + " " + httpRequest.getRequestURI() + " "
-                        + attempts);
 
                     // Fail after maxRetries attempts
                     if(attempts > maxRetries) {
                         log.error("reached maximum retries for "
                             + httpRequest.getMethod() + " "
                             + httpRequest.getRequestURI());
-                        sendError((ResponseErrorWrapper) response);
+                        if(!((ResponseErrorWrapper) response).flushError())
+                            sendError((ResponseErrorWrapper) response);
                     }
                     // Otherwise, prepare to retry
                     else {
+                        log.warn("caught: " + ex.getMessage() + " : retrying request " + httpRequest.getMethod()
+                            + " " + httpRequest.getRequestURI() + " "
+                            + attempts);
+                        ((ResponseErrorWrapper) response).clearError();
                         ((BufferedRequestWrapper) request).retryRequest();
                         Thread.yield();
                     }

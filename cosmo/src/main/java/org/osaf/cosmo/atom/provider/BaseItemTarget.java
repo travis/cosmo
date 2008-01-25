@@ -15,14 +15,11 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import java.util.Date;
-
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.AbstractTarget;
-import org.apache.abdera.util.EntityTag;
+import org.apache.abdera.protocol.server.impl.DefaultTarget;
 
-public abstract class BaseItemTarget extends AbstractTarget
+public abstract class BaseItemTarget extends DefaultTarget
     implements AuditableTarget {
 
     private String projection;

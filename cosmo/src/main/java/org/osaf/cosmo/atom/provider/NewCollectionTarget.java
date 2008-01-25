@@ -17,8 +17,7 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.AbstractTarget;
-
+import org.apache.abdera.protocol.server.impl.DefaultTarget;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 
@@ -26,7 +25,7 @@ import org.osaf.cosmo.model.User;
  * A target that identifies a particular user and home collection for which
  * a collection is to be creatd.
  */
-public class NewCollectionTarget extends AbstractTarget {
+public class NewCollectionTarget extends DefaultTarget {
 
     private User user;
     private HomeCollectionItem home;

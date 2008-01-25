@@ -23,7 +23,6 @@
  *      Most methods take handlerDicts identical to those required
  *      by dojo.io.bind.
  */
-
 dojo.provide("cosmo.service.transport.Atom");
 
 dojo.require("cosmo.env");

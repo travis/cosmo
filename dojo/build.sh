@@ -20,3 +20,4 @@ cd ..
 gzip -9c ../release/dojo/dojo/dojo.js > ../release/dojo/dojo/dojo.js.gzip-compressed
 gzip -9c ../release/dojo/dojo/cosmo-pim.js > ../release/dojo/dojo/cosmo-pim.js.gzip-compressed
 gzip -9c ../release/dojo/dojo/cosmo-login.js > ../release/dojo/dojo/cosmo-login.js.gzip-compressed
+

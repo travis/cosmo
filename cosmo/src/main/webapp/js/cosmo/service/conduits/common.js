@@ -25,7 +25,6 @@
  *
  */
 dojo.provide("cosmo.service.conduits.common");
-
 //TODO: remove once we move create/delete into Atom
 dojo.require("cosmo.caldav");
 dojo.require("dojo.DeferredList");

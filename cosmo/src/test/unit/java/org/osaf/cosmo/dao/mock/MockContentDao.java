@@ -286,6 +286,10 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         removeItem(content);
     }
 
+    public void removeUserContent(User user) {
+        // do nothing for now
+    }
+
     /**
      * Remove collection item
      *

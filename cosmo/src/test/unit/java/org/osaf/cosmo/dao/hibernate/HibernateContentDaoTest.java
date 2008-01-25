@@ -569,6 +569,31 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertTrue(root.getChildren().size()==0);
         
     }
+    
+    public void testContentDaoDeleteUserContent() throws Exception {
+        User user1 = getUser(userDao, "testuser1");
+        User user2 = getUser(userDao, "testuser2");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user1);
+
+        // Create test content, with owner of user2
+        ContentItem item = generateTestContent();
+        item.setOwner(user2);
+        
+        // create content in user1's home collection
+        ContentItem newItem = contentDao.createContent(root, item);
+
+        clearSession();
+
+        user1 = getUser(userDao, "testuser1");
+        user2 = getUser(userDao, "testuser2");
+       
+        // remove user2's content, which should include the item created
+        // in user1's home collections
+        contentDao.removeUserContent(user2);
+        
+        root = (CollectionItem) contentDao.getRootItem(user1);
+        Assert.assertEquals(0, root.getChildren().size());
+    }
 
     public void testDeleteContentByPath() throws Exception {
         User user = getUser(userDao, "testuser");

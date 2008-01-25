@@ -441,7 +441,11 @@ public class StandardUserService extends BaseService implements UserService {
         if(user==null)
             return;
         HomeCollectionItem home = contentDao.getRootItem(user);
+        // remove collections/subcollections
         contentDao.removeCollection(home);
+        // remove dangling items 
+        // (items that only exist in other user's collections)
+        contentDao.removeUserContent(user);
         userDao.removeUser(user);
     }
 }

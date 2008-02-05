@@ -31,6 +31,12 @@ dojo.require("cosmo.service.exception");
 
 dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
 
+
+cosmo.view.cal.init = function(){
+    cosmo.view.viewBase.init.apply(this);
+    cosmo.view.cal.setQuerySpan(cosmo.app.pim.currDate);
+}
+
 cosmo.view.cal.hasBeenInitialized = false;
 
 cosmo.view.cal.viewId = cosmo.view.names.CAL;
@@ -91,7 +97,7 @@ cosmo.view.cal.loadItems = function (p) {
     var id = '';
     var ev = null;
     var collectionReg = cosmo.view.cal.collectionItemRegistries;
-
+    var queryDate = null;
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
@@ -116,12 +122,8 @@ cosmo.view.cal.loadItems = function (p) {
         else {
             queryDate = goToNav;
         }
+        _cal.setQuerySpan(queryDate);
     }
-    else {
-        // Default on app load is to get the current week
-        queryDate = cosmo.app.pim.currDate;
-    }
-    _cal.setQuerySpan(queryDate);
 
     // Opts obj to pass to topic publishing
     var opts = {

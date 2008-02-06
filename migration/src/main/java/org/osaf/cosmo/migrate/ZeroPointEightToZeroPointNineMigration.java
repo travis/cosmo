@@ -56,6 +56,7 @@ public class ZeroPointEightToZeroPointNineMigration extends AbstractMigration {
         HashSet<String> dialects = new HashSet<String>();
         dialects.add("Derby");
         dialects.add("MySQL5");
+        dialects.add("PostgreSQL");
         return dialects;
     }
 

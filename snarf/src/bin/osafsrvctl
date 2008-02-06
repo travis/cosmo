@@ -72,7 +72,7 @@ if [ -f "$OSAFSRV_BINDIR"/"$CFGSCRIPT" ]; then
 fi
 
 # enable/disable features
-OSAFSRV_OPTS="-server -Dfile.encoding=UTF-8 -Dnet.fortuna.ical4j.timezone.registry=org.osaf.cosmo.calendar.CosmoTimeZoneRegistryFactory -Dical4j.unfolding.relaxed=true -Dical4j.parsing.relaxed=true -Dical4j.validation.relaxed=true"
+OSAFSRV_OPTS="-server -Dfile.encoding=UTF-8"
 check_feature $OSAFSRV_JMX_LOCAL
 if [ $? -lt 2 ]; then
     OSAFSRV_OPTS="$OSAFSRV_OPTS -Dcom.sun.management.jmxremote"

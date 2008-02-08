@@ -16,7 +16,7 @@
 
 dojo.provide("cosmo.ui.resize_area");
 
-dojo.require("dojo.event.*");
+
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 

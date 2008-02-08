@@ -26,7 +26,7 @@
 dojo.provide("cosmo.ui.widget.GraphicRadioButtonSet");
 
 dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
+
 dojo.require("cosmo.env");
 dojo.require("cosmo.env");
 

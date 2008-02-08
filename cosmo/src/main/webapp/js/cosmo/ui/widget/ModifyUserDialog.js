@@ -27,7 +27,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("dojo.validate.web");
-dojo.require("dojo.event");
+
 dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWidget,

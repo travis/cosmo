@@ -23,7 +23,7 @@
 
 dojo.provide("cosmo.ui.detail");
 
-dojo.require("dojo.event.*");
+
 dojo.require("dojo.fx");
 dojo.require("dojox.date.posix");
 dojo.require("cosmo.app.pim");

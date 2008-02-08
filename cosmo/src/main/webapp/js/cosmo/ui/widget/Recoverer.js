@@ -26,7 +26,7 @@
 dojo.provide("cosmo.ui.widget.Recoverer");
 
 dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
+
 dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");

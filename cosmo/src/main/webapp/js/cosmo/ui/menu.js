@@ -17,7 +17,7 @@
 dojo.provide('cosmo.ui.menu');
 
 dojo.require("dojo.io.cookie");
-dojo.require("dojo.event.*");
+
 dojo.require("cosmo.env");
 dojo.require('cosmo.app');
 dojo.require('cosmo.account.preferences');
@@ -615,9 +615,9 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
             var removeMenu = $('hierMenuLevel_' + n);
             delete this._expandedItemForEachLevel[n];
             if (removeMenu) {
-                dojo.event.disconnect(removeMenu, 'onmouseover',
+                dojo.disconnect(removeMenu, 'onmouseover',
                     this, 'handleMouseOver');
-                dojo.event.disconnect(removeMenu, 'onclick',
+                dojo.disconnect(removeMenu, 'onclick',
                     this, 'handleClick');
                 document.body.removeChild(removeMenu);
             }

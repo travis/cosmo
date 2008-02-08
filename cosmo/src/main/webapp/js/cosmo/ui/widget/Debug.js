@@ -17,7 +17,7 @@
 dojo.provide("cosmo.ui.widget.Debug");
 
 dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
+
 
 dojo.widget.defineWidget("cosmo.ui.widget.Debug", dojo.widget.HtmlWidget, {
 

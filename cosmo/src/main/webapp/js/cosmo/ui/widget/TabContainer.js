@@ -24,7 +24,7 @@
 dojo.provide("cosmo.ui.widget.TabContainer");
 
 dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
+
 dojo.require("cosmo.env");
 
 dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget, {

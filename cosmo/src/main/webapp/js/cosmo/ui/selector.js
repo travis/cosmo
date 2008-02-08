@@ -17,7 +17,7 @@
 dojo.provide("cosmo.ui.selector");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
-dojo.require("dojo.event.*");
+
 dojo.require("dojo.gfx.color.hsv");
 
 dojo.require("cosmo.app.pim");

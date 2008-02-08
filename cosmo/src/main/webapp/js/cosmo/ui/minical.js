@@ -506,7 +506,7 @@ cosmo.ui.minical.MiniCal = function (p) {
                 dayOffset = dt.getDay();
 
                 // Label month name
-                monthName = dojo.date.strftime(dt, '%B %Y');
+                monthName = dojox.date.posix.strftime(dt, '%B %Y');
                 monthNameDiv = document.getElementById(self.id +
                     '_month' + i + '_monthName');
                 monthNameDiv.appendChild(document.createTextNode(monthName));

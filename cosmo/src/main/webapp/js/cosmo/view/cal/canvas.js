@@ -289,17 +289,17 @@ cosmo.view.cal.canvas = new function () {
 
             // Format like 'March-April, 2006'
             if (mS < mE) {
-                str += dojo.date.strftime(vS, '%B-');
-                str += dojo.date.strftime(vE, '%B %Y');
+                str += dojox.date.posix.strftime(vS, '%B-');
+                str += dojox.date.posix.strftime(vE, '%B %Y');
             }
             // Format like 'December 2006-January 2007'
             else if (mS > mE) {
-                str += dojo.date.strftime(vS, '%B %Y-');
-                str += dojo.date.strftime(vE, '%B %Y');
+                str += dojox.date.posix.strftime(vS, '%B %Y-');
+                str += dojox.date.posix.strftime(vE, '%B %Y');
             }
             // Format like 'April 2-8, 2006'
             else {
-                str += dojo.date.strftime(vS, '%B %Y');
+                str += dojox.date.posix.strftime(vS, '%B %Y');
             }
             if (headerDiv.firstChild) {
                 headerDiv.removeChild(headerDiv.firstChild);

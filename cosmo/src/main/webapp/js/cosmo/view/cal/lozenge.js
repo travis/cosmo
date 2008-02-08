@@ -149,7 +149,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.updateText = function () {
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();
 
-    var strtime = dojo.date.strftime(startDate, '%I:%M%p');
+    var strtime = dojox.date.posix.strftime(startDate, '%I:%M%p');
     // Trim leading zero if need be
     strtime = strtime.indexOf('0') == 0 ? strtime.substr(1) : strtime;
     // Display timezone info for event if it has one

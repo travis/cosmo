@@ -418,8 +418,8 @@ cosmo.ui.detail.MarkupBar = function (p) {
                          _("Sidebar.Email.Timezone"), startDate.tzId , "%0d%0a"]);
                     }
                     body = body.concat([
-                         _("Sidebar.Email.Starts") , dojo.date.strftime(startDate, timeFormat) , "%0d%0a" ,
-                         _("Sidebar.Email.Ends") , dojo.date.strftime(endDate, timeFormat) , "%0d%0a"]);
+                         _("Sidebar.Email.Starts") , dojox.date.posix.strftime(startDate, timeFormat) , "%0d%0a" ,
+                         _("Sidebar.Email.Ends") , dojox.date.posix.strftime(endDate, timeFormat) , "%0d%0a"]);
                     if (eventStamp.getAllDay()) {
                         body.push(_("Sidebar.Email.AllDay") + "%0d%0a");
                     }
@@ -430,7 +430,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
                             rrule.getFrequency()]);
                         if (rrule.getEndDate()) {
                             body = body.concat([_("Sidebar.Email.EndingOn") ,
-                                dojo.date.strftime(rrule.getEndDate(), timeFormat)]);
+                                dojox.date.posix.strftime(rrule.getEndDate(), timeFormat)]);
                         }
                         body.push(".%0d%0a");
                     }
@@ -1450,7 +1450,7 @@ cosmo.ui.detail.EventFormElements= function () {
             _html.enableFormElem(recurEnd, 'text');
             if (recur.getEndDate()) {
                 _html.setTextInput(recurEnd,
-                    dojo.date.strftime(recur.getEndDate(), '%m/%d/%Y'), false, false);
+                    dojox.date.posix.strftime(recur.getEndDate(), '%m/%d/%Y'), false, false);
             }
             else {
                 _html.setTextInput(recurEnd, 'mm/dd/yyyy', true, false);

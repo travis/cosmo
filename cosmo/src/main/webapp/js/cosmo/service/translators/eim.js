@@ -1112,7 +1112,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         date.setMinutes(59);
         date.setSeconds(59);
         date = date.createDateForTimezone("utc");
-        return dojo.date.strftime(date, "%Y%m%dT%H%M%SZ")
+        return dojox.date.posix.strftime(date, "%Y%m%dT%H%M%SZ")
     },
 
     rrlePropsToICal: function (rProps, startDate){

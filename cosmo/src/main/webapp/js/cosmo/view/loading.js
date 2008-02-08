@@ -58,7 +58,7 @@ cosmo.view.loading.StatusMessage = function (p) {
             cosmo.view.loading.statusProcessing = false;
             self.domNode.style.zIndex = -1;
         };
-        dojo.lfx.fadeOut(this.domNode, 1000,
+        dojo.fadeOut(this.domNode, 1000,
             dojo.lfx.easeOut, f).play();
     };
     this.handlePub_calEvent = function (cmd) {

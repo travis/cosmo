@@ -362,15 +362,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         userHashToXML: function(/*Object*/ userHash){
+            var isRoot = userHash.username == "root";
             return '<?xml version="1.0" encoding="utf-8" ?>\r\n' +
                 '<user xmlns="http://osafoundation.org/cosmo/CMP">' +
-                (userHash.username? '<username>' + cosmo.util.string.escapeXml(userHash.username) + '</username>' : "") +
+                (userHash.username && !isRoot? '<username>' + cosmo.util.string.escapeXml(userHash.username) + '</username>' : "") +
                 (userHash.password? '<password>' + cosmo.util.string.escapeXml(userHash.password) + '</password>' : "") +
-                (userHash.firstName? '<firstName>' + cosmo.util.string.escapeXml(userHash.firstName) + '</firstName>' : "") +
-                (userHash.lastName? '<lastName>' + cosmo.util.string.escapeXml(userHash.lastName) + '</lastName>': "") +
+                (userHash.firstName && !isRoot? '<firstName>' + cosmo.util.string.escapeXml(userHash.firstName) + '</firstName>' : "") +
+                (userHash.lastName && !isRoot? '<lastName>' + cosmo.util.string.escapeXml(userHash.lastName) + '</lastName>': "") +
                 (userHash.email? '<email>' + cosmo.util.string.escapeXml(userHash.email) + '</email>': "") +
                 (userHash.subscription? this._subscriptionToXML(userHash.subscription) : "") +
-                (userHash.administrator? '<' + EL_ADMINISTRATOR + ' >true</' + EL_ADMINISTRATOR + '>' : "") +
+                (userHash.administrator && !isRoot? '<' + EL_ADMINISTRATOR + ' >true</' + EL_ADMINISTRATOR + '>' : "") +
                 (userHash.locked?'<locked>true</locked>' : "") +
                 '</user>';
         },
@@ -446,13 +447,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 user.getElementsByTagName("locked")[0].firstChild.nodeValue) == "true");
             obj.administrator =	(dojo.trim(
                 user.getElementsByTagName("administrator")[0].firstChild.nodeValue) == "true");
-            if (user.getElementsByTagName("unactivated").length > 0){
-                obj.unactivated = true;
-            }
+            obj.unactivated = (user.getElementsByTagName("unactivated").length > 0)?
+                true : null;
 
-            if (user.getElementsByTagName("homedirUrl").length > 0){
-                obj.homedirUrl = user.getElementsByTagName("homedirUrl")[0].firstChild.nodeValue;
-            }
+            obj.homedirUrl = (user.getElementsByTagName("homedirUrl").length > 0)? 
+                user.getElementsByTagName("homedirUrl")[0].firstChild.nodeValue: null;
 
             return obj;
         },

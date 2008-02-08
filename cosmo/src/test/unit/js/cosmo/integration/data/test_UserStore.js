@@ -37,21 +37,19 @@ doh.registerGroup(
             },
 
             runTest: function(){
-                var store = new cosmo.data.UserStore();
-                store.newItem({
-                })
-                var d = this._createUser(store);
+                this.store = new cosmo.data.UserStore();
+
+                var d = this._createUser(this.store);
+                d.addCallback(dojo.hitch(this, this._getUser));
+                d.addCallback(dojo.hitch(this, this._modifyUser));
+                d.addCallback(dojo.hitch(this, this._deleteUser));
 //                var d = store.loadItem({item: {username: "travis"}});
 //                d.addCallback(function(user){var x = user; 
 //                                             debugger});
                 
-//                d.addCallback(dojo.hitch(this, this._createUser));
-//                d.addCallback(dojo.hitch(this, this._getUser));
-//                d.addCallback(dojo.hitch(this, this._modifyUser));
-//                d.addCallback(dojo.hitch(this, this._deleteUser));
 //                d.addCallback(dojo.hitch(this, this._deleteUsers));
 //                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
-//                return cosmotest.testutils.defcon(d);
+                return cosmotest.testutils.defcon(d);
             },
             
             _assertCount: function(n){
@@ -94,7 +92,11 @@ doh.registerGroup(
             },
 
             _getUser: function(username){
-                var d = cosmo.cmp.getUser(username);
+                var d = this.store.loadItem({item: {username: username}});
+                d.addCallback(function(user){
+                    return user;
+                });
+
                 d.addCallback(function(user){
                     doh.assertEqual(username, user.username);
                     doh.assertEqual(username + "@example.com", user.email);
@@ -107,25 +109,25 @@ doh.registerGroup(
 
             _modifyUser: function(user){
                 var resultUser;
-                var d = cosmo.cmp.modifyUser(user.username, {
-                    username: "mod" + user.username,
-                    email: "mod" + user.email,
-                    password: "mod" + user.username,
-                    firstName: "mod" + user.firstName,
-                    lastName: "mod" + user.lastName
-                });
-                d.addCallback(function(){return cosmo.cmp.getUser("mod" + user.username)});
-                d.addCallback(function(newUser){
+                this.store.setValue(user, "username", "mod" + user.username)
+                this.store.setValue(user, "email", "mod" + user.email);
+                this.store.setValue(user, "password", "mod" + user.username);
+                this.store.setValue(user, "firstName", "mod" + user.firstName);
+                this.store.setValue(user, "lastName", "mod" + user.lastName);
+
+                var d = this.store.save();
+                d.addCallback(function(results){return user});
+/*                d.addCallback(function(newUser){
                     doh.assertEqual("mod" + user.username, newUser.username);
                     doh.assertEqual("mod" + user.email, newUser.email);
                     doh.assertEqual("mod" + user.firstName, newUser.firstName);
                     doh.assertEqual("mod" + user.lastName, newUser.lastName);
                     resultUser = newUser;
                     return newUser;
-                });
+                });*/
 
                 // Double check username is actually changed
-                d.addCallback(function(){return cosmo.cmp.getUser(user.username)});
+/*                d.addCallback(function(){return cosmo.cmp.getUser(user.username)});
                 d.addCallbacks(
                     function(result){
                         doh.assertTrue(false);
@@ -134,15 +136,17 @@ doh.registerGroup(
                         // Return "new" (that is, modified) user to get back into the callback chain
                         return resultUser;
                     }
-                );
+                );*/
                 return d;
             },
 
             _deleteUser: function(user){
-                var d = cosmo.cmp.deleteUser(user.username);
+//                this.store.loadItem({item: user});
+                this.store.deleteItem(user);
+                var d = this.store.save();
                 // Make sure user is gone
-                d.addCallback(function(){return cosmo.cmp.getUser(user.username)});
-                d.addCallbacks(
+//                d.addCallback(function(){return cosmo.cmp.getUser(user.username)});
+/*                d.addCallbacks(
                     function(result){
                         doh.assertTrue(false);
                     },
@@ -151,7 +155,7 @@ doh.registerGroup(
                     }
                 );
 
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));*/
 
                 return d;
             },

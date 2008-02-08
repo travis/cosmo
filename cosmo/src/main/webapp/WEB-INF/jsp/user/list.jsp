@@ -23,253 +23,100 @@
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
-<cosmo:standardLayout prefix="User.List." contentWrapperClass="fullPageWidthContent">
-
-<script type="text/javascript">
-
-dojo.require("cosmo.env");
-</script>
+<cosmo:standardLayout prefix="User.List." contentWrapperClass="foo">
 
 <script language="JavaScript">
-
-dojo.require("cosmo.ui.widget.CosmoUserList");
-dojo.require("cosmo.ui.widget.ModifyUserDialog");
-
+dojo.require("cosmo.data.UserStore");
+dojo.require("dojo.data.ItemFileReadStore");
+dojo.require("dojox.grid.Grid");
+dojo.require("dojox.grid._data.model");
+dojo.require("dojo.parser");
+dojo.require("dojox.grid.editors");
 </script>
-
-<cosmo:staticbaseurl var="staticBaseUrl"/>
-
-
 
 <cosmo:cnfmsg/>
 
-<table dojoType="cosmo.ui.widget.CosmoUserList" id="userList"
-       widgetId="userList" headClass="userListHead" tbodyClass="userListBody" enableMultipleSelect="true"
-       enableAlternateRows="true" rowAlternateClass="alternateRow" multiple="true"
-       valueField = "username">
+<script language="JavaScript">
+    function userListSearchKey(event){
+        if (event.keyCode == 13) userListSearch();
+    }
+    function userListSearch(){
+        var query = document.getElementById("searchBox").value;
+        var newModel = new dojox.grid.data.DojoData(null,null,{rowsPerPage: 20, 
+            store: userStore, query: query, clientSort: true});
+        userList.setModel(newModel);        
+    }
+</script>
 
-<thead>
-
-    <tr>
-
-            <th field="name" dataType="String">Name</th>
-            <th field="username" dataType="String" align="center">Username</th>
-            <th field="email" dataType="String" align="center">Email</th>
-            <th field="admin" dataType="String" align="center">Administrator</th>
-            <th field="activated" dataType="String" align="center">Activated</th>
-            <th field="locked" dataType="String" align="center">Locked</th>
-            <th field="created" dataType="Date" align="center">Created</th>
-            <th field="modified" dataType="Date" align="center">Last Modified</th>
-    </tr>
-</thead>
-</table>
-
-
-<div id="userAdminLinkBlock">
-
-<a href="javascript:showNewUser()">Create New User</a>
-<a 	id="modifySelectedUserLink" 
-	href="javascript:showModifySelectedUser()" 
-	style="display:none;">Modify Selected User</a>
-<a 	id="browseSelectedUserLink" 
-	href="javascript:browseSelectedUser()" 
-	style="display:none;">Browse Selected User</a>
-<a 	id="activateSelectedUserLink" 
-	href="javascript:activateSelectedUser()" 
-	style="display:none;">Activate Selected User</a>
-<a 	id="deleteSelectedUsersLink" 
-	href="javascript:dijit.byId('userList').deleteSelectedUsers()" 
-	style="display:none;">Delete Selected Users</a>
+    <input type="text" id="searchBox" onKeyPress="userListSearchKey(event)"/>
+<button id="searchButton" onClick="userListSearch()">Search</button>
+<div dojoType="cosmo.data.UserStore" jsId="userStore">
+  <script type="dojo/connect" event="onSet" args="item,attr,oldVal,newVal">
+    if (oldVal != newVal){
+        console.debug("About to change "+attr+" from "+oldVal+" to "+newVal);
+        this.save();
+    }
+  </script>
 </div>
-
-
-
-<script>
-
-
-function showNewUser(){
-    var createUserDialog = dijit.byId("createUserDialog")
-    createUserDialog.show();
-
-    void(0);
+<div dojoType="dojox.grid.data.DojoData" jsId="model"
+     rowsPerPage="20" store="userStore" query="">
+</div>
+    <div id="userList" autoHeight="true" dojoType="dojox.Grid" model="model" jsId="userList">
+<script type="dojo/method">
+  var view1 = {
+      noscroll: true,
+      cells: [[
+          {name: 'Username', field: "username", width: "auto",
+           editor: dojox.grid.editors.Input
+          },
+          {name: 'First Name', field: "firstName",  width: "auto",
+           editor: dojox.grid.editors.Input
+          },
+          {name: 'Last Name', field: "lastName", width: "auto",
+           editor: dojox.grid.editors.Input
+          },
+          {name: 'Email',  field: "email", width: "auto",
+           editor: dojox.grid.editors.Input
+          },
+          {name: 'Created',  field: "dateCreated", width: "auto"},
+          {name: 'Modified',  field: "dateModified", width: "auto"},
+          {name: 'Url',  field: "url", width: "auto"},
+          {name: 'Locked',  field: "locked", width: "6em", 
+           styles: "text-align: center;", editor: dojox.grid.editors.Bool
+          },
+          {name: 'Admin',  field: "administrator", width: "6em",
+           styles: "text-align: center;", editor: dojox.grid.editors.Bool
+          },
+          {name: 'Unactivated',  field: "unactivated", width: "auto"},
+          {name: 'Password', field: "password", width: "auto",
+           editor: dojox.grid.editors.Input
+          }
+      ]]
+  };
+  // a grid layout is an array of views.
+  var layout = [ view1 ];
+  userList.setStructure(layout);
+  dojo.connect(window, "onresize", dojo.hitch(userList, userList.update));
+</script>
+<script type="dojo/connect" event="onCellDblClick" args="e">
+    if (e.cell.grid.model.getDatum(e.rowIndex, e.cell.index) == "root") {
+        var fn = e.cell.field;
+        if (fn == "username" ||
+            fn == "firstName" ||
+            fn == "lastName" ||
+            fn == "admin"
+           ){
+            e.cell.grid.edit.cancel();
+        }
+    }
+    return false;
 }
-
-function showModifySelectedUser(){
-    var modifyDialog = dijit.byId("modifyUserDialog");
-
-    var username = dijit.byId("userList").getSelectedData()[0].username;
-
-    modifyDialog.populateFields(username);
-    modifyDialog.show();
-    void(0);
-    }
-
-function browseSelectedUser(){
-    var username = dijit.byId("userList").getSelectedData()[0].username;
-
-    location = cosmo.env.getBaseUrl() + "/browse/" + username;
-}
-
-function activateSelectedUser(){
-	var username = dijit.byId("userList").getSelectedData()[0].userObject.username;
-
-	var d = cosmo.cmp.activate(username);
-    d.addCallback(function (data){
-        dijit.byId('userList').updateUserList();
-	});
-    d.addErrback(function(error){
-			alert("Error activating user");
-			// TODO: Remove alert messages
-	});
-}
-
-var modifyHandlerDict = {
-    load: function(data, ioArgs){
-        var modifyDialog = dijit.byId("modifyUserDialog")
-	    if (ioArgs.xhr.status == 204){
-            modifyDialog.hide();
-            modifyDialog.form.reset();
-            dijit.byId('userList').updateUserList();
-        }
-    },
-
-    error: function(error, ioArgs){
-        var modifyDialog = dijit.byId("modifyUserDialog")
-        if (ioArgs.xhr.status == 431){
-            //TODO: username in use stuff
-            modifyDialog.usernameError.innerHTML = "Username in use";
-        }
-        else if (ioArgs.xhr.status == 432){
-            //TODO: email in use stuff
-            modifyDialog.emailError.innerHTML = "Email in use";
-        } else {
-        	alert("Problem handling modify result: " + ioArgs.xhr.status);
-        }
-    }
-}
-
-var createHandlerDict = {
-    load : function(data, ioArgs){
-        var createDialog = dijit.byId("createUserDialog");
-        if (ioArgs.xhr.status == 201){
-            createDialog.hide();
-            createDialog.form.reset();
-
-            dijit.byId('userList').updateUserList();
-        }
-    },
-    
-    error: function(error, ioArgs){
-        var createDialog = dijit.byId("createUserDialog");
-        if (ioArgs.xhr.status == 431){
-            //TODO: username in use stuff
-            createDialog.usernameError.innerHTML = "Username in use";
-        }
-        else if (ioArgs.xhr.status == 432){
-            //TODO: email in use stuff
-            createDialog.emailError.innerHTML = "Email in use";
-        } else {
-        	alert("Problem handling create result: " + ioArgs.xhr.status);
-        }
-    }
-}
-
-
-dojo.addOnLoad(function (){
-	dijit.byId("modifyUserDialog").hide();
-	dijit.byId("createUserDialog").hide();
-
-    var userList = dijit.byId("userList");
-    var modifyLink = document.getElementById("modifySelectedUserLink");
-    var browseLink = document.getElementById("browseSelectedUserLink");
-    var activateLink = document.getElementById("activateSelectedUserLink");
-    var deleteLink = document.getElementById("deleteSelectedUsersLink");
-
-    /*
-     * Methods for use by multiple links
-     */
-
-
-    function disableIfNotSingleSelect(){
-
-        var selection = userList.getSelectedData()
-
-        if (dojo.isArray(selection) &&
-            selection.length != 1){
-            this.style.display = 'none';
-
-        } else {
-            this.style.display = 'inline'
-        }
-
-    }
-    
-    /*
-     * Special methods for specific links
-     */
-    function isSelectionActivated(){
-    	var selection = userList.getSelectedData()[0];
-    	
-    	return selection.userObject.unactivated == undefined;
-
-    }
-
-    function isRootSelected(){
-        return userList.isValueSelected(cosmo.env.OVERLORD_USERNAME);
-    }
-
-    var getNumberSelected = function(){
-        return userList.getSelectedData().length;
-    }
-    var hide = function(){this.style.display = 'none'};
-    
-    function refreshControlLinks(){
-    	var numberSelected = getNumberSelected();
-
-		deleteLink.style.display = 
-			isRootSelected() || numberSelected == 0
-			? 'none':'inline';
-
-		modifyLink.style.display = 
-			numberSelected == 1
-			? 'inline':'none';
-
-		browseLink.style.display = 
-			numberSelected == 1
-			? 'inline':'none';
-
-		activateLink.style.display = 
-			numberSelected == 1 && !isSelectionActivated()
-			? 'inline':'none';
-    }
-
-    dojo.connect("after", userList, "renderSelections", refreshControlLinks);
-    dojo.connect("after", userList, "updateUserListCallback", refreshControlLinks);
-    
-    refreshControlLinks();
-
-})
-
-
+console.log(e.cellNode.textContent)
+return e;
 
 </script>
 
+</div>
 
-
-<div 	dojoType="cosmo.ui.widget.ModifyUserDialog" widgetId="createUserDialog"
-
-        createNew="true"
-        postActionHandler="createHandlerDict"
-        role="cosmo.ROLE_ADMINISTRATOR"
-		classes='floating'
-		title='<fmt:message key="User.List.NewUser"/>'
-        > </div>
-
-<div 	dojoType="cosmo.ui.widget.ModifyUserDialog" widgetId="modifyUserDialog"
-        postActionHandler="modifyHandlerDict"
-        role="cosmo.ROLE_ADMINISTRATOR"
-		classes='floating'
-		title='<fmt:message key="User.List.ModifyUser"/>'
-        > </div>
 </cosmo:standardLayout>
 

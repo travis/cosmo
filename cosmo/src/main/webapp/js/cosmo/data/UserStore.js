@@ -1,9 +1,8 @@
 dojo.provide("cosmo.data.UserStore");
 dojo.require("cosmo.cmp");
-dojo.require("dojo.data.api.Write");
 dojo.require("dojo.DeferredList");
 
-dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
+dojo.declare("cosmo.data.UserStore", null, {
     //	summary:
     //		A data store Chandler Server Users
     //	description:
@@ -13,9 +12,18 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
     DEFAULT_COUNT: 25,
 
     constructor: function(/*object*/ args) {
-
     },
     
+	getFeatures: function(){
+		//	summary: 
+		//		See dojo.data.api.Read.getFeatures()
+		return {
+			'dojo.data.api.Read': true,
+			'dojo.data.api.Write': true,
+			'dojo.data.api.Identity': true,
+			'dojo.data.api.Notification': true
+		};
+	},
     /* dojo.data.api.Read */
     
     getValue: function(/* Object */ user, /* attribute-name-string */ attribute, /* value? */ defaultValue){
@@ -31,7 +39,6 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 		//		A default value
 		//	returns:
 		//		An attribute value found, otherwise 'defaultValue'
-
         return user[attribute] || defaultValue;
 	},
 
@@ -58,10 +65,17 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
         //	returns:
 		//		An array of attributes found
         return [
-            user.username,
-            user.firstName,
-            user.lastName,
-            user.email
+            "username",
+            "firstName",
+            "lastName",
+            "email",
+            "dateCreated",
+            "dateModified",
+            "url",
+            "locked",
+            "administrator",
+            "unactivated",
+            "password"
         ];
 	},
 
@@ -96,7 +110,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 		//		An object to check
 		// 	returns:
 		//		True if the object is an user hash, false otherwise
-        return (something && something.name && something.firstName && 
+        return !!(something && something.username && something.firstName && 
                 something.lastName && something.email && 
                 (something._storeProp == this));
 	},
@@ -123,13 +137,13 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
             if (kwArgs.item && kwArgs.item.username){
                 // Get the user
                 var d = cosmo.cmp.getUser(kwArgs.item.username);
-                d.addCallback(function(user){
+                d.addCallback(dojo.hitch(this, function(user){
                     kwArgs.item._storeProp = this;
                     dojo.mixin(kwArgs.item, user)
                     if (kwArgs.onItem)
                         kwArgs.onItem.call(scope, kwArgs.item);
                     return kwArgs.item;
-                });
+                }));
                 d.addErrback(function(e){
                     if (kwArgs.onError)
                         kwArgs.onError.call(scope, e);
@@ -137,8 +151,9 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
                 });
                 return d;
             } else {
-                kwArgs.onError.call(
-                    scope, new Error("Could not load user, don't have enough information"));
+                var e = new Error("Could not load user, don't have enough information")
+                if (kwArgs.onError) kwArgs.onError.call(scope, e);
+                else throw e;
             }
         }
 	},
@@ -176,7 +191,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 
         request.abort = dojo.hitch(deferred, deferred.cancel);
         
-        deferred.addCallback(function(result){
+        deferred.addCallback(dojo.hitch(this, function(result){
             var items = dojo.isArray(result)? result : [result];
             if (request.onBegin) request.onBegin.call(scope, items.length, request);
             for (var i in items){
@@ -185,7 +200,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
             }
             if (request.onComplete) request.onComplete.call(scope, items, request);
             return result;
-        });
+        }));
 
         deferred.addErrback(function(error){
             if (request.onError) request.onError.call(scope, error, request);
@@ -218,6 +233,23 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 		 //		See dojo.data.api.Read.close()
 	},
 
+/* dojo.data.api.Identity */
+    getIdentity: function(user){
+        return user.username;
+    },
+    
+    getIdentityAttributes: function(item){
+        return ["username"];
+    },
+
+    fetchItemByIdentity: function(request){
+        var d = cosmo.cmp.getUser(request.identity);
+        var scope = request.scope || dojo.global;
+        d.addCallback(dojo.hitch(scope, request.onItem));
+        d.addErrback(dojo.hitch(scope, request.onError));
+        return d;
+    },
+
 /* dojo.data.api.Write */
     /* Users to create on a call to save() */
     _newItems: [],
@@ -226,25 +258,40 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
     _deletedItems: [],
 
     /* Users to modify on a call to save() */
-    _modifiedItems: [],
+    _modifiedItems: {},
 
 	newItem: function(/* object? */ user){
         this._newItems.push(user);
         user._storeProp = this;
+        this.onNew(user);
         return user;
 	},
 	
 	deleteItem: function(/* item */ item){
-        if (!this.isItem(item)) throw new Error(item  + " is not a user from this store.");
+        if (!this.isItem(item)) throw new Error("item is not a user from this store.");
 		this._deletedItems.push(item);
+        this.onDelete(item);
 		return true; //boolean
 	},
 	
 	setValue: function(/* item */ item, /* string */ attribute, /* string */ value){
+        // Make sure this is an editable property
+        if (!this._isEditable(item, attribute, value)) return false;
+        
+        var oldValue = item[attribute];
         item[attribute] = value;
-        this._modifiedItems.push(item);
+        this._modifiedItems[item.username] = item;
+        this.onSet(item, attribute, oldValue, value);
 		return true; //boolean
 	},
+
+    _isEditable: function(item, attribute, value){
+        if (item.username == "root"
+            && (attribute == "username"
+                || attribute == "firstName"
+                || attribute == "lastName")) return false;
+        return true;
+    },
 	
 //	setValues: function(/* item */ item, /* string */ attribute, /* array */ values){
 //        
@@ -265,18 +312,28 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 			keywordArgs = {};
 		}
         var deferreds = [];
-		for(var i = 0; i < this._modifiedItems.length; i++){
-            deferreds.push(cosmo.cmp.modifyUser(this._modifiedItems[i]));
-		}
+		for(var i in this._modifiedItems){
+            var user = this._modifiedItems[i];
+            deferreds.push(cosmo.cmp.modifyUser(user.username, user));
+        }
+        this._modifiedItems = {};
+        console.debug("creating " + this._newItems.length + " users");
 		for(var i = 0; i < this._newItems.length; i++){
             deferreds.push(cosmo.cmp.createUser(this._newItems[i]));
 		}
-        deferreds.push(cosmo.cmp.deleteUsers(
-            dojo.map(this._deletedItems, function(user){return user.username})));
+        this._newItems = [];
+        console.debug("deleting " + this._deletedItems.length + " users");
+        if (this._deletedItems.length > 0)
+            deferreds.push(cosmo.cmp.deleteUsers(
+                dojo.map(this._deletedItems, function(user){return user.username})));
+        this._deletedItems = [];
         var dl = new dojo.DeferredList(deferreds);
         var scope = keywordArgs.scope || dojo.global;
-        dl.addCallback(dojo.hitch(scope, keywordArgs.onComplete));
-        dl.addErrback(dojo.hitch(scope, keywordArgs.onError));
+        
+        if (keywordArgs.onComplete)
+            dl.addCallback(dojo.hitch(scope, keywordArgs.onComplete));
+        if (keywordArgs.onError)
+            dl.addErrback(dojo.hitch(scope, keywordArgs.onError));
         return dl;
 	},
 
@@ -292,7 +349,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 		this._restoreItems(this._deletedItems);
 		this._deletedItems = [];
 		this._restoreItems(this._modifiedItems);
-		this._modifiedItems = [];
+		this._modifiedItems = {};
 		return true; //boolean
 	},
 
@@ -327,12 +384,83 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 	},
     
     _getItemIndex: function(items, user){
-        for (var i = 0; i < items.length; i++){
+        for (var i in items){
             if (items[i].username == user.username){
                 return i;
             }
         }
         return -1;
-    }
+    },
+
+    onSet: function(/* item */ item,
+        /* attribute-name-string */ attribute,
+        /* object | array */ oldValue,
+        /* object | array */ newValue){},
+        //    summary:
+        //        This function is called any time an item is modified via setValue, setValues, unsetAttribute, etc. 
+        //    description:
+        //        This function is called any time an item is modified via setValue, setValues, unsetAttribute, etc. 
+        //        Its purpose is to provide a hook point for those who wish to monitor actions on items in the store
+        //        in a simple manner.  The general expected usage is to dojo.connect() to the store's
+        //        implementation and be called after the store function is called.
+        //
+        //    item:
+        //        The item being modified.
+        //    attribute:
+        //        The attribute being changed represented as a string name.
+        //    oldValue:
+        //        The old value of the attribute.  In the case of single value calls, such as setValue, unsetAttribute, etc,
+        //        this value will be generally be an atomic value of some sort (string, int, etc, object).  In the case of
+        //        multi-valued attributes, it will be an array.
+        //    newValue:
+        //        The new value of the attribute.  In the case of single value calls, such as setValue, this value will be
+        //        generally be an atomic value of some sort (string, int, etc, object).  In the case of multi-valued attributes,
+        //        it will be an array.  In the case of unsetAttribute, the new value will be 'undefined'.
+        //
+        //    returns:
+        //        Nothing.
+    onNew: function(/* item */ newItem, /*object?*/ parentInfo){},
+        //    summary:
+        //        This function is called any time a new item is created in the store.
+        //        It is called immediately after the store newItem processing has completed.
+        //    description:
+        //        This function is called any time a new item is created in the store.
+        //        It is called immediately after the store newItem processing has completed.
+        //
+        //    newItem:
+        //        The item created.
+        //    parentInfo:
+        //        An optional javascript object that is passed when the item created was placed in the store
+        //        hierarchy as a value f another item's attribute, instead of a root level item.  Note that if this
+        //        function is invoked with a value for parentInfo, then onSet is not invoked stating the attribute of
+        //        the parent item was modified.  This is to avoid getting two notification  events occurring when a new item
+        //        with a parent is created.  The structure passed in is as follows:
+        //        {
+        //            item: someItem,                     //The parent item
+        //            attribute:        "attribute-name-string",        //The attribute the new item was assigned to.
+        //            oldValue: something       //Whatever was the previous value for the attribute. 
+        //                                      //If it is a single-value attribute only, then this value will be a single value.
+        //                                      //If it was a multi-valued attribute, then this will be an array of all the values minues the new one.
+        //            newValue: something       //The new value of the attribute.  In the case of single value calls, such as setValue, this value will be
+        //                                      //generally be an atomic value of some sort (string, int, etc, object).  In the case of multi-valued attributes,
+        //                                      //it will be an array. 
+        //        }
+        //
+        //    returns:
+        //        Nothing.
+        onDelete: function(/* item */ deletedItem){}
+        //    summary:
+        //        This function is called any time an item is deleted from the store.
+        //        It is called immediately after the store deleteItem processing has completed.
+        //    description:
+        //        This function is called any time an item is deleted from the store.
+        //        It is called immediately after the store deleteItem processing has completed.
+        //
+        //    deletedItem:
+        //        The item deleted.
+        //
+        //    returns:
+        //        Nothing.
+
 });
 

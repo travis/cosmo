@@ -28,7 +28,6 @@
 dojo.provide('cosmo.view.cal.lozenge');
 
 dojo.require("dojox.date.posix");
-dojo.require("dojo.date.format");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.app.pim");

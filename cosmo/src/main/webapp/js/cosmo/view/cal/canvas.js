@@ -18,7 +18,6 @@ dojo.provide('cosmo.view.cal.canvas');
 
 dojo.require('dojo.event.*');
 dojo.require("dojox.date.posix");
-dojo.require("dojo.date.format");
 dojo.require("dojo.DeferredList");
 dojo.require("cosmo.app");
 dojo.require("cosmo.datetime");

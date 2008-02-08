@@ -413,7 +413,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             var title = form.listViewQuickItemEntry.value;
             disableButton();
             form.listViewQuickItemEntry.value = _('App.Status.Processing');
-            dojo.html.addClass(form.listViewQuickItemEntry,
+            dojo.addClass(form.listViewQuickItemEntry,
                 'listViewSelectedCell');
             cosmo.view.list.createNoteItem(title);
         };

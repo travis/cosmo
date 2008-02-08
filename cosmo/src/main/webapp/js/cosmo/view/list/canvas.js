@@ -128,7 +128,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                       'listViewHeaderCellSel');
                 }
                 else {
-                    dojo.html.addClass(targ, 'listViewHeaderCellLit');
+                    dojo.addClass(targ, 'listViewHeaderCellLit');
                 }
             }
             else {
@@ -138,7 +138,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 for (var i = 0; i < ch.length; i++) {
                     // Don't apply rollover effect to triage col
                     if (ch[i].className.indexOf('listViewTriage') == -1) {
-                        dojo.html.addClass(ch[i], 'mouseoverItem');
+                        dojo.addClass(ch[i], 'mouseoverItem');
                     }
                 }
             }
@@ -157,13 +157,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
                       'listViewHeaderCellSelLit');
                 }
                 else {
-                  dojo.html.removeClass(targ, 'listViewHeaderCellLit');
+                  dojo.removeClass(targ, 'listViewHeaderCellLit');
                 }
             }
             else {
                 var ch = targ.childNodes;
                 for (var i = 0; i < ch.length; i++) {
-                    dojo.html.removeClass(ch[i], 'mouseoverItem');
+                    dojo.removeClass(ch[i], 'mouseoverItem');
                 }
             }
         }
@@ -223,7 +223,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 if (origSelectionNode) {
                     ch = origSelectionNode.childNodes;
                     for (var i = 0; i < ch.length; i++) {
-                        dojo.html.removeClass(ch[i], 'selectedItem');
+                        dojo.removeClass(ch[i], 'selectedItem');
                     }
                 }
 
@@ -234,8 +234,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
             for (var i = 0; i < ch.length; i++) {
                 // Don't apply selection effect to triage col
                 if (ch[i].className.indexOf('listViewTriage') == -1) {
-                    dojo.html.removeClass(ch[i], 'mouseoverItem');
-                    dojo.html.addClass(ch[i], 'selectedItem');
+                    dojo.removeClass(ch[i], 'mouseoverItem');
+                    dojo.addClass(ch[i], 'selectedItem');
                 }
             }
             // Load the selected item's stuff into the detail-view form

@@ -432,7 +432,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
             var index = key.substr(key.length - 1); // Negative pos param breaks in IE
             var menuItem = this.displayedMenu.getMenuItem(key);
             var currSub = $('hierMenuLevel_' + nextLevel);
-            dojo.html.addClass(targ, 'selectedItem');
+            dojo.addClass(targ, 'selectedItem');
             if (currSub) {
                 var subKey = currSub.firstChild.firstChild.id.replace('hierMenuItem_', '');
                 if (subKey.substr(0, subKey.length - 1) == key) {
@@ -440,7 +440,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
                 }
                 var expandedItem = this._expandedItemForEachLevel[currLevel];
                 var expandedNode = this._getMenuItemNodeForMenuItem(expandedItem);
-                dojo.html.removeClass(expandedNode, 'selectedItem');
+                dojo.removeClass(expandedNode, 'selectedItem');
                 this._hideSubMenus(currLevel);
             }
             else if (menuItem.items && menuItem.items.length) {
@@ -464,7 +464,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
             if (this._expandedItemForEachLevel[currLevel] == menuItem) {
                 return false;
             }
-            dojo.html.removeClass(targ, 'selectedItem');
+            dojo.removeClass(targ, 'selectedItem');
         }
     };
     this.handleClick = function (e) {

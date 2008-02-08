@@ -81,7 +81,7 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
     this.mainApp = new cosmo.app.pim.layout.MainApp({ parent: this });
     this.children = [this.menuBar, this.mainApp];
     this.renderSelf = function () {
-        var viewport = dojo.html.getViewport();
+        var viewport = dijit.getViewport();
         var w = viewport.width;
         var h = viewport.height;
         // Pare width and height down to avoid

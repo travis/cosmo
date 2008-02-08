@@ -491,7 +491,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         var tr = null;
         var td = null;
         var div = null;
-        var viewport = dojo.html.getViewport();
+        var viewport = dijit.getViewport();
 
         table.cellPadding = 0;
         table.cellSpacing = 0;

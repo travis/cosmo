@@ -120,22 +120,22 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
             if (this.createNew) {
                 if (this.role == cosmo.ROLE_ADMINISTRATOR) {
-                    dojo.event.connect(this.submitButton, "handleOnClick", this, "createUser");
+                    dojo.connect(this.submitButton, "handleOnClick", this, "createUser");
                 } else if (this.role == cosmo.ROLE_ANONYMOUS){
-                    dojo.event.connect(this.submitButton, "handleOnClick", this, "signupUser");
+                    dojo.connect(this.submitButton, "handleOnClick", this, "signupUser");
                 }
             } else {
                 if (this.role == cosmo.ROLE_ADMINISTRATOR) {
-                    dojo.event.connect(this.submitButton, "handleOnClick", this, "modifyUser");
+                    dojo.connect(this.submitButton, "handleOnClick", this, "modifyUser");
                 } else if (this.role == cosmo.ROLE_AUTHENTICATED){
-                    dojo.event.connect(this.submitButton, "handleOnClick", this, "modifyUser");
+                    dojo.connect(this.submitButton, "handleOnClick", this, "modifyUser");
                 }
             }
             
             // Make sure we reset errors before submitting.
-            dojo.event.connect("before", this, "modifyUser", this, "clearErrors");
-            dojo.event.connect("before", this, "createUser", this, "clearErrors");
-            dojo.event.connect("before", this, "signupUser", this, "clearErrors");
+            dojo.connect("before", this, "modifyUser", this, "clearErrors");
+            dojo.connect("before", this, "createUser", this, "clearErrors");
+            dojo.connect("before", this, "signupUser", this, "clearErrors");
 
             if (this.disableCancel) {
                 dojo.dom.removeNode(this.cancelButton);
@@ -150,7 +150,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 
 //                this.cancelButton = button;
 
-                dojo.event.connect(this.cancelButton, "handleOnClick", this, "cancelAction");
+                dojo.connect(this.cancelButton, "handleOnClick", this, "cancelAction");
             }
 
         },

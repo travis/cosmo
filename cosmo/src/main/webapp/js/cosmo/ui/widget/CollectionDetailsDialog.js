@@ -147,7 +147,7 @@ dojo.widget.HtmlWidget, function(){
             for (var i = 0; i < inputs.length; i++) {
                 var inp = inputs[i];
                 if (inp.type == 'text') {
-                    dojo.event.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
+                    dojo.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
                 }
             }
 

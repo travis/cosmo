@@ -157,7 +157,7 @@ cosmo.ui.menu.allItems = [
                     sel.options[sel.selectedIndex].value));
             }
         };
-        dojo.event.connect(subscrSel, 'onchange', f);
+        dojo.connect(subscrSel, 'onchange', f);
         form.appendChild(subscrSel)
         return s;
       },
@@ -288,7 +288,7 @@ cosmo.ui.menu.MainMenu = function (p) {
                 a.className = 'menuBarLink';
                 a.innerHTML = item.displayText;
                 if (item.onclickFunc && typeof item.onclickFunc == 'function') {
-                    dojo.event.connect(a, 'onclick', item.onclickFunc);
+                    dojo.connect(a, 'onclick', item.onclickFunc);
                 }
                 if (item.urlString && typeof item.urlString == 'string') {
                     a.href = item.urlString;
@@ -602,9 +602,9 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         table.style.top = y + 'px';
         document.body.appendChild(table);
 
-        dojo.event.connect(table, 'onmouseover', this, 'handleMouseOver');
-        dojo.event.connect(table, 'onmouseout', this, 'handleMouseOut');
-        dojo.event.connect(table, 'onclick', this, 'handleClick');
+        dojo.connect(table, 'onmouseover', this, 'handleMouseOver');
+        dojo.connect(table, 'onmouseout', this, 'handleMouseOut');
+        dojo.connect(table, 'onclick', this, 'handleClick');
     };
     this._hideSubMenus = function (level) {
         this._currX = this._xPosMarksForEachLevel[level];
@@ -767,7 +767,7 @@ cosmo.ui.menu.HierarchicalMenu.prototype.getMenuItem =
 };
 
 // Close menus via any click on the doc body
-dojo.event.connect(document, 'onclick',
+dojo.connect(document, 'onclick',
     cosmo.ui.menu.HierarchicalMenuManager,
         'hideHierarchicalMenu');
 

@@ -448,12 +448,12 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             var func = cosmo.util.html.handleTextInputFocus;
             cosmo.util.html.setTextInput(text,
                 _('Main.NavBar.QuickItemEntryHint'), true);
-            dojo.event.connect(text, 'onfocus', func);
+            dojo.connect(text, 'onfocus', func);
         }
         form.appendChild(text);
         form.appendChild(cosmo.util.html.nbsp());
 
-        dojo.event.connect(text, 'onkeyup', function (e) {
+        dojo.connect(text, 'onkeyup', function (e) {
             if (writeable && e.keyCode == 13) {
                 createItem();
                 e.stopPropagation();
@@ -560,7 +560,7 @@ cosmo.ui.navbar.ListPager = function (p) {
             value: this.parent.listCanvas.currPageNum
         };
         var text = cosmo.util.html.createInput(o);
-        dojo.event.connect(text, 'onkeyup', goToPage);
+        dojo.connect(text, 'onkeyup', goToPage);
         form.appendChild(text);
         td.appendChild(_createText(' of ' + this.parent.listCanvas.pageCount));
         this.listViewPageNum = td;

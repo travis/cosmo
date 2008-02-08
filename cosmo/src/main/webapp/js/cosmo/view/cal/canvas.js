@@ -356,12 +356,12 @@ cosmo.view.cal.canvas = new function () {
         if (!hasBeenRendered) {
             // Make the all-day event area resizeable
             // Create event listeners
-            dojo.event.connect(hoursNode, 'onmousedown', mouseDownHandler);
-            dojo.event.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
-            dojo.event.connect(hoursNode, 'ondblclick', dblClickHandler);
-            dojo.event.connect(allDayColsNode, 'ondblclick', dblClickHandler);
-            dojo.event.connect(hoursNode, 'oncontextmenu', self, '_handleContextForCanvasOnly') 
-            dojo.event.connect(allDayColsNode, 'oncontextmenu', self, '_handleContextForCanvasOnly');
+            dojo.connect(hoursNode, 'onmousedown', mouseDownHandler);
+            dojo.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
+            dojo.connect(hoursNode, 'ondblclick', dblClickHandler);
+            dojo.connect(allDayColsNode, 'ondblclick', dblClickHandler);
+            dojo.connect(hoursNode, 'oncontextmenu', self, '_handleContextForCanvasOnly') 
+            dojo.connect(allDayColsNode, 'oncontextmenu', self, '_handleContextForCanvasOnly');
             // Get a reference to the main scrolling area for timed events;
             this.timedCanvas = $('timedCanvas');
             // Refs for appending lozenges to avoid lookup by id

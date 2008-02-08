@@ -120,12 +120,12 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
                   p.handleMouseOut(e);
                 }
             };
-            dojo.event.connect(d, 'onmouseover', over);
-            dojo.event.connect(d, 'onmouseout', out);
+            dojo.connect(d, 'onmouseover', over);
+            dojo.connect(d, 'onmouseout', out);
         }
         // Attach click handler is there is one
         if (typeof p.handleClick == 'function') {
-            dojo.event.connect(d, 'onclick', p.handleClick);
+            dojo.connect(d, 'onclick', p.handleClick);
         }
     }
     else {

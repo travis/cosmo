@@ -61,7 +61,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Debug", dojo.widget.HtmlWidget, {
      if (!djConfig.isDebug){
          return;
      }
-     dojo.event.connect(window, "onkeypress", this, "onkeypressHandler");
+     dojo.connect(window, "onkeypress", this, "onkeypressHandler");
      this.preWidgetContent = dojo.byId("dojoDebug").innerHTML;
   }
 

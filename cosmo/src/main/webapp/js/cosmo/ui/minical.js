@@ -234,9 +234,9 @@ cosmo.ui.minical.MiniCal = function (p) {
                 className: 'inputText' });
             f.appendChild(tInput);
             cosmo.util.html.setTextInput(tInput, 'mm/dd/yyyy', true, false);
-            dojo.event.connect(tInput, 'onfocus', cosmo.util.html,
+            dojo.connect(tInput, 'onfocus', cosmo.util.html,
                 'handleTextInputFocus');
-            dojo.event.connect(tInput, 'onkeyup', self,
+            dojo.connect(tInput, 'onkeyup', self,
                 'handleKeyUp');
             td.appendChild(f);
             tr.appendChild(td);

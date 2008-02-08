@@ -421,17 +421,17 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this.processingRow = row;
 
         // Attach event listeners -- event will be delagated by row
-        dojo.event.connect($('listViewTable'), 'onmouseover',
+        dojo.connect($('listViewTable'), 'onmouseover',
             this, 'handleMouseOver');
-        dojo.event.connect($('listViewTable'), 'onmouseout',
+        dojo.connect($('listViewTable'), 'onmouseout',
             this, 'handleMouseOut');
-        dojo.event.connect($('listViewTable'), 'onclick',
+        dojo.connect($('listViewTable'), 'onclick',
             this, 'handleClick');
         // HACK: Do explicit single selection on right-click
         // Because the appearance of the context menu in
         // Safari 2 breaks the normal mouseout event and makes
         // it look like multi-select is enabled
-        dojo.event.connect($('listViewTable'), 'oncontextmenu',
+        dojo.connect($('listViewTable'), 'oncontextmenu',
             this, 'handleClick');
 
         dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',

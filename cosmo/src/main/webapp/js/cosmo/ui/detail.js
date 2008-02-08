@@ -318,7 +318,7 @@ cosmo.ui.detail.DetailViewForm.prototype.updateFromItem =
     f.noteTitle.value = data.getDisplayName() || '';
     f.noteDescription.value = data.getBody() || '';
     var func = cosmo.util.html.handleTextInputFocus;
-    dojo.event.connect(f.noteTitle, 'onfocus', func);
+    dojo.connect(f.noteTitle, 'onfocus', func);
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
         stamp = data['get' + st.stampType + 'Stamp']();
@@ -658,11 +658,11 @@ cosmo.ui.detail.StampSection = function (p) {
 
     function addBehaviors() {
         // Toggle enabled state for all form sections
-        dojo.event.connect(self.enablerSwitch, 'onclick',
+        dojo.connect(self.enablerSwitch, 'onclick',
             self, 'toggleEnabled');
         // Form sections with no body have no expando toggle link
         if (self.hasBody) {
-            dojo.event.connect(self.showHideSwitch, 'onclick',
+            dojo.connect(self.showHideSwitch, 'onclick',
                 self, 'toggleExpando');
         }
     }
@@ -813,7 +813,7 @@ cosmo.ui.detail.StampFormElements = function () {
     // -------
     // Prevent form submission from hitting Enter key
     // while in a text box
-    dojo.event.connect(this.formNode, 'onsubmit', function (e) {
+    dojo.connect(this.formNode, 'onsubmit', function (e) {
         e.stopPropagation();
         e.preventDefault();
         return false;
@@ -985,7 +985,7 @@ cosmo.ui.detail.MailFormElements = function () {
                 className: 'inputText' });
             elem.style.width = '182px';
             var func = cosmo.util.html.handleTextInputFocus;
-            dojo.event.connect(elem, 'onfocus', func);
+            dojo.connect(elem, 'onfocus', func);
             td.appendChild(elem);
             tr.appendChild(td);
             return tr;
@@ -1306,7 +1306,7 @@ cosmo.ui.detail.EventFormElements= function () {
         var txtIn = ['eventLocation', 'startDate',
             'startTime', 'endDate', 'endTime', 'recurrenceEnd'];
         for (var el in txtIn) {
-            dojo.event.connect(formElements[txtIn[el]], 'onfocus', func);
+            dojo.connect(formElements[txtIn[el]], 'onfocus', func);
         }
         // Clear out time inputs if All-day checkbox is checked
         // Unchecking does nothing -- this would create an anytime
@@ -1328,7 +1328,7 @@ cosmo.ui.detail.EventFormElements= function () {
             handlerFunc(formElements.tzId, 'select');
         };
         // All-day event / normal event toggling
-        dojo.event.connect(formElements.eventAllDay, 'onclick', func);
+        dojo.connect(formElements.eventAllDay, 'onclick', func);
         // Recurrence -- disable 'ending' text box if event
         // does not recur
         var elem = formElements.recurrenceInterval;
@@ -1343,7 +1343,7 @@ cosmo.ui.detail.EventFormElements= function () {
                 }
             }
         }
-        dojo.event.connect(elem, 'onchange', func);
+        dojo.connect(elem, 'onchange', func);
 
         // Timezone selector -- selecting region should populate the
         // tz selector
@@ -1363,9 +1363,9 @@ cosmo.ui.detail.EventFormElements= function () {
             }
             _html.setSelectOptions(formElements.tzId, options);
         };
-        dojo.event.connect(formElements.tzRegion, 'onchange', func);
-        dojo.event.connect(formElements.eventAllDay, 'onchange', self.enableDisableEventStatus);
-        dojo.event.connect(formElements.endTime, 'onblur', self.enableDisableEventStatus);
+        dojo.connect(formElements.tzRegion, 'onchange', func);
+        dojo.connect(formElements.eventAllDay, 'onchange', self.enableDisableEventStatus);
+        dojo.connect(formElements.endTime, 'onblur', self.enableDisableEventStatus);
     }
 
     // Interface methods

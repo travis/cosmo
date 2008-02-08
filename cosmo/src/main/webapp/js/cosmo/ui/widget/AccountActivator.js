@@ -65,7 +65,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
 
             this.activateButtonContainer.appendChild(button.domNode);
 
-            dojo.event.connect(button, "handleOnClick",this, "_activateEventHandler");
+            dojo.connect(button, "handleOnClick",this, "_activateEventHandler");
 
         },
 

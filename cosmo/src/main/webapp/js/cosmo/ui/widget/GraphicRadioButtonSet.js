@@ -119,9 +119,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
             td.style.fontSize = '1px';
             td.style.height = this.height + 'px';
             td.appendChild(cosmo.util.html.nbsp());
-            dojo.event.connect(td, 'onmouseover', this, '_handleMouseover');
-            dojo.event.connect(td, 'onmouseout', this, '_handleMouseout');
-            dojo.event.connect(td, 'onclick', this, '_handleClick');
+            dojo.connect(td, 'onmouseover', this, '_handleMouseover');
+            dojo.connect(td, 'onmouseout', this, '_handleMouseout');
+            dojo.connect(td, 'onclick', this, '_handleClick');
             tr.appendChild(td);
             this.buttonNodes.push(td);
         }

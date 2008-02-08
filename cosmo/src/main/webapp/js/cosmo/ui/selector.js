@@ -203,13 +203,13 @@ cosmo.ui.selector.CollectionSelector = function (p) {
 
         // Attach event listeners -- event will be delagated
         // to clicked cell or checkbox
-        dojo.event.connect(container, 'onmouseover',
+        dojo.connect(container, 'onmouseover',
             this, 'handleMouseOver');
-        dojo.event.connect(container, 'onmouseout',
+        dojo.connect(container, 'onmouseout',
             this, 'handleMouseOut');
-        dojo.event.connect(container, 'onclick',
+        dojo.connect(container, 'onclick',
             this, 'handleClick');
-        dojo.event.connect(container, 'oncontextmenu',
+        dojo.connect(container, 'oncontextmenu',
             this, 'handleClick');
 
         this.domNode.appendChild(form);
@@ -248,7 +248,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         a.id = "newCollectionLink";
         a.appendChild(_createText(_("Main.NewCollectionLink")));
 
-        dojo.event.connect(a, "onclick", function(){
+        dojo.connect(a, "onclick", function(){
             var collectionNameDeferred =
                 cosmo.app.getValue(
                     _("Main.NewCollection.NamePrompt"),

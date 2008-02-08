@@ -55,7 +55,7 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
             dragSize : ALL_DAY_RESIZE_AREA_HEIGHT;
         this.direction = dir ? dir : this.direction;
         this.dragSize = dragSize;
-        dojo.event.connect(self.handleDiv, 'onmousedown',
+        dojo.connect(self.handleDiv, 'onmousedown',
             function () { cosmo.app.dragItem = self });
     };
     // Right now the only adjacent area is the timed canvas

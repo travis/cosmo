@@ -20,7 +20,6 @@ dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require('cosmo.ui.resize')
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("dojo.html.common");
 
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");

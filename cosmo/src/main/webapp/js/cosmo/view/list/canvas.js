@@ -17,7 +17,6 @@
 dojo.provide('cosmo.view.list.canvas');
 
 dojo.require('dojo.event.*');
-dojo.require('dojo.html.common');
 dojo.require('dojo.string');
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");

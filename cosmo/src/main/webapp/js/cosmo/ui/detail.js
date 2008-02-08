@@ -25,7 +25,6 @@ dojo.provide("cosmo.ui.detail");
 
 dojo.require("dojo.event.*");
 dojo.require("dojo.lfx.*");
-dojo.require("dojo.html.style");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");

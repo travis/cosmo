@@ -829,7 +829,7 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
     var toggleText = function (tags, isEnabled) {
         var key = isEnabled ? 'remove' : 'add';
         for (var i = 0; i < tags.length; i++) {
-            dojo.html[key + 'Class'](tags[i], 'disabledText');
+            dojo[key + 'Class'](tags[i], 'disabledText');
         }
     }
     // If passed explicitly, reset the enabled prop

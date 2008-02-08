@@ -79,7 +79,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     for (var i = 0; i < ch.length; i++) {
                         var node = ch[i];
                         if (node.className != 'collectionSelectorDetails') {
-                            dojo.html[addRemoveKey + 'Class'](ch[i], 'mouseoverItem');
+                            dojo[addRemoveKey + 'Class'](ch[i], 'mouseoverItem');
                         }
                     }
                 }

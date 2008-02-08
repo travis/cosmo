@@ -124,8 +124,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (targ.id == 'body') { return false; }
             if (targ.id.indexOf('Header') > -1) {
                 if (targ.className.indexOf('Sel') > -1) {
-                    dojo.html.replaceClass(targ, 'listViewHeaderCellSelLit',
-                      'listViewHeaderCellSel');
+                    dojo.removeClass(targ, 'listViewHeaderCellSelLit');
+                    dojo.addClass(targ, 'listViewHeaderCellSel');
                 }
                 else {
                     dojo.addClass(targ, 'listViewHeaderCellLit');
@@ -153,8 +153,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (targ.id == 'body') { return false; }
             if (targ.id.indexOf('Header') > -1) {
                 if (targ.className.indexOf('Sel') > -1) {
-                    dojo.html.replaceClass(targ, 'listViewHeaderCellSel',
-                      'listViewHeaderCellSelLit');
+                    dojo.removeClass(targ, 'listViewHeaderCellSel');
+                    dojo.addClass(targ, 'listViewHeaderCellSelLit');
                 }
                 else {
                   dojo.removeClass(targ, 'listViewHeaderCellLit');

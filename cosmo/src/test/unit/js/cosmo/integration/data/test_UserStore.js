@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.integration.data.test_UserStore.js");
+dojo.provide("cosmotest.integration.data.test_UserStore");
 
 dojo.require("cosmotest.testutils");
 dojo.require("cosmo.util.auth");
@@ -37,15 +37,21 @@ doh.registerGroup(
             },
 
             runTest: function(){
+                var store = new cosmo.data.UserStore();
+                store.newItem({
+                })
+                var d = this._createUser(store);
+//                var d = store.loadItem({item: {username: "travis"}});
+//                d.addCallback(function(user){var x = user; 
+//                                             debugger});
                 
-                
-                d.addCallback(dojo.hitch(this, this._createUser));
-                d.addCallback(dojo.hitch(this, this._getUser));
-                d.addCallback(dojo.hitch(this, this._modifyUser));
-                d.addCallback(dojo.hitch(this, this._deleteUser));
-                d.addCallback(dojo.hitch(this, this._deleteUsers));
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
-                return cosmotest.testutils.defcon(d);
+//                d.addCallback(dojo.hitch(this, this._createUser));
+//                d.addCallback(dojo.hitch(this, this._getUser));
+//                d.addCallback(dojo.hitch(this, this._modifyUser));
+//                d.addCallback(dojo.hitch(this, this._deleteUser));
+//                d.addCallback(dojo.hitch(this, this._deleteUsers));
+//                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+//                return cosmotest.testutils.defcon(d);
             },
             
             _assertCount: function(n){
@@ -63,9 +69,9 @@ doh.registerGroup(
                 return d;
             },
 
-            _createUser: function(){
+            _createUser: function(store){
                 var u = dojox.uuid.generateRandomUuid().slice(0, 8);
-                var d = cosmo.cmp.createUser(
+                store.newItem(
                     {username: u,
                      email: u + "@example.com",
                      password: u,
@@ -73,10 +79,12 @@ doh.registerGroup(
                      lastName: u
                     }
                 );
+                var d = store.save();
                 d.addCallback(function(result){
-                    doh.assertEqual("", result);
+                    console.log("TODO: test save result");
+                    return result;
                 });
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount + 1));
+//                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount + 1));
 
                 // Return username of created user for test chaining.
                 d.addCallback(function(result){
@@ -210,7 +218,7 @@ doh.registerGroup(
             tearDown: function(){
                 cosmo.util.auth.clearAuth();
             }
-        },
+        }/*,
         {
             name: "authenticated",
             timeout: 10000, 
@@ -279,15 +287,10 @@ doh.registerGroup(
             tearDown: function(){
                 cosmo.util.auth.clearAuth();
             }
-        }
+        }*/
     ],
     function(){ //setUp
         cosmo.util.auth.setCred(USERNAME_ROOT, PASSWORD_ROOT);
-        var d = cosmo.cmp.getUserCount({sync: true});
-        d.addCallback(function(count){
-            cosmotest.integration.test_cmp._initUserCount = count;
-            cosmo.util.auth.clearAuth();
-        });
     },
     function(){ //tearDown
     }

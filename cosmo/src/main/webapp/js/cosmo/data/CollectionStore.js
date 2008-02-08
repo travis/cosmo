@@ -13,7 +13,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
     DEFAULT_COUNT: 25,
 
     constructor: function(/*object*/ args) {
-
+        this._url = args.url;
     },
     
     /* dojo.data.api.Read */
@@ -116,7 +116,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
 		//		Load a user
 		//	keywordArgs:
 		//		object containing the args for loadItem.  See dojo.data.api.Read.loadItem()
-        var scope = kwArgs.scope || dojo.global;
+        var scope = keywordArgs.scope || dojo.global();
         // If the item isn't loaded
         if (!this.isItemLoaded(kwArgs.item)){
             // And we have enough information to get the user
@@ -140,7 +140,6 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
                 kwArgs.onError.call(
                     scope, new Error("Could not load user, don't have enough information"));
             }
-        }
 	},
 
     SORT_ASCENDING: "ascending",
@@ -164,7 +163,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
                 this.SORT_DESCENDING : this.SORT_ASCENDING;
         }
         return this._deferredToFetchRequest(
-            cosmo.cmp.getUsers(pageNumber, count, sortOrder, sortType, query),
+            cosmo.cmp.getUsers(pageNumber, count, sortOrder, sortType, query)
             request);
     },
 
@@ -172,7 +171,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
        appropriately from the Deferred.
     */
     _deferredToFetchRequest: function(deferred, request){
-        var scope = request.scope || dojo.global;
+        var scope = request.scope || dojo.global();
 
         request.abort = dojo.hitch(deferred, deferred.cancel);
         
@@ -274,7 +273,7 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
         deferreds.push(cosmo.cmp.deleteUsers(
             dojo.map(this._deletedItems, function(user){return user.username})));
         var dl = new dojo.DeferredList(deferreds);
-        var scope = keywordArgs.scope || dojo.global;
+        var scope = keywordArgs.scope || dojo.global();
         dl.addCallback(dojo.hitch(scope, keywordArgs.onComplete));
         dl.addErrback(dojo.hitch(scope, keywordArgs.onError));
         return dl;

@@ -586,13 +586,8 @@ cosmo.ui.minical.MiniCal = function (p) {
 
             // Since the context is not guaranteed, use kwConnect to
             // ensure that the event is bound only once
-            dojo.event.kwConnect({
-                    srcObj:     self.tileCanvas,
-                    srcFunc:    "onclick",
-                    targetObj:  self,
-                    targetFunc: 'clickHandler',
-                    once:       true
-                    });
+            dojo.connect(self.tileCanvas, "onclick", self, 'clickHandler');
+
         }
 
         // Begin rendering
@@ -804,13 +799,13 @@ cosmo.ui.minical.MiniCal = function (p) {
      */
     this.cleanup = function () {
         /* need to do dom cleanup*/
-         dojo.event.kwDisconnect({
-                srcObj:     self.tileCanvas,
-                srcFunc:    'onclick',
-                targetObj:  self,
-                targetFunc: 'clickHandler',
-                once:       true
-                });
+         dojo.disconnect(
+             self.tileCanvas,
+             'onclick',
+             self,
+             'clickHandler')
+
+
         self.navPanel = null;
         self.tileCanvas = null;
         while (selDiv = self.selectedDays.pop()) {

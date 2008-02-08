@@ -35,7 +35,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     var self = this;
     var params = p || {};
 
-    dojo.lang.mixin(this, cosmo.view.canvasBase);
+    dojo.mixin(this, cosmo.view.canvasBase);
 
     this.domNode = null;
     this.id = '';

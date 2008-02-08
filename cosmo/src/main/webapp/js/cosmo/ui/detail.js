@@ -1134,7 +1134,7 @@ cosmo.ui.detail.EventFormElements= function () {
             text: _("Main.DetailForm.TimezoneSelector.None"),
             value: "" }];
         if (tzIds){
-            dojo.lang.map(tzIds, function (tzId) {
+            dojo.map(tzIds, function (tzId) {
                 // Strip off the Region, turn underscores into spaces for display
                 options.push({text:tzId.substr(
                     tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
@@ -1355,7 +1355,7 @@ cosmo.ui.detail.EventFormElements= function () {
                 text: _("Main.DetailForm.TimezoneSelector.None"),
                 value: "" }];
             if (tzIds){
-                dojo.lang.map(tzIds, function (tzId) {
+                dojo.map(tzIds, function (tzId) {
                     //Strip off the Region, turn underscores into spaces for display
                     options.push({text:tzId.substr(
                         tzId.indexOf("/") + 1).replace(/_/g," "), value:tzId});
@@ -1574,7 +1574,7 @@ cosmo.ui.detail.ButtonSection = function () {
             if (btn) {
                 btn.destroy();
             }
-            var func = enabled ? dojo.lang.hitch(cosmo.ui.detail,cosmo.ui.detail[key + 'Item']) : null;
+            var func = enabled ? dojo.hitch(cosmo.ui.detail,cosmo.ui.detail[key + 'Item']) : null;
             this[key + 'Button'] = dojo.widget.createWidget("cosmo:Button", {
                 text: _("App.Button." + btns[i]),
                 id: "detail" + btns[i] + "Button",

@@ -56,7 +56,7 @@ cosmo.view.cal.canvas = new function () {
     // Ref to untimed canvas content area to save DOM lookup
     var untimedCanvasContentArea = null;
 
-    dojo.lang.mixin(this, cosmo.view.canvasBase);
+    dojo.mixin(this, cosmo.view.canvasBase);
 
     // Public props
     // ****************

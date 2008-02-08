@@ -204,7 +204,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             i.setAttribute("value", this.pageSize);
             i.setAttribute("align", "middle");
 
-            dojo.event.connect(i,"onchange", dojo.lang.hitch(this,
+            dojo.event.connect(i,"onchange", dojo.hitch(this,
                     function (){
                         if (i.value <= 0 ||
                             i.value % 1 != 0){
@@ -246,7 +246,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             i.setAttribute("value", this.query);
             i.setAttribute("align", "left");
 
-            dojo.event.connect(i,"onchange", dojo.lang.hitch(this,
+            dojo.event.connect(i,"onchange", dojo.hitch(this,
                     function (){
                         this.query = i.value;
                         this.updateUserList();
@@ -261,7 +261,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             b.setAttribute("value", _("UserList.Control.Search"));
             b.setAttribute("align", "middle");
 
-            b.onclick = dojo.lang.hitch(this, function(){
+            b.onclick = dojo.hitch(this, function(){
                 this.query = i.value;
                 this.updateUserList();
                 return false
@@ -291,7 +291,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CosmoUserList", dojo.widget.FilteringT
             i.setAttribute("value", this.pageNumber);
             i.setAttribute("align", "middle");
 
-            dojo.event.connect(i, "onchange", dojo.lang.hitch(this,
+            dojo.event.connect(i, "onchange", dojo.hitch(this,
                function (){
                   this.pageNumber = i.value;
                   this.updateUserList();

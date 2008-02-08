@@ -45,7 +45,7 @@ cosmo.ui.menu = new function () {
             cosmo.account.preferences.getPreferences() :
             cosmo.util.deferred.getFiredDeferred();
 
-        prefsDeferred.addCallback(dojo.lang.hitch(this, function (prefs) {
+        prefsDeferred.addCallback(dojo.hitch(this, function (prefs) {
             if (prefs){
                 this.preferences = prefs;
             }
@@ -268,7 +268,7 @@ cosmo.ui.menu.MenuItem = function (p) {
     this.hide = function (){this.span.style.display = this.divider.style.display = 'none';};
     for (var n in params) { this[n] = params[n]; }
     for (topic in this.subscribeTo){
-        dojo.event.topic.subscribe(topic, dojo.lang.hitch(this, this.subscribeTo[topic]));
+        dojo.event.topic.subscribe(topic, dojo.hitch(this, this.subscribeTo[topic]));
     }
 };
 
@@ -323,7 +323,7 @@ cosmo.ui.menu.MainMenu = function (p) {
         if (!this.hasBeenRendered) {
             initDeferred = cosmo.ui.menu.init();
             initDeferred.addCallback(
-                dojo.lang.hitch(this,
+                dojo.hitch(this,
                     function () {
                         this.hasBeenRendered = true;
                     }
@@ -334,7 +334,7 @@ cosmo.ui.menu.MainMenu = function (p) {
             initDeferred = cosmo.util.deferred.getFiredDeferred();
         }
 
-        initDeferred.addCallback(dojo.lang.hitch(this, function () {
+        initDeferred.addCallback(dojo.hitch(this, function () {
             this.clearAll();
             // Render menu according to loaded items
             var items = cosmo.ui.menu.items;
@@ -351,7 +351,7 @@ cosmo.ui.menu.MainMenu = function (p) {
     }
     for (var n in params) { this[n] = params[n]; }
     dojo.event.topic.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName,
-                           dojo.lang.hitch(this, function (message) {
+                           dojo.hitch(this, function (message) {
                                for (var pref in message.preferences){
                                    cosmo.ui.menu.preferences[pref] = message.preferences[pref];
                                }

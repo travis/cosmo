@@ -401,7 +401,7 @@ dojo.declare("cosmo.ui.Error", null, {
     //         in a hash
     toString: function(){
         var s = this.property + ";" + this.errorKey + ";"+this.errorMessage+";";
-        dojo.lang.map(params, function(param){s += param + ";" });
+        dojo.map(params, function(param){s += param + ";" });
         return s;
     }
 });
@@ -431,7 +431,7 @@ dojo.declare("cosmo.ui.ErrorList", null, {
 
     addErrors: function(/*Array*/ errors){
         var self = this;
-        dojo.lang.map(errors, function(error){ self.addError(error)});
+        dojo.map(errors, function(error){ self.addError(error)});
     },
 
     isEmpty: function(){
@@ -441,12 +441,12 @@ dojo.declare("cosmo.ui.ErrorList", null, {
     toString: function() {
         var s = "";
         var self = this;
-         dojo.lang.map(this._errorsList, function(error) {
+         dojo.map(this._errorsList, function(error) {
             var property = error.property
                 ? self._getPropertyDisplayName(error.property)
                 : null;
             var errorMessage = error.errorMessage
-                || _.apply(null, dojo.lang.unnest(error.errorKey, error.params));
+                || _.apply(null, cosmo.util.lang.unnest(error.errorKey, error.params));
             var message = property
                  ?  ("'" + property + "': "
                      + " " + errorMessage)

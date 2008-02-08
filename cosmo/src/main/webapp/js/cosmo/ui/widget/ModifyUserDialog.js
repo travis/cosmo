@@ -28,7 +28,6 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("dojo.validate.web");
 dojo.require("dojo.event");
-dojo.require("dojo.lang");
 dojo.require("cosmo.convenience");
 
 dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWidget,
@@ -200,7 +199,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
             } else {
                 d = cosmo.cmp.getAccount();
             }
-            d.addCallback(dojo.lang.hitch(this, function(user){
+            d.addCallback(dojo.hitch(this, function(user){
                 if (d.ioArgs.xhr.status == 200){
                     this.editingUser = user
                     this.usernameInput.value = user.username;

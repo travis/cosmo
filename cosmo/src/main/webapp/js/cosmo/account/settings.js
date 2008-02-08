@@ -47,7 +47,7 @@ cosmo.account.settings = new function () {
         advancedAccountBrowser: _('AccountSettings.Advanced.AccountBrowser')
     }
     
-    dojo.lang.mixin(this, cosmo.account.accountBase);
+    dojo.mixin(this, cosmo.account.accountBase);
 
     // Public memebers
     // ==============
@@ -147,7 +147,7 @@ cosmo.account.settings = new function () {
         tabLabel = strings.advanced;
         tabContent = _createElem('div');
         var advancedFormDeferred = this.getAdvancedForm();
-        advancedFormDeferred.addCallback(dojo.lang.hitch(this, function (advancedForm){
+        advancedFormDeferred.addCallback(dojo.hitch(this, function (advancedForm){
             this.advancedForm = advancedForm;
             tabContent.appendChild(this.advancedForm);
             tabs.push({ label: tabLabel, content: tabContent });
@@ -216,7 +216,7 @@ cosmo.account.settings = new function () {
         // Start preferences setting
         setPreferencesDeferred.callback();
         
-        setPreferencesDeferred.addCallback(dojo.lang.hitch(this, function () {
+        setPreferencesDeferred.addCallback(dojo.hitch(this, function () {
             // Validate the form input using each field's
             // attached validators
             var fieldList = this.fieldList;

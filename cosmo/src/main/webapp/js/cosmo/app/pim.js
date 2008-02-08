@@ -32,7 +32,6 @@ dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.timeout");
 dojo.require('cosmo.account.create');
-dojo.require('cosmo.util.uri');
 dojo.require('cosmo.util.hash');
 dojo.require('cosmo.util.deferred');
 dojo.require('cosmo.service.conduits.common');

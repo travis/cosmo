@@ -29,7 +29,7 @@ dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.service');
 dojo.require("cosmo.service.exception");
 
-dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
+dojo.mixin(cosmo.view.cal, cosmo.view.viewBase);
 
 cosmo.view.cal.hasBeenInitialized = false;
 

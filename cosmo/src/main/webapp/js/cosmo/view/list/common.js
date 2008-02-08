@@ -28,7 +28,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
 
-dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
+dojo.mixin(cosmo.view.list, cosmo.view.viewBase);
 
 cosmo.view.list.hasBeenInitialized = false;
 

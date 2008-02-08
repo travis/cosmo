@@ -73,3 +73,16 @@ cosmo.util.lang.shallowCopy = function (obj, deep) {
 cosmo.util.lang.isUndefined = function(it){
     return typeof it == "undefined" && it == undefined; 
 }
+
+//from dojo 0.4
+cosmo.util.lang.unnest = function () { 
+    var out = []; 
+    for (var i = 0; i < arguments.length; i++) { 
+        if (dojo.isArrayLike(arguments[i])) { 
+            var add = cosmo.util.lang.unnest.apply(this, arguments[i]); 
+            out = out.concat(add); 
+        } 
+        else { out.push(arguments[i]); } 
+    } 
+    return out; 
+}

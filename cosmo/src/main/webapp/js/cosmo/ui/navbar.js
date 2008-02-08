@@ -16,7 +16,7 @@
 
 dojo.provide('cosmo.ui.navbar');
 
-dojo.require("dojo.date.common");
+dojo.require("dojox.date.posix");
 dojo.require("dojo.date.format");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");

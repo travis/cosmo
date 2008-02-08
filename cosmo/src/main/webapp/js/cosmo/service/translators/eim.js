@@ -21,6 +21,7 @@
 dojo.provide("cosmo.service.translators.eim");
 
 dojo.require("dojo.date.stamp");
+dojo.require("dojox.date.posix");
 dojo.require("cosmo.util.string");
 dojo.require("cosmo.service.eim");
 dojo.require("cosmo.model");

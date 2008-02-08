@@ -24,7 +24,8 @@
 dojo.provide("cosmo.ui.detail");
 
 dojo.require("dojo.event.*");
-dojo.require("dojo.lfx.*");
+dojo.require("dojo.fx");
+dojo.require("dojox.date.posix");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
@@ -743,7 +744,7 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
         this.showHideSwitch.textContent = display;
     }
     // Do the expando animation
-    dojo.lfx[animKey](this.bodyNode, 500, null, f).play();
+    dojox.fx[animKey](this.bodyNode, 500, null, f).play();
 }
 
 cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {

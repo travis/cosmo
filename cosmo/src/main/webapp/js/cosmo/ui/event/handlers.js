@@ -32,7 +32,7 @@
 
 dojo.provide('cosmo.ui.event.handlers');
 
-dojo.require('dojo.event.topic');
+
 dojo.require('cosmo.app');
 dojo.require('cosmo.app.pim');
 dojo.require('cosmo.ui.timeout');

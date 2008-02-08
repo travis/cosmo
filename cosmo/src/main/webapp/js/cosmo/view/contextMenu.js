@@ -15,7 +15,7 @@
 */
 dojo.provide('cosmo.view.contextMenu');
 
-dojo.require('dojo.event.*');
+
 dojo.require('cosmo.app.pim');
 dojo.require('cosmo.ui.menu');
 

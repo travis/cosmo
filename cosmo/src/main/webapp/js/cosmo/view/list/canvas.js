@@ -60,7 +60,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     for (var n in params) { this[n] = params[n]; }
 
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     // Interface methods
     this.handlePub_calEvent = function (cmd) {
@@ -241,7 +241,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (item) {
                 self.setSelectedItem(item);
                 var f = function () {
-                  dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
+                  dojo.publish('/calEvent', { 'action': 'setSelected',
                     'data': item });
                 };
                 // Free up the UI thread so we don't see two items
@@ -434,7 +434,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         dojo.connect($('listViewTable'), 'oncontextmenu',
             this, 'handleClick');
 
-        dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
+        dojo.publish('/calEvent', { action: 'navigateLoadedCollection',
             opts: null });
 
         return true;
@@ -577,7 +577,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     // has been replaced in the itemRegistry
                     self.setSelectedItem(sel);
                     sel = self.getSelectedItem();
-                    dojo.event.topic.publish('/calEvent', { action: 'setSelected',
+                    dojo.publish('/calEvent', { action: 'setSelected',
                         data: sel });
                 }
             }
@@ -611,7 +611,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 self.view.itemRegistry.removeItem(item.id);
                 // If we just removed the last item, clear the form
                 if (self.view.itemRegistry.length == 0) {
-                    dojo.event.topic.publish('/calEvent', { 'action':
+                    dojo.publish('/calEvent', { 'action':
                         'clearSelected', 'data': null });
                 }
                 self._doSortAndDisplay();
@@ -642,12 +642,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 // List view has all items loaded at once
                 // in the itemRegistry -- no need for selectedItemCache
                 var sel = self.getSelectedItem();
-                dojo.event.topic.publish('/calEvent', { 'action':
+                dojo.publish('/calEvent', { 'action':
                     'eventsDisplaySuccess', 'data': sel });
 
             }
             else {
-                dojo.event.topic.publish('/calEvent', { 'action': 'noItems' });
+                dojo.publish('/calEvent', { 'action': 'noItems' });
             }
         }
         else {

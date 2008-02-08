@@ -61,13 +61,13 @@ cosmo.ui.detail = new function () {
             }
 
             this.item.makeSnapshot();
-            dojo.event.topic.publish('/calEvent', {
+            dojo.publish('/calEvent', {
                 action: 'saveConfirm', delta: delta, data: this.item });
         }
     };
 
     this.removeItem = function () {
-        dojo.event.topic.publish('/calEvent',
+        dojo.publish('/calEvent',
             { action: 'removeConfirm', data: this.item });
     };
 
@@ -225,7 +225,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         }
     };
 
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+    dojo.subscribe('/calEvent', self, 'handlePub');
 
     this.handlePub = function (cmd) {
         var act = cmd.action;

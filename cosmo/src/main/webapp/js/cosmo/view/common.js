@@ -27,9 +27,9 @@ cosmo.view.unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
 cosmo.view.viewBase = new function () {
     this.init = function () {
         // Subscribe to the '/calEvent' channel
-        dojo.event.topic.subscribe('/calEvent', this, 'handlePub_calEvent');
+        dojo.subscribe('/calEvent', this, 'handlePub_calEvent');
         // Subscribe to the '/app' channel
-        dojo.event.topic.subscribe('/app', this, 'handlePub_app');
+        dojo.subscribe('/app', this, 'handlePub_app');
         this.hasBeenInitialized = true;
         cosmo.view.contextMenu.menu = cosmo.view.contextMenu.menu || cosmo.view.contextMenu.createMenu();
     };
@@ -165,12 +165,12 @@ cosmo.view.viewBase = new function () {
                         switch (e.keyCode) {
                             // Enter
                             case 13:
-                                dojo.event.topic.publish('/calEvent',
+                                dojo.publish('/calEvent',
                                     { 'action': 'saveFromForm' });
                                 break;
                             // Delete
                             case 46:
-                                dojo.event.topic.publish('/calEvent',
+                                dojo.publish('/calEvent',
                                     { 'action': 'removeConfirm', 'data': item });
                                 break;
                         }
@@ -274,7 +274,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
                 if (typeof savePreHook == 'function') {
                     savePreHook();
                 }
-                dojo.event.topic.publish('/calEvent',
+                dojo.publish('/calEvent',
                     { 'action': 'saveFromForm' });
             }
             // Hide the dialog first, wait for return value to
@@ -309,7 +309,7 @@ cosmo.view.displayViewFromCollections = function (c) {
     }
     // Wrap in setTimeout so we don't lock up the UI
     // thread during the publish operation
-    var f = function () { dojo.event.topic.publish('/calEvent', {
+    var f = function () { dojo.publish('/calEvent', {
         action: 'loadCollection', opts: { loadType: 'changeCollection',
         collection: newCollection }, data: {}
     }); };

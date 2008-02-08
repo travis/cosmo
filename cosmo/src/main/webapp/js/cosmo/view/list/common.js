@@ -133,7 +133,7 @@ cosmo.view.list.loadItems = function (o) {
         var itemRegistry = cosmo.view.list.createItemRegistry(itemLoadList);
         cosmo.view.list.itemRegistry = itemRegistry;
         
-        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
+        dojo.publish('/calEvent', { action: 'eventsLoadSuccess',
                                                 data: itemRegistry, opts: opts });
     });
     return deferred;
@@ -251,7 +251,7 @@ cosmo.view.list.createNoteItem = function (s) {
         // Make service call to save the item -- success from
         // the service will publish 'saveSuccess' action to tell
         // the UI to update appropriately
-        dojo.event.topic.publish('/calEvent', { action: 'save', data: item,
+        dojo.publish('/calEvent', { action: 'save', data: item,
             qualifier: 'new', saveType: 'new' })
         return cosmo.view.list.itemRegistry.getItem(id);
     }

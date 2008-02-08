@@ -54,7 +54,7 @@ cosmo.ui.navbar.Bar = function (p) {
     for (var n in params) { this[n] = params[n]; }
 
     // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     // Interface methods
     // ===========
@@ -303,7 +303,7 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             }
         }
         var publish = function (dir) {
-            dojo.event.topic.publish('/calEvent', {
+            dojo.publish('/calEvent', {
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: dir },
                     data: {} });

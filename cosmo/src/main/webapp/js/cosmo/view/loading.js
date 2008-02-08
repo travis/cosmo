@@ -41,7 +41,7 @@ cosmo.view.loading.StatusMessage = function (p) {
             this.domNode.style.zIndex = 1000;
 
             // Subscribe to the '/calEvent' channel
-            dojo.event.topic.subscribe('/calEvent', this, 'handlePub_calEvent');
+            dojo.subscribe('/calEvent', this, 'handlePub_calEvent');
         }
         var left = ((this.parent.width - this.width) /  2);
         var top = ((this.parent.height - this.height) /  2);

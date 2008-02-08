@@ -160,7 +160,7 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     // (3) Don't trigger Save/Remove when typing in form fields
     // ======
     else {
-        dojo.event.topic.publish('/app', { type: 'keyboardInput', appEvent: e });
+        dojo.publish('/app', { type: 'keyboardInput', appEvent: e });
     }
 }
 

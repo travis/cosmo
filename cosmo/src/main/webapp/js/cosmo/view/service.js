@@ -59,7 +59,7 @@ cosmo.view.service = new function () {
     this.lastSent = null;
 
     // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
+    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     /**
      * Handle items published on the '/calEvent' channel, including
@@ -119,7 +119,7 @@ cosmo.view.service = new function () {
 
         if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
-            dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
+            dojo.publish('/calEvent', {action: 'save', data: item, delta: delta });
         }
         else {
             confirmType = '';
@@ -413,7 +413,7 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.event.topic.publish('/calEvent', {
+            dojo.publish('/calEvent', {
                  'action': act,
                  'data': item,
                  'saveType': saveType,
@@ -625,9 +625,9 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.event.topic.publish('/calEvent', { 'action': act,
+            dojo.publish('/calEvent', { 'action': act,
                 'data': removeEv, 'opts': opts });
-            dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});
+            dojo.publish('/calEvent', { action: 'setSelected', data: null});
         }
         setTimeout(f, 0);
     }

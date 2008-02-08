@@ -29,7 +29,7 @@ cosmo.view.contextMenu = new function () {
           handleClick: function () {
               var currView = cosmo.view.getCurrentView();
               var selItem = currView.canvasInstance.getSelectedItem();
-              dojo.event.topic.publish('/calEvent',
+              dojo.publish('/calEvent',
                   { action: 'removeConfirm',
                     data: selItem });
           } })

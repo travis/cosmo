@@ -175,7 +175,7 @@ cosmo.view.cal.loadItems = function (p) {
     loadDeferred.addCallback(function(){
         var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
     
-        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
+        dojo.publish('/calEvent', { action: 'eventsLoadSuccess',
                                                 data: itemRegistry, opts: opts });
     });
     return loadDeferred;

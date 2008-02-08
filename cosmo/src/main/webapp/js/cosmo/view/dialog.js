@@ -22,7 +22,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.button");
 
 cosmo.view.dialog = new function () {
-    dojo.event.topic.subscribe('/calEvent', this, 'handlePub');
+    dojo.subscribe('/calEvent', this, 'handlePub');
     // Public members
     // ********************
     this._item = null;
@@ -58,14 +58,14 @@ cosmo.view.dialog.BaseDialog.prototype.closeSelf = function () {
 cosmo.view.dialog.BaseDialog.prototype.doPublishRemove =
     function (qual) {
     var selItem = cosmo.view.dialog.getSelectedItem();
-    dojo.event.topic.publish('/calEvent', {
+    dojo.publish('/calEvent', {
         action: 'remove', qualifier: qual, data: selItem });
     this.closeSelf();
 };
 
 cosmo.view.dialog.BaseDialog.prototype.doPublishSave =
     function (qual, saveItem, delta) {
-    dojo.event.topic.publish('/calEvent', {
+    dojo.publish('/calEvent', {
         action: 'save', qualifier: qual,
         data: saveItem, delta: delta });
     this.closeSelf();

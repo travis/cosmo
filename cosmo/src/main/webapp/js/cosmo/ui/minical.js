@@ -123,7 +123,7 @@ cosmo.ui.minical.MiniCal = function (p) {
     // state in Firefox
     hide();
 
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub');
+    dojo.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function (cmd) {
         var act = cmd.action;
         var qual = cmd.qualifier || null;
@@ -722,7 +722,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
-            dojo.event.topic.publish('/calEvent', {
+            dojo.publish('/calEvent', {
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: self.currDate },
                 data: {} });
@@ -748,7 +748,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
-            dojo.event.topic.publish('/calEvent', {
+            dojo.publish('/calEvent', {
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: dt,
                       source: 'minical' },
@@ -780,7 +780,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
                 { viewName: cosmo.view.names.CAL, noLoad: true });
             var f = function () {
-                dojo.event.topic.publish('/calEvent', {
+                dojo.publish('/calEvent', {
                     action: 'loadCollection',
                     opts: { loadType: 'changeTimespan', goTo: d },
                         data: {} });

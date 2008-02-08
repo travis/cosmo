@@ -268,7 +268,7 @@ cosmo.ui.menu.MenuItem = function (p) {
     this.hide = function (){this.span.style.display = this.divider.style.display = 'none';};
     for (var n in params) { this[n] = params[n]; }
     for (topic in this.subscribeTo){
-        dojo.event.topic.subscribe(topic, dojo.hitch(this, this.subscribeTo[topic]));
+        dojo.subscribe(topic, dojo.hitch(this, this.subscribeTo[topic]));
     }
 };
 
@@ -350,7 +350,7 @@ cosmo.ui.menu.MainMenu = function (p) {
         return initDeferred;
     }
     for (var n in params) { this[n] = params[n]; }
-    dojo.event.topic.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName,
+    dojo.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName,
                            dojo.hitch(this, function (message) {
                                for (var pref in message.preferences){
                                    cosmo.ui.menu.preferences[pref] = message.preferences[pref];

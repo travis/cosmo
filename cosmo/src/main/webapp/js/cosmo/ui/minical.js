@@ -147,7 +147,7 @@ cosmo.ui.minical.MiniCal = function (p) {
                         var key = goToNav.toLowerCase();
                         var incr = key.indexOf('back') > -1 ? -1 : 1;
                         queryDate = cosmo.datetime.Date.add(viewStart,
-                            dojo.date.dateParts.WEEK, incr);
+                            cosmo.datetime.util.dateParts.WEEK, incr);
                     }
                     // param is actual Date
                     else {
@@ -702,7 +702,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             viewStart.getMonth(), 1);
 
         self.firstMonthDate = cosmo.datetime.Date.add(self.firstMonthDate,
-            dojo.date.dateParts.MONTH, incr); // Increment the months
+            cosmo.datetime.util.dateParts.MONTH, incr); // Increment the months
         self.renderMonths(); // Render the desired set of months
         self.renderSelection(); // Keep the selection where it was
     };

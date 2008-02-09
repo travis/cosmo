@@ -136,7 +136,7 @@ cosmo.view.cal.canvas = new function () {
 
             // Do a week's worth of day cols with day name and date
             for (var i = 0; i < 7; i++) {
-                calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
+                calcDay = cosmo.datetime.Date.add(viewStart, cosmo.datetime.util.dateParts.DAY, i);
                 // Subtract one pixel of height for 1px border per retarded CSS spec
                 str += '<div class="dayListDayDiv" id="dayListDiv' + i +
                     '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
@@ -244,7 +244,7 @@ cosmo.view.cal.canvas = new function () {
 
             // Do a week's worth of day cols with hours
             for (var i = 0; i < 7; i++) {
-                calcDay = cosmo.datetime.Date.add(viewStart, dojo.date.dateParts.DAY, i);
+                calcDay = cosmo.datetime.Date.add(viewStart, cosmo.datetime.util.dateParts.DAY, i);
                 str += '<div class="dayDiv" id="dayDiv' + i +
                     '" style="left:' + start + 'px; width:' +
                     (cosmo.view.cal.canvas.dayUnitWidth-1) +
@@ -1379,7 +1379,7 @@ cosmo.view.cal.canvas = new function () {
             hou = t.hours;
             min = t.minutes;
             start = new cosmo.datetime.Date(yea, mon, dat, hou, min);
-            end = cosmo.datetime.Date.add(start, dojo.date.dateParts.MINUTE, 60);
+            end = cosmo.datetime.Date.add(start, cosmo.datetime.util.dateParts.MINUTE, 60);
         }
         else if (lozType == types.UNTIMED) {
             dayind = getIndexFromAllDayDiv(evParam);

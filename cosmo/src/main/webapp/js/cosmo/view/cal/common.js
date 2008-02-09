@@ -110,7 +110,7 @@ cosmo.view.cal.loadItems = function (p) {
             var key = goToNav.toLowerCase();
             var incr = key.indexOf('back') > -1 ? -1 : 1;
             queryDate = cosmo.datetime.Date.add(_cal.viewStart,
-                dojo.date.dateParts.WEEK, incr);
+                cosmo.datetime.util.dateParts.WEEK, incr);
         }
         // param is actual Date
         else {
@@ -311,7 +311,7 @@ cosmo.view.cal.getNewViewStart = function (key) {
         incr = -1;
     }
     queryDate = cosmo.datetime.Date.add(this.viewStart,
-        dojo.date.dateParts.WEEK, incr);
+        cosmo.datetime.util.dateParts.WEEK, incr);
     return queryDate;
 };
 

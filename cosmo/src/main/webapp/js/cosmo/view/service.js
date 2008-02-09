@@ -32,11 +32,11 @@ cosmo.view.service = new function () {
     var self = this;
     
     this._ranges = {
-        'daily': [dojo.date.dateParts.DAY, 1],
-        'weekly': [dojo.date.dateParts.WEEK, 1],
-        'biweekly': [dojo.date.dateParts.WEEK, 2],
-        'monthly': [dojo.date.dateParts.MONTH, 1],
-        'yearly': [dojo.date.dateParts.YEAR, 1]
+        'daily': [cosmo.datetime.util.dateParts.DAY, 1],
+        'weekly': [cosmo.datetime.util.dateParts.WEEK, 1],
+        'biweekly': [cosmo.datetime.util.dateParts.WEEK, 2],
+        'monthly': [cosmo.datetime.util.dateParts.MONTH, 1],
+        'yearly': [cosmo.datetime.util.dateParts.YEAR, 1]
     };
 
     // Public attributes

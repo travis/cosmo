@@ -192,14 +192,14 @@ cosmo.view.cal.lozenge.Lozenge.prototype._mainAreaCursorChange = function (isPro
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicLeft = function () {
     var ev = this.getItem();
-    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+    var diff = cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.DAY,
         cosmo.view.cal.viewStart, ev.data.getEventStamp().getStartDate());
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 
 };
 cosmo.view.cal.lozenge.Lozenge.prototype.getPlatonicWidth = function () {
     var ev = this.getItem();
-    var diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+    var diff = (cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.DAY,
         ev.data.getEventStamp().getStartDate(), ev.data.getEventStamp().getEndDate()))+3;
     return (diff * cosmo.view.cal.canvas.dayUnitWidth);
 }
@@ -601,7 +601,7 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
 
     var evStart = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     var diff = this.auxDivList.length;
-    var evEnd = cosmo.datetime.Date.add(evStart, dojo.date.dateParts.DAY, diff);
+    var evEnd = cosmo.datetime.Date.add(evStart, cosmo.datetime.util.dateParts.DAY, diff);
     var startTime = cosmo.view.cal.canvas.calcTimeFromPos(this.top);
     // Add +1 to height for border on background
     // Add +2 to height for border on lozenge div
@@ -618,9 +618,9 @@ cosmo.view.cal.lozenge.HasTimeLozenge.prototype.getDelta = function (ev, dragMod
     // height, preserve the original times when editing
     var startDate = ev.dataOrig.getEventStamp().getStartDate().clone();
     var endDate = ev.dataOrig.getEventStamp().getEndDate().clone();
-    var origLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
+    var origLengthMinutes = cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.MINUTE,
         startDate, endDate);
-    var newLengthMinutes = cosmo.datetime.Date.diff(dojo.date.dateParts.MINUTE,
+    var newLengthMinutes = cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.MINUTE,
         evStart, evEnd);
 
     if (origLengthMinutes < this.minimumMinutes && newLengthMinutes == this.minimumMinutes) {
@@ -1027,7 +1027,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.updateFromEvent = function (ev, t
     var eventStamp = ev.data.getEventStamp();
     var startDate = eventStamp.getStartDate();
     var endDate = eventStamp.getEndDate();
-    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+    var diff = cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.DAY,
         startDate, endDate) + 1;
     this.left = this.getPlatonicLeft();
     this.width = (diff*cosmo.view.cal.canvas.dayUnitWidth)-3;
@@ -1054,14 +1054,14 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.getDelta = function (ev, dragMode
     var endDate = eventStamp.getEndDate();    // Dragged-to date
     var evDate = cosmo.view.cal.canvas.calcDateFromPos(this.left);
     // Difference in days
-    var diff = cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+    var diff = cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.DAY,
         startDate, evDate);
     // Increment start and end by number of days
     // User can't resize all-day events
     startDate = cosmo.datetime.Date.add(startDate,
-        dojo.date.dateParts.DAY, diff);
+        cosmo.datetime.util.dateParts.DAY, diff);
     endDate = cosmo.datetime.Date.add(endDate,
-        dojo.date.dateParts.DAY, diff + 1);
+        cosmo.datetime.util.dateParts.DAY, diff + 1);
 
     var delta = new cosmo.model.Delta(ev.data);
     delta.addStampProperty("event","startDate", startDate);
@@ -1086,7 +1086,7 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.calcWidth = function (startDay, e
     var maxDiff = (7-startDay);
     var width = 0;
 
-    diff = (cosmo.datetime.Date.diff(dojo.date.dateParts.DAY,
+    diff = (cosmo.datetime.Date.diff(cosmo.datetime.util.dateParts.DAY,
         startDate, endDate))+1;
 
     diff = (diff > maxDiff) ? maxDiff : diff;

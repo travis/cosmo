@@ -110,7 +110,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 //            var button = dojo.widget.createWidget("cosmo:Button",
 //                    {text:this.submitButtonText,
 //                     small:true,
-//                     widgetId: this.widgetId + "SubmitButton"});
+//                     id: this.widgetId + "SubmitButton"});
 //
 
 //            dojo.dom.prependChild(button.domNode, this.submitButton.parentNode);
@@ -143,7 +143,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ModifyUserDialog", dojo.widget.HtmlWid
 //                var button = dojo.widget.createWidget("cosmo:Button",
 //                        {text:this.cancelButtonText,
 //                         small:true,
-//                         widgetId: this.widgetId + "CancelButton"});
+//                         id: this.widgetId + "CancelButton"});
 
 //                dojo.dom.prependChild(button.domNode, this.cancelButton.parentNode);
 //                dojo.dom.removeNode(this.cancelButton);

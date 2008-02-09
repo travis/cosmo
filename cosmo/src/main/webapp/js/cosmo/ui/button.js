@@ -45,7 +45,7 @@ cosmo.ui.button.Button = function(elemId, width, onClickHandler,
     // Normal params in order
     else {
         widget = new cosmo.ui.widget.Button({
-            widgetId: elemId,
+            id: elemId,
             text: displayText, 'width':width,
             handleOnClick: onClickHandler, small: isSmall,
             enabled: enabled });

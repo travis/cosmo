@@ -42,7 +42,7 @@ dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Tem
 
     // Private
     _getButtonIndex: function (td) {
-        var n = td.id.replace(this.widgetId + '_button', '');
+        var n = td.id.replace(this.id + '_button', '');
         return parseInt(n);
     },
     _morphButton: function (td, over){
@@ -100,13 +100,13 @@ dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Tem
         table.appendChild(body);
         tr = _createElem('tr');
         body.appendChild(tr);
-        table.id = this.widgetId + '_buttonSet';
+        table.id = this.id + '_buttonSet';
         table.className = 'buttonSet';
         this.buttonNodes = [];
         for (var i = 0; i < buttons.length; i++) {
             var b = buttons[i];
             var td = _createElem('td');
-            td.id = this.widgetId + '_button' + i;
+            td.id = this.id + '_button' + i;
             td.style.width = b.width + 'px';
             td.style.backgroundImage = 'url(' + cosmo.env.getImageUrl('image_grid.png')+')';
             var pos = i == this.selectedButtonIndex ? b.downStateImgPos : b.defaultImgPos;

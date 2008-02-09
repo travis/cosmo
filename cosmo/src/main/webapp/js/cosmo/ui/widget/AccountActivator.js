@@ -61,7 +61,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
         fillInTemplate: function (){
             var button = dojo.widget.createWidget("cosmo:Button",
                 {text: _("Activation.Activate"),
-                 widgetId: "accountActivateButton"});
+                 id: "accountActivateButton"});
 
             this.activateButtonContainer.appendChild(button.domNode);
 

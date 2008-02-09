@@ -244,7 +244,7 @@ cosmo.ui.navbar.Bar = function (p) {
         var gbsDiv = _createElem("div");
         var vT =  new cosmo.ui.widget.GraphicRadioButtonSet({
             selectedButtonIndex: selButtonIndex, height: 35, buttons: btns,
-            widgetId: "viewToggle"
+            id: "viewToggle"
         }, gbsDiv);
         t.appendChild(gbsDiv);
         this.viewToggle = vT;
@@ -467,7 +467,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             small: true,
             width: 52,
             enabled: true,
-            widgetId: "quickEntryCreate"})
+            id: "quickEntryCreate"})
 
         var disabled = new cosmo.ui.widget.Button({
             text: _('App.Button.Create'),

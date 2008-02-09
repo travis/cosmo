@@ -22,7 +22,7 @@ dojo.declare("cosmo.ui.widget.About", [dijit._Widget, dijit._Templated], {
             var main = null;
             var d = null;
 
-            node.id = this.widgetId;
+            node.id = this.id;
             node.style.textAlign = 'center';
             node.style.margin = 'auto';
             node.style.width = '100%';

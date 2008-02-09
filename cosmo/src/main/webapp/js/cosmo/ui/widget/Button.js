@@ -49,8 +49,8 @@ dojo.declare("cosmo.ui.widget.Button", [dijit._Widget, dijit._Templated], {
         // Mouse effects and onclick
         this._attachHandlers();
         // DOM handles
-        this.domNode.id = this.widgetId;
-        this.domNode.name = this.widgetId;
+        this.domNode.id = this.id;
+        this.domNode.name = this.id;
 
         // Finish setting up
         this.setText(this.text);

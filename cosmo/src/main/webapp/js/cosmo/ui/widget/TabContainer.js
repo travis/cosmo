@@ -49,7 +49,7 @@ dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], 
         var o = tabObj;
         var d = null;
         d = _createElem('td');
-        d.id = this.widgetId + '_tab' + index;
+        d.id = this.id + '_tab' + index;
         d.className = sel ? 'tabSelected' : 'tabUnselected';
         d.appendChild(_createText(o.label));
         d.onclick = function () { self.showTab(index); };
@@ -57,7 +57,7 @@ dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], 
 
         if (typeof o.content == 'string') {
             var n = _createElem('div');
-            n.id = this.widgetId + '_content' + index;
+            n.id = this.id + '_content' + index;
             n.innerHTML = o.content;
             this.contentNodes.push(n);
         }
@@ -129,11 +129,11 @@ dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], 
         tabPanelTr = _createElem('tr');
         tabPanelTBody.appendChild(tabPanelTr);
         this.tabArea = tabPanelTable;
-        tabPanelTable.id = this.widgetId + '_tabPanel';
+        tabPanelTable.id = this.id + '_tabPanel';
         tabPanelTable.className = 'tabPanel';
         tabContent = _createElem('div');
         this.contentArea = tabContent;
-        tabContent.id = this.widgetId + '_contentArea';
+        tabContent.id = this.id + '_contentArea';
         tabContent.className = 'tabContent';
         s = _createElem('td');
         s.className = 'tabSpacer';

@@ -289,7 +289,7 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [
                 new Button({
-                    widgetId: "unsavedChangesDialogCancelButton",
+                    id: "unsavedChangesDialogCancelButton",
                     text: strings.cancelButtonText, 
                     width: btnWidth,
                     handleOnClick: opts.cancelFunc, 
@@ -298,14 +298,14 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             ],
             'btnsRight': [
                 new cosmo.ui.button.Button({ 
-                    widgetId: "unsavedChangesDialogDiscardButton",
+                    id: "unsavedChangesDialogDiscardButton",
                     text: strings.discardButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.discardFunc,
                     small: true,
                     enabled: true }),
                 new cosmo.ui.button.Button({ 
-                    widgetId: "unsavedChangesDialogSaveButton",
+                    id: "unsavedChangesDialogSaveButton",
                     text: strings.saveButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.saveFunc,

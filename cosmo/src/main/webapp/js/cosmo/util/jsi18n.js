@@ -30,7 +30,7 @@ cosmo.util.jsi18n.init = function(uri){
             var line = lines[i];
 
             //Skip comments
-            if (dojo.string.startsWith(dojo.string.trim(line), "#")){
+            if (cosmo.util.string.startsWith(dojo.trim(line), "#")){
                 continue;
             }
             

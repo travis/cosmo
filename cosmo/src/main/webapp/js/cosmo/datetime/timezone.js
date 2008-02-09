@@ -452,7 +452,7 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback,
             var line = lines[i];
 
             //Skip comments
-            if (cosmo.util.string.startsWith(dojo.string.trim(line), "#") || line.length < 3){
+            if (cosmo.util.string.startsWith(dojo.trim(line), "#") || line.length < 3){
                 continue;
             }
 

@@ -16,8 +16,6 @@
 
 dojo.provide("cosmo.ui.widget.CollectionDetailsDialog");
 
-
-
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
@@ -28,13 +26,8 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
 dojo.require("cosmo.topics");
 
-dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog", "html",
-
-//init function.
-dojo.widget.HtmlWidget, function(){
-
-}
-,
+dojo.declare("cosmo.ui.widget.CollectionDetailsDialog", 
+             [dijit._Widget, dijit._Templated], 
 //Prototype Properties
 {
         //User supplied properties:
@@ -42,8 +35,8 @@ dojo.widget.HtmlWidget, function(){
         displayedSelection: '', // The selection item to display if invoked from ticket view
 
         // Template stuff
-        templatePath:dojo.uri.dojoUri(
-            '../../cosmo/ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html'),
+        templatePath:dojo.moduleUrl("cosmo") +
+            'ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html',
 
         // Attach points
         table: null, //the table, which has pretty much all the content
@@ -94,7 +87,7 @@ dojo.widget.HtmlWidget, function(){
 
         protocolUrls: null,
         displayName: null,
-        httpSupported: !dojo.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
+        httpSupported: !cosmo.util.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
 
         // Lifecycle functions
         postMixInProperties: function(){
@@ -108,7 +101,7 @@ dojo.widget.HtmlWidget, function(){
            return !(collection instanceof cosmo.model.Collection && !collection.isWriteable())
         },
 
-        fillInTemplate: function () {
+        postCreate: function () {
             var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
             cosmo.util.html.setSelectOptions(this.clientSelector, options);
 
@@ -326,21 +319,14 @@ dojo.widget.HtmlWidget, function(){
  cosmo.ui.widget.CollectionDetailsDialog.getInitProperties =
     function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection) {
 
-    var dummyNode = document.createElement('span');
-    var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
-                    { collection: collection,
-                      displayedSelection: displayedSelection },
-                 dummyNode, 'last');
+        var contentWidget = new cosmo.ui.widget.CollectionDetailsDialog(
+            { collection: collection,
+              displayedSelection: displayedSelection });
 
-    dummyNode.removeChild(contentWidget.domNode);
-
-    var closeButton = dojo.widget.createWidget(
-        "cosmo:Button",
-        { text: _("Main.CollectionDetails.Close"),
-            width: 74,
-            handleOnClick: cosmo.app.hideDialog },
-            dummyNode, 'last');
-    dummyNode.removeChild(closeButton.domNode);
+        var closeButton = new cosmo.ui.widget.Button(
+            { text: _("Main.CollectionDetails.Close"),
+              width: 74,
+              handleOnClick: cosmo.app.hideDialog });
 
     return {
         content: contentWidget,

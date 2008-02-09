@@ -1,6 +1,6 @@
 dojo.provide("cosmo.ui.widget.About");
 
-dojo.require("dojo.widget.*");
+
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");

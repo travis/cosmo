@@ -16,8 +16,6 @@
 
 dojo.provide('cosmo.ui.menu');
 
-dojo.require("dojo.io.cookie");
-
 dojo.require("cosmo.env");
 dojo.require('cosmo.app');
 dojo.require('cosmo.account.preferences');

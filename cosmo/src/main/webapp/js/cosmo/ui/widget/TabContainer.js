@@ -23,7 +23,7 @@
 
 dojo.provide("cosmo.ui.widget.TabContainer");
 
-dojo.require("dojo.widget.*");
+
 
 dojo.require("cosmo.env");
 

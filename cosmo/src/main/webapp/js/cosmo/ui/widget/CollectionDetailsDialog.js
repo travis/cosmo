@@ -16,7 +16,7 @@
 
 dojo.provide("cosmo.ui.widget.CollectionDetailsDialog");
 
-dojo.require("dojo.widget.*");
+
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");

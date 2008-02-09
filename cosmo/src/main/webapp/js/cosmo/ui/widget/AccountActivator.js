@@ -24,7 +24,7 @@
 
 dojo.provide("cosmo.ui.widget.AccountActivator");
 
-dojo.require("dojo.widget.*");
+
 
 dojo.require("dojo.dom");
 dojo.require("cosmo.env");

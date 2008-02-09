@@ -18,8 +18,7 @@ dojo.provide("cosmo.ui.selector");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
 
-dojo.require("dojo.gfx.color.hsv");
-
+dojo.require("dojox.color");
 dojo.require("cosmo.app.pim");
 dojo.require('cosmo.convenience');
 dojo.require("cosmo.topics");
@@ -87,8 +86,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         }
     };
     this._getRGB = function (h, s, v) {
-        var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
-            inputRange: [360, 100, 100], outputRange: 255 });
+        var rgb = dojox.color.fromHsv(h, s, v).toRgb();
         return 'rgb(' + rgb.join() + ')';
     };
 

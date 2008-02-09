@@ -138,7 +138,7 @@ cosmo.topics.declareMessage({ className: "cosmo.topics.AppLevelMessage",
 cosmo.topics.declareMessage({ className: "cosmo.topics.ModalDialogToggle",
     // summary: published when the modal dialog box is toggled on or off
     superclass: cosmo.topics.AppLevelMessage,
-    initializer: function (opts) {
+    constructor: function (opts) {
         this.topicName = this.constructor.superclass.topicName;
         this.isDisplayed = opts.isDisplayed || false;
     },

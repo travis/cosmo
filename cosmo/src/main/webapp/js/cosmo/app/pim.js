@@ -23,7 +23,7 @@ dojo.require('cosmo.convenience');
 // --
 
 dojo.require("dojo.DeferredList");
-
+dojo.require("dojox.color");
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
@@ -239,8 +239,7 @@ cosmo.app.pim = dojo.mixin(new function () {
         var collections = [];
         var calcColors = function (hue) {
             var getRGB = function (h, s, v) {
-                var rgb = cosmo.util.color.hsv2rgb(h, s, v, {
-                    inputRange: [360, 100, 100], outputRange: 255 });
+                var rgb = dojox.color.fromHsv(h, s, v).toRgb();
                 return 'rgb(' + rgb.join() + ')';
             }
             var lozengeColors = {};

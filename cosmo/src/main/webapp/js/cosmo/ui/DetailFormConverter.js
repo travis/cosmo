@@ -21,7 +21,7 @@ dojo.require("cosmo.model.exception");
 dojo.declare("cosmo.ui.DetailFormConverter", null, {
    _item: null,
 
-   initializer: function(item){
+   constructor: function(item){
        this._item = item;
        this._errors = new cosmo.ui.ErrorList();
    },

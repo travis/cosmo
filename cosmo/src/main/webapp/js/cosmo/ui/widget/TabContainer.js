@@ -33,7 +33,7 @@ dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], 
     selectedTabIndex: 0,
 
     // Define these here so they don't end up as statics
-    initializer: function () {
+    constructor: function () {
         this.tabs = [];
         this.tabNodes = [];
         this.contentNodes = [];

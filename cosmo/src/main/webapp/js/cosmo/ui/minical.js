@@ -28,8 +28,6 @@
 dojo.provide("cosmo.ui.minical");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
-dojo.require("dojo.date.common");
-
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");

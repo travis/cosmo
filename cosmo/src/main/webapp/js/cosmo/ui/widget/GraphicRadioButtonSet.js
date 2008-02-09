@@ -24,13 +24,9 @@
  */
 
 dojo.provide("cosmo.ui.widget.GraphicRadioButtonSet");
-
-
-
-dojo.require("cosmo.env");
 dojo.require("cosmo.env");
 
-dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.HtmlWidget, {
+dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Templated], {
 
     templateString: '<span></span>',
 
@@ -39,7 +35,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
     height: 0,
 
     // Define these here so they don't end up as statics
-    initializer: function () {
+    constructor: function () {
         this.buttons = [];
         this.buttonNodes = [];
     },
@@ -84,7 +80,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
     // Public
 
     // Lifecycle
-    fillInTemplate: function () {
+    postCreate: function () {
 
         var d = this.domNode;
         var table = null;

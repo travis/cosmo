@@ -39,13 +39,13 @@ cosmo.ui.imagegrid.readConfig = function (data) {
 // Get the config data file that tells us
 // which images are where, and what sizes
 
-cosmo.ui.imagegrid.readConfig(
-    dojo.json.evalJson(
-        dojo.hostenv.getText(
-            cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/imagegrid.json"
-        )
-    )
-);
+var d = dojo.xhrGet({
+    url: cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/imagegrid.json",
+    sync: true
+});
+d.addCallback(function(str){
+    cosmo.ui.imagegrid.readConfig(dojo.fromJson(str));
+});
 
 cosmo.ui.imagegrid.Image = function (p) {
     this.row = p.row;

@@ -22,7 +22,6 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.button");
 
 cosmo.view.dialog = new function () {
-    dojo.subscribe('/calEvent', this, 'handlePub');
     // Public members
     // ********************
     this._item = null;
@@ -38,6 +37,7 @@ cosmo.view.dialog = new function () {
                 break;
         }
     };
+    dojo.subscribe('/calEvent', this, 'handlePub');
     this.getSelectedItem = function () {
         return this._item;
     };

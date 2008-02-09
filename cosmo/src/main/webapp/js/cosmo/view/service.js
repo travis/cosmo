@@ -58,15 +58,6 @@ cosmo.view.service = new function () {
     // Last clicked cal item -- used for selection persistence.
     this.lastSent = null;
 
-    // Subscribe to the '/calEvent' channel
-    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
-
-    /**
-     * Handle items published on the '/calEvent' channel, including
-     * self-published items
-     * @param cmd A JS Object, the command containing orders for
-     * how to handle the published item.
-     */
     this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;
         var qual = cmd.qualifier || null;
@@ -95,6 +86,16 @@ cosmo.view.service = new function () {
                 break;
         }
     };
+
+    // Subscribe to the '/calEvent' channel
+    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
+
+    /**
+     * Handle items published on the '/calEvent' channel, including
+     * self-published items
+     * @param cmd A JS Object, the command containing orders for
+     * how to handle the published item.
+     */
 
 
     // Saving changes

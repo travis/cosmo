@@ -54,7 +54,10 @@ dojo.declare("cosmo.ui.widget.About", [dijit._Widget, dijit._Templated], {
             
             d = _createElem('div');
             d.className = "notices";
-            d.innerHTML = dojo.hostenv.getText(cosmo.env.getFullUrl("Notices"));
+            var noticesDeferred = dojo.xhrGet({url: cosmo.env.getFullUrl("Notices")});
+            noticesDeferred.addCallback(function(str){
+                d.innerHTML = str;
+            });
             node.appendChild(d);
         }
 });

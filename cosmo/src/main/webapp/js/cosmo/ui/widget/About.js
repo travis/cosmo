@@ -1,13 +1,10 @@
 dojo.provide("cosmo.ui.widget.About");
 
-
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
 
-
-dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
-    {
+dojo.declare("cosmo.ui.widget.About", [dijit._Widget, dijit._Templated], {
         templateString: '<span></span>',
 
         // Props from template or set in constructor
@@ -20,7 +17,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
 
         // Attach points
 
-        fillInTemplate: function () {
+        postCreate: function () {
             var node = this.domNode
             var main = null;
             var d = null;
@@ -59,10 +56,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.About", dojo.widget.HtmlWidget,
             d.className = "notices";
             d.innerHTML = dojo.hostenv.getText(cosmo.env.getFullUrl("Notices"));
             node.appendChild(d);
-        },
-        postCreate: function () {
         }
-    },
-    "html");
+});
+
 
 

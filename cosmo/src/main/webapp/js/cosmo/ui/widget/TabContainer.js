@@ -23,11 +23,9 @@
 
 dojo.provide("cosmo.ui.widget.TabContainer");
 
-
-
 dojo.require("cosmo.env");
 
-dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget, {
+dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], {
 
     templateString: '<span></span>',
 
@@ -64,7 +62,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
             this.contentNodes.push(n);
         }
         else {
-            if (o.content instanceof dojo.widget.HtmlWidget) {
+            if (o.content instanceof dijit._Widget){
                 n = o.content.domNode;
                 // For widgets, keep the actual widget as the canonical reference
                 // We can grab the domNode of it as needed
@@ -88,7 +86,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
             var tab = this.tabNodes[i];
             var content = this.contentNodes[i];
             // If the content is a widget, point us as the DOM node
-            if (content instanceof dojo.widget.HtmlWidget) {
+            if (content instanceof dijit._Widget){
                 content = content.domNode;
             }
             if (i == index) {
@@ -109,7 +107,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
     // Private methods
 
     // Lifecycle
-    fillInTemplate: function () {
+    postCreate: function () {
 
         var tabMain = null;
         var tabPanelTable = null;
@@ -165,17 +163,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         this.domNode.appendChild(tabMain);
         tabMain.style.visibility = 'visible';
         this.showTab(0);
-    },
-    // Clean up any sub-widgets in any of the tabs
-    destroyChildren: function () {
-        n = this.contentNodes;
-        for (var i = 0; i < n.length; i++) {
-            var c = n[i];
-            if (c instanceof dojo.widget.HtmlWidget) {
-                c.destroy();
-            }
-        }
-
     }
 } );
 

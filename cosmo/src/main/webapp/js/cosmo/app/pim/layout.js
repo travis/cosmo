@@ -370,9 +370,11 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
-        var widget = dojo.widget.createWidget('cosmo:CollectionSelector', {
+        var d = _createElem("div");
+        var widget = cosmo.ui.widget.CollectionSelector({
             collection: cosmo.app.pim.getSelectedCollection(),
-            ticketKey: cosmo.app.pim.ticketKey }, selectorDiv, 'last');
+            ticketKey: cosmo.app.pim.ticketKey }, d);
+        selectorDiv.appendChild(d);
         cB.widget = widget;
     }
     // Logged-in view -- use the collection selector

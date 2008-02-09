@@ -286,8 +286,10 @@ cosmo.app.pim = dojo.mixin(new function () {
             var subscriptionsDeferred = this.serv.getSubscriptions();
             subscriptionsDeferred.addCallback(dojo.hitch(this, function (subscriptions){
                 var result = this.filterOutDeletedSubscriptions(subscriptions);
+                console.debug(result)
                 subscriptions = result[0];
                 this._deletedSubscriptions = result[1];
+                console.debug(result)
                 for (var i = 0; i < subscriptions.length; i++){
                     var subscription = subscriptions[i];
                     collections.push(subscription);

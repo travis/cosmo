@@ -63,7 +63,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     
     _extractDeferredListResults: function (results){
         var list = [];
-        for (var i = 0; i < results.length; i++){
+        for (var i = 1; i < results.length; i++){
             if (results[i][0]){
                 list.push(results[i][1]);
             } else {
@@ -259,23 +259,13 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return this._transport.deleteSubscription(subscription, kwArgs);
     },
     
-    // This is hacky, TODO: point to Atom for 0.10
     createCollection: function (name, kwArgs){
-        return this._transport.bind({
-            method: cosmo.caldav.METHOD_MKCALENDAR,
-            url: cosmo.env.getFullUrl("Dav") + 
-                "/" + encodeURIComponent(cosmo.util.auth.getUsername()) + 
-                "/" + encodeURIComponent(name)
-        });
+        return this._transport.createCollection(name, kwArgs);
     },
 
     // Also hacky, TODO: point to Atom for 0.10
     deleteCollection: function (collection, kwArgs){
-        var name = collection.getDisplayName();
-        return this._transport.bind({
-            method: cosmo.caldav.METHOD_DELETE,
-            url: collection.getUrl("dav")
-        });
+        return this._transport.deleteCollection(collection, kwArgs);
     },
     
     getPreference: function (key, kwArgs){

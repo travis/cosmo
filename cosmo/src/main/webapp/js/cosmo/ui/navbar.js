@@ -53,9 +53,6 @@ cosmo.ui.navbar.Bar = function (p) {
 
     for (var n in params) { this[n] = params[n]; }
 
-    // Subscribe to the '/calEvent' channel
-    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
-
     // Interface methods
     // ===========
     // Handle published messages -- in this case just a poke
@@ -71,6 +68,9 @@ cosmo.ui.navbar.Bar = function (p) {
                 break;
         }
     };
+    // Subscribe to the '/calEvent' channel
+    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
+
     this.renderSelf = function () {
         var _pim = cosmo.app.pim;
         this.clearAll();
@@ -241,10 +241,12 @@ cosmo.ui.navbar.Bar = function (p) {
         t.id = 'viewToggle';
         t.className = 'floatLeft';
         this.viewToggleNode = t;
-        var vT =  dojo.widget.createWidget("cosmo:GraphicRadioButtonSet", {
+        var gbsDiv = _createElem("div");
+        var vT =  new cosmo.ui.widget.GraphicRadioButtonSet({
             selectedButtonIndex: selButtonIndex, height: 35, buttons: btns,
             widgetId: "viewToggle"
-        }, t, 'last');
+        }, gbsDiv);
+        t.appendChild(gbsDiv);
         this.viewToggle = vT;
         d.appendChild(t);
     };
@@ -459,25 +461,21 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
                 e.stopPropagation();
             }
         });
-        var dummy = _createElem('span');
-        var enabled = dojo.widget.createWidget("cosmo:Button", {
+        var enabled = new cosmo.ui.widget.Button({
             text: _('App.Button.Create'),
             handleOnClick: createItem,
             small: true,
             width: 52,
             enabled: true,
-            widgetId: "quickEntryCreate"},
-            dummy, 'last');
-        dummy.removeChild(dummy.firstChild);
-        var dummy = _createElem('span');
-        var disabled = dojo.widget.createWidget("cosmo:Button", {
+            widgetId: "quickEntryCreate"})
+
+        var disabled = new cosmo.ui.widget.Button({
             text: _('App.Button.Create'),
             handleOnClick: null,
             small: true,
             width: 52,
-            enabled: false },
-            dummy, 'last');
-        dummy.removeChild(dummy.firstChild);
+            enabled: false });
+
         this.createButton = writeable ? enabled : disabled;
         this.formNode.appendChild(this.createButton.domNode);
     };
@@ -535,13 +533,16 @@ cosmo.ui.navbar.ListPager = function (p) {
         else {
             var fPrev = this.parent.listCanvas.goPrevPage;
         }
-        button = dojo.widget.createWidget("cosmo:Button", {
-            text: 'Prev',
-            handleOnClick: fPrev,
-            small: true,
-            width: 44,
-            enabled: (typeof fPrev == 'function') },
-            td, 'last');
+        var buttonDiv = _createElem("div");
+        button = new cosmo.ui.widget.Button(
+            {
+                text: 'Prev',
+                handleOnClick: fPrev,
+                small: true,
+                width: 44,
+                enabled: (typeof fPrev == 'function') },
+            buttonDiv);
+        td.appendChild(buttonDiv);
         this.prevButton = button;
         tr.appendChild(td);
 
@@ -573,13 +574,16 @@ cosmo.ui.navbar.ListPager = function (p) {
         else {
             var fNext = this.parent.listCanvas.goNextPage;
         }
-        button = dojo.widget.createWidget("cosmo:Button", {
-            text: 'Next',
-            handleOnClick: fNext,
-            small: true,
-            width: 44,
-            enabled: (typeof fNext == 'function') },
-            td, 'last');
+        var buttonDiv = _createElem('div');
+        button = cosmo.ui.widget.Button(
+            {
+                text: 'Next',
+                handleOnClick: fNext,
+                small: true,
+                width: 44,
+                enabled: (typeof fNext == 'function') },
+            buttonDiv);
+        td.appendChild(button);
         this.nextButton = button;
         tr.appendChild(td);
 

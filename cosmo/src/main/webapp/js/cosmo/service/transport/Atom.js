@@ -76,8 +76,24 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         return base.substring(0, queryIndex) + projection + this.queryHashToString(queryHash);
     },
 
-    createCollection: function(name){
-        dojo.unimplemented("cosmo.service.transport.Atom.createCollection");
+    // This is hacky, TODO: point to Atom for 0.10
+    createCollection: function(name, kwArgs){
+        var r = this.getDefaultRequest(
+            cosmo.env.getFullUrl("Dav") + 
+                "/" + encodeURIComponent(cosmo.util.auth.getUsername()) + 
+                "/" + encodeURIComponent(name),
+            kwArgs);
+
+        return dojo.xhr(cosmo.caldav.METHOD_MKCALENDAR, r);
+    },
+
+    // This is hacky, TODO: point to Atom for 0.10
+    deleteCollection: function(collection, kwArgs){
+        var r = this.getDefaultRequest(
+            collection.getUrl("dav"),
+            kwArgs);
+
+        return dojo.xhrDelete(r);
     },
 
     getCollection: function(collectionUrl, kwArgs){
@@ -221,7 +237,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         kwArgs = kwArgs || {}
         kwArgs = cosmo.util.lang.shallowCopy(kwArgs);
         kwArgs.noErr = true;
-        return dojo.xhrHead(this.getDefaultRequest(
+        return dojo.xhr('HEAD', this.getDefaultRequest(
             this.getAtomBase() + "/user/" + this._getUsernameForURI() + "/preference/"+ key,
             kwArgs));
     },

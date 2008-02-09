@@ -34,12 +34,6 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     var params = p || {};
     for (var n in params) { this[n] = params[n]; }
 
-    dojo.subscribe('/calEvent', _this, 'handlePub_calEvent');
-    dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
-        _this, 'handlePub_app');
-    dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
-        _this, 'handlePub_app');
-
     // Private vars
     this._scrollTop = 0;
     this._doRolloverEffect =  function(e, isOver, isFromContextual) {
@@ -109,6 +103,12 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     this.handlePub_app = function (cmd) {
         this.render();
     };
+
+    dojo.subscribe('/calEvent', _this, 'handlePub_calEvent');
+    dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
+        _this, 'handlePub_app');
+    dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
+        _this, 'handlePub_app');
 
     this.renderSelf = function () {
         // Preserve scrolled state

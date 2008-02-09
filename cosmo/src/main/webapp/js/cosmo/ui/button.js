@@ -40,18 +40,16 @@ cosmo.ui.button.Button = function(elemId, width, onClickHandler,
 
     // Allow instantiation from obj/keyword param
     if (typeof arguments[0] == 'object') {
-        widget =  dojo.widget.createWidget("cosmo:Button",
-            arguments[0], dummyDom, 'last');
+        widget = new cosmo.ui.widget.Button(arguments[0]);
     }
     // Normal params in order
     else {
-        widget =  dojo.widget.createWidget("cosmo:Button", {
+        widget = new cosmo.ui.widget.Button({
             widgetId: elemId,
             text: displayText, 'width':width,
             handleOnClick: onClickHandler, small: isSmall,
-            enabled: enabled }, dummyDom, 'last');
+            enabled: enabled });
     }
-    dummyDom.removeChild(widget.domNode);
     return widget;
 }
 

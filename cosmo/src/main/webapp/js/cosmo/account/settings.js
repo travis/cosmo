@@ -155,8 +155,7 @@ cosmo.account.settings = new function () {
             // About Cosmo tab
             // -------
             tabLabel = strings.about;
-            var about = dojo.widget.createWidget("cosmo:About", {}, s, 'last');
-            s.removeChild(about.domNode); // Detach from the throwaway node
+            var about = new cosmo.ui.widget.About({});
             tabContent = about;
             originalAboutBox = about;
             tabs.push({ label: tabLabel, content: tabContent });
@@ -167,9 +166,7 @@ cosmo.account.settings = new function () {
     
             var b = null; // For dialog buttons
             var c = null; // For dialog content area
-            c = dojo.widget.createWidget("cosmo:TabContainer", {
-                tabs: tabs }, s, 'last');
-            s.removeChild(c.domNode); // Detach from the throwaway node
+            c = new cosmo.ui.widget.TabContainer({});
             o.content = c;
             b = new cosmo.ui.button.Button({ text:_('App.Button.Close'),
                 width:60, small: true, handleOnClick: function () {

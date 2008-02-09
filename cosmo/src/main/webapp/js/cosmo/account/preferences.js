@@ -17,6 +17,7 @@
 dojo.provide("cosmo.account.preferences");
 
 dojo.require("cosmo.app.pim");
+dojo.require("cosmo.util.cookie");
 
 cosmo.account.preferences = new function () {
 	this.SHOW_ACCOUNT_BROWSER_LINK = 'UI.Show.AccountBrowserLink';

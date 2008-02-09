@@ -121,7 +121,6 @@ cosmo.ui.minical.MiniCal = function (p) {
     // state in Firefox
     hide();
 
-    dojo.subscribe('/calEvent', self, 'handlePub');
     this.handlePub = function (cmd) {
         var act = cmd.action;
         var qual = cmd.qualifier || null;
@@ -170,7 +169,8 @@ cosmo.ui.minical.MiniCal = function (p) {
                 break;
         }
     };
-
+    dojo.subscribe('/calEvent', self, 'handlePub');
+ 
     /**
      * Initialize minical state and render
      * Hide until rendering is completed because Firefox

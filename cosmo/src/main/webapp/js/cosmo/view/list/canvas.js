@@ -60,8 +60,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     for (var n in params) { this[n] = params[n]; }
 
-    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
-
     // Interface methods
     this.handlePub_calEvent = function (cmd) {
         if (!cosmo.view.list.isCurrentView()) { return false; }
@@ -97,6 +95,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
 
     };
+    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
+
     this.renderSelf = function () {
         // Rendering can be messages published to calEvent
         // or by window resizing

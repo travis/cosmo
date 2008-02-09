@@ -225,8 +225,6 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         }
     };
 
-    dojo.subscribe('/calEvent', self, 'handlePub');
-
     this.handlePub = function (cmd) {
         var act = cmd.action;
         var item = cmd.data;
@@ -291,6 +289,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                 break;
         }
     };
+    dojo.subscribe('/calEvent', self, 'handlePub');
 };
 
 cosmo.ui.detail.DetailViewForm.prototype =
@@ -1575,12 +1574,13 @@ cosmo.ui.detail.ButtonSection = function () {
                 btn.destroy();
             }
             var func = enabled ? dojo.hitch(cosmo.ui.detail,cosmo.ui.detail[key + 'Item']) : null;
-            this[key + 'Button'] = dojo.widget.createWidget("cosmo:Button", {
+            var newDiv = _createElem("div");
+            this[key + 'Button'] = new cosmo.ui.widget.Button({
                 text: _("App.Button." + btns[i]),
                 id: "detail" + btns[i] + "Button",
                 handleOnClick: func,
-                enabled: enabled },
-                this[key + 'ButtonNode'], 'last');
+                enabled: enabled }, newDiv);
+            this[key + 'ButtonNode'].appendChild(newDiv);
         }
     };
 

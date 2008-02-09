@@ -120,7 +120,6 @@ cosmo.view.viewBase = new function () {
      * how to handle the published event.
      */
     this.handlePub_app = function (cmd) {
-
         if (!this.isCurrentView()) { return false; }
 
         var e = cmd.appEvent;
@@ -248,7 +247,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
     var error = deltaAndError[1];
     var delta = deltaAndError[0];
     if (error || delta.hasChanges()) {
-        dojo.debug(error || delta);
+        console.debug(error || delta);
         // Cancel button -- just hide the dialog, do nothing
         var cancel = function () {
             // Execute any pre-cancel code passed in

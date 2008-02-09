@@ -90,7 +90,7 @@ cosmo.view.cal.canvas = new function () {
     // Public methods
     // ****************
     this.init = function () {
-        dojo.debug('init on cal canvas');
+        console.debug('init on cal canvas');
         // Subscribe to the '/calEvent' channel
         dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
         // Subscribe to the '/app' channel
@@ -718,6 +718,7 @@ cosmo.view.cal.canvas = new function () {
     };
 
     this.handlePub_app = function (cmd) {
+        console.debug(710)
         if (!cosmo.view.cal.isCurrentView()) { return false; }
 
         var t = cmd.type;
@@ -944,7 +945,7 @@ cosmo.view.cal.canvas = new function () {
         var item = cmd.data
         var data = item.data;
         var saveType = cmd.saveType || null;
-        dojo.debug("saveSuccess saveType: " + saveType);
+        console.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
@@ -1086,7 +1087,7 @@ cosmo.view.cal.canvas = new function () {
         }
 
         var updateEventsCallback = function () {
-            dojo.debug("updateEventsCallback")
+            console.debug("updateEventsCallback")
             // Don't re-render when requests are still processing
             if (!cosmo.view.service.processingQueue.length) {
                 updateEventsDisplay();
@@ -1122,7 +1123,7 @@ cosmo.view.cal.canvas = new function () {
                 }
             }
             else {
-                dojo.debug("how many left in queue: " + cosmo.view.service.processingQueue.length);
+                console.debug("how many left in queue: " + cosmo.view.service.processingQueue.length);
             }
         }
 
@@ -1143,7 +1144,7 @@ cosmo.view.cal.canvas = new function () {
     function removeSuccess(item, opts) {
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var removeType = opts.removeType;
-        dojo.debug("removeSuccess, removeType: " + removeType);
+        console.debug("removeSuccess, removeType: " + removeType);
 
         // If the user has navigated off the week displaying the
         // current selected item, it's not in the itemRegistry,
@@ -1341,7 +1342,7 @@ cosmo.view.cal.canvas = new function () {
      * @param id A string, the id of the div on the cal canvas double-clicked
      */
     function createNewCalItem(evParam) {
-        dojo.debug("createNewCalItem 1");
+        console.debug("createNewCalItem 1");
         var item = null; // New event
         var evSource = '';
         var lozType = ''; // Lozenge type
@@ -1367,7 +1368,7 @@ cosmo.view.cal.canvas = new function () {
         evSource = 'click';
         // Set props based on when and what canvas was clicked
         if (lozType == types.TIMED) {
-            dojo.debug("createNewCalItem 3");
+            console.debug("createNewCalItem 3");
             startstr = getIndexFromHourDiv(evParam);
             dayind = extractDayIndexFromId(startstr);
             evdate = calcDateFromIndex(dayind);

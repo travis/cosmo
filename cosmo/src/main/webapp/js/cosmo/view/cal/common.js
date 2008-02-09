@@ -78,7 +78,7 @@ cosmo.view.cal.handlePub_calEvent = function (cmd) {
 };
 
 cosmo.view.cal.loadItems = function (p) {
-    dojo.debug("trigger!");
+    console.debug("trigger!");
     var _cal = cosmo.view.cal; // Scope-ness
     var params = p || {};
     var goToNav = null;
@@ -104,7 +104,7 @@ cosmo.view.cal.loadItems = function (p) {
     // --------
     if (params.goTo) {
         goToNav = params.goTo;
-        dojo.debug("goto");
+        console.debug("goto");
         // param is 'back' or 'next'
         if (typeof goToNav == 'string') {
             var key = goToNav.toLowerCase();
@@ -291,9 +291,9 @@ cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry =
  */
 cosmo.view.cal.setQuerySpan = function (dt) {
     this.viewStart = cosmo.datetime.util.getWeekStart(dt);
-    dojo.debug("viewStart: " + this.viewStart)
+    console.debug("viewStart: " + this.viewStart)
     this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
-    dojo.debug("viewEnd: " + this.viewEnd)
+    console.debug("viewEnd: " + this.viewEnd)
     return true;
 };
 /**

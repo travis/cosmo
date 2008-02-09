@@ -35,7 +35,7 @@ cosmo.util.string.capitalize = function (str) {
     } 
     var words = str.split(" "); 
     for (var i = 0; i < words.length; i++) { 
-        words[i] = words[i].charAt(0).toUpperCase() + _1ca[i].substring(1); 
+        words[i] = words[i].charAt(0).toUpperCase() + words[i].substring(1); 
     } 
     return words.join(" "); 
 }

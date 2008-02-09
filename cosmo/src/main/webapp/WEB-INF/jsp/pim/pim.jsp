@@ -60,6 +60,7 @@
 <cosmo:dojoBoilerplate timezones="true" dojoLayers="cosmo-login,cosmo-pim"/>
 
 <script type="text/javascript">
+console.debug("abc")
 // Dojo requires
 dojo.require('cosmo.app');
 dojo.require('cosmo.app.pim.layout');
@@ -67,7 +68,6 @@ dojo.require('cosmo.convenience');
 dojo.require('cosmo.topics');
 dojo.require('cosmo.account.preferences');
 dojo.require('cosmo.account.settings');
-
 cosmo.app.initObj = cosmo.app.pim;
 cosmo.app.initParams = {};
 
@@ -96,8 +96,8 @@ cosmo.app.initParams.roleRoot = true;
 </authz:authorize>
 
 dojo.require("cosmo.ui.event.listeners");
-cosmo.ui.event.listeners.hookUpListeners();
 
+cosmo.ui.event.listeners.hookUpListeners();
 </script>
 
 </head>
@@ -105,9 +105,9 @@ cosmo.ui.event.listeners.hookUpListeners();
 <body id="body">
     <div id="baseLayout" style="position: absolute;"></div>
     <div id="maskDiv">
-      <div id="appLoadingMessage">
+<!--      <div id="appLoadingMessage">
         Loading the app ...
-      </div>
+      </div>-->
     <div id="dojoDebug">
     </div>
     </div>

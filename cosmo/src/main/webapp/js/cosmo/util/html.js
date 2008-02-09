@@ -18,7 +18,6 @@ dojo.provide("cosmo.util.html");
 
 cosmo.util.html.createSelect = function (id, name, size,
     multi, selOptions, className, parentNode) {
-
     var sel = document.createElement('select');
     var o = {};
     var options = [];

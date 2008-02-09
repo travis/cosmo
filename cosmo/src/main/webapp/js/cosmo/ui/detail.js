@@ -1151,7 +1151,7 @@ cosmo.ui.detail.EventFormElements= function () {
         var statusOpt = [];
         var opt = null;
         var str = '';
-
+        
         for (var i in cosmo.model.EventStatus) {
             opt = new Object();
             str = cosmo.model.EventStatus[i];
@@ -1159,7 +1159,7 @@ cosmo.ui.detail.EventFormElements= function () {
                 opt.text = i;
             }
             else {
-                opt.text = dojo.string.capitalize(i.toLowerCase());
+                opt.text = cosmo.util.string.capitalize(i.toLowerCase());
             }
             // Make sure null values convert to empty
             // string, not the string "null"
@@ -1180,7 +1180,7 @@ cosmo.ui.detail.EventFormElements= function () {
         for (var i in cosmo.model.RRULE_FREQUENCIES) {
             opt = new Object();
             str = cosmo.model.RRULE_FREQUENCIES[i];
-            opt.text = _("Main.DetailForm.RecurrenceInterval." + dojo.string.capitalize(str));
+            opt.text = _("Main.DetailForm.RecurrenceInterval." + cosmo.util.string.capitalize(str));
             opt.value = str;
             recurOpt.push(opt);
         }

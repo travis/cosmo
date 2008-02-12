@@ -43,6 +43,12 @@ cosmo.ROLE_AUTHENTICATED = "authenticated"
 
 dojo.declare("cosmo.cmp.Cmp", null,
     {
+        _baseUrl: null,
+
+        constructor: function(url){
+            this._baseUrl = url;
+        },
+
         /**
          * summary: Return request populated with attributes common to all CMP calls.
          */
@@ -104,7 +110,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                                /*String*/ query,
                                /*Object?*/ ioArgs) {
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/users";
+            requestDict.url = this._baseUrl + "/users";
 
             if (pageNumber || pageSize || sortOrder || sortType){
                 requestDict.url +=
@@ -138,7 +144,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             /*Object*/ ioArgs){
 
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
+            requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(username);
 
             return dojo.xhrGet(requestDict);
@@ -153,7 +159,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             
 
             requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
+            requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(userHash.username);
 
             requestDict.putData = request_content;
@@ -175,7 +181,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             
             var request_content = this.userHashToXML(userHash);
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
+            requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(username);
             requestDict.putData = request_content;
             var d = dojo.rawXhrPut(requestDict);
@@ -201,7 +207,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
+            requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(username);
             return dojo.xhrDelete(requestDict);
 
@@ -221,7 +227,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             }
             
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/delete";
+            requestDict.url = this._baseUrl + "/user/delete";
             
             for (var i = 0; i < usernames.length; i++){
                 usernames[i] = "user=" +
@@ -247,7 +253,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
             var requestDict = this.getDefaultCMPRequest(ioArgs);
 
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/activate/" + username;
+            requestDict.url = this._baseUrl + "/activate/" + username;
             requestDict.postData = "id="+username;
             return dojo.rawXhrPost(requestDict);
         },
@@ -258,7 +264,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          */
         getUserCount: function (/*Object*/ ioArgs){
         	var requestDict = this.getDefaultCMPRequest(ioArgs);
-        	requestDict.url = cosmo.env.getFullUrl("Cmp") + "/users/count";
+        	requestDict.url = this._baseUrl + "/users/count";
 			var d = dojo.xhrGet(requestDict);
             d.addCallback(function(countString){
                 return parseInt(countString);
@@ -275,7 +281,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         headUser: function (/*String*/ username,
             /*Object*/ ioArgs){
             var requestDict = this.getDefaultCMPRequest(ioArgs, true)
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/user/" +
+            requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(username);
 
             return dojo.xhrHead(requestDict);
@@ -299,7 +305,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          */
         getAccountXML: function(/*Object*/ ioArgs){
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account";
+            requestDict.url = this._baseUrl + "/account";
             
             return dojo.xhrGet(requestDict);
         },
@@ -321,7 +327,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             var requestContent = this.userHashToXML(userHash)
             
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account";
+            requestDict.url = this._baseUrl + "/account";
             requestDict.putData = requestContent;
             
             var d = dojo.rawXhrPut(requestDict);
@@ -356,7 +362,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         getSignupXML: function(/*Object*/ userHash,
             /*Object*/ ioArgs){
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/signup";
+            requestDict.url = this._baseUrl + "/signup";
             requestDict.putData = this.userHashToXML(userHash);
             return dojo.rawXhrPut(requestDict);
         },
@@ -390,12 +396,12 @@ dojo.declare("cosmo.cmp.Cmp", null,
         },
 
         sendActivation: function(username, email, ioArgs){
-            this._recover(cosmo.env.getFullUrl("Cmp") + "/account/activation/send", 
+            this._recover(this._baseUrl + "/account/activation/send", 
                           username, email, ioArgs);
         },
 
         recoverPassword: function(username, email, ioArgs){
-            return this._recover(cosmo.env.getFullUrl("Cmp") + "/account/password/recover", 
+            return this._recover(this._baseUrl + "/account/password/recover", 
                                  username, email, ioArgs);
         },
 
@@ -425,7 +431,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             }
 
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            requestDict.url = cosmo.env.getFullUrl("Cmp") + "/account/password/reset/" + key;
+            requestDict.url = this._baseUrl + "/account/password/reset/" + key;
             requestDict.contentType = "application/x-www-form-urlencoded";
             requestDict.postData = requestContent;
 
@@ -531,7 +537,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
     }
 );
 
-cosmo.cmp = new cosmo.cmp.Cmp();
+cosmo.cmp = new cosmo.cmp.Cmp(cosmo.env.getFullUrl("Cmp"));
 
 dojo.declare("cosmo.cmp.SubscriptionInfoMissingException", Error,  {
     name: null,

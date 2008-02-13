@@ -30,7 +30,7 @@ cosmo.account.login.doLogin = function(un, pw){
         content: postData
     });
     d.addCallback(function(url){
-        if (url == cosmo.env.getBaseUrl() + "/loginfailed"){
+        if (url.indexOf("/loginfailed") > -1){
             throw new Error(_('Login.Error.AuthFailed'));
         } else {
             cosmo.util.auth.setCred(un, pw);

@@ -61,7 +61,7 @@
 </script>
 
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
-<script type="text/javascript" src="${dojoPath}/dojo.js"></script>
+<script type="text/javascript" src="${dojoPath}/dojo.js.uncompressed.js"></script>
 <script type="text/javascript">
 (function (){
     dojo.registerModulePath("cosmo", "../../../cosmo");

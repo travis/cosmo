@@ -289,7 +289,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var colCount = 0; // Used to generated the 'processing' row
         var fillCell = function (s) {
             var cell = s;
-            if (s) s = dojo.string.escapeXml(s);
+            if (s) s = cosmo.util.string.escapeXml(s);
             return  s || '&nbsp;';
         };
         var createContentRow = function (key, val) {

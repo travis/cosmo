@@ -19,7 +19,6 @@ dojo.provide("cosmo.view.loading");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
-dojo.require("dojox.fx.easing");
 
 cosmo.view.loading.statusProcessing = false;
 
@@ -58,8 +57,8 @@ cosmo.view.loading.StatusMessage = function (p) {
             cosmo.view.loading.statusProcessing = false;
             self.domNode.style.zIndex = -1;
         };
-        dojo.fadeOut(this.domNode, 1000,
-            dojo.fx.easing.easeOut, f).play();
+        dojo.fadeOut({node: this.domNode, duration: 1000,
+                      easing: f}).play();
     };
     this.handlePub_calEvent = function (cmd) {
         var act = cmd.action;

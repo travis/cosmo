@@ -575,7 +575,7 @@ cosmo.ui.navbar.ListPager = function (p) {
             var fNext = this.parent.listCanvas.goNextPage;
         }
         var buttonDiv = _createElem('div');
-        button = cosmo.ui.widget.Button(
+        button = new cosmo.ui.widget.Button(
             {
                 text: 'Next',
                 handleOnClick: fNext,
@@ -583,7 +583,7 @@ cosmo.ui.navbar.ListPager = function (p) {
                 width: 44,
                 enabled: (typeof fNext == 'function') },
             buttonDiv);
-        td.appendChild(button);
+        td.appendChild(buttonDiv);
         this.nextButton = button;
         tr.appendChild(td);
 

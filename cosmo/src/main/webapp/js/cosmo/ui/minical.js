@@ -715,10 +715,10 @@ cosmo.ui.minical.MiniCal = function (p) {
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
-            dojo.publish('/calEvent', {
+            dojo.publish('/calEvent', [{
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: self.currDate },
-                data: {} });
+                data: {} }]);
         }
         setTimeout(f, 0);
     }
@@ -741,11 +741,11 @@ cosmo.ui.minical.MiniCal = function (p) {
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
-            dojo.publish('/calEvent', {
+            dojo.publish('/calEvent', [{
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: dt,
                       source: 'minical' },
-                data: {} });
+                data: {} }]);
         }
         setTimeout(f, 0);
     };
@@ -773,10 +773,10 @@ cosmo.ui.minical.MiniCal = function (p) {
             cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
                 { viewName: cosmo.view.names.CAL, noLoad: true });
             var f = function () {
-                dojo.publish('/calEvent', {
+                dojo.publish('/calEvent', [{
                     action: 'loadCollection',
                     opts: { loadType: 'changeTimespan', goTo: d },
-                        data: {} });
+                        data: {} }]);
             }
             setTimeout(f, 0);
         }

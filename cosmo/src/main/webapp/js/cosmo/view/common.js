@@ -165,12 +165,12 @@ cosmo.view.viewBase = new function () {
                             // Enter
                             case 13:
                                 dojo.publish('/calEvent',
-                                    { 'action': 'saveFromForm' });
+                                             [{ 'action': 'saveFromForm' }]);
                                 break;
                             // Delete
                             case 46:
                                 dojo.publish('/calEvent',
-                                    { 'action': 'removeConfirm', 'data': item });
+                                    [{ 'action': 'removeConfirm', 'data': item }]);
                                 break;
                         }
                     }
@@ -274,7 +274,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
                     savePreHook();
                 }
                 dojo.publish('/calEvent',
-                    { 'action': 'saveFromForm' });
+                    [{ 'action': 'saveFromForm' }]);
             }
             // Hide the dialog first, wait for return value to
             // avoid contention for the use of the dialog box
@@ -308,10 +308,10 @@ cosmo.view.displayViewFromCollections = function (c) {
     }
     // Wrap in setTimeout so we don't lock up the UI
     // thread during the publish operation
-    var f = function () { dojo.publish('/calEvent', {
+    var f = function () { dojo.publish('/calEvent', [{
         action: 'loadCollection', opts: { loadType: 'changeCollection',
         collection: newCollection }, data: {}
-    }); };
+    }]); };
     // Make the timeout value greater than zero to
     // ensure that the 'loading' status message appears
     setTimeout(f, 35);

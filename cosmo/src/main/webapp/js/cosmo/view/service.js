@@ -120,7 +120,7 @@ cosmo.view.service = new function () {
 
         if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
-            dojo.publish('/calEvent', {action: 'save', data: item, delta: delta });
+            dojo.publish('/calEvent', [{action: 'save', data: item, delta: delta }]);
         }
         else {
             confirmType = '';
@@ -414,13 +414,13 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.publish('/calEvent', {
+            dojo.publish('/calEvent', [{
                  'action': act,
                  'data': item,
                  'saveType': saveType,
                  'delta':delta,
                  'newItemNote':newItem
-            });
+            }]);
         }
         setTimeout(f, 0);
     }
@@ -626,9 +626,9 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.publish('/calEvent', { 'action': act,
-                'data': removeEv, 'opts': opts });
-            dojo.publish('/calEvent', { action: 'setSelected', data: null});
+            dojo.publish('/calEvent', [{ 'action': act,
+                'data': removeEv, 'opts': opts }]);
+            dojo.publish('/calEvent', [{ action: 'setSelected', data: null}]);
         }
         setTimeout(f, 0);
     }

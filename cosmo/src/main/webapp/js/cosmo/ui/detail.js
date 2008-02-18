@@ -61,14 +61,14 @@ cosmo.ui.detail = new function () {
             }
 
             this.item.makeSnapshot();
-            dojo.publish('/calEvent', {
-                action: 'saveConfirm', delta: delta, data: this.item });
+            dojo.publish('/calEvent', [{
+                action: 'saveConfirm', delta: delta, data: this.item }]);
         }
     };
 
     this.removeItem = function () {
         dojo.publish('/calEvent',
-            { action: 'removeConfirm', data: this.item });
+                     [{ action: 'removeConfirm', data: this.item }]);
     };
 
     // Utility functions

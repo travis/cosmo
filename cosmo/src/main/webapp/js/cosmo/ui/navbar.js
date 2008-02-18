@@ -305,10 +305,10 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             }
         }
         var publish = function (dir) {
-            dojo.publish('/calEvent', {
+            dojo.publish('/calEvent', [{
                 action: 'loadCollection',
                 opts: { loadType: 'changeTimespan', goTo: dir },
-                    data: {} });
+                    data: {} }]);
         };
         var back = function back() {
             var backFunc = function () {

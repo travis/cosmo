@@ -172,5 +172,5 @@ cosmo.topics.publish = function (/*Function*/messageConstructor,
     else {
         message = new messageConstructor(initializerArg);
     }
-    dojo.publish(message.topicName, message);
+    dojo.publish(message.topicName, [message]);
 }

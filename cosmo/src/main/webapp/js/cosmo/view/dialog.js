@@ -58,16 +58,16 @@ cosmo.view.dialog.BaseDialog.prototype.closeSelf = function () {
 cosmo.view.dialog.BaseDialog.prototype.doPublishRemove =
     function (qual) {
     var selItem = cosmo.view.dialog.getSelectedItem();
-    dojo.publish('/calEvent', {
-        action: 'remove', qualifier: qual, data: selItem });
+    dojo.publish('/calEvent', [{
+        action: 'remove', qualifier: qual, data: selItem }]);
     this.closeSelf();
 };
 
 cosmo.view.dialog.BaseDialog.prototype.doPublishSave =
     function (qual, saveItem, delta) {
-    dojo.publish('/calEvent', {
+    dojo.publish('/calEvent', [{
         action: 'save', qualifier: qual,
-        data: saveItem, delta: delta });
+        data: saveItem, delta: delta }]);
     this.closeSelf();
 };
 

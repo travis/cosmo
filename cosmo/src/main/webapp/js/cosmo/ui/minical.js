@@ -32,6 +32,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.validate");
+dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
@@ -246,7 +247,7 @@ cosmo.ui.minical.MiniCal = function (p) {
 
             // Button
             td = _createElem('td');
-            var buttonGoTo = new Button('goToDateButton', 36, self.doGoToDate,
+            var buttonGoTo = new cosmo.ui.widget.Button('goToDateButton', 36, self.doGoToDate,
                 _('App.Button.Go'), true);
             self.goToButton = buttonGoTo;
             td.appendChild(buttonGoTo.domNode);

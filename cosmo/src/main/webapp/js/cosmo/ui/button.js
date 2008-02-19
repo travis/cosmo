@@ -20,40 +20,7 @@
  * @license Apache License 2.0
  */
 dojo.provide("cosmo.ui.button");
-dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.env");
-dojo.require("cosmo.ui.widget.Button");
-
-/**
- * @object Button -- creates a button with a text label, and images
- * for endcaps and a stretchable, tiling middle section. Comes in
- * two sizes, normal and small.
- */
-cosmo.ui.button.Button = function(elemId, width, onClickHandler,
-    displayText, isSmall, isDisabled) {
-
-    // If you don't do this dummyDom business, the page reflows and
-    // scrollbars are reset
-    var dummyDom = document.createElement('span');
-    var widget = null;
-    var enabled = isDisabled == true ? false : true;
-
-    // Allow instantiation from obj/keyword param
-    if (typeof arguments[0] == 'object') {
-        widget = new cosmo.ui.widget.Button(arguments[0]);
-    }
-    // Normal params in order
-    else {
-        widget = new cosmo.ui.widget.Button({
-            id: elemId,
-            text: displayText, 'width':width,
-            handleOnClick: onClickHandler, small: isSmall,
-            enabled: enabled });
-    }
-    return widget;
-}
-
-Button = cosmo.ui.button.Button;
 
 /**
  * @object NavButtonSet -- creates a two-button cluster with a

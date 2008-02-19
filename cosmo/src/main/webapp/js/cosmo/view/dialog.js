@@ -19,7 +19,7 @@ dojo.provide('cosmo.view.dialog');
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
-dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.widget.Button");
 
 cosmo.view.dialog = new function () {
     // Public members
@@ -297,14 +297,14 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
                     enabled: true })
             ],
             'btnsRight': [
-                new cosmo.ui.button.Button({ 
+                new cosmo.ui.widget.Button({ 
                     id: "unsavedChangesDialogDiscardButton",
                     text: strings.discardButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.discardFunc,
                     small: true,
                     enabled: true }),
-                new cosmo.ui.button.Button({ 
+                new cosmo.ui.widget.Button({ 
                     id: "unsavedChangesDialogSaveButton",
                     text: strings.saveButtonText,
                     width: btnWidthWide,

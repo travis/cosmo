@@ -22,6 +22,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.ui.widget.TabContainer");
+dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.account.preferences");
 dojo.require("cosmo.ui.widget.About");
 
@@ -168,11 +169,11 @@ cosmo.account.settings = new function () {
             var c = null; // For dialog content area
             c = new cosmo.ui.widget.TabContainer({});
             o.content = c;
-            b = new cosmo.ui.button.Button({ text:_('App.Button.Close'),
+            b = new cosmo.ui.widget.Button({ text:_('App.Button.Close'),
                 width:60, small: true, handleOnClick: function () {
                     cosmo.app.hideDialog(); } });
             o.btnsLeft = [b];
-            b = new cosmo.ui.button.Button({ text:_('App.Button.Save'),
+            b = new cosmo.ui.widget.Button({ text:_('App.Button.Save'),
                 width:60, small: true, handleOnClick: f });
             o.btnsRight = [b];
             o.defaultAction = f;

@@ -30,7 +30,6 @@ dojo.provide("cosmo.ui.widget.PasswordResetter");
 dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
-dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
 
 dojo.require("cosmo.convenience");

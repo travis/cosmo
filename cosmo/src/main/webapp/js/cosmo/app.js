@@ -17,7 +17,7 @@
 dojo.provide('cosmo.app');
 
 dojo.require('cosmo.ui.widget.ModalDialog');
-dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.timeout");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.auth");
@@ -133,7 +133,7 @@ cosmo.app = new function () {
                 }
             }
             this.modalDialog.type = this.modalDialog.ERROR;
-            var but = new Button('okButton', 64, self.hideDialog,
+            var but = new cosmo.ui.widget.Button('okButton', 64, self.hideDialog,
                 _('App.Button.OK'), true);
             this.modalDialog.btnsCenter[0] = but;
             this.modalDialog.defaultAction = self.hideDialog;
@@ -228,7 +228,7 @@ cosmo.app = new function () {
                                     deferred.callback(valueInput.value);
                                     }) 
         var buttonText = kwArgs.defaultActionButtonText || _('App.Button.Submit'); 
-        var button = new cosmo.ui.button.Button(
+        var button = new cosmo.ui.widget.Button(
                               { text: buttonText, 
                                 id: "getValueSubmit",
                                 width:74,
@@ -244,7 +244,7 @@ cosmo.app = new function () {
         };
         if (kwArgs.showCancel){
             dialogProps.btnsLeft = [
-                new cosmo.ui.button.Button(
+                new cosmo.ui.widget.Button(
                     { text: _('App.Button.Cancel'),
                       id: "getValueCancel",
                       width: 74,
@@ -265,7 +265,7 @@ cosmo.app = new function () {
             this.hideDialog();
             deferred.callback(returnValue);
         })
-        var button = new cosmo.ui.button.Button(
+        var button = new cosmo.ui.widget.Button(
                               { text:_('App.Button.OK'), 
                                 width:74,
                                 handleOnClick: submitFunc
@@ -296,12 +296,12 @@ cosmo.app = new function () {
             this.hideDialog();
             deferred.callback(false);
         })
-        var yesButton = new cosmo.ui.button.Button(
+        var yesButton = new cosmo.ui.widget.Button(
                               { text:_('App.Button.Yes'), 
                                 width:74,
                                 handleOnClick: yesFunc
                               });
-        var noButton = new cosmo.ui.button.Button(
+        var noButton = new cosmo.ui.widget.Button(
                               { text:_('App.Button.No'), 
                                 width:74,
                                 handleOnClick: noFunc
@@ -405,14 +405,14 @@ cosmo.app = new function () {
                        cosmo.ui.conf.timeoutDialogAutoLogout * 1000)
         
         var dialogHash = {};
-        var cancelLogoutButton = new cosmo.ui.button.Button({ text:_('App.Button.Cancel'), width:74,
+        var cancelLogoutButton = new cosmo.ui.widget.Button({ text:_('App.Button.Cancel'), width:74,
             handleOnClick: function () { 
                 cosmo.app.hideDialog();
                 clearTimeout(autoLogoutTimeout)
                 cosmo.ui.timeout.updateLastActionTime() 
             } });
         dialogHash.btnsLeft = [cancelLogoutButton];
-        var logoutButton = new cosmo.ui.button.Button({ text:_('App.Button.OK'), width:74,
+        var logoutButton = new cosmo.ui.widget.Button({ text:_('App.Button.OK'), width:74,
             handleOnClick: logoutFunction
             });
         dialogHash.btnsRight = [logoutButton];

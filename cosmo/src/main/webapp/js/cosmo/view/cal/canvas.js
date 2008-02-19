@@ -30,7 +30,6 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
 dojo.require("cosmo.ui.menu");
-dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.resize_area");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.view.common");

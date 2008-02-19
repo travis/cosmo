@@ -1,8 +1,9 @@
 Index: dojo/_base/xhr.js
 ===================================================================
---- dojo/_base/xhr.js (revision 12122)
-+++ dojo/_base/xhr.js (revision 12286)
-@@ -626,10 +626,22 @@
+--- dojo/_base/xhr.js	(revision 12377)
++++ dojo/_base/xhr.js	(working copy)
+@@ -623,18 +623,30 @@
+ 	}
  	=====*/
  
 +	dojo.xhr = function(/*String*/ method, /*dojo.__xhrArgs*/ args, /*boolean?*/ hasBody){
@@ -28,26 +29,44 @@ Index: dojo/_base/xhr.js
 +		return dojo.xhr("GET", args); //dojo.Deferred
  	}
  
-@@ -637,5 +649,5 @@
+ 	dojo.xhrPost = function(/*dojo.__xhrArgs*/ args){
  		//summary: 
  		//		Sends an HTTP POST request to the server.
 -		return _doIt("POST", _makeXhrDeferred(args)); // dojo.Deferred
 +		return dojo.xhr("POST", args, true); // dojo.Deferred
  	}
  
-@@ -654,5 +666,5 @@
+ 	dojo.rawXhrPost = function(/*dojo.__xhrArgs*/ args){
+@@ -651,7 +663,7 @@
+ 	dojo.xhrPut = function(/*dojo.__xhrArgs*/ args){
  		//	summary:
  		//		Sends an HTTP PUT request to the server.
 -		return _doIt("PUT", _makeXhrDeferred(args)); // dojo.Deferred
 +		return dojo.xhr("PUT", args, true); // dojo.Deferred
  	}
  
-@@ -675,7 +687,5 @@
+ 	dojo.rawXhrPut = function(/*dojo.__xhrArgs*/ args){
+@@ -672,9 +684,7 @@
+ 	dojo.xhrDelete = function(/*dojo.__xhrArgs*/ args){
  		//	summary:
  		//		Sends an HTTP DELETE request to the server.
 -		var dfd = _makeXhrDeferred(args);
 -		_d._ioAddQueryToUrl(dfd.ioArgs);
 -		return _doIt("DELETE", dfd); // dojo.Deferred
-+		return d.xhr("DELETE", args); //dojo.Deferred
++		return dojo.xhr("DELETE", args); //dojo.Deferred
  	}
  
+ 	/*
+Index: dojo/DeferredList.js
+===================================================================
+--- dojo/DeferredList.js	(revision 12377)
++++ dojo/DeferredList.js	(working copy)
+@@ -74,7 +74,7 @@
+ 		//	Gathers the results of the deferreds for packaging
+ 		//	as the parameters to the Deferred Lists' callback
+ 
+-		var d = new dojo.DeferedList(deferredList, false, true, false);
++		var d = new dojo.DeferredList(deferredList, false, true, false);
+ 		d.addCallback(function (results) {
+ 			var ret = [];
+ 			for (var i = 0; i < results.length; i++) {

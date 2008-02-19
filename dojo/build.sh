@@ -2,7 +2,7 @@
 DOJO_VERSION="release-1.0.2"
 if [ ! -d "$DOJO_VERSION" ]; then
     svn co http://svn.dojotoolkit.org/dojo/tags/$DOJO_VERSION
-    patch -p0 -d release-1.0.2 < dojoXhrHead.patch 
+    patch -p0 -d release-1.0.2 < dojo.patch 
 fi
 
 cp cosmo-pim.js $DOJO_VERSION/dojo

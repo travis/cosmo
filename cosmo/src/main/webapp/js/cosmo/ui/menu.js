@@ -527,7 +527,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         }
         // Menu would extend outside the browser window
         // X position overlap -- go into reverso mode
-        if ((x + menuLevelWidth) > viewport.width) {
+        if ((x + menuLevelWidth) > viewport.w) {
             x -= menuLevelWidth;
             if (level > 0) {
                 var parentWidth =
@@ -543,7 +543,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         }
         // Y position overlap -- compensate by the
         // amount of the overlap
-        var yOver = (y + (items.length * 24)) - viewport.height;
+        var yOver = (y + (items.length * 24)) - viewport.h;
         if (yOver > 0) {
             y -= (yOver + (BORDER_WIDTH * 2));
         }

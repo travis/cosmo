@@ -24,7 +24,7 @@
 dojo.provide("cosmo.ui.detail");
 
 
-dojo.require("dojo.fx");
+dojo.require("dojox.fx");
 dojo.require("dojox.date.posix");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.util.i18n");
@@ -192,7 +192,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     this.domNode.appendChild(c.domNode);
     this.byline = c;
 
-    var c = new cosmo.ui.detail.ButtonSection();
+    var c = new cosmo.ui.detail.ButtonSection({id: "detailButtonSection"});
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.buttonSection = c;
@@ -736,14 +736,14 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
         animKey = 'wipeOut';
     }
     // Toggle the switch text
-    if (dojo.render.html.ie || dojo.render.html.safari) {
+    if (dojo.isIE || dojo.isSafari) {
         this.showHideSwitch.innerText = display;
     }
     else {
         this.showHideSwitch.textContent = display;
     }
     // Do the expando animation
-    dojox.fx[animKey](this.bodyNode, 500, null, f).play();
+    dojox.fx[animKey]({node: this.bodyNode, duration: 500, easing: f}).play();
 }
 
 cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {
@@ -1553,63 +1553,22 @@ cosmo.ui.detail.Byline = function () {
 };
 cosmo.ui.detail.Byline.prototype = new cosmo.ui.ContentBox();
 
-cosmo.ui.detail.ButtonSection = function () {
-    var self = this;
-
-    // Public members
-    this.domNode = _createElem('div');
-    this.removeButtonNode = null;
-    this.saveButtonNode = null;
-    this.removeButton = null;
-    this.saveButton = null;
-
-    // Interface methods
-    // -------
-    this.setButtons = function (enabled) {
-        var btns = ['Remove', 'Save'];
-        for (var i = 0; i < btns.length; i++) {
-            var key = btns[i].toLowerCase();
-            var btn = this[key + 'Button'];
-            if (btn) {
-                btn.destroy();
-            }
-            var func = enabled ? dojo.hitch(cosmo.ui.detail,cosmo.ui.detail[key + 'Item']) : null;
-            var newDiv = _createElem("div");
-            this[key + 'Button'] = new cosmo.ui.widget.Button({
-                text: _("App.Button." + btns[i]),
-                id: "detail" + btns[i] + "Button",
-                handleOnClick: func,
-                enabled: enabled }, newDiv);
-            this[key + 'ButtonNode'].appendChild(newDiv);
-        }
-    };
-
-    setUpDOM();
-    this.setButtons(false);
-
-    // Private methods
-    // -------
-    function setUpDOM() {
-        var d = self.domNode;
-        d.style.padding = '6px';
-        var t = _createElem('div');
-        t.id = 'detailRemoveButtonContainer';
-        t.className = 'floatLeft';
-        self.removeButtonNode = t;
-        d.appendChild(t);
-        var t = _createElem('div');
-        t.id = 'detailSaveButtonContainer';
-        t.className = 'floatRight';
-        self.saveButtonNode = t;
-        d.appendChild(t);
-        var t = _createElem('div');
-        t.className = 'clearBoth';
-        d.appendChild(t);
-    }
-};
-
-cosmo.ui.detail.ButtonSection.prototype =
-    new cosmo.ui.ContentBox();
-
-
+dojo.declare("cosmo.ui.detail.ButtonSection", [dijit._Widget, dijit._Templated, cosmo.ui.ContentBox],
+             {
+                 widgetsInTemplate: true,
+                 
+                 // Attach points
+                 removeButton: null,
+                 saveButton: null,
+                 removeText: _("App.Button.Remove"),
+                 saveText: _("App.Button.Save"),
+                 
+                 templateString: "<div><div class='floatLeft'><div dojoType='cosmo.ui.widget.Button' dojoAttachPoint='removeButton' id='detailRemoveButton' text='${removeText}' enabled='false' dojoAttachEvent='handleOnClick: _handleRemove'></div></div><div class='floatRight'><div dojoType='cosmo.ui.widget.Button' dojoAttachPoint='saveButton' id='detailSaveButton' text='${saveText}' enabled='false' dojoAttachEvent='handleOnClick: _handleSave'></div></div><div class='clearBoth'></div></div>",
+                 setButtons: function(enabled){
+                     this.saveButton.setEnabled(enabled);
+                     this.removeButton.setEnabled(enabled);
+                 },
+                 _handleRemove: dojo.hitch(cosmo.ui.detail,cosmo.ui.detail.removeItem),
+                 _handleSave: dojo.hitch(cosmo.ui.detail,cosmo.ui.detail.saveItem)
+             });
 

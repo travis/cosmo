@@ -81,8 +81,8 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
     this.children = [this.menuBar, this.mainApp];
     this.renderSelf = function () {
         var viewport = dijit.getViewport();
-        var w = viewport.width;
-        var h = viewport.height;
+        var w = viewport.w;
+        var h = viewport.h;
         // Pare width and height down to avoid
         // stupid scrollbars showing up
         w -= 2;

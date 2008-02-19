@@ -675,3 +675,7 @@ position: absolute;
 }
 
 
+/* Detail view*/
+#detailButtonSection {
+    padding: 9px;                     
+}

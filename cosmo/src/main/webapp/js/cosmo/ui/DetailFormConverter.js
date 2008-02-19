@@ -390,7 +390,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
 // note that "errorKey" and "errorMessage" are mutually exclusive - but having at least
 // one of them is required. All other properties are optional.
 dojo.declare("cosmo.ui.Error", null, {
-    initializer: function(property, errorKey, errorMessage, params) {
+    constructor: function(property, errorKey, errorMessage, params) {
         this.property = property;
         this.errorKey = errorKey;
         this.errorMessage = errorMessage;
@@ -410,7 +410,7 @@ dojo.declare("cosmo.ui.ErrorList", null, {
     _errorsList: null,
     _errorsMap: null,
 
-    initializer: function(){
+    constructor: function(){
         this._errorsList  = [];
         this._errorsMap = {};
     },

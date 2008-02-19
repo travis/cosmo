@@ -81,7 +81,6 @@ dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Tem
 
     // Lifecycle
     postCreate: function () {
-
         var d = this.domNode;
         var table = null;
         var body = null;

@@ -46,7 +46,7 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
     this.upConstraint = (DAY_LIST_DIV_HEIGHT - 2);
     // Downward dragging constraint -- 2px fudge factor
     // This value is relative, local Y
-    this.downConstraint = (dijit.getViewport().height -
+    this.downConstraint = (dijit.getViewport().h -
         this.absTop - 2);
 
     this.init = function(dir, off) {

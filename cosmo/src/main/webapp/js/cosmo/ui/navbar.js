@@ -241,12 +241,11 @@ cosmo.ui.navbar.Bar = function (p) {
         t.id = 'viewToggle';
         t.className = 'floatLeft';
         this.viewToggleNode = t;
-        var gbsDiv = _createElem("div");
         var vT =  new cosmo.ui.widget.GraphicRadioButtonSet({
             selectedButtonIndex: selButtonIndex, height: 35, buttons: btns,
             id: "viewToggle"
-        }, gbsDiv);
-        t.appendChild(gbsDiv);
+        });
+        t.appendChild(vT.domNode);
         this.viewToggle = vT;
         d.appendChild(t);
     };

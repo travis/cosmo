@@ -272,25 +272,22 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
         },
 
         _setClientInstructions: function(client){
-            var x = 1;
-            var d = document.createElement("div");
             if (!this.httpSupported && client == "iCal"){
                 client = "icalNotSupported";
             }
+            var strings = [];
+            var x = 1;
             while (true){
                 var key = "Main.CollectionDetails.Instructions." + client + "." + x;
                 if (cosmo.util.i18n.messageExists(key)){
-                    var message = _(key);
-                    if (x > 1){
-                        d.appendChild(document.createElement("br"));
-                    }
-                    d.appendChild(document.createTextNode(message));
+                    strings.push(_(key));
                 } else {
                     break;
                 }
                 x++;
             }
-            dojo.dom.replaceChildren(this.clientInstructions, d);
+            strings.push("");
+            this.clientInstructions.innerHTML = strings.join("<br/>");
         },
 
         _setClientCollectionAddress: function(client){

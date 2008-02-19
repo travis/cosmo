@@ -7,13 +7,13 @@
   </colgroup>
     <tr>
       <td class="labelTextHoriz labelTextCell">
-         ${this.strings.nameLabel}:
+         ${strings.nameLabel}:
       </td>
       <td>
         <div class="floatLeft">
           <span dojoAttachPoint="collectionNameText" 
             style="display: none">
-            '${this.displayName}' ${this.strings.calendarLabel}
+            '${displayName}' ${strings.calendarLabel}
           </span>
         </div>
         <div class="floatLeft">
@@ -21,18 +21,18 @@
             style="display: none">
              <input class="inputText" dojoAttachPoint="collectionNameInput"
                 type="text"
-                value="${this.displayName}"/>&nbsp;
+                value="${displayName}"/>&nbsp;
                <input  dojoAttachPoint="collectionNameChangeButton" 
                 type="button" class="btnElemBaseSm" 
-                style="width: 86px;" value="${this.strings.changeNameButton}"
-                dojoAttachEvent="onClick: _handleSave;"/>
+                style="width: 86px;" value="${strings.changeNameButton}"
+                dojoAttachEvent="onclick: _handleSave"/>
           </span>
         </div>
         <div class="floatLeft">
           &nbsp;&nbsp;
         </div>
         <div class="floatLeft">
-          <a href="${this.protocolUrls.pim}">
+          <a href="${protocolUrls.pim}">
             <span dojoAttachPoint="linkSpan"></span>
           </a>
         </div>
@@ -45,18 +45,18 @@
     <td>
       <input  dojoAttachPoint="deleteCollectionButton" 
               type="button" class="btnElemBaseSm" id="deleteCollectionButton"
-              style="width: 86px;" value="${this.strings.deleteCollectionButton}"
-              dojoAttachEvent="onClick: _handleDelete;"/>
+              style="width: 86px;" value="${strings.deleteCollectionButton}"
+              dojoAttachEvent="onclick: _handleDelete"/>
     </td>
   </tr>
     <tr>
       <td class="labelTextHoriz labelTextCell">
-         ${this.strings.selectYourClient}:
+         ${strings.selectYourClient}:
       </td>
       <td>
         <div>
           <select class="selectElem" dojoAttachPoint="clientSelector"
-              dojoAttachEvent="onChange: _handleClientChanged;">
+              dojoAttachEvent="onchange: _handleClientChanged">
           </select>
         </div>
       </td>
@@ -70,14 +70,14 @@
       </tr>
       <tr>
       <td class="labelTextHoriz labelTextCell">
-         ${this.strings.collectionAddress}:
+         ${strings.collectionAddress}:
       </td>
       <td >
         <input class="inputText" style="display: none;" size="40" type="text" 
         dojoAttachPoint="clientCollectionAddress" value="" readonly="readonly"/>
         <a style="display: none" dojoAttachPoint="clientCollectionLink" 
         href="">
-          ${this.strings.clickHere}
+          ${strings.clickHere}
         </a>
       </td>
       </tr>
@@ -85,34 +85,34 @@
      <tbody dojoAttachPoint="protocolRows" style="display: none">
        <tr>
          <td colspan="2" style="padding-top: 12px; padding-bottom: 8px;">
-           ${this.strings.protocolInstructions}
+           ${strings.protocolInstructions}
          </td>
        </tr>
        <tr>
         <td class="labelTextHoriz labelTextCell">
-           ${this.strings.caldav}:
+           ${strings.caldav}:
         </td>
         <td>
            <input class="inputText" size="40" type="text" 
-             readonly="readonly" value="${this.protocolUrls.dav}"/>
+             readonly="readonly" value="${protocolUrls.dav}"/>
         </td>
        </tr>
        <tr>
         <td class="labelTextHoriz labelTextCell">
-           ${this.strings.webcal}:
+           ${strings.webcal}:
         </td>
         <td>
            <input class="inputText" size="40" type="text" 
-            readonly="readonly" value="${this.protocolUrls.webcal}"/>
+            readonly="readonly" value="${protocolUrls.webcal}"/>
         </td>
        </tr>
        <tr>
         <td class="labelTextHoriz labelTextCell">
-           ${this.strings.atom}:
+           ${strings.atom}:
         </td>
         <td>
            <input class="inputText" size="40" type="text" 
-            readonly="readonly" value="${this.protocolUrls.atom}"/>
+            readonly="readonly" value="${protocolUrls.atom}"/>
         </td>
        </tr>
      </tbody>
@@ -120,9 +120,9 @@
   </div>
   <div dojoAttachPoint="helpText" style="visibility: hidden; 
     position:absolute; top:0px; left:0px; width: 420px; padding-left: 12px; text-align: left;">
-    <a href="${this.strings.helpLink}" 
-      onclick="window.open('${this.strings.helpLink}'); 
-      return false;">${this.strings.help}</a>
+    <a href="${strings.helpLink}" 
+      onclick="window.open('${strings.helpLink}'); 
+      return false;">${strings.help}</a>
     <span dojoAttachPoint="chandlerPlug" style="display:none"><!--
       Don't use Dojo widget string substitution with anchor tags -
       it 'helpfully' escapes the quotes in the href prop

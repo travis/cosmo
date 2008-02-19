@@ -26,7 +26,7 @@ dojo.require("cosmo.util.deferred");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.widget.NavButtonSet");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.imagegrid");
@@ -323,7 +323,9 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             showLoading();
             setTimeout(nextFunc, 0);
         }
-        this.navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
+        if (this.navButtons) this.navButtons.destroy();
+        this.navButtons = new cosmo.ui.widget.NavButtonSet(
+            {id: 'viewNav', leftClickHandler: back, rightClickHandler: next});
         self.viewNavButtons.appendChild(this.navButtons.domNode);
         tr.appendChild(td);
 

@@ -696,8 +696,7 @@ cosmo.ui.minical.MiniCal = function (p) {
      * The selection gets re-rendered so it stays in place
      * as you move month-to-month
      */
-    this.goMonth = function (dir) {
-        var incr = dir;
+    this.goMonth = function (incr) {
         var compMonthDate =  new Date(viewStart.getFullYear(),
             viewStart.getMonth(), 1);
 

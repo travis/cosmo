@@ -376,7 +376,7 @@ cosmo.datetime.Date.prototype._setStrftimeCached = function(formatString, format
  * Increments by the desired number of specified units
  */
 cosmo.datetime.Date.prototype.add = function(interv, incr) {
-    var dt = dojo.date.add(this.toUTC(), interv, incr);
+    var dt = dojo.date.add(new Date(this.toUTC()), interv, incr);
     // Get incremented Date
     // 'n', 'd', etc., string keys
     
@@ -570,7 +570,7 @@ cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
  * Returns a new Date incremented the desired number of units
  */
 cosmo.datetime.Date.add = function(dt, interv, incr) {
-    var d = dojo.date.add(dt.getTime(), interv, incr);
+    var d = dojo.date.add(new Date(dt.getTime()), interv, incr);
 
     // JS Date
     if (dt instanceof Date) {

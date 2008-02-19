@@ -34,7 +34,7 @@ cosmo.util.deferred = {
     /* Add callback to deferredList to display error messages from component deferreds */
     addStdDLCallback: function(deferredList, primaryMessage, secondaryMessage){
         deferredList.addCallback(function (dResultList){
-            for (var i = 1; i < dResultList.length; i++){
+            for (var i = 0; i < dResultList.length; i++){
                 var result = dResultList[i];
                 if (!result[0]){
                     cosmo.app.showErr(primaryMessage || _("Error.DeferredPrimary"), 

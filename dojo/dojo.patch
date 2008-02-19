@@ -1,6 +1,18 @@
+Index: dojo/tests/module.js
+===================================================================
+--- dojo/tests/module.js	(revision 12509)
++++ dojo/tests/module.js	(working copy)
+@@ -18,6 +18,7 @@
+ 	dojo.require("tests.parser");
+ 	dojo.require("tests.colors");
+ 	dojo.require("tests.fx");
++	dojo.require("tests.DeferredList");
+ }catch(e){
+ 	doh.debug(e);
+ }
 Index: dojo/_base/xhr.js
 ===================================================================
---- dojo/_base/xhr.js	(revision 12377)
+--- dojo/_base/xhr.js	(revision 12509)
 +++ dojo/_base/xhr.js	(working copy)
 @@ -623,18 +623,30 @@
  	}
@@ -59,9 +71,22 @@ Index: dojo/_base/xhr.js
  	/*
 Index: dojo/DeferredList.js
 ===================================================================
---- dojo/DeferredList.js	(revision 12377)
+--- dojo/DeferredList.js	(revision 12505)
 +++ dojo/DeferredList.js	(working copy)
-@@ -74,7 +74,7 @@
+@@ -40,12 +40,9 @@
+ 		this.fireOnOneErrback = fireOnOneErrback;
+ 		this.consumeErrors = consumeErrors;
+ 
+-		var index = 0;
+-
+ 		dojo.forEach(this.list, function(d, index) {
+ 			d.addCallback(this, function(r) { this._cbDeferred(index, true, r); return r; });
+ 			d.addErrback(this, function(r) { this._cbDeferred(index, false, r); return r; });
+-			index++;
+ 		},this);
+ 	},
+ 
+@@ -74,7 +71,7 @@
  		//	Gathers the results of the deferreds for packaging
  		//	as the parameters to the Deferred Lists' callback
  

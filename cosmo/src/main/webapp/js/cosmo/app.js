@@ -133,8 +133,8 @@ cosmo.app = new function () {
                 }
             }
             this.modalDialog.type = this.modalDialog.ERROR;
-            var but = new cosmo.ui.widget.Button('okButton', 64, self.hideDialog,
-                _('App.Button.OK'), true);
+            var but = new cosmo.ui.widget.Button({id: 'okButton', width: 64, handleOnClick: self.hideDialog,
+                text: _('App.Button.OK'), small: true});
             this.modalDialog.btnsCenter[0] = but;
             this.modalDialog.defaultAction = self.hideDialog;
             this.modalDialog.content = msg;

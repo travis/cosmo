@@ -247,8 +247,9 @@ cosmo.ui.minical.MiniCal = function (p) {
 
             // Button
             td = _createElem('td');
-            var buttonGoTo = new cosmo.ui.widget.Button('goToDateButton', 36, self.doGoToDate,
-                _('App.Button.Go'), true);
+            var buttonGoTo = new cosmo.ui.widget.Button({id: 'goToDateButton', width: 36, 
+                handleOnClick: self.doGoToDate, text: _('App.Button.Go'), 
+                small: true});
             self.goToButton = buttonGoTo;
             td.appendChild(buttonGoTo.domNode);
             tr.appendChild(td);

@@ -101,7 +101,6 @@ cosmo.ui.selector.CollectionSelector = function (p) {
     };
     // Interface methods
     this.handlePub_app = function (cmd) {
-        console.debug(825)
         this.render();
     };
 

@@ -717,7 +717,6 @@ cosmo.view.cal.canvas = new function () {
     };
 
     this.handlePub_app = function (cmd) {
-        console.debug(710)
         if (!cosmo.view.cal.isCurrentView()) { return false; }
 
         var t = cmd.type;

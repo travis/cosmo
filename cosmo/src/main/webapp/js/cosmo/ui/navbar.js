@@ -534,16 +534,15 @@ cosmo.ui.navbar.ListPager = function (p) {
         else {
             var fPrev = this.parent.listCanvas.goPrevPage;
         }
-        var buttonDiv = _createElem("div");
         button = new cosmo.ui.widget.Button(
             {
                 text: 'Prev',
                 handleOnClick: fPrev,
                 small: true,
                 width: 44,
-                enabled: (typeof fPrev == 'function') },
-            buttonDiv);
-        td.appendChild(buttonDiv);
+                enabled: (typeof fPrev == 'function') })
+
+        td.appendChild(button.domNode);
         this.prevButton = button;
         tr.appendChild(td);
 
@@ -582,9 +581,9 @@ cosmo.ui.navbar.ListPager = function (p) {
                 handleOnClick: fNext,
                 small: true,
                 width: 44,
-                enabled: (typeof fNext == 'function') },
-            buttonDiv);
-        td.appendChild(buttonDiv);
+                enabled: (typeof fNext == 'function') });
+
+        td.appendChild(button.domNode);
         this.nextButton = button;
         tr.appendChild(td);
 

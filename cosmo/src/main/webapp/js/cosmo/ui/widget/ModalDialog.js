@@ -173,7 +173,7 @@ dojo.declare(
             return true;
         },
         setContent: function (content) {
-            this.content = content || this.content;
+            this.content = content || this.content || "";
             // Content area
             if (typeof this.content == 'string') {
                 this.contentNode.innerHTML = this.content;

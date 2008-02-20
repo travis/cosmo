@@ -105,9 +105,9 @@ cosmo.ui.event.listeners.hookUpListeners();
 <body id="body">
     <div id="baseLayout" style="position: absolute;"></div>
     <div id="maskDiv">
-<!--      <div id="appLoadingMessage">
+      <div id="appLoadingMessage">
         Loading the app ...
-      </div>-->
+      </div>
     <div id="dojoDebug">
     </div>
     </div>

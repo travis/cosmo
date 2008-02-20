@@ -66,7 +66,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         queryHash = queryHash || {};
         var queryIndex = base.indexOf("?");
         if (queryIndex > -1) {
-            var queryString = base.substring(queryIndex);
+            var queryString = base.substring(queryIndex + 1);
             var params = dojo.queryToObject(queryString);
             dojo.mixin(queryHash, params);
         } else {

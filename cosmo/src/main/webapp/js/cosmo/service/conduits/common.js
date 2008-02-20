@@ -63,7 +63,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     
     _extractDeferredListResults: function (results){
         var list = [];
-        for (var i = 1; i < results.length; i++){
+        for (var i = 0; i < results.length; i++){
             if (results[i][0]){
                 list.push(results[i][1]);
             } else {

@@ -167,7 +167,7 @@ cosmo.account.settings = new function () {
     
             var b = null; // For dialog buttons
             var c = null; // For dialog content area
-            c = new cosmo.ui.widget.TabContainer({});
+            c = new cosmo.ui.widget.TabContainer({tabs: tabs});
             o.content = c;
             b = new cosmo.ui.widget.Button({ text:_('App.Button.Close'),
                 width:60, small: true, handleOnClick: function () {
@@ -197,22 +197,14 @@ cosmo.account.settings = new function () {
 
         prefs[cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK] =
             this.advancedForm.showAccountBrowser.checked;
-        
-        var setPreferencesDeferred = new dojo.Deferred();
+
+        var prefDeferreds = [];
         for (var pref in prefs){
-            // create new function and call immediately to define scope
-            var throwAway = function (){
-                // capture preference key in scope
-                var capturedPref = pref;
-                setPreferencesDeferred.addCallback(function () {
-                    return cosmo.account.preferences.setPreference(capturedPref, 
-                        prefs[capturedPref]);
-                }
-                );
-            }();
+            prefDeferreds.push(cosmo.account.preferences.setPreference(
+                pref, prefs[pref]));
         }
         // Start preferences setting
-        setPreferencesDeferred.callback();
+        setPreferencesDeferred = new dojo.DeferredList(prefDeferreds);
         
         setPreferencesDeferred.addCallback(dojo.hitch(this, function () {
             // Validate the form input using each field's

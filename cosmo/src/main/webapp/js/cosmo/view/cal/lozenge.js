@@ -326,8 +326,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
     mainDiv.style.borderStyle = borderStyle;
     // Using the AlphaImageLoader hack b0rks normal z-indexing
     // No pretty transparent PNGs for IE6 -- works nicely in IE7
-    //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
-    if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
+    if (!(dojo.isIE && dojo.isIE < 7)) {
         if (imgPath) {
             mainDiv.style.backgroundImage = 'url(' + imgPath + ')';
         }
@@ -354,8 +353,7 @@ cosmo.view.cal.lozenge.Lozenge.prototype.setLozengeAppearance = function (stateI
             auxDiv.style.backgroundColor = lozengeColor;
             auxDiv.style.borderStyle = borderStyle;
             // Use transparent PNG background in non-IE6 browsers
-            //if (!(dojo.render.html.ie && !dojo.render.html.ie7)) { // Wait for 0.4
-            if (!(document.all && navigator.appVersion.indexOf('MSIE 7') == -1)) {
+            if (!(dojo.isIE && dojo.isIE < 7)) {
                 if (imgPath) {
                     auxDiv.style.backgroundImage = 'url(' + imgPath + ')';
                 }

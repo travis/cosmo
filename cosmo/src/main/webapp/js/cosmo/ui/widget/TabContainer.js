@@ -108,7 +108,6 @@ dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], 
 
     // Lifecycle
     postCreate: function () {
-
         var tabMain = null;
         var tabPanelTable = null;
         var tabPanelTBody = null;

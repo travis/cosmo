@@ -731,12 +731,12 @@ cosmo.view.cal.canvas = new function () {
                 if (typeof this.timedCanvas != 'undefined' && this.timedCanvas) {
                     this.timedCanvasScrollTop = this.timedCanvas.scrollTop; // Preserve the scroll offset
                     if (cmd.isDisplayed) {
-                        if (dojo.render.html.mozilla) {
+                        if (dojo.isMoz) {
                             this.timedCanvas.style.overflow = "hidden";
                         }
                     }
                     else {
-                       if (dojo.render.html.mozilla) {
+                       if (dojo.isMoz) {
                            this.timedCanvas.style.overflow = "auto";
                            this.timedCanvas.style.overflowY = "auto";
                            this.timedCanvas.style.overflowX = "hidden";

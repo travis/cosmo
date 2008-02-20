@@ -51,7 +51,7 @@ call "%CURRENT_DIR%\%CFGSCRIPT"
 :checkFeatures
 
 rem enable/disable features
-set OSAFSRV_OPTS=-server -Dnet.fortuna.ical4j.timezone.registry=org.osaf.cosmo.calendar.CosmoTimeZoneRegistryFactory -Dical4j.unfolding.relaxed=true -Dical4j.parsing.relaxed=true -Dical4j.validation.relaxed=true
+set OSAFSRV_OPTS=-server
 
 if "%OSAFSRV_JMX_LOCAL%" == "" goto setJMX
 echo "Disabling JMX"

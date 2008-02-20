@@ -498,10 +498,12 @@ public class HCalendarParser implements CalendarParser {
             return new Date(HCAL_DATE_FORMAT.parse(original));
         }
 
-        try {
+        // Return DateTime if we don't find '-'
+        if(original.indexOf('-') == -1)
             return new DateTime(original);
-        } catch (Exception e) {}
-
+        
+        // otherwise try parsing RFC 3339 formats
+        
         // the date-time value can represent its time zone in a few different
         // ways. we have to normalize those to match our pattern.
 

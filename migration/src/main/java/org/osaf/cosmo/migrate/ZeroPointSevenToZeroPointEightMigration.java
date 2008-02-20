@@ -69,6 +69,7 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
         HashSet<String> dialects = new HashSet<String>();
         dialects.add("Derby");
         dialects.add("MySQL5");
+        dialects.add("PostgreSQL");
         return dialects;
     }
 
@@ -102,7 +103,7 @@ public class ZeroPointSevenToZeroPointEightMigration extends AbstractMigration {
         
         try {
             // get all to migrate
-            stmt = conn.prepareStatement("select * from (SELECT ci.collectionid, i.icaluid, count(*) counticaluid from item i, collection_item ci where ci.itemid=i.id and i.icaluid is not null and i.modifiesitemid is null group by i.icaluid, ci.collectionid) as ss where counticaluid > 1");
+            stmt = conn.prepareStatement("select * from (SELECT ci.collectionid, i.icaluid, count(*) as counticaluid from item i, collection_item ci where ci.itemid=i.id and i.icaluid is not null and i.modifiesitemid is null group by i.icaluid, ci.collectionid) as ss where counticaluid > 1");
             selectNumDuplicates = conn.prepareStatement("select count(*) from item i, collection_item ci where ci.collectionid=? and ci.itemid=i.id and i.icaluid=?");
             selectByIcalUid = conn.prepareStatement("select i.id from item i, collection_item ci where ci.collectionid=? and ci.itemid=i.id and i.icaluid=? and upper(i.icaluid)!=upper(i.uid)");
             // migration statements

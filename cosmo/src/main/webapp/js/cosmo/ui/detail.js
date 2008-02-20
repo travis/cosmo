@@ -1571,4 +1571,3 @@ dojo.declare("cosmo.ui.detail.ButtonSection", [dijit._Widget, dijit._Templated, 
                  _handleRemove: dojo.hitch(cosmo.ui.detail,cosmo.ui.detail.removeItem),
                  _handleSave: dojo.hitch(cosmo.ui.detail,cosmo.ui.detail.saveItem)
              });
-

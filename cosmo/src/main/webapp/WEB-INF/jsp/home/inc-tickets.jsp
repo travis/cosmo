@@ -21,10 +21,6 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 
-<script type="text/javascript">
-dojo.require("cosmo.ui.widget.TicketWidget");
-</script>
-
 <c:if test="${empty isCollection}">
   <c:set var="isCollection" value="false"/>
 </c:if>
@@ -40,16 +36,25 @@ dojo.require("cosmo.ui.widget.TicketWidget");
   Tickets
 </div>
 
-<div dojoType="cosmo:TicketWidget" id="newTicketWidget" widgetId = "newTicketWidget"  itemId="${Path}"></div>
 <script type="text/javascript">
-dojo.addOnLoad(function(){
-	dojo.event.connect(dojo.widget.byId("newTicketWidget"), "createSuccess", 
-		function(){location = location});
-	
-	});
+function reload(){location = location};
+dojo.require('dojo.parser');
+dojo.require("cosmo.ui.widget.TicketWidget");
 </script>
-
-
+<div id="newTicketContainer">
+  <div dojoType="cosmo.ui.widget.TicketWidget" id="newTicketWidget" 
+       itemId="${Path}"  dojoAttachEvent="createSuccess: reload">
+    <script type="dojo/connect" event="createSuccess" args="data">
+      // TODO: reloading the page here is a pretty ugly way to do this...
+      location = location;
+    </script>
+  </div>
+</div>
+<script type="text/javascript">
+    dojo.addOnLoad(function(){
+        dojo.parser.parse(dojo.byId("newTicketContainer"));
+    });
+</script>
 
 <div style="margin-top:12px;">
   <table cellpadding="4" cellspacing="1" border="0" width="100%">

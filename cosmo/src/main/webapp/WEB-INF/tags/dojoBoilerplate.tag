@@ -23,7 +23,6 @@
 
 <%@ attribute name="timezones"        %>
 <%@ attribute name="parseWidgets"        %>
-<%@ attribute name="searchIds"        %>
 <%@ attribute name="dojoLayers"        %>
 
 <u:bind var="PRODUCT_VERSION"
@@ -46,9 +45,6 @@
 
     // Set isDebug to true to get nice dojo debugging messages.
 
-    var searchIds = [<c:forEach var="searchId" items="${searchIds}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>
-                     "${searchId}"</c:forEach>];
-
     var djConfig = {isDebug: true, 
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
@@ -56,7 +52,6 @@
                     confLocation: "${baseUrl}/webui.conf",
                     templateName: "${templateName}",
                     parseOnLoad: ${parseWidgets},
-                    searchIds: searchIds,
                     serverBaseUrl: "${baseUrl}"}
 </script>
 

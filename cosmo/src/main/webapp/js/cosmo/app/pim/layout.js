@@ -299,6 +299,7 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
+    console.debug("pop pop pop");
 
     var menuBar = this.baseLayout.menuBar;
     var centerColumn = this.baseLayout.mainApp.centerColumn;
@@ -318,7 +319,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     // Main menu of links at the top of the UI
     var menuDiv = _createElem('div');
     menuDiv.id = 'menuNavItems';
-    var cB = new  cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
+    var cB = new cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
     menuBar.addChild(cB);
     menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data
@@ -371,7 +372,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
         var d = _createElem("div");
-        var widget = cosmo.ui.widget.CollectionSelector({
+        var widget = new cosmo.ui.widget.CollectionSelector({
             collection: cosmo.app.pim.getSelectedCollection(),
             ticketKey: cosmo.app.pim.ticketKey }, d);
         selectorDiv.appendChild(d);

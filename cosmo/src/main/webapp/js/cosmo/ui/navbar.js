@@ -462,12 +462,13 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
                 e.stopPropagation();
             }
         });
+
         var enabled = new cosmo.ui.widget.Button({
             text: _('App.Button.Create'),
             handleOnClick: createItem,
             small: true,
             width: 52,
-            enabled: true,
+            enabled: writeable,
             id: "quickEntryCreate"})
 
         var disabled = new cosmo.ui.widget.Button({

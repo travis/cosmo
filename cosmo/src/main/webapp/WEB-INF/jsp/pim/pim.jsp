@@ -118,6 +118,7 @@ dojo.require("dijit.layout.ContentPane");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.ui.selector");
 dojo.require("cosmo.ui.widget.CollectionSelector");
+dojo.require("cosmo.ui.minical");
 dojo.require('cosmo.service.conduits.common');
 dojo.require('cosmo.service.tickler');
 cosmo.app.pim.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.getAtomPlusEimConduit());
@@ -142,7 +143,7 @@ cosmo.app.pim.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.ge
      <authz:authorize ifNotGranted="ROLE_USER">
        <div dojoType="cosmo.ui.widget.CollectionSelector"></div>
      </authz:authorize>
-<!--     <div dojoType="cosmo.ui.minical.Minical"></div>-->
+     <div dojoType="cosmo.ui.minical.MiniCal" currDate="${cosmo.app.pim.currDate}"></div>
    </div>
    <div dojoType="dijit.layout.ContentPane" layoutAlign="client" style="background-color:yellow">
     baz

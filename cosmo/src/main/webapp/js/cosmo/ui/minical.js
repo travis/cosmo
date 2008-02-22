@@ -39,8 +39,9 @@ dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.service.exception");
 
-cosmo.ui.minical.MiniCal = function (p) {
-
+dojo.declare("cosmo.ui.minical.MiniCal", [dijit._Widget, cosmo.ui.ContentBox],{
+    postCreate: function(p){
+        debugger
     var params = p || {};
     var self = this;
     // Initialize these to the start/ends of the
@@ -385,6 +386,7 @@ cosmo.ui.minical.MiniCal = function (p) {
 
         return true;
     };
+
     /**
      * Render three blank month tiles and attach to tileCanvas
      */
@@ -702,12 +704,12 @@ cosmo.ui.minical.MiniCal = function (p) {
                 data: {} }]);
         }
         setTimeout(f, 0);
-    }
+    };
     /**
      * Handle clicks on normal dates within minical
      * Navigate to appropriate dates and re-render selection
      */
-    this.clickHandler = function (event) {
+        this.clickHandler = function (event) {
         var target = (typeof event.target != "undefined") ?
             event.target : event.srcElement;
         var elem = getElementOfAttribute("day", target);
@@ -718,7 +720,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         dt = elem.getAttribute('day');
         // Convert to int because FF saves attributes as strings
         dt = new Date(parseInt(dt));
-
+    
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
@@ -789,9 +791,8 @@ cosmo.ui.minical.MiniCal = function (p) {
             selDiv = null;
         }
     };
+    }});
+             
 
-};
 
-cosmo.ui.minical.MiniCal.prototype =
-    new cosmo.ui.ContentBox();
 

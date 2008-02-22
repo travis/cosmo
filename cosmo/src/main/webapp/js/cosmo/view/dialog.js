@@ -26,18 +26,10 @@ cosmo.view.dialog = new function () {
     // ********************
     this._item = null;
 
+    dojo.subscribe('cosmo:calSetSelected', 
+                   dojo.hitch(this, function(cmd){this._item = cmd.data}));
     // Public methods
     // ********************
-    this.handlePub = function (cmd) {
-        var act = cmd.action;
-        var item = cmd.data;
-        switch (act) {
-            case 'setSelected':
-                this._item = item;
-                break;
-        }
-    };
-    dojo.subscribe('/calEvent', this, 'handlePub');
     this.getSelectedItem = function () {
         return this._item;
     };
@@ -57,17 +49,14 @@ cosmo.view.dialog.BaseDialog.prototype.closeSelf = function () {
 };
 cosmo.view.dialog.BaseDialog.prototype.doPublishRemove =
     function (qual) {
-    var selItem = cosmo.view.dialog.getSelectedItem();
-    dojo.publish('/calEvent', [{
-        action: 'remove', qualifier: qual, data: selItem }]);
-    this.closeSelf();
-};
+        var selItem = cosmo.view.dialog.getSelectedItem();
+        dojo.publish('cosmo:calRemove', [{qualifier: qual, data: selItem }]);
+        this.closeSelf();
+    };
 
 cosmo.view.dialog.BaseDialog.prototype.doPublishSave =
     function (qual, saveItem, delta) {
-    dojo.publish('/calEvent', [{
-        action: 'save', qualifier: qual,
-        data: saveItem, delta: delta }]);
+        dojo.publish('cosmo:calSave', [{qualifier: qual, data: saveItem, delta: delta }]);
     this.closeSelf();
 };
 

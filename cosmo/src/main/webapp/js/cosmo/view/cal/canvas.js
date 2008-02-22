@@ -90,10 +90,7 @@ cosmo.view.cal.canvas = new function () {
     // ****************
     this.init = function () {
         console.debug('init on cal canvas');
-        // Subscribe to the '/calEvent' channel
-        dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
         // Subscribe to the '/app' channel
-        dojo.subscribe('/app', self, 'handlePub_app');
         this.hasBeenInitialized = true;
     };
     /**
@@ -526,8 +523,7 @@ cosmo.view.cal.canvas = new function () {
             // hurt to re-select the currently selected item
             self.setSelectedCalItem(item);
             var f = function () {
-                dojo.publish('/calEvent', [{
-                    'action': 'setSelected', 'data': item }]);
+                dojo.publish('cosmo:calSetSelected', [{ 'data': item }]);
             }
             setTimeout(f, 0);
         }
@@ -640,113 +636,102 @@ cosmo.view.cal.canvas = new function () {
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published event.
      */
-    this.handlePub_calEvent = function (cmd) {
+
+    dojo.subscribe('cosmo:calSaveSuccess', function(cmd){
         if (!cosmo.view.cal.isCurrentView()) { return false; }
-        var act = cmd.action;
+        if (cmd.data.data.getEventStamp()){
+            saveSuccess(cmd);
+        }
+        else {
+            removeRecurrenceChain(cmd.data.data.getUid());
+        }
+    });
+    dojo.subscribe('cosmo:calEventsLoadSuccess', function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
         var opts = cmd.opts;
         var data = cmd.data;
-        switch (act) {
-            case 'eventsLoadSuccess':
-                cosmo.view.cal.itemRegistry = data;
-                var c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
-                // Update viewStart, viewEnd from passed opts
-                for (var n in opts) { c[n] = opts[n]; }
-                c.render();
-                cosmo.app.hideMask();
-                break;
-            case 'setSelected':
-                var ev = cmd.data;
-                self.setSelectedCalItem(ev);
-                break;
-            case 'save':
-                setLozengeProcessing(cmd);
-                break;
-            case 'saveFailed':
-                var ev = cmd.data;
-                // If the failure was a new event, remove
-                // the placeholder lozenge
-                if (cmd.saveType == "new") {
-                    removeEvent(ev);
-                }
-                // Otherwise put it back where it was and
-                // restore to non-processing state
-                else {
-                    var rEv = null;
-                    // Recurrence, 'All events'
-                    if (cmd.saveType == 'recurrenceMaster' ||
-                        cmd.saveType == 'instanceAllFuture') {
-                        // Edit ocurring from one of the instances
-                        if (opts.instanceEvent) {
-                            rEv = cmd.instanceEvent
-                        }
-                        // Edit occurring from the actual master
-                        else {
-                            rEv = ev;
-                        }
-                    }
-                    // Single event
-                    else {
-                        var rEv = ev;
-                    }
-                    restoreEvent(rEv);
-                    rEv.lozenge.setInputDisabled(false);
-                }
-                break;
-            case 'saveSuccess':
-                if (cmd.data.data.getEventStamp()){
-                    saveSuccess(cmd);
-                }
-                else {
-                    removeRecurrenceChain(cmd.data.data.getUid());
-                }
-                break;
-            case 'remove':
-                // Show 'processing' state here
-                setLozengeProcessing(cmd);
-                break;
-            case 'removeSuccess':
-                var ev = cmd.data;
-                removeSuccess(ev, opts)
-                break;
-            case 'removeFailed':
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
-
-    this.handlePub_app = function (cmd) {
+        cosmo.view.cal.itemRegistry = data;
+        var c = cosmo.app.pim.baseLayout.mainApp.centerColumn.calCanvas;
+        // Update viewStart, viewEnd from passed opts
+        for (var n in opts) { c[n] = opts[n]; }
+        c.render();
+        cosmo.app.hideMask();
+    });
+    dojo.subscribe('cosmo:calSetSelected', function(cmd){
         if (!cosmo.view.cal.isCurrentView()) { return false; }
-
-        var t = cmd.type;
-        switch (t) {
-            case 'modalDialogToggle':
-                // Showing the modal dialog box: remove scrolling in the timed
-                // event div below (1. Firefox Mac, the scrollbar uses a native
-                // wigdet and shows through the dialog box. 2. Firefox on all
-                // plaforms, overflow of 'auto' in underlying divs causes
-                // carets/cursors in textboxes to disappear. This is a verified
-                // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
-                if (typeof this.timedCanvas != 'undefined' && this.timedCanvas) {
-                    this.timedCanvasScrollTop = this.timedCanvas.scrollTop; // Preserve the scroll offset
-                    if (cmd.isDisplayed) {
-                        if (dojo.isMoz) {
-                            this.timedCanvas.style.overflow = "hidden";
-                        }
-                    }
-                    else {
-                       if (dojo.isMoz) {
-                           this.timedCanvas.style.overflow = "auto";
-                           this.timedCanvas.style.overflowY = "auto";
-                           this.timedCanvas.style.overflowX = "hidden";
-                       }
-                    }
-                    this.timedCanvas.scrollTop = this.timedCanvasScrollTop;
-                }
-                break;
+        self.setSelectedCalItem(cmd.data);
+    });
+    dojo.subscribe('cosmo:calSave', function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        setLozengeProcessing(cmd);
+    });
+    dojo.subscribe('cosmo:calSaveFailed', function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        var ev = cmd.data;
+        var opts = cmd.opts;
+        // If the failure was a new event, remove
+        // the placeholder lozenge
+        if (cmd.saveType == "new") {
+            removeEvent(ev);
         }
-    };
+        // Otherwise put it back where it was and
+                // restore to non-processing state
+        else {
+            var rEv = null;
+            // Recurrence, 'All events'
+            if (cmd.saveType == 'recurrenceMaster' ||
+                cmd.saveType == 'instanceAllFuture') {
+                // Edit ocurring from one of the instances
+                if (opts.instanceEvent) {
+                    rEv = cmd.instanceEvent
+                }
+                // Edit occurring from the actual master
+                else {
+                    rEv = ev;
+                }
+            }
+            // Single event
+            else {
+                var rEv = ev;
+            }
+            restoreEvent(rEv);
+            rEv.lozenge.setInputDisabled(false);
+        }
+    });
+
+    dojo.subscribe('cosmo:calRemoveSuccess', function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        removeSuccess(cmd.data, cmd.opts)
+    });
+    dojo.subscribe("cosmo:calRemove", function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        setLozengeProcessing(cmd);
+    });
+    dojo.subscribe("cosmo:appModalDialogToggle", dojo.hitch(this, function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        // Showing the modal dialog box: remove scrolling in the timed
+        // event div below (1. Firefox Mac, the scrollbar uses a native
+        // wigdet and shows through the dialog box. 2. Firefox on all
+        // plaforms, overflow of 'auto' in underlying divs causes
+        // carets/cursors in textboxes to disappear. This is a verified
+        // Mozilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=167801
+        if (typeof this.timedCanvas != 'undefined' && this.timedCanvas) {
+            this.timedCanvasScrollTop = this.timedCanvas.scrollTop; // Preserve the scroll offset
+            if (cmd.isDisplayed) {
+                if (dojo.isMoz) {
+                    this.timedCanvas.style.overflow = "hidden";
+                }
+            }
+            else {
+                if (dojo.isMoz) {
+                    this.timedCanvas.style.overflow = "auto";
+                    this.timedCanvas.style.overflowY = "auto";
+                    this.timedCanvas.style.overflowX = "hidden";
+                }
+            }
+            this.timedCanvas.scrollTop = this.timedCanvasScrollTop;
+        }
+    }));
 
     // Private methods
     // ****************
@@ -853,13 +838,12 @@ cosmo.view.cal.canvas = new function () {
                 // If the selected item is not in the on-canvas itemRegistry,
                 // pull the copy from the selectedItemCache
                 var sel = self.getSelectedItem() || self.getSelectedItemCacheCopy();
-                dojo.publish('/calEvent', [{ 'action':
-                    'eventsDisplaySuccess', 'data': sel }]);
+                dojo.publish('cosmo:calEventsDisplaySuccess', [{'data': sel }]);
             }
         }
         // No items displayed in the current collection
         else {
-            dojo.publish('/calEvent', [{ 'action': 'noItems' }]);
+            dojo.publish('cosmo:calNoItems', [{}]);
         }
         return true;
     }
@@ -1116,8 +1100,8 @@ cosmo.view.cal.canvas = new function () {
                     }
                     self.setSelectedCalItem(sel);
                     sel = self.getSelectedItem();
-                    dojo.publish('/calEvent', [{ action: 'setSelected',
-                        saveType: saveType, data: sel }]);
+                    dojo.publish('cosmo:calSetSelected',
+                                 [{saveType: saveType, data: sel}]);
                 }
             }
             else {
@@ -1151,8 +1135,7 @@ cosmo.view.cal.canvas = new function () {
         // the currently displayed canvas
         // just send the 'clear selected' message
         if (item.lozenge.isOrphaned()) {
-            dojo.publish('/calEvent', [{ 'action':
-                'clearSelected', 'data': null }]);
+            dojo.publish('cosmo:calClearSelected', [{'data': null }]);
             return;
         }
         if (item.data.hasRecurrence()) {
@@ -1185,8 +1168,7 @@ cosmo.view.cal.canvas = new function () {
             removeEvent(item);
         }
         self.clearSelectedItem();
-        dojo.publish('/calEvent', [{ 'action':
-            'clearSelected', 'data': null }]);
+        dojo.publish('cosmo:calClearSelected', [{'data': null }]);
         updateEventsDisplay();
     }
 
@@ -1421,8 +1403,8 @@ cosmo.view.cal.canvas = new function () {
 
 
         // Save new event
-        dojo.publish('/calEvent', [{ 'action': 'save',
-            'data': item, 'qualifier': 'new' }])
+        dojo.publish('cosmo:calSave', [{
+            'data': item, 'qualifier': 'new' }]);
         return cosmo.view.cal.itemRegistry.getItem(id);
     };
     /**

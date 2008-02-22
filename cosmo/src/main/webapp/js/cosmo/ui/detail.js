@@ -61,14 +61,12 @@ cosmo.ui.detail = new function () {
             }
 
             this.item.makeSnapshot();
-            dojo.publish('/calEvent', [{
-                action: 'saveConfirm', delta: delta, data: this.item }]);
+            dojo.publish('cosmo:calSaveConfirm' [{delta: delta, data: this.item }]);
         }
     };
 
     this.removeItem = function () {
-        dojo.publish('/calEvent',
-                     [{ action: 'removeConfirm', data: this.item }]);
+        dojo.publish('cosmo:calRemoveConfirm', [{data: this.item }]);
     };
 
     // Utility functions
@@ -225,71 +223,48 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         }
     };
 
-    this.handlePub = function (cmd) {
-        var act = cmd.action;
+    function clearSelected(){
+        cosmo.ui.detail.item = null;
+        self.clear(true);
+        self.buttonSection.setButtons(false);
+    }
+    
+    function updateItems(cmd){
         var item = cmd.data;
-        switch (act) {
-            // Successfully displaying all the loaded items on the canvas
-            case 'eventsDisplaySuccess':
-            // Collections with nothing in them
-            case 'noItems':
-            // Items clicked to select, newly saved items
-            case 'setSelected':
-            // Nothing has the selection -- clear out the form
-            case 'clearSelected':
-                // An item has been clicked on, selected
-                if (item) {
-                    // Only update the values in the form if
-                    // the item has actually changed -- note that
-                    // in the cal, when navigating off the week
-                    // where the selected item is displayed, the
-                    // selected item will in the selectedItemCache
-                    if (item != cosmo.ui.detail.item) {
-                        self.updateFromItem(item);
-                        // For brand-new items auto-focus the Title field
-                        // to allow people to change the placeholder
-                        // 'New Event' text quickly
-                        if (cmd.saveType == 'new') {
-                            this.mainSection.formNode.noteTitle.focus();
-                        }
-                    }
-                }
-                // No-item means 'clear the selection'
-                // FIXME: We need better sematics for this --
-                // an empty collection/week-view will also pass nothing here
-                // On the other hand, the itemRegistry could now be empty
-                // because the user just removed the last item, in which
-                // case we need to clear out the form after all. We ought to
-                // have a specific 'clear the selection' flag
-                else if (act == 'clearSelected' ||
-                    cosmo.view[cosmo.app.pim.currentView].itemRegistry.length) {
-                    cosmo.ui.detail.item = null;
-                    self.clear(true);
-                    self.buttonSection.setButtons(false);
-                }
-                break;
-            // Edited items, newly saved items (don't update newly saved
-            // items; that happens when they get the selection)
-            case 'saveSuccess':
-                // Don't update here for newly saved items -- it wil
-                // update again when the new item gets the selection,
-                // resulting in weird flashing from the multiple updates
-                if (cmd.saveType != 'new') {
-                    self.updateFromItem(item);
-                }
-                break;
-            case 'saveFailed':
-                //self.setButtons(true, true);
-                break;
-            case 'saveFromForm':
-                cosmo.ui.detail.saveItem();
-                break;
-            default:
-                // Do nothing
-                break;
+           if (item) {
+               // Only update the values in the form if
+               // the item has actually changed -- note that
+               // in the cal, when navigating off the week
+               // where the selected item is displayed, the
+               // selected item will in the selectedItemCache
+               if (item != cosmo.ui.detail.item) {
+                   self.updateFromItem(item);
+                   // For brand-new items auto-focus the Title field
+                   // to allow people to change the placeholder
+                   // 'New Event' text quickly
+                   if (cmd.saveType == 'new') {
+                       self.mainSection.formNode.noteTitle.focus();
+                   }
+               }
+           }
+        else if (cosmo.view[cosmo.app.pim.currentView].itemRegistry.length) {
+            clearSelected();
         }
-    };
-    dojo.subscribe('/calEvent', self, 'handlePub');
+    }
+
+    dojo.subscribe('cosmo:calEventsDisplaySuccess', updateItems)
+    dojo.subscribe('cosmo:calNoItems', updateItems)
+    dojo.subscribe('cosmo:calSetSelected', updateItems)
+    dojo.subscribe('cosmo:calClearSelected', updateItems);
+    dojo.subscribe('cosmo:calSaveSuccess', function(cmd){
+        var item = cmd.data;
+        if (cmd.saveType != 'new') {
+            self.updateFromItem(item);
+        }
+    });
+    dojo.subscribe('cosmo:calSaveFromForm', function(){
+        cosmo.ui.detail.saveItem();
+    });
 };
 
 cosmo.ui.detail.DetailViewForm.prototype =

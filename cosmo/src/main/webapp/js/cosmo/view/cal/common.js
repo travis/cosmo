@@ -58,30 +58,13 @@ cosmo.view.cal.collectionItemRegistries = {};
  * @param cmd A JS Object, the command containing orders for
  * how to handle the published event.
  */
-cosmo.view.cal.handlePub_calEvent = function (cmd) {
 
-    if (!cosmo.view.cal.isCurrentView()) { return false; }
+dojo.subscribe("cosmo:calLoadCollection", function(cmd){
+    if (!cosmo.view.cal.isCurrentView()) return false;
+    var opts = cmd.opts || {};
+    cosmo.view.cal.loadItems(opts);
+});
 
-    // Ignore input when not the current view
-    var _pim = cosmo.app.pim;
-    if (_pim.currentView != _pim.views.CAL) {
-        return false;
-    }
-
-    var act = cmd.action;
-    var qual = cmd.qualifier || null;
-    var data = cmd.data || {};
-    var opts = cmd.opts;
-    var delta = cmd.delta;
-    switch (act) {
-        case 'loadCollection':
-            cosmo.view.cal.loadItems(opts);
-            break;
-        default:
-            // Do nothing
-            break;
-    }
-};
 
 cosmo.view.cal.loadItems = function (p) {
     console.debug("trigger!");
@@ -101,7 +84,6 @@ cosmo.view.cal.loadItems = function (p) {
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent
@@ -176,10 +158,8 @@ cosmo.view.cal.loadItems = function (p) {
     cosmo.util.deferred.addStdDLCallback(loadDeferred);
     loadDeferred.addCallback(function(){
         var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
-    
-        dojo.publish('/calEvent', [{ action: 'eventsLoadSuccess',
-                                                data: itemRegistry, opts: opts }]);
-    });
+        dojo.publish('cosmo:calEventsLoadSuccess', [{data: itemRegistry, opts: opts }]);
+    });        
     return loadDeferred;
 };
 /**

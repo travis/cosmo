@@ -29,9 +29,7 @@ cosmo.view.contextMenu = new function () {
           handleClick: function () {
               var currView = cosmo.view.getCurrentView();
               var selItem = currView.canvasInstance.getSelectedItem();
-              dojo.publish('/calEvent',
-                  [{ action: 'removeConfirm',
-                    data: selItem }]);
+              dojo.publish('cosmo:calRemoveConfirm', [{data: selItem }]);
           } })
         /*new _menuItem({
           display: "Add to Collection",

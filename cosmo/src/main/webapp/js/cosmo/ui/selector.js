@@ -83,32 +83,11 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         var rgb = dojox.color.fromHsv(h, s, v).toRgb();
         return 'rgb(' + rgb.join() + ')';
     };
+    var r = dojo.hitch(this, function(){this.render()});
+    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
+    dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, r);
+    dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, r);
 
-    // Interface methods
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        switch (act) {
-            // FIXME: Piggybacking rendering on view changes -- used here
-            // so the overlay checkboxes can appear/disapper. This also
-            // triggers initial render when app loads
-            case 'eventsLoadSuccess':
-                this.render();
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
-    // Interface methods
-    this.handlePub_app = function (cmd) {
-        this.render();
-    };
-
-    dojo.subscribe('/calEvent', _this, 'handlePub_calEvent');
-    dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
-        _this, 'handlePub_app');
-    dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
-        _this, 'handlePub_app');
 
     this.renderSelf = function () {
         // Preserve scrolled state

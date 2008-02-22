@@ -57,39 +57,18 @@ cosmo.view.service = new function () {
     this.processingQueue = [];
     // Last clicked cal item -- used for selection persistence.
     this.lastSent = null;
-
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var qual = cmd.qualifier || null;
-        var data = cmd.data || {};
-        var opts = cmd.opts;
-        var delta = cmd.delta;
-        switch (act) {
-            case 'saveConfirm':
-                var confirmItem = cmd.data;
-                saveItemChangesConfirm(confirmItem, delta);
-                break;
-            case 'save':
-                var saveItem = cmd.data;
-                saveItemChanges(saveItem, qual, delta);
-                break;
-            case 'removeConfirm':
-                var confirmItem = cmd.data;
-                removeItemConfirm(confirmItem);
-                break;
-            case 'remove':
-                var removeEv = cmd.data;
-                removeItem(removeEv, qual);
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
-
-    // Subscribe to the '/calEvent' channel
-    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
-
+    dojo.subscribe("cosmo:calSave", function(cmd){
+        saveItemChanges(cmd.data, cmd.qualifier, cmd.delta);
+    });
+    dojo.subscribe("cosmo:calSaveConfirm", function(cmd){
+        saveItemChangesConfirm(cmd.data, cmd.delta);
+    });
+    dojo.subscribe("cosmo:calRemoveConfirm", function(cmd){
+        removeItemConfirm(cmd.data);
+    });
+    dojo.subscribe("cosmo:calRemove", function(cmd){
+        removeItem(cmd.data, cmd.qualifier);
+    });
     /**
      * Handle items published on the '/calEvent' channel, including
      * self-published items
@@ -120,7 +99,7 @@ cosmo.view.service = new function () {
 
         if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
-            dojo.publish('/calEvent', [{action: 'save', data: item, delta: delta }]);
+            dojo.publish('cosmo:calSave', [{data: item, delta: delta }]);
         }
         else {
             confirmType = '';
@@ -362,7 +341,7 @@ cosmo.view.service = new function () {
          
         if (err){
             // Failure -- display exception info
-            act = 'saveFailed';
+            act = 'cosmo:calSaveFailed';
             
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
@@ -404,7 +383,7 @@ cosmo.view.service = new function () {
             }
         } else {
             // Success
-            act = 'saveSuccess';
+            act = 'cosmo:calSaveSuccess';
         }
 
         // Success/failure for all other cases
@@ -414,8 +393,7 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.publish('/calEvent', [{
-                 'action': act,
+            dojo.publish(act, [{
                  'data': item,
                  'saveType': saveType,
                  'delta':delta,
@@ -610,15 +588,16 @@ cosmo.view.service = new function () {
      */
     function handleRemoveResult(item, err, reqId, opts) {
         var removeEv = item;
+        var act;
         // Simple error message to go along with details from Error obj
         var errMsg = _('Main.Error.ItemRemoveFailed');
         if (err) {
-            act = 'removeFailed';
+            act = 'cosmo:calRemoveFailed';
             cosmo.app.showErr(errMsg, getErrDetailMessage(err), err);
             item.restoreEvent();
         }
         else {
-            act = 'removeSuccess';
+            act = 'cosmo:calRemoveSuccess';
         }
 
         // Broadcast message for success/failure
@@ -626,9 +605,8 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.publish('/calEvent', [{ 'action': act,
-                'data': removeEv, 'opts': opts }]);
-            dojo.publish('/calEvent', [{ action: 'setSelected', data: null}]);
+            dojo.publish(act, [{'data': removeEv, 'opts': opts }]);
+            dojo.publish('cosmo:calSetSelected', [{data: null}]);
         }
         setTimeout(f, 0);
     }

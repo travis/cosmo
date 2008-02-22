@@ -38,9 +38,6 @@ cosmo.view.loading.StatusMessage = function (p) {
             this.domNode.style.height = this.height + 'px';
             this.domNode.style.lineHeight = this.height + 'px';
             this.domNode.style.zIndex = 1000;
-
-            // Subscribe to the '/calEvent' channel
-            dojo.subscribe('/calEvent', this, 'handlePub_calEvent');
         }
         var left = ((this.parent.width - this.width) /  2);
         var top = ((this.parent.height - this.height) /  2);
@@ -60,18 +57,9 @@ cosmo.view.loading.StatusMessage = function (p) {
         dojo.fadeOut({node: this.domNode, duration: 1000,
                       easing: f}).play();
     };
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var opts = cmd.opts;
-        switch (act) {
-            case 'eventsLoadSuccess':
-                this.hide();
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
+
+    dojo.subscribe('cosmo:calEventsLoadSuccess', 
+                   dojo.hitch(this, function(){this.hide()}));
 };
 
 cosmo.view.loading.StatusMessage.prototype =

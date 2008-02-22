@@ -74,7 +74,6 @@ cosmo.ui.minical.MiniCal = function (p) {
     };
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent
@@ -122,56 +121,38 @@ cosmo.ui.minical.MiniCal = function (p) {
     // state in Firefox
     hide();
 
-    this.handlePub = function (cmd) {
-        var act = cmd.action;
-        var qual = cmd.qualifier || null;
+    dojo.subscribe("cosmo:calLoadCollection", function(cmd){
         var opts = cmd.opts || {};
-        var ev = cmd.data;
-        switch (act) {
-            case 'loadCollection':
-                // FIXME: There is similar logic is dup'd in ...
-                // view.cal.common.loadItems
-                // ui.minical.handlePub
-                // ui.minical -- setSelectionSpan private function
-                // ui.navbar._showMonthheader
-                // These different UI widgets have to be independent
-                // of the calendar view, but still display sync'd
-                // information -- what's a good way to consolidate this?
-                if (opts.loadType == 'changeTimespan') {
-                    var goToNav = opts.goTo;
-                    var queryDate = null;
-                    // param is 'back' or 'next'
-                    if (typeof goToNav == 'string') {
-                        var key = goToNav.toLowerCase();
-                        var incr = key.indexOf('back') > -1 ? -1 : 1;
-                        queryDate = cosmo.datetime.Date.add(viewStart,
-                            cosmo.datetime.util.dateParts.WEEK, incr);
-                    }
-                    // param is actual Date
-                    else {
-                        queryDate = goToNav;
-                    }
-                    // Span of time for selection
-                    setSelectionSpan(queryDate);
-                }
-                // If the update originated here at minical,
-                // just update the selection, don't re-render
-                if (opts.source == 'minical') {
-                    // Set selection
-                    self.renderSelection();
-                }
-                // Otherwise do a full re-render
-                else {
-                    self.renderSelf();
-                }
-                break;
-            default:
-                // Do nothing
-                break;
+        if (opts.loadType == 'changeTimespan') {
+            var goToNav = opts.goTo;
+            var queryDate = null;
+            // param is 'back' or 'next'
+            if (typeof goToNav == 'string') {
+                var key = goToNav.toLowerCase();
+                var incr = key.indexOf('back') > -1 ? -1 : 1;
+                queryDate = cosmo.datetime.Date.add(viewStart,
+                                                    cosmo.datetime.util.dateParts.WEEK, incr);
+            }
+            // param is actual Date
+            else {
+                queryDate = goToNav;
+            }
+            // Span of time for selection
+            setSelectionSpan(queryDate);
         }
-    };
-    dojo.subscribe('/calEvent', self, 'handlePub');
- 
+        // If the update originated here at minical,
+        // just update the selection, don't re-render
+        if (opts.source == 'minical') {
+            // Set selection
+                    self.renderSelection();
+        }
+        // Otherwise do a full re-render
+        else {
+            self.renderSelf();
+        }
+        
+    });
+
     /**
      * Initialize minical state and render
      * Hide until rendering is completed because Firefox
@@ -716,8 +697,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
-            dojo.publish('/calEvent', [{
-                action: 'loadCollection',
+            dojo.publish('cosmo:calLoadCollection', [{
                 opts: { loadType: 'changeTimespan', goTo: self.currDate },
                 data: {} }]);
         }
@@ -742,8 +722,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
             { viewName: cosmo.view.names.CAL, noLoad: true });
         var f = function () {
-            dojo.publish('/calEvent', [{
-                action: 'loadCollection',
+            dojo.publish('cosmo:calLoadCollection', [{
                 opts: { loadType: 'changeTimespan', goTo: dt,
                       source: 'minical' },
                 data: {} }]);
@@ -774,8 +753,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             cosmo.app.pim.baseLayout.mainApp.centerColumn.navBar.displayView(
                 { viewName: cosmo.view.names.CAL, noLoad: true });
             var f = function () {
-                dojo.publish('/calEvent', [{
-                    action: 'loadCollection',
+                dojo.publish('cosmo:calLoadCollection',[{
                     opts: { loadType: 'changeTimespan', goTo: d },
                         data: {} }]);
             }

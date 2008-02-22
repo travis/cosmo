@@ -103,27 +103,24 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
 cosmo.app.pim.layout.BaseLayout.prototype =
     new cosmo.ui.ContentBox();
 
-cosmo.app.pim.layout.MenuBar = function (p) {
-    var params = p || {};
-    for (var n in params) { this[n] = params[n]; }
-
-    var d = _createElem('div');
-    d.id = 'menuBar';
-    this.parent.domNode.appendChild(d);
-
-    this.domNode = d;
-    this.children = [];
-    this.renderSelf = function () {
-        this.setPosition();
-        this.setSize();
-        if (!this.hasBeenRendered) {
-            this.parent.domNode.appendChild(this.domNode);
-            this.hasBeenRendered = true;
-        }
+dojo.require("cosmo.ui.menu");
+dojo.declare("cosmo.app.pim.layout.MenuBar", [dijit._Widget, dijit._Templated],{
+    widgetsInTemplate: true,
+    templateString: 
+    "<div><div dojoType='cosmo.ui.menu.MainMenu' id='menuNavItems' top='4'></div></div>",
+    // Main logo graphic
+    
+    postCreate: function(){
+        var logoDiv = _createElem('div');
+        logoDiv.id = 'mainLogoContainer';
+        logoDiv = cosmo.ui.imagegrid.createImageIcon({ domNode: logoDiv,
+                                                       iconState: 'mainLogoGraphic' });
+        logoDiv.style.position = 'absolute';
+        logoDiv.style.top = '0px';
+        logoDiv.style.left = '6px';
+        dojo.place(logoDiv, this.domNode, "first");
     }
-};
-cosmo.app.pim.layout.MenuBar.prototype =
-    new cosmo.ui.ContentBox();
+});
 
 cosmo.app.pim.layout.MainApp = function (p) {
 
@@ -306,23 +303,6 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     var leftSidebar = this.baseLayout.mainApp.leftSidebar;
     var rightSidebar = this.baseLayout.mainApp.rightSidebar;
 
-    // Main logo graphic
-    var logoDiv = _createElem('div');
-    logoDiv.id = 'mainLogoContainer';
-    logoDiv = cosmo.ui.imagegrid.createImageIcon({ domNode: logoDiv,
-        iconState: 'mainLogoGraphic' });
-    logoDiv.style.position = 'absolute';
-    logoDiv.style.top = '0px';
-    logoDiv.style.left = '6px';
-    menuBar.domNode.appendChild(logoDiv);
-
-    // Main menu of links at the top of the UI
-    var menuDiv = _createElem('div');
-    menuDiv.id = 'menuNavItems';
-    var cB = new cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
-    menuBar.addChild(cB);
-    menuBar.mainMenu = cB;
-    cB.render(); // Go ahead and render the menubar -- no waiting for data
 
     // List view canvas
     var listDiv = _createElem('div');

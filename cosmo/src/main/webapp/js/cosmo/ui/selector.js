@@ -17,7 +17,6 @@
 dojo.provide("cosmo.ui.selector");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
-
 dojo.require("dojox.color");
 dojo.require("cosmo.app.pim");
 dojo.require('cosmo.convenience');
@@ -26,17 +25,10 @@ dojo.require("cosmo.view.names");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.menu");
 
-cosmo.ui.selector.CollectionSelector = function (p) {
-    var _this = this;
-    this.parent = null;
-    this.domNode = null;
-
-    var params = p || {};
-    for (var n in params) { this[n] = params[n]; }
-
+dojo.declare("cosmo.ui.selector.CollectionSelector", [dijit._Widget, cosmo.ui.ContentBox], {
     // Private vars
-    this._scrollTop = 0;
-    this._doRolloverEffect =  function(e, isOver, isFromContextual) {
+    _scrollTop: 0,
+    _doRolloverEffect:  function(e, isOver, isFromContextual) {
         // Safari 2 sucks -- DOM-event/DOM-node contention problems
         if (navigator.userAgent.indexOf('Safari/41') > -1) {
             return false;
@@ -78,24 +70,24 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 }
             }
         }
-    };
-    this._getRGB = function (h, s, v) {
+    },
+    _getRGB: function (h, s, v) {
         var rgb = dojox.color.fromHsv(h, s, v).toRgb();
         return 'rgb(' + rgb.join() + ')';
-    };
-    var r = dojo.hitch(this, function(){this.render()});
-    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
-    dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, r);
-    dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, r);
-
-
-    this.renderSelf = function () {
+    },
+    constructor: function(){
+        var r = dojo.hitch(this, function(){this.render()});
+        dojo.subscribe('cosmo:calEventsLoadSuccess', r);
+        dojo.subscribe('cosmo:collectionsLoaded', r);
+        dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, r);
+        dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, r);
+    },
+    renderSelf: function () {
         // Preserve scrolled state
         var origContainer = $('collectionSelectorContainer');
         if (origContainer) {
             this._scrollTop = origContainer.scrollTop;
         }
-        var _this = this;
         var collections = cosmo.app.pim.collections;
         var currColl = cosmo.app.pim.getSelectedCollection();
         var container = _createElem('div');
@@ -108,7 +100,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         var tbody = _createElem('tbody');
         var tr = null;
         var td = null;
-        var displayColl = function (key, c) {
+        var displayColl = dojo.hitch(this, function (key, c) {
             var cUid = c.getUid();
             var sel = cUid == currColl.getUid();
             var className = '';
@@ -151,12 +143,12 @@ cosmo.ui.selector.CollectionSelector = function (p) {
             var icon = cosmo.ui.imagegrid.createImageIcon(
                 { domNode: d, iconState: 'collectionDetailsDefault' });
             td.className = 'collectionSelectorDetails';
-            td.style.backgroundColor = _this._getRGB(c.hue, 80, 90);
+            td.style.backgroundColor = this._getRGB(c.hue, 80, 90);
             td.appendChild(icon);
             tr.appendChild(td);
 
             tbody.appendChild(tr);
-        };
+        });
 
         // Clear the DOM
         this.clearAll();
@@ -278,14 +270,14 @@ cosmo.ui.selector.CollectionSelector = function (p) {
             this.hasBeenRendered = true;
         }
 
-    };
-    this.handleMouseOver = function (e) {
+    },
+    handleMouseOver: function (e) {
         this._doRolloverEffect(e, true);
-    };
-    this.handleMouseOut = function (e) {
+    },
+    handleMouseOut: function (e) {
         this._doRolloverEffect(e, false);
-    };
-    this.handleClick = function (e) {
+    },
+    handleClick: function (e) {
         if (e && e.target) {
             var targ = e.target;
             while (!targ.id) { targ = targ.parentNode; }
@@ -349,11 +341,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 }
             }
         }
-    };
-};
-
-cosmo.ui.selector.CollectionSelector.prototype =
-    new cosmo.ui.ContentBox();
-
+    }
+});
 
 

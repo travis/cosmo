@@ -59,7 +59,7 @@
 
 <cosmo:dojoBoilerplate timezones="true" dojoLayers=""/>
 
-<script type="text/javascript">
+<!--<script type="text/javascript">
 console.debug("abc")
 // Dojo requires
 dojo.require('cosmo.app');
@@ -86,31 +86,82 @@ if (params.ticket)
 if (params.view)
 	cosmo.app.initParams.initialView = cosmo.app.pim.views[params.view[0].toUpperCase()];
 
+-->
+<script type="text/javascript">
+dojo.require("dojo.parser");
+dojo.require("cosmo.app");
+dojo.require("cosmo.app.pim");
+cosmo.app.initObj = cosmo.app.pim;
+cosmo.app.initParams = {};
+dojo.require("cosmo.util.auth");
 cosmo.app.initParams.authAccess = cosmo.util.auth.currentlyAuthenticated();
-
 <authz:authorize ifAnyGranted="ROLE_USER">
 cosmo.app.initParams.roleUser = true;
 </authz:authorize>
 <authz:authorize ifAllGranted="ROLE_ROOT">
 cosmo.app.initParams.roleRoot = true;
 </authz:authorize>
-
+dojo.addOnLoad(function(){
+debugger
+    cosmo.app.init();
+});
+</script>
+<!--
 dojo.require("cosmo.ui.event.listeners");
 
 cosmo.ui.event.listeners.hookUpListeners();
 </script>
+-->
+<script type="text/javascript">
+dojo.require("dijit.layout.LayoutContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("cosmo.app.pim.layout");
+dojo.require("cosmo.ui.selector");
+dojo.require("cosmo.ui.widget.CollectionSelector");
+dojo.require('cosmo.service.conduits.common');
+dojo.require('cosmo.service.tickler');
+cosmo.app.pim.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.getAtomPlusEimConduit());
 
+</script>
+    <style> 
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+    </style>
+<link rel="stylesheet" href="${staticBaseUrl}/js/lib/dojo/dijit/themes/dijit.css"/>
 </head>
 
 <body id="body">
-    <div id="baseLayout" style="position: absolute;"></div>
+<div dojoType="dijit.layout.LayoutContainer" style="width: 100%; height: 100%; padding: 0; margin: 0; border: 0;" id="baseLayout">
+  <div dojoType="dijit.layout.ContentPane" layoutAlign="top" style="height: 47px;">
+    <div dojoType="cosmo.app.pim.layout.MenuBar"></div>
+   </div>
+   <div dojoType="dijit.layout.ContentPane" layoutAlign="left"
+        style="width: 168px;">
+     <authz:authorize ifAnyGranted="ROLE_USER">
+       <div dojoType="cosmo.ui.selector.CollectionSelector"></div>
+     </authz:authorize>
+     <authz:authorize ifNotGranted="ROLE_USER">
+       <div dojoType="cosmo.ui.widget.CollectionSelector"></div>
+     </authz:authorize>
+<!--     <div dojoType="cosmo.ui.minical.Minical"></div>-->
+   </div>
+   <div dojoType="dijit.layout.ContentPane" layoutAlign="client" style="background-color:yellow">
+    baz
+    </div>
+   <div dojoType="dijit.layout.ContentPane" layoutAlign="right"
+        style="background-color:green;width: 257px;">
+     bar
+    </div>
+
+</div>
+<!--    <div id="baseLayout" style="position: absolute;"></div>
     <div id="maskDiv">
       <div id="appLoadingMessage">
         Loading the app ...
       </div>
     <div id="dojoDebug">
     </div>
-    </div>
+    </div>-->
+
 </body>
 
 </html>

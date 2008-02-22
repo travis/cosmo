@@ -60,6 +60,8 @@ cosmo.view.loading.StatusMessage = function (p) {
 
     dojo.subscribe('cosmo:calEventsLoadSuccess', 
                    dojo.hitch(this, function(){this.hide()}));
+    dojo.subscribe('cosmo:calEventsLoadCollection', 
+                   dojo.hitch(this, function(){this.show()}));
 };
 
 cosmo.view.loading.StatusMessage.prototype =

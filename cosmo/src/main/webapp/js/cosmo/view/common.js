@@ -293,12 +293,6 @@ cosmo.view.displayViewFromCollections = function (c) {
     if (newCollection) {
         cosmo.app.pim.setSelectedCollection(newCollection);
     }
-    // Show the 'loading' message if there's a selected collection
-    // to load data from
-    if (cosmo.app.pim.getSelectedCollection()) {
-        var loading = cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.loading;
-        loading.show();
-    }
     // Wrap in setTimeout so we don't lock up the UI
     // thread during the publish operation
     var f = function () { 

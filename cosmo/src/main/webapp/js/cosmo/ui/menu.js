@@ -270,11 +270,11 @@ cosmo.ui.menu.MenuItem = function (p) {
     }
 };
 
-cosmo.ui.menu.MainMenu = function (p) {
+cosmo.ui.menu.MainMenu1 = function (p) {
     var params = p || {};
     this.domNode = null;
     this.hasBeenRendered = false;
-    this.currentlyDisplayedItems = [];
+    this.currentlyDisplayedItems = []; 
     this.createItem = function (item, lastItem) {
         if (item.createFunc) {
             return item.createFunc();
@@ -358,8 +358,76 @@ cosmo.ui.menu.MainMenu = function (p) {
                            }));
 
 };
-cosmo.ui.menu.MainMenu.prototype =
+cosmo.ui.menu.MainMenu1.prototype =
     new cosmo.ui.ContentBox();
+
+dojo.declare("cosmo.ui.menu.MainMenu", [dijit._Widget, cosmo.ui.ContentBox],{
+    constructor: function(){
+        this.initD = cosmo.ui.menu.init();
+    },
+    createItem: function (item, lastItem) {
+        if (item.createFunc) {
+            return item.createFunc();
+        } else {
+            var s = _createElem('span');
+            s.id = item.id;
+            if (item.onclickFunc || item.urlString) {
+                var a = _createElem('a');
+                a.className = 'menuBarLink';
+                a.innerHTML = item.displayText;
+                if (item.onclickFunc && typeof item.onclickFunc == 'function') {
+                    dojo.connect(a, 'onclick', item.onclickFunc);
+                }
+                if (item.urlString && typeof item.urlString == 'string') {
+                    a.href = item.urlString;
+                }
+                s.appendChild(a);
+            }
+            else {
+                s.innerHTML = item.displayText;
+            }
+            return s;
+        }
+    },
+    appendItem: function (item, lastItem) {
+        var s = this.createItem(item, lastItem);
+        this.domNode.appendChild(s);
+        item.span = s;
+        var s = _createElem('span');
+        s.className = 'menuBarDivider';
+        s.appendChild(cosmo.util.html.nbsp());
+        if (!lastItem) {
+            s.appendChild(_createText(item.dividerText? item.dividerText : '|'));
+        }
+        s.appendChild(cosmo.util.html.nbsp());
+        this.domNode.appendChild(s);
+        item.divider = s;
+    },
+    postCreate: function(){
+        this.initD.addCallback(dojo.hitch(this, this.draw));
+        dojo.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName,
+                       dojo.hitch(this, function (message) {
+                           for (var pref in message.preferences){
+                               cosmo.ui.menu.preferences[pref] = message.preferences[pref];
+                           }
+                           cosmo.ui.menu.loadItems(true);
+                           this.redraw();
+                       }));
+    },
+    draw: function(){
+        var items = cosmo.ui.menu.items;
+        var last = (items.length - 1);
+        for (var i = 0; i < items.length; i++) {
+            var item = items.getAtPos(i);
+            var lastItem = i == last;
+            this.appendItem(item, lastItem);
+        }
+    },
+    redraw: function(){
+        this.clearAll();
+        this.draw();
+    }
+});
 
 cosmo.ui.menu.HierarchicalMenuManager = new function () {
     // Config -- used in width calculations

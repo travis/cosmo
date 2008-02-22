@@ -33,8 +33,6 @@ dojo.require("cosmo.ui.timeout");
 dojo.require('cosmo.account.create');
 dojo.require('cosmo.util.hash');
 dojo.require('cosmo.util.deferred');
-dojo.require('cosmo.service.conduits.common');
-dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
 dojo.require("cosmo.view.names");
 dojo.require("cosmo.account.preferences");
@@ -111,7 +109,7 @@ cosmo.app.pim = dojo.mixin(new function () {
         // Do some setup
         // ===============================
         // Create and init the Cosmo service
-        this.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.getAtomPlusEimConduit());
+//        this.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.getAtomPlusEimConduit());
         // Localized date strings
         this.loadLocaleDateInfo();
         // Tell the calendar view what week we're on
@@ -122,10 +120,10 @@ cosmo.app.pim = dojo.mixin(new function () {
             this.setDefaultSelectedCollection(params);
             // Base layout
             // ===============================
-            this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
+//            this.baseLayout = cosmo.app.pim.layout.initBaseLayout({ domNode: $('baseLayout') });
 
             // Display the default view
-            this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
+//            this.baseLayout.mainApp.centerColumn.navBar.displayView({ viewName: startView });
             // Show errors for deleted subscriptions -- this._deletedSubscriptions
             // is a private var populated in the loadCollections method
             var deletedSubscriptions = this._deletedSubscriptions;
@@ -142,6 +140,7 @@ cosmo.app.pim = dojo.mixin(new function () {
                                         deletedSubscription.getDisplayName()));
                 }
             }
+            dojo.publish("cosmo:collectionsLoaded", [this.collections]);
             if (this.authAccess){
                 cosmo.ui.timeout.setTimeout(cosmo.app.handleTimeout);
             }
@@ -312,13 +311,11 @@ cosmo.app.pim = dojo.mixin(new function () {
                 return r;
             };
             collections.sort(f);
-            var c = collections;
             var hues = this.collectionHues;
-
             // Create the new list of collections
             this.collections = new cosmo.util.hash.Hash();
-            for (var i = 0; i < c.length; i++) {
-                var coll = c[i];
+            for (var i = 0; i < collections.length; i++) {
+                var coll = collections[i];
                 coll.isDisplayed = false;
                 coll.isOverlaid = false;
                 coll.doDisplay = false;

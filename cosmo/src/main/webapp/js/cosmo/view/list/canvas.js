@@ -83,9 +83,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     cosmo.app.hideMask();
                 }
                 break;
-            case 'saveSuccess':
-                this._saveSuccess(cmd)
-                break;
             case 'removeSuccess':
                 var ev = cmd.data;
                 this._removeSuccess(cmd);
@@ -96,6 +93,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     };
     dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
+    dojo.subscribe('cosmo:calSaveSuccess', function(cmd){
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        this._saveSuccess(cmd)
+    });
 
     this.renderSelf = function () {
         // Rendering can be messages published to calEvent
@@ -241,8 +242,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (item) {
                 self.setSelectedItem(item);
                 var f = function () {
-                  dojo.publish('/calEvent', [{ 'action': 'setSelected',
-                    'data': item }]);
+                    dojo.publish('cosmo:calSetSelected', [{
+                        'data': item }]);
                 };
                 // Free up the UI thread so we don't see two items
                 // selected at once while the message is being published
@@ -577,7 +578,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     // has been replaced in the itemRegistry
                     self.setSelectedItem(sel);
                     sel = self.getSelectedItem();
-                    dojo.publish('/calEvent', [{ action: 'setSelected',
+                    dojo.publish('cosmo:calSetSelected', [{
                         data: sel }]);
                 }
             }
@@ -611,8 +612,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 self.view.itemRegistry.removeItem(item.id);
                 // If we just removed the last item, clear the form
                 if (self.view.itemRegistry.length == 0) {
-                    dojo.publish('/calEvent', [{ 'action':
-                        'clearSelected', 'data': null }]);
+                    dojo.publish('cosmo:calClearSelected', [{ 'data': null }]);
                 }
                 self._doSortAndDisplay();
                 break;
@@ -642,12 +642,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 // List view has all items loaded at once
                 // in the itemRegistry -- no need for selectedItemCache
                 var sel = self.getSelectedItem();
-                dojo.publish('/calEvent', [{ 'action':
-                    'eventsDisplaySuccess', 'data': sel }]);
+                dojo.publish('cosmo:calEventsDisplaySuccess', [{'data': sel }]);
 
             }
             else {
-                dojo.publish('/calEvent', [{'action': 'noItems' }]);
+                dojo.publish('cosmo:calNoItems', [{}]);
             }
         }
         else {

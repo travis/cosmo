@@ -362,7 +362,7 @@ cosmo.view.service = new function () {
          
         if (err){
             // Failure -- display exception info
-            act = 'saveFailed';
+            act = 'cosmo:calSaveFailed';
             
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
@@ -404,7 +404,7 @@ cosmo.view.service = new function () {
             }
         } else {
             // Success
-            act = 'saveSuccess';
+            act = 'cosmo:calSaveSuccess';
         }
 
         // Success/failure for all other cases
@@ -414,8 +414,7 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.publish('/calEvent', [{
-                 'action': act,
+            dojo.publish(act, [{
                  'data': item,
                  'saveType': saveType,
                  'delta':delta,
@@ -628,7 +627,7 @@ cosmo.view.service = new function () {
         var f = function () {
             dojo.publish('/calEvent', [{ 'action': act,
                 'data': removeEv, 'opts': opts }]);
-            dojo.publish('/calEvent', [{ action: 'setSelected', data: null}]);
+            dojo.publish('cosmo:calSetSelected', [{data: null}]);
         }
         setTimeout(f, 0);
     }

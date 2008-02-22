@@ -63,13 +63,14 @@ cosmo.ui.navbar.Bar = function (p) {
         switch (act) {
             case 'eventsLoadSuccess':
             case 'navigateLoadedCollection':
-            case 'saveSuccess':
                 self.render();
                 break;
         }
     };
-    // Subscribe to the '/calEvent' channel
-    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
+    var r = function(){self.render()};
+//    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
+//    dojo.subscribe('cosmo:calNavigateLoadedCollection', r);
+    dojo.subscribe('cosmo:calSaveSuccess', r);
 
     this.renderSelf = function () {
         var _pim = cosmo.app.pim;
@@ -304,8 +305,7 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             }
         }
         var publish = function (dir) {
-            dojo.publish('/calEvent', [{
-                action: 'loadCollection',
+            dojo.publish('cosmo:calLoadCollection',[{
                 opts: { loadType: 'changeTimespan', goTo: dir },
                     data: {} }]);
         };

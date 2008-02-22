@@ -26,8 +26,6 @@ cosmo.view.unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
 
 cosmo.view.viewBase = new function () {
     this.init = function () {
-        // Subscribe to the '/calEvent' channel
-        dojo.subscribe('/calEvent', this, 'handlePub_calEvent');
         // Subscribe to the '/app' channel
         dojo.subscribe('/app', this, 'handlePub_app');
         this.hasBeenInitialized = true;
@@ -164,8 +162,7 @@ cosmo.view.viewBase = new function () {
                         switch (e.keyCode) {
                             // Enter
                             case 13:
-                                dojo.publish('/calEvent',
-                                             [{ 'action': 'saveFromForm' }]);
+                            dojo.publish('cosmo:calSaveFromForm', []);
                                 break;
                             // Delete
                             case 46:
@@ -273,8 +270,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
                 if (typeof savePreHook == 'function') {
                     savePreHook();
                 }
-                dojo.publish('/calEvent',
-                    [{ 'action': 'saveFromForm' }]);
+                dojo.publish('cosmo:calSaveFromForm', []);
             }
             // Hide the dialog first, wait for return value to
             // avoid contention for the use of the dialog box
@@ -308,10 +304,12 @@ cosmo.view.displayViewFromCollections = function (c) {
     }
     // Wrap in setTimeout so we don't lock up the UI
     // thread during the publish operation
-    var f = function () { dojo.publish('/calEvent', [{
-        action: 'loadCollection', opts: { loadType: 'changeCollection',
-        collection: newCollection }, data: {}
-    }]); };
+    var f = function () { 
+        dojo.publish('/calLoadCollection', [
+            {opts: { loadType: 'changeCollection',
+                     collection: newCollection }, data: {}
+            }]); 
+    };
     // Make the timeout value greater than zero to
     // ensure that the 'loading' status message appears
     setTimeout(f, 35);

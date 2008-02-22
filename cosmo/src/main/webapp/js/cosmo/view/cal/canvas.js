@@ -526,8 +526,7 @@ cosmo.view.cal.canvas = new function () {
             // hurt to re-select the currently selected item
             self.setSelectedCalItem(item);
             var f = function () {
-                dojo.publish('/calEvent', [{
-                    'action': 'setSelected', 'data': item }]);
+                dojo.publish('cosmo:calSetSelected', [{ 'data': item }]);
             }
             setTimeout(f, 0);
         }
@@ -640,6 +639,17 @@ cosmo.view.cal.canvas = new function () {
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published event.
      */
+
+    dojo.subscribe('cosmo:calSaveSuccess', function(cmd){
+        if (!cosmo.view.cal.isCurrentView()) { return false; }
+        if (cmd.data.data.getEventStamp()){
+            saveSuccess(cmd);
+        }
+        else {
+            removeRecurrenceChain(cmd.data.data.getUid());
+        }
+    });
+
     this.handlePub_calEvent = function (cmd) {
         if (!cosmo.view.cal.isCurrentView()) { return false; }
         var act = cmd.action;
@@ -690,14 +700,6 @@ cosmo.view.cal.canvas = new function () {
                     }
                     restoreEvent(rEv);
                     rEv.lozenge.setInputDisabled(false);
-                }
-                break;
-            case 'saveSuccess':
-                if (cmd.data.data.getEventStamp()){
-                    saveSuccess(cmd);
-                }
-                else {
-                    removeRecurrenceChain(cmd.data.data.getUid());
                 }
                 break;
             case 'remove':
@@ -853,13 +855,12 @@ cosmo.view.cal.canvas = new function () {
                 // If the selected item is not in the on-canvas itemRegistry,
                 // pull the copy from the selectedItemCache
                 var sel = self.getSelectedItem() || self.getSelectedItemCacheCopy();
-                dojo.publish('/calEvent', [{ 'action':
-                    'eventsDisplaySuccess', 'data': sel }]);
+                dojo.publish('cosmo:calEventsDisplaySuccess', [{'data': sel }]);
             }
         }
         // No items displayed in the current collection
         else {
-            dojo.publish('/calEvent', [{ 'action': 'noItems' }]);
+            dojo.publish('cosmo:calNoItems', [{}]);
         }
         return true;
     }
@@ -1116,8 +1117,8 @@ cosmo.view.cal.canvas = new function () {
                     }
                     self.setSelectedCalItem(sel);
                     sel = self.getSelectedItem();
-                    dojo.publish('/calEvent', [{ action: 'setSelected',
-                        saveType: saveType, data: sel }]);
+                    dojo.publish('cosmo:calSetSelected',
+                                 {saveType: saveType, data: sel});
                 }
             }
             else {
@@ -1151,8 +1152,7 @@ cosmo.view.cal.canvas = new function () {
         // the currently displayed canvas
         // just send the 'clear selected' message
         if (item.lozenge.isOrphaned()) {
-            dojo.publish('/calEvent', [{ 'action':
-                'clearSelected', 'data': null }]);
+            dojo.publish('cosmo:calClearSelected', [{'data': null }]);
             return;
         }
         if (item.data.hasRecurrence()) {
@@ -1185,8 +1185,7 @@ cosmo.view.cal.canvas = new function () {
             removeEvent(item);
         }
         self.clearSelectedItem();
-        dojo.publish('/calEvent', [{ 'action':
-            'clearSelected', 'data': null }]);
+        dojo.publish('cosmo:calClearSelected', [{'data': null }]);
         updateEventsDisplay();
     }
 

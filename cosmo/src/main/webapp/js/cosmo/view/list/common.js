@@ -64,27 +64,14 @@ cosmo.view.list.triageStatusCodeReverseMappings = {
     NOW: 100,
     LATER: 200 };
 
-cosmo.view.list.handlePub_calEvent = function (cmd) {
 
+dojo.subscribe("cosmo:calLoadCollection", function(cmd){
     if (!cosmo.view.list.isCurrentView()) { return false; }
-
-    var act = cmd.action;
-    var qual = cmd.qualifier || null;
-    var data = cmd.data || {};
     var opts = cmd.opts;
-    var delta = cmd.delta;
-    switch (act) {
-        case 'loadCollection':
-            if (opts.loadType == 'changeCollection') {
-                cosmo.view.list.loadItems();
-            }
-            break;
-        default:
-            // Do nothing
-            break;
+    if (opts.loadType == 'changeCollection') {
+        cosmo.view.list.loadItems();
     }
-
-};
+});
 
 cosmo.view.list.loadItems = function (o) {
     var opts = o || {};

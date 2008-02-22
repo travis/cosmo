@@ -415,8 +415,8 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         t.style.paddingLeft = '12px';
 
         // Cleanup
-        this.clearAll();
         if (this.createButton) { this.createButton.destroy() };
+        this.clearAll();
 
         this.formNode = _createElem('form');
         var form = this.formNode;
@@ -453,7 +453,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             }
         });
 
-        var enabled = new cosmo.ui.widget.Button({
+        this.createButton = new cosmo.ui.widget.Button({
             text: _('App.Button.Create'),
             handleOnClick: createItem,
             small: true,
@@ -461,14 +461,6 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             enabled: writeable,
             id: "quickEntryCreate"})
 
-        var disabled = new cosmo.ui.widget.Button({
-            text: _('App.Button.Create'),
-            handleOnClick: null,
-            small: true,
-            width: 52,
-            enabled: false });
-
-        this.createButton = writeable ? enabled : disabled;
         this.formNode.appendChild(this.createButton.domNode);
     };
 };

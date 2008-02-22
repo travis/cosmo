@@ -230,8 +230,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         var delta = item.lozenge.getDelta(item, self.dragMode);
         // Item has actually been edited
         if (delta.hasChanges()) {
-            dojo.publish('/calEvent', [{ action: 'saveConfirm',
-                delta: delta, data: item }]);
+            dojo.publish('cosmo:calSaveConfirm', [{delta: delta, data: item }]);
         }
         // If no real edit, then just reposition the lozenge
         // With conflict calculations and snap-to

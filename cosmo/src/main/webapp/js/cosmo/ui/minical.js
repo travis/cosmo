@@ -74,7 +74,6 @@ cosmo.ui.minical.MiniCal = function (p) {
     };
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent
@@ -122,7 +121,7 @@ cosmo.ui.minical.MiniCal = function (p) {
     // state in Firefox
     hide();
 
-    dojo.subscribe("cosmo:calLoadCollection" function(cmd){
+    dojo.subscribe("cosmo:calLoadCollection", function(cmd){
         var opts = cmd.opts || {};
         if (opts.loadType == 'changeTimespan') {
             var goToNav = opts.goTo;

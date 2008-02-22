@@ -61,14 +61,12 @@ cosmo.ui.detail = new function () {
             }
 
             this.item.makeSnapshot();
-            dojo.publish('/calEvent', [{
-                action: 'saveConfirm', delta: delta, data: this.item }]);
+            dojo.publish('cosmo:calSaveConfirm' [{delta: delta, data: this.item }]);
         }
     };
 
     this.removeItem = function () {
-        dojo.publish('/calEvent',
-                     [{ action: 'removeConfirm', data: this.item }]);
+        dojo.publish('cosmo:calRemoveConfirm', [{data: this.item }]);
     };
 
     // Utility functions
@@ -245,7 +243,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
                    // to allow people to change the placeholder
                    // 'New Event' text quickly
                    if (cmd.saveType == 'new') {
-                       this.mainSection.formNode.noteTitle.focus();
+                       self.mainSection.formNode.noteTitle.focus();
                    }
                }
            }
@@ -266,7 +264,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     });
     dojo.subscribe('cosmo:calSaveFromForm', function(){
         cosmo.ui.detail.saveItem();
-    }
+    });
 };
 
 cosmo.ui.detail.DetailViewForm.prototype =

@@ -84,7 +84,6 @@ cosmo.view.cal.loadItems = function (p) {
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent
@@ -159,10 +158,8 @@ cosmo.view.cal.loadItems = function (p) {
     cosmo.util.deferred.addStdDLCallback(loadDeferred);
     loadDeferred.addCallback(function(){
         var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
-    
-        dojo.publish('/calEvent', [{ action: 'eventsLoadSuccess',
-                                                data: itemRegistry, opts: opts }]);
-    });
+        dojo.publish('cosmo:calEventsLoadSuccess', [{data: itemRegistry, opts: opts }]);
+    });        
     return loadDeferred;
 };
 /**

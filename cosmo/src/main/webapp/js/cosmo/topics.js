@@ -128,17 +128,13 @@ cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage",
 /**
  * Lower Level UI messages: Messsages very specific to the UI - like screen resizes and whatnot
  */
-cosmo.topics.declareMessage({ className: "cosmo.topics.AppLevelMessage",
-    topicName: '/app',
-    props: { type: null }
-});
-
-cosmo.topics.declareMessage({ className: "cosmo.topics.ModalDialogToggle",
+cosmo.topics.declareMessage({ 
+    className: "cosmo.topics.ModalDialogToggle",
     // summary: published when the modal dialog box is toggled on or off
     superclass: cosmo.topics.AppLevelMessage,
+    topicName: 'cosmo:appModalDialogToggle',                              
     props: { 
         constructor: function (opts) {
-            this.topicName = this.constructor.superclass.topicName;
             this.isDisplayed = opts.isDisplayed || false;
         },
 

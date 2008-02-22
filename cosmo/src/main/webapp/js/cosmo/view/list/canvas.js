@@ -60,43 +60,32 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     for (var n in params) { this[n] = params[n]; }
 
-    // Interface methods
-    this.handlePub_calEvent = function (cmd) {
+    dojo.subscribe('cosmo:calEventsLoadSuccess', dojo.hitch(this, function(cmd){
         if (!cosmo.view.list.isCurrentView()) { return false; }
-
-        var act = cmd.action;
-        var qual = cmd.qualifier || null;
-        var data = cmd.data || {};
-        var opts = cmd.opts;
-        var delta = cmd.delta;
-        switch (act) {
-            case 'save':
-            case 'remove':
-                if (cmd.saveType != "new") {
-                    this._showRowProcessing();
-                }
-                break;
-            case 'eventsLoadSuccess':
-                this.initListProps();
-                this.render();
-                if (this._doSortAndDisplay()) {
-                    cosmo.app.hideMask();
-                }
-                break;
-            case 'removeSuccess':
-                var ev = cmd.data;
-                this._removeSuccess(cmd);
-            default:
-                // Do nothing
-                break;
+        this.initListProps();
+        this.render();
+        if (this._doSortAndDisplay()) {
+            cosmo.app.hideMask();
         }
+    }));
 
-    };
-    dojo.subscribe('/calEvent', self, 'handlePub_calEvent');
-    dojo.subscribe('cosmo:calSaveSuccess', function(cmd){
+    var update = dojo.hitch(this, function(cmd){
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        if (cmd.saveType != "new") {
+            this._showRowProcessing();
+        }
+    });
+    dojo.subscribe('cosmo:calSave', update);
+    dojo.subscribe('cosmo:calRemove', update);
+    dojo.subscribe('cosmo:calRemoveSuccess', dojo.hitch(this, function(cmd){
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        this._removeSuccess(cmd);
+    }));
+
+    dojo.subscribe('cosmo:calSaveSuccess', dojo.hitch(this, function(cmd){
         if (!cosmo.view.list.isCurrentView()) { return false; }
         this._saveSuccess(cmd)
-    });
+    }));
 
     this.renderSelf = function () {
         // Rendering can be messages published to calEvent
@@ -435,8 +424,8 @@ cosmo.view.list.canvas.Canvas = function (p) {
         dojo.connect($('listViewTable'), 'oncontextmenu',
             this, 'handleClick');
 
-        dojo.publish('/calEvent', [{ action: 'navigateLoadedCollection',
-            opts: null }]);
+        dojo.publish('cosmo:calNavigateLoadedCollection',
+                     [{opts: null }]);
 
         return true;
     };

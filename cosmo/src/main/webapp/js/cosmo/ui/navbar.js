@@ -57,19 +57,10 @@ cosmo.ui.navbar.Bar = function (p) {
     // ===========
     // Handle published messages -- in this case just a poke
     // to let the NavBar know to re-render
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var opts = cmd.opts;
-        switch (act) {
-            case 'eventsLoadSuccess':
-            case 'navigateLoadedCollection':
-                self.render();
-                break;
-        }
-    };
+    
     var r = function(){self.render()};
-//    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
-//    dojo.subscribe('cosmo:calNavigateLoadedCollection', r);
+    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
+    dojo.subscribe('cosmo:calNavigateLoadedCollection', r);
     dojo.subscribe('cosmo:calSaveSuccess', r);
 
     this.renderSelf = function () {
@@ -336,7 +327,6 @@ cosmo.ui.navbar.CalViewNav = function (p) {
     };
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent

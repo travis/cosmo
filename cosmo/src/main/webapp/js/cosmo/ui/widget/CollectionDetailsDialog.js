@@ -177,8 +177,9 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
         _handleDelete: function () {
             cosmo.app.hideDialog();
             var collectionToDelete = this.collection;
+            var isSubscription = this.collection instanceof cosmo.model.Subscription;
             var confirmDeferred = cosmo.app.confirm(
-                _("Main.DeleteCollection.Confirm", collectionToDelete.getDisplayName()),
+                _(isSubscription? "Main.DeleteSubscription.Confirm" :"Main.DeleteCollection.Confirm", collectionToDelete.getDisplayName()),
                 {cancelDefault: true}
             );
             // This errback will fire if the user selects "no".
@@ -192,7 +193,7 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
                     if (confirmed){
                         cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
                         var deleteDeferred =
-                            cosmo.app.pim.serv.deleteCollection(collectionToDelete);
+                            cosmo.app.pim.serv[isSubscription? "deleteSubscription":"deleteCollection"](collectionToDelete);
                         deleteDeferred.addCallback(function () {
                             // FIXME: Need to reorg the collections-related code
                             // to behave similarly to CalItem/ListItem Items

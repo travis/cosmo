@@ -171,24 +171,22 @@ dojo.declare(
 
 cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) {
     var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')
-    var s = document.createElement('span');
-    var c = dojo.widget.createWidget("cosmo:AuthBox", {
+
+    var c = new cosmo.ui.widget.AuthBox({
         'authAction': authAction, 
-        'subscription': authAction.subscription }, 
-                                     s, 'last');
-    s.removeChild(c.domNode);
-    var cancelButton = dojo.widget.createWidget("cosmo:Button", {
+        'subscription': authAction.subscription })
+
+    var cancelButton = new cosmo.ui.widget.Button({
         text: _("App.Button.Cancel"),
         width: '60px',
         handleOnClick: cosmo.app.hideDialog,
-        small: true }, s, 'last');
-    s.removeChild(cancelButton.domNode);
-    var submitButton = dojo.widget.createWidget("cosmo:Button", {
+        small: true });
+
+    var submitButton = new cosmo.ui.widget.Button({
         text: _("App.Button.Submit"),
         width: '60px',
         handleOnClick: function () { c.doAuth.apply(c) },
-        small: true }, s, 'last');
-    s.removeChild(submitButton.domNode);
+        small: true });
 
     return {prompt: initPrompt,
             content: c,

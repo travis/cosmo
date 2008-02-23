@@ -392,10 +392,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
 
         var disableButton = function () {
-          self.formNode.removeChild(self.createButton.domNode);
-          self.createButton.destroy();
-          self.createButton = disabled;
-          self.formNode.appendChild(self.createButton.domNode);
+            self.createButton.setEnabled(false);
         };
         var createItem = function () {
             // Only create one item at a time

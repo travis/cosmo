@@ -81,10 +81,10 @@ if (collectionUrlIndex >= 0){
 var params = (location.search)? dojo.queryToObject(location.search.substring(1)) : {};
 
 if (params.ticket) 
-    cosmo.app.initParams.ticketKey = params.ticket[0];
+    cosmo.app.initParams.ticketKey = params.ticket;
 
 if (params.view)
-	cosmo.app.initParams.initialView = cosmo.app.pim.views[params.view[0].toUpperCase()];
+	cosmo.app.initParams.initialView = cosmo.app.pim.views[params.view.toUpperCase()];
 
 cosmo.app.initParams.authAccess = cosmo.util.auth.currentlyAuthenticated();
 

@@ -6,7 +6,6 @@ dojo.require("cosmo.util.auth");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.ui.widget.Button");
-dojo.require("cosmo.util.cookie");
 dojo.require("cosmo.account.login");
 dojo.require("cosmo.convenience");
 

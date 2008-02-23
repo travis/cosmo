@@ -25,7 +25,7 @@ cosmo.util.auth = new function() {
     this.setCred = function (username, password){
         dojo.cookie(COSMO_AUTH_COOKIE,
             cosmo.util.encoding.toBase64(
-                username + ":" + password), -1, "/");
+                username + ":" + password), {path:"/"});
     }
 
     this.getPassword = function(){
@@ -59,7 +59,7 @@ cosmo.util.auth = new function() {
     }
 
     this.clearAuth = function (){
-        dojo.cookie(COSMO_AUTH_COOKIE, "", {expires: -1});
+        dojo.cookie(COSMO_AUTH_COOKIE, null, {expires: -1, path: "/"});
     }
 
     this.getCred = function(){

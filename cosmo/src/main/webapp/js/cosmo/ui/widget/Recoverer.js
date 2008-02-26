@@ -101,7 +101,7 @@ dojo.declare("cosmo.ui.widget.Recoverer", [dijit._Widget, dijit._Templated],
 
         postMixInProperties: function(){
             dojo.require(this.recoverFunctionModule);
-            var module = dojo.evalObjPath(this.recoverFunctionModule) || dj_global;
+            var module = dojo.getObject(this.recoverFunctionModule) || dojo.global;
             this.recoverFunction = dojo.hitch(module, this.recoverFunctionName);
         }
     }

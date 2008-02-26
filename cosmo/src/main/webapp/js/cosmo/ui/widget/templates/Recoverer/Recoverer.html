@@ -1,4 +1,4 @@
-<div id="${this.widgetId}">
+<div>
 <!--
   Copyright 2006 Open Source Applications Foundation
 
@@ -18,7 +18,7 @@
 	<p dojoAttachPoint="infoBox" class="infoText"></p>
 	<p dojoAttachPoint="errorBox" class="errorText"></p>
 	
-    <table dojoAttachPoint="tableContainer" id="recovererInputForm">
+    <table dojoAttachPoint="tableContainer" id="recovererInputForm" style="margin-left: auto; margin-right: auto; margin-top: 1em;">
 
         <tbody>
             <tr>
@@ -29,7 +29,7 @@
                 </td>
             </tr>
             <tr>
-            	<td class="labelTextCell">${this.orText}</td>
+            	<td class="labelTextCell">${orText}</td>
             	<td>&nbsp;</td>
             </tr>
             <tr>
@@ -42,7 +42,7 @@
             <tr>
                 <td></td>
                 <td dojoAttachPoint="sendButtonContainer" id="sendButtonContainer" style="text-align: right">
-                   	<input dojoType="cosmo:Button" dojoAttachPoint="sendButton" type="button" i18nText="${this.i18nPrefix}Submit" dojoAttachEvent="handleOnClick:recover" value="Submit"/>
+                   	<input dojoType="cosmo.ui.widget.Button" dojoAttachPoint="sendButton" type="button" i18nText="${i18nPrefix}Submit" dojoAttachEvent="handleOnClick:recover" value="Submit"/>
                 </td>
             </tr>
 

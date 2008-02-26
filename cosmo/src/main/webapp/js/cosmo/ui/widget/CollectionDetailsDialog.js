@@ -36,7 +36,7 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
 
         // Template stuff
         templatePath:dojo.moduleUrl("cosmo") +
-            'ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html',
+            'ui/widget/templates/CollectionDetailsDialog.html',
 
         // Attach points
         table: null, //the table, which has pretty much all the content

@@ -36,7 +36,7 @@ dojo.require("cosmo.convenience");
 dojo.requireLocalization("cosmo.ui.widget", "TicketWidget");
 
 dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], {
-    templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/TicketWidget/TicketWidget.html"),
+    templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/TicketWidget.html"),
 
     widgetsInTemplate: true,
     l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "TicketWidget"),

@@ -33,7 +33,7 @@ dojo.declare(
     [dijit._Widget, dijit._Templated],
     {
 
-        templatePath: dojo.moduleUrl("cosmo",  "ui/widget/templates/ButtonPanel/ButtonPanel.html"),
+        templatePath: dojo.moduleUrl("cosmo",  "ui/widget/templates/ButtonPanel.html"),
 
     // Attach points
     leftContainer: null,

@@ -14,7 +14,7 @@ dojo.declare(
     [dijit._Widget, dijit._Templated],
     {
         stylesheet: "",
-        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/LoginDialog/LoginDialog.html"),
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/LoginDialog.html"),
 
         // Props from template or set in constructor
         passwordLabel: _("Login.Password"),

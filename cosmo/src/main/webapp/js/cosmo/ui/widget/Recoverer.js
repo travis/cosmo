@@ -37,9 +37,7 @@ dojo.declare("cosmo.ui.widget.Recoverer", [dijit._Widget, dijit._Templated],
     {
 
         templatePath: dojo.moduleUrl(
-            "cosmo" ,"ui/widget/templates/Recoverer/Recoverer.html"),
-        templateCssPath: dojo.moduleUrl(
-            "cosmo", "ui/widget/templates/Recoverer/Recoverer.css"),
+            "cosmo" ,"ui/widget/templates/Recoverer.html"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,

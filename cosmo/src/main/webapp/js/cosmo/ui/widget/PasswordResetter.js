@@ -37,9 +37,7 @@ dojo.declare("cosmo.ui.widget.PasswordResetter",
     {
 
         templatePath: dojo.moduleUri(
-            "cosmo", "ui/widget/templates/PasswordResetter/PasswordResetter.html"),
-        templateCssPath: dojo.moduleUri(
-            "cosmo", "ui/widget/templates/PasswordResetter/PasswordResetter.css"),
+            "cosmo", "ui/widget/templates/PasswordResetter.html"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,

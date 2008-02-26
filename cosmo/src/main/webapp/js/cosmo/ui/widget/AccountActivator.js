@@ -35,7 +35,7 @@ dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
     {
 
         templatePath: dojo.moduleUrl(
-            "cosmo", "/ui/widget/templates/AccountActivator/AccountActivator.html"),
+            "cosmo", "/ui/widget/templates/AccountActivator.html"),
 
         //properties to be set by tag or constructor
         activationId: "",

@@ -29,14 +29,15 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.ui.widget.Button");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 
 dojo.declare("cosmo.ui.widget.PasswordResetter", 
-             [dojo._Widget, dojo._Templated],
+             [dijit._Widget, dijit._Templated],
     {
 
-        templatePath: dojo.moduleUri(
+        templatePath: dojo.moduleUrl(
             "cosmo", "ui/widget/templates/PasswordResetter.html"),
 
         widgetsInTemplate: true,
@@ -77,7 +78,7 @@ dojo.declare("cosmo.ui.widget.PasswordResetter",
                     if (d.ioArgs.xhr.status == "404"){
                         self.setError(_(self.i18nPrefix + ".Error.404", self.recoveryKey));
                     } else {
-                        self.setError(data);
+                        self.setError(error.message);
                     }
                 });
             } else {

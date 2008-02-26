@@ -410,32 +410,28 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
 
-            var requestContent =
-                username? "username=" + username : "" +
-                username && email? "&" : "" +
-                email? "email=" + email : "";
+            var requestContent = {};
+            if (username) requestContent.username = username;
+            if (email) requestContent.email = email;
 
             var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.contentType = null;
             requestDict.url = url;
-            requestDict.postData = requestContent;
-
-            return dojo.rawXhrPost(requestDict);
+            requestDict.content = requestContent;
+            return dojo.xhrPost(requestDict);
         },
 
         resetPassword: function(key, password, ioArgs){
-
-            var requestContent = "password=" + password;
-
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
 
             var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.contentType = null;
             requestDict.url = this._baseUrl + "/account/password/reset/" + key;
-            requestDict.contentType = "application/x-www-form-urlencoded";
-            requestDict.postData = requestContent;
+            requestDict.content = {password: password};
 
-            return dojo.rawXhrPost(requestDict);
+            return dojo.xhrPost(requestDict);
         },
 
         cmpUserXMLToJSON: function (/*Element*/ cmpUserXml){

@@ -167,7 +167,7 @@ dojo.declare("cosmo.data.UserStore", null, {
         var count = request.count || this.DEFAULT_COUNT;
         var start = request.start || this.DEFAULT_START;
         var pageNumber = Math.floor(start / count);
-        var query = request.query;
+        var query = request.query.q;
 
         // Sorting
         var sortOrder = this.DEFAULT_SORT_ORDER;
@@ -178,22 +178,30 @@ dojo.declare("cosmo.data.UserStore", null, {
             sortOrder = sort.descending? 
                 this.SORT_DESCENDING : this.SORT_ASCENDING;
         }
-        return this._deferredToFetchRequest(
-            cosmo.cmp.getUsers(pageNumber, count, sortOrder, sortType, query),
-            request);
+        var scope = request.scope || dojo.global;
+        var deferreds = [];
+        if (request.onBegin) {
+            var countD = cosmo.cmp.getUserCount();
+            countD.addCallback(function(count){
+                request.onBegin.call(scope, count, request);
+            });
+            deferreds.push(countD);
+        }
+        var getD = cosmo.cmp.getUsers(pageNumber, count, sortOrder, sortType, query);
+        deferreds.push(getD);
+        var r = this._deferredToFetchRequest(getD, request, scope)
+        r._deferred = new dojo.DeferredList(deferreds);
+        return r;
     },
 
     /* Given a dojo.Deferred and a dojo.data.api.Request, set up the request object 
        appropriately from the Deferred.
     */
-    _deferredToFetchRequest: function(deferred, request){
-        var scope = request.scope || dojo.global;
-
+    _deferredToFetchRequest: function(deferred, request, scope){
         request.abort = dojo.hitch(deferred, deferred.cancel);
         
         deferred.addCallback(dojo.hitch(this, function(result){
             var items = dojo.isArray(result)? result : [result];
-            if (request.onBegin) request.onBegin.call(scope, items.length, request);
             for (var i in items){
                 items[i]._storeProp = this;
                 if (request.onItem) request.onItem.call(scope, items[i], request);
@@ -206,7 +214,6 @@ dojo.declare("cosmo.data.UserStore", null, {
             if (request.onError) request.onError.call(scope, error, request);
             return error;
         });
-        request._deferred = deferred;
         return request;
     },
 

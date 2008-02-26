@@ -82,7 +82,7 @@
       @import "${staticBaseUrl}/js/lib/dojo/dojo/resources/dojo.css"
     </style>
   </head>
-  <body class="adminPage tundra">
+  <body class="tundra">
     <div id="menuBar">
           <div id="mainLogoContainer">
             <a href="<c:url value="/account/view"/>">
@@ -130,16 +130,13 @@
             </div>
         </c:if>
 	</div>
-    <div class="md" id="contentDiv">
-    	<div id="contentWrapper" class="${contentWrapperClass}">
+    <div class="md" id="contentDiv" style="height: 80%">
 
         <!-- page body -->
         <jsp:doBody/>
         <!-- end page body -->
-      	<div class="aboutChandlerServer"><cosmo:aboutPopupLink/></div>
-		</div>
     </div>
-    <div id="debug"></div>
+    <div class="aboutChandlerServer"><cosmo:aboutPopupLink/></div>
   </body>
 </html>
 

@@ -43,7 +43,7 @@ dojo.require("dojox.grid.editors");
     function userListSearch(){
         var query = document.getElementById("searchBox").value;
         var newModel = new dojox.grid.data.DojoData(null,null,{rowsPerPage: 20, 
-            store: userStore, query: query, clientSort: true});
+            store: userStore, query: {q: query}, clientSort: true});
         userList.setModel(newModel);        
     }
 </script>
@@ -61,10 +61,10 @@ dojo.require("dojox.grid.editors");
 <div dojoType="dojox.grid.data.DojoData" jsId="model"
      rowsPerPage="20" store="userStore" query="">
 </div>
-    <div id="userList" autoHeight="true" dojoType="dojox.Grid" model="model" jsId="userList">
+    <div id="userList" dojoType="dojox.Grid" model="model" jsId="userList" style="height: 80%;">
 <script type="dojo/method">
   var view1 = {
-      noscroll: true,
+      noscroll: false,
       cells: [[
           {name: 'Username', field: "username", width: "auto",
            editor: dojox.grid.editors.Input

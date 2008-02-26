@@ -25,25 +25,21 @@
 
 dojo.provide("cosmo.ui.widget.Recoverer");
 
-
-
-dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.i18n");
-
 dojo.require("cosmo.convenience");
 
-dojo.widget.defineWidget("cosmo.ui.widget.Recoverer", dojo.widget.HtmlWidget,
-    function(){
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 
-    },
+dojo.declare("cosmo.ui.widget.Recoverer", [dijit._Widget, dijit._Templated],
     {
 
-        templatePath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/Recoverer/Recoverer.html"),
-        templateCssPath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/Recoverer/Recoverer.css"),
+        templatePath: dojo.moduleUrl(
+            "cosmo" ,"ui/widget/templates/Recoverer/Recoverer.html"),
+        templateCssPath: dojo.moduleUrl(
+            "cosmo", "ui/widget/templates/Recoverer/Recoverer.css"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
@@ -94,7 +90,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Recoverer", dojo.widget.HtmlWidget,
             });
         },
 
-        fillInTemplate: function(){
+        postCreate: function(){
             if (this.displayDefaultInfo){
                 this.setInfo(_(this.i18nPrefix + "InitialInfo"));
             }

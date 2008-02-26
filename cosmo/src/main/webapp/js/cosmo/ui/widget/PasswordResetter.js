@@ -25,25 +25,21 @@
 
 dojo.provide("cosmo.ui.widget.PasswordResetter");
 
-
-
-dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.i18n");
-
 dojo.require("cosmo.convenience");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 
-dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWidget,
-    function(){
-
-    },
+dojo.declare("cosmo.ui.widget.PasswordResetter", 
+             [dojo._Widget, dojo._Templated],
     {
 
-        templatePath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/PasswordResetter/PasswordResetter.html"),
-        templateCssPath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/PasswordResetter/PasswordResetter.css"),
+        templatePath: dojo.moduleUri(
+            "cosmo", "ui/widget/templates/PasswordResetter/PasswordResetter.html"),
+        templateCssPath: dojo.moduleUri(
+            "cosmo", "ui/widget/templates/PasswordResetter/PasswordResetter.css"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
@@ -91,7 +87,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWid
             }
         },
 
-        fillInTemplate: function(){
+        postCreate: function(){
            if (this.displayDefaultInfo){
                this.setInfo(_(this.i18nPrefix + ".InitialInfo"));
            }

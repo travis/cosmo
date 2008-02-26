@@ -24,23 +24,18 @@
 
 dojo.provide("cosmo.ui.widget.AccountActivator");
 
-
-
-dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
+dojo.require("dijit._Templated");
 
-dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWidget,
-    function(){
-
-    },
+dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
     {
 
-        templatePath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/AccountActivator/AccountActivator.html"),
+        templatePath: dojo.moduleUrl(
+            "cosmo", "/ui/widget/templates/AccountActivator/AccountActivator.html"),
 
         //properties to be set by tag or constructor
         activationId: "",
@@ -58,8 +53,8 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
         homedirUrlText: null,
         activateButtonContainer: null,
 
-        fillInTemplate: function (){
-            var button = dojo.widget.createWidget("cosmo:Button",
+        postCreate: function (){
+            var button = new cosmo.ui.widget.Button,
                 {text: _("Activation.Activate"),
                  id: "accountActivateButton"});
 
@@ -114,6 +109,5 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
                 cosmo.cmp.activate(activationId);
             }
         }
-
     }
 );

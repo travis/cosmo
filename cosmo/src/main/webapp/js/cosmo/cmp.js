@@ -107,21 +107,17 @@ dojo.declare("cosmo.cmp.Cmp", null,
                                /*int*/ pageSize,
                                /*String*/ sortOrder,
                                /*String*/ sortType,
-                               /*String*/ query,
+                               /*String*/ search,
                                /*Object?*/ ioArgs) {
             var requestDict = this.getDefaultCMPRequest(ioArgs);
+            var query = {};
             requestDict.url = this._baseUrl + "/users";
-
-            if (pageNumber || pageSize || sortOrder || sortType){
-                requestDict.url +=
-                    "?pn=" + (pageNumber ? pageNumber : DEFAULT_PAGE_NUMBER).toString() +
-                    "&ps=" + (pageSize ? pageSize : DEFAULT_PAGE_SIZE).toString() +
-                    "&so=" + (sortOrder ? sortOrder : DEFAULT_SORT_ORDER) +
-                    "&st=" + (sortType ? sortType : DEFAULT_SORT_TYPE);
-            }
-            if (query) {
-                requestDict.url += "&q=" + escape(query);
-            }
+            query.pn = pageNumber || DEFAULT_PAGE_NUMBER;
+            query.ps = pageSize || DEFAULT_PAGE_SIZE;
+            query.so = sortOrder || DEFAULT_SORT_ORDER;
+            query.st = sortType || DEFAULT_SORT_TYPE;
+            if (search) query.q = search;
+            requestDict.content = query;
             return dojo.xhrGet(requestDict);
         },
 
@@ -262,9 +258,11 @@ dojo.declare("cosmo.cmp.Cmp", null,
          * summary: Return the number of users on this server.
          * description: Return the number of users on this server.
          */
-        getUserCount: function (/*Object*/ ioArgs){
+        getUserCount: function (/*String*/ search, /*Object*/ ioArgs){
         	var requestDict = this.getDefaultCMPRequest(ioArgs);
         	requestDict.url = this._baseUrl + "/users/count";
+            if (search) requestDict.content = {q: search};
+
 			var d = dojo.xhrGet(requestDict);
             d.addCallback(function(countString){
                 return parseInt(countString);

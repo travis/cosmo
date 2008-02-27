@@ -181,7 +181,7 @@ dojo.declare("cosmo.data.UserStore", null, {
         var scope = request.scope || dojo.global;
         var deferreds = [];
         if (request.onBegin) {
-            var countD = cosmo.cmp.getUserCount();
+            var countD = cosmo.cmp.getUserCount(query);
             countD.addCallback(function(count){
                 request.onBegin.call(scope, count, request);
             });

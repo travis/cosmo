@@ -52,7 +52,8 @@ dojo.require("dojox.grid.editors");
 <button id="searchButton" onClick="userListSearch()">Search</button>
 <div dojoType="cosmo.data.UserStore" jsId="userStore">
   <script type="dojo/connect" event="onSet" args="item,attr,oldVal,newVal">
-    if (oldVal != newVal){
+    // make sure value has changed and, if password, value is not default
+    if (oldVal != newVal)
         console.debug("About to change "+attr+" from "+oldVal+" to "+newVal);
         this.save();
     }
@@ -61,35 +62,35 @@ dojo.require("dojox.grid.editors");
 <div dojoType="dojox.grid.data.DojoData" jsId="model"
      rowsPerPage="20" store="userStore" query="">
 </div>
-    <div id="userList" dojoType="dojox.Grid" model="model" jsId="userList" style="height: 80%;">
+    <div id="userList" dojoType="dojox.Grid" model="model" jsId="userList">
 <script type="dojo/method">
   var view1 = {
       noscroll: false,
       cells: [[
-          {name: 'Username', field: "username", width: "auto",
+          {name: 'Username', field: "username",
            editor: dojox.grid.editors.Input
           },
-          {name: 'First Name', field: "firstName",  width: "auto",
+          {name: 'First Name', field: "firstName",
            editor: dojox.grid.editors.Input
           },
-          {name: 'Last Name', field: "lastName", width: "auto",
+          {name: 'Last Name', field: "lastName",
            editor: dojox.grid.editors.Input
           },
-          {name: 'Email',  field: "email", width: "auto",
+          {name: 'Email',  field: "email", width: "10em",
            editor: dojox.grid.editors.Input
           },
-          {name: 'Created',  field: "dateCreated", width: "auto"},
-          {name: 'Modified',  field: "dateModified", width: "auto"},
-          {name: 'Url',  field: "url", width: "auto"},
-          {name: 'Locked',  field: "locked", width: "6em", 
+          {name: 'Created',  field: "dateCreated", width: "6.5em"},
+          {name: 'Modified',  field: "dateModified", width: "6.5em"},
+          {name: 'Url',  field: "url"},
+          {name: 'Locked',  field: "locked", width: "6em", noresize: "true",
            styles: "text-align: center;", editor: dojox.grid.editors.Bool
           },
-          {name: 'Admin',  field: "administrator", width: "6em",
+          {name: 'Admin',  field: "administrator", width: "6em", noresize: "true",
            styles: "text-align: center;", editor: dojox.grid.editors.Bool
           },
-          {name: 'Unactivated',  field: "unactivated", width: "auto"},
-          {name: 'Password', field: "password", width: "auto",
-           editor: dojox.grid.editors.Input
+          {name: 'Unactivated',  field: "unactivated", width: "6em"},
+          {name: 'Password', field: "password", width: "auto", 
+           styles: "text-align: center;", editor: dojox.grid.editors.Input
           }
       ]]
   };

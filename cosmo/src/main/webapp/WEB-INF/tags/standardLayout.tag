@@ -59,10 +59,10 @@
     <!-- Stylesheets -->
     <c:choose>
     <c:when  test="${not empty stylesheets}">
-    	<c:set var="stylesheets" value="admin,${stylesheets}"/>
+    	<c:set var="stylesheets" value="${stylesheets}"/>
 	</c:when>
 	<c:otherwise>
-		<c:set var="stylesheets" value="admin"/>
+		<c:set var="stylesheets" value=""/>
 	</c:otherwise>
     </c:choose>
 
@@ -79,17 +79,66 @@
       Use Grid.css on the same path for a more color-neutral theme */
       @import "${staticBaseUrl}/js/lib/dojo/dojox/grid/_grid/tundraGrid.css";
       @import "${staticBaseUrl}/js/lib/dojo/dijit/themes/tundra/tundra.css";
-      @import "${staticBaseUrl}/js/lib/dojo/dojo/resources/dojo.css"
+      @import "${staticBaseUrl}/js/lib/dojo/dojo/resources/dojo.css";
+
+#head {
+position: absolute;
+width: 100%;
+top: 0;
+height: 6em;
+border: 0;
+margin: 0;
+}
+
+#main {
+position: absolute;
+width: 100%;
+top: 6em;
+bottom: 2em;
+border: 0;
+margin: 0;
+}
+
+#foot {
+position: absolute;
+text-align: center;      
+height: 2em;
+bottom: 0;
+width: 100%;
+border: 0;
+margin: 0;
+}
+
+html, body{
+height: 100%;
+width: 100%;
+margin: 0;
+padding: 0;
+}
+
+#menuNavItems {
+	position: absolute;
+	display: inline;
+	width: auto;
+	right: 0;
+	padding: 5px;
+}
+
+img#logo {
+	height: 45px;
+	width: 216px;
+}
+
     </style>
   </head>
   <body class="tundra">
-    <div id="menuBar">
-          <div id="mainLogoContainer">
-            <a href="<c:url value="/account/view"/>">
-              <img id="logo" src="${staticBaseUrl}/templates/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
-              	   alt="<fmt:message key="App.Name"  bundle="${uiBundle}"/>"/>
-            </a>
-          </div>
+    <div id="head">
+      <span id="mainLogoContainer">
+        <a href="<c:url value="/account/view"/>">
+          <img id="logo" src="${staticBaseUrl}/templates/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
+               alt="<fmt:message key="App.Name"  bundle="${uiBundle}"/>"/>
+        </a>
+      </span>
         <c:if test="${showNav}">
             <!-- main navbar -->
             <div id="menuNavItems">
@@ -130,13 +179,13 @@
             </div>
         </c:if>
 	</div>
-    <div class="md" id="contentDiv" style="height: 80%">
+    <div id="main">
 
         <!-- page body -->
         <jsp:doBody/>
         <!-- end page body -->
     </div>
-    <div class="aboutChandlerServer"><cosmo:aboutPopupLink/></div>
+    <div id="foot"><cosmo:aboutPopupLink/></div>
   </body>
 </html>
 

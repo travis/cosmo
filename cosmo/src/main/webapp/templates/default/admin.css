@@ -68,15 +68,6 @@ img#logo {
 	width: auto;
 }
 
-#menuNavItems {
-	position: absolute;
-	display: inline;
-	width: auto;
-	right: 0;
-	padding: 5px;
-
-}
-
 hr {
 	color: lightgrey;	
 }

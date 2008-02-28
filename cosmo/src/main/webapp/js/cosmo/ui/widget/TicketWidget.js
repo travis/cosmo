@@ -82,30 +82,6 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
 
    	createFailure: function(error){
 		alert("Ticket not created. Error: " + error.message);
-   	},
-
-   	validateInput: function(){
-   		var timeout = this.ticketForm.timeout.value;
-    	var timeoutValid = timeout == "" ||
-    		dojo.validate.isInteger(timeout);
-
-   		var privs = this.ticketForm.privileges;
-   		var privsSelected = false;
-
-   		for (var i = 0; i < privs.length; i++){
-   			if (privs[i].checked){
-   				privsSelected = true;
-   				break;
-   			}
-   		}
-
-   		if (!privsSelected){
-			this.privilegesErrorSpan.innerHTML = _('Ticket.Error.Privilege');
-		}
-		if (!timeoutValid){
-			this.timeoutErrorSpan.innerHTML = _('Ticket.Error.Timeout');
-		}
-
-		return timeoutValid && privsSelected;
    	}
-  } );
+} 
+            );

@@ -166,7 +166,7 @@ dojo.declare("cosmo.data.UserStore", null, {
     fetch: function(/* Object */request){
         var count = request.count || this.DEFAULT_COUNT;
         var start = request.start || this.DEFAULT_START;
-        var pageNumber = Math.floor(start / count);
+        var pageNumber = Math.floor(start / count) + 1;
         var query = request.query.q;
 
         // Sorting
@@ -282,16 +282,17 @@ dojo.declare("cosmo.data.UserStore", null, {
 	},
 	
 	setValue: function(/* item */ item, /* string */ attribute, /* string */ value){
-        // Make sure this is an editable property
         if (!this._isEditable(item, attribute, value)) return false;
         
         var oldValue = item[attribute];
-        item[attribute] = value;
-        this._modifiedItems[item.username] = item;
         this.onSet(item, attribute, oldValue, value);
+        if (value != oldValue) {
+            item[attribute] = value;
+            this._modifiedItems[item.username] = item;
+        }
 		return true; //boolean
 	},
-
+    
     _isEditable: function(item, attribute, value){
         if (item.username == "root"
             && (attribute == "username"

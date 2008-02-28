@@ -27,11 +27,9 @@
 
 <script language="JavaScript">
 dojo.require("cosmo.data.UserStore");
-dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dojox.grid.Grid");
-dojo.require("dojox.grid._data.model");
-dojo.require("dojo.parser");
-dojo.require("dojox.grid.editors");
+dojo.require("dojox.grid._data.dijitEditors");
+dojo.require("dijit.form.ValidationTextBox");
 </script>
 
 <cosmo:cnfmsg/>
@@ -53,14 +51,14 @@ dojo.require("dojox.grid.editors");
 <div dojoType="cosmo.data.UserStore" jsId="userStore">
   <script type="dojo/connect" event="onSet" args="item,attr,oldVal,newVal">
     // make sure value has changed and, if password, value is not default
-    if (oldVal != newVal)
+    if (oldVal != newVal){
         console.debug("About to change "+attr+" from "+oldVal+" to "+newVal);
         this.save();
     }
   </script>
 </div>
 <div dojoType="dojox.grid.data.DojoData" jsId="model"
-     rowsPerPage="20" store="userStore" query="">
+     rowsPerPage="20" store="userStore" query="{}">
 </div>
     <div id="userList" dojoType="dojox.Grid" model="model" jsId="userList">
 <script type="dojo/method">
@@ -68,20 +66,28 @@ dojo.require("dojox.grid.editors");
       noscroll: false,
       cells: [[
           {name: 'Username', field: "username",
-           editor: dojox.grid.editors.Input
+           editor: dojox.grid.editors.Dijit,
+           editorClass: "dijit.form.ValidationTextBox"
           },
           {name: 'First Name', field: "firstName",
-           editor: dojox.grid.editors.Input
+           editor: dojox.grid.editors.Dijit,
+           editorClass: "dijit.form.ValidationTextBox"
           },
           {name: 'Last Name', field: "lastName",
-           editor: dojox.grid.editors.Input
+           editor: dojox.grid.editors.Dijit,
+           editorClass: "dijit.form.ValidationTextBox"
           },
           {name: 'Email',  field: "email", width: "10em",
-           editor: dojox.grid.editors.Input
+           editor: dojox.grid.editors.Dijit,
+           editorClass: "dijit.form.ValidationTextBox"
+          },
+          {name: 'Password', field: "password", 
+           styles: "text-align: center;", 
+           editor: dojox.grid.editors.Dijit,
+           editorClass: "dijit.form.ValidationTextBox"
           },
           {name: 'Created',  field: "dateCreated", width: "6.5em"},
           {name: 'Modified',  field: "dateModified", width: "6.5em"},
-          {name: 'Url',  field: "url"},
           {name: 'Locked',  field: "locked", width: "6em", noresize: "true",
            styles: "text-align: center;", editor: dojox.grid.editors.Bool
           },
@@ -89,9 +95,7 @@ dojo.require("dojox.grid.editors");
            styles: "text-align: center;", editor: dojox.grid.editors.Bool
           },
           {name: 'Unactivated',  field: "unactivated", width: "6em"},
-          {name: 'Password', field: "password", width: "auto", 
-           styles: "text-align: center;", editor: dojox.grid.editors.Input
-          }
+          {name: 'Url',  field: "url", width: "auto" }
       ]]
   };
   // a grid layout is an array of views.

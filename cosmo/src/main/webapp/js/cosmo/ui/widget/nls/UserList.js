@@ -14,9 +14,24 @@
  * limitations under the License.
 */
 ({
+    username: "Username",
+    lastName: "Last name",
+    firstName: "First name",
+    email: "Email",
+    password: "Password",
+    created: "Created",
+    modified: "Modified",
+    locked: "Locked",
+    admin: "Admin",
+    unactivated: "Unactivated",
+    url: "Url",
     usernameValid: "Username must be between 3 and 32 characters.",
     firstNameValid: "First name must be between 1 and 128 characters.",
     lastNameValid: "Last name must be between 1 and 128 characters.",
     emailValid: "Not a valid email address.",
-    passwordValid: "Password must be between 5 and 16 characters."
+    passwordValid: "Password must be between 5 and 16 characters.",
+    attributeUpdate: "${attr} updated to ${newVal}.",
+    attributeUpdateFailed: "${attr} update failed.",
+    passwordConfirm: "Please retype the new password.",
+    passwordMismatch: "Password not changed: passwords do not match."
 })

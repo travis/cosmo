@@ -30,11 +30,13 @@
 <script language="JavaScript">
 
 dojo.require("cosmo.data.UserStore");
+dojo.require("cosmo.util.notify");
 dojo.require("dojox.grid.Grid");
 dojo.require("dojox.grid._data.dijitEditors");
 dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dijit.form.CheckBox");
 dojo.require("dojox.validate.regexp");
-    
+
 function userListSearchKey(event){
     if (event.keyCode == 13) userListSearch();
     }
@@ -49,54 +51,64 @@ dojo.requireLocalization("cosmo.ui.widget", "UserList");
 var l10n =  dojo.i18n.getLocalization("cosmo.ui.widget", "UserList");
 DEFAULT_PASSWORD_VALUE = "\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
 var userListLayout = [{
-    noscroll: false,
     cells: [[
-        {name: 'Username', field: "username",
+        {name: l10n.username, field: "username",
          editor: dojox.grid.editors.Dijit,
          editorClass: "dijit.form.ValidationTextBox",
          editorProps: {regExp:".{3,32}", required: true, 
                        invalidMessage: l10n.usernameValid
                       }
         },
-        {name: 'First Name', field: "firstName",
+        {name: l10n.firstName, field: "firstName",
          editor: dojox.grid.editors.Dijit,
          editorClass: "dijit.form.ValidationTextBox",
          editorProps: {regExp:".{1,128}", required: true,
                        invalidMessage: l10n.firstNameValid
                       }
         },
-        {name: 'Last Name', field: "lastName",
+        {name: l10n.lastName, field: "lastName",
          editor: dojox.grid.editors.Dijit,
          editorClass: "dijit.form.ValidationTextBox",
          editorProps: {regExp:".{1,128}", required: true,
                        invalidMessage: l10n.lastNameValid
                       }
         },
-        {name: 'Email',  field: "email", width: "10em",
+        {name: l10n.email,  field: "email", width: "10em",
          editor: dojox.grid.editors.Dijit,
          editorClass: "dijit.form.ValidationTextBox",
          editorProps: {regExp:dojox.regexp.emailAddress(), required: true,
                        invalidMessage: l10n.emailValid
                       }
         },
-        {name: 'Password', field: "password", 
+        {name: l10n.password, field: "password", 
          styles: "text-align: center;", value: DEFAULT_PASSWORD_VALUE,
          editor: dojox.grid.editors.Dijit,
          editorClass: "dijit.form.ValidationTextBox",
+         applyEdit: 
+         function(inValue, inRowIndex){
+             if (inValue == DEFAULT_PASSWORD_VALUE) this.cancelEdit(inRowIndex);
+             else if (window.prompt(l10n.passwordConfirm) == inValue) this.inherited("applyEdit", arguments);
+             else {
+                 this.cancelEdit(inRowIndex);
+                 setTimeout(function(){
+                     cosmo.util.notify.showMessage(l10n.passwordMismatch);
+                 }, 50);
+             }
+         },
          editorProps: {regExp:".{5,16}", 
                        invalidMessage: l10n.passwordValid
                       }
         },
-        {name: 'Created',  field: "dateCreated", width: "6.5em"},
-        {name: 'Modified',  field: "dateModified", width: "6.5em"},
-        {name: 'Locked',  field: "locked", width: "6em", noresize: "true",
-         styles: "text-align: center;", editor: dojox.grid.editors.Bool
+        {name: l10n.created,  field: "dateCreated", width: "6.5em"},
+        {name: l10n.modified,  field: "dateModified", width: "6.5em"},
+        {name: l10n.locked,  field: "locked", width: "6em", noresize: "true",
+         styles: "text-align: center;", editor: dojox.grid.editors.CheckBox
         },
-        {name: 'Admin',  field: "administrator", width: "6em", noresize: "true",
-         styles: "text-align: center;", editor: dojox.grid.editors.Bool
+        {name: l10n.admin,  field: "administrator", width: "6em", noresize: "true",
+         styles: "text-align: center;", editor: dojox.grid.editors.CheckBox
         },
-        {name: 'Unactivated',  field: "unactivated", width: "6em"},
-        {name: 'Url',  field: "url", width: "auto" }
+        {name: l10n.unactivated,  field: "unactivated", width: "6em"},
+        {name: l10n.url,  field: "url", width: "auto" }
     ]]
 }];
 </script>
@@ -106,11 +118,21 @@ var userListLayout = [{
 <div dojoType="cosmo.data.UserStore" jsId="userStore">
   <script type="dojo/connect" event="onSet" args="item,attr,oldVal,newVal">
     // make sure value has changed and, if password, value is not default
-    if (oldVal != newVal &&
-    !(attr == "password" && newVal == DEFAULT_PASSWORD_VALUE)
-    ){
+    if (oldVal != newVal){
         console.debug("About to change "+attr+" from "+oldVal+" to "+newVal);
-        this.save();
+        this.save({
+            onComplete: function(){
+                cosmo.util.notify.showMessage(dojo.string.substitute(
+                    l10n.attributeUpdate, 
+                    {attr: l10n[attr], 
+                     newVal: newVal}));
+            },
+            onError: function(e){
+                cosmo.util.notify.showMessage(dojo.string.substitute(l10n.attributeUpdateFailed, {attr: l10n[attr]}));
+                console.log(e);
+            }
+        });
+        
     }
   </script>
 </div>
@@ -120,7 +142,13 @@ var userListLayout = [{
     <div id="userList" dojoType="dojox.Grid" model="model" 
          structure="userListLayout" jsId="userList">
 <script type="dojo/method">
-
+    dojo.connect(userList, "onStyleRow", function(inRow){
+        var row = model.getRow(inRow.index);
+        if (row &&
+            row.username == 'root'){
+            inRow.customStyles = 'background-color:red';
+        }
+    });
 dojo.connect(window, "onresize", dojo.hitch(userList, userList.update));
 </script>
 <script type="dojo/connect" event="onCellDblClick" args="e">

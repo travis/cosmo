@@ -679,3 +679,14 @@ position: absolute;
 #detailButtonSection {
     padding: 9px;                     
 }
+
+#cosmoTransparentMessage {
+    position: absolute;
+    width: 60%;
+    font-size: 4em;
+    background-color: blue;
+    text-align: center;
+    left: 20%;
+    top: 30%;
+    padding: 0.1em;
+}

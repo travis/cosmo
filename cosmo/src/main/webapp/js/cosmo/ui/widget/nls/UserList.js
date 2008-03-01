@@ -22,7 +22,7 @@
     created: "Created",
     modified: "Modified",
     locked: "Locked",
-    admin: "Admin",
+    administrator: "Admin",
     unactivated: "Unactivated",
     url: "Url",
     usernameValid: "Username must be between 3 and 32 characters.",
@@ -33,5 +33,6 @@
     attributeUpdate: "${attr} updated to ${newVal}.",
     attributeUpdateFailed: "${attr} update failed.",
     passwordConfirm: "Please retype the new password.",
-    passwordMismatch: "Password not changed: passwords do not match."
+    passwordMismatch: "Password not changed: passwords do not match.",
+    confirmDelete: "Are you sure you want to delete the following users: ${usernames}?"
 })

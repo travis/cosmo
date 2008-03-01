@@ -1,0 +1,68 @@
+<div>
+<style type="text/css">
+
+.cosmoRootRow .rootNoChange{
+    background: #ffcccc;
+}
+
+.dojoxGrid-row .noChange{
+    background: #ffcccc;
+}
+</style>
+<input type="text" id="searchBox" dojoAttachEvent="onkeypress:userListSearchKey"/>
+<button dojoType="dijit.form.Button" id="searchButton" dojoAttachEvent="onClick:userListSearch">Search</button>
+<button dojoType="dijit.form.Button" id="newUserButton" dojoAttachEvent="onClick:newUser">New User</button>
+<button dojoType="dijit.form.Button" id="deleteUserButton" dojoAttachEvent="onClick:deleteUser">Delete User</button>
+<button dojoType="dijit.form.Button" id="activateUserButton" dojoAttachEvent="onClick:activateUser">Activate User</button>
+
+<div id="userList" dojoType="dojox.Grid" dojoAttachPoint="userList">
+  <script type="dojo/method" event="onCellDblClick" args="e">
+    
+var fn = e.cell.field;
+var rowData = this.model.getRow(e.rowIndex);
+if (!(rowData.username == "root" &&
+      (fn == "username" ||
+       fn == "firstName" ||
+       fn == "lastName" ||
+       fn == "administrator" ||
+       fn == "locked"
+      ))
+   ){
+    return this.inherited("onCellDblClick", arguments);
+}
+  </script>
+</div>
+    
+    <div dojoType="dijit.Dialog" id="newUserDialog" title="Create new user" dojoAttachEvent="execute:createNewUser" dojoAttachPoint="newUserDialog">
+      <table>
+        <tr>
+          <td><label for="loc">Username: </label></td>
+          <td><input dojoType="dijit.form.TextBox" type="text" name="username"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">First Name: </label></td>
+          <td><input dojoType="dijit.form.TextBox" type="text" name="firstName"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">Last Name: </label></td>
+          <td><input dojoType="dijit.form.TextBox" type="text" name="lastName"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">Email: </label></td>
+          <td><input dojoType="dijit.form.TextBox" type="text" name="email"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">Password: </label></td>
+          <td><input dojoType="dijit.form.TextBox" type="password" name="password"></td>
+        </tr>
+        <tr>
+          <td><label for="desc">Confirm Password: </label></td>
+          <td><input dojoType="dijit.form.TextBox" type="password" name="confirm"></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center">
+            <button dojoType=dijit.form.Button type="submit">OK</button></td>
+        </tr>
+      </table>
+    </div>
+</div>

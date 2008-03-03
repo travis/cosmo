@@ -36,6 +36,9 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
     widgetsInTemplate: true,
     templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/UserList.html"),
     l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "UserList"),
+    USERNAME_OVERLORD: "root",
+    DEFAULT_PASSWORD_VALUE: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+
     userListSearchKey: function(event){
         if (event.keyCode == 13) this.userListSearch();
     },
@@ -43,12 +46,8 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
     userListSearch: function(){
         var query = document.getElementById("searchBox").value;
         var newModel = new dojox.grid.data.DojoData(null,null,{rowsPerPage: 20, 
-            store: this.store, query: {q: query}, clientSort: true});
+            store: this.store, query: {q: query}});
         this.userList.setModel(newModel);
-    },
-
-    activateUser: function(event){
-        var user = this.model.getRow(this.userList.selection.selectedIndex);
     },
 
     newUser: function(event){
@@ -56,70 +55,101 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
     },
 
     createNewUser: function(form){
-        console.debug(form);
-        var user = {
-            
+        if (this.newUserForm.isValid()){
+            console.log("valid");
+            this.store.newItem(form);
+            this.store.save({
+                onComplete: dojo.hitch(this, function(){
+                    this.model.insert(form);
+                    this.newUserForm.setValues({username: "",
+                                               firstName: "",
+                                               lastName: "",
+                                               email: "",
+                                               password: "",
+                                               confirm: ""
+                                              });
+                    this.newUserDialog.hide();
+                })
+            });
+        } else {
+            cosmo.util.notify.showMessage(this.l10n.invalidUser);
         }
     },
 
     deleteUser: function(event){
-        var selection = userList.selection.getSelected();
+        var selection = this.userList.selection.getSelected();
         var usernames = [];
         for (var i in selection){
-            usernames.push(model.getRow(selection[i]).username);
-        }
-        if (confirm(dojo.string.substitute(this.l10n.confirmDelete, {usernames: usernames.join()}))){
-            for (var i in selection){
-                var rowIndex = selection[i];
-                userStore.deleteItem(model.getRow(rowIndex).__dojo_data_item);
+            var username = this.userList.model.getRow(selection[i]).username;
+            if (username == this.USERNAME_OVERLORD){
+                cosmo.util.notify.showMessage(this.l10n.deleteRoot);
+            } else {
+                usernames.push(username);
             }
-            userStore.save({
-                onComplete: function(){
-                    userList.model.remove(selection);
-                    userList.selection.clear();
-                }}
-                          );
+        }
+        if (usernames.length > 0){
+            if (confirm(dojo.string.substitute(this.l10n.confirmDelete, {usernames: usernames.join()}))){
+                for (var i in selection){
+                    var rowIndex = selection[i];
+                    this.store.deleteItem(this.userList.model.getRow(rowIndex).__dojo_data_item);
+                }
+                this.store.save({
+                    onComplete: dojo.hitch(this.userList, function(){
+                        this.model.remove(selection);
+                        this.selection.clear();
+                    })
+                });
+            }
         }
         
     },
 
-    DEFAULT_PASSWORD_VALUE: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
-
     constructor: function(){
         var DEFAULT_PASSWORD_VALUE = this.DEFAULT_PASSWORD_VALUE;
         var l10n = this.l10n;
+        this.validation = 
+            {username: {regExp:".{3,32}", required: true, 
+                        invalidMessage: l10n.usernameValid
+                       },
+             firstName: {regExp:".{1,128}", required: true,
+                         invalidMessage: l10n.firstNameValid
+                        },
+             lastName: {regExp:".{1,128}", required: true,
+                        invalidMessage: l10n.lastNameValid
+                       },
+             email: {regExp:dojox.regexp.emailAddress({allowLocal: true}), required: true,
+                     invalidMessage: l10n.emailValid
+               },
+             password: {regExp:".{5,16}", 
+                        invalidMessage: l10n.passwordValid,
+                        required: true
+                       }
+            };
+             
         this.userListLayout = [{
             cells: [[
                 {name: l10n.username, field: "username",
                  editor: dojox.grid.editors.Dijit,
                  editorClass: "dijit.form.ValidationTextBox",
-                 editorProps: {regExp:".{3,32}", required: true, 
-                               invalidMessage: l10n.usernameValid
-                              },
+                 editorProps: this.validation.username,
                  cellClasses: "rootNoChange"
                 },
                 {name: l10n.firstName, field: "firstName",
                  editor: dojox.grid.editors.Dijit,
                  editorClass: "dijit.form.ValidationTextBox",
-                 editorProps: {regExp:".{1,128}", required: true,
-                               invalidMessage: l10n.firstNameValid
-                              },
+                 editorProps: this.validation.firstName,
                  cellClasses: "rootNoChange"
                 },
                 {name: l10n.lastName, field: "lastName",
                  editor: dojox.grid.editors.Dijit,
                  editorClass: "dijit.form.ValidationTextBox",
-                 editorProps: {regExp:".{1,128}", required: true,
-                               invalidMessage: l10n.lastNameValid
-                              },
+                 editorProps: this.validation.lastName,
                  cellClasses: "rootNoChange"
                 },
                 {name: l10n.email,  field: "email", width: "10em",
                  editor: dojox.grid.editors.Dijit,
                  editorClass: "dijit.form.ValidationTextBox",
-                 editorProps: {regExp:dojox.regexp.emailAddress({allowLocal: true}), required: true,
-                               invalidMessage: l10n.emailValid
-                              }
+                 editorProps: this.validation.email
                 },
                 {name: l10n.password, field: "password", 
                  styles: "text-align: center;", value: this.DEFAULT_PASSWORD_VALUE,
@@ -136,9 +166,7 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
                          }, 50);
                      }
                  },
-                 editorProps: {regExp:".{5,16}", 
-                               invalidMessage: l10n.passwordValid
-                              }
+                 editorProps: dojo.mixin({type: "password"}, this.validation.password)
                 },
                 {name: l10n.created,  field: "dateCreated", width: "6.5em",  cellClasses: "noChange"},
                 {name: l10n.modified,  field: "dateModified", width: "6.5em", cellClasses: "noChange"},
@@ -151,7 +179,7 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
                  cellClasses: "rootNoChange"
                 },
                 {name: l10n.unactivated,  field: "unactivated", width: "6em",
-                 cellClasses: "noChange"
+                 cellClasses: "unactivatedCell", editor: dojox.grid.editors.CheckBox
                 },
                 {name: l10n.url,  field: "url", width: "auto",
                  cellClasses: "noChange"
@@ -186,12 +214,17 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
 
     postCreate: function(){
         var model = this.model;
-        dojo.connect(this.userList, "onStyleRow", function(inRow){
+        dojo.connect(this.userList, "onStyleRow", dojo.hitch(this, function(inRow){
             var row = model.getRow(inRow.index);
-            if (row && row.username == 'root'){
-                inRow.customClasses += " cosmoRootRow";
+            if (row){
+                if (row.username == this.USERNAME_OVERLORD){
+                    inRow.customClasses += " cosmoRootRow";
+                }
+                if (!row.unactivated){
+                    inRow.customClasses += " cosmoActivatedRow";
+                }
             }
-        });
+        }));
         dojo.connect(window, "onresize", dojo.hitch(this.userList, this.userList.update));
 
         this.userList.setStructure(this.userListLayout);

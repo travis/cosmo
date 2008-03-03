@@ -25,8 +25,6 @@
 
 <cosmo:standardLayout prefix="User.List." contentWrapperClass="foo">
 
-<cosmo:cnfmsg/>
-
 <script language="JavaScript">
 dojo.require("cosmo.ui.widget.UserList");
 </script>

@@ -19,6 +19,7 @@
     firstName: "First name",
     email: "Email",
     password: "Password",
+    confirm: "Confirm Password",
     created: "Created",
     modified: "Modified",
     locked: "Locked",
@@ -34,5 +35,8 @@
     attributeUpdateFailed: "${attr} update failed.",
     passwordConfirm: "Please retype the new password.",
     passwordMismatch: "Password not changed: passwords do not match.",
-    confirmDelete: "Are you sure you want to delete the following users: ${usernames}?"
+    confirmDelete: "Are you sure you want to delete the following users: ${usernames}?",
+    deleteRoot: "Can't delete super user 'root'",
+    alreadyActivated: "${username} has already been activated.",
+    invalidUser: "Invalid user details."
 })

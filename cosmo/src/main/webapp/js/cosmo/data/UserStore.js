@@ -285,11 +285,14 @@ dojo.declare("cosmo.data.UserStore", null, {
         if (!this._isEditable(item, attribute, value)) return false;
         
         var oldValue = item[attribute];
-        this.onSet(item, attribute, oldValue, value);
-        if (value != oldValue) {
+        if (attribute == "unactivated" && oldValue && !value){
+            item["doActivate"] = true;
+        }
+        else if (value != oldValue) {
             item[attribute] = value;
             this._modifiedItems[item.username] = item;
         }
+        this.onSet(item, attribute, oldValue, value);
 		return true; //boolean
 	},
     
@@ -320,8 +323,10 @@ dojo.declare("cosmo.data.UserStore", null, {
 			keywordArgs = {};
 		}
         var deferreds = [];
+        console.debug(this._modifiedItems);
 		for(var i in this._modifiedItems){
             var user = this._modifiedItems[i];
+            if (user.doActivate){deferreds.push(cosmo.cmp.activate(user.username));}
             deferreds.push(cosmo.cmp.modifyUser(user.username, user));
         }
         this._modifiedItems = {};

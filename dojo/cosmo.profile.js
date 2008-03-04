@@ -1,40 +1,29 @@
-// pull in the dependency list and define it in the var "dependencies". This
-// over-rides the default built into getDependencyList.js. The bootstrap and
-// hostenv files are included by default and don't need to be included here,
-// but you can change the hostenv file that's included by setting the value of
-// the variable "hostenvType" (defaults to "browser").
-var dependencies = [
-    "dojo.lang.*",
-    "dojo.debug.console",
-    "dojo.widget.*"
-];
+dependencies = {};
 
 dependencies.layers = [
-	{
-		name: "src/cosmo-login.js",
-		resourceName: "dojo.cosmo-login",
-		layerDependencies: [
-			"dojo.js"
-		],
-		dependencies: [
-			"dojo.cosmo-login"
-		]
-	},
     {
-		name: "src/cosmo-pim.js",
-		resourceName: "dojo.cosmo-pim",
-		layerDependencies: [
-			"dojo.js"
-		],
-		dependencies: [
-			"dojo.cosmo-pim"
-		]
-	}
+        name: "../cosmo/login.js",
+        resourceName: "cosmo.login",
+        dependencies: [
+            "cosmo.app",
+            "cosmo.account.create",
+            "cosmo.convenience",
+            "cosmo.ui.widget.LoginDialog",
+            "cosmo.ui.widget.ModalDialog",
+            "dojo.cookie"
+        ]
+    },
+    {
+        name: "../cosmo/pim.js",
+        resourceName: "cosmo.pim",
+        layerDependencies:["cosmo.login"],
+        dependencies: [
+            "cosmo.app.pim"
+        ]
+    }
 ];
 dependencies.prefixes = [
-                         [ "dijit", "../dijit" ],
-                         [ "dojox", "../dojox" ],
-                         ["cosmo", "../../cosmo/src/main/webapp/js/cosmo"]
+    [ "dijit", "../dijit" ],
+    [ "dojox", "../dojox" ],
+    ["cosmo", "../../../cosmo/src/main/webapp/js/cosmo", "../../../../cosmo/src/main/webapp/js/cosmo/copyright.txt"]
 ];
-
-load("getDependencyList.js");

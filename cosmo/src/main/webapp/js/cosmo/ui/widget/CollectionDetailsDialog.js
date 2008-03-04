@@ -35,8 +35,8 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
         displayedSelection: '', // The selection item to display if invoked from ticket view
 
         // Template stuff
-        templatePath:dojo.moduleUrl("cosmo") +
-            'ui/widget/templates/CollectionDetailsDialog.html',
+    templatePath: dojo.moduleUrl("cosmo",
+                                 'ui/widget/templates/CollectionDetailsDialog.html'),
 
         // Attach points
         table: null, //the table, which has pretty much all the content

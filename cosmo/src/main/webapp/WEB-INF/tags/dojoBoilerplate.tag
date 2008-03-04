@@ -45,7 +45,7 @@
 
     // Set isDebug to true to get nice dojo debugging messages.
 
-    var djConfig = {isDebug: true, 
+    var djConfig = {isDebug: false, 
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
                     i18nLocation: "${baseUrl}/i18n.js",
@@ -56,15 +56,15 @@
 </script>
 
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
-<script type="text/javascript" src="${dojoPath}/dojo.js.uncompressed.js"></script>
+<script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <script type="text/javascript">
 (function (){
-    dojo.registerModulePath("cosmo", "../../../cosmo");
-    dojo.require("cosmo.util.debug");
+//    dojo.registerModulePath("cosmo", "../../../cosmo");
+//    dojo.require("cosmo.util.debug");
 })();
 </script>
 <c:forEach var="layerName" items="${dojoLayers}">
-<script type="text/javascript" src="${dojoPath}/src/${layerName}.js"></script>
+<script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>
 </c:forEach>
 
 <script type="text/javascript">

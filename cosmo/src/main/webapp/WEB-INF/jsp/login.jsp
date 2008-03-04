@@ -36,20 +36,17 @@
       
     </title>
     <cosmo:staticbaseurl var="staticBaseUrl"/>
-    <cosmo:dojoBoilerplate dojoLayers="cosmo-login"/>
+    <cosmo:dojoBoilerplate dojoLayers="login"/>
     <cosmo:stylesheets stylesheets="login"/>
     <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
 
     <%--
         Login and account-creation stuff
-        Note: button.js still needed to do preloading of button images
     --%>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
     <script type="text/javascript">
 
         dojo.require("cosmo.app");
         dojo.require("cosmo.account.create");
-        dojo.require("cosmo.util.popup");
         dojo.require("cosmo.convenience");
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");

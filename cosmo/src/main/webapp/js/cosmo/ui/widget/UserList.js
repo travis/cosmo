@@ -35,7 +35,6 @@ dojo.requireLocalization("cosmo.ui.widget", "UserList");
 dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
     widgetsInTemplate: true,
     templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/UserList.html"),
-    l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "UserList"),
     USERNAME_OVERLORD: "root",
     DEFAULT_PASSWORD_VALUE: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
 
@@ -56,7 +55,6 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
 
     createNewUser: function(form){
         if (this.newUserForm.isValid()){
-            console.log("valid");
             this.store.newItem(form);
             this.store.save({
                 onComplete: dojo.hitch(this, function(){
@@ -106,7 +104,8 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
 
     constructor: function(){
         var DEFAULT_PASSWORD_VALUE = this.DEFAULT_PASSWORD_VALUE;
-        var l10n = this.l10n;
+        var l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "UserList");
+        this.l10n = l10n;
         this.validation = 
             {username: {regExp:".{3,32}", required: true, 
                         invalidMessage: l10n.usernameValid

@@ -24,6 +24,7 @@
 <%@ attribute name="selfLink"        %>
 <%@ attribute name="stylesheets"     %>
 <%@ attribute name="parseWidgets"    %>
+<%@ attribute name="dojoLayers"        %>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
@@ -73,7 +74,7 @@
     <link rel="self" type="text/html" href="${selfLink }"/>
     </c:if>
 
-    <cosmo:dojoBoilerplate parseWidgets="${parseWidgets}"/>
+    <cosmo:dojoBoilerplate parseWidgets="${parseWidgets}" dojoLayers="${dojoLayers}"/>
     <style type="text/css">
       /* tundraGrid.css matches Dijit Tundra style.  Others forthcoming.
       Use Grid.css on the same path for a more color-neutral theme */

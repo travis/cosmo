@@ -13,6 +13,12 @@ dependencies.layers = [
         layerDependencies:["cosmo.login"],
         dependencies: [
         ]
+    },
+    {
+        name: "../cosmo/userlist.js",
+        layerDependencies:["../cosmo/userlist.js"],
+        dependencies: [
+        ]
     }
 ];
 dependencies.prefixes = [

@@ -23,7 +23,7 @@
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
-<cosmo:standardLayout prefix="User.List." contentWrapperClass="foo">
+<cosmo:standardLayout prefix="User.List." contentWrapperClass="foo" dojoLayers="userlist">
 
 <script language="JavaScript">
 dojo.require("cosmo.ui.widget.UserList");

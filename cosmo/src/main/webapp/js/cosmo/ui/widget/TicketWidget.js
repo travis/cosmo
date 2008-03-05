@@ -39,14 +39,16 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
     templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/TicketWidget.html"),
 
     widgetsInTemplate: true,
-    l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "TicketWidget"),
-    
     itemId: "",
     timeoutRE: dojo.number._integerRegexp(),
 
     privDict: {'ro': '<D:read/>',
             'rw': '<D:read/><D:write/>',
             'fb': '<D:freebusy/>'},
+
+    constructor: function(){
+        this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "TicketWidget");
+    },
 
     execute: function(form){
         if (this.form.isValid()){

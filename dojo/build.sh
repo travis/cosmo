@@ -14,7 +14,8 @@ fi
 
 cd ..
 
-gzip -9c ../release/dojo/dojo/dojo.js > ../release/dojo/dojo/dojo.js.gzip-compressed
-gzip -9c ../release/dojo/cosmo/pim.js > ../release/dojo/cosmo/pim.js.gzip-compressed
-gzip -9c ../release/dojo/cosmo/login.js > ../release/dojo/cosmo/login.js.gzip-compressed
+gzip -9c ../release/dojo/dojo/dojo.js > ../release/dojo/dojo/dojo.js.gzip-compressed.js
+gzip -9c ../release/dojo/cosmo/pim.js > ../release/dojo/cosmo/pim.js.gzip-compressed.js
+gzip -9c ../release/dojo/cosmo/login.js > ../release/dojo/cosmo/login.js.gzip-compressed.js
+gzip -9c ../release/dojo/cosmo/userlist.js > ../release/dojo/cosmo/userlist.js.gzip-compressed.js
 

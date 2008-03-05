@@ -3,7 +3,6 @@ dependencies = {};
 dependencies.layers = [
     {
         name: "../cosmo/login.js",
-        resourceName: "cosmo.login",
         dependencies: [
             "cosmo.app",
             "cosmo.account.create",
@@ -15,10 +14,18 @@ dependencies.layers = [
     },
     {
         name: "../cosmo/pim.js",
-        resourceName: "cosmo.pim",
-        layerDependencies:["cosmo.login"],
+        layerDependencies:["../cosmo/login.js"],
         dependencies: [
-            "cosmo.app.pim"
+            "cosmo.app.pim",
+            "cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
+            "cosmo.ui.event.listeners"
+        ]
+    },
+    {
+        name: "../cosmo/userlist.js",
+        layerDependencies:["../cosmo/userlist.js"],
+        dependencies: [
+            "cosmo.ui.widget.UserList"
         ]
     }
 ];

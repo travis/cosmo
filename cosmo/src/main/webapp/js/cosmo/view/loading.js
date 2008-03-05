@@ -32,12 +32,11 @@ cosmo.view.loading.StatusMessage = function (p) {
 
     this.renderSelf = function () {
         if (!this.hasBeenRendered) {
-            cosmo.util.html.setOpacity(this.domNode, 0);
             this.domNode.innerHTML = _('App.Status.LoadingCollection');
             this.domNode.style.width = this.width + 'px';
             this.domNode.style.height = this.height + 'px';
             this.domNode.style.lineHeight = this.height + 'px';
-            this.domNode.style.zIndex = 1000;
+            this.hide(1);
         }
         var left = ((this.parent.width - this.width) /  2);
         var top = ((this.parent.height - this.height) /  2);
@@ -47,15 +46,17 @@ cosmo.view.loading.StatusMessage = function (p) {
         if (cosmo.view.loading.statusProcessing) { return false; }
         cosmo.view.loading.statusProcessing = true;
         this.domNode.style.zIndex = 1000;
-        cosmo.util.html.setOpacity(this.domNode, 0.8);
+        dojo.fadeIn({node: this.domNode, duration: 1}).play();
     };
-    this.hide = function () {
-        var f = function () {
-            cosmo.view.loading.statusProcessing = false;
-            self.domNode.style.zIndex = -1;
-        };
-        dojo.fadeOut({node: this.domNode, duration: 1000,
-                      easing: f}).play();
+    this.hide = function (duration) {
+        console.log("load hide")
+        dojo.fadeOut({node: this.domNode, 
+                      duration: duration || 500,
+                      onEnd: dojo.hitch(this, function () {
+                          cosmo.view.loading.statusProcessing = false;
+                          this.domNode.style.zIndex = -1;
+                      })
+                     }).play();
     };
 
     dojo.subscribe('cosmo:calEventsLoadSuccess', 

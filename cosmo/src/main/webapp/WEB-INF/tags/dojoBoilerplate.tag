@@ -43,8 +43,8 @@
 
 <script type="text/javascript">
 
-    // Set isDebug to true to get nice dojo debugging messages.
-
+    // Set isDebug to true to get nice dojo debugging messages
+    // and to grab javascript from /js/cosmo instead of /js/lib/dojo/cosmo
     var djConfig = {isDebug: false, 
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
@@ -57,19 +57,13 @@
 
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
-<script type="text/javascript">
-(function (){
-//    dojo.registerModulePath("cosmo", "../../../cosmo");
-//    dojo.require("cosmo.util.debug");
-})();
-</script>
 <c:forEach var="layerName" items="${dojoLayers}">
 <script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>
 </c:forEach>
 
 <script type="text/javascript">
-
-function bootstrap(){
+(function bootstrap(){
+    if (djConfig.isDebug) dojo.registerModulePath("cosmo", "../../../cosmo");
     dojo.require("cosmo.env");
     cosmo.env.setVersion("${PRODUCT_VERSION}");
     dojo.require("cosmo.ui.conf");
@@ -89,8 +83,6 @@ function bootstrap(){
         cosmo.datetime.timezone.setTimezoneRegistry(registry);
     }
     dojo.require('cosmo.ui.conf');
-}
-bootstrap();
-
+})();
 </script>
 

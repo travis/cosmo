@@ -45,15 +45,16 @@ cosmo.view.loading.StatusMessage = function (p) {
     this.show = function () {
         if (cosmo.view.loading.statusProcessing) { return false; }
         cosmo.view.loading.statusProcessing = true;
+        this.domNode.style.visibility = "visible";
         this.domNode.style.zIndex = 1000;
         dojo.fadeIn({node: this.domNode, duration: 1}).play();
     };
     this.hide = function (duration) {
-        console.log("load hide")
         dojo.fadeOut({node: this.domNode, 
                       duration: duration || 500,
                       onEnd: dojo.hitch(this, function () {
                           cosmo.view.loading.statusProcessing = false;
+                          this.domNode.style.visibility = "hidden";
                           this.domNode.style.zIndex = -1;
                       })
                      }).play();

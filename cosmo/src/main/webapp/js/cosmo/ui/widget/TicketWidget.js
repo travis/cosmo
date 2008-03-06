@@ -67,8 +67,7 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
 		               {
                            contentType: 'text/xml',
 			               postData: content,
-                           url: cosmo.env.getBaseUrl() + "/dav" + this.itemId,
-                           
+                           url: cosmo.env.getBaseUrl() + "/dav" + this.itemId
         	           }
                       );
             request.headers['X-Http-Method-Override'] =  "MKTICKET";
@@ -85,5 +84,4 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
    	createFailure: function(error){
 		alert("Ticket not created. Error: " + error.message);
    	}
-} 
-            );
+});

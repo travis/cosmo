@@ -133,7 +133,7 @@ dojo.declare(
                         {"prompt":_("Main.CollectionAdd.RedirectPrompt")}
                     );
                     // Log the user into Cosmo and display the current collection
-                    //location = cosmo.env.getBaseUrl() + '/pim/collection/' + collection.getUid();
+                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + collection.getUid();
                 }
 
                 // Called by clicking on the "Add to my account...: link

@@ -536,8 +536,8 @@
     padding: 4px;
 }
 #newCollectionDiv {
-    width: 100%;
-    padding: 3px;
+    padding-top: 3px;
+    padding-left: 3px;
 }
 
 /* Minical styles

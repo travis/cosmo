@@ -61,7 +61,7 @@ cosmo.ui.detail = new function () {
             }
 
             this.item.makeSnapshot();
-            dojo.publish('cosmo:calSaveConfirm' [{delta: delta, data: this.item }]);
+            dojo.publish('cosmo:calSaveConfirm', [{delta: delta, data: this.item }]);
         }
     };
 

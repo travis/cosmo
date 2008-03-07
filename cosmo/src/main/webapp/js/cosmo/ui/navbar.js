@@ -49,7 +49,9 @@ cosmo.ui.navbar.Bar = function (p) {
     this.defaultViewHasBeenInitialized = false;
     this.calViewNav = new cosmo.ui.navbar.CalViewNav({ parent: this });
     this.quickItemEntry = new cosmo.ui.navbar.QuickItemEntry({ parent: this });
-    this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this });
+    this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this, 
+                                                         listCanvas: p.listCanvas
+                                                       });
 
     for (var n in params) { this[n] = params[n]; }
 
@@ -465,12 +467,13 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
 cosmo.ui.navbar.QuickItemEntry.prototype = new cosmo.ui.ContentBox();
 
 cosmo.ui.navbar.ListPager = function (p) {
+    var self = this;
     var params = p || {};
     this.parent = params.parent;
+    this.listCanvas = p.listCanvas;
     this.domNode = _createElem('div');
     this.prevButton = null;
     this.nextButton = null;
-
     this.renderSelf = function () {
         var form = null;
         // Go-to page num

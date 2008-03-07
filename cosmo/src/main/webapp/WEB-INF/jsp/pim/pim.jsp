@@ -60,7 +60,6 @@
 <cosmo:dojoBoilerplate timezones="true" dojoLayers="login,pim"/>
 
 <script type="text/javascript">
-console.debug("abc")
 // Dojo requires
 dojo.require('cosmo.app');
 dojo.require('cosmo.app.pim.layout');

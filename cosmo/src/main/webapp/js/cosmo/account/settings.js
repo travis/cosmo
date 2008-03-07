@@ -169,11 +169,15 @@ cosmo.account.settings = new function () {
             var c = null; // For dialog content area
             c = new cosmo.ui.widget.TabContainer({tabs: tabs});
             o.content = c;
-            b = new cosmo.ui.widget.Button({ text:_('App.Button.Close'),
+            b = new cosmo.ui.widget.Button({ 
+                text:_('App.Button.Close'),
+                id: "settingsAdvancedClose",                             
                 width:60, small: true, handleOnClick: function () {
                     cosmo.app.hideDialog(); } });
             o.btnsLeft = [b];
-            b = new cosmo.ui.widget.Button({ text:_('App.Button.Save'),
+            b = new cosmo.ui.widget.Button({ 
+                text:_('App.Button.Save'),
+                id: "settingsAdvancedSave",                             
                 width:60, small: true, handleOnClick: f });
             o.btnsRight = [b];
             o.defaultAction = f;

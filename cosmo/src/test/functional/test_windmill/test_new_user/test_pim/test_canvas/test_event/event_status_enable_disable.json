@@ -7,14 +7,14 @@
 
 //make the end time == start time, making it a an @time event
 {"params": {"text": "9:00", "id": "endTime"},  "method": "type"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 
 //ensure that eventStatus is disabled (as it should be for @time)
 {"params": {"validator": "disabled|true", "id": "eventStatus"},  "method": "asserts.assertProperty"}
 
 //make the event all day
 {"params": {"id": "eventAllDay"},  "method": "check"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"params": {"milliseconds": 3000},  "method": "waits.sleep"}
 
 //all day events can have event status
@@ -22,7 +22,7 @@
 
 //turn off all day checkbox, making it any time
 {"params": {"id": "eventAllDay"},  "method": "check"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"params": {"milliseconds": 3000},  "method": "waits.sleep"}
 
 //event status should be disabled for any time events

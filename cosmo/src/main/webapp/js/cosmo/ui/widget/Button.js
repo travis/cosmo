@@ -115,6 +115,7 @@ dojo.declare("cosmo.ui.widget.Button", [dijit._Widget, dijit._Templated], {
         }
     },
     _handleOnClick: function() {
+        console.log("button click");
         if (this.enabled) {
            this.handleOnClick();
         }

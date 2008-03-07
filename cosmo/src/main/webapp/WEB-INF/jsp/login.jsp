@@ -59,7 +59,7 @@
             dojo.cookie('username', null, {expires: -1});
             cosmo.util.auth.clearAuth();
             cosmo.app.init();
-            if (dojo.queryToObject(location.search)['signup']
+            if (dojo.queryToObject(location.search.substring(1))['signup']
                 == 'true'){
                 cosmo.account.create.showForm();
             }

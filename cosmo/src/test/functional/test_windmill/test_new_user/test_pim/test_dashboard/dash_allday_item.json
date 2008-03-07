@@ -9,4 +9,4 @@
 {"params": {"id": "eventAllDay"},  "method": "click"}
 {"params": {"text": "8\/06\/2007", "id": "startDate"},  "method": "type"}
 {"params": {"text": "8\/06\/2007", "id": "endDate"},  "method": "type"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}

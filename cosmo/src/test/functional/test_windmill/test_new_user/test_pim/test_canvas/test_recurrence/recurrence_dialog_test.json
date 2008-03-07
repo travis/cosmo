@@ -3,34 +3,34 @@
 {"params": {"id": "hourDiv0-900"},  "method": "doubleClick"}
 {"method": "waits.sleep", "params": {"milliseconds" : 1500}}
 {"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"id": "hourDiv0-1030"},  "method": "doubleClick"}
 {"method": "waits.sleep", "params": {"milliseconds" : 1500}}
 {"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"id": "hourDiv0-1300"},  "method": "doubleClick"}
 {"method": "waits.sleep", "params": {"milliseconds" : 1500}}
 {"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"jsid": "cosmo.view.cal.itemRegistry.getCurrent().id"},  "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Mazatlan", "id": "tzId"},  "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Barbados", "id": "tzId"},  "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
 {"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
 {"method": "select", "params": {"id" : "tzRegion", "option": "America"}}
 {"params": {"option": "Miquelon", "id": "tzId"},  "method": "select"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 500}}
 {"params": {"jsid": "{$btnsRight1}"}, "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}

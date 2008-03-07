@@ -44,6 +44,7 @@ if (!(rowData.username == "root" &&
         <tr>
           <td><label for="loc">${l10n.username}: </label></td>
           <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}Username"
                      name="username" regExp="${validation.username.regExp}" 
                      required="${validation.username.required}"
                      invalidMessage="${validation.username.invalidMessage}"></td>
@@ -51,6 +52,7 @@ if (!(rowData.username == "root" &&
         <tr>
           <td><label for="loc">${l10n.firstName}: </label></td>
           <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}FirstName"
                      name="firstName" regExp="${validation.firstName.regExp}" 
                      required="${validation.firstName.required}"
                      invalidMessage="${validation.firstName.invalidMessage}"></td>
@@ -58,6 +60,7 @@ if (!(rowData.username == "root" &&
         <tr>
           <td><label for="loc">${l10n.lastName}: </label></td>
           <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}LastName"
                      name="lastName" regExp="${validation.lastName.regExp}" 
                      required="${validation.lastName.required}"
                      invalidMessage="${validation.lastName.invalidMessage}"></td>
@@ -65,6 +68,7 @@ if (!(rowData.username == "root" &&
         <tr>
           <td><label for="loc">${l10n.email}: </label></td>
           <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}Email"
                      name="email" regExp="${validation.email.regExp}" 
                      required="${validation.email.required}"
                      invalidMessage="${validation.email.invalidMessage}"></td>
@@ -72,6 +76,7 @@ if (!(rowData.username == "root" &&
         <tr>
           <td><label for="loc">${l10n.password}: </label></td>
           <td><input dojoType="dijit.form.ValidationTextBox" type="password" 
+                     id="${id}Password"
                      name="password" regExp="${validation.password.regExp}" 
                      required="${validation.password.required}"
                      invalidMessage="${validation.password.invalidMessage}"></td>
@@ -79,13 +84,16 @@ if (!(rowData.username == "root" &&
         <tr>
           <td><label for="desc">${l10n.confirm}: </label></td>
           <td><input dojoType="dijit.form.ValidationTextBox" type="password" 
+                     id="${id}Confirm"
                      name="confirm" regExp="${validation.password.regExp}" 
                      required="${validation.password.required}"
                      invalidMessage="${validation.password.invalidMessage}"></td>
         </tr>
         <tr>
           <td colspan="2" align="center">
-            <button dojoType="dijit.form.Button" type="submit">OK</button></td>
+            <button id="${id}Submit"
+                    dojoType="dijit.form.Button" 
+                    type="submit">${l10n.ok}</button></td>
         </tr>
       </table>
       </form>

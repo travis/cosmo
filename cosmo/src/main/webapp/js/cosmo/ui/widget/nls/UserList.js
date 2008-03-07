@@ -38,5 +38,6 @@
     confirmDelete: "Are you sure you want to delete the following users: ${usernames}?",
     deleteRoot: "Can't delete super user 'root'",
     alreadyActivated: "${username} has already been activated.",
-    invalidUser: "Invalid user details."
+    invalidUser: "Invalid user details.",
+    ok: "OK"
 })

@@ -4,7 +4,7 @@ login_with_root_lab_json = """{"method": "type", "params": {"id" : "loginDialogU
 {"params": {"milliseconds": 500}, "method": "waits.sleep"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}
-{"method": "waits.forElement", "params": {"id": "contentWrapper", "timeout": 40000}}"""
+{"method": "waits.forElement", "params": {"id": "main", "timeout": 40000}}"""
 
 login_with_root_snarf_json = """{"method": "click", "params": {"link" : "Log in to Chandler Server"}}
 {"method": "waits.forElement", "params": {"id": "loginDialogFormContainer", "timeout": 40000}}
@@ -15,7 +15,7 @@ login_with_root_snarf_json = """{"method": "click", "params": {"link" : "Log in 
 {"params": {"milliseconds": 500}, "method": "waits.sleep"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}
-{"method": "waits.forElement", "params": {"id": "contentWrapper", "timeout": 40000}}"""
+{"method": "waits.forElement", "params": {"id": "main", "timeout": 40000}}"""
 
 logout = """{"method": "click", "params": {"link" : "Log out"}}
 {"params": {"url": "\/"}, "method": "open"}

@@ -51,7 +51,7 @@ ticket_view_settings = """
 
 from windmill.authoring import enable_collector, RunJsonFile
 import windmill
-lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://trunk.osaf.us']
+lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://d10test.osaf.us', 'http://trunk.osaf.us']
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:

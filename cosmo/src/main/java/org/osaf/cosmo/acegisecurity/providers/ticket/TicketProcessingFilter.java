@@ -16,8 +16,6 @@
 package org.osaf.cosmo.acegisecurity.providers.ticket;
 
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -31,10 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.server.ServerUtils;
 
 /**

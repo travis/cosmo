@@ -21,30 +21,24 @@ import java.io.InputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
-
 import org.osaf.cosmo.dav.BadRequestException;
+import org.osaf.cosmo.dav.DavContent;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.ForbiddenException;
-import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
-import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.property.ContentLanguage;
 import org.osaf.cosmo.dav.property.ContentLength;
 import org.osaf.cosmo.dav.property.ContentType;
 import org.osaf.cosmo.dav.property.DavProperty;
-import org.osaf.cosmo.dav.property.Etag;
-import org.osaf.cosmo.dav.property.LastModified;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.FileItem;
-import org.osaf.cosmo.model.ModelValidationException;
 
 /**
  * Extends <code>DavResourceBase</code> to adapt the Cosmo

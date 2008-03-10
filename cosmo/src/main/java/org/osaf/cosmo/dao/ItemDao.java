@@ -90,7 +90,7 @@ public interface ItemDao extends Dao {
     /**
      * Copy an item to the given path
      * @param item item to copy
-     * @param path path to copy item to
+     * @param destPath destination path to copy item to
      * @param deepCopy true for deep copy, else shallow copy will
      *                 be performed
      * @throws org.osaf.cosmo.model.ItemNotFoundException
@@ -98,7 +98,7 @@ public interface ItemDao extends Dao {
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
      */
-    public void copyItem(Item item, String path, boolean deepCopy);
+    public void copyItem(Item item, String destPath, boolean deepCopy);
     
   
     /**
@@ -149,6 +149,13 @@ public interface ItemDao extends Dao {
     public Set<Ticket> getTickets(Item item);
 
     /**
+     * Find ticket for ticket key.
+     * @param key ticket key
+     * @return Ticket corresponding to key
+     */
+    public Ticket findTicket(String key);
+    
+    /**
      * Returns the identified ticket on the given item, or
      * <code>null</code> if the ticket does not exists. Tickets are
      * inherited, so if the specified item does not have the ticket
@@ -175,7 +182,7 @@ public interface ItemDao extends Dao {
      * @param collection the collection to add to
      */
     public void addItemToCollection(Item item, CollectionItem collection);
-    
+
     /**
      * Remove item from a collection.
      *

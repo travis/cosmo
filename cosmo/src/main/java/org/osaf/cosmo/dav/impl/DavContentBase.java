@@ -32,8 +32,10 @@ import org.osaf.cosmo.dav.DavContent;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
+import org.osaf.cosmo.dav.LockedException;
 import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.property.DavProperty;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.MessageStamp;
@@ -171,4 +173,16 @@ public abstract class DavContentBase extends DavItemResourceBase
     protected Set<String> getDeadPropertyFilter() {
         return DEAD_PROPERTY_FILTER;
     }
+
+    @Override
+    protected void updateItem() throws DavException {
+        try {
+            getContentService().updateContent((ContentItem) getItem());
+        } catch (CollectionLockedException e) {
+            throw new LockedException();
+        }
+
+    }
+    
+    
 }

@@ -17,8 +17,11 @@ package org.osaf.cosmo.mc;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -46,11 +49,11 @@ import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
@@ -67,6 +70,7 @@ public class StandardMorseCodeController implements MorseCodeController {
     private UserService userService;
     private CosmoSecurityManager securityManager;
     private EntityFactory entityFactory;
+    private static final HashSet<String> EMPTY_TICKETS = new HashSet<String>(0);
 
     /**
      * Returns information about every collection in the user's home
@@ -76,7 +80,7 @@ public class StandardMorseCodeController implements MorseCodeController {
      * to be described
      * @param locator the service locator used to resolve collection URLs
      *
-     * @throws DataRetrievalFailureException if the user is not found
+     * @throws UnknownUserException if the user is not found
      * @throws MorseCodeException if an unknown error occurs
      */
     public CollectionService discoverCollections(String username,
@@ -85,6 +89,9 @@ public class StandardMorseCodeController implements MorseCodeController {
             log.debug("discovering collections for " + username);
 
         User user = userService.getUser(username);
+        if(user==null)
+            throw new UnknownUserException(username);
+        
         HomeCollectionItem home = contentService.getRootItem(user);
 
         return new CollectionService(home, locator,
@@ -111,7 +118,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         if (item == null)
             throw new UnknownCollectionException(uid);
         if (! (item instanceof CollectionItem))
-            throw new NotCollectionException(uid);
+            throw new NotCollectionException(item);
 
         contentService.removeCollection((CollectionItem)item);
     }
@@ -133,7 +140,6 @@ public class StandardMorseCodeController implements MorseCodeController {
      * and the items with which it is initially populated
      * @param ticketTypes a set of ticket types to create on the
      * collection, one per type
-     *
      * @returns the initial <code>SyncToken</code> for the collection
      * @throws IllegalArgumentException if the authenticated principal
      * is not a <code>User</code> but no parent uid was specified
@@ -169,8 +175,18 @@ public class StandardMorseCodeController implements MorseCodeController {
         else {
             Item parentItem = contentService.findItemByUid(parentUid);
             if (! (parentItem instanceof CollectionItem))
-                throw new NotCollectionException("Parent item not a collection");
+                throw new NotCollectionException(parentItem);
             parent = (CollectionItem) parentItem;
+        }
+        
+        // check for existing collection
+        try {
+            if(contentService.findItemByUid(uid)!=null)
+                throw new CollectionExistsException(uid);
+        } catch (CosmoSecurityException e) {
+            // Security exception will be thrown for existing collections
+            // that aren't owned by user
+            throw new CollectionExistsException(uid);
         }
 
         CollectionItem collection = entityFactory.createCollection();
@@ -190,21 +206,22 @@ public class StandardMorseCodeController implements MorseCodeController {
         CalendarCollectionStamp ccs = entityFactory.createCalendarCollectionStamp(collection);
         collection.addStamp(ccs);
 
-        Set<Item> children = recordsToItems(records.getRecordSets(),
+        Set<Item> toUpdate = recordsToItems(records.getRecordSets(),
                                             collection);
 
         for (TicketType type : ticketTypes)
             collection.addTicket(entityFactory.createTicket(type));
-
+        
         // throws UidinUseException
         try {
-            collection = contentService.createCollection(parent, collection, children);
+            collection = contentService.createCollection(parent, collection,
+                    toUpdate);
         } catch (IcalUidInUseException e) {
             throw new UidConflictException(e);
         } catch (ModelValidationException e) {
             throw new ValidationException(e.getMessage());
         }
-       
+        
         return new PubCollection(collection);
     }
 
@@ -230,7 +247,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         if (item == null)
             throw new UnknownCollectionException(uid);
         if (! (item instanceof CollectionItem))
-            throw new NotCollectionException(uid);
+            throw new NotCollectionException(item);
         CollectionItem collection = (CollectionItem) item;
 
         SubRecords subRecords = new SubRecords(collection, getAllItems(collection));
@@ -278,7 +295,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         if (item == null)
             throw new UnknownCollectionException(uid);
         if (! (item instanceof CollectionItem))
-            throw new NotCollectionException(uid);
+            throw new NotCollectionException(item);
         CollectionItem collection = (CollectionItem) item;
 
         // If collection hasn't changed, don't bother querying for children
@@ -325,7 +342,6 @@ public class StandardMorseCodeController implements MorseCodeController {
      * the collection
      * @param records the EIM records describing the collection and
      * the items with which it is updated
-     *
      * @returns a new <code>SyncToken</code> that invalidates any
      * previously issued
      * @throws UnknownCollectionException if the specified collection
@@ -351,7 +367,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         if (item == null)
             throw new UnknownCollectionException(uid);
         if (! (item instanceof CollectionItem))
-            throw new NotCollectionException(uid);
+            throw new NotCollectionException(item);
         CollectionItem collection = (CollectionItem) item;
 
         if (! token.isValid(collection)) {
@@ -366,13 +382,15 @@ public class StandardMorseCodeController implements MorseCodeController {
         if(records.getHue()!=null)
             collection.setHue(records.getHue());
 
-        Set<Item> children = recordsToItems(records.getRecordSets(),
+        Set<Item> toUpdate = recordsToItems(records.getRecordSets(),
                                             collection);
-
+        
         try {
             // throws CollectionLockedException, and may throw
             // ConcurrencyFailureException
-            collection = contentService.updateCollection(collection, children);
+            collection = contentService.updateCollection(collection,
+                    toUpdate);
+            
         } catch (OptimisticLockingFailureException cfe) {
             // This means the data has been updated since the last sync token,
             // so a StaleCollectionException should be thrown
@@ -383,6 +401,7 @@ public class StandardMorseCodeController implements MorseCodeController {
             throw new ValidationException(e.getMessage());
         }
 
+        
         return new PubCollection(collection);
     }
 
@@ -452,9 +471,14 @@ public class StandardMorseCodeController implements MorseCodeController {
 
     private Set<Item> recordsToItems(EimRecordSetIterator i,
                                      CollectionItem collection) {
+       
+        // All child item for collection (both current and new) indexed by Uid
+        HashMap<String, Item> allChildrenByUid = new HashMap<String, Item>();
+        LinkedHashSet<Item> children = new LinkedHashSet<Item>();
         
-        // The set of items that need to be updated/created/deleted
-        HashSet<Item> children = new HashSet<Item>();
+        // Index all existing children
+        for(Item child: collection.getChildren())
+            allChildrenByUid.put(child.getUid(), child);
         
         try {
             while (i.hasNext()) {
@@ -471,12 +495,10 @@ public class StandardMorseCodeController implements MorseCodeController {
                     // a new modification NoteItem needs to be created
                     if(child instanceof NoteOccurrence) {
                         if(recordset.isDeleted()==false)
-                            child = createChildItem((NoteOccurrence) child, collection, recordset);
+                            child = createChildItem((NoteOccurrence) child, collection, recordset, allChildrenByUid);
                         else
                             child = null;
                     }
-                    else if(child!=null && recordset.isDeleted()==false)
-                        collection.getChildren().add(child);
                     
                     // Handle case where recordset is to be deleted, but the
                     // target item doesn't exist.
@@ -485,14 +507,16 @@ public class StandardMorseCodeController implements MorseCodeController {
                                 "Tried to delete child item "
                                         + recordset.getUuid()
                                         + " , but it does not exist");
-                    
-                    
+                   
                     // Handle case where item doesn't exist, so create a new one
                     if(child==null)
-                        child = createChildItem(collection, recordset);
-                    
+                        child = createChildItem(collection, recordset, allChildrenByUid);
+                   
                     children.add(child);
+                    
+                    // apply recordset
                     new ItemTranslator(child).applyRecords(recordset);
+                    
                 } catch (EimValidationException e) {
                     throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
                 }
@@ -507,43 +531,42 @@ public class StandardMorseCodeController implements MorseCodeController {
 
     // creates a new item and adds it as a child of the collection
     private ContentItem createChildItem(CollectionItem collection,
-                                        EimRecordSet recordset) {
-        ContentItem child = createBaseChildItem(collection, recordset);
+                                        EimRecordSet recordset,
+                                        Map<String, Item> allChildrenByUid) {
+        ContentItem child = createBaseChildItem(collection, recordset, allChildrenByUid);
         if(child.getUid().contains(ModificationUid.RECURRENCEID_DELIMITER))
-            handleModificationItem((NoteItem) child, collection);
+            handleModificationItem((NoteItem) child, allChildrenByUid);
         return child;
     }
     
     //  creates a new item based off a NoteOccurrence
     private ContentItem createChildItem(NoteOccurrence occurrence, 
                                         CollectionItem collection,
-                                        EimRecordSet recordset) {
-        NoteItem child = (NoteItem) createBaseChildItem(collection, recordset);
+                                        EimRecordSet recordset,
+                                        Map<String, Item> allChildrenByUid) {
+        NoteItem child = (NoteItem) createBaseChildItem(collection, recordset, allChildrenByUid);
         child.setModifies(occurrence.getMasterNote());
         return child;
     }
     
     private ContentItem createBaseChildItem(CollectionItem collection,
-                                        EimRecordSet recordset) {
+                                        EimRecordSet recordset,
+                                        Map<String, Item> allChildrenByUid) {
         NoteItem child = entityFactory.createNote();
 
         child.setUid(recordset.getUuid());
         child.setIcalUid(child.getUid());
         child.setOwner(collection.getOwner());
         
-        // Add reference to parent collection so that applicator can
-        // access parent (and children) if necessary
-        child.getParents().add(collection);
-        
-        // add new item to parent's children
-        collection.getChildren().add(child);
+        allChildrenByUid.put(child.getUid(), child);
         
         return child;
     }
     
-    private boolean handleModificationItem(NoteItem noteMod, CollectionItem collection) {
+    private boolean handleModificationItem(NoteItem noteMod,
+            Map<String, Item> allChildrenByUid) {
         ModificationUid modUid = null;
-        
+
         try {
             modUid = new ModificationUid(noteMod.getUid());
         } catch (ModelValidationException e) {
@@ -554,13 +577,12 @@ public class StandardMorseCodeController implements MorseCodeController {
         String parentUid = modUid.getParentUid();
         
         // Find parent note item by looking through collection's children.
-        for (Item child : collection.getChildren()) {
-            if (child.getUid().equals(parentUid) && child instanceof NoteItem) {
-                noteMod.setModifies((NoteItem) child);
-                return true;
-            }
+        Item parentNote = allChildrenByUid.get(parentUid);
+        if (parentNote!=null && parentNote instanceof NoteItem) {
+            noteMod.setModifies((NoteItem) parentNote);
+            return true;
         }
-        
+       
         // mods should not have icaluid as its inherited from the master
         noteMod.setIcalUid(null);
         

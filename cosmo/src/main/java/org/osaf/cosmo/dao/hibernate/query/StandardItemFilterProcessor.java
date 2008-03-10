@@ -144,8 +144,8 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
         
         // filter on parent
         if(filter.getParent()!=null) {
-            selectBuf.append(" join i.parents parent");
-            appendWhere(whereBuf, "parent=:parent");
+            selectBuf.append(" join i.parentDetails pd");
+            appendWhere(whereBuf, "pd.primaryKey.collection=:parent");
             params.put("parent", filter.getParent());
         }
         

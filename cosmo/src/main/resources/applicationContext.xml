@@ -128,6 +128,7 @@
             <value>org.osaf.cosmo.model.hibernate.HibCalendarAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp</value>			
             <value>org.osaf.cosmo.model.hibernate.HibCollectionItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibCollectionItemDetails</value>
             <value>org.osaf.cosmo.model.hibernate.HibCollectionSubscription</value>
             <value>org.osaf.cosmo.model.hibernate.HibContentData</value>
             <value>org.osaf.cosmo.model.hibernate.HibContentItem</value>
@@ -208,6 +209,33 @@
     </property>
   </bean>
   
+  <!--  Security Advice -->
+  <aop:aspectj-autoproxy/>
+  
+  <!--  Monitors all service calls (well ContentService for now) and
+        logs and calls that aren't secured by advice in SecurityAdvice 
+   -->
+  <bean id="securityAdviceMonitorAspect" class="org.osaf.cosmo.security.aop.SecurityAdviceMonitor">
+    <property name="order" value="4"/>
+  </bean>
+  
+  <!--  Intercepts service calls and verifies current principal has sufficient
+        privileges to execute
+   -->
+  <bean id="securityAspect" init-method="init" class="org.osaf.cosmo.security.aop.SecurityAdvice">
+    <property name="securityManager">
+      <ref local="securityManager" />
+    </property>
+    <property name="contentDao">
+      <ref local="contentDao" />
+    </property>
+    <property name="userDao">
+      <ref local="userDao" />
+    </property>
+    <property name="order" value="5"/>
+    <property name="enabled" value="true"/>
+  </bean>
+  
   <!--  Transaction Definitions -->
   
   <!-- Transaction manager for a single Hibernate SessionFactory
@@ -243,6 +271,13 @@
   <bean id="timingAdvice" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
     <property name="loggerName" value="org.osaf.cosmo.perf" />
   </bean>
+  
+   <!-- Throw away Hibernate Session and bind new one on errors -->
+  <bean id="throwAwayHibernateSessionAdvice" class="org.osaf.cosmo.hibernate.ThrowAwayHibernateSessionOnErrorInterceptor">
+    <property name="sessionFactory">
+      <ref local="sessionFactory" />
+    </property>
+  </bean>
  
   <!--  define advice for all service methods -->
   <aop:config>
@@ -250,7 +285,9 @@
                   expression="execution(* org.osaf.cosmo.service.*Service.*(..))"/>
     
       <aop:advisor pointcut-ref="serviceOperation" order="1" advice-ref="timingAdvice"/>
-      <aop:advisor pointcut-ref="serviceOperation" order="2" advice-ref="txAdvice"/>
+      <aop:advisor pointcut-ref="serviceOperation" order="2" advice-ref="throwAwayHibernateSessionAdvice"/>
+      <aop:advisor pointcut-ref="serviceOperation" order="3" advice-ref="txAdvice"/>
+      
   </aop:config>
   
  
@@ -689,8 +726,8 @@
 
   <bean id="ticketAuthenticationProvider"
         class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationProvider">
-    <property name="contentService">
-      <ref bean="contentService"/>
+    <property name="contentDao">
+      <ref bean="contentDao"/>
     </property>
   </bean>
 
@@ -710,16 +747,6 @@
   <bean id="ticketVoter"
         class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketVoter"/>
 
-  <bean id="ownerVoter"
-        class="org.osaf.cosmo.acegisecurity.providers.owner.OwnerVoter">
-    <property name="contentService">
-      <ref bean="contentService"/>
-    </property>
-    <property name="userService">
-      <ref bean="userService"/>
-    </property>
-  </bean>
-
   <bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
 
   <bean id="defaultAccessDecisionManager"
@@ -733,6 +760,9 @@
       </list>
     </property>
   </bean>
+  
+  <bean id="userPathAccessDecisionManager" 
+        class="org.osaf.cosmo.acegisecurity.UserPathAccessDecisionManager"/>
 
   <!-- security facade resources -->
 
@@ -742,6 +772,14 @@
       <ref local="authenticationManager"/>
     </property>
   </bean>
+
+  <!-- filter that checks for Ticket authentication and clears.  To be used
+       after the session integration filter to prevent ticket authentication
+       from sticking -->
+
+  <bean id="protocolTicketAuthenticationClearingFilter"
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationClearingFilter"/>
+  
 
   <bean id="defaultFilterInvocationInterceptor"
          class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
@@ -793,7 +831,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=defaultHttpSessionContextIntegrationFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
+        /**=defaultHttpSessionContextIntegrationFilter,protocolTicketAuthenticationClearingFilter,defaultAnonymousProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
 
       </value>
     </property>
@@ -805,7 +843,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=defaultHttpSessionContextIntegrationFilter,webuiFormBasedProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
+        /**=defaultHttpSessionContextIntegrationFilter,protocolTicketAuthenticationClearingFilter,webuiFormBasedProcessingFilter,defaultExceptionTranslationFilter,defaultFilterInvocationInterceptor
 
       </value>
     </property>
@@ -867,6 +905,8 @@
   </bean>
 
   <!-- security beans for protocol access -->
+  <bean id="dummyAccessDecisionMaanger"
+        class="org.osaf.cosmo.acegisecurity.DummyAccessDecisionManager"/>
 
   <bean id="protocolHttpRequestContextIntegrationFilter"
         class="org.osaf.cosmo.acegisecurity.context.HttpRequestContextIntegrationFilter"/>
@@ -876,6 +916,16 @@
 
   <bean id="protocolTicketProcessingFilter"
         class="org.osaf.cosmo.acegisecurity.providers.ticket.TicketProcessingFilter"/>
+
+  <bean id="protocolExtraTicketProcessingFilter"
+        class="org.osaf.cosmo.acegisecurity.providers.ticket.ExtraTicketProcessingFilter">
+    <property name="securityManager">
+      <ref local="securityManager" />
+    </property>
+    <property name="contentDao">
+      <ref local="contentDao" />
+    </property>
+  </bean>
 
   <bean id="protocolBasicProcessingFilter"
         class="org.acegisecurity.ui.basicauth.BasicProcessingFilter">

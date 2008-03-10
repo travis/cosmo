@@ -84,6 +84,7 @@
             <value>org.osaf.cosmo.model.hibernate.HibCalendarAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibCalendarCollectionStamp</value>            
             <value>org.osaf.cosmo.model.hibernate.HibCollectionItem</value>
+            <value>org.osaf.cosmo.model.hibernate.HibCollectionItemDetails</value>
             <value>org.osaf.cosmo.model.hibernate.HibCollectionSubscription</value>
             <value>org.osaf.cosmo.model.hibernate.HibContentData</value>
             <value>org.osaf.cosmo.model.hibernate.HibContentItem</value>

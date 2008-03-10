@@ -66,7 +66,7 @@
          /pim/logout.page*=ROLE_ROOT,ROLE_USER
          /pim*=ROLE_ROOT,ROLE_USER
          /pim/keepalive.jsp=ROLE_ROOT,ROLE_USER
-         /pim/collection/**=ROLE_ROOT,ROLE_USER,ROLE_ANONYMOUS
+         /pim/collection/**=ROLE_ROOT,ROLE_USER
          /=ROLE_ROOT, ROLE_USER
          /**=ROLE_ROOT
        </value>
@@ -81,7 +81,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=pimHttpSessionContextIntegrationFilter,pimFormBasedProcessingFilter,pimAnonymousProcessingFilter,pimExceptionTranslationFilter,pimFilterInvocationInterceptor
+        /**=pimHttpSessionContextIntegrationFilter,protocolTicketAuthenticationClearingFilter,pimFormBasedProcessingFilter,protocolTicketProcessingFilter,pimAnonymousProcessingFilter,pimExceptionTranslationFilter,pimFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
       </value>
     </property>
   </bean>

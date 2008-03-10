@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.security.impl;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.Ticket;
@@ -44,6 +47,9 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
         LogFactory.getLog(CosmoSecurityManagerImpl.class);
 
     private AuthenticationManager authenticationManager;
+    
+    // store additional tickets for authenticated principal
+    private ThreadLocal<Set<Ticket>> tickets = new ThreadLocal<Set<Ticket>>();
 
     /* ----- CosmoSecurityManager methods ----- */
 
@@ -146,7 +152,7 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
      */
     protected CosmoSecurityContext
         createSecurityContext(Authentication authen) {
-        return new CosmoSecurityContextImpl(authen);
+        return new CosmoSecurityContextImpl(authen, tickets.get());
     }
 
     /**
@@ -160,5 +166,17 @@ public class CosmoSecurityManagerImpl implements CosmoSecurityManager {
     public void
         setAuthenticationManager(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
+    }
+
+    public void registerTickets(Set<Ticket> tickets) {
+        Set<Ticket> currentTickets = this.tickets.get();
+        if(currentTickets==null) {
+            this.tickets.set(new HashSet<Ticket>());
+        }
+        this.tickets.get().addAll(tickets);
+    }
+    
+    public void unregisterTickets() {
+        this.tickets.remove();
     }
 }

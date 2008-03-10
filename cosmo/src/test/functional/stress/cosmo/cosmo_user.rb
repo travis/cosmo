@@ -16,6 +16,32 @@ require "net/http"
 
 module Cosmo
 
+  class CosmoCollectionStore
+    
+    def initialize
+      @mutex = Mutex.new
+      @collections = {}
+    end
+    
+    def addCollection(collection, username, password)
+      mutex.synchronize do
+        @collections[collection] = {:collection=>collection, :username=>username, :password=>password}
+      end
+    end
+    
+    def removeCollection(collection)
+      mutex.synchronize do
+        @collections.delete(collection)
+      end
+    end
+    
+    def getCollection
+      mutex.synchronize do
+        @collections.to_a[rand(@collections.size)][1]
+      end
+    end
+  end
+
   #  Represents a statistics store for a CosmoUser.  Every time an operation
   #  is performed by a CosmoUser, information about the operation is stored
   #  in a statistics map in a CosmoUserStats object.

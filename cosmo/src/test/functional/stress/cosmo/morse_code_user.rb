@@ -23,8 +23,8 @@ module Cosmo
     MEAN_COL_SIZE = 50
     DELETE_PROB = 0.333
     
-    OPERATIONS = [:publish, :sync, :update, :subscribe, :delete]
-    PROBS = [0.005, 0.765, 0.15, 0.0775, 0.0025]
+    OPERATIONS = [:publish, :sync, :update, :subscribe, :delete, :serviceDoc]
+    PROBS = [0.005, 0.765, 0.15, 0.075, 0.0025, 0.0025]
              
     class CollectionHolder
       def initialize(uid, itemUids, sync_token)
@@ -61,6 +61,7 @@ module Cosmo
       @stats.registerStatMap(:mcUpdate, "morse code update")
       @stats.registerStatMap(:mcDelete, "morse code delete")
       @stats.registerStatMap(:mcSubscribe, "morse code subscribe")
+      @stats.registerStatMap(:mcServiceDoc, "morse code service doc")
     end
     
     def preRun
@@ -106,12 +107,23 @@ module Cosmo
               collection = @collections.to_a[rand(@collections.size)][1]
               deleted = deleteCollection(collection.uid)
               @collections.delete(collection.uid) if deleted==true
+            when :serviceDoc
+              serviceDoc
           end
         end
     end
     
     def randomWait
       sleep(rand/2.to_f)
+    end
+    
+    def serviceDoc
+      resp = @mcClient.get_service_doc(@user)
+      if(resp.code==200)
+        @stats.reportStat(:mcServiceDoc, true, resp.time, nil, resp.data.length, 200)
+      else
+        @stats.reportStat(:mcServiceDoc, false, nil, nil, nil, resp.code) 
+      end
     end
     
     def createCollection

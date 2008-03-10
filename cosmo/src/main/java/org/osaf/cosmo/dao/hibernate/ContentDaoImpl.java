@@ -77,7 +77,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             checkForDuplicateUid(collection);
             
             setBaseItemProps(collection);
-            collection.getParents().add(parent);
+            ((HibItem) collection).addParent(parent);
             
             getSession().save(collection);
             getSession().flush();
@@ -94,7 +94,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
     
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.ContentDao#updateCollection(org.osaf.cosmo.model.CollectionItem, java.util.Set)
+     * @see org.osaf.cosmo.dao.ContentDao#updateCollection(org.osaf.cosmo.model.CollectionItem, java.util.Set, java.util.Map)
      */
     public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
         
@@ -147,8 +147,16 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                 // update item
                 else {
                     if(!item.getParents().contains(collection)) {
-                        addItemToCollectionInternal(item, collection);
+                        
+                        // If item is being added to another collection,
+                        // we need the ticket/perms to add that item.
+                        // If ticket exists, then add with ticket and ticket perms.
+                        // If ticket doesn't exist, but item uuid is present in
+                        // itemPerms map, then add with read-only access.
+                        
+                        addItemToCollectionInternal(item, collection);  
                     }
+                    
                     updateContentInternal(item);
                 }
             }
@@ -532,7 +540,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             if(item instanceof CollectionItem) {
                 removeCollectionRecursive((CollectionItem) item);
             } else if(item instanceof ContentItem) {                    
-                item.getParents().remove(collection);
+                ((HibItem) item).removeParent(collection);
                 if(item.getParents().size()==0)
                     getSession().delete(item);
             } else {
@@ -553,7 +561,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             return;
         
         getHibItem(collection).addTombstone(new HibItemTombstone(collection, note));
-        note.getParents().remove(collection);
+        ((HibItem) note).removeParent(collection);
         
         for(NoteItem mod: note.getModifications())
             removeNoteItemFromCollectionInternal(mod, collection);
@@ -609,11 +617,11 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             for (CollectionItem col : note.getModifies().getParents()) {
                 if (((HibCollectionItem) col).removeTombstone(content) == true)
                     getSession().update(col);
-                note.getParents().add(col);
+                ((HibItem) note).addParent(col);
             }
         } else {
             // add parent to new content
-            content.getParents().add(parent);
+            ((HibItem) content).addParent(parent);
             
             // remove tombstone (if it exists) from parent
             if(((HibCollectionItem)parent).removeTombstone(content)==true)
@@ -676,7 +684,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
         
         for(CollectionItem parent: parents) {
-            content.getParents().add(parent);
+            ((HibItem) content).addParent(parent);
             if(((HibCollectionItem)parent).removeTombstone(content)==true)
                 getSession().update(parent);
         }

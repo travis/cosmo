@@ -16,29 +16,27 @@
 package org.osaf.cosmo.dav.servlet;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.abdera.util.EntityTag;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavCollection;
 import org.osaf.cosmo.dav.DavContent;
 import org.osaf.cosmo.dav.DavException;
-import org.osaf.cosmo.dav.DavResourceLocatorFactory;
 import org.osaf.cosmo.dav.DavRequest;
 import org.osaf.cosmo.dav.DavResource;
 import org.osaf.cosmo.dav.DavResourceFactory;
+import org.osaf.cosmo.dav.DavResourceLocatorFactory;
 import org.osaf.cosmo.dav.DavResponse;
 import org.osaf.cosmo.dav.MethodNotAllowedException;
 import org.osaf.cosmo.dav.NotModifiedException;
 import org.osaf.cosmo.dav.PreconditionFailedException;
+import org.osaf.cosmo.dav.acl.DavPrivilege;
+import org.osaf.cosmo.dav.acl.NeedsPrivilegesException;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
@@ -56,8 +54,10 @@ import org.osaf.cosmo.dav.provider.HomeCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalCollectionProvider;
 import org.osaf.cosmo.dav.provider.UserPrincipalProvider;
 import org.osaf.cosmo.model.EntityFactory;
+import org.osaf.cosmo.model.ItemSecurityException;
+import org.osaf.cosmo.security.CosmoSecurityException;
+import org.osaf.cosmo.security.Permission;
 import org.osaf.cosmo.server.ServerConstants;
-
 import org.springframework.web.HttpRequestHandler;
 
 /**
@@ -97,13 +97,31 @@ public class StandardRequestHandler
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
         throws ServletException, IOException {
-        DavRequest wreq = createDavRequest(request);
-        DavResponse wres = createDavResponse(response);
-
+        
+        DavRequest wreq = null;
+        DavResponse wres = null;
+        
         try {
+            wreq = createDavRequest(request);
+            wres = createDavResponse(response);
+
             DavResource resource = resolveTarget(wreq);
             preconditions(wreq, wres, resource);
             process(wreq, wres, resource);
+        } catch(CosmoSecurityException e) {
+            // handle security errors
+            NeedsPrivilegesException npe = null;
+            // Determine required privilege if we can and include
+            // in response
+            if(e instanceof ItemSecurityException) {
+                ItemSecurityException ise = (ItemSecurityException) e;
+                DavPrivilege priv = ise.getPermission()==Permission.READ ? DavPrivilege.READ : DavPrivilege.WRITE;
+                npe = new NeedsPrivilegesException(wreq.getRequestURI(), priv);
+            } else {
+                // otherwise send generic response
+                npe = new NeedsPrivilegesException(e.getMessage());
+            }
+            wres.sendDavError(npe);
         } catch (Throwable e) {
             DavException de = null;
             if (e instanceof DavException) {

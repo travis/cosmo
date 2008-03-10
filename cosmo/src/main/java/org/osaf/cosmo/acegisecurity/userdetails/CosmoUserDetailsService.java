@@ -15,18 +15,13 @@
  */
 package org.osaf.cosmo.acegisecurity.userdetails;
 
-import org.osaf.cosmo.dao.UserDao;
-import org.osaf.cosmo.security.CosmoSecurityManager;
-
 import org.acegisecurity.userdetails.UserDetails;
 import org.acegisecurity.userdetails.UserDetailsService;
 import org.acegisecurity.userdetails.UsernameNotFoundException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.User;
-
 import org.springframework.dao.DataAccessException;
 
 /**

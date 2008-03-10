@@ -15,9 +15,6 @@
 require "cosmo/morse_code_client"
 require "cosmo/atom_client"
 require "cosmo/cmp_client"
-require "rexml/document"
-
-include REXML
 
 module Cosmo
 
@@ -27,8 +24,8 @@ module Cosmo
     MEAN_COL_SIZE = 50
     SECONDS_IN_WEEK = 60*60*24*7
     
-    OPERATIONS = [:rangeQuery, :fullFeed, :createEvent, :updateEvent, :dashBoardQuery]
-    PROBS = [0.60, 0.05, 0.15, 0.05, 0.15]
+    OPERATIONS = [:rangeQuery, :fullFeed, :createEvent, :updateEvent, :dashBoardQuery, :createCollection, :deleteEvent, :deleteCollection]
+    PROBS = [0.5925, 0.045, 0.15, 0.05, 0.15, 0.005, 0.005, 0.0025]
     
     class CollectionHolder
       def initialize(uid, itemUids)
@@ -54,10 +51,12 @@ module Cosmo
     end
     
     def registerStats
-      @stats.registerStatMap(:mcPublish, "morse code publish")
+      @stats.registerStatMap(:atomCreateCollection, "atom create collection")
+      @stats.registerStatMap(:atomDeleteCollection, "atom delete collection")
       @stats.registerStatMap(:atomRangeQuery, "atom range query")
       @stats.registerStatMap(:atomFullFeed, "atom full feed")
       @stats.registerStatMap(:atomCreateEntry, "atom create entry")
+      @stats.registerStatMap(:atomDeleteEntry, "atom delete entry")
       @stats.registerStatMap(:atomUpdateEntry, "atom update entry")
       @stats.registerStatMap(:dashboardQuery, "atom dashboard query")
     end
@@ -93,10 +92,31 @@ module Cosmo
               createEvent(collection)
             when :updateEvent
               collection = @collections[rand(@collections.size)]
-              updateEvent(collection)
+              if(collection.itemUids.size==0)
+                createEvent(collection)
+              else
+                updateEvent(collection)
+              end
             when :dashBoardQuery
               collection = @collections[rand(@collections.size)]
               dashboardQuery(collection)
+            when :createCollection
+                collection = createCollection
+                # only add collection to current set if publish succeeded
+                if(!collection.nil?)
+                  @collections << collection
+                end
+            when :deleteEvent
+              collection = @collections[rand(@collections.size)]
+              if(collection.itemUids.size==0)
+                createEvent(collection)
+              else
+                deleteEvent(collection)
+              end
+            when :deleteCollection
+              collection = @collections[rand(@collections.size)]
+              deleted = deleteCollection(collection)
+              @collections.delete(collection) if deleted==true
           end
         end
     end
@@ -107,17 +127,15 @@ module Cosmo
     
     def createCollection
       colUid = random_string(40)
-      itemUids = []
-      for num in 0..random_collection_size
-        itemUids << random_string(40)
-      end
-      colXml = generateCollectionXml(colUid, itemUids)
-      resp = @mcClient.publish(colUid, colXml)
+      colName = random_string(64)
+      
+      colXml = generateCollectionXml(colUid, colName)
+      resp = @atomClient.createCollection(colXml)
       if(resp.code==201)
-        @stats.reportStat(:mcPublish, true, resp.time, colXml.length, nil, 201)
-        return CollectionHolder.new(colUid, itemUids)
+        @stats.reportStat(:atomCreateCollection, true, resp.time, colXml.length, nil, 201)
+        return CollectionHolder.new(colUid, [])
       else
-        @stats.reportStat(:mcPublish, false, nil, nil, nil, resp.code)
+        @stats.reportStat(:atomCreateCollection, false, nil, nil, nil, resp.code)
         return nil
       end
     end
@@ -173,19 +191,36 @@ module Cosmo
         @stats.reportStat(:atomUpdateEntry, false, nil, nil, nil, resp.code)
       end
     end
-   
-    def generateCollectionXml(uid, modifyItemUids)
-      xml =<<EOF
-      <eim:collection uuid="#{uid}"
-                  name="#{random_string}"
-                  xmlns:eim="http://osafoundation.org/eim/0">
-EOF
-  
-      for itemUid in modifyItemUids
-        xml << generateItemXml(itemUid)
+    
+    def deleteEvent(collection)
+      eventUid = collection.randomItemUid
+      eventEntry = generateItemEntry(eventUid) 
+      resp = @atomClient.deleteItem(eventUid)
+      if(resp.code==204)
+        @stats.reportStat(:atomDeleteEntry, true, resp.time, nil, nil, 204)
+        collection.itemUids.delete(eventUid)
+      else
+        @stats.reportStat(:atomDeleteEntry, false, nil, nil, nil, resp.code)
       end
-      
-      xml << "</eim:collection>"
+    end
+    
+    def deleteCollection(collection)
+      resp = @atomClient.deleteCollection(collection.uid)
+      if(resp.code==204)
+        @stats.reportStat(:atomDeleteCollection, true, resp.time, nil, nil, 204)
+      else
+        @stats.reportStat(:atomDeleteCollection, false, nil, nil, nil, resp.code)
+      end
+      return (resp.code==204)
+    end
+   
+    def generateCollectionXml(uid, name)
+      xml =<<EOF
+      <div class="collection">
+        <span class="name">#{name}</span>
+        <span class="uuid">#{uid}</span>
+      </div>
+EOF
       return xml
     end
   
@@ -236,73 +271,6 @@ EOF
   
     end
   
-    def generateItemXml(uid)
-      recurring = (rand < 0.05)
-      recordset = <<EOF
-      <eim:recordset uuid="#{uid}">
-        <item:record xmlns:item="http://osafoundation.org/eim/item/0">
-          <item:uuid eim:key="true" eim:type="text">#{uid}</item:uuid>
-          <item:title eim:type="text">#{random_string}</item:title>
-          <item:triage eim:type="text">100 10.00 1</item:triage>
-          <item:createdOn eim:type="decimal">1171318773</item:createdOn>
-        </item:record>
-        <modby:record xmlns:modby="http://osafoundation.org/eim/modifiedBy/0">
-    		<modby:uuid eim:key="true" eim:type="text">#{uid}</modby:uuid>
-    		<modby:timestamp eim:key="true" eim:type="decimal">1171318773</modby:timestamp>
-    		<modby:userid eim:key="true" eim:type="text">user1</modby:userid>
-    		<modby:action eim:key="true" eim:type="integer">100</modby:action>
-    	</modby:record>
-        <note:record xmlns:note="http://osafoundation.org/eim/note/0">
-          <note:uuid eim:key="true" eim:type="text">#{uid}</note:uuid>
-          <note:body eim:type="clob">#{random_string}</note:body>
-          <note:icalUid eim:type="text">#{uid}</note:icalUid>
-        </note:record>
-        #{generateEventXml(uid)}
-      </eim:recordset>
-EOF
-  
-    end
-    
-    def generateEventXml(uid)
-      if rand < 0.05
-        return generateRecurringEventXml(uid)
-      else
-        return generateStandardEventXml(uid)
-      end
-    end
-    
-    def generateStandardEventXml(uid)
-      recordset = <<EOF
-      <event:record xmlns:event="http://osafoundation.org/eim/event/0">
-          <event:uuid eim:key="true" eim:type="text">#{uid}</event:uuid>
-          <event:dtstart eim:type="text">#{random_date}</event:dtstart>
-          <event:duration eim:type="text">#{random_duration}</event:duration>
-          <event:location eim:type="text"/>
-          <event:rrule eim:type="text"/>
-          <event:exrule eim:type="text" />
-          <event:rdate eim:type="text" />
-          <event:exdate eim:type="text" />
-          <event:status eim:type="text">CONFIRMED</event:status>
-        </event:record>
-EOF
-    end
-    
-    def generateRecurringEventXml(uid)
-      recordset = <<EOF
-      <event:record xmlns:event="http://osafoundation.org/eim/event/0">
-          <event:uuid eim:key="true" eim:type="text">#{uid}</event:uuid>
-          <event:dtstart eim:type="text">;VALUE=DATE-TIME:20070501T080000</event:dtstart>
-          <event:duration eim:type="text">#{random_duration}</event:duration>
-          <event:location eim:type="text"/>
-          <event:rrule eim:type="text">;FREQ=DAILY;UNTIL=20080506T045959Z</event:rrule>
-          <event:exrule eim:type="text" />
-          <event:rdate eim:type="text" />
-          <event:exdate eim:type="text" />
-          <event:status eim:type="text">CONFIRMED</event:status>
-        </event:record>
-EOF
-    end
-   
     def random_date
       date = ";VALUE=DATE-TIME:2007" + random_integer_string(12) + random_integer_string(28) +
         "T" + random_integer_string(23) + random_integer_string(59) + "00Z"

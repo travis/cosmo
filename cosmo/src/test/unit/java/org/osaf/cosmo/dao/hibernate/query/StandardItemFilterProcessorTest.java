@@ -25,8 +25,6 @@ import org.hibernate.Query;
 import org.osaf.cosmo.dao.hibernate.AbstractHibernateDaoTestCase;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.filter.AttributeFilter;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
@@ -97,7 +95,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         CollectionItem parent = new HibCollectionItem();
         filter.setParent(parent);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibItem i join i.parents parent where parent=:parent", query.getQueryString());
+        Assert.assertEquals("select i from HibItem i join i.parentDetails pd where pd.primaryKey.collection=:parent", query.getQueryString());
     }
     
     public void testDisplayNameAndParentQuery() throws Exception {
@@ -106,7 +104,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setParent(parent);
         filter.setDisplayName(Restrictions.eq("test"));
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibItem i join i.parents parent where parent=:parent and i.displayName=:param1", query.getQueryString());
+        Assert.assertEquals("select i from HibItem i join i.parentDetails pd where pd.primaryKey.collection=:parent and i.displayName=:param1", query.getQueryString());
     }
     
     public void testContentItemQuery() throws Exception {
@@ -115,16 +113,16 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setParent(parent);
         filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:param1", query.getQueryString());
+        Assert.assertEquals("select i from HibContentItem i join i.parentDetails pd where pd.primaryKey.collection=:parent and i.triageStatus.code=:param1", query.getQueryString());
     
         filter.setTriageStatusCode(Restrictions.isNull());
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibContentItem i join i.parents parent where parent=:parent and i.triageStatus.code is null", query.getQueryString());
+        Assert.assertEquals("select i from HibContentItem i join i.parentDetails pd where pd.primaryKey.collection=:parent and i.triageStatus.code is null", query.getQueryString());
         
         filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
         filter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK_ASC);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibContentItem i join i.parents parent where parent=:parent and i.triageStatus.code=:param1 order by i.triageStatus.rank", query.getQueryString());
+        Assert.assertEquals("select i from HibContentItem i join i.parentDetails pd where pd.primaryKey.collection=:parent and i.triageStatus.code=:param1 order by i.triageStatus.rank", query.getQueryString());
     }
     
     public void testNoteItemQuery() throws Exception {
@@ -137,7 +135,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setTriageStatusCode(Restrictions.eq(TriageStatus.CODE_DONE));
         
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibNoteItem i join i.parents parent, HibTextAttribute ta4 where parent=:parent and i.displayName=:param1 and i.triageStatus.code=:param2 and i.icalUid=:param3 and ta4.item=i and ta4.qname=:ta4qname and ta4.value=:param5", query.getQueryString());
+        Assert.assertEquals("select i from HibNoteItem i join i.parentDetails pd, HibTextAttribute ta4 where pd.primaryKey.collection=:parent and i.displayName=:param1 and i.triageStatus.code=:param2 and i.icalUid=:param3 and ta4.item=i and ta4.qname=:ta4qname and ta4.value=:param5", query.getQueryString());
         
         filter = new NoteItemFilter();
         filter.setIsModification(true);
@@ -174,11 +172,11 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         //filter.setBody("body");
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibNoteItem i join i.parents parent, HibBaseEventStamp es where parent=:parent and i.displayName=:param1 and es.item=i and i.icalUid=:param2", query.getQueryString());
+        Assert.assertEquals("select i from HibNoteItem i join i.parentDetails pd, HibBaseEventStamp es where pd.primaryKey.collection=:parent and i.displayName=:param1 and es.item=i and i.icalUid=:param2", query.getQueryString());
     
         eventFilter.setIsRecurring(true);
         query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibNoteItem i join i.parents parent, HibBaseEventStamp es where parent=:parent and i.displayName=:param1 and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:param2", query.getQueryString());
+        Assert.assertEquals("select i from HibNoteItem i join i.parentDetails pd, HibBaseEventStamp es where pd.primaryKey.collection=:parent and i.displayName=:param1 and es.item=i and (es.timeRangeIndex.isRecurring=true or i.modifies is not null) and i.icalUid=:param2", query.getQueryString());
     }
     
     public void testEventStampTimeRangeQuery() throws Exception {
@@ -192,7 +190,7 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setParent(parent);
         filter.getStampFilters().add(eventFilter);
         Query query =  queryBuilder.buildQuery(session, filter);
-        Assert.assertEquals("select i from HibNoteItem i join i.parents parent, HibBaseEventStamp es where parent=:parent and es.item=i and ( (es.timeRangeIndex.isFloating=true and es.timeRangeIndex.startDate < '20070201T040000' and es.timeRangeIndex.endDate > '20070101T040000') or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.startDate < '20070201T100000Z' and es.timeRangeIndex.endDate > '20070101T100000Z') or (es.timeRangeIndex.startDate=es.timeRangeIndex.endDate and (es.timeRangeIndex.startDate='20070101T040000' or es.timeRangeIndex.startDate='20070101T100000Z')))", query.getQueryString());
+        Assert.assertEquals("select i from HibNoteItem i join i.parentDetails pd, HibBaseEventStamp es where pd.primaryKey.collection=:parent and es.item=i and ( (es.timeRangeIndex.isFloating=true and es.timeRangeIndex.startDate < '20070201T040000' and es.timeRangeIndex.endDate > '20070101T040000') or (es.timeRangeIndex.isFloating=false and es.timeRangeIndex.startDate < '20070201T100000Z' and es.timeRangeIndex.endDate > '20070101T100000Z') or (es.timeRangeIndex.startDate=es.timeRangeIndex.endDate and (es.timeRangeIndex.startDate='20070101T040000' or es.timeRangeIndex.startDate='20070101T100000Z')))", query.getQueryString());
     }
     
     public void testBasicStampQuery() throws Exception {

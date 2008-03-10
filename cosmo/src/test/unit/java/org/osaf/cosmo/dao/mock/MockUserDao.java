@@ -53,11 +53,14 @@ public class MockUserDao implements UserDao {
     private HashMap activationIdIdx;
     private HashMap<String, PasswordRecovery> passwordRecoveryIdx;
 
+    private MockDaoStorage storage = null;
+    
     private VersionFourGenerator idGenerator = new VersionFourGenerator();
 
     /**
      */
-    public MockUserDao() {
+    public MockUserDao(MockDaoStorage storage) {
+        this.storage = storage;
         usernameIdx = new HashMap();
         emailIdx = new HashMap();
         uidIdx = new HashMap();
@@ -223,6 +226,7 @@ public class MockUserDao implements UserDao {
         usernameIdx.put(user.getUsername(), user);
         if (user.isUsernameChanged()) {
             usernameIdx.remove(user.getOldUsername());
+            storage.setRootUid(user.getUsername(), storage.getRootUid(user.getOldUsername()));
         }
         emailIdx.put(user.getEmail(), user);
         if (user.isEmailChanged()) {

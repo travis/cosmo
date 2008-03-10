@@ -17,8 +17,9 @@ package org.osaf.cosmo.mc;
 
 import java.util.Set;
 
-import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.TicketType;
+import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**
@@ -35,7 +36,7 @@ public interface MorseCodeController {
      * to be described
      * @param locator the service locator used to resolve collection URLs
      *
-     * @throws DataRetrievalFailureException if the user is not found
+     * @throws UnknownUserException if the user is not found
      * @throws MorseCodeException if an unknown error occurs
      */
     public CollectionService discoverCollections(String username,
@@ -72,7 +73,6 @@ public interface MorseCodeController {
      * collection is initially populated
      * @param ticketTypes a set of ticket types to create on the
      * collection, one per type
-     *
      * @returns the initial <code>SyncToken</code> for the collection
      * @throws IllegalArgumentException if the authenticated principal
      * is not a <code>User</code> but no parent uid was specified
@@ -146,7 +146,6 @@ public interface MorseCodeController {
      * the collection
      * @param records the EIM records with which the published
      * collection is updated
-     *
      * @returns a new <code>SyncToken</code> that invalidates any
      * previously issued
      * @throws UnknownCollectionException if the specified collection

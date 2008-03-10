@@ -57,7 +57,9 @@ public class ClientBugAccommodationFilter implements Filter {
         final HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpServletResponse wrappedResponse = httpResponse;
         
-        if (httpRequest.getHeader("User-Agent").contains("MSIE")){
+        String userAgent = httpRequest.getHeader("User-Agent");
+        
+        if (userAgent !=null && userAgent.contains("MSIE")){
             log.info("Modifying response to accommodate Internet Explorer.");
             wrappedResponse = new XMLContentTypeWrapper(wrappedResponse);
             wrappedResponse = new ReplaceTextWrapper(wrappedResponse, 

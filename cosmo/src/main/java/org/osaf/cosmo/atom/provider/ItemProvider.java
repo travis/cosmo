@@ -43,13 +43,12 @@ import org.apache.abdera.protocol.server.impl.AbstractResponseContext;
 import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
 import org.apache.abdera.util.MimeTypeHelper;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.atom.InsufficientPrivilegesException;
 import org.osaf.cosmo.atom.UidConflictException;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
@@ -70,6 +69,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ItemSecurityException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
@@ -78,6 +78,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
@@ -198,6 +199,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         }
     }
 
@@ -225,6 +231,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return deleted();
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         }
     }
   
@@ -305,7 +316,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             ContentProcessor processor =
                 createContentProcessor(request.getContentType().toString());
             processor.processContent(request.getReader(), item);
-            item = (NoteItem) contentService.updateItem(item);
+            item = (NoteItem) contentService.updateContent((ContentItem) item);
 
             return updated(item);
         } catch (IOException e) {
@@ -327,6 +338,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return servererror(getAbdera(), request, reason, e);
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         }
     }
   
@@ -455,6 +471,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return conflict(getAbdera(), request, "Uid already in use");
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         }
     }
 
@@ -495,6 +516,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return badrequest(getAbdera(), request, msg);
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         }
     }
 
@@ -514,6 +540,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return deleted();
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         }
     }
 
@@ -540,8 +571,21 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             if (! (item instanceof NoteItem))
                 return badrequest(getAbdera(), request, "Item with uuid " + uuid + " is not a note");
 
-            contentService.addItemToCollection(item, collection);
-
+            //
+            // FIXME
+            // for now can only check if item owner is collection owner
+            
+            // if item owner is collection owner, then item will be updateable,
+            // otherwise it will be read-only for now, until we support
+            // multiple tickets vs single ticket/single principal
+            if(item.getOwner().equals(collection.getOwner()))
+                contentService.addItemToCollection(item, collection);
+            else {
+                // return forbidden
+                return forbidden(getAbdera(), request, "unauthorized for item "
+                        + item.getUid());
+            }
+               
             return createResponseContext(204);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
@@ -549,6 +593,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             return servererror(getAbdera(), request, reason, e);
         } catch (CollectionLockedException e) {
             return locked(getAbdera(), request);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return forbidden(getAbdera(), request, e.getMessage());
         }
     }
 
@@ -775,12 +824,12 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     contentService.updateContentItems(item.getParents(), updates);
                 } else {
                     // otherwise use simple update
-                    item = (NoteItem) contentService.updateItem(item);
+                    item = (NoteItem) contentService.updateContent((ContentItem) item);
                 }
             }
         } else {
             // use simple update
-            item = (NoteItem) contentService.updateItem(item);
+            item = (NoteItem) contentService.updateContent((ContentItem) item);
         }
 
         return item;

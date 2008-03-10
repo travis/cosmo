@@ -18,24 +18,15 @@ package org.osaf.cosmo.atom.servlet;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.abdera.protocol.ItemManager;
 import org.apache.abdera.protocol.server.HttpResponse;
-import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.protocol.server.Provider;
 import org.apache.abdera.protocol.server.RequestContext;
-import org.apache.abdera.protocol.server.ResponseContext;
-import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
 import org.apache.abdera.protocol.server.impl.DefaultRequestHandler;
 import org.apache.abdera.util.EntityTag;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.AuditableTarget;
-import org.osaf.cosmo.atom.provider.ExtendedProvider;
 
 /**
  * Extends {@link DefaultRequestHandler} to provide Cosmo-specific

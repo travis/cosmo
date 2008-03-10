@@ -193,8 +193,27 @@ public abstract class DavItemResourceBase extends DavResourceBase
             log.debug("moving resource " + getResourcePath() + " to " +
                       destination.getResourcePath());
 
+        if(destination.exists())
+            throw new ExistsException();
+        
         try {
-            getContentService().moveItem(getResourcePath(), destination.getResourcePath());
+            Item destItem = ((DavItemResourceBase) destination).getItem();
+            CollectionItem newParent = (CollectionItem) getContentService().findItemParentByPath(destination.getResourcePath());
+            if(newParent==null)
+                throw new ConflictException("One or more intermediate collections must be created");
+            CollectionItem oldParent = (CollectionItem) ((DavItemResourceBase)getParent()).getItem();
+            
+            // update name
+            getItem().setName(PathUtil.getBasename(destination.getResourcePath()));
+            
+            // only move if parents are different
+            if(!newParent.equals(oldParent))  {
+                getContentService().moveItem(getItem(), oldParent, newParent);
+            } else {
+                // otherwise update name
+                updateItem();
+            }
+            
         } catch (ItemNotFoundException e) {
             throw new ConflictException("One or more intermediate collections must be created");
         } catch (DuplicateItemNameException e) {
@@ -215,8 +234,12 @@ public abstract class DavItemResourceBase extends DavResourceBase
                       destination.getResourcePath());
 
         try {
-            getContentService().copyItem(item, destination.getResourcePath(),
-                                         ! shallow);
+            getContentService()
+                    .copyItem(
+                            item,
+                            (CollectionItem) ((DavItemResourceBase) destination.getCollection()).getItem(), 
+                            destination.getResourcePath(),
+                            !shallow);
         } catch (ItemNotFoundException e) {
             throw new ConflictException("One or more intermediate collections must be created");
         } catch (DuplicateItemNameException e) {
@@ -341,13 +364,17 @@ public abstract class DavItemResourceBase extends DavResourceBase
         // if we don't know specifically who the user is, then the
         // owner of the resource becomes the person who issued the
         // ticket
-        User owner = getSecurityManager().getSecurityContext().getUser();
-        if (owner == null) {
-            Ticket ticket = getSecurityManager().getSecurityContext().
-                getTicket();
-            owner = ticket.getOwner();
+        
+        // Only initialize owner once
+        if(item.getOwner()==null) {
+            User owner = getSecurityManager().getSecurityContext().getUser();
+            if (owner == null) {
+                Ticket ticket = getSecurityManager().getSecurityContext().
+                    getTicket();
+                owner = ticket.getOwner();
+            }
+            item.setOwner(owner);
         }
-        item.setOwner(owner);
 
         if (item.getUid() == null) {
             item.setClientCreationDate(Calendar.getInstance().getTime());
@@ -640,14 +667,8 @@ public abstract class DavItemResourceBase extends DavResourceBase
         item.removeAttribute(propNameToQName(name));
     }
 
-    private void updateItem()
-        throws DavException {
-        try {
-            getContentService().updateItem(item);
-        } catch (CollectionLockedException e) {
-            throw new LockedException();
-        }        
-    }
+    abstract protected void updateItem()
+        throws DavException;
 
     private QName propNameToQName(DavPropertyName name) {
         String uri = name.getNamespace() != null ?

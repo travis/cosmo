@@ -83,24 +83,20 @@ public interface ContentService extends Service {
     public Item findItemParentByPath(String path);
 
     /**
-     * Update an existing item.
+     * Add an item to a collection.
      * 
      * @param item
-     *            item to update
-     * @return updated item
-     */
-    public Item updateItem(Item item);
-    
-    /**
-     * Add an item to a collection.
-     * @param item item to add to collection
-     * @param collection collection to add item to
+     *            item to add to collection
+     * @param collection
+     *            collection to add item to
      */
     public void addItemToCollection(Item item, CollectionItem collection);
 
     /**
      * Copy an item to the given path
      * @param item item to copy
+     * @param existingParent existing source collection
+     * @param target existing destination collection
      * @param path path to copy item to
      * @param deepCopy true for deep copy, else shallow copy will
      *                 be performed
@@ -109,21 +105,19 @@ public interface ContentService extends Service {
      * @throws org.osaf.cosmo.model.DuplicateItemNameException
      *         if path points to an item with the same path
      */
-    public void copyItem(Item item, String path, boolean deepCopy);
+    public void copyItem(Item item, CollectionItem targetParent, 
+            String path, boolean deepCopy);
   
     /**
-     * Move item to the given path
-     * @param fromPath path of item to move
-     * @param toPath path of item to move
-     * @throws org.osaf.cosmo.model.ItemNotFoundException
-     *         if parent item specified by path does not exist
-     * @throws org.osaf.cosmo.model.DuplicateItemNameException
-     *         if path points to an item with the same path
+     * Move item from one collection to another
+     * @param item item to move
+     * @param oldParent parent to remove item from
+     * @param newParent parent to add item to
      */
-    public void moveItem(String fromPath, String toPath);
+    public void moveItem(Item item, CollectionItem oldParent, CollectionItem newParent);
     
     /**
-     * Remove an item.
+     * Remove an item. Removes item from all collections.
      * 
      * @param item
      *            item to remove
@@ -131,21 +125,14 @@ public interface ContentService extends Service {
     public void removeItem(Item item);
     
     /**
-     * Remove an item from a collection.  The item will be deleted if
+     * Remove an item from a collection.  The item will be removed if
      * it belongs to no more collections.
      * @param item item to remove from collection
      * @param collection item to remove item from
      */
     public void removeItemFromCollection(Item item, CollectionItem collection);
 
-    /**
-     * Remove an item.
-     * 
-     * @param path
-     *            path of item to remove
-     */
-    public void removeItem(String path);
-    
+   
     /**
      * Load all children for collection that have been updated since a
      * given timestamp.  If no timestamp is specified, then return all 
@@ -174,7 +161,7 @@ public interface ContentService extends Service {
      * The initial set of items can include new items and
      * existing items.  New items will be created and associated
      * to the new collection and existing items will be updated
-     * and associated to the new collection.
+     * and associated to the new collection.  
      * 
      * @param parent
      *            parent of collection.
@@ -193,7 +180,7 @@ public interface ContentService extends Service {
      * child items to be updated can include updates to existing
      * children, new children, and removed children.  A removal
      * of a child Item is accomplished by setting Item.isActive
-     * to false to an existing Item.  When an item is marked
+     * to false for an existing Item.  When an item is marked
      * for removal, it is removed from the collection and
      * removed from the server only if the item has no parent
      * collections.
@@ -259,7 +246,7 @@ public interface ContentService extends Service {
      * ContentItem creation adds the item to the specified parent collections.
      * 
      * @param parents
-     *            parents that new conten items will be added to.
+     *            parents that new content items will be added to.
      * @param contentItems to update
      * @throws org.osaf.cosmo.model.CollectionLockedException
      *         if parent CollectionItem is locked
@@ -352,13 +339,7 @@ public interface ContentService extends Service {
     public void createTicket(String path,
                              Ticket ticket);
 
-    /**
-     * Returns all tickets on the given item.
-     *
-     * @param item the item to be ticketed
-     */
-    public Set getTickets(Item item);
-
+   
     /**
      * Returns the identified ticket on the given item, or
      * <code>null</code> if the ticket does not exists. Tickets are
@@ -369,18 +350,6 @@ public interface ContentService extends Service {
      * @param key the ticket to return
      */
     public Ticket getTicket(Item item,
-                            String key);
-
-    /**
-     * Returns the identified ticket on the given item, or
-     * <code>null</code> if the ticket does not exists. Tickets are
-     * inherited, so if the specified item does not have the ticket
-     * but an ancestor does, it will still be returned.
-     *
-     * @param itemId the uid of the item whose ticket you want
-     * @param key the ticket to return
-     */
-    public Ticket getTicket(String itemId,
                             String key);
 
     /**
@@ -395,10 +364,10 @@ public interface ContentService extends Service {
     /**
      * Removes a ticket from an item.
      *
-     * @param path the path of the item to be de-ticketed
+     * @param item the item to be de-ticketed
      * @param key the key of the ticket to remove
      */
-    public void removeTicket(String path,
+    public void removeTicket(Item item,
                              String key);
     
 }

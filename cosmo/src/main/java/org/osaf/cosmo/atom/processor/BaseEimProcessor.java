@@ -147,9 +147,6 @@ public abstract class BaseEimProcessor extends BaseContentProcessor {
                 throw new ValidationException("Master item not found for " + child.getUid());
         }     
 
-        child.getParents().add(collection);
-        collection.getChildren().add(child);
-
         return child;
     }
 

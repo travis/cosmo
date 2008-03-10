@@ -15,20 +15,31 @@
  */
 package org.osaf.cosmo.mc;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.osaf.cosmo.model.Item;
+
 /**
  * An exception that signifies that an item specified in a Morse Code
  * collection request is not a collection.
  */
 public class NotCollectionException extends MorseCodeException {
 
+    private Item item;
+    
     /** */
-    public NotCollectionException(String message) {
-        super(message);
+    public NotCollectionException(Item item) {
+        super(412, "item with uuid " + item.getUid() + " not a collection");
+        this.item = item;
     }
 
-    /** */
-    public NotCollectionException(String message,
-                                  Throwable cause) {
-        super(message, cause);
+    protected void writeContent(XMLStreamWriter writer)
+            throws XMLStreamException {
+        writer.writeStartElement(NS_MC, "not-collection");
+        writer.writeStartElement(NS_MC, "target-uuid");
+        writer.writeCharacters(item.getUid());
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 }

@@ -279,6 +279,14 @@ public interface Item extends AuditableObject{
     public Integer getVersion();
 
     public Set<CollectionItem> getParents();
+    
+    /**
+     * Each collection an item belongs to contains additional
+     * attributes, and is represented as a CollectionItemDetails object.
+     * @param parent parent collection
+     * @return details about parent<-->child relationship
+     */
+    public CollectionItemDetails getParentDetails(CollectionItem parent);
 
     /**
      * Return a single parent.
@@ -286,8 +294,16 @@ public interface Item extends AuditableObject{
      */
     public CollectionItem getParent();
 
+    /**
+     * Transient attribute used to mark item for deletion.
+     * @return true if item should be deleted
+     */
     public Boolean getIsActive();
 
+    /**
+     * Transient attribute used to mark item for deletion.
+     * @param isActive true if item should be deleted
+     */
     public void setIsActive(Boolean isActive);
 
     /**

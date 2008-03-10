@@ -81,6 +81,60 @@ module Cosmo
       end
     end
     
+    def createCollection(body, user=nil)
+      @@log.debug "post collection to #{user.nil? ? @user : user} begin"
+      @http.start do |http|
+        
+        strRequest = "#{@context}#{COL_PATH}user/#{user.nil? ? @user : user}"
+        
+        req = Net::HTTP::Post.new(strRequest)
+        init_req(req)
+        http.read_timeout=600
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        req['Content-Type'] = 'application/xhtml+xml'
+        resp, data = time_block { http.request(req, body) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "post collection to user #{user.nil? ? @user : user} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
+      end
+    end
+    
+    def deleteCollection(collection)
+      @@log.debug "delete collection #{collection} begin"
+      @http.start do |http|
+        req = Net::HTTP::Delete.new("#{@context}#{COL_PATH}collection/#{collection}")
+        init_req(req)
+        http.read_timeout=600
+        
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        resp, data = time_block { http.request(req) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "delete collection #{collection} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
+      end
+    end
+    
+    def deleteItem(item)
+      @@log.debug "delete item #{item} begin"
+      @http.start do |http|
+        req = Net::HTTP::Delete.new("#{@context}#{COL_PATH}item/#{item}")
+        init_req(req)
+        http.read_timeout=600
+        
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        resp, data = time_block { http.request(req) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "delete item #{item} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
+      end
+    end
+    
     def createEntry(collection, body)
       @@log.debug "post #{collection} begin"
       @http.start do |http|

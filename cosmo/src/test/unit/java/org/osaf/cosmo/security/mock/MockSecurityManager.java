@@ -16,12 +16,14 @@
 package org.osaf.cosmo.security.mock;
 
 import java.security.Principal;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -33,6 +35,7 @@ import org.osaf.cosmo.security.PermissionDeniedException;
  * unit mocks.
  */
 public class MockSecurityManager implements CosmoSecurityManager {
+   
     private static final Log log =
         LogFactory.getLog(MockSecurityManager.class);
 
@@ -84,6 +87,11 @@ public class MockSecurityManager implements CosmoSecurityManager {
         contexts.set(context);
         return context;
     }
+    
+    // for testing
+    public void initiateSecurityContext(CosmoSecurityContext context) {
+        contexts.set(context);
+    }
 
     /**
      * Overwrite the existing <code>CosmoSecurityContext</code>. This 
@@ -125,6 +133,16 @@ public class MockSecurityManager implements CosmoSecurityManager {
         }
         contexts.set(null);
     }
+    
+    public void registerTickets(Set<Ticket> tickets) {
+        // for now nothing
+    }
+    
+
+    public void unregisterTickets() {
+        // for now nothing
+    }
+
     
     public void checkPermission(Item item, int permission) throws PermissionDeniedException {
         return; //TODO does this Mock need more?

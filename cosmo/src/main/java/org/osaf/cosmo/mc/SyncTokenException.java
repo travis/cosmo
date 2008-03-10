@@ -15,20 +15,29 @@
  */
 package org.osaf.cosmo.mc;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 /**
  * An exception related to sync tokens (signifying, for example, a
  * non-well-formed token).
  */
 public class SyncTokenException extends MorseCodeException {
 
+    private String token = null;
+    
     /** */
-    public SyncTokenException(String message) {
-        super(message);
+    public SyncTokenException(String token) {
+        super(400, "invalid sync token: " + token);
+        this.token = token;
     }
-
-    /** */
-    public SyncTokenException(String message,
-                              Throwable cause) {
-        super(message, cause);
+    
+    protected void writeContent(XMLStreamWriter writer)
+            throws XMLStreamException {
+        writer.writeStartElement(NS_MC, "invalid-synctoken");
+        writer.writeStartElement(NS_MC, "token");
+        writer.writeCharacters(token);
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 }

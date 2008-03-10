@@ -246,6 +246,18 @@
                     <artifactId>ehcache</artifactId>
                     <groupId>ehcache</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>asm</groupId>
+                    <artifactId>asm-attrs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -296,16 +308,21 @@
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
-            <version>1.5.3</version>
+            <version>2.2.3</version>
         </dependency>
         <dependency>
             <groupId>asm</groupId>
-            <artifactId>asm-attrs</artifactId>
-            <version>1.5.3</version>
+            <artifactId>asm-commons</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>2.2.3</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
+            <artifactId>cglib-nodep</artifactId>
             <version>2.1_3</version>
         </dependency>
         <dependency>

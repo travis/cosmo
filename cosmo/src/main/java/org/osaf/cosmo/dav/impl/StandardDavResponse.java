@@ -25,21 +25,14 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.DavConstants;
-import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.WebdavResponseImpl;
-import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
-
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResponse;
-import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
-import org.osaf.cosmo.model.Ticket;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

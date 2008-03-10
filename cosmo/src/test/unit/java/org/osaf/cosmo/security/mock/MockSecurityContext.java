@@ -18,10 +18,12 @@ package org.osaf.cosmo.security.mock;
 import org.osaf.cosmo.security.BaseSecurityContext;
 
 import java.security.Principal;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 
 /**
@@ -35,7 +37,13 @@ public class MockSecurityContext extends BaseSecurityContext {
     /**
      */
     public MockSecurityContext(Principal principal) {
-        super(principal);
+        super(principal, null);
+    }
+    
+    /**
+     */
+    public MockSecurityContext(Principal principal, Set<Ticket> tickets) {
+        super(principal, tickets);
     }
 
     protected void processPrincipal() {

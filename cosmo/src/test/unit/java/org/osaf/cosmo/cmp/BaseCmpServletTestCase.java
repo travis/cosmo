@@ -58,7 +58,7 @@ public abstract class BaseCmpServletTestCase extends BaseMockServletTestCase {
         MockDaoStorage storage = new MockDaoStorage();
         MockCalendarDao calendarDao = new MockCalendarDao(storage);
         MockContentDao contentDao = new MockContentDao(storage);
-        MockUserDao userDao = new MockUserDao();
+        MockUserDao userDao = new MockUserDao(storage);
         SingleVMLockManager lockManager = new SingleVMLockManager();
         StaticMessageSource messageSource =
             new StaticMessageSource();

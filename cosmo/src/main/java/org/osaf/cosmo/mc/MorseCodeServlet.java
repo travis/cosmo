@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.eim.EimException;
 import org.osaf.cosmo.eim.EimRecordSetIterator;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
@@ -42,17 +41,17 @@ import org.osaf.cosmo.eim.eimml.EimmlStreamReaderIterator;
 import org.osaf.cosmo.eim.eimml.EimmlStreamWriter;
 import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.model.CollectionLockedException;
+import org.osaf.cosmo.model.ItemSecurityException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.model.UidInUseException;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.server.UserPath;
-
 import org.springframework.beans.BeansException;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -104,7 +103,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
     public static final String HEADER_TICKET_TYPE =
         "X-MorseCode-TicketType";
     /**
-     * The extension header <code>X-MorseCode-Tickete</code> 
+     * The extension header <code>X-MorseCode-Ticket</code> 
      */
     public static final String HEADER_TICKET =
         "X-MorseCode-Ticket";
@@ -151,13 +150,13 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 controller.deleteCollection(cp.getUid());
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 return;
-            } catch (UnknownCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               "Unknown collection");
-                return;
-            } catch (NotCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
-                               "Item not a collection");
+            } catch(CosmoSecurityException e) {
+                if(e instanceof ItemSecurityException) {
+                    InsufficientPrivilegesException ipe = new InsufficientPrivilegesException((ItemSecurityException) e);
+                    handleGeneralException(ipe, resp);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+                }
             } catch (MorseCodeException e) {
                 handleGeneralException(e, resp);
                 return;
@@ -208,9 +207,13 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 svc.writeTo(resp.getOutputStream());
 
                 return;
-            } catch (DataRetrievalFailureException e) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               "Unknown user " + up.getUsername());
+            } catch(CosmoSecurityException e) {
+                if(e instanceof ItemSecurityException) {
+                    InsufficientPrivilegesException ipe = new InsufficientPrivilegesException((ItemSecurityException) e);
+                    handleGeneralException(ipe, resp);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+                }
                 return;
             } catch (XMLStreamException e) {
                 String msg = "Error writing XML stream";
@@ -276,17 +279,13 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 writer.close();
 
                 return;
-            } catch (SyncTokenException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Invalid sync token");
-                return;
-            } catch (UnknownCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               "Unknown collection");
-                return;
-            } catch (NotCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
-                               "Item not a collection");
+            }catch(CosmoSecurityException e) {
+                if(e instanceof ItemSecurityException) {
+                    InsufficientPrivilegesException ipe = new InsufficientPrivilegesException((ItemSecurityException) e);
+                    handleGeneralException(ipe, resp);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+                }
                 return;
             } catch (EimmlStreamException e) {
                 String msg = "Error writing EIMML stream";
@@ -335,7 +334,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             EimmlStreamReader reader = null;
             try {
                 SyncToken token = SyncToken.deserialize(tokenStr);
-
+                
                 reader = new EimmlStreamReader(req.getReader());
                 if (! reader.getCollectionUuid().equals(cp.getUid())) {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
@@ -358,9 +357,13 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 resp.addHeader(HEADER_SYNC_TOKEN,
                                pubCollection.getToken().serialize());
                 return;
-            } catch (SyncTokenException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Invalid sync token");
+            } catch(CosmoSecurityException e) {
+                if(e instanceof ItemSecurityException) {
+                    InsufficientPrivilegesException ipe = new InsufficientPrivilegesException((ItemSecurityException) e);
+                    handleGeneralException(ipe, resp);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+                }
                 return;
             } catch (EimmlStreamException e) {
                 log.warn("Unable to read EIM stream", e);
@@ -369,27 +372,12 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 msg += cause != null ? ": " + cause.getMessage() : "";
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
                 return;
-            } catch (UnknownCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               "Unknown collection");
-                return;
-            } catch (NotCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
-                               "Item not a collection");
             } catch (CollectionLockedException e) {
                 resp.sendError(SC_LOCKED, "Collection is locked for update");
                 return;
             } catch (StaleCollectionException e) {
                 resp.sendError(HttpServletResponse.SC_RESET_CONTENT,
                                "Collection contains more recently updated items");
-                return;
-            } catch (ValidationException e) {
-                //                log.warn("Recordset contains invalid data", e);
-                Throwable cause = e.getCause();
-                String msg = ": " + e.getMessage();
-                msg += cause != null ? ": " + cause.getMessage() : "";
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Recordset contains invalid data" + msg);
                 return;
             } catch (MorseCodeException e) {
                 Throwable root = e.getCause();
@@ -475,6 +463,14 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                     resp.addHeader(HEADER_TICKET, formatTicket(ticket));
 
                 return;
+            } catch(CosmoSecurityException e) {
+                if(e instanceof ItemSecurityException) {
+                    InsufficientPrivilegesException ipe = new InsufficientPrivilegesException((ItemSecurityException) e);
+                    handleGeneralException(ipe, resp);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+                }
+                return;
             } catch (IllegalArgumentException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                                "Parent uid must be specified when authenticated principal is not a user");
@@ -488,22 +484,6 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 return;
             } catch (UidInUseException e) {
                 resp.sendError(HttpServletResponse.SC_CONFLICT, "Uid in use");
-                return;
-            } catch (UnknownCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               "Unknown parent collection");
-                 return;
-            } catch (NotCollectionException e) {
-                resp.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
-                               "Parent item not a collection");
-                return;
-            } catch (ValidationException e) {
-                //                log.warn("Recordset contains invalid data", e);
-                Throwable cause = e.getCause();
-                String msg = ": " + e.getMessage();
-                msg += cause != null ? ": " + cause.getMessage() : "";
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Recordset contains invalid data" + msg);
                 return;
             } catch (ServerBusyException e){
                     log.debug("received ServerBusyException during PUT");
@@ -678,6 +658,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         buf.append(ticket.getType()).append("=").append(ticket.getKey());
         return buf.toString();
     }
+    
 
     private void handleGeneralException(MorseCodeException e,
                                         HttpServletResponse resp)

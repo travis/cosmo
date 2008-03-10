@@ -24,16 +24,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.icalendar.ICalendarOutputter;
-import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.service.ContentService;
-
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -78,7 +76,17 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
             return;
         }
 
-        Item item = contentService.findItemByUid(cp.getUid());
+        Item item;
+        
+        try {
+            item = contentService.findItemByUid(cp.getUid());
+        } 
+        // handle security errors by returing 403
+        catch (CosmoSecurityException e) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+            return;
+        }
+        
         if (item == null) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;

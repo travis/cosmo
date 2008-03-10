@@ -23,20 +23,6 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-  <bean id="feedAccessDecisionManager"
-        class="org.acegisecurity.vote.AffirmativeBased">
-    <property name="allowIfAllAbstainDecisions">
-      <value>false</value>
-    </property>
-    <property name="decisionVoters">
-      <list>
-        <ref bean="ticketVoter"/>
-        <ref bean="ownerVoter"/>
-        <ref bean="roleVoter"/>
-      </list>
-    </property>
-  </bean>
-
   <!-- interceptor which performs authorization for feed requests -->
 
    <bean id="feedFilterInvocationInterceptor"
@@ -45,7 +31,7 @@
        <ref bean="authenticationManager"/>
      </property>
      <property name="accessDecisionManager">
-       <ref bean="feedAccessDecisionManager"/>
+       <ref bean="userPathAccessDecisionManager"/>
      </property>
      <property name="objectDefinitionSource">
        <value>
@@ -64,7 +50,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
       </value>
     </property>
   </bean>

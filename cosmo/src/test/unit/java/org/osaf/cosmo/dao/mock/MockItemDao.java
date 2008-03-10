@@ -35,6 +35,8 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.ItemFilterEvaluater;
 import org.osaf.cosmo.model.filter.ItemFilterPostProcessor;
+import org.osaf.cosmo.model.mock.MockCollectionItem;
+import org.osaf.cosmo.model.mock.MockItem;
 import org.osaf.cosmo.util.PathUtil;
 
 /**
@@ -68,18 +70,6 @@ public class MockItemDao implements ItemDao {
         return storage.getItemByUid(uid);
     }
     
-    /**
-     * Find any item (active or inactive) with the specified uid. 
-     * The return type will be one of ContentItem, CollectionItem, 
-     * CalendarCollectionItem, CalendarItem.
-     *
-     * @param uid
-     *            uid of item to find
-     * @return item represented by uid
-     */
-    public Item findAnyItemByUid(String uid) {
-        return storage.getItemByUid(uid);
-    }
 
     /**
      * Find an item with the specified path. The return type will be one of
@@ -143,7 +133,7 @@ public class MockItemDao implements ItemDao {
             log.debug("getting root item for user " + user.getUsername());
         }
 
-        return getStorage().getRootItem(user.getUid());
+        return getStorage().getRootItem(user.getUsername());
     }
 
     /**
@@ -254,7 +244,7 @@ public class MockItemDao implements ItemDao {
      */
     public void removeItem(Item item) {
         if(item.getParent()!=null)
-            item.getParent().getChildren().remove(item);
+            ((MockCollectionItem) item.getParent()).removeChild(item);
         
         // update modifications
         if(item instanceof NoteItem) {
@@ -265,9 +255,9 @@ public class MockItemDao implements ItemDao {
 
         storage.removeItemByUid(item.getUid());
         storage.removeItemByPath(getItemPath(item));
-        if (storage.getRootUid(item.getOwner().getUid()).
+        if (storage.getRootUid(item.getOwner().getUsername()).
             equals(item.getUid())) {
-            storage.removeRootUid(item.getOwner().getUid());
+            storage.removeRootUid(item.getOwner().getUsername());
         }
     }
 
@@ -292,6 +282,11 @@ public class MockItemDao implements ItemDao {
         return storage.findItemTickets(item);
     }
 
+    public Ticket findTicket(String key) {
+        return storage.findTicket(key);
+    }
+    
+    
     /**
      * Returns the identified ticket on the given item, or
      * <code>null</code> if the ticket does not exists. Tickets are
@@ -356,13 +351,13 @@ public class MockItemDao implements ItemDao {
     }
     
     public void addItemToCollection(Item item, CollectionItem collection) {
-        collection.getChildren().add(item);
-        item.getParents().add(collection);
+        ((MockCollectionItem) collection).addChild(item);
+        ((MockItem) item).addParent(collection);
     }
     
     public void removeItemFromCollection(Item item, CollectionItem collection) {
-        item.getParents().remove(collection);
-        collection.getChildren().remove(item);
+        ((MockItem) item).removeParent(collection);
+        ((MockCollectionItem) collection).removeChild(item);
         if(item.getParents().size()==0)
             removeItem(item);
     }

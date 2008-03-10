@@ -15,15 +15,21 @@
  */
 package org.osaf.cosmo.model.hibernate;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionItemDetails;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.QName;
@@ -47,8 +53,11 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
     public static final QName ATTR_HUE =
         new HibQName(CollectionItem.class, "hue");
 
-    @ManyToMany(targetEntity=HibItem.class, mappedBy="parents",fetch=FetchType.LAZY)
-    private Set<Item> children = new HashSet<Item>(0);
+    @OneToMany(targetEntity=HibCollectionItemDetails.class, mappedBy="primaryKey.collection", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.DELETE }) 
+    private Set<CollectionItemDetails> childDetails = new HashSet<CollectionItemDetails>(0);
+    
+    private transient Set<Item> children = null;
     
     public HibCollectionItem() {
     };
@@ -57,14 +66,34 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
      * @see org.osaf.cosmo.model.CollectionItem#getChildren()
      */
     public Set<Item> getChildren() {
+        if(children!=null)
+            return children;
+        
+        children = new HashSet<Item>();
+        for(CollectionItemDetails cid: childDetails)
+            children.add(cid.getItem());
+        
+        children = Collections.unmodifiableSet(children);
+        
         return children;
     }
-   
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.CollectionItem#getChildDetails(org.osaf.cosmo.model.Item)
+     */
+    public CollectionItemDetails getChildDetails(Item item) {
+        for(CollectionItemDetails cid: childDetails)
+            if(cid.getItem().equals(item))
+                return cid;
+        
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.CollectionItem#getChild(java.lang.String)
      */
     public Item getChild(String uid) {
-        for (Item child : children) {
+        for (Item child : getChildren()) {
             if (child.getUid().equals(uid))
                 return child;
         }
@@ -75,7 +104,7 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
      * @see org.osaf.cosmo.model.CollectionItem#getChildByName(java.lang.String)
      */
     public Item getChildByName(String name) {
-        for (Item child : children) {
+        for (Item child : getChildren()) {
             if (child.getName().equals(name))
                 return child;
         }

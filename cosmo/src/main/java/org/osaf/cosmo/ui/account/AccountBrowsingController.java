@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ValidationException;
 
 import org.apache.commons.io.IOUtils;
@@ -35,15 +34,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.FileItem;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
@@ -332,7 +329,7 @@ public class AccountBrowsingController extends MultiActionController
             log.debug("revoking ticket " + key + " from item " +
                       item.getUid() + " at " + path);
 
-        contentService.removeTicket(path, key);
+        contentService.removeTicket(item, key);
 
         return new ModelAndView(this.revokeTicketBaseView + path);
     }

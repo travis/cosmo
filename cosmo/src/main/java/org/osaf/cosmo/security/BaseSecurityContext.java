@@ -40,14 +40,15 @@ public abstract class BaseSecurityContext implements CosmoSecurityContext {
     private Principal principal;
     private Ticket ticket;
     private User user;
+    private Set<Ticket> tickets;
 
     /**
      */
-    public BaseSecurityContext(Principal principal) {
+    public BaseSecurityContext(Principal principal, Set<Ticket> tickets) {
         this.anonymous = false;
         this.principal = principal;
         this.admin = false;
-
+        this.tickets = tickets;
         processPrincipal();
     }
 
@@ -166,5 +167,13 @@ public abstract class BaseSecurityContext implements CosmoSecurityContext {
     public String toString() {
         return ToStringBuilder.
             reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
+
+    public Set<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(Set<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }

@@ -15,11 +15,13 @@
  */
 package org.osaf.cosmo.model.mock;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionItemDetails;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.QName;
@@ -43,27 +45,51 @@ public class MockCollectionItem extends MockItem implements CollectionItem {
     public static final QName ATTR_HUE =
         new MockQName(CollectionItem.class, "hue");
 
-    private Set<Item> children = new HashSet<Item>(0);
+    private Set<CollectionItemDetails> childDetails = new HashSet<CollectionItemDetails>(0);
+    
     
     public MockCollectionItem() {
     };
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getChildren()
-     */
-    public Set<Item> getChildren() {
-        return children;
+    
+    public void addChild(Item item) {
+        MockCollectionItemDetails cid = new MockCollectionItemDetails(this, item);
+        childDetails.add(cid);
     }
-
-    private void setChildren(Set<Item> children) {
-        this.children = children;
+    
+    public void removeChild(Item item) {
+        CollectionItemDetails cid = getChildDetails(item);
+        if(cid!=null)
+            childDetails.remove(cid);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getChild(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionItem#getChildren()
+     */
+    public Set<Item> getChildren() {
+        Set<Item> children = new HashSet<Item>();
+        for(CollectionItemDetails cid: childDetails)
+            children.add(cid.getItem());
+        
+        return Collections.unmodifiableSet(children);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.CollectionItem#getChildDetails(org.osaf.cosmo.model.Item)
+     */
+    public CollectionItemDetails getChildDetails(Item item) {
+        for(CollectionItemDetails cid: childDetails)
+            if(cid.getItem().equals(item))
+                return cid;
+        
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.CollectionItem#getChild(java.lang.String)
      */
     public Item getChild(String uid) {
-        for (Item child : children) {
+        for (Item child : getChildren()) {
             if (child.getUid().equals(uid))
                 return child;
         }
@@ -71,10 +97,10 @@ public class MockCollectionItem extends MockItem implements CollectionItem {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#getChildByName(java.lang.String)
+     * @see org.osaf.cosmo.model.CollectionItem#getChildByName(java.lang.String)
      */
     public Item getChildByName(String name) {
-        for (Item child : children) {
+        for (Item child : getChildren()) {
             if (child.getName().equals(name))
                 return child;
         }

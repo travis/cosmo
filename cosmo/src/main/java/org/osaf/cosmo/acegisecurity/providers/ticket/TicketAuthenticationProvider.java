@@ -15,25 +15,18 @@
  */
 package org.osaf.cosmo.acegisecurity.providers.ticket;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Iterator;
-
 import org.acegisecurity.Authentication;
 import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.AuthenticationServiceException;
 import org.acegisecurity.BadCredentialsException;
 import org.acegisecurity.providers.AuthenticationProvider;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.server.CollectionPath;
 import org.osaf.cosmo.server.ItemPath;
-
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -43,7 +36,7 @@ public class TicketAuthenticationProvider
     private static final Log log =
         LogFactory.getLog(TicketAuthenticationProvider.class);
 
-    private ContentService contentService;
+    private ContentDao contentDao;
 
     // AuthenticationProvider methods
 
@@ -76,13 +69,13 @@ public class TicketAuthenticationProvider
     // our methods
 
     /** */
-    public ContentService getContentService() {
-        return contentService;
+    public ContentDao getContentDao() {
+        return contentDao;
     }
 
     /** */
-    public void setContentService(ContentService contentService) {
-        this.contentService = contentService;
+    public void setContentDao(ContentDao contentDao) {
+        this.contentDao = contentDao;
     }
 
     private Ticket findTicket(String path,
@@ -93,14 +86,14 @@ public class TicketAuthenticationProvider
                           " for resource at path " + path);
 
             Item item = findItem(path);
-            Ticket ticket = contentService.getTicket(item, key);
+            Ticket ticket = contentDao.getTicket(item, key);
             if (ticket == null)
                 return null;
 
             if (ticket.hasTimedOut()) {
                 if (log.isDebugEnabled())
                     log.debug("removing timed out ticket " + ticket.getKey());
-                contentService.removeTicket(item, ticket);
+                contentDao.removeTicket(item, ticket);
                 return null;
             }
 
@@ -115,7 +108,7 @@ public class TicketAuthenticationProvider
         Item item = null;
 
         if (cp != null) {
-            item = contentService.findItemByUid(cp.getUid());
+            item = contentDao.findItemByUid(cp.getUid());
             // a ticket cannot be used to access a collection that
             // does not already exist
             if (item == null)
@@ -126,16 +119,16 @@ public class TicketAuthenticationProvider
 
         ItemPath ip = ItemPath.parse(path, true);
         if (ip != null) {
-            item = contentService.findItemByUid(ip.getUid());
+            item = contentDao.findItemByUid(ip.getUid());
             if (item != null)
                 return item;
         }
 
-        item = contentService.findItemByPath(path);
+        item = contentDao.findItemByPath(path);
         if (item == null)
             // if the item's parent exists, the ticket may be good for
             // that
-            item = contentService.findItemParentByPath(path);
+            item = contentDao.findItemParentByPath(path);
         if (item == null)
             throw new TicketedItemNotFoundException("Resource at " + path + " not found");
 

@@ -40,6 +40,7 @@ public class StandardUserServiceTest extends TestCase {
         LogFactory.getLog(StandardUserServiceTest.class);
 
     private StandardUserService service;
+    private MockDaoStorage storage;
     private MockContentDao contentDao;
     private MockUserDao userDao;
     private TestHelper testHelper;
@@ -48,8 +49,9 @@ public class StandardUserServiceTest extends TestCase {
      */
     protected void setUp() throws Exception {
         testHelper = new TestHelper();
-        contentDao = new MockContentDao(new MockDaoStorage());
-        userDao = new MockUserDao();
+        storage = new MockDaoStorage();
+        contentDao = new MockContentDao(storage);
+        userDao = new MockUserDao(storage);
         service = new StandardUserService();
         service.setContentDao(contentDao);
         service.setUserDao(userDao);

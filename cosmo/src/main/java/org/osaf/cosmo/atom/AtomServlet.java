@@ -16,21 +16,28 @@
 package org.osaf.cosmo.atom;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.abdera.model.Base;
+import org.apache.abdera.model.Document;
+import org.apache.abdera.model.Element;
 import org.apache.abdera.protocol.server.HttpResponse;
 import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.ServiceContext;
+import org.apache.abdera.protocol.server.impl.BaseResponseContext;
 import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
 import org.apache.abdera.protocol.server.servlet.HttpResponseServletAdapter;
-
+import org.apache.abdera.util.MimeTypeHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.osaf.cosmo.model.ItemSecurityException;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -53,8 +60,20 @@ public class AtomServlet extends HttpServlet implements AtomConstants {
     protected void service(HttpServletRequest req,
                            HttpServletResponse res)
         throws ServletException, IOException {
-        RequestContext requestContext =
-            new HttpServletRequestContext(serviceContext, req);
+        RequestContext requestContext;
+        try {
+            requestContext = new HttpServletRequestContext(serviceContext, req);
+        } catch (CosmoSecurityException e) {
+            // Handle case where principal isn't authorized for target
+            if(e instanceof ItemSecurityException) {
+                handleItemSecurityError((ItemSecurityException) e, res);
+            }
+            else {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+            }
+            return;
+        }
+        
         HttpResponse response = new HttpResponseServletAdapter(res);
         serviceContext.getRequestHandlerManager().get(requestContext).
             process(serviceContext, requestContext, response);
@@ -109,5 +128,38 @@ public class AtomServlet extends HttpServlet implements AtomConstants {
                                        " of type " + clazz +
                                        " from web application context", e);
         }
+    }
+    
+    protected void handleItemSecurityError(ItemSecurityException ise, HttpServletResponse resp) {
+        InsufficientPrivilegesException se = new InsufficientPrivilegesException(ise);
+        ResponseContext rc = getBaseContext(se.createDocument(serviceContext.getAbdera()), se.getCode(), null);
+        try {
+            rc.writeTo(resp.getOutputStream());
+        } catch (Throwable e) {
+            log.error("Error writing XML", e);
+            log.error("Original exception", ise);
+            resp.setStatus(500);
+        } 
+    }
+    
+    protected ResponseContext getBaseContext(Base base,
+            int status, Date lastModified) {
+
+        BaseResponseContext response = new BaseResponseContext(base);
+        response.setStatus(status);
+        if (lastModified != null)
+            response.setLastModified(lastModified);
+        response.setContentType(MimeTypeHelper.getMimeType(base));
+        Document doc = base instanceof Document ? (Document) base
+                : ((Element) base).getDocument();
+        if (doc.getEntityTag() != null) {
+            response.setEntityTag(doc.getEntityTag());
+        } else if (doc.getLastModified() != null) {
+            response.setLastModified(doc.getLastModified());
+        }
+        
+        response.setWriter(serviceContext.getAbdera().getWriterFactory().getWriter("PrettyXML"));
+        
+        return response;
     }
 }

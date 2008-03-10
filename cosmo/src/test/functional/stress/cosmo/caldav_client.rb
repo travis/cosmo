@@ -44,7 +44,7 @@ module Cosmo
     @@log = Logger.new 'CalDAVClient'
     
     DAV_PATH = "/dav/"
-    
+   
     def initialize(server, port, context, user, pass)
       super(server,port,context,user,pass)
     end

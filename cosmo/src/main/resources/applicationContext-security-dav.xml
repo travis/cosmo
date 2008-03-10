@@ -23,6 +23,14 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
+  <!--  morse code AccessDecisionManager that verifies user paths -->
+  <bean id="davAccessDecisionManager" 
+        class="org.osaf.cosmo.dav.acegisecurity.DavAccessDecisionManager">
+    <property name="userService">
+      <ref bean="userService"/>
+    </property>
+  </bean>
+
   <!-- interceptor which performs authorization for DAV requests -->
 
   <bean id="davFilterInvocationInterceptor"
@@ -31,10 +39,7 @@
       <ref bean="authenticationManager"/>
     </property>
     <property name="accessDecisionManager">
-      <bean class="org.osaf.cosmo.dav.acegisecurity.DavAccessDecisionManager">
-         <constructor-arg><ref bean="userService"/></constructor-arg>
-         <constructor-arg><ref bean="contentService"/></constructor-arg>
-      </bean>
+      <ref bean="davAccessDecisionManager"/>
     </property>
      <property name="objectDefinitionSource">
        <value>

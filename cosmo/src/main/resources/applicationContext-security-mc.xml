@@ -23,17 +23,13 @@
 <beans>
 
   <!-- interceptor which performs authorization for morse code requests -->
-
   <bean id="mcFilterInvocationInterceptor"
         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
     <property name="accessDecisionManager">
-      <bean class="org.osaf.cosmo.mc.acegisecurity.MorseCodeAccessDecisionManager">
-         <constructor-arg><ref bean="userService"/></constructor-arg>
-         <constructor-arg><ref bean="contentService"/></constructor-arg>
-      </bean>
+      <ref bean="userPathAccessDecisionManager"/>
     </property>
      <property name="objectDefinitionSource">
        <value>
@@ -52,7 +48,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,mcFilterInvocationInterceptor
+        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,mcFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
       </value>
     </property>
   </bean>

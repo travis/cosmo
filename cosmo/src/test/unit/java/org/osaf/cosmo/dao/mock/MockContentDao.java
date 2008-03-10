@@ -15,17 +15,13 @@
  */
 package org.osaf.cosmo.dao.mock;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dao.ContentDao;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.Item;
@@ -33,8 +29,7 @@ import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
-import org.osaf.cosmo.model.mock.MockContentItem;
-
+import org.osaf.cosmo.model.mock.MockItem;
 import org.springframework.dao.ConcurrencyFailureException;
 
 /**
@@ -75,7 +70,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (getStorage().getItemByUid(collection.getUid()) != null)
             throw new UidInUseException(collection.getUid());
 
-        collection.getParents().add(parent);
+        ((MockItem) collection).addParent(parent);
 
         getStorage().storeItem((Item) collection);
 
@@ -93,10 +88,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (collection == null)
             throw new IllegalArgumentException("collection cannot be null");
 
-        if (collection instanceof MockCollectionItem)
-            ((MockCollectionItem) collection).setVersion(collection
-                    .getVersion() + 1);
-        
         getStorage().updateItem(collection);
 
         return collection;
@@ -175,36 +166,13 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (getStorage().getItemByUid(content.getUid()) != null)
             throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
-        content.getParents().add(parent);
+        ((MockItem) content).addParent(parent);
         
         getStorage().storeItem((Item)content);
 
         return content;
-    }
-    
-    /**
-     * Create new content item. A content item represents a piece of content or
-     * file.
-     *
-     * @param content
-     *            content to create
-     * @return newly created content
-     */
-    public ContentItem createContent(ContentItem content) {
-       
-        if (content == null)
-            throw new IllegalArgumentException("collection cannot be null");
-
-        if(THROW_CONCURRENT_EXCEPTION)
-            throw new ConcurrencyFailureException("fail!");
-        
-        if (getStorage().getItemByUid(content.getUid()) != null)
-            throw new UidInUseException("Uid " + content.getUid() + " already in use");
-        
-        getStorage().storeItem((Item)content);
-
-        return content;
-    }
+    } 
+   
 
     /**
      * Update an existing content item.
@@ -223,9 +191,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         Item stored = getStorage().getItemByUid(content.getUid());
         if (stored != null && stored != content)
             throw new UidInUseException("Uid " + content.getUid() + " already in use");
-        
-        if(content instanceof MockContentItem)
-            ((MockContentItem) content).setVersion(content.getVersion()+1);
         
         getStorage().updateItem((Item) content);
 
@@ -312,25 +277,26 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (getStorage().getItemByUid(content.getUid()) != null)
             throw new UidInUseException("Uid " + content.getUid() + " already in use");
         
-        content.getParents().addAll(parents);
+        for(CollectionItem parent: parents)
+            ((MockItem) content).addParent(parent);
           
         getStorage().storeItem((Item)content);
 
         return content;
     }
 
-    public CollectionItem updateCollection(CollectionItem collection, Set<ContentItem> children) {
-        for(ContentItem child : children) {
-            if(child.getCreationDate()==null) {
+    public CollectionItem updateCollection(CollectionItem collection,
+            Set<ContentItem> children) {
+        for (ContentItem child : children) {
+            if (child.getCreationDate() == null) {
                 createContent(collection, child);
-            }
-            else if(child.getIsActive()==false) {
-                removeContent(child);
+            } else if (child.getIsActive() == false) {
+                removeItemFromCollection(child, collection);
             } else {
-                if(!child.getParents().contains(collection)) {
-                    addItemToCollection(child, collection);
-                    updateContent(child);
-                }
+                if(!child.getParents().contains(collection)) 
+                   addItemToCollection(child, collection);    
+                
+                updateContent(child);
             }
             
         }
@@ -339,9 +305,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
     public CollectionItem updateCollectionTimestamp(CollectionItem collection) {
         ((MockCollectionItem) collection).setModifiedDate(new Date());
-        if (collection instanceof MockCollectionItem)
-            ((MockCollectionItem) collection).setVersion(collection
-                    .getVersion() + 1);
+        getStorage().updateItem(collection);
         return collection;
     }
 

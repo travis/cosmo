@@ -59,5 +59,22 @@
      <bean id="zeroPointNineToZeroPointTen"
          class="org.osaf.cosmo.migrate.ZeroPointNineToZeroPointTenMigration">
     </bean>
+    
+    <bean id="zeroPointTwelveToZeroPointThirteen"
+        class="org.osaf.cosmo.migrate.BasicSqlScriptMigration">
+        <property name="fromVersion">
+            <value>140</value>
+        </property>
+        <property name="toVersion">
+            <value>150</value>
+        </property>
+        <property name="supportedDialects">
+            <set>
+                <value>Derby</value>
+                <value>MySQL5</value>
+                <value>PostgresSQL</value>
+            </set>
+        </property>
+    </bean>
 
 </beans>

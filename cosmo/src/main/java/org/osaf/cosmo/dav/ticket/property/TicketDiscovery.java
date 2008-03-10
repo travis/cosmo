@@ -18,16 +18,13 @@ package org.osaf.cosmo.dav.ticket.property;
 import java.util.Set;
 
 import org.apache.jackrabbit.webdav.xml.DomUtil;
-
 import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.DavPrivilegeSet;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.Ticket;
-
-import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Represents the WebDAV Tickets ticketdiscovery property.

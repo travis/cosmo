@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.mc;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;

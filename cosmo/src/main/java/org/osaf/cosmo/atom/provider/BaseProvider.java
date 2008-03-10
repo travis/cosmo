@@ -376,6 +376,10 @@ public abstract class BaseProvider extends AbstractProvider
                                        AtomException e) {
         return returnBase(e.createDocument(abdera), e.getCode(), null);
     }
+    
+    protected ResponseContext insufficientPrivileges(RequestContext request, AtomException e) {
+        return returnBase(e.createDocument(abdera), e.getCode(), null);
+    }
 
     protected ResponseContext preconditionfailed(Abdera abdera,
                                                  RequestContext request,

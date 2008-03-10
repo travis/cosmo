@@ -38,7 +38,6 @@ import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
-import org.osaf.cosmo.model.AttributeTombstone;
 import org.osaf.cosmo.model.AvailabilityItem;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
@@ -1037,7 +1036,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         b = contentDao.findCollectionByPath("/testuser2/a/b");
 
-        contentDao.copyItem(b, "/testuser2/a/e/bcopyshallow", false);
+        contentDao.copyItem(b,"/testuser2/a/e/bcopyshallow", false);
 
         clearSession();
 
@@ -1051,7 +1050,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
         d = contentDao.findContentByUid(d.getUid());
-        contentDao.copyItem(d, "/testuser2/dcopy", true);
+        contentDao.copyItem(d,"/testuser2/dcopy", true);
 
         clearSession();
 
@@ -1094,9 +1093,15 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
+        Ticket queryTicket1 = contentDao.findTicket("ticket1");
+        Assert.assertNotNull(queryTicket1);
+        Assert.assertNull(contentDao.findTicket("blah"));
+        
+        clearSession();
+        
         newItem = contentDao.findContentByUid(newItem.getUid());
         
-        Ticket queryTicket1 = contentDao.getTicket(newItem,"ticket1");
+        queryTicket1 = contentDao.getTicket(newItem,"ticket1");
         Assert.assertNotNull(queryTicket1);
         verifyTicket(queryTicket1, ticket1);
 

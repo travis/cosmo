@@ -54,6 +54,12 @@ public interface CosmoSecurityContext {
      * the context does not represent a ticket.
      */
     public Ticket getTicket();
+    
+    /**
+     * Returns a set of tickets in addition to the principal.  This
+     * set of tickets gives the current principal additional access.
+     */
+    public Set<Ticket> getTickets();
 
     /**
      * Determines whether or not the security context represents an

@@ -119,20 +119,20 @@ public class SyncToken {
         if (chunks.length != 2 ||
             StringUtils.isBlank(chunks[0]) ||
             StringUtils.isBlank(chunks[1]))
-            throw new SyncTokenException("malformed token string");
+            throw new SyncTokenException(str);
 
         long timestamp = -1;
         try {
             timestamp = Long.parseLong(chunks[0]);
         } catch (NumberFormatException e) {
-            throw new SyncTokenException("malformed token string", e);
+            throw new SyncTokenException(str);
         }
 
         int hashcode = -1;
         try {
             hashcode = Integer.parseInt(chunks[1]);
         } catch (NumberFormatException e) {
-            throw new SyncTokenException("malformed token string", e);
+            throw new SyncTokenException(str);
         }
 
         return new SyncToken(timestamp, hashcode);

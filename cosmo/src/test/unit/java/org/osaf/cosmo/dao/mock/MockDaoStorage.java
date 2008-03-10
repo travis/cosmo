@@ -33,6 +33,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockHomeCollectionItem;
 import org.osaf.cosmo.model.mock.MockItem;
 
@@ -44,7 +45,7 @@ public class MockDaoStorage {
 
     private HashMap<String, Item> itemsByPath;
     private HashMap<String, Item> itemsByUid;
-    private HashMap<String, String> rootUids;
+    private HashMap<String, String> rootUidsByUsername;
     private HashMap<String, Set> tickets;
     private SessionIdGenerator idGenerator;
 
@@ -52,7 +53,7 @@ public class MockDaoStorage {
     public MockDaoStorage() {
         itemsByPath = new HashMap<String, Item>();
         itemsByUid = new HashMap<String, Item>();
-        rootUids = new HashMap<String, String>();
+        rootUidsByUsername = new HashMap<String, String>();
         tickets = new HashMap<String, Set>();
         idGenerator = new SessionIdGenerator();
     }
@@ -89,18 +90,18 @@ public class MockDaoStorage {
     }
 
     /** */
-    public String getRootUid(String userId) {
-        return rootUids.get(userId);
+    public String getRootUid(String username) {
+        return rootUidsByUsername.get(username);
     }
 
     /** */
-    public void setRootUid(String userId, String uid) {
-        rootUids.put(userId, uid);
+    public void setRootUid(String userName, String uid) {
+        rootUidsByUsername.put(userName, uid);
     }
 
     /** */
-    public void removeRootUid(String userId) {
-        rootUids.remove(userId);
+    public void removeRootUid(String userName) {
+        rootUidsByUsername.remove(userName);
     }
 
     public Collection<Item> getAllItems() {
@@ -108,8 +109,8 @@ public class MockDaoStorage {
     }
     
     /** */
-    public HomeCollectionItem getRootItem(String userId) {
-        String rootUid = rootUids.get(userId);
+    public HomeCollectionItem getRootItem(String userName) {
+        String rootUid = rootUidsByUsername.get(userName);
         if (rootUid == null) {
             throw new IllegalStateException("user does not have a root item");
         }
@@ -128,7 +129,7 @@ public class MockDaoStorage {
 
         itemsByUid.put(rootCollection.getUid(), rootCollection);
         itemsByPath.put("/" + rootCollection.getName(), rootCollection);
-        rootUids.put(user.getUid(), rootCollection.getUid());
+        rootUidsByUsername.put(user.getUsername(), rootCollection.getUid());
 
         return rootCollection;
     }
@@ -145,14 +146,14 @@ public class MockDaoStorage {
         ((MockItem) item).setCreationDate(new Date());
         ((MockItem) item).setModifiedDate(item.getCreationDate());
         ((MockItem) item).setEntityTag(getMockItem(item).calculateEntityTag());
-
+        
         if(item.getParent()!=null) {
             for (Item sibling : item.getParent().getChildren()) {
                 if (sibling.getName().equals(item.getName()))
                     throw new DuplicateItemNameException();
             }
             
-            item.getParent().getChildren().add(item);
+            ((MockCollectionItem) item.getParent()).addChild(item);
             itemsByPath.put(getItemPath(item.getParent()) + "/" + item.getName(),
                     item);
         }
@@ -163,6 +164,10 @@ public class MockDaoStorage {
             if(note.getModifies()!=null)
                 note.getModifies().addModification(note);
         }
+        
+        // handle tickets
+        for(Ticket ticket: item.getTickets())
+            this.createTicket(item, ticket);
         
         itemsByUid.put(item.getUid(), item);
     }
@@ -190,6 +195,8 @@ public class MockDaoStorage {
         }
 
         ((MockItem) item).setModifiedDate(new Date());
+        ((MockItem) item).setEntityTag(getMockItem(item).calculateEntityTag());
+        ((MockItem) item).setVersion(getMockItem(item).getVersion()+1);
 
         String path = "";
         if (parentItem != null)
@@ -222,6 +229,15 @@ public class MockDaoStorage {
             tickets.put(item.getUid(), itemTickets);
         }
         return itemTickets;
+    }
+    
+    public Ticket findTicket(String key) {
+        for(Set ticketSet: tickets.values())
+            for(Ticket ticket: (Set<Ticket>) ticketSet)
+                if(ticket.getKey().equals(key))
+                    return ticket;
+        
+        return null;
     }
 
     /** */

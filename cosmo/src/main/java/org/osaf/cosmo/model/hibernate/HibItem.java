@@ -33,8 +33,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -54,6 +52,7 @@ import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AttributeTombstone;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionItemDetails;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
@@ -142,14 +141,12 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     
     private transient Map<String, Stamp> stampMap = null;
     
-    @ManyToMany(targetEntity=HibCollectionItem.class, fetch=FetchType.LAZY) 
-    @JoinTable(
-        name="collection_item",
-        joinColumns={@JoinColumn(name="itemid")},
-        inverseJoinColumns={@JoinColumn(name="collectionid")}
-    )
+    @OneToMany(targetEntity=HibCollectionItemDetails.class, mappedBy="primaryKey.item", fetch=FetchType.LAZY)
+    @Cascade( {CascadeType.ALL, CascadeType.DELETE_ORPHAN }) 
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<CollectionItem> parents = new HashSet<CollectionItem>(0);
+    private Set<CollectionItemDetails> parentDetails = new HashSet<CollectionItemDetails>(0);
+    
+    private transient Set<CollectionItem> parents = null;
     
     @ManyToOne(targetEntity=HibUser.class, fetch=FetchType.LAZY)
     @JoinColumn(name="ownerid", nullable = false)
@@ -605,10 +602,39 @@ public abstract class HibItem extends HibAuditableObject implements Item {
         return version;
     }
 
+    /**
+     * @param parent collection to add item to
+     * @param readOnly true if item is read-only in collection
+     */
+    public void addParent(CollectionItem parent) {
+        parentDetails.add(new HibCollectionItemDetails(parent,this));
+        
+        // clear cached parents
+        parents = null;
+    }
+
+    public void removeParent(CollectionItem parent) {
+        CollectionItemDetails cid = getParentDetails(parent);
+        if(cid!=null) {
+            parentDetails.remove(cid);
+            // clear cached parents
+            parents = null;
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.Item#getParents()
      */
     public Set<CollectionItem> getParents() {
+        if(parents!=null)
+            return parents;
+        
+        parents = new HashSet<CollectionItem>();
+        for(CollectionItemDetails cid: parentDetails)
+            parents.add(cid.getCollection());
+        
+        parents = Collections.unmodifiableSet(parents);
+        
         return parents;
     }
 
@@ -616,10 +642,21 @@ public abstract class HibItem extends HibAuditableObject implements Item {
      * @see org.osaf.cosmo.model.Item#getParent()
      */
     public CollectionItem getParent() {
-        if(parents.size()==0)
+        if(getParents().size()==0)
             return null;
         
-        return parents.iterator().next();
+        return getParents().iterator().next();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Item#getParentDetails(org.osaf.cosmo.model.CollectionItem)
+     */
+    public CollectionItemDetails getParentDetails(CollectionItem parent) {
+        for(CollectionItemDetails cid: parentDetails)
+            if(cid.getCollection().equals(parent))
+                return cid;
+        
+        return null;
     }
 
     /* (non-Javadoc)

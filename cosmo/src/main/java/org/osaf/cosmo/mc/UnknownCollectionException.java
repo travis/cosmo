@@ -15,20 +15,29 @@
  */
 package org.osaf.cosmo.mc;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 /**
  * An exception that signifies that a Morse Code request specified a
  * collection that does not appear in storage.
  */
 public class UnknownCollectionException extends MorseCodeException {
 
+    private String uid = null;
+    
     /** */
-    public UnknownCollectionException(String message) {
-        super(message);
+    public UnknownCollectionException(String uid) {
+        super(404, "collection referenced by uuid " + uid + " not found");
+        this.uid = uid;
     }
 
-    /** */
-    public UnknownCollectionException(String message,
-                                      Throwable cause) {
-        super(message, cause);
+    protected void writeContent(XMLStreamWriter writer)
+            throws XMLStreamException {
+        writer.writeStartElement(NS_MC, "unknown-collection");
+        writer.writeStartElement(NS_MC, "collection-uuid");
+        writer.writeCharacters(uid);
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 }

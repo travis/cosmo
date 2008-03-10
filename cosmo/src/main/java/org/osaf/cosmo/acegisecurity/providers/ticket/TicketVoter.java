@@ -15,17 +15,13 @@
  */
 package org.osaf.cosmo.acegisecurity.providers.ticket;
 
-import java.util.HashSet;
-
 import org.acegisecurity.Authentication;
 import org.acegisecurity.ConfigAttribute;
 import org.acegisecurity.ConfigAttributeDefinition;
 import org.acegisecurity.intercept.web.FilterInvocation;
 import org.acegisecurity.vote.AccessDecisionVoter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.http.Methods;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;

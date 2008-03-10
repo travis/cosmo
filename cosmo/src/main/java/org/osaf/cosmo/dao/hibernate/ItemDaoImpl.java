@@ -30,12 +30,14 @@ import org.hibernate.ObjectDeletedException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.UnresolvableObjectException;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
 import org.osaf.cosmo.dao.ItemDao;
 import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
 import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionItemDetails;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ICalendarItem;
@@ -126,7 +128,13 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
                     .setParameter("uid", uid);
             hibQuery.setCacheable(true);
             hibQuery.setFlushMode(FlushMode.MANUAL);
-            return (Item) hibQuery.uniqueResult();
+            Item item = (Item) hibQuery.uniqueResult();
+            
+            // Prevent proxied object from being returned
+            if(item instanceof HibernateProxy)
+                item = (Item) ((HibernateProxy) item).getHibernateLazyInitializer().getImplementation();
+        
+            return item;
         } catch (HibernateException e) {
             getSession().clear();
             throw convertHibernateAccessException(e);
@@ -239,6 +247,24 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             throw convertHibernateAccessException(e);
         }
     }
+    
+    public Ticket findTicket(String key) {
+        if(key==null)
+            throw new IllegalArgumentException("key cannot be null");
+        
+        try {
+            // prevent auto flushing when looking up ticket
+            getSession().setFlushMode(FlushMode.MANUAL);
+            Query hibQuery = getSession().getNamedQuery("ticket.by.key")
+                    .setParameter("key", key);
+            hibQuery.setCacheable(true);
+            hibQuery.setFlushMode(FlushMode.MANUAL);
+            return (Ticket) hibQuery.uniqueResult();
+        } catch (HibernateException e) {
+            getSession().clear();
+            throw convertHibernateAccessException(e);
+        }
+    }
 
     public void createTicket(Item item, Ticket ticket) {
         try {
@@ -324,12 +350,9 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     }
     
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.dao.ItemDao#copyItem(org.osaf.cosmo.model.Item, java.lang.String, boolean)
-     */
-    public void copyItem(Item item, String path, boolean deepCopy) {
+    public void copyItem(Item item, String destPath, boolean deepCopy) {
         try {
-            String copyName = itemPathTranslator.getItemName(path);
+            String copyName = itemPathTranslator.getItemName(destPath);
             
             if(copyName==null || "".equals(copyName))
                 throw new IllegalArgumentException("path must include name");
@@ -337,14 +360,14 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             if(item instanceof HomeCollectionItem)
                 throw new IllegalArgumentException("cannot copy root collection");
             
-            CollectionItem parent = (CollectionItem) itemPathTranslator.findItemParent(path);
+            CollectionItem newParent = (CollectionItem) itemPathTranslator.findItemParent(destPath);
             
-            if(parent==null)
+            if(newParent==null)
                 throw new ItemNotFoundException("parent collection not found");
+          
+            verifyNotInLoop(item, newParent);
             
-            verifyNotInLoop(item, parent);
-            
-            Item newItem = copyItem(item,parent,deepCopy);
+            Item newItem = copyItemInternal(item, newParent, deepCopy);
             newItem.setName(copyName);
             getSession().flush();
             
@@ -393,9 +416,14 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             item.setName(moveName);
             if(!parent.getUid().equals(oldParent.getUid())) {
                 ((HibCollectionItem)parent).removeTombstone(item);
-                item.getParents().add(parent);
+                
+                // Copy over existing CollectionItemDetails
+                CollectionItemDetails cid = item.getParentDetails(oldParent);
+                ((HibItem) item).addParent(parent);
+                
+                // Remove item from old parent collection
                 getHibItem(oldParent).addTombstone(new HibItemTombstone(oldParent, item));
-                item.getParents().remove(oldParent);
+                ((HibItem) item).removeParent(oldParent);
             }
             
             getSession().flush();
@@ -564,14 +592,15 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
 
     }
 
-    protected Item copyItem(Item item, CollectionItem parent, boolean deepCopy) {
+    protected Item copyItemInternal(Item item, CollectionItem newParent, boolean deepCopy) {
         
         Item item2 = item.copy();
         item2.setName(item.getName());
         
         // copy base Item fields
-        item2.getParents().add(parent);
         setBaseItemProps(item2);
+        
+        ((HibItem) item2).addParent(newParent);
         
         // save Item before attempting deep copy
         getSession().save(item2);
@@ -581,7 +610,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         if(deepCopy==true && (item instanceof CollectionItem) ) {
             CollectionItem collection = (CollectionItem) item;
             for(Item child: collection.getChildren())
-                copyItem(child,(CollectionItem) item2,true);       
+                copyItemInternal(child, (CollectionItem) item2,true);       
         }
         
         return item2;
@@ -761,7 +790,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             return;
         
         getHibItem(collection).addTombstone(new HibItemTombstone(collection, item));
-        item.getParents().remove(collection);
+        ((HibItem) item).removeParent(collection);
         
         // If the item belongs to no collection, then it should
         // be purged.
@@ -769,12 +798,13 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
             removeItemInternal(item);
     }
     
-    protected void addItemToCollectionInternal(Item item, CollectionItem collection) {
-        
+    protected void addItemToCollectionInternal(Item item,
+            CollectionItem collection) {
+
         getSession().update(item);
         getSession().update(collection);
         ((HibCollectionItem)collection).removeTombstone(item);
-        item.getParents().add(collection);  
+        ((HibItem) item).addParent(collection);
     }
     
     protected void removeItemInternal(Item item) {

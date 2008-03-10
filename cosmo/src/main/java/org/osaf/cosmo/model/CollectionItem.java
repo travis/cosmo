@@ -27,6 +27,8 @@ public interface CollectionItem extends Item{
      * @return active children items
      */
     public Set<Item> getChildren();
+    
+    public CollectionItemDetails getChildDetails(Item item);
 
     /**
      * Return child item with matching uid

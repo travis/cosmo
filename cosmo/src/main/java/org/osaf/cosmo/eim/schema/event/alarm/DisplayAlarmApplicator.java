@@ -33,7 +33,6 @@ import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
-import org.osaf.cosmo.mc.ValidationException;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -264,7 +263,7 @@ public class DisplayAlarmApplicator extends BaseStampApplicator
         if (trigger.getDateTime() != null) {
             note.setReminderTime(trigger.getDateTime());
         } else {
-            throw new ValidationException(
+            throw new EimSchemaException(
                     "trigger for non event must be absolute");
         }
     }

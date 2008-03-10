@@ -16,24 +16,20 @@
 package org.osaf.cosmo.ui.pim;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.security.CosmoSecurityContext;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
-import org.osaf.cosmo.service.UserService;
-
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -49,8 +45,7 @@ public class CollectionBookmarkController extends AbstractController {
     private ContentService contentService;
     private CosmoSecurityManager securityManager;
     private ServiceLocatorFactory serviceLocatorFactory;
-    private UserService userService;
-        
+       
     /** 
      */
     public ModelAndView handleRequestInternal(HttpServletRequest request,
@@ -67,6 +62,8 @@ public class CollectionBookmarkController extends AbstractController {
         } catch (ClassCastException e){
             // This isn't quite the right thing to do, but is a good idea for now.
             return new ModelAndView("error_notfound");     
+        } catch(CosmoSecurityException e) {
+            new ModelAndView("error_forbidden");
         }
 
         if (collection == null){
@@ -76,30 +73,20 @@ public class CollectionBookmarkController extends AbstractController {
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("collection", collection);
         
+        CosmoSecurityContext csc = securityManager.getSecurityContext();
         
         // First try to find a ticket principal
-        String ticketKey = request.getParameter("ticket");
-
-        if (ticketKey != null) {
-            Ticket ticket = contentService.getTicket(collection, ticketKey);
-            if (ticket != null) {
-                Map<String, String> relationLinks = serviceLocatorFactory.
-                    createServiceLocator(request, ticket, false).
-                    getCollectionUrls(collection);
-                model.put("relationLinks", relationLinks);
-                model.put("ticketKey", ticketKey);
-                return new ModelAndView(pimView, model);
-            } else {
-                return new ModelAndView("error_forbidden");
-            }
+        if (csc.getTicket() != null) {
+            Map<String, String> relationLinks = serviceLocatorFactory
+                    .createServiceLocator(request, csc.getTicket(), false)
+                    .getCollectionUrls(collection);
+            model.put("relationLinks", relationLinks);
+            model.put("ticketKey", csc.getTicket().getKey());
+            return new ModelAndView(pimView, model);
         } else {
             // If we can't find a ticket principal, use the current user.
             User authUser = securityManager.getSecurityContext().getUser();
             if (authUser != null) {
-                User currentUser =
-                    userService.getUser(authUser.getUsername());
-                if (collection.getOwner().equals(currentUser) ||
-                    currentUser.isSubscribedTo(collection))
                 return new ModelAndView(pimView, model);
             }
         }
@@ -123,9 +110,4 @@ public class CollectionBookmarkController extends AbstractController {
     public void setServiceLocatorFactory(ServiceLocatorFactory serviceLocatorFactory) {
         this.serviceLocatorFactory = serviceLocatorFactory;
     }
-
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
 }

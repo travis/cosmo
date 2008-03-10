@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.acegisecurity.GrantedAuthority;
+import org.acegisecurity.GrantedAuthorityImpl;
 import org.acegisecurity.providers.AbstractAuthenticationToken;
 
 import org.osaf.cosmo.model.Ticket;
@@ -34,7 +35,8 @@ import org.osaf.cosmo.model.Ticket;
 public class TicketAuthenticationToken extends AbstractAuthenticationToken
     implements Serializable {
 
-    private static final GrantedAuthority[] AUTHORITIES = {};
+    private static final GrantedAuthority[] AUTHORITIES = { new GrantedAuthorityImpl(
+            "ROLE_TICKET") };
 
     private boolean authenticated;
     private String path;

@@ -104,9 +104,6 @@
     <property name="serviceLocatorFactory">
       <ref bean="serviceLocatorFactory"/>
     </property>
-    <property name="userService"><ref bean="userService"/></property>
-    
-    
  </bean>
 
 <!-- 

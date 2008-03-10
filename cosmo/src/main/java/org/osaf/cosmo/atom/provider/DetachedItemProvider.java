@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.osaf.cosmo.atom.InsufficientPrivilegesException;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.processor.ContentProcessor;
@@ -35,9 +36,11 @@ import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionLockedException;
 import org.osaf.cosmo.model.ContentItem;
+import org.osaf.cosmo.model.ItemSecurityException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.util.ThisAndFutureHelper;
+import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.server.ServiceLocator;
 
 public class DetachedItemProvider extends ItemProvider {
@@ -112,6 +115,11 @@ public class DetachedItemProvider extends ItemProvider {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
             return servererror(getAbdera(), request, reason, e);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return forbidden(getAbdera(), request, e.getMessage());
         }
     }
 

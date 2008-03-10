@@ -15,10 +15,13 @@
  */
 package org.osaf.cosmo.security;
 
+import java.util.Set;
+
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.Ticket;
 
 /**
- * Rrepresents a server-wide security controller for Cosmo. It
+ * Represents a server-wide security controller for Cosmo. It
  * provides entry points for obtaining information about the
  * authentication state of the currently executing thread or for
  * initiating authentication (or overwriting the current state).
@@ -55,4 +58,15 @@ public interface CosmoSecurityManager {
     public void checkPermission(Item item,
                                 int permission)
         throws PermissionDeniedException;
+    
+    /**
+     * Associate additional tickets with the current security context.
+     * Additional tickets all a principal to have additional access
+     * to resources.
+     * @param tickets additional tickets to associate with the current
+     *                security context
+     */
+    public void registerTickets(Set<Ticket> tickets);
+    
+    public void unregisterTickets();
 }

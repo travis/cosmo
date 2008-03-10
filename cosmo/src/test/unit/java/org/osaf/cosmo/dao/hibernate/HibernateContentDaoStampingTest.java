@@ -20,6 +20,8 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.validator.InvalidStateException;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
@@ -44,6 +46,9 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
     protected UserDaoImpl userDao = null;
     protected ContentDaoImpl contentDao = null;
 
+    private static final Log log = LogFactory.getLog(HibernateContentDaoStampingTest.class);
+
+    
     public HibernateContentDaoStampingTest() {
         super();
     }
@@ -183,6 +188,10 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         es = (EventStamp) stamp;
        
         Assert.assertTrue(stamp.getModifiedDate().after(stamp.getCreationDate()));
+        if(!es.getCalendar().toString().equals(newCal.toString())) {
+            log.error(es.getCalendar().toString());
+            log.error(newCal.toString());
+        }
         Assert.assertEquals(es.getCalendar().toString(), newCal.toString());
     }
     

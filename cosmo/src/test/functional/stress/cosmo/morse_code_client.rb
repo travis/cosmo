@@ -44,6 +44,7 @@ module Cosmo
     @@log = Logger.new 'MorseCodeClient'
     
     COL_PATH = "/mc/collection/"
+    USER_PATH = "/mc/user/"
     
     def initialize(server, port, context, user, pass)
       super(server, port, context, user, pass)
@@ -65,6 +66,21 @@ module Cosmo
         @@log.debug "received sync token: #{@sync_token}"
         @@log.debug "subscribe #{collection} end (#{@reqTime}ms)"
         return MorseCodeResponse.new(@sync_token, resp, data, @reqTime)
+      end
+    end
+    
+    def get_service_doc(user)
+      @@log.debug "get user doc for #{user} begin"
+      @http.start do |http|
+        req = Net::HTTP::Get.new("#{@context}#{USER_PATH}#{user}")
+        http.read_timeout=600
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        resp, data = time_block { http.request(req) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "get user doc for end (#{@reqTime}ms)"
+        return MorseCodeResponse.new(nil, resp, data, @reqTime)
       end
     end
     

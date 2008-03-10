@@ -22,12 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.ui.webapp.AuthenticationProcessingFilter;
-import org.acegisecurity.context.SecurityContextHolder;
-
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.ui.UIConstants;
-
 import org.springframework.util.Assert;
 
 /**

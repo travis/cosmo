@@ -15,19 +15,18 @@
  */
 package org.osaf.cosmo.security.impl;
 
+import java.util.Set;
+
 import org.acegisecurity.Authentication;
-import org.acegisecurity.GrantedAuthority;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.BaseSecurityContext;
+import org.osaf.cosmo.security.CosmoSecurityContext;
 
 /**
  * Standard implementation of {@link CosmoSecurityContext}. Wraps
@@ -43,8 +42,8 @@ public class CosmoSecurityContextImpl extends BaseSecurityContext {
     private static final Log log =
         LogFactory.getLog(CosmoSecurityContextImpl.class);
 
-    public CosmoSecurityContextImpl(Authentication authentication) {
-        super(authentication);
+    public CosmoSecurityContextImpl(Authentication authentication, Set<Ticket> tickets) {
+        super(authentication, tickets);
     }
 
     protected void processPrincipal() {

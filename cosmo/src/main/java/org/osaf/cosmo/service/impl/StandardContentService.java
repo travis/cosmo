@@ -35,7 +35,6 @@ import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
@@ -161,29 +160,7 @@ public class StandardContentService implements ContentService {
         return contentDao.findItemParentByPath(path);
     }
 
-    /**
-     * Update an existing item.
-     * 
-     * @param item
-     *            item to update
-     * @return updated item
-     */
-    public Item updateItem(Item item) {
-        if (log.isDebugEnabled()) {
-            log.debug("updating item " + item.getUid());
-        }
-        
-        if (item instanceof CollectionItem)
-            return updateCollection((CollectionItem) item);
-        return updateContent((ContentItem) item);
-    }
-    
-    
-    /**
-     * Add an item to a collection.
-     * @param item item to add to collection
-     * @param collection collection to add item to
-     */
+   
     public void addItemToCollection(Item item, CollectionItem collection) {
         if (log.isDebugEnabled()) {
             log.debug("adding item " + item.getUid() + " to collection "
@@ -197,6 +174,8 @@ public class StandardContentService implements ContentService {
     /**
      * Copy an item to the given path
      * @param item item to copy
+     * @param existingParent existing source collection
+     * @param targetParent existing destination collection
      * @param path path to copy item to
      * @param deepCopy true for deep copy, else shallow copy will
      *                 be performed
@@ -208,8 +187,9 @@ public class StandardContentService implements ContentService {
      *         if Item is a ContentItem and destination CollectionItem
      *         is lockecd.
      */
-    public void copyItem(Item item, String path, boolean deepCopy) {
-        
+    public void copyItem(Item item, CollectionItem targetParent, 
+            String path, boolean deepCopy) {
+
         Item toItem = findItemByPath(path);
         if(toItem!=null)
             throw new DuplicateItemNameException(path + " exists");
@@ -221,23 +201,22 @@ public class StandardContentService implements ContentService {
             CollectionItem parent = 
                 (CollectionItem) contentDao.findItemParentByPath(path);
             
-            // only attempt to lock if destination exists
-            if(parent!=null) {
-                
-                // if we can't get lock, then throw exception
-                if (!lockManager.lockCollection(parent, lockTimeout))
-                    throw new CollectionLockedException(
-                            "unable to obtain collection lock");
+            if(parent==null)
+                throw new IllegalArgumentException("path must match parent collection");
+            
+            // Verify that destination parent in path matches newParent
+            if(!parent.equals(targetParent))
+                throw new IllegalArgumentException("targetParent must mach target path");
+           
+            // if we can't get lock, then throw exception
+            if (!lockManager.lockCollection(parent, lockTimeout))
+                throw new CollectionLockedException(
+                        "unable to obtain collection lock");
 
-                try {
-                    contentDao.copyItem(item, path, deepCopy);
-                } finally {
-                    lockManager.unlockCollection(parent);
-                }
-                
-            } else { 
-                // let the dao handle throwing an error
+            try {
                 contentDao.copyItem(item, path, deepCopy);
+            } finally {
+                lockManager.unlockCollection(parent);
             }
         }
         else { 
@@ -247,45 +226,25 @@ public class StandardContentService implements ContentService {
     }
   
     /**
-     * Move item to the given path
-     * @param fromPath path of item to move
-     * @param toPath path of item to move
-     * @throws org.osaf.cosmo.model.ItemNotFoundException
-     *         if parent item specified by path does not exist
-     * @throws org.osaf.cosmo.model.DuplicateItemNameException
-     *         if path points to an item with the same path
+     * Move item from one collection to another
+     * @param item item to move
+     * @param oldParent parent to remove item from
+     * @param newParent parent to add item to
      * @throws org.osaf.cosmo.model.CollectionLockedException
      *         if Item is a ContentItem and source or destination 
      *         CollectionItem is lockecd.
      */
-    public void moveItem(String fromPath, String toPath) {
-        
-        Item toItem = findItemByPath(toPath);
-        if(toItem!=null)
-            throw new DuplicateItemNameException(toPath + " exists");
-        
-        CollectionItem oldParent = (CollectionItem) contentDao
-                .findItemParentByPath(fromPath);
-        
-        if(oldParent==null | !(oldParent instanceof CollectionItem))
-            throw new ItemNotFoundException("no item found for " + fromPath);
-        
-        CollectionItem newParent = (CollectionItem) contentDao
-                .findItemParentByPath(toPath);
-
-        if(newParent==null || !(newParent instanceof CollectionItem) )
-            throw new ItemNotFoundException("no collection found for " + toPath + " found");
-        
-        Item fromItem = contentDao.findItemByPath(fromPath);
-        
-        if(fromItem==null)
-            throw new ItemNotFoundException("no item found for " + fromPath);
+    public void moveItem(Item item, CollectionItem oldParent, CollectionItem newParent) {
         
         // Only need locking for ContentItem for now
-        if(fromItem instanceof ContentItem) {
-            Set<CollectionItem> locks = acquireLocks(newParent, fromItem);
+        if(item instanceof ContentItem) {
+            Set<CollectionItem> locks = acquireLocks(newParent, item);
             try {
-                contentDao.moveItem(fromPath, toPath);
+                // add item to newParent
+                contentDao.addItemToCollection(item, newParent);
+                // remove item from oldParent
+                contentDao.removeItemFromCollection(item, oldParent);
+                
                 // update collections involved
                 for(CollectionItem parent : locks)
                     contentDao.updateCollectionTimestamp(parent);
@@ -294,9 +253,11 @@ public class StandardContentService implements ContentService {
                 releaseLocks(locks);
             }
         } else {
-            contentDao.moveItem(fromPath, toPath);
+            // add item to newParent
+            contentDao.addItemToCollection(item, newParent);
+            // remove item from oldParent
+            contentDao.removeItemFromCollection(item, oldParent);
         }
-        
     }
     
     /**
@@ -336,25 +297,6 @@ public class StandardContentService implements ContentService {
         contentDao.updateCollectionTimestamp(collection);
     }
 
-    /**
-     * Remove an item.
-     * 
-     * @param path
-     *            path of item to remove
-     * @throws org.osaf.cosmo.model.CollectionLockedException
-     *         if Item is a ContentItem and parent CollectionItem
-     *         is locked
-     */
-    public void removeItem(String path) {
-        if (log.isDebugEnabled()) {
-            log.debug("removing item at path " + path);
-        }
-        Item item = contentDao.findItemByPath(path);
-        if (item == null)
-            return;
-        
-        removeItem(item);
-    }
     
     /**
      * Load all children for collection that have been updated since a given
@@ -648,7 +590,7 @@ public class StandardContentService implements ContentService {
      * ContentItem creation adds the item to the specified parent collections.
      * 
      * @param parents
-     *            parents that new conten items will be added to.
+     *            parents that new content items will be added to.
      * @param contentItems to update
      * @throws org.osaf.cosmo.model.CollectionLockedException
      *         if parent CollectionItem is locked
@@ -825,18 +767,6 @@ public class StandardContentService implements ContentService {
     }
 
     /**
-     * Returns all tickets on the given item.
-     *
-     * @param item the item to be ticketed
-     */
-    public Set getTickets(Item item) {
-        if (log.isDebugEnabled()) {
-            log.debug("getting tickets for item " + item.getUid());
-        }
-        return contentDao.getTickets(item);
-    }
-
-    /**
      * Returns the identified ticket on the given item, or
      * <code>null</code> if the ticket does not exists. Tickets are
      * inherited, so if the specified item does not have the ticket
@@ -852,12 +782,7 @@ public class StandardContentService implements ContentService {
         }
         return contentDao.getTicket(item, key);
     }
-
-    public Ticket getTicket(String itemId, String key){
-        Item item = findItemByUid(itemId);
-        return getTicket(item, key);
-    }
-
+    
     /**
      * Removes a ticket from an item.
      *
@@ -876,17 +801,19 @@ public class StandardContentService implements ContentService {
     /**
      * Removes a ticket from an item.
      *
-     * @param path the path of the item to be de-ticketed
+     * @param item the item to be de-ticketed
      * @param key the key of the ticket to remove
      */
-    public void removeTicket(String path,
+    public void removeTicket(Item item,
                              String key) {
         if (log.isDebugEnabled()) {
-            log.debug("removing ticket " + key + " on item at path " + path);
+            log.debug("removing ticket " + key + " on item " +
+                      item.getUid());
         }
-        Item item = contentDao.findItemByPath(path);
+       
         if (item == null)
-            throw new IllegalArgumentException("item not found for path " + path);
+            throw new IllegalArgumentException("item required");
+        
         Ticket ticket = contentDao.getTicket(item, key);
         if (ticket == null)
             return;

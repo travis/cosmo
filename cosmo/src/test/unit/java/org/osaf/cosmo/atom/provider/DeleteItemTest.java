@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.mock.MockCollectionItem;
 
 /**
  * Test class for {@link ItemProvider#deleteEntry()} tests.
@@ -46,7 +47,7 @@ public class DeleteItemTest extends BaseItemProviderTestCase {
         CollectionItem collection1 = helper.makeAndStoreDummyCollection();
         CollectionItem collection2 = helper.makeAndStoreDummyCollection();
         NoteItem item = helper.makeAndStoreDummyItem(collection1);
-        collection2.getChildren().add(item);
+        ((MockCollectionItem) collection2).addChild(item);
         helper.getContentService().updateContent(item);
         helper.getContentService().updateCollection(collection2);
 

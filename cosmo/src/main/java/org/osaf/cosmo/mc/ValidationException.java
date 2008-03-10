@@ -15,20 +15,37 @@
  */
 package org.osaf.cosmo.mc;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 /**
  * An exception signifying that data sent by a Morse Code client is
  * invalid.
  */
 public class ValidationException extends MorseCodeException {
-
+    
     /** */
     public ValidationException(String message) {
-        super(message);
+        super(400, message);
     }
 
     /** */
     public ValidationException(String message,
                                Throwable cause) {
-        super(message, cause);
+        super(400, message, cause);
+    }
+    
+    protected void writeContent(XMLStreamWriter writer)
+            throws XMLStreamException {
+        StringBuffer msgBuffer = new StringBuffer(getMessage());
+        Throwable cause = getCause();
+        if(cause!=null && cause.getMessage()!=null)
+            msgBuffer.append(": " + cause.getMessage());
+            
+        writer.writeStartElement(NS_MC, "data-validation-error");
+        writer.writeStartElement(NS_MC, "message");
+        writer.writeCharacters(msgBuffer.toString());
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 }

@@ -29,6 +29,7 @@ import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AttributeTombstone;
 import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.CollectionItemDetails;
 import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
@@ -38,6 +39,7 @@ import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.hibernate.HibCollectionItemDetails;
 import org.w3c.dom.Element;
 
 
@@ -83,9 +85,7 @@ public abstract class MockItem extends MockAuditableObject implements Item {
     
     private transient Map<String, Stamp> stampMap = null;
     
-    
-    private Set<CollectionItem> parents = new HashSet<CollectionItem>(0);
-    
+    private Set<CollectionItemDetails> parentDetails = new HashSet<CollectionItemDetails>(0);
     
     private User owner;
   
@@ -546,21 +546,48 @@ public abstract class MockItem extends MockAuditableObject implements Item {
         return version;
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getParents()
-     */
-    public Set<CollectionItem> getParents() {
-        return parents;
+    public void addParent(CollectionItem parent) {
+        MockCollectionItemDetails cid = new MockCollectionItemDetails(parent, this);
+        parentDetails.add(cid);
     }
 
+    public void removeParent(CollectionItem parent) {
+        CollectionItemDetails cid = getParentDetails(parent);
+        if(cid!=null)
+            parentDetails.remove(cid);
+    }
+    
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#getParent()
+     * @see org.osaf.cosmo.model.Item#getParents()
+     */
+    public Set<CollectionItem> getParents() {
+        
+        Set<CollectionItem> parents = new HashSet<CollectionItem>();
+        for(CollectionItemDetails cid: parentDetails)
+            parents.add(cid.getCollection());
+        
+        return Collections.unmodifiableSet(parents);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Item#getParent()
      */
     public CollectionItem getParent() {
-        if(parents.size()==0)
+        if(getParents().size()==0)
             return null;
         
-        return parents.iterator().next();
+        return getParents().iterator().next();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.model.Item#getParentDetails(org.osaf.cosmo.model.CollectionItem)
+     */
+    public CollectionItemDetails getParentDetails(CollectionItem parent) {
+        for(CollectionItemDetails cid: parentDetails)
+            if(cid.getCollection().equals(parent))
+                return cid;
+        
+        return null;
     }
 
     /* (non-Javadoc)

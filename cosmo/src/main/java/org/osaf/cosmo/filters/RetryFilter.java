@@ -35,7 +35,7 @@ import org.osaf.cosmo.server.ServerConstants;
  * as runtime exceptions or stored in a request attribute), and 
  * retries the request a number of times before failing.  
  * 
- * The filter can be configured watch any HTTP method (PUT,POST,DELETE, etc)
+ * The filter can be configured to watch any HTTP method (PUT,POST,DELETE, etc)
  * and search for any exception type and retry any number of times.
  * 
  * This filter is useful for catching runtime exceptions such as
@@ -156,8 +156,11 @@ public class RetryFilter implements Filter, ServerConstants {
             request.getAttribute(ATTR_SERVICE_EXCEPTION);
         if (e == null)
             return null;
-        if(isFilterException(e))
+        if(isFilterException(e)) {
+            // clear for retry
+            request.removeAttribute(ATTR_SERVICE_EXCEPTION);
             return e;
+        }
         return null;
     }
 

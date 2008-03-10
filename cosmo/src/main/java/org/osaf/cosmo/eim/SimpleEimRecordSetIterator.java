@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.mc.acegisecurity;
+package org.osaf.cosmo.eim;
 
-import org.acegisecurity.AccessDeniedException;
+import java.util.Iterator;
 
 /**
- * <p>
- * An exception indicating that a principal was denied a privilege for a
- * morse code resource.
- * </p>
+ * EimRecordSetIterator implementation that wraps simple Iterator
  */
-public class MorseCodeAccessDeniedException extends AccessDeniedException {
-    private String href;
-   
-    public MorseCodeAccessDeniedException(String href) {
-        super(null);
-        this.href = href;
+public class SimpleEimRecordSetIterator implements EimRecordSetIterator {
+
+    Iterator<EimRecordSet> iterator = null;
+    
+    public SimpleEimRecordSetIterator(Iterator<EimRecordSet> iterator) {
+        this.iterator = iterator;
+    }
+    
+    public boolean hasNext() throws EimException {
+        return iterator.hasNext();
     }
 
-    public String getHref() {
-        return href;
+    public EimRecordSet next() throws EimException {
+        return iterator.next();
     }
+
 }

@@ -39,6 +39,10 @@ public class AtomException extends Exception implements AtomConstants {
                          Throwable cause) {
         this(code, cause.getMessage(), cause);
     }
+    
+    public AtomException(int code, String message) {
+        this(code, message, null);
+    }
 
     public AtomException(int code,
                          String message,

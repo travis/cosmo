@@ -1069,7 +1069,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     dateParamsFromEimDate: function (dateString){
-        var returnVal = {};
+        var returnVal = {
+            anyTime: false
+        };
         var params = dateString.split(":")[0].split(";");
         for (var i = 0; i < params.length; i++){
             var param = params[i].split("=");
@@ -1080,8 +1082,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 returnVal.value = param[1].toLowerCase();
             }
         }
-        
-        if ((returnVal.value == "date") && !returnVal.anyTime) returnVal.allDay = true;
+        returnVal.allDay = (returnVal.value == "date") && !returnVal.anyTime;
         return returnVal;
     },
     

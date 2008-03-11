@@ -112,7 +112,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     getTicketType: function (ticketEl){
-        if (!(!!dojo.isIE && dojo.isIE < 7)){
+        if (!dojo.isIE){
             return ticketEl.getAttributeNS(this.COSMO_NS, "type");
         } else {
             return ticketEl.getAttribute("cosmo:type");

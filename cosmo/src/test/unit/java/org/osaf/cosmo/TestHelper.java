@@ -107,7 +107,7 @@ public class TestHelper {
         cal.getComponents().add(e1);
 
         VTimeZone tz1 = TimeZoneRegistryFactory.getInstance().createRegistry().
-            getTimeZone(TimeZone.getDefault().getID()).getVTimeZone();
+        getTimeZone("America/Los_Angeles").getVTimeZone();
         cal.getComponents().add(tz1);
 
         return cal;
@@ -131,7 +131,7 @@ public class TestHelper {
  
         // add timezone information
         VTimeZone tz = TimeZoneRegistryFactory.getInstance().createRegistry().
-            getTimeZone(TimeZone.getDefault().getID()).getVTimeZone();
+            getTimeZone("America/Los_Angeles").getVTimeZone();
         String tzValue =
             tz.getProperties().getProperty(Property.TZID).getValue();
         net.fortuna.ical4j.model.parameter.TzId tzParam =

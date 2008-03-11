@@ -166,7 +166,18 @@
         />
 
     <cache
-        name="org.osaf.cosmo.model.hibernate.HibItem.parents"
+        name="org.osaf.cosmo.model.hibernate.HibCollectionItemDetails"
+        maxElementsInMemory="10000"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="600"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        />
+
+    <cache
+        name="org.osaf.cosmo.model.hibernate.HibItem.parentDetails"
         maxElementsInMemory="10000"
         eternal="false"
         overflowToDisk="false"

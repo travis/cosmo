@@ -116,7 +116,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
             this.clickOffsetLozengeTop = this.getLocalMouseYPos(yPos) - node.offsetTop;
             this.clickOffsetLozengeBottom = this.getLocalMouseYPos(yPos) - offsetBottom;
         }
-        this.setLozengTitleNode(true);
+        this.setLozengeTitleNode(true);
     };
     this.doDrag = function () {
         // Hand off to Draggable methods based on dragMode
@@ -265,7 +265,7 @@ cosmo.view.cal.draggable.Draggable = function (id) {
         this.item.lozenge.setOpacity(o);
     };
 
-    this.setLozengTitleNode = function (forceToLeft) {
+    this.setLozengeTitleNode = function (forceToLeft) {
         var lozenge = this.item.lozenge;
         if (lozenge instanceof cosmo.view.cal.lozenge.NoTimeLozenge &&
             lozenge.left < 0) {
@@ -480,7 +480,7 @@ cosmo.view.cal.draggable.NoTimeDraggable.prototype =
  */
 cosmo.view.cal.draggable.NoTimeDraggable.prototype.drop = function () {
 
-    this.setLozengTitleNode(false);
+    this.setLozengeTitleNode(false);
 
     if (!this.dragged || !this.paranoia()) {
         return false;

@@ -1,6 +1,8 @@
-open_lab_json = """{"params": {"url": "\/pim"},  "method": "open"}"""
-open_snarf_json = """{"params": {"url": "\/chandler\/pim"},  "method": "open"}"""
+open_lab_json = """{"params": {"url": "\/pim"},  "method": "open"}
+{"method": "waits.forElement", "params": {"timeout": "40000", "id": "_month2_day28"}}"""
 
+open_snarf_json = """{"params": {"url": "\/chandler\/pim"},  "method": "open"}
+{"method": "waits.forElement", "params": {"timeout": "40000", "id": "_month2_day28"}}"""
 
 from windmill.authoring import RunJsonFile
 import windmill
@@ -12,5 +14,5 @@ def setup_module(module):
         json = open_lab_json
     else:
         json = open_snarf_json
-    RunJsonFile('setup_test_pim.json', lines=[json])()
+    RunJsonFile('setup_test_pim.json', lines=json.splitlines())()
     

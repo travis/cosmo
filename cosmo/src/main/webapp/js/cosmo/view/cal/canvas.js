@@ -550,12 +550,6 @@ cosmo.view.cal.canvas = new function () {
                 }
 
                 switch(true) {
-                    // Main content area -- drag entire event
-                    case id.indexOf('Content') > -1:
-                    case id.indexOf('Title') > -1:
-                    case id.indexOf('Start') > -1:
-                        dragItem.init('drag', item);
-                        break;
                     // Top lip -- resize top
                     case id.indexOf('Top') > -1:
                         dragItem.init('resizetop', item);
@@ -564,8 +558,12 @@ cosmo.view.cal.canvas = new function () {
                     case id.indexOf('Bottom') > -1:
                         dragItem.init('resizebottom', item);
                         break;
+                    // Main content area -- drag entire event
+                    case id.indexOf('Content') > -1:
+                    case id.indexOf('Title') > -1:
+                    case id.indexOf('Start') > -1:
                     default:
-                        // Do nothing
+                        dragItem.init('drag', item);
                         break;
                 }
                 // Set the Cal draggable to the dragged lozenge

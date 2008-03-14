@@ -40,7 +40,6 @@ dojo.require("cosmo.model.Item");
 
 cosmo.ui.detail = new function () {
     this.item = null;
-    this.processingExpando = false;
 
     this.createFormElementsForStamp = function (stampType) {
         return new cosmo.ui.detail[stampType + 'FormElements']();
@@ -651,74 +650,40 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
     if (!this.bodyNode) {
         return false;
     }
-    // Dojo bug http://trac.dojotoolkit.org/ticket/1776
-    // Set processing lock: Don't trigger again until
-    // animation completes -- Dojo doesn't allow an explicit
-    // target height to be passed to the wipeIn; it guesses
-    // based on the height of the node when the animation
-    // begins. If the wipeIn is initiated when the wipeOut
-    // is in progress, it mistakes the truncated height as the
-    // desired target height. Setting a lock prevents this
-    // from happening -- NOTE, the lock has to be removed as
-    // a callback from the animation, otherwise it gets removed
-    // before the animation has really completed.
-    // -------------------------
-    // If this is being called from accordion mode, bypass
-    // the animation lock -- multiple sections need to collapse
-    // at the same time, and since this is not user-invoked,
-    // there are no issues with the Dojo bug above
-    if (accordion) {
-        // Dummy var for anim callback
-        var f = null;
-    }
-    // This is normal, user-mode -- go through the locking
-    // mechanism
-    else {
-        if (cosmo.ui.detail.processingExpando) {
-            return false;
-        }
-        else {
-            // Add the animation processing lock
-            cosmo.ui.detail.processingExpando = true;
-            // Callback to remove the lock
-            var f = function () { cosmo.ui.detail.processingExpando = false; }
-        }
-    }
 
-    // Allow to be passed in explicitly, or just trigger toggle
-    var doShow = typeof p == 'boolean' ? p : !this.expanded;
-    var display = '';
-    var animKey = '';
-    if (doShow) {
-        var dvForm = this.parent;
-        if (dvForm.accordionMode) {
-            var stamps = dvForm.stamps;
-            for (var i = 0; i < stamps.length; i++) {
-                var st = stamps[i];
-                var sec = dvForm[st.stampType.toLowerCase() + 'Section'];
-                if (sec != this) {
-                    sec.toggleExpando(false, true);
-                }
+    if (typeof p == 'boolean' ? p : !this.expanded) this.expand() 
+    else this.shrink();
+}
+cosmo.ui.detail.StampSection.prototype.setShowHideText = function(str){
+    if (dojo.isIE || dojo.isSafari) {
+        this.showHideSwitch.innerText = str;
+    }
+    else {
+        this.showHideSwitch.textContent = str;
+    }
+}
+
+cosmo.ui.detail.StampSection.prototype.expand = function(){
+    var dvForm = this.parent;
+    if (dvForm.accordionMode) {
+        var stamps = dvForm.stamps;
+        for (var i = 0; i < stamps.length; i++) {
+            var st = stamps[i];
+            var sec = dvForm[st.stampType.toLowerCase() + 'Section'];
+            if (sec != this) {
+                sec.toggleExpando(false, true);
             }
         }
-        this.expanded = true;
-        display = _('Main.DetailForm.Hide');
-        animKey = 'wipeIn';
     }
-    else {
-        this.expanded = false;
-        display = _('Main.DetailForm.Show');
-        animKey = 'wipeOut';
-    }
-    // Toggle the switch text
-    if (dojo.isIE || dojo.isSafari) {
-        this.showHideSwitch.innerText = display;
-    }
-    else {
-        this.showHideSwitch.textContent = display;
-    }
-    // Do the expando animation
-    dojox.fx[animKey]({node: this.bodyNode, duration: 500, easing: f}).play();
+    this.expanded = true;
+    this.setShowHideText(_('Main.DetailForm.Hide'));
+    dojo.fx.wipeIn({node: this.bodyNode, duration: 500}).play();
+}
+
+cosmo.ui.detail.StampSection.prototype.shrink = function(){
+    this.expanded = false;
+    this.setShowHideText(_('Main.DetailForm.Show'));
+    dojo.fx.wipeOut({node: this.bodyNode, duration: 500}).play();
 }
 
 cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {

@@ -33,17 +33,11 @@ cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
         date.tzId = timezone;
     }
     else if (formattedString.substring(formattedString.length - 1).toLowerCase() == "z"){
-
         date.utc = true;
     }
-
-    var dateProps = cosmo.datetime.parseIso8601(formattedString);
-    date.setYear(dateProps[ parts.YEAR]);
-    date.setMonth(dateProps[parts.MONTH]);
-    date.setDate(dateProps[parts.DAY]);
-    date.setHours(dateProps[parts.HOUR]);
-    date.setMinutes(dateProps[parts.MINUTE]);
-    date.setSeconds(dateProps[parts.SECOND]);
+    dojo.date.stamp._isoRegExp = /^(?:(\d{4})(?:(\d{2})(?:(\d{2}))?)?)?(?:T(\d{2})(\d{2})(?:(\d{2})())?((?:[+-](\d{2})(\d{2}))|Z)?)?$/
+    date.updateFromUTC(dojo.date.stamp.fromISOString(formattedString).getTime());
+    dojo.date.stamp._isoRegExp = null;
     return date;
 };
 

@@ -76,23 +76,23 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         return base.substring(0, queryIndex) + projection + this.queryHashToString(queryHash);
     },
 
-    // This is hacky, TODO: point to Atom for 0.10
     createCollection: function(name, kwArgs){
         var r = this.getDefaultRequest(
-            cosmo.env.getFullUrl("Dav") + 
-                "/" + encodeURIComponent(cosmo.util.auth.getUsername()) + 
-                "/" + encodeURIComponent(name),
+            this.getAtomBase() + "/user/" + this._getUsernameForURI(),
             kwArgs);
-
-        return dojo.xhr(cosmo.caldav.METHOD_MKCALENDAR, r);
+        r.postData =  ["<?xml version='1.0' encoding='UTF8'?>",
+                       '<div class="collection">', 
+                       '<span class="name">', cosmo.util.string.escapeXml(name), '</span>',
+                       '<span class="uuid">', dojox.uuid.generateTimeBasedUuid(), '</span>',
+                       '</div>'].join("");
+        r.contentType = "application/xhtml+xml";
+        return dojo.rawXhrPost(r);
     },
 
-    // This is hacky, TODO: point to Atom for 0.10
     deleteCollection: function(collection, kwArgs){
         var r = this.getDefaultRequest(
-            collection.getUrl("dav"),
+            collection.getUrl("atom"),
             kwArgs);
-
         return dojo.xhrDelete(r);
     },
 

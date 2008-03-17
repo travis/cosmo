@@ -72,7 +72,7 @@
             <set>
                 <value>Derby</value>
                 <value>MySQL5</value>
-                <value>PostgresSQL</value>
+                <value>PostgreSQL</value>
             </set>
         </property>
     </bean>

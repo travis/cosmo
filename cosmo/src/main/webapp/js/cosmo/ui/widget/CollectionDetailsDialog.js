@@ -315,11 +315,12 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
  );
 
  cosmo.ui.widget.CollectionDetailsDialog.getInitProperties =
-    function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection) {
-
+    function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection, id) {
         var contentWidget = new cosmo.ui.widget.CollectionDetailsDialog(
             { collection: collection,
-              displayedSelection: displayedSelection });
+              displayedSelection: displayedSelection,
+              id: id
+            });
 
         var closeButton = new cosmo.ui.widget.Button(
             { text: _("Main.CollectionDetails.Close"),

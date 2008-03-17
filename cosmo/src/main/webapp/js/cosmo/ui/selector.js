@@ -300,7 +300,11 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     var id = targ.id.replace(prefix + 'Details_', '');
                     cosmo.app.showDialog(
                         cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            cosmo.app.pim.collections.getItem(id)));
+                            cosmo.app.pim.collections.getItem(id),
+                            null,
+                            "collectionDetailsDialog"
+                        )
+                    );
                     return true;
                 }
                 // Selector

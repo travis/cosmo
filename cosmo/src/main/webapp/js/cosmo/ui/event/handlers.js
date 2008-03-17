@@ -176,6 +176,7 @@ cosmo.ui.event.handlers.cleanup = function () {
 cosmo.ui.event.handlers.resize = function () {
     //here goes
 	//cosmo.ui.resize.Viewports.resize()
-	cosmo.app.pim.baseLayout.render();
+    if (cosmo.app.pim.baseLayout)
+	    cosmo.app.pim.baseLayout.render();
 }
 

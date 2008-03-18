@@ -61,7 +61,7 @@
             cosmo.app.init();
             if (dojo.queryToObject(location.search.substring(1))['signup']
                 == 'true'){
-                cosmo.account.create.showForm();
+                dojo.addOnLoad(function(){cosmo.account.create.showForm()});
             }
                         
         }

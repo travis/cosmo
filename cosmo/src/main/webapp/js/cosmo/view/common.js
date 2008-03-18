@@ -117,9 +117,8 @@ cosmo.view.viewBase = new function () {
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published event.
      */
-    dojo.subscribe("cosmo:appKeyboardInput", dojo.hitch(this, function (cmd) {
+    this.handleKeyboardInput = function (cmd) {
         if (!this.isCurrentView()) { return false; }
-
         var e = cmd.appEvent;
         var t = cmd.type;
         var isValidEventSource = function (e, elem) {
@@ -170,7 +169,7 @@ cosmo.view.viewBase = new function () {
             }
             break;
         }
-    }));
+    };
                                                        
 };
 

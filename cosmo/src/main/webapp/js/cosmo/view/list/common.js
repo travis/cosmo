@@ -73,6 +73,9 @@ dojo.subscribe("cosmo:calLoadCollection", function(cmd){
     }
 });
 
+dojo.subscribe("cosmo:appKeyboardInput", 
+               dojo.hitch(cosmo.view.list, cosmo.view.list.handleKeyboardInput));
+
 cosmo.view.list.loadItems = function (o) {
     var opts = o || {};
     var note = opts.note || null;

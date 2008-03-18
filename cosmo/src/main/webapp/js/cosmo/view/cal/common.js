@@ -64,6 +64,8 @@ dojo.subscribe("cosmo:calLoadCollection", function(cmd){
     var opts = cmd.opts || {};
     cosmo.view.cal.loadItems(opts);
 });
+dojo.subscribe("cosmo:appKeyboardInput", 
+               dojo.hitch(cosmo.view.cal, cosmo.view.cal.handleKeyboardInput));
 
 
 cosmo.view.cal.loadItems = function (p) {

@@ -16,7 +16,6 @@
 
 dojo.provide("cosmo.ui.ContentBox");
 dojo.require("cosmo.util.deferred");
-dojo.require("dojo.Deferred");
 // Generic content container class
 // ==============================
 cosmo.ui.ContentBox = function (p) {
@@ -105,7 +104,7 @@ cosmo.ui.ContentBox.prototype.render = function () {
     if (!(renderDeferred instanceof dojo.Deferred)){
         renderDeferred = cosmo.util.deferred.getFiredDeferred(renderDeferred);
     }
-    renderDeferred.addCallback(dojo.lang.hitch(this, function () {
+    renderDeferred.addCallback(dojo.hitch(this, function () {
         var ch = this.children;
         for (var i = 0; i < ch.length; i++) {
             ch[i].render();

@@ -23,14 +23,12 @@
 
 dojo.provide("cosmo.ui.widget.Button");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
-dojo.require("dojo.html.common");
+dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 
-dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
+dojo.declare("cosmo.ui.widget.Button", [dijit._Widget, dijit._Templated], {
 
     // Constants
     DISABLED_OPACITY : 0.8,
@@ -44,15 +42,15 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
     width: 0,
     handleOnClick: "",
 
-    fillInTemplate: function() {
+    postCreate: function() {
         if (typeof(this.handleOnClick) == "string") {
          eval("this.handleOnClick = function() {" + this.handleOnClick + ";}");
         }
         // Mouse effects and onclick
         this._attachHandlers();
         // DOM handles
-        this.domNode.id = this.widgetId;
-        this.domNode.name = this.widgetId;
+        this.domNode.id = this.id;
+        this.domNode.name = this.id;
 
         // Finish setting up
         this.setText(this.text);
@@ -97,11 +95,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
         }
     },
     _attachHandlers: function () {
-        dojo.event.connect(this.domNode, 'onmouseover', this, '_morphButton');
-        dojo.event.connect(this.domNode, 'onmouseout', this, '_morphButton');
-        dojo.event.connect(this.domNode, 'onmousedown', this, '_morphButton');
-        dojo.event.connect(this.domNode, 'onmouseup', this, '_morphButton');
-        dojo.event.connect(this.domNode, 'onclick', this, '_handleOnClick');
+        dojo.connect(this.domNode, 'onmouseover', this, '_morphButton');
+        dojo.connect(this.domNode, 'onmouseout', this, '_morphButton');
+        dojo.connect(this.domNode, 'onmousedown', this, '_morphButton');
+        dojo.connect(this.domNode, 'onmouseup', this, '_morphButton');
+        dojo.connect(this.domNode, 'onclick', this, '_handleOnClick');
     },
     _morphButton: function(e) {
         if (this.enabled) {
@@ -117,6 +115,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.Button", dojo.widget.HtmlWidget, {
         }
     },
     _handleOnClick: function() {
+        console.log("button click");
         if (this.enabled) {
            this.handleOnClick();
         }

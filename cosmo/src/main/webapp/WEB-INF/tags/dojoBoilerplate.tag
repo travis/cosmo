@@ -23,7 +23,6 @@
 
 <%@ attribute name="timezones"        %>
 <%@ attribute name="parseWidgets"        %>
-<%@ attribute name="searchIds"        %>
 <%@ attribute name="dojoLayers"        %>
 
 <u:bind var="PRODUCT_VERSION"
@@ -44,39 +43,27 @@
 
 <script type="text/javascript">
 
-    // Set isDebug to true to get nice dojo debugging messages.
-
-    var searchIds = [<c:forEach var="searchId" items="${searchIds}" varStatus="status"><c:if test='${status.count != 1}'>,</c:if>
-                     "${searchId}"</c:forEach>];
-
+    // Set isDebug to true to get nice dojo debugging messages
+    // and to grab javascript from /js/cosmo instead of /js/lib/dojo/cosmo
     var djConfig = {isDebug: false, 
-                    baseUrl: "${baseUrl}",
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
                     i18nLocation: "${baseUrl}/i18n.js",
                     confLocation: "${baseUrl}/webui.conf",
                     templateName: "${templateName}",
-                    parseWidgets: ${parseWidgets},
-                    searchIds: searchIds}
+                    parseOnLoad: ${parseWidgets},
+                    serverBaseUrl: "${baseUrl}"}
 </script>
 
-<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo"/>
+<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
-<script type="text/javascript">
-(function (){
-    dojo.require("dojo.widget.*");
-    dojo.require("dojo.debug.console");
-    dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);
-    dojo.widget.manager.registerWidgetPackage("cosmo.ui.widget");
-})();
-</script>
 <c:forEach var="layerName" items="${dojoLayers}">
-<script type="text/javascript" src="${dojoPath}/src/${layerName}.js"></script>
+<script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>
 </c:forEach>
 
 <script type="text/javascript">
-
-function bootstrap(){
+(function bootstrap(){
+    if (djConfig.isDebug) dojo.registerModulePath("cosmo", "../../../cosmo");
     dojo.require("cosmo.env");
     cosmo.env.setVersion("${PRODUCT_VERSION}");
     dojo.require("cosmo.ui.conf");
@@ -96,8 +83,6 @@ function bootstrap(){
         cosmo.datetime.timezone.setTimezoneRegistry(registry);
     }
     dojo.require('cosmo.ui.conf');
-}
-bootstrap();
-
+})();
 </script>
 

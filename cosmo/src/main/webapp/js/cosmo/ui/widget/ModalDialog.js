@@ -29,16 +29,18 @@
 
 dojo.provide("cosmo.ui.widget.ModalDialog");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.html.common");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");
 
-dojo.widget.defineWidget("cosmo.ui.widget.ModalDialog", 
-dojo.widget.HtmlWidget, {
+dojo.declare(
+    "cosmo.ui.widget.ModalDialog", 
+    [dijit._Widget, dijit._Templated],
+    {
         // Template stuff
         templateString: '<div id="modalDialog"></div>',
         
@@ -171,33 +173,33 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         setContent: function (content) {
-            this.content = content || this.content;
+            this.content = content || this.content || "";
             // Content area
             if (typeof this.content == 'string') {
                 this.contentNode.innerHTML = this.content;
-            } else if (dojo.html.isNode(this.content)) {
+            } else if (!isNaN(this.content.nodeType)) {
+                // if this.content is a dom node
                 this._removeChildren(this.contentNode);
                 this.contentNode.appendChild(this.content);
-            } else if (this.content instanceof dojo.widget.HtmlWidget){
+            } else if (this.content instanceof dijit._Widget){
                 this._removeChildren(this.contentNode);
                 this.contentNode.appendChild(this.content.domNode);
             }
             return true;
         },
         setButtons: function (l, c, r) {
-            var bDiv = this.buttonPanelNode;
             // Reset buttons if needed
             this.btnsLeft = l || this.btnsLeft;
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
             
-            // Clean up previous panel if any
-            if (this.btnPanel) {
-                this.btnPanel.destroyButtons();
-                if (bDiv.firstChild) {
-                    bDiv.removeChild(bDiv.firstChild);
+            if (this.btnPanel){
+                // Only clean up if btnPanel.domNode exists
+                // otherwise cleanup already occurred
+                if (this.btnPanel.domNode){
+                    this.btnPanel.destroyRecursive()
                 }
-                this.btnPanel.destroy();
+                this.btnPanel = null;
             }
            
             // Create and append the panel
@@ -205,9 +207,11 @@ dojo.widget.HtmlWidget, {
             // a parent element to append to, the widget parser uses document.body,
             // which causes the doc to reflow -- and
             // scrolling canvas scrollOffset gets reset
-            this.btnPanel = dojo.widget.createWidget(
-                'cosmo:ButtonPanel', { btnsLeft: this.btnsLeft, btnsCenter: this.btnsCenter,
-                btnsRight: this.btnsRight }, bDiv, 'last');
+            this.btnPanel = new cosmo.ui.widget.ButtonPanel(
+                { btnsLeft: this.btnsLeft, 
+                  btnsCenter: this.btnsCenter,
+                  btnsRight: this.btnsRight });
+            this.buttonPanelNode.appendChild(this.btnPanel.domNode);
             return true;
         },
         render: function () {
@@ -218,8 +222,8 @@ dojo.widget.HtmlWidget, {
             return true;
         },
         center: function () {
-            var w = dojo.html.getViewport().width;
-            var h = dojo.html.getViewport().height;
+            var w = dijit.getViewport().w;
+            var h = dijit.getViewport().h;
             this.setLeft(parseInt((w - this.width)/2));
             this.setTop(parseInt((h - this.height)/2));
             return true;
@@ -355,16 +359,12 @@ dojo.widget.HtmlWidget, {
         
         // Lifecycle functions
         postMixInProperties: function () {
-            this.toggleObj =
-                dojo.lfx.toggle[this.toggle] || dojo.lfx.toggle.plain;
-                
             // reference to original show method
             this.showOrig = this.show;
             
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
-                
                 // Set style visibility to hidden -- display needs to be
                 // block in order to do sizing/positioning, but we don't
                 // want to see stuff shifting around after we can see the
@@ -393,20 +393,17 @@ dojo.widget.HtmlWidget, {
                 // Sizing
                 this.width = this.width || DIALOG_BOX_WIDTH;
                 this.height = this.height || DIALOG_BOX_HEIGHT;                
-                
                 this._setUpDialog();
-                
                 var waitForIt = this.render() && this.center();
                 this.renderUiMask();
                 this.domNode.style.display = 'block';
                 this.domNode.style.zIndex = 2000;
-
                 // Have to measure for content area height once div is actually on the page
                 if (this.setWidth() &&
                 this.setHeight()) {
                 this.setContentAreaHeight();
                 }
-                if (this.content instanceof dojo.widget.HtmlWidget 
+                if (this.content instanceof dijit._Widget
                     && this.content.appendedToParent){
                     this.content.appendedToParent(this);
                 }
@@ -424,10 +421,8 @@ dojo.widget.HtmlWidget, {
 
                 // Clean up previous panel if any
                 if (this.btnPanel) {
-                    if (bDiv.firstChild) {
-                        bDiv.removeChild(bDiv.firstChild);
-                    }
-                    this.btnPanel.destroy();
+                    this.btnPanel.destroyRecursive();
+                    this.btnPanel = null;
                 }
  
                 this.title = '';
@@ -439,8 +434,8 @@ dojo.widget.HtmlWidget, {
                 this.height = null;
                 this.uiFullMask.style.display = 'none';
                 this.isDisplayed = false;
-                if (this.content instanceof dojo.widget.HtmlWidget) {
-                    this.content.destroy();
+                if (this.content instanceof dijit._Widget) {
+                    this.content.destroyRecursive();
                 }
                 this.content = null;
                 // Cleanup -- wipe DOM inside container
@@ -449,5 +444,12 @@ dojo.widget.HtmlWidget, {
             };
         },
         
+        postCreate: function(){
+            dojo.body().appendChild(this.domNode);
+			this.inherited("postCreate", arguments);
+        },
+        
         // Toggling visibility
-        toggle: 'plain' } );
+        toggle: 'plain' 
+    } 
+);

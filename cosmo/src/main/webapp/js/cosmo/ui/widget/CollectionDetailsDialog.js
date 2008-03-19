@@ -16,9 +16,6 @@
 
 dojo.provide("cosmo.ui.widget.CollectionDetailsDialog");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.html.common");
-
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
@@ -29,13 +26,8 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
 dojo.require("cosmo.topics");
 
-dojo.widget.defineWidget("cosmo.ui.widget.CollectionDetailsDialog", "html",
-
-//init function.
-dojo.widget.HtmlWidget, function(){
-
-}
-,
+dojo.declare("cosmo.ui.widget.CollectionDetailsDialog", 
+             [dijit._Widget, dijit._Templated], 
 //Prototype Properties
 {
         //User supplied properties:
@@ -43,8 +35,8 @@ dojo.widget.HtmlWidget, function(){
         displayedSelection: '', // The selection item to display if invoked from ticket view
 
         // Template stuff
-        templatePath:dojo.uri.dojoUri(
-            '../../cosmo/ui/widget/templates/CollectionDetailsDialog/CollectionDetailsDialog.html'),
+    templatePath: dojo.moduleUrl("cosmo",
+                                 'ui/widget/templates/CollectionDetailsDialog.html'),
 
         // Attach points
         table: null, //the table, which has pretty much all the content
@@ -95,7 +87,7 @@ dojo.widget.HtmlWidget, function(){
 
         protocolUrls: null,
         displayName: null,
-        httpSupported: !dojo.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
+        httpSupported: !cosmo.util.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
 
         // Lifecycle functions
         postMixInProperties: function(){
@@ -109,7 +101,7 @@ dojo.widget.HtmlWidget, function(){
            return !(collection instanceof cosmo.model.Collection && !collection.isWriteable())
         },
 
-        fillInTemplate: function () {
+        postCreate: function () {
             var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
             cosmo.util.html.setSelectOptions(this.clientSelector, options);
 
@@ -148,7 +140,7 @@ dojo.widget.HtmlWidget, function(){
             for (var i = 0; i < inputs.length; i++) {
                 var inp = inputs[i];
                 if (inp.type == 'text') {
-                    dojo.event.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
+                    dojo.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
                 }
             }
 
@@ -185,8 +177,9 @@ dojo.widget.HtmlWidget, function(){
         _handleDelete: function () {
             cosmo.app.hideDialog();
             var collectionToDelete = this.collection;
+            var isSubscription = this.collection instanceof cosmo.model.Subscription;
             var confirmDeferred = cosmo.app.confirm(
-                _("Main.DeleteCollection.Confirm", collectionToDelete.getDisplayName()),
+                _(isSubscription? "Main.DeleteSubscription.Confirm" :"Main.DeleteCollection.Confirm", collectionToDelete.getDisplayName()),
                 {cancelDefault: true}
             );
             // This errback will fire if the user selects "no".
@@ -200,7 +193,7 @@ dojo.widget.HtmlWidget, function(){
                     if (confirmed){
                         cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
                         var deleteDeferred =
-                            cosmo.app.pim.serv.deleteCollection(collectionToDelete);
+                            cosmo.app.pim.serv[isSubscription? "deleteSubscription":"deleteCollection"](collectionToDelete);
                         deleteDeferred.addCallback(function () {
                             // FIXME: Need to reorg the collections-related code
                             // to behave similarly to CalItem/ListItem Items
@@ -280,25 +273,22 @@ dojo.widget.HtmlWidget, function(){
         },
 
         _setClientInstructions: function(client){
-            var x = 1;
-            var d = document.createElement("div");
             if (!this.httpSupported && client == "iCal"){
                 client = "icalNotSupported";
             }
+            var strings = [];
+            var x = 1;
             while (true){
                 var key = "Main.CollectionDetails.Instructions." + client + "." + x;
                 if (cosmo.util.i18n.messageExists(key)){
-                    var message = _(key);
-                    if (x > 1){
-                        d.appendChild(document.createElement("br"));
-                    }
-                    d.appendChild(document.createTextNode(message));
+                    strings.push(_(key));
                 } else {
                     break;
                 }
                 x++;
             }
-            dojo.dom.replaceChildren(this.clientInstructions, d);
+            strings.push("");
+            this.clientInstructions.innerHTML = strings.join("<br/>");
         },
 
         _setClientCollectionAddress: function(client){
@@ -325,23 +315,17 @@ dojo.widget.HtmlWidget, function(){
  );
 
  cosmo.ui.widget.CollectionDetailsDialog.getInitProperties =
-    function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection) {
+    function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection, id) {
+        var contentWidget = new cosmo.ui.widget.CollectionDetailsDialog(
+            { collection: collection,
+              displayedSelection: displayedSelection,
+              id: id
+            });
 
-    var dummyNode = document.createElement('span');
-    var contentWidget = dojo.widget.createWidget("cosmo:CollectionDetailsDialog",
-                    { collection: collection,
-                      displayedSelection: displayedSelection },
-                 dummyNode, 'last');
-
-    dummyNode.removeChild(contentWidget.domNode);
-
-    var closeButton = dojo.widget.createWidget(
-        "cosmo:Button",
-        { text: _("Main.CollectionDetails.Close"),
-            width: 74,
-            handleOnClick: cosmo.app.hideDialog },
-            dummyNode, 'last');
-    dummyNode.removeChild(closeButton.domNode);
+        var closeButton = new cosmo.ui.widget.Button(
+            { text: _("Main.CollectionDetails.Close"),
+              width: 74,
+              handleOnClick: cosmo.app.hideDialog });
 
     return {
         content: contentWidget,

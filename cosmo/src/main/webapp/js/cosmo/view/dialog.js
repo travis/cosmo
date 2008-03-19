@@ -19,25 +19,17 @@ dojo.provide('cosmo.view.dialog');
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
-dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.widget.Button");
 
 cosmo.view.dialog = new function () {
-    dojo.event.topic.subscribe('/calEvent', this, 'handlePub');
     // Public members
     // ********************
     this._item = null;
 
+    dojo.subscribe('cosmo:calSetSelected', 
+                   dojo.hitch(this, function(cmd){this._item = cmd.data}));
     // Public methods
     // ********************
-    this.handlePub = function (cmd) {
-        var act = cmd.action;
-        var item = cmd.data;
-        switch (act) {
-            case 'setSelected':
-                this._item = item;
-                break;
-        }
-    };
     this.getSelectedItem = function () {
         return this._item;
     };
@@ -57,17 +49,14 @@ cosmo.view.dialog.BaseDialog.prototype.closeSelf = function () {
 };
 cosmo.view.dialog.BaseDialog.prototype.doPublishRemove =
     function (qual) {
-    var selItem = cosmo.view.dialog.getSelectedItem();
-    dojo.event.topic.publish('/calEvent', {
-        action: 'remove', qualifier: qual, data: selItem });
-    this.closeSelf();
-};
+        var selItem = cosmo.view.dialog.getSelectedItem();
+        dojo.publish('cosmo:calRemove', [{qualifier: qual, data: selItem }]);
+        this.closeSelf();
+    };
 
 cosmo.view.dialog.BaseDialog.prototype.doPublishSave =
     function (qual, saveItem, delta) {
-    dojo.event.topic.publish('/calEvent', {
-        action: 'save', qualifier: qual,
-        data: saveItem, delta: delta });
+        dojo.publish('cosmo:calSave', [{qualifier: qual, data: saveItem, delta: delta }]);
     this.closeSelf();
 };
 
@@ -86,83 +75,95 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     var buttons = {
         'removeAllEvents': function (only) {
             var btnText = only ? _('App.Button.Remove') : allEventsMsg;
-            dojo.debug("create removeAllEvents button called.");
-            return new Button('allButtonDialog', btnWideWidth,
-                function () { self.doPublishRemove(
+            console.debug("create removeAllEvents button called.");
+            return new cosmo.ui.widget.Button(
+                {id: 'allButtonDialog', width: btnWideWidth,
+                 handleOnClick: function () { self.doPublishRemove(
                     cosmo.view.service.recurringEventOptions.ALL_EVENTS); },
-                btnText, true);
+                 text: btnText, small: true});
         },
 
         'removeFutureEvents': function () {
-            dojo.debug("create removeFutureEvents button called.");
-            return new Button('allFutureButtonDialog', btnWiderWidth,
-                function () { self.doPublishRemove(
+            console.debug("create removeFutureEvents button called.");
+            return new cosmo.ui.widget.Button(
+                {id: 'allFutureButtonDialog', 
+                 width: btnWiderWidth,
+                 handleOnClick: function () { self.doPublishRemove(
                 cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS); },
-                AllFutureMsg, true);
+                 text: AllFutureMsg, small: true});
         },
 
         'removeOnlyThisEvent': function () {
-            dojo.debug("create removeOnlyThisEvent button called.");
-            return new Button('onlyThisButtonDialog', btnWiderWidth,
-                function () {
+            console.debug("create removeOnlyThisEvent button called.");
+            return new cosmo.ui.widget.Button(
+                {id: 'onlyThisButtonDialog', width: btnWiderWidth,
+                 handleOnClick: function () {
                     self.doPublishRemove(
                         cosmo.view.service.recurringEventOptions.ONLY_THIS_EVENT);
                 },
-                OnlyThisMsg, true);
+                 text: OnlyThisMsg, small: true});
         },
 
         'saveAllEvents': function (saveItem, delta, only) {
             var btnText = only ? _('App.Button.Save') : allEventsMsg;
-            return new Button('allButtonDialog', btnWideWidth,
-                function () {
+            return new cosmo.ui.widget.Button(
+                {id: 'allButtonDialog', width: btnWideWidth,
+                 handleOnClick: function () {
                     self.doPublishSave(
                         cosmo.view.service.recurringEventOptions.ALL_EVENTS,
                         saveItem, delta)
                 },
-                btnText,
-                true);
+                 text: btnText, small: true});
         },
 
         'saveFutureEvents': function (saveItem, delta) {
-            return new Button('allFutureButtonDialog', btnWiderWidth,
-                function () {
+            return new cosmo.ui.widget.Button(
+                {id: 'allFutureButtonDialog', width: btnWiderWidth,
+                 handleOnClick: function () {
                     self.doPublishSave(
                         cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS,
                         saveItem, delta);
                 },
-                AllFutureMsg, true);
+                 text: AllFutureMsg, small: true});
         },
 
         'saveOnlyThisEvent': function (saveItem, delta) {
-            return new Button('onlyThisButtonDialog', btnWiderWidth,
-                function () {
+            return new cosmo.ui.widget.Button(
+                {id: 'onlyThisButtonDialog', width: btnWiderWidth,
+                 handleOnClick: function () {
                     self.doPublishSave(
                         cosmo.view.service.recurringEventOptions.ONLY_THIS_EVENT,
                         saveItem,
                         delta);
                 },
-                OnlyThisMsg, true);
+                 text: OnlyThisMsg, small: true});
         },
 
         'allEventsDisabled': function () {
-            return new Button('allButtonDialog', btnWideWidth,
-                null, allEventsMsg, true, true);
+            return new cosmo.ui.widget.Button(
+                {id: 'allButtonDialog', width: btnWideWidth,
+                 text: allEventsMsg, small: true, enabled: false});
         },
 
         'futureEventsDisabled': function () {
-            return new Button('allFutureButtonDialog', btnWiderWidth,
-                null, AllFutureMsg, true, true);
+            return new cosmo.ui.widget.Button(
+                {id: 'allFutureButtonDialog', width: btnWiderWidth,
+                 text: AllFutureMsg, small: true, enabled: false});
         }
     };
 
     props.removeConfirm = function () {
-        dojo.debug("removeConfirm dialog called.");
+        console.debug("removeConfirm dialog called.");
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('removeConfirmCancelButton', 74, cosmo.app.hideDialog,
-                _('App.Button.Cancel'), true)],
-            'btnsRight': [new Button('removeConfirmRemoveButton', 74, function () { self.doPublishRemove(); },
-                _('App.Button.Remove'), true)],
+            'btnsLeft': [new cosmo.ui.widget.Button(
+                {id: 'removeConfirmCancelButton', width: 74, 
+                 handleOnClick: cosmo.app.hideDialog,
+                 text: _('App.Button.Cancel'), small: true})],
+            'btnsRight': [new cosmo.ui.widget.Button(
+                {id: 'removeConfirmRemoveButton', width: 74, 
+                 handleOnClick: function () { self.doPublishRemove(); },
+                 text: _('App.Button.Remove'), small: true})],
             'defaultAction': function () { self.doPublishRemove(); },
             'content': _('Main.Prompt.ItemRemoveConfirm')
         };
@@ -171,8 +172,10 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.removeRecurConfirm = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('removeRecurrenceCancelButton', 74, cosmo.app.hideDialog,
-                _('App.Button.Cancel'), true)],
+            'btnsLeft': [new cosmo.ui.widget.Button(
+                {id: 'removeRecurrenceCancelButton', width: 74, 
+                 handleOnClick: cosmo.app.hideDialog, text: _('App.Button.Cancel'), 
+                 small: true})],
             'btnsRight': [],
             'defaultAction': function () {},
             'width': 480,
@@ -183,9 +186,10 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.saveRecurConfirm = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('saveRecurConfirmSaveButton', 74,
-                function () { self.doCancelSave.apply(self) },
-                _('App.Button.Cancel'), true)],
+            'btnsLeft': [new cosmo.ui.widget.Button(
+                {id: 'saveRecurConfirmSaveButton', width: 74,
+                 handleOnClick: function () { self.doCancelSave.apply(self) },
+                 text: _('App.Button.Cancel'), small: true})],
             'btnsRight': [],
             'defaultAction': function () {},
             'width': 480,
@@ -196,9 +200,10 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.saveRecurConfirmAllEventsOnly = function () {
          return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('saveRecurConfirmAllEventsCancelButton', 74,
-                function () { self.doCancelSave.apply(self) },
-                _('App.Button.Cancel'), true)],
+            'btnsLeft': [new cosmo.ui.widget.Button(
+                {id: 'saveRecurConfirmAllEventsCancelButton', width: 74,
+                 handleOnClick: function () { self.doCancelSave.apply(self) },
+                 text: _('App.Button.Cancel'), small: true})],
             'btnsRight': [],
             'defaultAction': function () {},
             'width': 480,
@@ -209,9 +214,10 @@ cosmo.view.dialog.RecurrenceDialog = function () {
     props.removeRecurConfirmAllEventsOnly = function () {
          return {
             'type': cosmo.app.modalDialog.CONFIRM,
-            'btnsLeft': [new Button('removeRecurConfirmAllEventsCancelButton', 74,
-                function () { self.doCancelSave.apply(self) },
-                _('App.Button.Cancel'), true)],
+            'btnsLeft': [new cosmo.ui.widget.Button(
+                {id: 'removeRecurConfirmAllEventsCancelButton', width: 74,
+                 handleOnClick: function () { self.doCancelSave.apply(self) },
+                 text: _('App.Button.Cancel'), small: true})],
             'btnsRight': [],
             'defaultAction': function () {},
             'width': 480,
@@ -288,8 +294,8 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             'width': 480,
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [
-                new Button({
-                    widgetId: "unsavedChangesDialogCancelButton",
+                new cosmo.ui.widget.Button({
+                    id: "unsavedChangesDialogCancelButton",
                     text: strings.cancelButtonText, 
                     width: btnWidth,
                     handleOnClick: opts.cancelFunc, 
@@ -297,15 +303,15 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
                     enabled: true })
             ],
             'btnsRight': [
-                new cosmo.ui.button.Button({ 
-                    widgetId: "unsavedChangesDialogDiscardButton",
+                new cosmo.ui.widget.Button({ 
+                    id: "unsavedChangesDialogDiscardButton",
                     text: strings.discardButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.discardFunc,
                     small: true,
                     enabled: true }),
-                new cosmo.ui.button.Button({ 
-                    widgetId: "unsavedChangesDialogSaveButton",
+                new cosmo.ui.widget.Button({ 
+                    id: "unsavedChangesDialogSaveButton",
                     text: strings.saveButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.saveFunc,

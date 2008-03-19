@@ -15,7 +15,7 @@
  */
 dojo.provide('cosmo.ui.event.listeners');
 
-dojo.require('dojo.event.browser');
+
 dojo.require('cosmo.ui.event.handlers');
 
 // Event listeners
@@ -27,7 +27,7 @@ cosmo.ui.event.listeners.hookUpListeners = function (){
 	document.onmouseup = cosmo.ui.event.handlers.mouseUpHandler;
 	document.onkeyup = cosmo.ui.event.handlers.keyUpHandler;
 
-	dojo.event.browser.addListener(window, "onload", cosmo.app.init, false);
-	dojo.event.browser.addListener(window, "onunload", cosmo.ui.event.handlers.cleanup, false);
-	dojo.event.browser.addListener(window, "onresize", cosmo.ui.event.handlers.resize, false);
+	dojo.addOnLoad(cosmo.app.init);
+	dojo.addOnUnload(cosmo.ui.event.handlers.cleanup);
+	dojo.connect(window, "onresize", cosmo.ui.event.handlers.resize);
 }

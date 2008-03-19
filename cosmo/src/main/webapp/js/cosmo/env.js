@@ -72,16 +72,6 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
 }
 
 /**
- * Returns the path to the cosmo script base, relative to the document NOT dojo
- */
-cosmo.env.getCosmoBase = cosmo.env._getCachePropGetterPopulator("cosmoBase", function(){
-    // "../.." is ugly but it works.
-    var uri = dojo.hostenv.getBaseScriptUri() + "../../";
-    cosmo.env._cosmoConfig["baseCosmoUri"] = uri;
-    return uri;
-});
-
-/**
  * Returns the path to the widgets template directory , relative to the document NOT dojo.
  * In other words, not for use with dojo.uri.dojoUri(), which wants you to be relative to
  * dojo scripts. This is useful for stuff like css background urls which can't deal with
@@ -91,8 +81,7 @@ cosmo.env.getCosmoBase = cosmo.env._getCachePropGetterPopulator("cosmoBase", fun
  */
 cosmo.env.getTemplateBase = cosmo.env._getCachePropGetterPopulator("templateBase", function(){
 //FIXME maybe this should go in our base widget (once we make one ;-) )
-    var uri = cosmo.env.getCosmoBase() + "cosmo/ui/widget/templates/";
-    return uri;
+    return dojo.moduleUrl("cosmo") + "ui/widget/templates/";
 });
 
 /**
@@ -271,7 +260,7 @@ cosmo.env.getTimeoutMinutes = function (){
 }
 
 //initialize from djConfig
-cosmo.env.setBaseUrl(djConfig['baseUrl']);
+cosmo.env.setBaseUrl(djConfig['serverBaseUrl']);
 cosmo.env.setStaticBaseUrlTemplate(djConfig['staticBaseUrlTemplate']);
 cosmo.env.setStaticBaseUrlRange(djConfig['staticBaseUrlRange']);
 

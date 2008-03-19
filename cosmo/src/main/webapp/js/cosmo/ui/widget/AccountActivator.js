@@ -24,23 +24,18 @@
 
 dojo.provide("cosmo.ui.widget.AccountActivator");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
-dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.convenience");
+dojo.require("dijit._Templated");
 
-dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWidget,
-    function(){
-
-    },
+dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
     {
 
-        templatePath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/AccountActivator/AccountActivator.html"),
+        templatePath: dojo.moduleUrl(
+            "cosmo", "/ui/widget/templates/AccountActivator.html"),
 
         //properties to be set by tag or constructor
         activationId: "",
@@ -58,14 +53,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
         homedirUrlText: null,
         activateButtonContainer: null,
 
-        fillInTemplate: function (){
-            var button = dojo.widget.createWidget("cosmo:Button",
+        postCreate: function (){
+            var button = new cosmo.ui.widget.Button,
                 {text: _("Activation.Activate"),
-                 widgetId: "accountActivateButton"});
+                 id: "accountActivateButton"});
 
             this.activateButtonContainer.appendChild(button.domNode);
 
-            dojo.event.connect(button, "handleOnClick",this, "_activateEventHandler");
+            dojo.connect(button, "handleOnClick",this, "_activateEventHandler");
 
         },
 
@@ -73,45 +68,46 @@ dojo.widget.defineWidget("cosmo.ui.widget.AccountActivator", dojo.widget.HtmlWid
             var self = this;
             self.activationId = id;
 
-            var setActivationIdHandlerDict = {
-                handle: function(type, user, evt){
-                    if (evt.status == 200){
-                        self.usernameText.innerHTML = user.username;
-                        self.nameText.innerHTML = user.firstName + " " + user.lastName;
-                        self.emailText.innerHTML = user.email;
-                        self.urlText.innerHTML = user.url;
-                        self.homedirUrlText.innerHTML = user.homedirUrl;
-                    } else if (evt.status == 403){
-                        alert("couldn't find user");
-                    } else {
-                        alert(evt.status);
-                    }
-                }
-            }
+            var d = cosmo.cmp.getUserByActivationId(id, setActivationIdHandlerDict);
+            d.addCallback(function(){
+                self.usernameText.innerHTML = user.username;
+                self.nameText.innerHTML = user.firstName + " " + user.lastName;
+                self.emailText.innerHTML = user.email;
+                self.urlText.innerHTML = user.url;
+                self.homedirUrlText.innerHTML = user.homedirUrl;
+            });
 
-            cosmo.cmp.getUserByActivationId(id, setActivationIdHandlerDict);
+            d.addErrback(function(){
+                if (d.ioArgs.xhr.status == 403){
+                    alert(_("Account.Activate.UserNotFound"));
+                } else {
+                    alert(_("Account.Activate.UserNotFound") + ": " + 
+                          evt.status);
+                }
+            });
+            
 
 
         },
 
         _activateEventHandler: function(){
-            this.activate({load: this.activateSuccess,
-                           error: this.activateFailure})
+            var d = this.activate();
+            d.addCallback(dojo.hitch(this, this.activateSuccess));
+            d.addErrback(dojo.hitch(this, this.activateFailure));
         },
 
-        activateSuccess: function(type, data, evt){},
+        activateSuccess: function(data){},
 
-        activateFailure: function(type, data, evt){},
+        activateFailure: function(err){},
 
-        activate: function (activateHandlerDict, id){
+        activate: function (id){
             var activationId = (id == undefined) ? this.activationId : id;
 
             if (activationId == "" || activationId == undefined){
                 throw new Error("Activation id not specified");
             } else {
-                cosmo.cmp.activate(activationId, activateHandlerDict);
+                cosmo.cmp.activate(activationId);
             }
         }
-
     }
 );

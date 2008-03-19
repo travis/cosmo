@@ -698,10 +698,14 @@ public class CmpServlet extends HttpServlet {
     private void processGetUserCount(HttpServletRequest req,
             HttpServletResponse resp)
     throws ServletException, IOException {
-        resp.setStatus(HttpServletResponse.SC_OK);
-        
-        sendPlainTextResponse(resp, Integer.toString(userService.getUsers().size()));
-        return;
+        try {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            sendPlainTextResponse(resp, Integer.toString(getUserList(req, resp).size()));
+        }
+        catch (CmpException e){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           e.getMessage());
+        }
     }
 
     /*
@@ -712,26 +716,28 @@ public class CmpServlet extends HttpServlet {
     private void processUsersGet(HttpServletRequest req,
             HttpServletResponse resp)
     throws ServletException, IOException {
+        try {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            sendXmlResponse(resp, new UsersResource(getUserList(req, resp), 
+                                                    getUrlBase(req), 
+                                                    req.getParameterMap()));
+        }
+        catch (CmpException e){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                           e.getMessage());
+        }
+    }
+
+    private Collection<User> getUserList(HttpServletRequest req,
+                                         HttpServletResponse resp) 
+        throws CmpException {
         Collection<User> users;
-
         if (req.getQueryString() != null){
-            PageCriteria<User.SortType> pageCriteria;
-            try {
-                pageCriteria = buildPageCriteria(req);
-            }
-            catch (CmpException e){
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        e.getMessage());
-                return;
-            }
-            users = userService.getUsers(pageCriteria).getList();
-
+            users = userService.getUsers(buildPageCriteria(req)).getList();
         } else {
             users = userService.getUsers();
         }
-        resp.setStatus(HttpServletResponse.SC_OK);
-        sendXmlResponse(resp, new UsersResource(users, getUrlBase(req), 
-                req.getParameterMap()));
+        return users;
     }
 
     /*

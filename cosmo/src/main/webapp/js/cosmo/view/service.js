@@ -32,11 +32,11 @@ cosmo.view.service = new function () {
     var self = this;
     
     this._ranges = {
-        'daily': [dojo.date.dateParts.DAY, 1],
-        'weekly': [dojo.date.dateParts.WEEK, 1],
-        'biweekly': [dojo.date.dateParts.WEEK, 2],
-        'monthly': [dojo.date.dateParts.MONTH, 1],
-        'yearly': [dojo.date.dateParts.YEAR, 1]
+        'daily': [cosmo.datetime.util.dateParts.DAY, 1],
+        'weekly': [cosmo.datetime.util.dateParts.WEEK, 1],
+        'biweekly': [cosmo.datetime.util.dateParts.WEEK, 2],
+        'monthly': [cosmo.datetime.util.dateParts.MONTH, 1],
+        'yearly': [cosmo.datetime.util.dateParts.YEAR, 1]
     };
 
     // Public attributes
@@ -57,44 +57,24 @@ cosmo.view.service = new function () {
     this.processingQueue = [];
     // Last clicked cal item -- used for selection persistence.
     this.lastSent = null;
-
-    // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
-
+    dojo.subscribe("cosmo:calSave", function(cmd){
+        saveItemChanges(cmd.data, cmd.qualifier, cmd.delta);
+    });
+    dojo.subscribe("cosmo:calSaveConfirm", function(cmd){
+        saveItemChangesConfirm(cmd.data, cmd.delta);
+    });
+    dojo.subscribe("cosmo:calRemoveConfirm", function(cmd){
+        removeItemConfirm(cmd.data);
+    });
+    dojo.subscribe("cosmo:calRemove", function(cmd){
+        removeItem(cmd.data, cmd.qualifier);
+    });
     /**
      * Handle items published on the '/calEvent' channel, including
      * self-published items
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published item.
      */
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var qual = cmd.qualifier || null;
-        var data = cmd.data || {};
-        var opts = cmd.opts;
-        var delta = cmd.delta;
-        switch (act) {
-            case 'saveConfirm':
-                var confirmItem = cmd.data;
-                saveItemChangesConfirm(confirmItem, delta);
-                break;
-            case 'save':
-                var saveItem = cmd.data;
-                saveItemChanges(saveItem, qual, delta);
-                break;
-            case 'removeConfirm':
-                var confirmItem = cmd.data;
-                removeItemConfirm(confirmItem);
-                break;
-            case 'remove':
-                var removeEv = cmd.data;
-                removeItem(removeEv, qual);
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
 
 
     // Saving changes
@@ -111,7 +91,7 @@ cosmo.view.service = new function () {
         var change = null;
         var changeCount = 0;
         for (change in changeTypes){
-            dojo.debug("changeType: " +change);
+            console.debug("changeType: " +change);
             if (changeTypes[change]){
                 changeCount++;
             }
@@ -119,7 +99,7 @@ cosmo.view.service = new function () {
 
         if (!item.data.hasRecurrence()){
             delta.applyChangeType(change);
-            dojo.event.topic.publish('/calEvent', {action: 'save', data: item, delta: delta });
+            dojo.publish('cosmo:calSave', [{data: item, delta: delta }]);
         }
         else {
             confirmType = '';
@@ -136,7 +116,7 @@ cosmo.view.service = new function () {
             }
             var props = cosmo.view.recurrenceDialog.getProps(confirmType,
                 { changeTypes: changeTypes, delta: delta, saveItem: item });
-            dojo.debug(props.content);
+            console.debug(props.content);
             cosmo.app.showDialog(props);
         }
     }
@@ -171,7 +151,7 @@ cosmo.view.service = new function () {
             switch(qual) {
                 // Changing the master item in the recurring sequence
                 case opts.ALL_EVENTS:
-                    dojo.debug("ALL_EVENTS");
+                    console.debug("ALL_EVENTS");
                     delta.applyToMaster();
                     f = function(){
                         doSaveItem(item,
@@ -184,7 +164,7 @@ cosmo.view.service = new function () {
 
                 // Break the previous recurrence and start a new one
                 case opts.ALL_FUTURE_EVENTS:
-                    dojo.debug("ALL_FUTURE");
+                    console.debug("ALL_FUTURE");
                     var newItem  = delta.applyToOccurrenceAndFuture();
                     f = function () {
                         doSaveItem(item,
@@ -198,7 +178,7 @@ cosmo.view.service = new function () {
 
                 // Modifications
                 case opts.ONLY_THIS_EVENT:
-                    dojo.debug("ONLY_THIS_EVENT");
+                    console.debug("ONLY_THIS_EVENT");
                     var note = item.data;
                     var recurrenceId = note.recurrenceId;
                     var master = note.getMaster();
@@ -218,7 +198,7 @@ cosmo.view.service = new function () {
                     break;
 
                 case 'new':
-                    dojo.debug("doSaveChanges: new")
+                    console.debug("doSaveChanges: new")
                     f = function () { doSaveItem(item, { 'new': true } ) };
                     break;
                 default:
@@ -227,12 +207,12 @@ cosmo.view.service = new function () {
         }
         // Normal one-shot item
         else {
-            dojo.debug("saveItemChanges: normal sone shot item");
+            console.debug("saveItemChanges: normal sone shot item");
             f = function () { doSaveItem(item, { } ) };
         }
 
         // Give a sec for the processing state to show
-        dojo.debug("before set timeout");
+        console.debug("before set timeout");
         setTimeout(f, 35);
     }
     /**
@@ -253,20 +233,20 @@ cosmo.view.service = new function () {
         var note = item.data;
         var delta = opts.delta;
         var newItem = opts.newItemNote;
-        dojo.debug("Do save: savetype: " + opts.saveType)
-        dojo.debug("Do save: iznew: " + isNew)
+        console.debug("Do save: savetype: " + opts.saveType)
+        console.debug("Do save: iznew: " + isNew)
 
         if (isNew){
             deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.getSelectedCollection(),{});
         } else if (opts.saveType) {
-            dojo.debug("opty! " + opts.saveType );
+            console.debug("opty! " + opts.saveType );
             switch(opts.saveType){
                 case OPTIONS.ALL_EVENTS:
-                    dojo.debug("about to save note in ALL EVENTS")
+                    console.debug("about to save note in ALL EVENTS")
                     deferred = cosmo.app.pim.serv.saveItem(note.getMaster());
                     break;
                 case OPTIONS.ALL_FUTURE_EVENTS:
-                    dojo.debug("about to save note in ALL FUTURE EVENTS")
+                    console.debug("about to save note in ALL FUTURE EVENTS")
                     //saveThisAndFuture(oldOccurrence, newMaster, kwArgs)
                     var newItemDeferred = cosmo.app.pim.serv.saveThisAndFuture(note, newItem);
                     var requestId = newItemDeferred.id;
@@ -289,22 +269,22 @@ cosmo.view.service = new function () {
                         handleSaveItem(item, error, newItemDeferred.id, opts.saveType, delta);
                     });
 
-                    dojo.debug("about to save note in ALL FUTURE EVENTS")
+                    console.debug("about to save note in ALL FUTURE EVENTS")
                     return;
                 case OPTIONS.ONLY_THIS_EVENT:
                      if (!opts.newModification){
-                         dojo.debug("doSaveItem: saving a previously created modificaiton")
+                         console.debug("doSaveItem: saving a previously created modificaiton")
                          deferred = cosmo.app.pim.serv.saveItem(note);
                      }
                      else {
-                         dojo.debug("doSaveItem: creating a new modificaiton")
+                         console.debug("doSaveItem: creating a new modificaiton")
                          deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.getSelectedCollection());
                      }
                 break;
             }
         }
         else {
-            dojo.debug("normal, non-recurring item")
+            console.debug("normal, non-recurring item")
             deferred = cosmo.app.pim.serv.saveItem(note);
         }
 
@@ -361,7 +341,7 @@ cosmo.view.service = new function () {
          
         if (err){
             // Failure -- display exception info
-            act = 'saveFailed';
+            act = 'cosmo:calSaveFailed';
             
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
@@ -403,7 +383,7 @@ cosmo.view.service = new function () {
             }
         } else {
             // Success
-            act = 'saveSuccess';
+            act = 'cosmo:calSaveSuccess';
         }
 
         // Success/failure for all other cases
@@ -413,13 +393,12 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.event.topic.publish('/calEvent', {
-                 'action': act,
+            dojo.publish(act, [{
                  'data': item,
                  'saveType': saveType,
                  'delta':delta,
                  'newItemNote':newItem
-            });
+            }]);
         }
         setTimeout(f, 0);
     }
@@ -432,7 +411,7 @@ cosmo.view.service = new function () {
      * @param item A ListItem/CalItem object, the item to be removed.
      */
     function removeItemConfirm(item) {
-        dojo.debug("removeItemConfirm!");
+        console.debug("removeItemConfirm!");
         var confirmType = '';
         var opts = {};
         opts.masterEvent = false;
@@ -462,8 +441,8 @@ cosmo.view.service = new function () {
      * recurring items. Will be one of the three recurringEventOptions.
      */
     function removeItem(item, qual) {
-        dojo.debug("remove Item: item: " +item);
-        dojo.debug("qual: "+ qual);
+        console.debug("remove Item: item: " +item);
+        console.debug("qual: "+ qual);
 
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
@@ -508,7 +487,7 @@ cosmo.view.service = new function () {
         }
         // Normal one-shot item
         else {
-            dojo.debug("normal one shot item");
+            console.debug("normal one shot item");
             f = function () { doRemoveItem(item, { 'removeType': 'singleEvent' }) }
         }
         // Give a sec for the processing state to show
@@ -522,7 +501,7 @@ cosmo.view.service = new function () {
      * @param opts A JS Object, options for the remove operation.
      */
     function doRemoveItem(item, opts) {
-        dojo.debug("doRemoveItem: opts.removeType:" + opts.removeType);
+        console.debug("doRemoveItem: opts.removeType:" + opts.removeType);
         var OPTIONS = self.recurringEventOptions;
         var deferred = null;
         var reqId = null;
@@ -609,15 +588,16 @@ cosmo.view.service = new function () {
      */
     function handleRemoveResult(item, err, reqId, opts) {
         var removeEv = item;
+        var act;
         // Simple error message to go along with details from Error obj
         var errMsg = _('Main.Error.ItemRemoveFailed');
         if (err) {
-            act = 'removeFailed';
+            act = 'cosmo:calRemoveFailed';
             cosmo.app.showErr(errMsg, getErrDetailMessage(err), err);
             item.restoreEvent();
         }
         else {
-            act = 'removeSuccess';
+            act = 'cosmo:calRemoveSuccess';
         }
 
         // Broadcast message for success/failure
@@ -625,9 +605,8 @@ cosmo.view.service = new function () {
         // subsequent UI code errors in the addErrBack for
         // the service Deferred
         var f = function () {
-            dojo.event.topic.publish('/calEvent', { 'action': act,
-                'data': removeEv, 'opts': opts });
-            dojo.event.topic.publish('/calEvent', { action: 'setSelected', data: null});
+            dojo.publish(act, [{'data': removeEv, 'opts': opts }]);
+            dojo.publish('cosmo:calSetSelected', [{data: null}]);
         }
         setTimeout(f, 0);
     }

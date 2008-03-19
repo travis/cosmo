@@ -93,6 +93,41 @@ cosmotest.datetime.test_serialize = {
         cosmotest.datetime.test_serialize.durationsEqual("4", d1, d2);
     },
     
+   test_dojoFromIso8601: function(){
+       //we monkey-patched dojo.date.fromIso8601 to fix a bug that occurs when 
+       //parsing dates near DST switchover time. But then we switched over to dojo
+       //1.0 which didn't have quite the same function, so we wrote our own. 
+       //This verifies that this is no longer a problem.
+       var string = "20071104T190000Z";
+       var jsDate = cosmo.datetime.fromIso8601(string);
+       //should be 19, but unpatched gives 20!
+       jum.assertEquals("Should be 19", 19,jsDate.getUTCHours())
+   },
+
+    test_parseIso8601: function(){
+        var p = cosmo.datetime.util.dateParts;
+        
+        var tests = [["20000101", 2000, 0, 1],
+                     ["20000131", 2000, 0, 31],
+                     ["20080229", 2008, 1, 29],
+                     ["20000101T000000", 2000, 0, 1],
+                     ["20000505T000000", 2000, 4, 5],
+                     ["20000101T050505", 2000, 0, 1, 5, 5, 5],
+                     ["20000101T050505", 2000, 0, 1, 5, 5, 5],
+                     ["20080108T123045", 2008, 0, 8, 12, 30, 45]
+                     ];
+
+        for (var i in tests){
+            var test = tests[i];
+            var dateParts = cosmo.datetime.parseIso8601(test[0]);
+            jum.assertEquals(test[0] + " year", test[1], dateParts[p.YEAR]);
+            jum.assertEquals(test[0] + " month", test[2], dateParts[p.MONTH]);
+            jum.assertEquals(test[0] + " day", test[3], dateParts[p.DAY]);
+            jum.assertEquals(test[0] + " hour", test[4] || 0, dateParts[p.HOUR]);
+            jum.assertEquals(test[0] + " minute", test[5] || 0, dateParts[p.MINUTE]);
+            jum.assertEquals(test[0] + " second", test[6] || 0, dateParts[p.SECOND]);
+        }
+    },
     
     /* Makes sure properties specified in the expected match the actual.
      * Also, makes sure properties not specified in the expected

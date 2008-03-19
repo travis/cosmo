@@ -17,9 +17,8 @@
 dojo.provide("cosmo.ui.selector");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
-dojo.require("dojo.event.*");
-dojo.require("dojo.gfx.color.hsv");
 
+dojo.require("dojox.color");
 dojo.require("cosmo.app.pim");
 dojo.require('cosmo.convenience');
 dojo.require("cosmo.topics");
@@ -34,12 +33,6 @@ cosmo.ui.selector.CollectionSelector = function (p) {
 
     var params = p || {};
     for (var n in params) { this[n] = params[n]; }
-
-    dojo.event.topic.subscribe('/calEvent', _this, 'handlePub_calEvent');
-    dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,
-        _this, 'handlePub_app');
-    dojo.event.topic.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName,
-        _this, 'handlePub_app');
 
     // Private vars
     this._scrollTop = 0;
@@ -79,7 +72,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     for (var i = 0; i < ch.length; i++) {
                         var node = ch[i];
                         if (node.className != 'collectionSelectorDetails') {
-                            dojo.html[addRemoveKey + 'Class'](ch[i], 'mouseoverItem');
+                            dojo[addRemoveKey + 'Class'](ch[i], 'mouseoverItem');
                         }
                     }
                 }
@@ -87,30 +80,14 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         }
     };
     this._getRGB = function (h, s, v) {
-        var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
-            inputRange: [360, 100, 100], outputRange: 255 });
+        var rgb = dojox.color.fromHsv(h, s, v).toRgb();
         return 'rgb(' + rgb.join() + ')';
     };
+    var r = dojo.hitch(this, function(){this.render()});
+    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
+    dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, r);
+    dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, r);
 
-    // Interface methods
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        switch (act) {
-            // FIXME: Piggybacking rendering on view changes -- used here
-            // so the overlay checkboxes can appear/disapper. This also
-            // triggers initial render when app loads
-            case 'eventsLoadSuccess':
-                this.render();
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
-    // Interface methods
-    this.handlePub_app = function (cmd) {
-        this.render();
-    };
 
     this.renderSelf = function () {
         // Preserve scrolled state
@@ -203,13 +180,13 @@ cosmo.ui.selector.CollectionSelector = function (p) {
 
         // Attach event listeners -- event will be delagated
         // to clicked cell or checkbox
-        dojo.event.connect(container, 'onmouseover',
+        dojo.connect(container, 'onmouseover',
             this, 'handleMouseOver');
-        dojo.event.connect(container, 'onmouseout',
+        dojo.connect(container, 'onmouseout',
             this, 'handleMouseOut');
-        dojo.event.connect(container, 'onclick',
+        dojo.connect(container, 'onclick',
             this, 'handleClick');
-        dojo.event.connect(container, 'oncontextmenu',
+        dojo.connect(container, 'oncontextmenu',
             this, 'handleClick');
 
         this.domNode.appendChild(form);
@@ -248,7 +225,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
         a.id = "newCollectionLink";
         a.appendChild(_createText(_("Main.NewCollectionLink")));
 
-        dojo.event.connect(a, "onclick", function(){
+        dojo.connect(a, "onclick", function(){
             var collectionNameDeferred =
                 cosmo.app.getValue(
                     _("Main.NewCollection.NamePrompt"),
@@ -323,7 +300,11 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     var id = targ.id.replace(prefix + 'Details_', '');
                     cosmo.app.showDialog(
                         cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            cosmo.app.pim.collections.getItem(id)));
+                            cosmo.app.pim.collections.getItem(id),
+                            null,
+                            "collectionDetailsDialog"
+                        )
+                    );
                     return true;
                 }
                 // Selector

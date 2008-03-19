@@ -23,20 +23,23 @@
 
 dojo.provide("cosmo.ui.widget.ButtonPanel");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
-dojo.require("dojo.html.common");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");
 
-dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, {
+dojo.declare(
+    "cosmo.ui.widget.ButtonPanel", 
+    [dijit._Widget, dijit._Templated],
+    {
 
-    templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/ButtonPanel/ButtonPanel.html"),
+        templatePath: dojo.moduleUrl("cosmo",  "ui/widget/templates/ButtonPanel.html"),
 
     // Attach points
     leftContainer: null,
     centerContainer: null,
     rightContainer: null,
+    panelContainer: null,
     btnsLeft: [],
     btnsCenter: [],
     btnsRight: [],
@@ -44,7 +47,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
     // Props set by tag or constructor
     width: null,
 
-    fillInTemplate: function () {
+    postCreate: function () {
         function sectionCell(area, btns) {
             // Insert table of buttons for this section
             if (btns.length) {
@@ -79,14 +82,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
         sectionCell.apply(this, ['right', this.btnsRight]);
     },
 
-    destroyButtons: function(){
-         dojo.lang.map([this.btnsLeft, this.btnsCenter, this.btnsRight], function(widgets){
-             dojo.lang.map(widgets, function(widget){
-                widget.destroy();
-             })
-         });
-    },
-
     setWidth: function (width) {
         this.width = width;
         if (width) {
@@ -94,11 +89,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.ButtonPanel", dojo.widget.HtmlWidget, 
         } else {
             this.panelContainer.style.width = '100%';
         }
-    },
-
-    destroy: function(){
-        this.destroyButtons();
     }
-
-
-  } );
+  } 
+);

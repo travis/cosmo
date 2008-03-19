@@ -16,18 +16,16 @@
 
 dojo.provide("cosmo.util.auth");
 
-dojo.require("dojo.io.cookie");
-dojo.require("cosmo.util.cookie");
+dojo.require("dojo.cookie");
 dojo.require("cosmo.util.encoding");
-// dojo.io.cookie.destroyCookie doesn't appear to be working...
 
 var COSMO_AUTH_COOKIE = "CosmoCred";
 
 cosmo.util.auth = new function() {
     this.setCred = function (username, password){
-        dojo.io.cookie.set(COSMO_AUTH_COOKIE,
+        dojo.cookie(COSMO_AUTH_COOKIE,
             cosmo.util.encoding.toBase64(
-                username + ":" + password), -1, "/");
+                username + ":" + password), {path:"/"});
     }
 
     this.getPassword = function(){
@@ -61,11 +59,11 @@ cosmo.util.auth = new function() {
     }
 
     this.clearAuth = function (){
-        cosmo.util.cookie.destroy(COSMO_AUTH_COOKIE);
+        dojo.cookie(COSMO_AUTH_COOKIE, null, {expires: -1, path: "/"});
     }
 
     this.getCred = function(){
-		return dojo.io.cookie.get(COSMO_AUTH_COOKIE);
+		return dojo.cookie(COSMO_AUTH_COOKIE);
     }
     
     this.currentlyAuthenticated = function(){

@@ -23,12 +23,9 @@
 
 dojo.provide("cosmo.ui.widget.TabContainer");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
-dojo.require("dojo.html.common");
 dojo.require("cosmo.env");
 
-dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget, {
+dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], {
 
     templateString: '<span></span>',
 
@@ -36,7 +33,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
     selectedTabIndex: 0,
 
     // Define these here so they don't end up as statics
-    initializer: function () {
+    constructor: function () {
         this.tabs = [];
         this.tabNodes = [];
         this.contentNodes = [];
@@ -52,7 +49,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         var o = tabObj;
         var d = null;
         d = _createElem('td');
-        d.id = this.widgetId + '_tab' + index;
+        d.id = this.id + '_tab' + index;
         d.className = sel ? 'tabSelected' : 'tabUnselected';
         d.appendChild(_createText(o.label));
         d.onclick = function () { self.showTab(index); };
@@ -60,12 +57,12 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
 
         if (typeof o.content == 'string') {
             var n = _createElem('div');
-            n.id = this.widgetId + '_content' + index;
+            n.id = this.id + '_content' + index;
             n.innerHTML = o.content;
             this.contentNodes.push(n);
         }
         else {
-            if (o.content instanceof dojo.widget.HtmlWidget) {
+            if (o.content instanceof dijit._Widget){
                 n = o.content.domNode;
                 // For widgets, keep the actual widget as the canonical reference
                 // We can grab the domNode of it as needed
@@ -89,7 +86,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
             var tab = this.tabNodes[i];
             var content = this.contentNodes[i];
             // If the content is a widget, point us as the DOM node
-            if (content instanceof dojo.widget.HtmlWidget) {
+            if (content instanceof dijit._Widget){
                 content = content.domNode;
             }
             if (i == index) {
@@ -110,8 +107,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
     // Private methods
 
     // Lifecycle
-    fillInTemplate: function () {
-
+    postCreate: function () {
         var tabMain = null;
         var tabPanelTable = null;
         var tabPanelTBody = null;
@@ -132,11 +128,11 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         tabPanelTr = _createElem('tr');
         tabPanelTBody.appendChild(tabPanelTr);
         this.tabArea = tabPanelTable;
-        tabPanelTable.id = this.widgetId + '_tabPanel';
+        tabPanelTable.id = this.id + '_tabPanel';
         tabPanelTable.className = 'tabPanel';
         tabContent = _createElem('div');
         this.contentArea = tabContent;
-        tabContent.id = this.widgetId + '_contentArea';
+        tabContent.id = this.id + '_contentArea';
         tabContent.className = 'tabContent';
         s = _createElem('td');
         s.className = 'tabSpacer';
@@ -166,17 +162,6 @@ dojo.widget.defineWidget("cosmo.ui.widget.TabContainer", dojo.widget.HtmlWidget,
         this.domNode.appendChild(tabMain);
         tabMain.style.visibility = 'visible';
         this.showTab(0);
-    },
-    // Clean up any sub-widgets in any of the tabs
-    destroyChildren: function () {
-        n = this.contentNodes;
-        for (var i = 0; i < n.length; i++) {
-            var c = n[i];
-            if (c instanceof dojo.widget.HtmlWidget) {
-                c.destroy();
-            }
-        }
-
     }
 } );
 

@@ -18,7 +18,6 @@ dojo.provide("cosmo.util.html");
 
 cosmo.util.html.createSelect = function (id, name, size,
     multi, selOptions, className, parentNode) {
-
     var sel = document.createElement('select');
     var o = {};
     var options = [];
@@ -69,7 +68,7 @@ cosmo.util.html.createSelect = function (id, name, size,
 };
 
 cosmo.util.html.getChildrenByTagName = function (node, tagName){
-    return dojo.lang.filter(node.getElementsByTagName(tagName),
+    return dojo.filter(node.getElementsByTagName(tagName),
         function(filterTarget){
             return (filterTarget.nodeName == tagName) && (filterTarget.parentNode == node);
         });
@@ -222,16 +221,16 @@ cosmo.util.html.createRollOverMouseDownImage = function(normalImageUrl){
     var prefix = normalImageUrl.substr(0,i);
     var img = document.createElement("img");
     img.src = normalImageUrl;
-    dojo.event.connect(img, "onmouseover", function(){
+    dojo.connect(img, "onmouseover", function(){
        img.src = prefix + "_rollover" + suffix;
     });
-    dojo.event.connect(img, "onmouseout", function(){
+    dojo.connect(img, "onmouseout", function(){
        img.src = normalImageUrl;
     });
-    dojo.event.connect(img, "onmousedown", function(){
+    dojo.connect(img, "onmousedown", function(){
        img.src = prefix + "_mousedown" + suffix;
     });
-    dojo.event.connect(img, "onmouseup", function(){
+    dojo.connect(img, "onmouseup", function(){
        img.src = prefix + "_rollover" + suffix;
     });
     return img;
@@ -270,7 +269,7 @@ cosmo.util.html.getElementsByTagName = function(parent, namespace, tagName, kwAr
         namespace = null;
     }
 
-    if (dojo.render.html.ie){
+    if (dojo.isIE){
         tagName = namespace? namespace + ":" + tagName : tagName;
         return parent.getElementsByTagName(tagName);
     }

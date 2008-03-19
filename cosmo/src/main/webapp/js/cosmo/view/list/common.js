@@ -15,7 +15,7 @@
 
 dojo.provide('cosmo.view.list.common');
 
-dojo.require('dojo.event.*');
+
 dojo.require("cosmo.model");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
@@ -28,7 +28,7 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
 
-dojo.lang.mixin(cosmo.view.list, cosmo.view.viewBase);
+dojo.mixin(cosmo.view.list, cosmo.view.viewBase);
 
 cosmo.view.list.hasBeenInitialized = false;
 
@@ -64,27 +64,17 @@ cosmo.view.list.triageStatusCodeReverseMappings = {
     NOW: 100,
     LATER: 200 };
 
-cosmo.view.list.handlePub_calEvent = function (cmd) {
 
+dojo.subscribe("cosmo:calLoadCollection", function(cmd){
     if (!cosmo.view.list.isCurrentView()) { return false; }
-
-    var act = cmd.action;
-    var qual = cmd.qualifier || null;
-    var data = cmd.data || {};
     var opts = cmd.opts;
-    var delta = cmd.delta;
-    switch (act) {
-        case 'loadCollection':
-            if (opts.loadType == 'changeCollection') {
-                cosmo.view.list.loadItems();
-            }
-            break;
-        default:
-            // Do nothing
-            break;
+    if (opts.loadType == 'changeCollection') {
+        cosmo.view.list.loadItems();
     }
+});
 
-};
+dojo.subscribe("cosmo:appKeyboardInput", 
+               dojo.hitch(cosmo.view.list, cosmo.view.list.handleKeyboardInput));
 
 cosmo.view.list.loadItems = function (o) {
     var opts = o || {};
@@ -132,9 +122,8 @@ cosmo.view.list.loadItems = function (o) {
         // Create a hash from the array
         var itemRegistry = cosmo.view.list.createItemRegistry(itemLoadList);
         cosmo.view.list.itemRegistry = itemRegistry;
-        
-        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
-                                                data: itemRegistry, opts: opts });
+
+        dojo.publish('cosmo:calEventsLoadSuccess', [{data: itemRegistry, opts: opts }]);
     });
     return deferred;
 };
@@ -251,8 +240,7 @@ cosmo.view.list.createNoteItem = function (s) {
         // Make service call to save the item -- success from
         // the service will publish 'saveSuccess' action to tell
         // the UI to update appropriately
-        dojo.event.topic.publish('/calEvent', { action: 'save', data: item,
-            qualifier: 'new', saveType: 'new' })
+        dojo.publish('cosmo:calSave', [{data: item, qualifier: 'new', saveType: 'new' }]);
         return cosmo.view.list.itemRegistry.getItem(id);
     }
 };

@@ -9,4 +9,4 @@
 {"method": "radio", "params": {"id" : "endMeridianPM"}}
 {"method": "select", "params": {"id" : "eventStatus", "option": "Tentative"}}
 {"method": "type", "params": {"id" : "noteDescription", "text": "A description for the properties test"}}
-{"method": "click", "params": {"jsid" : "{$dvSaveButton}"}}
+{"method": "click", "params": {"id" : "detailSaveButton"}}

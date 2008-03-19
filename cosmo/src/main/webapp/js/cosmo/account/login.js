@@ -16,29 +16,26 @@
 
 dojo.provide('cosmo.account.login');
 
-dojo.require("dojo.io.*");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.convenience");
 
-cosmo.account.login.doLogin = function(un, pw, handlers){
-    var postData = "j_username=" + encodeURIComponent(un) + 
-        "&j_password=" + encodeURIComponent(pw);
+cosmo.account.login.doLogin = function(un, pw){
+    var postData = 
+        {"j_username": encodeURIComponent(un), 
+         "j_password": encodeURIComponent(pw)};
 
-    var _authSuccessCB = function(type, data, obj){
-        if (data == cosmo.env.getBaseUrl() + "/loginfailed"){
-            handlers.error(type, _('Login.Error.AuthFailed'), obj);
+    var d = dojo.xhrPost({
+        url: cosmo.env.getFullUrl("Auth"),
+        content: postData
+    });
+    d.addCallback(function(url){
+        if (url.indexOf("/loginfailed") > -1){
+            throw new Error(_('Login.Error.AuthFailed'));
         } else {
             cosmo.util.auth.setCred(un, pw);
-            handlers.load(type, data, obj);
+            return url;
         }
-    }
-    dojo.io.bind({
-        url: cosmo.env.getFullUrl("Auth"),
-        method: 'POST',
-        postContent: postData,
-        load: _authSuccessCB,
-        contentType: "application/x-www-form-urlencoded; charset=utf-8",
-        error: handlers.error
     });
+    return d;
 };

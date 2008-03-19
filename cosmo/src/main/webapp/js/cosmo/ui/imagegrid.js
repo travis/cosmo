@@ -23,7 +23,7 @@
 
 dojo.provide("cosmo.ui.imagegrid");
 
-dojo.require("dojo.event.*");
+
 dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
@@ -39,13 +39,13 @@ cosmo.ui.imagegrid.readConfig = function (data) {
 // Get the config data file that tells us
 // which images are where, and what sizes
 
-cosmo.ui.imagegrid.readConfig(
-    dojo.json.evalJson(
-        dojo.hostenv.getText(
-            cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/imagegrid.json"
-        )
-    )
-);
+var d = dojo.xhrGet({
+    url: cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/imagegrid.json",
+    sync: true
+});
+d.addCallback(function(str){
+    cosmo.ui.imagegrid.readConfig(dojo.fromJson(str));
+});
 
 cosmo.ui.imagegrid.Image = function (p) {
     this.row = p.row;
@@ -120,12 +120,12 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
                   p.handleMouseOut(e);
                 }
             };
-            dojo.event.connect(d, 'onmouseover', over);
-            dojo.event.connect(d, 'onmouseout', out);
+            dojo.connect(d, 'onmouseover', over);
+            dojo.connect(d, 'onmouseout', out);
         }
         // Attach click handler is there is one
         if (typeof p.handleClick == 'function') {
-            dojo.event.connect(d, 'onclick', p.handleClick);
+            dojo.connect(d, 'onclick', p.handleClick);
         }
     }
     else {

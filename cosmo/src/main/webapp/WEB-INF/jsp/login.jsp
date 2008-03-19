@@ -36,37 +36,32 @@
       
     </title>
     <cosmo:staticbaseurl var="staticBaseUrl"/>
-    <cosmo:dojoBoilerplate dojoLayers="cosmo-login"/>
+    <cosmo:dojoBoilerplate dojoLayers="login"/>
     <cosmo:stylesheets stylesheets="login"/>
     <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
 
     <%--
         Login and account-creation stuff
-        Note: button.js still needed to do preloading of button images
     --%>
-    <script type="text/javascript" src="${staticBaseUrl}/js/cosmo/ui/button.js"></script>
     <script type="text/javascript">
 
         dojo.require("cosmo.app");
         dojo.require("cosmo.account.create");
-        dojo.require("cosmo.util.popup");
         dojo.require("cosmo.convenience");
         dojo.require("cosmo.ui.widget.LoginDialog");
         dojo.require("cosmo.ui.widget.ModalDialog");
-        dojo.require("cosmo.util.uri");
-        
-        dojo.event.browser.addListener(window, "onload", init, false);
+        dojo.require("dojo.cookie");
+        dojo.addOnLoad(init);
 
         function init() {
-            cosmo.util.cookie.destroy('JSESSIONID', '${staticBaseUrl}');
-            cosmo.util.cookie.destroy('inputTimestamp');
-            cosmo.util.cookie.destroy('username');
+            dojo.cookie('JSESSIONID', null, {expires: -1});
+            dojo.cookie('inputTimestamp', null, {expires: -1});
+            dojo.cookie('username', null, {expires: -1});
             cosmo.util.auth.clearAuth();
-            
             cosmo.app.init();
-            if (cosmo.util.uri.parseQueryString(location.search)['signup']
+            if (dojo.queryToObject(location.search.substring(1))['signup']
                 == 'true'){
-                cosmo.account.create.showForm();
+                dojo.addOnLoad(function(){cosmo.account.create.showForm()});
             }
                         
         }
@@ -74,7 +69,7 @@
   </head>
   <body>
     <div>
-      <div dojoType="cosmo:LoginDialog" widgetId="loginDialog">
+      <div dojoType="cosmo.ui.widget.LoginDialog" id="loginDialog">
       </div>
       <div style="padding-top:24px; text-align:center">
         <fmt:message key="Login.CreateAccount"/>

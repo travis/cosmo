@@ -4,7 +4,7 @@ login_with_root_lab_json = """{"method": "type", "params": {"id" : "loginDialogU
 {"params": {"milliseconds": 500}, "method": "waits.sleep"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}
-{"method": "waits.forElement", "params": {"id": "contentWrapper", "timeout": 40000}}"""
+{"method": "waits.forElement", "params": {"id": "main", "timeout": 40000}}"""
 
 login_with_root_snarf_json = """{"method": "click", "params": {"link" : "Log in to Chandler Server"}}
 {"method": "waits.forElement", "params": {"id": "loginDialogFormContainer", "timeout": 40000}}
@@ -15,7 +15,7 @@ login_with_root_snarf_json = """{"method": "click", "params": {"link" : "Log in 
 {"params": {"milliseconds": 500}, "method": "waits.sleep"}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}
-{"method": "waits.forElement", "params": {"id": "contentWrapper", "timeout": 40000}}"""
+{"method": "waits.forElement", "params": {"id": "main", "timeout": 40000}}"""
 
 logout = """{"method": "click", "params": {"link" : "Log out"}}
 {"params": {"url": "\/"}, "method": "open"}
@@ -26,7 +26,7 @@ logout = """{"method": "click", "params": {"link" : "Log out"}}
 from windmill.authoring import RunJsonFile
 import windmill
 
-lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://trunk.osaf.us']
+lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://d10test.osaf.us', 'http://trunk.osaf.us']
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:

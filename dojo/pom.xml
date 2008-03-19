@@ -22,7 +22,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dojo</artifactId>
-    <version>0.4.3-0E0-SNAPSHOT</version>
+    <version>1.0.2-0D0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Dojo Build</name>
     <dependencies>
@@ -30,27 +30,8 @@
     <build>
         <resources>
             <resource>
-                <directory>release-0.4.3/release/dojo</directory>
+                <directory>release-1.0.2/release/dojo</directory>
                 <targetPath>/dojo</targetPath>
-                <filtering>false</filtering>
-                <includes>
-                    <include>dojo.js</include>
-                    <include>dojo.js.gzip-compressed</include>
-                    <include>LICENSE</include>
-                    <include>README</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>release-0.4.3/release/dojo/src</directory>
-                <targetPath>/dojo/src</targetPath>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>release-0.4.3/release/dojo/nls</directory>
-                <targetPath>/dojo/nls</targetPath>
                 <filtering>false</filtering>
                 <includes>
                     <include>**/*</include>

@@ -16,26 +16,21 @@
 
 dojo.provide("cosmo.app.pim");
 
-dojo.require("dojo.html.common");
-dojo.require("dojo.gfx.color.hsv");
-
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
 dojo.require("cosmo.util.i18n");
 dojo.require('cosmo.convenience');
 // --
-dojo.require("dojo.lang");
-dojo.require("dojo.DeferredList");
 
+dojo.require("dojo.DeferredList");
+dojo.require("dojox.color");
 dojo.require("cosmo.model");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
 dojo.require("cosmo.datetime.util");
-dojo.require("cosmo.ui.button");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.timeout");
 dojo.require('cosmo.account.create');
-dojo.require('cosmo.util.uri');
 dojo.require('cosmo.util.hash');
 dojo.require('cosmo.util.deferred');
 dojo.require('cosmo.service.conduits.common');
@@ -43,6 +38,7 @@ dojo.require('cosmo.service.tickler');
 dojo.require('cosmo.app.pim.layout');
 dojo.require("cosmo.view.names");
 dojo.require("cosmo.account.preferences");
+
 // Global variables for X and Y position for mouse
 xPos = 0;
 yPos = 0;
@@ -50,7 +46,7 @@ yPos = 0;
 /**
  * @object The Cal singleton
  */
-cosmo.app.pim = dojo.lang.mixin(new function () {
+cosmo.app.pim = dojo.mixin(new function () {
 
     var self = this;
 
@@ -122,7 +118,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         //cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
         var loadCollectionsDeferred = this.loadCollections(params);
-        loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
+        loadCollectionsDeferred.addCallback(dojo.hitch(this, function (){
             this.setDefaultSelectedCollection(params);
             // Base layout
             // ===============================
@@ -242,8 +238,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
         var collections = [];
         var calcColors = function (hue) {
             var getRGB = function (h, s, v) {
-                var rgb = dojo.gfx.color.hsv2rgb(h, s, v, {
-                    inputRange: [360, 100, 100], outputRange: 255 });
+                var rgb = dojox.color.fromHsv(h, s, v).toRgb();
                 return 'rgb(' + rgb.join() + ')';
             }
             var lozengeColors = {};
@@ -288,7 +283,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
 
             // Subscriptions
             var subscriptionsDeferred = this.serv.getSubscriptions();
-            subscriptionsDeferred.addCallback(dojo.lang.hitch(this, function (subscriptions){
+            subscriptionsDeferred.addCallback(dojo.hitch(this, function (subscriptions){
                 var result = this.filterOutDeletedSubscriptions(subscriptions);
                 subscriptions = result[0];
                 this._deletedSubscriptions = result[1];
@@ -302,7 +297,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             );
             cosmo.util.deferred.addStdDLCallback(collectionsLoadedDeferred);
         }
-        collectionsLoadedDeferred.addCallback(dojo.lang.hitch(this, function (){
+        collectionsLoadedDeferred.addCallback(dojo.hitch(this, function (){
             // Sort the collections
             var f = function (a, b) {
                 var aName = a.getDisplayName().toLowerCase();
@@ -366,7 +361,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
     };
     this.filterOutDeletedSubscriptions = function(subscriptions){
         var deletedSubscriptions = [];
-        var filteredSubscriptions = dojo.lang.filter(subscriptions,
+        var filteredSubscriptions = dojo.filter(subscriptions,
             function(sub){
                if (sub.getCollectionDeleted() || sub.getTicketDeleted()){
                    var deleteDeferred = self.serv.deleteSubscription(sub);
@@ -403,7 +398,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             this.collections.each(saveState);
             // Reload collections from the server
             var loadCollectionsDeferred = this.loadCollections({ ticketKey: this.ticketKey });
-            loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function () {
+            loadCollectionsDeferred.addCallback(dojo.hitch(this, function () {
                 // Restore any saved state
                 for (var p in state) {
                     var savedProps = state[p];
@@ -417,7 +412,7 @@ cosmo.app.pim = dojo.lang.mixin(new function () {
             }));
         }
 
-        loadCollectionsDeferred.addCallback(dojo.lang.hitch(this, function (){
+        loadCollectionsDeferred.addCallback(dojo.hitch(this, function (){
             // If we had an originally selected collection
             var selCollId = this.getSelectedCollectionId();
             var newSel = this.collections.getItem(selCollId);

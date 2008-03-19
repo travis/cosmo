@@ -31,7 +31,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
     ],
     //mixins for master item stamps		 
     {
-        initializer: function(kwArgs){
+        constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
         },
 
@@ -48,7 +48,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
             var endDate = this.getStartDate().clone();
             endDate.addDuration(duration);
             if (this.getAnyTime() || this.getAllDay()){
-                endDate.add(dojo.date.dateParts.DAY, -1);
+                endDate.add(cosmo.datetime.util.dateParts, -1);
             }
             return endDate;
         },
@@ -64,7 +64,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         setEndDate: function (/*CosmoDate*/ endDate){
             endDate = endDate.clone();
             if (this.getAnyTime() || this.getAllDay()){
-                endDate.add(dojo.date.dateParts.DAY, +1);
+                endDate.add(cosmo.datetime.util.dateParts.DAY, +1);
             }
             var duration = new cosmo.model.Duration(this.getStartDate(), endDate);
             this.setDuration(duration);
@@ -74,25 +74,26 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
            var oldDate = this.getStartDate();
            this.__setProperty("startDate", newStartDate);
 
-           //if this event stamp is attached to an item, and already has a previous start date
-           //we may have some updating to do
+           //if this event stamp is attached to an item, and already has a 
+           //previous start date we may have some updating to do
            if (this.item && oldDate){
-               var diff = dojo.date.diff(oldDate.toUTC(), newStartDate.toUTC(), dojo.date.dateParts.SECOND);
+               var diff = dojo.date.difference(oldDate, 
+                   newStartDate, cosmo.datetime.util.dateParts.SECOND);
                
                //if there are modifications, we need to move the recurrenceid's for all of them
-               if (!dojo.lang.isEmpty(this.item._modifications)){
+               if (!cosmo.util.lang.isEmpty(this.item._modifications)){
                
                    //first copy the modifications into a new hash
                    var mods = this.item._modifications;
                    var oldMods = {};
-                   dojo.lang.mixin(oldMods, mods);
+                   dojo.mixin(oldMods, mods);
                    for (var x in mods){
                        delete mods[x];
                    }
                    for (var x in oldMods){
                        var mod = oldMods[x];
                        var rId = mod.getRecurrenceId().clone();
-                       rId.add(dojo.date.dateParts.SECOND, diff);
+                       rId.add(cosmo.datetime.util.dateParts.SECOND, diff);
                        mod.setRecurrenceId(rId);
                        this.item.addModification(mod);
                    }
@@ -104,7 +105,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                    var newExdates = [];
                    for (var x = 0; x < oldExdates.length; x++){
                        var exdate = oldExdates[x];
-                       exdate.add(dojo.date.dateParts.SECOND, diff);
+                       exdate.add(cosmo.datetime.util.dateParts.SECOND, diff);
                        newExdates.push(exdate);                   
                    }
                    this._exates = newExdates;
@@ -127,22 +128,22 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 var getterName = getterAndSetter[0];
                 var setterName = getterAndSetter[1];
                 
-                var diff =  dojo.date.diff(this[getterName]().toUTC(), 
-                            changeValue.toUTC(), 
-                            dojo.date.dateParts.SECOND);
+                var diff =  dojo.date.difference(this[getterName](), 
+                            changeValue, 
+                            cosmo.datetime.util.dateParts.SECOND);
 
                 var masterDate = this.getMaster().getEventStamp()[getterName]();
                 var newDate = masterDate.clone();
-                newDate.add(dojo.date.dateParts.SECOND, diff);
+                newDate.add(cosmo.datetime.util.dateParts.SECOND, diff);
                 var tzId = changeValue.tzId || (changeValue.utc ? "utc" : null);
                 newDate = newDate.createDateForTimezone(tzId);
                 this.getMaster().getEventStamp()[setterName](newDate);
                 if (propertyName == "startDate"){
-                    this.item.recurrenceId.add(dojo.date.dateParts.SECOND,diff);
+                    this.item.recurrenceId.add(cosmo.datetime.util.dateParts.SECOND,diff);
                 }
                 return;  
             }
-            this._inherited("applyChange", arguments);
+            this.inherited("applyChange", arguments);
         }
     },
     //mixins for occurrence stamps

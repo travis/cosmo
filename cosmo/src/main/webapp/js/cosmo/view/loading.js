@@ -19,7 +19,6 @@ dojo.provide("cosmo.view.loading");
 dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
-dojo.require("dojo.lfx.*");
 
 cosmo.view.loading.statusProcessing = false;
 
@@ -33,15 +32,11 @@ cosmo.view.loading.StatusMessage = function (p) {
 
     this.renderSelf = function () {
         if (!this.hasBeenRendered) {
-            cosmo.util.html.setOpacity(this.domNode, 0);
             this.domNode.innerHTML = _('App.Status.LoadingCollection');
             this.domNode.style.width = this.width + 'px';
             this.domNode.style.height = this.height + 'px';
             this.domNode.style.lineHeight = this.height + 'px';
-            this.domNode.style.zIndex = 1000;
-
-            // Subscribe to the '/calEvent' channel
-            dojo.event.topic.subscribe('/calEvent', this, 'handlePub_calEvent');
+            this.hide(1);
         }
         var left = ((this.parent.width - this.width) /  2);
         var top = ((this.parent.height - this.height) /  2);
@@ -51,28 +46,20 @@ cosmo.view.loading.StatusMessage = function (p) {
         if (cosmo.view.loading.statusProcessing) { return false; }
         cosmo.view.loading.statusProcessing = true;
         this.domNode.style.zIndex = 1000;
-        cosmo.util.html.setOpacity(this.domNode, 0.8);
+        dojo.fadeIn({node: this.domNode, duration: 1}).play();
     };
-    this.hide = function () {
-        var f = function () {
-            cosmo.view.loading.statusProcessing = false;
-            self.domNode.style.zIndex = -1;
-        };
-        dojo.lfx.fadeOut(this.domNode, 1000,
-            dojo.lfx.easeOut, f).play();
+    this.hide = function (duration) {
+        dojo.fadeOut({node: this.domNode, 
+                      duration: duration || 500,
+                      onEnd: dojo.hitch(this, function () {
+                          cosmo.view.loading.statusProcessing = false;
+                          this.domNode.style.zIndex = -1;
+                      })
+                     }).play();
     };
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var opts = cmd.opts;
-        switch (act) {
-            case 'eventsLoadSuccess':
-                this.hide();
-                break;
-            default:
-                // Do nothing
-                break;
-        }
-    };
+
+    dojo.subscribe('cosmo:calEventsLoadSuccess', 
+                   dojo.hitch(this, function(){this.hide()}));
 };
 
 cosmo.view.loading.StatusMessage.prototype =

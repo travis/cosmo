@@ -25,9 +25,9 @@
  *
  */
 dojo.provide("cosmo.service.conduits.common");
-
 //TODO: remove once we move create/delete into Atom
 dojo.require("cosmo.caldav");
+dojo.require("dojo.DeferredList");
 
 dojo.declare("cosmo.service.conduits.Conduit", null, {
 
@@ -35,20 +35,18 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     _translator: null,
 
-    initializer: function (transport, translator){
+    constructor: function (transport, translator){
         this._transport = transport;
         this._translator = translator;
     },
 
     getCollections: function (kwArgs){
         kwArgs = kwArgs || {};
-
         var deferred = this._transport.getCollections(kwArgs);
-
         this._addTranslation(deferred, "translateGetCollections");
 
         // Flesh out each collection
-        deferred.addCallback(dojo.lang.hitch(this, function(collections){
+        deferred.addCallback(dojo.hitch(this, function(collections){
             var collectionDetailDeferreds = [];
             for (var i = 0; i < collections.length; i++){
                 collectionDetailDeferreds.push(
@@ -83,11 +81,11 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         this._addTranslation(deferred, "translateGetSubscriptions");
 
         // Flesh out each collection
-        deferred.addCallback(dojo.lang.hitch(this, function(subscriptions){
+        deferred.addCallback(dojo.hitch(this, function(subscriptions){
             collectionDetailDeferreds = [];
             for (var i = 0; i < subscriptions.length; i++){
                 //capturing scope
-                (dojo.lang.hitch(this, function (){
+                (dojo.hitch(this, function (){
                     var subscription = subscriptions[i];
                     var deferred = this.getCollection(subscription.getCollection().href, kwArgs);
                     deferred.addCallback(function(collection){
@@ -261,23 +259,13 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         return this._transport.deleteSubscription(subscription, kwArgs);
     },
     
-    // This is hacky, TODO: point to Atom for 0.10
     createCollection: function (name, kwArgs){
-        return this._transport.bind({
-            method: cosmo.caldav.METHOD_MKCALENDAR,
-            url: cosmo.env.getFullUrl("Dav") + 
-                "/" + encodeURIComponent(cosmo.util.auth.getUsername()) + 
-                "/" + encodeURIComponent(name)
-        });
+        return this._transport.createCollection(name, kwArgs);
     },
 
     // Also hacky, TODO: point to Atom for 0.10
     deleteCollection: function (collection, kwArgs){
-        var name = collection.getDisplayName();
-        return this._transport.bind({
-            method: cosmo.caldav.METHOD_DELETE,
-            url: collection.getUrl("dav")
-        });
+        return this._transport.deleteCollection(collection, kwArgs);
     },
     
     getPreference: function (key, kwArgs){
@@ -302,14 +290,14 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
     _addTranslation: function (deferred, translationFunction, kwArgs){
         deferred.addCallback(
-            dojo.lang.hitch(this._translator, function (obj, xhr){
+            dojo.hitch(this._translator, function (obj, xhr){
                 return this[translationFunction](obj, kwArgs);
             })
         );
         
         deferred.addErrback(function (e, xhr){
-            dojo.debug("Translation error:")
-            dojo.debug(e);
+            console.debug("Translation error:")
+            console.debug(e);
             return e;
         });
         

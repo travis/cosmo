@@ -61,7 +61,7 @@ login_with_user_json = """{"method": "type", "params": {"id" : "loginDialogUsern
 from windmill.authoring import RunJsonFile
 import windmill
 
-lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://trunk.osaf.us']
+lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://d10test.osaf.us', 'http://trunk.osaf.us']
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:

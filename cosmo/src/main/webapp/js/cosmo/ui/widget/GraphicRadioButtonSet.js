@@ -24,14 +24,9 @@
  */
 
 dojo.provide("cosmo.ui.widget.GraphicRadioButtonSet");
-
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
-dojo.require("dojo.html.common");
-dojo.require("cosmo.env");
 dojo.require("cosmo.env");
 
-dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.HtmlWidget, {
+dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Templated], {
 
     templateString: '<span></span>',
 
@@ -40,14 +35,14 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
     height: 0,
 
     // Define these here so they don't end up as statics
-    initializer: function () {
+    constructor: function () {
         this.buttons = [];
         this.buttonNodes = [];
     },
 
     // Private
     _getButtonIndex: function (td) {
-        var n = td.id.replace(this.widgetId + '_button', '');
+        var n = td.id.replace(this.id + '_button', '');
         return parseInt(n);
     },
     _morphButton: function (td, over){
@@ -85,8 +80,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
     // Public
 
     // Lifecycle
-    fillInTemplate: function () {
-
+    postCreate: function () {
         var d = this.domNode;
         var table = null;
         var body = null;
@@ -105,13 +99,13 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
         table.appendChild(body);
         tr = _createElem('tr');
         body.appendChild(tr);
-        table.id = this.widgetId + '_buttonSet';
+        table.id = this.id + '_buttonSet';
         table.className = 'buttonSet';
         this.buttonNodes = [];
         for (var i = 0; i < buttons.length; i++) {
             var b = buttons[i];
             var td = _createElem('td');
-            td.id = this.widgetId + '_button' + i;
+            td.id = this.id + '_button' + i;
             td.style.width = b.width + 'px';
             td.style.backgroundImage = 'url(' + cosmo.env.getImageUrl('image_grid.png')+')';
             var pos = i == this.selectedButtonIndex ? b.downStateImgPos : b.defaultImgPos;
@@ -120,9 +114,9 @@ dojo.widget.defineWidget("cosmo.ui.widget.GraphicRadioButtonSet", dojo.widget.Ht
             td.style.fontSize = '1px';
             td.style.height = this.height + 'px';
             td.appendChild(cosmo.util.html.nbsp());
-            dojo.event.connect(td, 'onmouseover', this, '_handleMouseover');
-            dojo.event.connect(td, 'onmouseout', this, '_handleMouseout');
-            dojo.event.connect(td, 'onclick', this, '_handleClick');
+            dojo.connect(td, 'onmouseover', this, '_handleMouseover');
+            dojo.connect(td, 'onmouseout', this, '_handleMouseout');
+            dojo.connect(td, 'onclick', this, '_handleClick');
             tr.appendChild(td);
             this.buttonNodes.push(td);
         }

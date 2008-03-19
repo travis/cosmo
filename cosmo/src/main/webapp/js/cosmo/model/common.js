@@ -29,7 +29,7 @@ cosmo.model.declare("cosmo.model.RecurrenceRule", null,
      ["unsupportedRule", {"default": null}]
     ], 
     {
-        initializer: function (kwArgs){
+        constructor: function (kwArgs){
             this.initializeProperties(kwArgs);
         },
         
@@ -61,7 +61,7 @@ cosmo.model.declare("cosmo.model.Duration", null,
      ["multiplier", {"default":1}]
      ],
     {
-        initializer:function(){
+        constructor:function(){
             //summary: create a new Duration using either the difference between two dates
             //         or kwArgs for the properties or a string with a iso8601 duration
             var kwArgs = null;

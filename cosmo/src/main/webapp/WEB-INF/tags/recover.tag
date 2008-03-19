@@ -38,7 +38,7 @@
 dojo.require("cosmo.ui.widget.Recoverer");
 </script>
 
-<div dojoType="cosmo:Recoverer" widgetId="recoverer" displayDefaultInfo="true" i18nPrefix="${prefix}"
+<div dojoType="cosmo.ui.widget.Recoverer" id="recoverer" displayDefaultInfo="true" i18nPrefix="${prefix}"
      recoverFunctionModule="${recoverFunctionModule}" recoverFunctionName="${recoverFunctionName}">
 
 </div>

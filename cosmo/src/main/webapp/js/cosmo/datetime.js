@@ -18,20 +18,7 @@
 dojo.provide("cosmo.datetime");
 
 cosmo.datetime = new function () {
-    this.dateParts = {
-        YEAR: "yyyy",
-        QUARTER:  "q",
-        MONTH: "m",
-        YEAR: "y",
-        DAY: "d",
-        WEEKDAY: "w",
-        WEEK: "ww",
-        HOUR: "h",
-        MINUTE: "n",
-        SECOND: "s"
-    };
-    this.fullWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-        'Friday', 'Saturday'];
+    //FIXME: please put into i18n file
     this.abbrWeekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     this.fullMonth = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];

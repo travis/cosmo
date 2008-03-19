@@ -57,7 +57,7 @@
 <link rel="alternate" type="text/calendar" href="${relationLinks['webcal']}"/>
 </c:if>
 
-<cosmo:dojoBoilerplate timezones="true" dojoLayers="cosmo-login,cosmo-pim"/>
+<cosmo:dojoBoilerplate timezones="true" dojoLayers="login,pim"/>
 
 <script type="text/javascript">
 // Dojo requires
@@ -67,7 +67,6 @@ dojo.require('cosmo.convenience');
 dojo.require('cosmo.topics');
 dojo.require('cosmo.account.preferences');
 dojo.require('cosmo.account.settings');
-
 cosmo.app.initObj = cosmo.app.pim;
 cosmo.app.initParams = {};
 
@@ -78,13 +77,13 @@ if (collectionUrlIndex >= 0){
 	cosmo.app.initParams.collectionUid = 
 		location.pathname.substring(collectionUrlIndex + 11);
 }
-var params = (location.search)? cosmo.util.uri.parseQueryString(location.search) : {};
+var params = (location.search)? dojo.queryToObject(location.search.substring(1)) : {};
 
 if (params.ticket) 
-    cosmo.app.initParams.ticketKey = params.ticket[0];
+    cosmo.app.initParams.ticketKey = params.ticket;
 
 if (params.view)
-	cosmo.app.initParams.initialView = cosmo.app.pim.views[params.view[0].toUpperCase()];
+	cosmo.app.initParams.initialView = cosmo.app.pim.views[params.view.toUpperCase()];
 
 cosmo.app.initParams.authAccess = cosmo.util.auth.currentlyAuthenticated();
 
@@ -96,8 +95,8 @@ cosmo.app.initParams.roleRoot = true;
 </authz:authorize>
 
 dojo.require("cosmo.ui.event.listeners");
-cosmo.ui.event.listeners.hookUpListeners();
 
+cosmo.ui.event.listeners.hookUpListeners();
 </script>
 
 </head>

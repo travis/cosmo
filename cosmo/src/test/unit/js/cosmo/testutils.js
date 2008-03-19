@@ -15,33 +15,91 @@
 */
 
 dojo.provide("cosmotest.testutils");
+dojo.require("dojox.uuid.generateRandomUuid");
 
-dojo.require("cosmo.cmp");
+// Object to provide compatibility with old jum framework
+JUM = function(){
+}
+
+function _JUM_first_arg_string_func(n, name){
+    return function(){
+        var args = arguments;
+        var s = null;
+        if (arguments.length == n){
+            args = arguments;
+        } else if (arguments.length == n + 1){
+            s = arguments[0];
+            args = Array.prototype.slice.apply(arguments, [1]);
+        } 
+        try {
+            return doh[name].apply(doh, args);
+        } catch (e){
+            console.log("Test failure message was: " + s);
+            throw e;
+        }
+    }
+}
+
+JUM.prototype = {
+    assertTrue: _JUM_first_arg_string_func(1, "assertTrue"),
+    assertFalse: _JUM_first_arg_string_func(1, "assertFalse"),
+    assertEquals: _JUM_first_arg_string_func(2, "assertEqual")
+}
+
+/*dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
-
+*/
 cosmotest.testutils = {
     init: function initCosmoTests(/*Array*/ testModules){
-        var alltests = jum_new_alltests();
-        for (var x = 0; x < testModules.length; x++){
-            var moduleName = testModules[x];
-            dojo.require(moduleName);
-            var module = dojo.evalObjPath(moduleName);
-            var functionNames = this.getFunctionNames(module);
-            for (var y = 0; y < functionNames.length; y++){
-                var functionName = functionNames[y];
-                jum_add_test(alltests, moduleName, functionName.split("_")[1], functionName, dojo.evalObjPath(moduleName +"." +functionName) );
-            }         
-            
+
+        for (var i = 0; i < testModules.length; i++){
+            var moduleName = testModules[i];
+            try {
+                dojo.require(moduleName);
+                var module = dojo.getObject(moduleName);
+                var functionNames = this.getFunctionNames(module);
+                
+                var testFunctions = [];
+                for (var j in functionNames){
+                    var name = functionNames[j];
+                    testFunctions.push(
+                        {
+                            name: name,
+			    setUp: function(){
+			    },
+			    runTest: module[name],
+			    tearDown: function(){
+			    }
+                        }
+                    );
+                }
+            } catch (error){
+                doh.register(moduleName, 
+                             [function failure(){
+                                 throw(error);
+                             }]);
+                continue;
+            }
+            doh.register(moduleName, testFunctions);
         }
-        jum.setTests(alltests);
+        jum = new JUM();
+
     },
     
     getFunctionNames: function getFunctionNames(scope){
-        return jum_get_object_function_names(scope);
+        var fNames = [];
+        for (var name in scope){
+            if (name.indexOf("test_") == 0 && typeof scope[name] == "function"){
+                fNames.push(name);
+            }
+        }
+        return fNames; 
     },
 
     createTestAccount: function(){
-        return cosmotest.testutils.createUser("User0");
+        return cosmotest.testutils.createUser(
+            dojox.uuid.generateRandomUuid().slice(0, 8)
+        );
     },
 
     createUser: function(username, email){
@@ -51,15 +109,15 @@ cosmotest.testutils = {
             username: username,
             firstName: username,
             lastName: username,
-            email: (email || username) + "@cosmotesting.osafoundation.org"
+            email: email || username + "@cosmotesting.osafoundation.org"
         };
-        cosmo.cmp.signup(user, {
-            load: function(type, data, evt){
-                cosmo.util.auth.setCred(user.username, user.password);
-            },
-            error: function(e){
-                dojo.debug(e);
-            }}, true);
+        var d = cosmo.cmp.signup(user, {sync: true});
+        d.addCallback(function(data){
+            cosmo.util.auth.setCred(user.username, user.password);
+        });
+        d.addErrback(function(e){
+            console.debug(e);
+        });
         return user;
     },
     
@@ -67,5 +125,14 @@ cosmotest.testutils = {
         cosmo.util.auth.setCred("root", "cosmo");
         cosmo.cmp.deleteUser(user.username, {handle: function(){}}, true);
         cosmo.util.auth.clearAuth();
+    },
+ 
+    // convert dojo.Deferred into doh.Deferred in able to return from test
+    defcon: function(dojoDeferred){
+        var d2 = new doh.Deferred()
+        dojoDeferred.addCallbacks(
+            dojo.hitch(d2, d2.callback), 
+            dojo.hitch(d2, d2.errback));
+        return d2;
     }
 }

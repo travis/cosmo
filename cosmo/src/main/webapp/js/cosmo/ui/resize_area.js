@@ -16,8 +16,7 @@
 
 dojo.provide("cosmo.ui.resize_area");
 
-dojo.require("dojo.html.common");
-dojo.require("dojo.event.*");
+
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 
@@ -47,7 +46,7 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
     this.upConstraint = (DAY_LIST_DIV_HEIGHT - 2);
     // Downward dragging constraint -- 2px fudge factor
     // This value is relative, local Y
-    this.downConstraint = (dojo.html.getViewport().height -
+    this.downConstraint = (dijit.getViewport().h -
         this.absTop - 2);
 
     this.init = function(dir, off) {
@@ -56,7 +55,7 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
             dragSize : ALL_DAY_RESIZE_AREA_HEIGHT;
         this.direction = dir ? dir : this.direction;
         this.dragSize = dragSize;
-        dojo.event.connect(self.handleDiv, 'onmousedown',
+        dojo.connect(self.handleDiv, 'onmousedown',
             function () { cosmo.app.dragItem = self });
     };
     // Right now the only adjacent area is the timed canvas

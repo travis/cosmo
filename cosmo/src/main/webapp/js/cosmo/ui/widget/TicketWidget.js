@@ -22,125 +22,66 @@
 
 dojo.provide("cosmo.ui.widget.TicketWidget");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.validate.*");
+dojo.require("dojo.number");
+dojo.require("dijit._Templated");
+dojo.require("dijit.form.Form");
+dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.CheckBox");
+
 dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.auth");
-dojo.require("dojo.lang");
-dojo.require("dojo.io.*");
 dojo.require("cosmo.convenience");
 
-dojo.widget.defineWidget("cosmo.ui.widget.TicketWidget", dojo.widget.HtmlWidget, {
+dojo.requireLocalization("cosmo.ui.widget", "TicketWidget");
 
-    templatePath: dojo.uri.dojoUri( "../../cosmo/ui/widget/templates/TicketWidget/TicketWidget.html"),
+dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], {
+    templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/TicketWidget.html"),
 
-    ticketForm: null,
-    timeoutErrorSpan: null,
-    privilegesErrorSpan: null,
-
+    widgetsInTemplate: true,
     itemId: "",
+    timeoutRE: dojo.number._integerRegexp(),
 
-    createTicket: function(){
-    	if (!this.validateInput()){
-    		return;
-    	}
+    privDict: {'ro': '<D:read/>',
+            'rw': '<D:read/><D:write/>',
+            'fb': '<D:freebusy/>'},
 
-		var timeout = this.ticketForm.timeout.value;
+    constructor: function(){
+        this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "TicketWidget");
+    },
 
-		if (timeout == ""){
-			timeout = "Infinite";
-		} else {
-			timeout = "Second-" + timeout;
-		}
+    execute: function(form){
+        if (this.form.isValid()){
+		    var timeout = form.timeout;
+            
+		    timeout = timeout? "Second-" + timeout: "Infinite";
+            
+		    var content = ['<?xml version="1.0" encoding="utf-8" ?>',
+		        '<ticket:ticketinfo xmlns:D="DAV:" ',
+		        'xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">',
+   		        '<D:privilege>', this.privDict[form.privileges], '</D:privilege>',
+   		        '<ticket:timeout>', timeout, '</ticket:timeout>',
+		        '</ticket:ticketinfo>'].join("");
+		    var request = cosmo.util.auth.getAuthorizedRequest()
+		    dojo.mixin(request,
+		               {
+                           contentType: 'text/xml',
+			               postData: content,
+                           url: cosmo.env.getBaseUrl() + "/dav" + this.itemId
+        	           }
+                      );
+            request.headers['X-Http-Method-Override'] =  "MKTICKET";
+            var d = dojo.rawXhrPost(request);
+		    d.addCallback(dojo.hitch(this, this.createSuccess));
+            d.addErrback(dojo.hitch(this, this.createFailure));
+            return d;
+        }
+    },
 
-		var privs = this.ticketForm.privileges;
-		var privString = "";
-
-		for (var i = 0; i < privs.length; i++){
-			if (privs[i].checked){
-				switch(privs[i].value){
-					case 'ro':
-						privString = '<D:read/>'
-						break;
-					case 'rw':
-						privString = '<D:read/><D:write/>'
-						break;
-					case 'fb':
-						privString = '<D:freebusy/>'
-						break;
-				}
-
-				break;
-			}
-
-		}
-
-		var content = '<?xml version="1.0" encoding="utf-8" ?>';
-		content += '<ticket:ticketinfo xmlns:D="DAV:" ';
-		content += 'xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">';
-   		content += '<D:privilege>' + privString + '</D:privilege>';
-   		content += '<ticket:timeout>' + timeout + '</ticket:timeout>';
-		content += '</ticket:ticketinfo>';
-		var request = cosmo.util.auth.getAuthorizedRequest()
-		dojo.lang.mixin(request,
-		 {
-		    load: this.createSuccess,
-            error: this.createFailure,
-            transport: "XMLHTTPTransport",
-            contentType: 'text/xml',
-			postContent: content,
-			method:  "POST",
-
-
-            url: cosmo.env.getBaseUrl() + "/dav" + this.itemId
-
-        	}
-        );
-        request.headers['X-Http-Method-Override'] =  "MKTICKET";
-
-
-	    dojo.io.bind(request);
-
-    	},
-
-   	createSuccess: function(type, data, evt){
+   	createSuccess: function(data){
    	},
-   	createFailure: function(type, error){
+
+   	createFailure: function(error){
 		alert("Ticket not created. Error: " + error.message);
-   	},
-
-   	validateInput: function(){
-   		var timeout = this.ticketForm.timeout.value;
-    	var timeoutValid = timeout == "" ||
-    		dojo.validate.isInteger(timeout);
-
-   		var privs = this.ticketForm.privileges;
-   		var privsSelected = false;
-
-   		for (var i = 0; i < privs.length; i++){
-   			if (privs[i].checked){
-   				privsSelected = true;
-   				break;
-   			}
-   		}
-
-   		if (!privsSelected){
-			this.privilegesErrorSpan.innerHTML = _('Ticket.Error.Privilege');
-		}
-		if (!timeoutValid){
-			this.timeoutErrorSpan.innerHTML = _('Ticket.Error.Timeout');
-		}
-
-		return timeoutValid && privsSelected;
-
-
-   	},
-
-   	postCreate: function(){
-		this.ticketForm.privileges[0].checked = true;
-
-
    	}
-
-
-  } );
+});

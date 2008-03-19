@@ -16,11 +16,10 @@
 
 dojo.provide("cosmo.service.translators.exception");
 
-dojo.declare("cosmo.service.translators.exception.TranslationException", Error,
-    // summary: The root of all service exceptions. If your error is not an instance
-function(){}, {});
+// summary: The root of all service exceptions. If your error is not an instance
+dojo.declare("cosmo.service.translators.exception.TranslationException", Error, {});
 
+// summary: Thrown when we encounter problems with saving an entity.
 dojo.declare("cosmo.service.translators.exception.ModelToRecordSetException", 
-             cosmo.service.translators.exception.TranslationException,
-    // summary: Thrown when we encounter problems with saving an entity.
-function(){}, {});
+             cosmo.service.translators.exception.TranslationException, {});
+

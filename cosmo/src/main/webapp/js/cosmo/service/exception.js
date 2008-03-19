@@ -16,16 +16,16 @@
 
 dojo.provide("cosmo.service.exception");
 
+// summary: The root of all service exceptions. If your error is not an instance
 dojo.declare("cosmo.service.exception.ServiceException", Error,
-    // summary: The root of all service exceptions. If your error is not an instance
-function(){}, {           });
+             {});
 
 dojo.declare("cosmo.service.exception.ClientSideError", cosmo.service.exception.ServiceException, {});
 
+// summary: General errors that result from 5xx or 4xx Http Errors 
 dojo.declare("cosmo.service.exception.ServerSideError", cosmo.service.exception.ServiceException,
-    // summary: General errors that result from 5xx or 4xx Http Errors 
 {
-    initializer: function(kwArgs){
+    constructor: function(kwArgs){
         this.url = kwArgs.url;
         this.statusCode = kwArgs.statusCode;
         this.postContent = kwArgs.postContent;
@@ -42,24 +42,21 @@ dojo.declare("cosmo.service.exception.ServerSideError", cosmo.service.exception.
     }
 });
 
-dojo.declare("cosmo.service.exception.CollectionLockedException", cosmo.service.exception.ServiceException,
-    // summary: Thrown when another client is trying to update the item on the server
-function(){}, {});
+// summary: Thrown when another client is trying to update the item on the server
+dojo.declare("cosmo.service.exception.CollectionLockedException", cosmo.service.exception.ServiceException, {});
 
-dojo.declare("cosmo.service.exception.ConflictException", cosmo.service.exception.ServiceException,
-    // summary: Thrown when we receive a 409.
-function(){}, {});
+// summary: Thrown when we receive a 409.
+dojo.declare("cosmo.service.exception.ConflictException", cosmo.service.exception.ServiceException, {});
 
-dojo.declare("cosmo.service.exception.ConcurrencyException", cosmo.service.exception.ServiceException,
-    // summary: Thrown when we receive a 409.
-function(){}, {});
+// summary: Thrown when we receive a 409.
+dojo.declare("cosmo.service.exception.ConcurrencyException", cosmo.service.exception.ServiceException, {});
 
+//summary: Thrown when a resource could not be retrieved from the service.
+//id: The identifier that was used when try to retrieve the item. In RESTful services, this
+//    would be the URL. 
 dojo.declare("cosmo.service.exception.ResourceNotFoundException", cosmo.service.exception.ServiceException, 
 {
-    initializer: function(id){
-        //sumamry: Thrown when a resource could not be retrieved from the service.
-        //id: The identifier that was used when try to retrieve the item. In RESTful services, this
-        //    would be the URL. 
+    constructor: function(id){
         this.id = id;
         this.message = this.toString();
     }, 

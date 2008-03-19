@@ -2,7 +2,7 @@
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"link": "[browse]"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "contentWrapper"},  "method": "asserts.assertNode"}
+{"params": {"id": "main"},  "method": "asserts.assertNode"}
 {"params": {"link": "Account Browser"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"link": "[browse]"},  "method": "click"}

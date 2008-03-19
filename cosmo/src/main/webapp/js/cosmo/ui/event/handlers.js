@@ -32,7 +32,7 @@
 
 dojo.provide('cosmo.ui.event.handlers');
 
-dojo.require('dojo.event.topic');
+
 dojo.require('cosmo.app');
 dojo.require('cosmo.app.pim');
 dojo.require('cosmo.ui.timeout');
@@ -160,7 +160,7 @@ cosmo.ui.event.handlers.keyUpHandler = function (e) {
     // (3) Don't trigger Save/Remove when typing in form fields
     // ======
     else {
-        dojo.event.topic.publish('/app', { type: 'keyboardInput', appEvent: e });
+        dojo.publish('cosmo:appKeyboardInput',[{ appEvent: e }]);
     }
 }
 
@@ -176,6 +176,7 @@ cosmo.ui.event.handlers.cleanup = function () {
 cosmo.ui.event.handlers.resize = function () {
     //here goes
 	//cosmo.ui.resize.Viewports.resize()
-	cosmo.app.pim.baseLayout.render();
+    if (cosmo.app.pim.baseLayout)
+	    cosmo.app.pim.baseLayout.render();
 }
 

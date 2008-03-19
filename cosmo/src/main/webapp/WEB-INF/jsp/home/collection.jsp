@@ -30,7 +30,7 @@
 
 <cosmo:standardLayout prefix="HomeDirectory.Collection." 
 				      contentWrapperClass="fullPageWidthContent" stylesheets="account_browser"
-				      parseWidgets="false" searchIds="newTicketWidget">
+				      parseWidgets="false">
 
 <div>
   <span class="hd" style="margin-top: 12px;">

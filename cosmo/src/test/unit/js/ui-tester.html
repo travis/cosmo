@@ -1,0 +1,36 @@
+<html>
+        <head>
+                <title>Cosmo UI Tester</title>
+                <script type="text/javascript"> 
+                  var jsBase = "../../../main/webapp/js/";
+                  dojoUrl = jsBase + "lib/dojo/dojo/dojo.js";
+			      document.write("<scr"+"ipt type='text/javascript' djConfig='isDebug: true' src='"+dojoUrl+"'></scr"+"ipt>");
+                </script>
+                <script type="text/javascript"> 
+                  dojo.registerModulePath("cosmo", "../../../cosmo");
+                  dojo.registerModulePath("cosmotest", "../../../../../../test/unit/js/cosmo");
+                  dojo.require("cosmo.util.debug");
+                  dojo.require("cosmo.env");
+                  dojo.require("cosmotest.ui.testloader");
+                  cosmo.env.setBaseUrl("../../../main/webapp/");
+                  
+                  var cssBase = cosmo.env.getBaseUrl() + "templates/default/"
+                  document.write("<link rel='stylesheet' href='"+cssBase+"global.css' />");
+                                    document.write("<link rel='stylesheet' href='"+cssBase+"pim.css' />")
+                </script>
+        </head>
+        <body>
+          <div id="selection_div">
+            <form id="selection_form">
+            </form>
+          </div>
+
+          <div id="output">
+          </div>
+          
+          
+        </body>
+        <script type="text/javascript">
+          cosmotest.ui.testloader.init();
+        </script>
+</html>

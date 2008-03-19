@@ -15,8 +15,8 @@
 */
 dojo.provide("cosmo.ui.widget.CollectionSelector");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.html.common");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
@@ -28,8 +28,9 @@ dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
 
 
-dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
-    dojo.widget.HtmlWidget, function () {},
+dojo.declare(
+    "cosmo.ui.widget.CollectionSelector", 
+    [dijit._Widget, dijit._Templated],
     {
         templateString: '<span></span>',
         verticalHeight: 18,
@@ -51,7 +52,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
         //references to various DOM nodes
         displayNameText: null, 
 
-        fillInTemplate: function () {
+        postCreate: function () {
             var self = this;
             var collection = cosmo.app.pim.getSelectedCollection();
             var passedKey = this.ticketKey; // Indicates we're in ticket view
@@ -161,7 +162,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                             var deferred = subscribeFunction();
                             
                             deferred.addCallback(redirectFunction);
-                            deferred.addErrback(dojo.lang.hitch(this, function (err) {
+                            deferred.addErrback(dojo.hitch(this, function (err) {
                                 cosmo.app.hideDialog();
                                 cosmo.app.showErr(self.strings.collectionAddError, err.message);
                                 return false;
@@ -203,7 +204,7 @@ dojo.widget.defineWidget("cosmo.ui.widget.CollectionSelector",
                 addCollectionPromptNode.id = 'addCollectionPrompt';
                 var anchor = _createElem('a');
                 anchor.title = self.strings.collectionAddTooltip;
-                dojo.event.connect(anchor, 'onclick', clickFunction);
+                dojo.connect(anchor, 'onclick', clickFunction);
                 anchor.appendChild(_createText(self.strings.collectionAddPrompt));
                 addCollectionPromptNode.appendChild(anchor);
 

@@ -15,7 +15,7 @@ test_settings_setup_lab_json = """{"params": {"link": "Settings"}, "method": "cl
 {"params": {"id": "hourDiv4-1200"},  "method": "doubleClick"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"url": "\/browse\/{$random}"},  "method": "open"}
-{"params": {"id": "contentWrapper"}, "method": "waits.forElement"}"""
+{"params": {"id": "main"}, "method": "waits.forElement"}"""
 
 test_settings_setup_snarf_json = """{"params": {"link": "Settings"}, "method": "click"}
 {"params": {"id": "modalDialogContent"}, "method": "waits.forElement"}
@@ -34,7 +34,7 @@ test_settings_setup_snarf_json = """{"params": {"link": "Settings"}, "method": "
 {"params": {"id": "hourDiv4-1200"},  "method": "doubleClick"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"url": "\/chandler\/browse\/{$random}"},  "method": "open"}
-{"params": {"id": "contentWrapper"}, "method": "waits.forElement"}"""
+{"params": {"id": "main"}, "method": "waits.forElement"}"""
 
 test_settings_teardown_json = """{"params": {"url": "\/pim"},  "method": "open"}
 {"params": {"link": "Settings"},  "method": "click"}
@@ -48,7 +48,7 @@ test_settings_teardown_json = """{"params": {"url": "\/pim"},  "method": "open"}
 from windmill.authoring import RunJsonFile
 import windmill
 
-lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://trunk.osaf.us']
+lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://d10test.osaf.us', 'http://trunk.osaf.us']
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:

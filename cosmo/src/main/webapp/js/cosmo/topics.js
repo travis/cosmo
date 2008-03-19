@@ -20,12 +20,9 @@
  */
 dojo.provide("cosmo.topics");
 
-dojo.require("dojo.event.topic");
-
 cosmo.topics.declareMessage = function (/*string*/ className,
                                        /*string*/ topicName,
                                        /*Function|Array*/ superclass,
-                                       /*Function*/ initializer,
                                        /*Object*/ props) {
     /**
      * summary: convienience method for declaring new messages.
@@ -48,12 +45,10 @@ cosmo.topics.declareMessage = function (/*string*/ className,
         o.className = className;
         o.topicName = topicName;
         o.superclass = superclass;
-        o.initializer = initializer;
         o.props = props;
     }
     var con = dojo.declare(o.className,
         o.superclass || cosmo.topics.Message,
-        o.initializer || null,
         o.props || null);
     con.topicName = o.topicName;
     con.prototype.topicName = o.topicName;
@@ -71,12 +66,12 @@ cosmo.topics.declareMessage("cosmo.topics.CollectionUpdatedMessage",
     // summary: Published after successful updating of a collection to the server
     //          has occured
     "COLLECTION_UPDATED", null,
-    //initializer
-    function (/*cosmo.model.Collection*/ collection){
-        this.collection = collection;
-    },
     //props
     {
+        //initializer
+        constructor: function (/*cosmo.model.Collection*/ collection){
+            this.collection = collection;
+        },
         collection: null
     }
 );
@@ -85,12 +80,12 @@ cosmo.topics.declareMessage("cosmo.topics.CollectionDeletedMessage",
     // summary: Published after successful deletion of a collection
     //          has occured
     "COLLECTION_DELETED", null,
-    //initializer
-    function (/*cosmo.model.Collection*/ collection){
-        this.collection = collection;
-    },
     //props
     {
+        //initializer
+        constructor: function (/*cosmo.model.Collection*/ collection){
+            this.collection = collection;
+        },
         collection: null
     }
 );
@@ -99,12 +94,12 @@ cosmo.topics.declareMessage("cosmo.topics.SubscriptionUpdatedMessage",
     // summary: Published after successful updating of a subscription to the server
     //          has occured
     "SUBSCRIPTION_UPDATED", null,
-    //initializer
-    function (/*cosmo.model.Subscription*/ subscription){
-        this.subscription = subscription;
-    },
     //props
     {
+        //initializer
+        constructor: function (/*cosmo.model.Subscription*/ subscription){
+            this.subscription = subscription;
+        },
         subscription: null
     }
 );
@@ -113,12 +108,12 @@ cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage",
     // summary: Published after preferences are changed
     //          has occured
     "PREFERENCES_UPDATED", null,
-    //initializer
-    function (/*Object*/ preferences){
-        this.preferences = preferences;
-    },
     //props
     {
+        //initializer
+        constructor: function (/*Object*/ preferences){
+            this.preferences = preferences;
+        },
         preferences: null
     }
 );
@@ -133,19 +128,17 @@ cosmo.topics.declareMessage("cosmo.topics.PreferencesUpdatedMessage",
 /**
  * Lower Level UI messages: Messsages very specific to the UI - like screen resizes and whatnot
  */
-cosmo.topics.declareMessage({ className: "cosmo.topics.AppLevelMessage",
-    topicName: '/app',
-    props: { type: null }
-});
-
-cosmo.topics.declareMessage({ className: "cosmo.topics.ModalDialogToggle",
+cosmo.topics.declareMessage({ 
+    className: "cosmo.topics.ModalDialogToggle",
     // summary: published when the modal dialog box is toggled on or off
     superclass: cosmo.topics.AppLevelMessage,
-    initializer: function (opts) {
-        this.topicName = this.constructor.superclass.topicName;
-        this.isDisplayed = opts.isDisplayed || false;
-    },
-    props: { isDisplayed: false,
+    topicName: 'cosmo:appModalDialogToggle',                              
+    props: { 
+        constructor: function (opts) {
+            this.isDisplayed = opts.isDisplayed || false;
+        },
+
+        isDisplayed: false,
         type: 'modalDialogToggle'  }
 } );
 
@@ -175,5 +168,5 @@ cosmo.topics.publish = function (/*Function*/messageConstructor,
     else {
         message = new messageConstructor(initializerArg);
     }
-    dojo.event.topic.publish(message.topicName, message);
+    dojo.publish(message.topicName, [message]);
 }

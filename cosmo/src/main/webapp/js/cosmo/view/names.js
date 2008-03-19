@@ -16,7 +16,7 @@
 
 dojo.provide('cosmo.view.names');
 
-dojo.lang.mixin(cosmo.view.names, {
+dojo.mixin(cosmo.view.names, {
     CAL: "cal" ,
     LIST: "list"
 });

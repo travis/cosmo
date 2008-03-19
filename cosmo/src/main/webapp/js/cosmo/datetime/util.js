@@ -18,11 +18,25 @@ dojo.provide("cosmo.datetime.util");
 
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
-dojo.require("dojo.date.common");
-
+dojo.require("cosmo.util.string");
 cosmo.datetime.util = new function () {
 
     var stripZeroPat = /^0/;
+
+    //note that these are now strings instead of int's
+    this.dateParts = {
+        YEAR:        'year', 
+        MONTH:       'month', 
+        DAY:         'day', 
+        HOUR:        'hour', 
+        MINUTE:      'minute', 
+        SECOND:      'second', 
+        MILLISECOND: 'millisecond', 
+        QUARTER:     'quarter', 
+        WEEK:        'week', 
+        WEEKDAY:     'weekday'
+    };
+
     this.parseTimeString = function (str, opts) {
         var stripLeadingZero = function (s) {
             return s.replace(stripZeroPat, '');
@@ -65,7 +79,7 @@ cosmo.datetime.util = new function () {
     this.hrStd2Mil = function  (hour, pm) {
         var h = typeof hour == 'number' ? hour : parseInt(hour);
         var str = '';
-        // PM
+        // PMs
         if (pm) {
             str = h < 12 ? (h+12) : h;
         }
@@ -74,7 +88,7 @@ cosmo.datetime.util = new function () {
             str = h == 12 ? 0 : h;
         }
         return str;
-    }
+    }   
     /**
      * Return 'AM' or 'PM' based on hour in 24-hour format
      * @param h Integer for hour in 24-hour format
@@ -100,10 +114,11 @@ cosmo.datetime.util = new function () {
         var diff = dt.getDay();
         var sun = new Date(dt.getTime());
         diff = 0 - diff;
-        sun = cosmo.datetime.Date.add(sun, dojo.date.dateParts.DAY, diff);
+        sun = cosmo.datetime.Date.add(sun, this.dateParts.DAY, diff);
         var ret = new Date(sun.getFullYear(), sun.getMonth(), sun.getDate());
         return ret;
     };
+
     /**
      * Get the datetime for 23:59:59 Saturday night of a week
      * given a date anywhere in the week
@@ -111,11 +126,13 @@ cosmo.datetime.util = new function () {
     this.getWeekEnd = function (dt) {
         var diff = 6-dt.getDay();
         var sat = new Date(dt.getTime());
-        sat = cosmo.datetime.Date.add(sat, dojo.date.dateParts.DAY, diff);
+        sat = cosmo.datetime.Date.add(sat, this.dateParts.DAY, diff);
          // Make time of day 11:59:99 to get the entire day's events
         var ret = new Date(sat.getFullYear(), sat.getMonth(), sat.getDate(), 23, 59, 59);
         return ret;
     };
+
+
 };
 
 

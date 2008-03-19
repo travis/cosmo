@@ -16,8 +16,6 @@
 
 dojo.provide('cosmo.ui.menu');
 
-dojo.require("dojo.io.cookie");
-dojo.require("dojo.event.*");
 dojo.require("cosmo.env");
 dojo.require('cosmo.app');
 dojo.require('cosmo.account.preferences');
@@ -45,7 +43,7 @@ cosmo.ui.menu = new function () {
             cosmo.account.preferences.getPreferences() :
             cosmo.util.deferred.getFiredDeferred();
 
-        prefsDeferred.addCallback(dojo.lang.hitch(this, function (prefs) {
+        prefsDeferred.addCallback(dojo.hitch(this, function (prefs) {
             if (prefs){
                 this.preferences = prefs;
             }
@@ -157,7 +155,7 @@ cosmo.ui.menu.allItems = [
                     sel.options[sel.selectedIndex].value));
             }
         };
-        dojo.event.connect(subscrSel, 'onchange', f);
+        dojo.connect(subscrSel, 'onchange', f);
         form.appendChild(subscrSel)
         return s;
       },
@@ -268,7 +266,7 @@ cosmo.ui.menu.MenuItem = function (p) {
     this.hide = function (){this.span.style.display = this.divider.style.display = 'none';};
     for (var n in params) { this[n] = params[n]; }
     for (topic in this.subscribeTo){
-        dojo.event.topic.subscribe(topic, dojo.lang.hitch(this, this.subscribeTo[topic]));
+        dojo.subscribe(topic, dojo.hitch(this, this.subscribeTo[topic]));
     }
 };
 
@@ -288,7 +286,7 @@ cosmo.ui.menu.MainMenu = function (p) {
                 a.className = 'menuBarLink';
                 a.innerHTML = item.displayText;
                 if (item.onclickFunc && typeof item.onclickFunc == 'function') {
-                    dojo.event.connect(a, 'onclick', item.onclickFunc);
+                    dojo.connect(a, 'onclick', item.onclickFunc);
                 }
                 if (item.urlString && typeof item.urlString == 'string') {
                     a.href = item.urlString;
@@ -323,7 +321,7 @@ cosmo.ui.menu.MainMenu = function (p) {
         if (!this.hasBeenRendered) {
             initDeferred = cosmo.ui.menu.init();
             initDeferred.addCallback(
-                dojo.lang.hitch(this,
+                dojo.hitch(this,
                     function () {
                         this.hasBeenRendered = true;
                     }
@@ -334,7 +332,7 @@ cosmo.ui.menu.MainMenu = function (p) {
             initDeferred = cosmo.util.deferred.getFiredDeferred();
         }
 
-        initDeferred.addCallback(dojo.lang.hitch(this, function () {
+        initDeferred.addCallback(dojo.hitch(this, function () {
             this.clearAll();
             // Render menu according to loaded items
             var items = cosmo.ui.menu.items;
@@ -350,8 +348,8 @@ cosmo.ui.menu.MainMenu = function (p) {
         return initDeferred;
     }
     for (var n in params) { this[n] = params[n]; }
-    dojo.event.topic.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName,
-                           dojo.lang.hitch(this, function (message) {
+    dojo.subscribe(cosmo.topics.PreferencesUpdatedMessage.topicName,
+                           dojo.hitch(this, function (message) {
                                for (var pref in message.preferences){
                                    cosmo.ui.menu.preferences[pref] = message.preferences[pref];
                                }
@@ -432,7 +430,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
             var index = key.substr(key.length - 1); // Negative pos param breaks in IE
             var menuItem = this.displayedMenu.getMenuItem(key);
             var currSub = $('hierMenuLevel_' + nextLevel);
-            dojo.html.addClass(targ, 'selectedItem');
+            dojo.addClass(targ, 'selectedItem');
             if (currSub) {
                 var subKey = currSub.firstChild.firstChild.id.replace('hierMenuItem_', '');
                 if (subKey.substr(0, subKey.length - 1) == key) {
@@ -440,7 +438,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
                 }
                 var expandedItem = this._expandedItemForEachLevel[currLevel];
                 var expandedNode = this._getMenuItemNodeForMenuItem(expandedItem);
-                dojo.html.removeClass(expandedNode, 'selectedItem');
+                dojo.removeClass(expandedNode, 'selectedItem');
                 this._hideSubMenus(currLevel);
             }
             else if (menuItem.items && menuItem.items.length) {
@@ -464,7 +462,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
             if (this._expandedItemForEachLevel[currLevel] == menuItem) {
                 return false;
             }
-            dojo.html.removeClass(targ, 'selectedItem');
+            dojo.removeClass(targ, 'selectedItem');
         }
     };
     this.handleClick = function (e) {
@@ -491,7 +489,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         var tr = null;
         var td = null;
         var div = null;
-        var viewport = dojo.html.getViewport();
+        var viewport = dijit.getViewport();
 
         table.cellPadding = 0;
         table.cellSpacing = 0;
@@ -529,7 +527,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         }
         // Menu would extend outside the browser window
         // X position overlap -- go into reverso mode
-        if ((x + menuLevelWidth) > viewport.width) {
+        if ((x + menuLevelWidth) > viewport.w) {
             x -= menuLevelWidth;
             if (level > 0) {
                 var parentWidth =
@@ -545,7 +543,7 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         }
         // Y position overlap -- compensate by the
         // amount of the overlap
-        var yOver = (y + (items.length * 24)) - viewport.height;
+        var yOver = (y + (items.length * 24)) - viewport.h;
         if (yOver > 0) {
             y -= (yOver + (BORDER_WIDTH * 2));
         }
@@ -602,9 +600,9 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
         table.style.top = y + 'px';
         document.body.appendChild(table);
 
-        dojo.event.connect(table, 'onmouseover', this, 'handleMouseOver');
-        dojo.event.connect(table, 'onmouseout', this, 'handleMouseOut');
-        dojo.event.connect(table, 'onclick', this, 'handleClick');
+        dojo.connect(table, 'onmouseover', this, 'handleMouseOver');
+        dojo.connect(table, 'onmouseout', this, 'handleMouseOut');
+        dojo.connect(table, 'onclick', this, 'handleClick');
     };
     this._hideSubMenus = function (level) {
         this._currX = this._xPosMarksForEachLevel[level];
@@ -615,9 +613,9 @@ cosmo.ui.menu.HierarchicalMenuManager = new function () {
             var removeMenu = $('hierMenuLevel_' + n);
             delete this._expandedItemForEachLevel[n];
             if (removeMenu) {
-                dojo.event.disconnect(removeMenu, 'onmouseover',
+                dojo.disconnect(removeMenu, 'onmouseover',
                     this, 'handleMouseOver');
-                dojo.event.disconnect(removeMenu, 'onclick',
+                dojo.disconnect(removeMenu, 'onclick',
                     this, 'handleClick');
                 document.body.removeChild(removeMenu);
             }
@@ -767,7 +765,7 @@ cosmo.ui.menu.HierarchicalMenu.prototype.getMenuItem =
 };
 
 // Close menus via any click on the doc body
-dojo.event.connect(document, 'onclick',
+dojo.connect(document, 'onclick',
     cosmo.ui.menu.HierarchicalMenuManager,
         'hideHierarchicalMenu');
 

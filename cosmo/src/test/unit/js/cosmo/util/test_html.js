@@ -17,12 +17,10 @@
 dojo.provide("cosmotest.util.test_html");
 
 dojo.require("cosmo.util.html");
-dojo.require("dojo.dom");
 
 cosmotest.util.test_html = {
     test_getElementsByTagName: function (){
         var xmlDoc = cosmotest.util.test_html.getTestXml();
-        yyy = xmlDoc
         //Just make sure it returns something
         var workspace = cosmo.util.html.getElementsByTagName(xmlDoc, "workspace");
         jum.assertTrue("workspace", !!workspace);
@@ -49,8 +47,68 @@ cosmotest.util.test_html = {
                         '</collection>' +
                     '</workspace>' +
                 '</service>'
-        return dojo.dom.createDocumentFromText(x);
+        return createDocumentFromText(x);
         
     }
 }
-  
+
+
+createDocument = function () {
+    var doc = null;
+    var _document = document;
+    if (typeof ActiveXObject != "undefined") {
+	var prefixes = ["MSXML2", "Microsoft", "MSXML", "MSXML3"];
+	for (var i = 0; i < prefixes.length; i++) {
+	    try {
+		doc = new ActiveXObject(prefixes[i] + ".XMLDOM");
+	    }
+	    catch (e) {
+	    }
+	    if (doc) {
+		break;
+	    }
+	}
+    } else {
+	if ((_document.implementation) && (_document.implementation.createDocument)) {
+	    doc = _document.implementation.createDocument("", "", null);
+	}
+    }
+    return doc;
+};  
+
+//cribbed from dojo0.4
+createDocumentFromText = function (str, mimetype) {
+    if (!mimetype) {
+	mimetype = "text/xml";
+    }
+    if (typeof DOMParser != "undefined") {
+	var parser = new DOMParser();
+	return parser.parseFromString(str, mimetype);
+    } else {
+	if (typeof ActiveXObject != "undefined") {
+	    var domDoc = dojo.dom.createDocument();
+	    if (domDoc) {
+		domDoc.async = false;
+		domDoc.loadXML(str);
+		return domDoc;
+	    } else {
+		console.debug("toXml didn't work?");
+	    }
+	} else {
+	    var _document = document;
+	    if (_document.createElement) {
+		var tmp = _document.createElement("xml");
+		tmp.innerHTML = str;
+		if (_document.implementation && _document.implementation.createDocument) {
+		    var xmlDoc = _document.implementation.createDocument("foo", "", null);
+		    for (var i = 0; i < tmp.childNodes.length; i++) {
+			xmlDoc.importNode(tmp.childNodes.item(i), true);
+		    }
+		    return xmlDoc;
+		}
+		return ((tmp.document) && (tmp.document.firstChild ? tmp.document.firstChild : tmp));
+	    }
+	}
+    }
+    return null;
+};

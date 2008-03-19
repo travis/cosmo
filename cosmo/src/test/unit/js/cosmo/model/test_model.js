@@ -16,16 +16,17 @@
 
 dojo.provide("cosmotest.model.test_model");
 dojo.require("cosmo.model.util");
+dojo.require("cosmo.model.common");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
 
-dojo.lang.mixin(cosmotest.model.test_model,{
+dojo.mixin(cosmotest.model.test_model,{
 test_declareStamp : function(){
     cosmo.model.declareStamp("TestStamp", "test", "namespace",
         [["testString", String, {"default" : "def"}],
          ["testArrayOfNumbers", [Array, Number], {"default" : function(){return [1,2,3]}}]],
          {
-            initializer: function(kwArgs){
+            constructor: function(kwArgs){
                 this.initializeProperties(kwArgs);
             }});
     
@@ -34,8 +35,8 @@ test_declareStamp : function(){
     jum.assertEquals(s.getTestString(), "def");
     jum.assertEquals([1,2,3].toString(), s.getTestArrayOfNumbers().toString());
     var attr = s.stampMetaData.getAttribute("testArrayOfNumbers");
-    assertEquals(attr.type[0], Array);
-    assertEquals(attr.type[1], Number);
+    jum.assertEquals(attr.type[0], Array);
+    jum.assertEquals(attr.type[1], Number);
 },
 
 test_declareSeriesOnlyStamp: function(){
@@ -82,8 +83,8 @@ test_getEventStampGetTaskStamp : function(){
     task = null;
     event = note.getEventStamp();
     task = note.getTaskStamp();
-    assertEquals("event", event.stampMetaData.stampName)
-    assertEquals("task", task.stampMetaData.stampName)
+    jum.assertEquals("event", event.stampMetaData.stampName)
+    jum.assertEquals("task", task.stampMetaData.stampName)
 },
 
 test_noteOccurrence : function(){
@@ -152,7 +153,7 @@ test_equals : function(){
     jum.assertTrue(caught);
     
     // Test for handling weird line break char insertion in IE.
-    if (dojo.render.html.ie){
+    if (dojo.isIE){
        jum.assertTrue(equals("One\r\nTwo", "One\nTwo"));
        jum.assertTrue(equals("One\nTwo", "One\r\nTwo"));
     }
@@ -186,16 +187,16 @@ test_hasRecurrence: function(){
         uid: "123",
         displayName: "display"
     });
-    assertFalse(note.hasRecurrence());
+    jum.assertFalse(note.hasRecurrence());
     var stamp = note.getEventStamp(true);
     stamp.setRrule(new cosmo.model.RecurrenceRule({frequency:cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY}));
-    assertTrue(note.hasRecurrence());
+    jum.assertTrue(note.hasRecurrence());
     var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
-    assertTrue(occurrence.hasRecurrence());
+    jum.assertTrue(occurrence.hasRecurrence());
 },
 
 test_stampMetaData: function(){
-    assertEquals("event", cosmo.model.getStampMetaData("event").stampName);
+    jum.assertEquals("event", cosmo.model.getStampMetaData("event").stampName);
 },
 
 test_addressRecurring: function(){
@@ -209,7 +210,19 @@ test_addressRecurring: function(){
     var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());
     var stamp = occurrence.getMailStamp(true);
     stamp.setFromAddress("from");
-    assertTrue(stamp.getFromAddress() == "from");
-}
+    jum.assertTrue(stamp.getFromAddress() == "from");
+},
+
+ test_addDuration: function (){
+       var date = new cosmo.datetime.Date(2000,0,1,12,0,0);
+       var duration = new cosmo.model.Duration({year:1});
+       date.addDuration(duration);
+       jum.assertTrue(date.equals(new cosmo.datetime.Date(2001,0,1,12,0,0)));
+
+       var date = new cosmo.datetime.Date(2000,0,1,12,0,0);
+       var duration = new cosmo.model.Duration("P1W");
+       date.addDuration(duration);
+       jum.assertTrue(date.equals(new cosmo.datetime.Date(2000,0,8,12,0,0)));
+   }
 
 });

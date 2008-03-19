@@ -29,7 +29,7 @@ dojo.require("cosmo.datetime.util");
 dojo.require('cosmo.view.service');
 dojo.require("cosmo.service.exception");
 
-dojo.lang.mixin(cosmo.view.cal, cosmo.view.viewBase);
+dojo.mixin(cosmo.view.cal, cosmo.view.viewBase);
 
 
 cosmo.view.cal.init = function(){
@@ -58,33 +58,18 @@ cosmo.view.cal.collectionItemRegistries = {};
  * @param cmd A JS Object, the command containing orders for
  * how to handle the published event.
  */
-cosmo.view.cal.handlePub_calEvent = function (cmd) {
 
-    if (!cosmo.view.cal.isCurrentView()) { return false; }
+dojo.subscribe("cosmo:calLoadCollection", function(cmd){
+    if (!cosmo.view.cal.isCurrentView()) return false;
+    var opts = cmd.opts || {};
+    cosmo.view.cal.loadItems(opts);
+});
+dojo.subscribe("cosmo:appKeyboardInput", 
+               dojo.hitch(cosmo.view.cal, cosmo.view.cal.handleKeyboardInput));
 
-    // Ignore input when not the current view
-    var _pim = cosmo.app.pim;
-    if (_pim.currentView != _pim.views.CAL) {
-        return false;
-    }
-
-    var act = cmd.action;
-    var qual = cmd.qualifier || null;
-    var data = cmd.data || {};
-    var opts = cmd.opts;
-    var delta = cmd.delta;
-    switch (act) {
-        case 'loadCollection':
-            cosmo.view.cal.loadItems(opts);
-            break;
-        default:
-            // Do nothing
-            break;
-    }
-};
 
 cosmo.view.cal.loadItems = function (p) {
-    dojo.debug("trigger!");
+    console.debug("trigger!");
     var _cal = cosmo.view.cal; // Scope-ness
     var params = p || {};
     var goToNav = null;
@@ -101,7 +86,6 @@ cosmo.view.cal.loadItems = function (p) {
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent
@@ -110,13 +94,13 @@ cosmo.view.cal.loadItems = function (p) {
     // --------
     if (params.goTo) {
         goToNav = params.goTo;
-        dojo.debug("goto");
+        console.debug("goto");
         // param is 'back' or 'next'
         if (typeof goToNav == 'string') {
             var key = goToNav.toLowerCase();
             var incr = key.indexOf('back') > -1 ? -1 : 1;
             queryDate = cosmo.datetime.Date.add(_cal.viewStart,
-                dojo.date.dateParts.WEEK, incr);
+                cosmo.datetime.util.dateParts.WEEK, incr);
         }
         // param is actual Date
         else {
@@ -176,10 +160,8 @@ cosmo.view.cal.loadItems = function (p) {
     cosmo.util.deferred.addStdDLCallback(loadDeferred);
     loadDeferred.addCallback(function(){
         var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
-    
-        dojo.event.topic.publish('/calEvent', { action: 'eventsLoadSuccess',
-                                                data: itemRegistry, opts: opts });
-    });
+        dojo.publish('cosmo:calEventsLoadSuccess', [{data: itemRegistry, opts: opts }]);
+    });        
     return loadDeferred;
 };
 /**
@@ -293,9 +275,9 @@ cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry =
  */
 cosmo.view.cal.setQuerySpan = function (dt) {
     this.viewStart = cosmo.datetime.util.getWeekStart(dt);
-    dojo.debug("viewStart: " + this.viewStart)
+    console.debug("viewStart: " + this.viewStart)
     this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
-    dojo.debug("viewEnd: " + this.viewEnd)
+    console.debug("viewEnd: " + this.viewEnd)
     return true;
 };
 /**
@@ -313,7 +295,7 @@ cosmo.view.cal.getNewViewStart = function (key) {
         incr = -1;
     }
     queryDate = cosmo.datetime.Date.add(this.viewStart,
-        dojo.date.dateParts.WEEK, incr);
+        cosmo.datetime.util.dateParts.WEEK, incr);
     return queryDate;
 };
 

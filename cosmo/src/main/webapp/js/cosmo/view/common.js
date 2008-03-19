@@ -26,10 +26,6 @@ cosmo.view.unsavedChangesDialog = new cosmo.view.dialog.UnsavedChangesDialog();
 
 cosmo.view.viewBase = new function () {
     this.init = function () {
-        // Subscribe to the '/calEvent' channel
-        dojo.event.topic.subscribe('/calEvent', this, 'handlePub_calEvent');
-        // Subscribe to the '/app' channel
-        dojo.event.topic.subscribe('/app', this, 'handlePub_app');
         this.hasBeenInitialized = true;
         cosmo.view.contextMenu.menu = cosmo.view.contextMenu.menu || cosmo.view.contextMenu.createMenu();
     };
@@ -113,16 +109,16 @@ cosmo.view.viewBase = new function () {
         reg.append(origReg);
         return reg;
     };
+
+    
     /**
      * Handle events published on the '/app' channel -- app-wide
      * events
      * @param cmd A JS Object, the command containing orders for
      * how to handle the published event.
      */
-    this.handlePub_app = function (cmd) {
-
+    this.handleKeyboardInput = function (cmd) {
         if (!this.isCurrentView()) { return false; }
-
         var e = cmd.appEvent;
         var t = cmd.type;
         var isValidEventSource = function (e, elem) {
@@ -142,43 +138,39 @@ cosmo.view.viewBase = new function () {
             };
             return testByCode[e.keyCode]();
         }
-        // Handle keyboard input
-        if (t == 'keyboardInput') {
-            // Don't bother executing all these tests unless it's the Enter
-            // or Delete key -- use case statement here so we can cleanly
-            // add other keys as needed
-            switch (e.keyCode) {
+        // Don't bother executing all these tests unless it's the Enter
+        // or Delete key -- use case statement here so we can cleanly
+        // add other keys as needed
+        switch (e.keyCode) {
+        case 13:
+        case 46:
+            // Must have a currently selected item and a
+            // writable collection, and the caret/focus has
+            // to be somewhere appropriate for the key input
+            // in question
+            // Find whwatever elem in the DOM hier above
+            // the event source that has an id
+            var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
+            // Currently selected item, if any
+            var item = this.canvasInstance.getSelectedItem();
+            if (item &&
+                cosmo.app.pim.getSelectedCollectionWriteable() &&
+                isValidEventSource(e, elem)) {
+                switch (e.keyCode) {
+                    // Enter
                 case 13:
-                case 46:
-                    // Must have a currently selected item and a
-                    // writable collection, and the caret/focus has
-                    // to be somewhere appropriate for the key input
-                    // in question
-                    // Find whwatever elem in the DOM hier above
-                    // the event source that has an id
-                    var elem = cosmo.ui.event.handlers.getSrcElemByProp(e, 'id');
-                    // Currently selected item, if any
-                    var item = this.canvasInstance.getSelectedItem();
-                    if (item &&
-                        cosmo.app.pim.getSelectedCollectionWriteable() &&
-                        isValidEventSource(e, elem)) {
-                        switch (e.keyCode) {
-                            // Enter
-                            case 13:
-                                dojo.event.topic.publish('/calEvent',
-                                    { 'action': 'saveFromForm' });
-                                break;
-                            // Delete
-                            case 46:
-                                dojo.event.topic.publish('/calEvent',
-                                    { 'action': 'removeConfirm', 'data': item });
-                                break;
-                        }
-                    }
+                    dojo.publish('cosmo:calSaveFromForm', [{}]);
                     break;
+                    // Delete
+                case 46:
+                    dojo.publish('cosmo:calRemoveConfirm', [{'data': item }]);
+                    break;
+                }
             }
+            break;
         }
     };
+                                                       
 };
 
 cosmo.view.canvasBase = new function () {
@@ -248,7 +240,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
     var error = deltaAndError[1];
     var delta = deltaAndError[0];
     if (error || delta.hasChanges()) {
-        dojo.debug(error || delta);
+        console.debug(error || delta);
         // Cancel button -- just hide the dialog, do nothing
         var cancel = function () {
             // Execute any pre-cancel code passed in
@@ -274,8 +266,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
                 if (typeof savePreHook == 'function') {
                     savePreHook();
                 }
-                dojo.event.topic.publish('/calEvent',
-                    { 'action': 'saveFromForm' });
+                dojo.publish('cosmo:calSaveFromForm', []);
             }
             // Hide the dialog first, wait for return value to
             // avoid contention for the use of the dialog box
@@ -309,10 +300,12 @@ cosmo.view.displayViewFromCollections = function (c) {
     }
     // Wrap in setTimeout so we don't lock up the UI
     // thread during the publish operation
-    var f = function () { dojo.event.topic.publish('/calEvent', {
-        action: 'loadCollection', opts: { loadType: 'changeCollection',
-        collection: newCollection }, data: {}
-    }); };
+    var f = function () { 
+        dojo.publish('cosmo:calLoadCollection', [
+            {opts: { loadType: 'changeCollection',
+                     collection: newCollection }, data: {}
+            }]); 
+    };
     // Make the timeout value greater than zero to
     // ensure that the 'loading' status message appears
     setTimeout(f, 35);

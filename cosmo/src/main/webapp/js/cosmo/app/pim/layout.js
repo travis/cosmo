@@ -20,7 +20,6 @@ dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
 dojo.require('cosmo.ui.resize')
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("dojo.html.common");
 
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
@@ -81,9 +80,9 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
     this.mainApp = new cosmo.app.pim.layout.MainApp({ parent: this });
     this.children = [this.menuBar, this.mainApp];
     this.renderSelf = function () {
-        var viewport = dojo.html.getViewport();
-        var w = viewport.width;
-        var h = viewport.height;
+        var viewport = dijit.getViewport();
+        var w = viewport.w;
+        var h = viewport.h;
         // Pare width and height down to avoid
         // stupid scrollbars showing up
         w -= 2;
@@ -300,6 +299,7 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
+    console.debug("pop pop pop");
 
     var menuBar = this.baseLayout.menuBar;
     var centerColumn = this.baseLayout.mainApp.centerColumn;
@@ -319,7 +319,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     // Main menu of links at the top of the UI
     var menuDiv = _createElem('div');
     menuDiv.id = 'menuNavItems';
-    var cB = new  cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
+    var cB = new cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
     menuBar.addChild(cB);
     menuBar.mainMenu = cB;
     cB.render(); // Go ahead and render the menubar -- no waiting for data
@@ -371,9 +371,10 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
-        var widget = dojo.widget.createWidget('cosmo:CollectionSelector', {
+        var widget = new cosmo.ui.widget.CollectionSelector({
             collection: cosmo.app.pim.getSelectedCollection(),
-            ticketKey: cosmo.app.pim.ticketKey }, selectorDiv, 'last');
+            ticketKey: cosmo.app.pim.ticketKey });
+        selectorDiv.appendChild(widget.domNode);
         cB.widget = widget;
     }
     // Logged-in view -- use the collection selector

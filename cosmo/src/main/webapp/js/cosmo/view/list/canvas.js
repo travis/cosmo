@@ -16,8 +16,7 @@
 
 dojo.provide('cosmo.view.list.canvas');
 
-dojo.require('dojo.event.*');
-dojo.require('dojo.html.common');
+
 dojo.require('dojo.string');
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
@@ -35,7 +34,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
     var self = this;
     var params = p || {};
 
-    dojo.lang.mixin(this, cosmo.view.canvasBase);
+    dojo.mixin(this, cosmo.view.canvasBase);
 
     this.domNode = null;
     this.id = '';
@@ -61,43 +60,33 @@ cosmo.view.list.canvas.Canvas = function (p) {
 
     for (var n in params) { this[n] = params[n]; }
 
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
-
-    // Interface methods
-    this.handlePub_calEvent = function (cmd) {
+    dojo.subscribe('cosmo:calEventsLoadSuccess', dojo.hitch(this, function(cmd){
         if (!cosmo.view.list.isCurrentView()) { return false; }
-
-        var act = cmd.action;
-        var qual = cmd.qualifier || null;
-        var data = cmd.data || {};
-        var opts = cmd.opts;
-        var delta = cmd.delta;
-        switch (act) {
-            case 'save':
-            case 'remove':
-                if (cmd.saveType != "new") {
-                    this._showRowProcessing();
-                }
-                break;
-            case 'eventsLoadSuccess':
-                this.initListProps();
-                this.render();
-                if (this._doSortAndDisplay()) {
-                    cosmo.app.hideMask();
-                }
-                break;
-            case 'saveSuccess':
-                this._saveSuccess(cmd)
-                break;
-            case 'removeSuccess':
-                var ev = cmd.data;
-                this._removeSuccess(cmd);
-            default:
-                // Do nothing
-                break;
+        this.initListProps();
+        this.render();
+        if (this._doSortAndDisplay()) {
+            cosmo.app.hideMask();
         }
+    }));
 
-    };
+    var update = dojo.hitch(this, function(cmd){
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        if (cmd.saveType != "new") {
+            this._showRowProcessing();
+        }
+    });
+    dojo.subscribe('cosmo:calSave', update);
+    dojo.subscribe('cosmo:calRemove', update);
+    dojo.subscribe('cosmo:calRemoveSuccess', dojo.hitch(this, function(cmd){
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        this._removeSuccess(cmd);
+    }));
+
+    dojo.subscribe('cosmo:calSaveSuccess', dojo.hitch(this, function(cmd){
+        if (!cosmo.view.list.isCurrentView()) { return false; }
+        this._saveSuccess(cmd)
+    }));
+
     this.renderSelf = function () {
         // Rendering can be messages published to calEvent
         // or by window resizing
@@ -124,11 +113,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (targ.id == 'body') { return false; }
             if (targ.id.indexOf('Header') > -1) {
                 if (targ.className.indexOf('Sel') > -1) {
-                    dojo.html.replaceClass(targ, 'listViewHeaderCellSelLit',
-                      'listViewHeaderCellSel');
+                    dojo.removeClass(targ, 'listViewHeaderCellSelLit');
+                    dojo.addClass(targ, 'listViewHeaderCellSel');
                 }
                 else {
-                    dojo.html.addClass(targ, 'listViewHeaderCellLit');
+                    dojo.addClass(targ, 'listViewHeaderCellLit');
                 }
             }
             else {
@@ -138,7 +127,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 for (var i = 0; i < ch.length; i++) {
                     // Don't apply rollover effect to triage col
                     if (ch[i].className.indexOf('listViewTriage') == -1) {
-                        dojo.html.addClass(ch[i], 'mouseoverItem');
+                        dojo.addClass(ch[i], 'mouseoverItem');
                     }
                 }
             }
@@ -153,17 +142,17 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (targ.id == 'body') { return false; }
             if (targ.id.indexOf('Header') > -1) {
                 if (targ.className.indexOf('Sel') > -1) {
-                    dojo.html.replaceClass(targ, 'listViewHeaderCellSel',
-                      'listViewHeaderCellSelLit');
+                    dojo.removeClass(targ, 'listViewHeaderCellSel');
+                    dojo.addClass(targ, 'listViewHeaderCellSelLit');
                 }
                 else {
-                  dojo.html.removeClass(targ, 'listViewHeaderCellLit');
+                  dojo.removeClass(targ, 'listViewHeaderCellLit');
                 }
             }
             else {
                 var ch = targ.childNodes;
                 for (var i = 0; i < ch.length; i++) {
-                    dojo.html.removeClass(ch[i], 'mouseoverItem');
+                    dojo.removeClass(ch[i], 'mouseoverItem');
                 }
             }
         }
@@ -223,7 +212,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 if (origSelectionNode) {
                     ch = origSelectionNode.childNodes;
                     for (var i = 0; i < ch.length; i++) {
-                        dojo.html.removeClass(ch[i], 'selectedItem');
+                        dojo.removeClass(ch[i], 'selectedItem');
                     }
                 }
 
@@ -234,16 +223,16 @@ cosmo.view.list.canvas.Canvas = function (p) {
             for (var i = 0; i < ch.length; i++) {
                 // Don't apply selection effect to triage col
                 if (ch[i].className.indexOf('listViewTriage') == -1) {
-                    dojo.html.removeClass(ch[i], 'mouseoverItem');
-                    dojo.html.addClass(ch[i], 'selectedItem');
+                    dojo.removeClass(ch[i], 'mouseoverItem');
+                    dojo.addClass(ch[i], 'selectedItem');
                 }
             }
             // Load the selected item's stuff into the detail-view form
             if (item) {
                 self.setSelectedItem(item);
                 var f = function () {
-                  dojo.event.topic.publish('/calEvent', { 'action': 'setSelected',
-                    'data': item });
+                    dojo.publish('cosmo:calSetSelected', [{
+                        'data': item }]);
                 };
                 // Free up the UI thread so we don't see two items
                 // selected at once while the message is being published
@@ -290,7 +279,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var colCount = 0; // Used to generated the 'processing' row
         var fillCell = function (s) {
             var cell = s;
-            if (s) s = dojo.string.escapeXml(s);
+            if (s) s = cosmo.util.string.escapeXml(s);
             return  s || '&nbsp;';
         };
         var createContentRow = function (key, val) {
@@ -422,21 +411,21 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this.processingRow = row;
 
         // Attach event listeners -- event will be delagated by row
-        dojo.event.connect($('listViewTable'), 'onmouseover',
+        dojo.connect($('listViewTable'), 'onmouseover',
             this, 'handleMouseOver');
-        dojo.event.connect($('listViewTable'), 'onmouseout',
+        dojo.connect($('listViewTable'), 'onmouseout',
             this, 'handleMouseOut');
-        dojo.event.connect($('listViewTable'), 'onclick',
+        dojo.connect($('listViewTable'), 'onclick',
             this, 'handleClick');
         // HACK: Do explicit single selection on right-click
         // Because the appearance of the context menu in
         // Safari 2 breaks the normal mouseout event and makes
         // it look like multi-select is enabled
-        dojo.event.connect($('listViewTable'), 'oncontextmenu',
+        dojo.connect($('listViewTable'), 'oncontextmenu',
             this, 'handleClick');
 
-        dojo.event.topic.publish('/calEvent', { action: 'navigateLoadedCollection',
-            opts: null });
+        dojo.publish('cosmo:calNavigateLoadedCollection',
+                     [{opts: null }]);
 
         return true;
     };
@@ -475,12 +464,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
      * published 'success' message
      */
     this._saveSuccess = function (cmd) {
-        dojo.debug("saveSuccess: ");
+        console.debug("saveSuccess: ");
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var item = cmd.data
         var data = item.data;
         var saveType = cmd.saveType || null;
-        dojo.debug("saveSuccess saveType: " + saveType);
+        console.debug("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
@@ -489,7 +478,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
         if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
-            dojo.debug("saveSuccess: has recurrence");
+            console.debug("saveSuccess: has recurrence");
             //first remove the event and recurrences from the registry.
             var idsToRemove = [data.getUid()];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
@@ -546,7 +535,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
 
         var updateEventsCallback = function () {
-            dojo.debug("updateEventsCallback")
+            console.debug("updateEventsCallback")
             // Don't re-render when requests are still processing
             if (!cosmo.view.service.processingQueue.length) {
 
@@ -578,12 +567,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
                     // has been replaced in the itemRegistry
                     self.setSelectedItem(sel);
                     sel = self.getSelectedItem();
-                    dojo.event.topic.publish('/calEvent', { action: 'setSelected',
-                        data: sel });
+                    dojo.publish('cosmo:calSetSelected', [{
+                        data: sel }]);
                 }
             }
             else {
-                dojo.debug("how many left in queue: " +
+                console.debug("how many left in queue: " +
                     cosmo.view.service.processingQueue.length);
             }
         }
@@ -612,8 +601,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 self.view.itemRegistry.removeItem(item.id);
                 // If we just removed the last item, clear the form
                 if (self.view.itemRegistry.length == 0) {
-                    dojo.event.topic.publish('/calEvent', { 'action':
-                        'clearSelected', 'data': null });
+                    dojo.publish('cosmo:calClearSelected', [{ 'data': null }]);
                 }
                 self._doSortAndDisplay();
                 break;
@@ -643,12 +631,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 // List view has all items loaded at once
                 // in the itemRegistry -- no need for selectedItemCache
                 var sel = self.getSelectedItem();
-                dojo.event.topic.publish('/calEvent', { 'action':
-                    'eventsDisplaySuccess', 'data': sel });
+                dojo.publish('cosmo:calEventsDisplaySuccess', [{'data': sel }]);
 
             }
             else {
-                dojo.event.topic.publish('/calEvent', { 'action': 'noItems' });
+                dojo.publish('cosmo:calNoItems', [{}]);
             }
         }
         else {

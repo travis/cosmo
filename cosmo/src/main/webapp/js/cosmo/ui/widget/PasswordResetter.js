@@ -25,26 +25,20 @@
 
 dojo.provide("cosmo.ui.widget.PasswordResetter");
 
-dojo.require("dojo.widget.*");
-dojo.require("dojo.event.*");
-dojo.require("dojo.dom");
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
-dojo.require("cosmo.ui.button");
 dojo.require("cosmo.util.i18n");
-
 dojo.require("cosmo.convenience");
+dojo.require("cosmo.ui.widget.Button");
+dojo.require("dijit._Widget");
+dojo.require("dijit._Templated");
 
-dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWidget,
-    function(){
-
-    },
+dojo.declare("cosmo.ui.widget.PasswordResetter", 
+             [dijit._Widget, dijit._Templated],
     {
 
-        templatePath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/PasswordResetter/PasswordResetter.html"),
-        templateCssPath: dojo.uri.dojoUri(
-            "../../cosmo/ui/widget/templates/PasswordResetter/PasswordResetter.css"),
+        templatePath: dojo.moduleUrl(
+            "cosmo", "ui/widget/templates/PasswordResetter.html"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
@@ -75,25 +69,24 @@ dojo.widget.defineWidget("cosmo.ui.widget.PasswordResetter", dojo.widget.HtmlWid
             var self = this;
             self.setError("");
             if (this.passwordInput.value == this.confirmInput.value){
-                cosmo.cmp.resetPassword(this.recoveryKey, this.passwordInput.value,
-                  {error: function(type, data, xhr){
-                       if (xhr.status == "404"){
-                           self.setError(_(self.i18nPrefix + ".Error.404", self.recoveryKey));
-                       } else {
-                          self.setError(data);
-                       }
-                     },
-                   load: function(type, data, xhr){
-                      self.setInfo(_(self.i18nPrefix + ".Success",
-                          cosmo.env.getLoginRedirect()));
-                     }
-                   });
+                var d = cosmo.cmp.resetPassword(this.recoveryKey, this.passwordInput.value);
+                d.addCallback(function(data){
+                    self.setInfo(_(self.i18nPrefix + ".Success",
+                                   cosmo.env.getLoginRedirect()));
+                });
+                d.addErrback(function(error){
+                    if (d.ioArgs.xhr.status == "404"){
+                        self.setError(_(self.i18nPrefix + ".Error.404", self.recoveryKey));
+                    } else {
+                        self.setError(error.message);
+                    }
+                });
             } else {
                 this.setError(_(this.i18nPrefix + ".Error.PasswordMatch"));
             }
         },
 
-        fillInTemplate: function(){
+        postCreate: function(){
            if (this.displayDefaultInfo){
                this.setInfo(_(this.i18nPrefix + ".InitialInfo"));
            }

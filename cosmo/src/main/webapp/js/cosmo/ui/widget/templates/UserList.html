@@ -1,0 +1,101 @@
+<div>
+<style type="text/css">
+
+.cosmoRootRow .rootNoChange{
+    background: #ffcccc;
+}
+
+.cosmoActivatedRow .unactivatedCell{
+    background: #ffcccc;
+}
+
+.dojoxGrid-row .noChange{
+    background: #ffcccc;
+}
+</style>
+<input type="text" id="searchBox" dojoAttachEvent="onkeypress:userListSearchKey"/>
+<button dojoType="dijit.form.Button" id="searchButton" dojoAttachEvent="onClick:userListSearch">Search</button>
+<button dojoType="dijit.form.Button" id="newUserButton" dojoAttachEvent="onClick:newUser">New User</button>
+<button dojoType="dijit.form.Button" id="deleteUserButton" dojoAttachEvent="onClick:deleteUser">Delete User</button>
+
+<div id="userList" dojoType="dojox.Grid" dojoAttachPoint="userList">
+  <script type="dojo/method" event="onCellDblClick" args="e">
+    
+var fn = e.cell.field;
+var rowData = this.model.getRow(e.rowIndex);
+if (!(rowData.username == "root" &&
+      (fn == "username" ||
+       fn == "firstName" ||
+       fn == "lastName" ||
+       fn == "administrator" ||
+       fn == "locked"
+      )) &&
+    !(!rowData.unactivated &&
+      fn == "unactivated")
+   ){
+    return this.inherited("onCellDblClick", arguments);
+}
+  </script>
+</div>
+    
+<div dojoType="dijit.Dialog" id="newUserDialog" title="Create new user" dojoAttachPoint="newUserDialog">
+  <form dojoType="dijit.form.Form" dojoAttachEvent="execute:createNewUser" dojoAttachPoint="newUserForm">
+      <table>
+        <tr>
+          <td><label for="loc">${l10n.username}: </label></td>
+          <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}Username"
+                     name="username" regExp="${validation.username.regExp}" 
+                     required="${validation.username.required}"
+                     invalidMessage="${validation.username.invalidMessage}"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">${l10n.firstName}: </label></td>
+          <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}FirstName"
+                     name="firstName" regExp="${validation.firstName.regExp}" 
+                     required="${validation.firstName.required}"
+                     invalidMessage="${validation.firstName.invalidMessage}"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">${l10n.lastName}: </label></td>
+          <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}LastName"
+                     name="lastName" regExp="${validation.lastName.regExp}" 
+                     required="${validation.lastName.required}"
+                     invalidMessage="${validation.lastName.invalidMessage}"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">${l10n.email}: </label></td>
+          <td><input dojoType="dijit.form.ValidationTextBox" type="text" 
+                     id="${id}Email"
+                     name="email" regExp="${validation.email.regExp}" 
+                     required="${validation.email.required}"
+                     invalidMessage="${validation.email.invalidMessage}"></td>
+        </tr>
+        <tr>
+          <td><label for="loc">${l10n.password}: </label></td>
+          <td><input dojoType="dijit.form.ValidationTextBox" type="password" 
+                     id="${id}Password"
+                     name="password" regExp="${validation.password.regExp}" 
+                     required="${validation.password.required}"
+                     invalidMessage="${validation.password.invalidMessage}"></td>
+        </tr>
+        <tr>
+          <td><label for="desc">${l10n.confirm}: </label></td>
+          <td><input dojoType="dijit.form.ValidationTextBox" type="password" 
+                     id="${id}Confirm"
+                     name="confirm" regExp="${validation.password.regExp}" 
+                     required="${validation.password.required}"
+                     invalidMessage="${validation.password.invalidMessage}"></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center">
+            <button id="${id}Submit"
+                    dojoType="dijit.form.Button" 
+                    type="submit">${l10n.ok}</button></td>
+        </tr>
+      </table>
+      </form>
+</div>
+</div>

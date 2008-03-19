@@ -12,4 +12,4 @@
 {"params": {"text": "mikeal@osafoundation.org", "id": "mailTo"},  "method": "type"}
 {"params": {"text": "aparna@osafoundation.org", "id": "mailCc"},  "method": "type"}
 {"params": {"text": "dan@osafoundation.org", "id": "mailBcc"},  "method": "type"}
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}

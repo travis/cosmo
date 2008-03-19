@@ -7,6 +7,7 @@
 **/
 
 //create the event 
+{"params": {"timeout": 15000, "id": "hourDiv0-930"}, "method": "waits.forElement"}
 {"params": {"id": "hourDiv0-930"}, "method": "doubleClick"}
 {"method": "waits.sleep", "params": {"milliseconds" : 1100}}
 
@@ -14,7 +15,7 @@
 {"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
 
 //save it
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 
 //go to list view
@@ -28,6 +29,7 @@
 {"params": {"id": "sectionEventEnableToggle"}, "method": "check"}
 
 //save it!
-{"params": {"jsid": "{$dvSaveButton}"},  "method": "click"}
+{"params": {"id": "detailSaveButton"},  "method": "click"}
 
 {"method": "waits.sleep", "params": {"milliseconds" : 1100}}
+{"params": {"id": "allButtonDialog"}, "method": "click"}

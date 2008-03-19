@@ -18,13 +18,13 @@ dojo.require("cosmo.util.i18n");
 
 dojo.provide("cosmo.convenience");
 
-dj_global.$ = function (s) {
+dojo.global.$ = function (s) {
     return document.getElementById(s);
 }
-dj_global._createElem = function (s) {
+dojo.global._createElem = function (s) {
     return document.createElement(s);
 }
-dj_global._createText = function (s) {
+dojo.global._createText = function (s) {
     return document.createTextNode(s);
 }
-dj_global._ = dojo.lang.hitch(cosmo.util.i18n, cosmo.util.i18n.getText);
+dojo.global._ = dojo.hitch(cosmo.util.i18n, cosmo.util.i18n.getText);

@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
 dojo.provide("cosmo.datetime.serialize");
 
-dojo.require("dojo.date.serialize");
+dojo.require("cosmo.datetime.util")
+//for iso8601 parsing
+cosmo.datetime._iso8601DateFormatString = "yyyyMMdd";
+cosmo.datetime._iso8601TimeFormatString = "HHmmss";
 
 cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
     // summary: returns a Date object based on an ISO 8601 formatted string (uses date and time)
@@ -25,22 +27,45 @@ cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
 };
 
 cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
-    var date = new cosmo.datetime.Date();
+    var parts = cosmo.datetime.util.dateParts;
+    var date = new cosmo.datetime.Date(2000,0,1);
     if (timezone){
         date.tzId = timezone;
     }
     else if (formattedString.substring(formattedString.length - 1).toLowerCase() == "z"){
         date.utc = true;
     }
-
-    date.updateFromUTC(dojo.date.fromIso8601(formattedString).getTime());
+    dojo.date.stamp._isoRegExp = /^(?:(\d{4})(?:(\d{2})(?:(\d{2}))?)?)?(?:T(\d{2})(\d{2})(?:(\d{2})())?((?:[+-](\d{2})(\d{2}))|Z)?)?$/
+    date.updateFromUTC(dojo.date.stamp.fromISOString(formattedString).getTime());
+    dojo.date.stamp._isoRegExp = null;
     return date;
 };
 
-cosmo.datetime.fromRfc3339 = function(/*String*/rfcDate){
-    return new cosmo.datetime.Date(dojo.date.fromRfc3339(rfcDate));
-}
+//summary: parses a date or datetime and returns an object set with the 
+//various date properties.
+cosmo.datetime.parseIso8601 = function(str) {
+    var parts = cosmo.datetime.util.dateParts;
 
+    //eg. 20071104T190000Z
+    var hasTime = str.indexOf("T") > -1;
+    var o = {};
+
+    o[parts.YEAR] = parseInt(str.substring(0,4), 10);
+    o[parts.MONTH] = parseInt(str.substring(4,6), 10) - 1;
+    o[parts.DAY] = parseInt(str.substring(6,8), 10);
+    
+    if (hasTime){
+        o[parts.HOUR] = parseInt(str.substring(9,11), 10);
+        o[parts.MINUTE] = parseInt(str.substring(11,13), 10);
+        o[parts.SECOND] = parseInt(str.substring(13,15), 10);
+    } else {
+        o[parts.HOUR] = 0;
+        o[parts.MINUTE] = 0;
+        o[parts.SECOND] = 0;
+    }
+
+    return o;
+}
 
 cosmo.datetime.parseIso8601Duration = 
 function parseIso8601Duration(/*String*/duration){
@@ -70,7 +95,7 @@ function addIso8601Duration(/*cosmo.datetime.Date*/date,
         dHash = duration;
     }
     
-    with (dojo.date.dateParts){
+    with (cosmo.datetime.util.dateParts){
         if (dHash.year) date.add(YEAR, dHash.year);
         if (dHash.month) date.add(MONTH, dHash.month);
         if (dHash.day) date.add(DAY, dHash.day);
@@ -94,7 +119,8 @@ cosmo.datetime.getDuration = function getDuration(dt1, dt2){
     var dur = {}
     with (cosmo.datetime.durationsInSeconds){
         var multiplier = 1;
-        var secs = cosmo.datetime.Date.diff(dojo.date.dateParts.SECOND, dt1, dt2);
+        var secs = cosmo.datetime.Date.diff(
+            cosmo.datetime.util.dateParts.SECOND, dt1, dt2);
         if (secs < 0) {
             multiplier = -1;
             secs *= -1;

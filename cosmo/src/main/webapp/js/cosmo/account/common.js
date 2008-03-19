@@ -14,7 +14,6 @@
  * limitations under the License.
 */
 
-dojo.require("dojo.event.*");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
@@ -241,8 +240,8 @@ cosmo.account.getFormTable = function (fieldList, callingContext) {
             elem.size = type == 'text' ? 32 : 16;
             elem.style.width = type == 'text' ? '240px' : '140px';
             elem.className = 'inputText';
-            dojo.event.connect(elem, 'onfocus', callingContext, 'handleInputFocusChange');
-            dojo.event.connect(elem, 'onblur', callingContext, 'handleInputFocusChange');
+            dojo.connect(elem, 'onfocus', callingContext, 'handleInputFocusChange');
+            dojo.connect(elem, 'onblur', callingContext, 'handleInputFocusChange');
             inputs.push(elem);
             td.appendChild(elem);
 

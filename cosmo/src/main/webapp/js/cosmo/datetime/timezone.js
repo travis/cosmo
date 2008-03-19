@@ -18,8 +18,10 @@ dojo.provide("cosmo.datetime.timezone");
 
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
-dojo.require("dojo.collections.Dictionary");
-dojo.require("dojo.string.extras");
+dojo.require("cosmo.util.lang");
+dojo.require("cosmo.util.string");
+
+dojo.require("dojox.collections.Dictionary");
 
 cosmo.datetime.HOURS_IN_DAY = 24;
 cosmo.datetime.MINUTES_IN_HOUR = 60;
@@ -207,7 +209,7 @@ cosmo.datetime.timezone.ZoneItem = function(){
 };
 
 cosmo.datetime.timezone._hasOrElse = function(obj, prop, orElse){
-   return dojo.lang.has(obj, prop) && obj[prop] != null ? obj[prop] : orElse;
+   return cosmo.util.lang.has(obj, prop) && obj[prop] != null ? obj[prop] : orElse;
 }
 
 cosmo.datetime.timezone.ZoneItem.prototype.toString = function(/*boolean (optional)*/ showHeader){
@@ -438,8 +440,8 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback,
         // summary: parses the given string as olson data, creating ZoneItems, Rules and link entries
         // passing them to the appropriate given call back
 
-        var ruleSets = new dojo.collections.Dictionary();
-        var zones = new dojo.collections.Dictionary();
+        var ruleSets = new dojox.collections.Dictionary();
+        var zones = new dojox.collections.Dictionary();
         var links = {};
         var lines = str.split('\n');
 
@@ -450,7 +452,7 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback,
             var line = lines[i];
 
             //Skip comments
-            if (dojo.string.startsWith(dojo.string.trim(line), "#") || line.length < 3){
+            if (cosmo.util.string.startsWith(dojo.trim(line), "#") || line.length < 3){
                 continue;
             }
 
@@ -502,8 +504,8 @@ cosmo.datetime.timezone.parse = function(str, timezoneCallback, rulesetCallback,
                     break;
             }//end switch
         }//end for
-        dojo.lang.map(zones.getValueList(),timezoneCallback);
-        dojo.lang.map(ruleSets.getValueList(), rulesetCallback);
+        dojo.map(zones.getValueList(),timezoneCallback);
+        dojo.map(ruleSets.getValueList(), rulesetCallback);
         for (var oldName in links){
             linkCallback(oldName, links[oldName])
         }
@@ -570,11 +572,11 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
     //                            FROM      TO        TYPE   IN       ON     AT        SAVE      LETTER
 
     //set the start year
-    rule.startYear = parseInt(array[0]) || (dojo.string.startsWith(array[0], "min") ? -99999 : 99999);
+    rule.startYear = parseInt(array[0]) || (cosmo.util.string.startsWith(array[0], "min") ? -99999 : 99999);
 
     //set the end Year
     rule.endYear = parseInt(array[1])
-        || (dojo.string.startsWith(array[1], "o") ? rule.startYear : (dojo.string.startsWith(array[1], "min") ? -99999 : 99999));
+        || (cosmo.util.string.startsWith(array[1], "o") ? rule.startYear : (cosmo.util.string.startsWith(array[1], "min") ? -99999 : 99999));
 
     //set the type
     rule.type = array[2];
@@ -588,7 +590,7 @@ cosmo.datetime.timezone._parseRuleLine = function(array){
     if (!isNaN(parsedOn)){
         rule.startDate = parseInt(rawOn);
     } else {
-        if (dojo.string.startsWith(rawOn, "last")){
+        if (cosmo.util.string.startsWith(rawOn, "last")){
             rule.startDate = null;
             rule.startDay = this._DAY_MAP[rawOn.substr(4,3).toLowerCase()];
             rule.startOperator = this._RULE_OP_LAST;
@@ -622,7 +624,7 @@ cosmo.datetime.timezone._parseTimeString = function(str) {
     result.hours = parseInt(matchArray[1]);
     result.minutes = matchArray[2] ? parseInt(matchArray[2]) : 0;
     result.seconds = matchArray[3] ? parseInt(matchArray[3]) : 0;
-    result.negative = dojo.string.startsWith(str, "-");
+    result.negative = cosmo.util.string.startsWith(str, "-");
     return result;
 };
 

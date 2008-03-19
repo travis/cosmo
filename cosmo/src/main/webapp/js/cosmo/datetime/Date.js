@@ -29,9 +29,8 @@
  */
 dojo.provide("cosmo.datetime.Date");
 
-dojo.require("dojo.date.serialize");
-dojo.require("dojo.date.common");
-dojo.require("dojo.date.format");
+dojo.require("dojox.date.posix");
+
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.debug");
@@ -95,10 +94,6 @@ cosmo.datetime.Date = function () {
     this.setFromDateObjProxy(dt);
     this._strftimeCache = [null, null];
 }
-
-//This is just an alias from ScoobyDate to comso.datetime.Date for use while we
-//ferrett out all remaining ScoobyDates
-cosmo.util.debug.aliasToDeprecatedFuncion(cosmo.datetime.Date, "ScoobyDate", "0.6");
 
 cosmo.datetime.Date.prototype.getFullYear = function() {
     return this.year;
@@ -329,7 +324,7 @@ cosmo.datetime.Date.prototype.getTimezoneOffsetMsForGivenDate = function(date) {
 
 /**
   * One place to go to get the user-pref timezone offset for a cosmo.datetime.Date
-  * This should ultimately work with the Scooby app's user prefs
+  * This should ultimately work with the app's user prefs
   * Or independently with fallback to the normal browser local offset
   */
 cosmo.datetime.Date.prototype.getUserPrefTimezoneOffset = function() {
@@ -359,7 +354,7 @@ cosmo.datetime.Date.prototype.strftime = function strftime(formatString){
         return cached;
     }
 
-    var formatted = dojo.date.strftime(this, formatString);
+    var formatted = dojox.date.posix.strftime(this, formatString);
 
     this._setStrftimeCached(formatString, formatted);
     return formatted;
@@ -381,7 +376,7 @@ cosmo.datetime.Date.prototype._setStrftimeCached = function(formatString, format
  * Increments by the desired number of specified units
  */
 cosmo.datetime.Date.prototype.add = function(interv, incr) {
-    var dt = dojo.date.add(this.toUTC(), interv, incr);
+    var dt = dojo.date.add(new Date(this.toUTC()), interv, incr);
     // Get incremented Date
     // 'n', 'd', etc., string keys
     
@@ -390,8 +385,8 @@ cosmo.datetime.Date.prototype.add = function(interv, incr) {
 };
 
 cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ duration){
-    var utc = this.toUTC();
-    with(dojo.date.dateParts){
+    var utc = new Date(this.toUTC());
+    with(cosmo.datetime.util.dateParts){
         if (duration.getYear()){
             utc = dojo.date.add(utc, YEAR, duration.getYear()).getTime();
         }
@@ -427,7 +422,7 @@ cosmo.datetime.Date.prototype.addDuration = function(/*cosmo.model.Duration*/ du
  */
 cosmo.datetime.Date.prototype.strftimeLocalTimezone = function(/* String */ format){
     var local = new Date(this.toUTC());
-    return dojo.date.strftime(local, format);
+    return dojox.date.posix.strftime(local, format);
 };
 
 /**
@@ -552,8 +547,6 @@ cosmo.datetime.Date.clone = function(sdt) {
 
     return ret;
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.clone, "ScoobyDate.clone", "0.6");
 
 /**
  * Returns the UTC offset (in milliseconds) for a particular date for the user's
@@ -565,25 +558,19 @@ cosmo.datetime.Date.getBrowserTimezoneOffset = function(year, month, day, hours,
     var date = new Date(year, month, day, hours, minutes, seconds, 0);
     return date.getTimezoneOffset();
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.getBrowserTimezoneOffset,
-    "ScoobyDate.getBrowserTimezoneOffset", "0.6");
 
 /**
  * Returns the difference in specified units between two Date
  */
 cosmo.datetime.Date.diff = function(interv, sdt1, sdt2) {
-        return dojo.date.diff(sdt1.getTime(), sdt2.getTime(), interv);
+    return dojo.date.difference(sdt1, sdt2, interv);
 }
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.diff, "ScoobyDate.diff", "0.6");
-
 
 /**
  * Returns a new Date incremented the desired number of units
  */
 cosmo.datetime.Date.add = function(dt, interv, incr) {
-    var d = dojo.date.add(dt.getTime(), interv, incr);
+    var d = dojo.date.add(new Date(dt.getTime()), interv, incr);
 
     // JS Date
     if (dt instanceof Date) {
@@ -599,37 +586,3 @@ cosmo.datetime.Date.add = function(dt, interv, incr) {
         throw('dt is not a usable Date object.');
     }
 }
-
-cosmo.datetime.Date.monkeyPatchDojo = function(){
-    var origFunc = dojo.date.setIso8601Time;
-    var newFunc = function(dateObject, formattedString){
-        if (dojo.string.endsWith(formattedString, "z", true)){
-           formattedString = formattedString.substr(0, formattedString.length-1 );
-            //mostly copied from dojo.date.setIso8601Time
-            var regexp = "^([0-9]{2})(:?([0-9]{2})(:?([0-9]{2})(\.([0-9]+))?)?)?$";
-            d = formattedString.match(new RegExp(regexp));
-            if(!d){
-                dojo.debug("invalid time string: " + formattedString);
-                return null; // null
-            }
-            var hours = d[1];
-            var mins = Number((d[3]) ? d[3] : 0);
-            var secs = (d[5]) ? d[5] : 0;
-            var ms = d[7] ? (Number("0." + d[7]) * 1000) : 0;
-        
-            //changes are here:
-            dateObject.setUTCHours(hours);
-            dateObject.setUTCMinutes(mins);
-            dateObject.setUTCSeconds(secs);
-            dateObject.setUTCMilliseconds(ms);
-            return dateObject;            
-        } else {
-            return origFunc.apply(this, arguments);
-        }
-    }
-    dojo.date.setIso8601Time = newFunc;
-}
-cosmo.datetime.Date.monkeyPatchDojo();
-
-cosmo.util.debug.aliasToDeprecatedFuncion(
-    cosmo.datetime.Date.add, "ScoobyDate.add", "0.6");

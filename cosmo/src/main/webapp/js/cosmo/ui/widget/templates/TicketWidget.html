@@ -1,0 +1,27 @@
+<div>
+<form dojoType="dijit.form.Form" dojoAttachEvent="execute: execute" dojoAttachPoint="form">
+  <span>
+    ${l10n.ticket}
+  </span>
+  
+  <span>
+    <input dojoType="dijit.form.ValidationTextBox" regExp="${timeoutRE}" name="timeout" invalidMessage="${l10n.ticketInvalid}"/>
+    ${l10n.ticketSeconds}
+  </span>
+  <span>
+    ${l10n.privileges}
+  </span>
+  <span>
+    <input type="radio" dojoType="dijit.form.RadioButton" 
+           name="privileges" value="ro" id="${id}ReadRadio" checked="true"/> ${l10n.read}
+    <input type="radio" dojoType="dijit.form.RadioButton" 
+           name="privileges" value="rw" id="${id}ReadWriteRadio"/> ${l10n.readWrite}
+    <input type="radio" dojoType="dijit.form.RadioButton" 
+           name="privileges" value="fb" id="${id}FreeBusyRadio"/> ${l10n.freeBusy}
+  </span>
+  <button styleClass="buttonInput"  type="submit" name="submit" id="${id}GrantTicketButton" dojoType="dijit.form.Button">
+    ${l10n.grantTicket}
+  </button>
+</span>
+</form>
+</div>

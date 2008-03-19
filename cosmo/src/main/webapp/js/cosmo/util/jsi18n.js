@@ -21,14 +21,16 @@ dojo.provide("cosmo.util.jsi18n");
 dojo.provide("cosmo.util.i18n");
 
 cosmo.util.jsi18n.init = function(uri){
-    var s = dojo.hostenv.getText(uri);
+    var d = dojo.xhrGet({url: uri, sync: true});
+    var s;
+    d.addCallback(function(str){s = str});
     var lines = s.split('\n');
     this._localtext = {};
     for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
 
             //Skip comments
-            if (dojo.string.startsWith(dojo.string.trim(line), "#")){
+            if (cosmo.util.string.startsWith(dojo.trim(line), "#")){
                 continue;
             }
             

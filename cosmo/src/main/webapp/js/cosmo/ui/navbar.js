@@ -16,8 +16,7 @@
 
 dojo.provide('cosmo.ui.navbar');
 
-dojo.require("dojo.date.common");
-dojo.require("dojo.date.format");
+dojo.require("dojox.date.posix");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.util.i18n");
@@ -27,7 +26,7 @@ dojo.require("cosmo.util.deferred");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("cosmo.ui.button");
+dojo.require("cosmo.ui.widget.NavButtonSet");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.imagegrid");
@@ -50,28 +49,22 @@ cosmo.ui.navbar.Bar = function (p) {
     this.defaultViewHasBeenInitialized = false;
     this.calViewNav = new cosmo.ui.navbar.CalViewNav({ parent: this });
     this.quickItemEntry = new cosmo.ui.navbar.QuickItemEntry({ parent: this });
-    this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this });
+    this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this, 
+                                                         listCanvas: p.listCanvas
+                                                       });
 
     for (var n in params) { this[n] = params[n]; }
-
-    // Subscribe to the '/calEvent' channel
-    dojo.event.topic.subscribe('/calEvent', self, 'handlePub_calEvent');
 
     // Interface methods
     // ===========
     // Handle published messages -- in this case just a poke
     // to let the NavBar know to re-render
-    this.handlePub_calEvent = function (cmd) {
-        var act = cmd.action;
-        var opts = cmd.opts;
-        switch (act) {
-            case 'eventsLoadSuccess':
-            case 'navigateLoadedCollection':
-            case 'saveSuccess':
-                self.render();
-                break;
-        }
-    };
+    
+    var r = function(){self.render()};
+    dojo.subscribe('cosmo:calEventsLoadSuccess', r);
+    dojo.subscribe('cosmo:calNavigateLoadedCollection', r);
+    dojo.subscribe('cosmo:calSaveSuccess', r);
+
     this.renderSelf = function () {
         var _pim = cosmo.app.pim;
         this.clearAll();
@@ -199,7 +192,7 @@ cosmo.ui.navbar.Bar = function (p) {
                 throw(viewName + ' is not a valid view.');
             }
             displayDeferred = displayDeferred || cosmo.util.deferred.getFiredDeferred();
-            displayDeferred.addErrback(function(e){dojo.debug(e)});
+            displayDeferred.addErrback(function(e){console.debug(e)});
             return displayDeferred;
 
         }
@@ -242,10 +235,11 @@ cosmo.ui.navbar.Bar = function (p) {
         t.id = 'viewToggle';
         t.className = 'floatLeft';
         this.viewToggleNode = t;
-        var vT =  dojo.widget.createWidget("cosmo:GraphicRadioButtonSet", {
+        var vT =  new cosmo.ui.widget.GraphicRadioButtonSet({
             selectedButtonIndex: selButtonIndex, height: 35, buttons: btns,
-            widgetId: "viewToggle"
-        }, t, 'last');
+            id: "viewToggle"
+        });
+        t.appendChild(vT.domNode);
         this.viewToggle = vT;
         d.appendChild(t);
     };
@@ -304,10 +298,9 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             }
         }
         var publish = function (dir) {
-            dojo.event.topic.publish('/calEvent', {
-                action: 'loadCollection',
+            dojo.publish('cosmo:calLoadCollection',[{
                 opts: { loadType: 'changeTimespan', goTo: dir },
-                    data: {} });
+                    data: {} }]);
         };
         var back = function back() {
             var backFunc = function () {
@@ -323,7 +316,9 @@ cosmo.ui.navbar.CalViewNav = function (p) {
             showLoading();
             setTimeout(nextFunc, 0);
         }
-        this.navButtons = new cosmo.ui.button.NavButtonSet('viewNav', back, next);
+        if (this.navButtons) this.navButtons.destroy();
+        this.navButtons = new cosmo.ui.widget.NavButtonSet(
+            {id: 'viewNav', leftClickHandler: back, rightClickHandler: next});
         self.viewNavButtons.appendChild(this.navButtons.domNode);
         tr.appendChild(td);
 
@@ -334,7 +329,6 @@ cosmo.ui.navbar.CalViewNav = function (p) {
     };
     // FIXME: There is similar logic is dup'd in ...
     // view.cal.common.loadItems
-    // ui.minical.handlePub
     // ui.minical -- setSelectionSpan private function
     // ui.navbar._showMonthheader
     // These different UI widgets have to be independent
@@ -359,17 +353,17 @@ cosmo.ui.navbar.CalViewNav = function (p) {
 
         // Format like 'March-April, 2006'
         if (mS < mE) {
-            str += dojo.date.strftime(vS, '%B-');
-            str += dojo.date.strftime(vE, '%B %Y');
+            str += dojox.date.posix.strftime(vS, '%B-');
+            str += dojox.date.posix.strftime(vE, '%B %Y');
         }
         // Format like 'December 2006-January 2007'
         else if (mS > mE) {
-            str += dojo.date.strftime(vS, '%B %Y-');
-            str += dojo.date.strftime(vE, '%B %Y');
+            str += dojox.date.posix.strftime(vS, '%B %Y-');
+            str += dojox.date.posix.strftime(vE, '%B %Y');
         }
         // Format like 'April 2-8, 2006'
         else {
-            str += dojo.date.strftime(vS, '%B %Y');
+            str += dojox.date.posix.strftime(vS, '%B %Y');
         }
         if (headerDiv.firstChild) {
             headerDiv.removeChild(headerDiv.firstChild);
@@ -400,10 +394,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
 
         var disableButton = function () {
-          self.formNode.removeChild(self.createButton.domNode);
-          self.createButton.destroy();
-          self.createButton = disabled;
-          self.formNode.appendChild(self.createButton.domNode);
+            self.createButton.setEnabled(false);
         };
         var createItem = function () {
             // Only create one item at a time
@@ -413,7 +404,7 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             var title = form.listViewQuickItemEntry.value;
             disableButton();
             form.listViewQuickItemEntry.value = _('App.Status.Processing');
-            dojo.html.addClass(form.listViewQuickItemEntry,
+            dojo.addClass(form.listViewQuickItemEntry,
                 'listViewSelectedCell');
             cosmo.view.list.createNoteItem(title);
         };
@@ -423,8 +414,8 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         t.style.paddingLeft = '12px';
 
         // Cleanup
-        this.clearAll();
         if (this.createButton) { this.createButton.destroy() };
+        this.clearAll();
 
         this.formNode = _createElem('form');
         var form = this.formNode;
@@ -449,37 +440,26 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             var func = cosmo.util.html.handleTextInputFocus;
             cosmo.util.html.setTextInput(text,
                 _('Main.NavBar.QuickItemEntryHint'), true);
-            dojo.event.connect(text, 'onfocus', func);
+            dojo.connect(text, 'onfocus', func);
         }
         form.appendChild(text);
         form.appendChild(cosmo.util.html.nbsp());
 
-        dojo.event.connect(text, 'onkeyup', function (e) {
+        dojo.connect(text, 'onkeyup', function (e) {
             if (writeable && e.keyCode == 13) {
                 createItem();
                 e.stopPropagation();
             }
         });
-        var dummy = _createElem('span');
-        var enabled = dojo.widget.createWidget("cosmo:Button", {
+
+        this.createButton = new cosmo.ui.widget.Button({
             text: _('App.Button.Create'),
             handleOnClick: createItem,
             small: true,
             width: 52,
-            enabled: true,
-            widgetId: "quickEntryCreate"},
-            dummy, 'last');
-        dummy.removeChild(dummy.firstChild);
-        var dummy = _createElem('span');
-        var disabled = dojo.widget.createWidget("cosmo:Button", {
-            text: _('App.Button.Create'),
-            handleOnClick: null,
-            small: true,
-            width: 52,
-            enabled: false },
-            dummy, 'last');
-        dummy.removeChild(dummy.firstChild);
-        this.createButton = writeable ? enabled : disabled;
+            enabled: writeable,
+            id: "quickEntryCreate"})
+
         this.formNode.appendChild(this.createButton.domNode);
     };
 };
@@ -487,12 +467,13 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
 cosmo.ui.navbar.QuickItemEntry.prototype = new cosmo.ui.ContentBox();
 
 cosmo.ui.navbar.ListPager = function (p) {
+    var self = this;
     var params = p || {};
     this.parent = params.parent;
+    this.listCanvas = p.listCanvas;
     this.domNode = _createElem('div');
     this.prevButton = null;
     this.nextButton = null;
-
     this.renderSelf = function () {
         var form = null;
         // Go-to page num
@@ -536,13 +517,15 @@ cosmo.ui.navbar.ListPager = function (p) {
         else {
             var fPrev = this.parent.listCanvas.goPrevPage;
         }
-        button = dojo.widget.createWidget("cosmo:Button", {
-            text: 'Prev',
-            handleOnClick: fPrev,
-            small: true,
-            width: 44,
-            enabled: (typeof fPrev == 'function') },
-            td, 'last');
+        button = new cosmo.ui.widget.Button(
+            {
+                text: 'Prev',
+                handleOnClick: fPrev,
+                small: true,
+                width: 44,
+                enabled: (typeof fPrev == 'function') })
+
+        td.appendChild(button.domNode);
         this.prevButton = button;
         tr.appendChild(td);
 
@@ -561,7 +544,7 @@ cosmo.ui.navbar.ListPager = function (p) {
             value: this.parent.listCanvas.currPageNum
         };
         var text = cosmo.util.html.createInput(o);
-        dojo.event.connect(text, 'onkeyup', goToPage);
+        dojo.connect(text, 'onkeyup', goToPage);
         form.appendChild(text);
         td.appendChild(_createText(' of ' + this.parent.listCanvas.pageCount));
         this.listViewPageNum = td;
@@ -574,13 +557,16 @@ cosmo.ui.navbar.ListPager = function (p) {
         else {
             var fNext = this.parent.listCanvas.goNextPage;
         }
-        button = dojo.widget.createWidget("cosmo:Button", {
-            text: 'Next',
-            handleOnClick: fNext,
-            small: true,
-            width: 44,
-            enabled: (typeof fNext == 'function') },
-            td, 'last');
+        var buttonDiv = _createElem('div');
+        button = new cosmo.ui.widget.Button(
+            {
+                text: 'Next',
+                handleOnClick: fNext,
+                small: true,
+                width: 44,
+                enabled: (typeof fNext == 'function') });
+
+        td.appendChild(button.domNode);
         this.nextButton = button;
         tr.appendChild(td);
 

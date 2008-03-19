@@ -8,8 +8,10 @@
 			      document.write("<scr"+"ipt type='text/javascript' djConfig='isDebug: true' src='"+dojoUrl+"'></scr"+"ipt>");
                 </script>
                 <script type="text/javascript"> 
-                  dojo.registerModulePath("cosmo", "../../../cosmo");
-                  dojo.registerModulePath("cosmotest", "../../../../test/unit/js/cosmo");
+                  dojo.registerModulePath(
+                      "cosmo", dojo.moduleUrl("dojo", "../../../cosmo"));
+                  dojo.registerModulePath(
+                      "cosmotest", dojo.moduleUrl("cosmo", "../../test/cosmo"));
                   dojo.require("cosmo.env");
                   cosmo.env.setBaseUrl(baseUrl);
                   dojo.require("cosmo.util.debug");

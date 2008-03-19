@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.integration.test_unicode");
+dojo.provide("cosmotest.test_unicode");
 
 dojo.require("cosmotest.testutils");
 dojo.require("cosmo.service.conduits.common");
@@ -23,9 +23,9 @@ function createUsername(i){
     return "t" + String.fromCharCode(i) + "est";
 }
 
-cosmotest.integration.test_unicode = {
+cosmotest.test_unicode = {
     test_accountCreate: function(){
-        var strings = cosmotest.integration.test_unicode.unicodeStrings;
+        var strings = cosmotest.test_unicode.unicodeStrings;
         var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
         var lastDeferred = null;
         for (var i = 0x0020; i <= 0x0100; i = i + 0x0001){

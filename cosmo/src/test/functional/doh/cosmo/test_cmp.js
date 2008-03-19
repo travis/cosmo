@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.integration.test_cmp");
+dojo.provide("cosmotest.test_cmp");
 
 dojo.require("cosmotest.testutils");
 dojo.require("cosmo.util.auth");
@@ -26,7 +26,7 @@ USERNAME_ROOT = "root";
 PASSWORD_ROOT = "cosmo";
 
 doh.registerGroup(
-    "cosmotest.integration.test_cmp",
+    "cosmotest.test_cmp",
     [
         // test cmp.getUsers
         {
@@ -37,7 +37,7 @@ doh.registerGroup(
                 cosmo.util.auth.setCred(USERNAME_ROOT, PASSWORD_ROOT);
                 var d = cosmo.cmp.getUserCount(null, {sync: true});
                 d.addCallback(function(count){
-                    cosmotest.integration.test_cmp._initUserCount = count;
+                    cosmotest.test_cmp._initUserCount = count;
                 });
             },
 
@@ -48,7 +48,7 @@ doh.registerGroup(
                 d.addCallback(dojo.hitch(this, this._modifyUser));
                 d.addCallback(dojo.hitch(this, this._deleteUser));
                 d.addCallback(dojo.hitch(this, this._deleteUsers));
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));
                 return cosmotest.testutils.defcon(d);
             },
             
@@ -64,10 +64,10 @@ doh.registerGroup(
             },
 
             _getUsers: function(){
-                var d = cosmo.cmp.getUsers();
+                var d = cosmo.cmp.getUsers(0, -1);
                 d.addCallback(function(userList){
                     doh.assertEqual(
-                        cosmotest.integration.test_cmp._initUserCount,
+                        cosmotest.test_cmp._initUserCount,
                         userList.length);
                     return userList;
                 });
@@ -87,7 +87,7 @@ doh.registerGroup(
                 d.addCallback(function(result){
                     doh.assertEqual("", result);
                 });
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount + 1));
+                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount + 1));
 
                 // Return username of created user for test chaining.
                 d.addCallback(function(result){
@@ -154,7 +154,7 @@ doh.registerGroup(
                     }
                 );
 
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));
 
                 return d;
             },
@@ -188,7 +188,7 @@ doh.registerGroup(
                     }
                     return new dojo.DeferredList(checkdefs);
                 });
-                dl.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount + 3));
+                dl.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount + 3));
 
 
                 dl.addCallback(function(){
@@ -214,7 +214,7 @@ doh.registerGroup(
                     }
                     return true;
                 });
-                dl.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+                dl.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));
                 return dl;
             },
 

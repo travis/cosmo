@@ -224,12 +224,12 @@ dojo.declare("cosmo.cmp.Cmp", null,
             
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/user/delete";
-            
+            var usernameArgs = [];
             for (var i = 0; i < usernames.length; i++){
-                usernames[i] = "user=" +
+                usernameArgs[i] = "user=" +
                     encodeURIComponent(usernames[i]);
             }
-            var requestContent = usernames.join("&");
+            var requestContent = usernameArgs.join("&");
             
             requestDict.postData = requestContent;
             requestDict.contentType = "application/x-www-form-urlencoded";

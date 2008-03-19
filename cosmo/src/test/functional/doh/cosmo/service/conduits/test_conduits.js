@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-dojo.provide("cosmotest.integration.service.conduits.test_conduits");
+dojo.provide("cosmotest.service.conduits.test_conduits");
 
 dojo.require("cosmotest.testutils");
 dojo.require("cosmo.service.conduits.common");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
 
-cosmotest.integration.service.conduits.test_conduits = {
+cosmotest.service.conduits.test_conduits = {
     test_Note: function(){
         try{
             var user = cosmotest.testutils.createTestAccount();

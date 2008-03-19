@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.integration.data.test_UserStore");
+dojo.provide("cosmotest.data.test_UserStore");
 
 dojo.require("cosmotest.testutils");
 dojo.require("cosmo.util.auth");
@@ -25,7 +25,7 @@ USERNAME_ROOT = "root";
 PASSWORD_ROOT = "cosmo";
 
 doh.registerGroup(
-    "cosmotest.integration.data.test_UserStore.js",
+    "cosmotest.data.test_UserStore.js",
     [
         // test UserStore
         {
@@ -48,7 +48,7 @@ doh.registerGroup(
 //                                             debugger});
                 
 //                d.addCallback(dojo.hitch(this, this._deleteUsers));
-//                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+//                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));
                 return cosmotest.testutils.defcon(d);
             },
             
@@ -60,7 +60,7 @@ doh.registerGroup(
                 var d = cosmo.cmp.getUsers();
                 d.addCallback(function(userList){
                     doh.assertEqual(
-                        cosmotest.integration.test_cmp._initUserCount,
+                        cosmotest.test_cmp._initUserCount,
                         userList.length);
                     return userList;
                 });
@@ -82,7 +82,7 @@ doh.registerGroup(
                     console.log("TODO: test save result");
                     return result;
                 });
-//                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount + 1));
+//                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount + 1));
 
                 // Return username of created user for test chaining.
                 d.addCallback(function(result){
@@ -155,7 +155,7 @@ doh.registerGroup(
                     }
                 );
 
-                d.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));*/
+                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));*/
 
                 return d;
             },
@@ -189,7 +189,7 @@ doh.registerGroup(
                     }
                     return new dojo.DeferredList(checkdefs);
                 });
-                dl.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount + 3));
+                dl.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount + 3));
 
 
                 dl.addCallback(function(){
@@ -215,7 +215,7 @@ doh.registerGroup(
                     }
                     return true;
                 });
-                dl.addCallback(this._assertCount(cosmotest.integration.test_cmp._initUserCount));
+                dl.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));
                 return dl;
             },
 

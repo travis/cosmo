@@ -40,7 +40,7 @@ cosmotest.integration.test_unicode = {
             var un = createUsername(i);
             try{
                 try{
-                    user = cosmotest.testutils.createUser(un, i + "fooz");
+                    user = cosmotest.testutils.createUser(un, i + "fooz@example.com");
                 } catch (e){
                     dojo.debug(i.toString(16))
                 }

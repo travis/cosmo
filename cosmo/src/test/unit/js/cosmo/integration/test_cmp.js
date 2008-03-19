@@ -35,6 +35,10 @@ doh.registerGroup(
 
             setUp: function(){
                 cosmo.util.auth.setCred(USERNAME_ROOT, PASSWORD_ROOT);
+                var d = cosmo.cmp.getUserCount(null, {sync: true});
+                d.addCallback(function(count){
+                    cosmotest.integration.test_cmp._initUserCount = count;
+                });
             },
 
             runTest: function(){
@@ -287,15 +291,5 @@ doh.registerGroup(
                 cosmo.util.auth.clearAuth();
             }
         }
-    ],
-    function(){ //setUp
-        cosmo.util.auth.setCred(USERNAME_ROOT, PASSWORD_ROOT);
-        var d = cosmo.cmp.getUserCount({sync: true});
-        d.addCallback(function(count){
-            cosmotest.integration.test_cmp._initUserCount = count;
-            cosmo.util.auth.clearAuth();
-        });
-    },
-    function(){ //tearDown
-    }
+    ]
 );

@@ -46,9 +46,9 @@ JUM.prototype = {
     assertEquals: _JUM_first_arg_string_func(2, "assertEqual")
 }
 
-/*dojo.require("cosmo.cmp");
+dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
-*/
+
 cosmotest.testutils = {
     init: function initCosmoTests(/*Array*/ testModules){
 

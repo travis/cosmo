@@ -1,70 +1,45 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!--
-For use with the JsUnit from www.jsunit.net
--->
-<head>
-  <title>Cosmo Tests</title>
+        <head>
+                <title>testing dojo.NodeList</title>
+                <script type="text/javascript"> 
+                  var baseUrl = location.protocol + "//" + location.host + "/chandler";
+                  var jsBase = baseUrl + "/js/";
+                  dojoUrl = jsBase + "lib/dojo/dojo/dojo.js";
+			      document.write("<scr"+"ipt type='text/javascript' djConfig='isDebug: true' src='"+dojoUrl+"'></scr"+"ipt>");
+                </script>
+                <script type="text/javascript"> 
+                  dojo.registerModulePath("cosmo", "../../../cosmo");
+                  dojo.registerModulePath("cosmotest", "../../../../test/unit/js/cosmo");
+                  dojo.require("cosmo.env");
+                  cosmo.env.setBaseUrl(baseUrl);
+                  dojo.require("cosmo.util.debug");
+                  dojo.require("cosmotest.testutils");
+                  dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
+                  var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(dojo.moduleUrl("dojo", "../../../lib/olson-tzdata/"));
+                  cosmo.datetime.timezone.setTimezoneRegistry(registry);
+                </script>
+                
+                 <script type="text/javascript">
+                        dojo.require("doh.runner");
+                        dojo.addOnLoad(function(){
+                        cosmotest.testutils.init(
+                        [
+                        "cosmotest.integration.test_unicode",
+                        "cosmotest.integration.service.conduits.test_conduits",
+                        "cosmotest.integration.test_cmp",
+                        "cosmotest.integration.data.test_UserStore"
+                        ]);
+                        doh.run();
+                        });
+                </script>
+        </head>
+        <body>
+                <h1>testing dojo.NodeList</h1>
+                <div id="t">
+                        <span id="c1">c1</span>
+                </div>
+                <div id="logBody">
 
-  <!-- JsUnit -->
-  <link rel="stylesheet" type="text/css" href="jsunit/css/jsUnitStyle.css">
-  <!-- hack so we can get somewhere loading this file standalone without error -->
-  <script language="JavaScript" type="text/javascript">
-
-      var xbDEBUG = ''; xbDEBUG.on = false;
-      var djConfig = {isDebug: true, debugContainerId:"output"};
-  </script>
-  <script src="jsunit/app/jsUnitCore.js" language="JavaScript" type="text/javascript"></script>
-
-  <!-- scripts under test -->
-  <script src="../../../js/lib/dojo/dojo.js" language="JavaScript" type="text/javascript"></script>
-  <script src="../../../js/cosmo/util/debug.js" language="JavaScript" type="text/javascript"></script>
-
-  <!-- dojo setup stuff -->
-  <script language="JavaScript" type="text/javascript">
-      dojo.require("dojo.widget.*");
-      dojo.require("dojo.debug");
-      dojo.registerNamespaceManifest("cosmo", "../../cosmo", "cosmo", "cosmo.ui.widget",null);      
-      dojo.registerModulePath("cosmotest", "../../../test/unit/js/cosmo")
-      dojo.require("cosmo.env");
-      dojo.require("cosmotest.testutils");
-      cosmo.env.setBaseUrl("/chandler");
-  </script>
-
-  <!-- jsunit api wrapper -->
-  <script src="testtools/JsTestManager/jsunit_wrap.js" language="JavaScript" type="text/javascript"></script>
-
-
-  <!-- end of jusnit wrapper -->
-<!--
-  <script src="$JSUNIT_POST" language="JavaScript" type="text/javascript"></script>
--->
-
-  <!-- doing this in body onload seems to disable jsunit -->
-  <script language="JavaScript" type="text/javascript">
-    cosmotest.testutils.init(
-        [
-        "cosmotest.service.conduits.test_conduits",
-        "cosmotest.integration.test_unicode"
-        ]
-     );
-  </script>
-</head>
-<!--<body onload="alert('hieatt_core.html onload, number scripts=' + document.getElementsByTagName('script').length); jum.init()">-->
-<!--<body onload="jum.init()">-->
-<body>
-  <table>
-  <tbody id="test-menu">
-  	
-  </tbody>
-  </table>
-<script type="text/javascript" src="setupTester.js" language="JavaScript"></script>
- 
-   <button id="run_tests" onclick="run_tests()">Run Tests</button>
-  <br />
-  <br />
-  <div id="output">
-  
-  </div>
-</body>
+                  </div>
+        </body>
 </html>

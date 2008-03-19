@@ -45,6 +45,7 @@
 <bean id="exceptionHandler" class="org.osaf.cosmo.ui.ExceptionResolver">
     <property name="exceptionMappings">
        <value>
+          org.osaf.cosmo.model.ItemSecurityException=error_forbidden
           org.osaf.cosmo.security.PermissionDeniedException=error_forbidden
           org.osaf.cosmo.dao.NoSuchResourceException=error_activated
           java.lang.Exception=error_exception

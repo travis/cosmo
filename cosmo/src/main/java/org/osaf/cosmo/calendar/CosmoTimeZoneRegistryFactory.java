@@ -32,6 +32,6 @@ public class CosmoTimeZoneRegistryFactory extends TimeZoneRegistryFactory {
      * @see net.fortuna.ical4j.model.TimeZoneRegistryFactory#createRegistry()
      */
     public TimeZoneRegistry createRegistry() {
-        return new CosmoTimeZoneRegistry();
+        return new CosmoICUTimeZoneRegistry();
     }
 }

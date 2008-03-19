@@ -27,6 +27,8 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
@@ -39,7 +41,6 @@ import net.fortuna.ical4j.model.property.DtStart;
 
 import org.osaf.cosmo.calendar.ICalendarUtils;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
-import org.osaf.cosmo.calendar.util.TimeZoneUtils;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.hibernate.HibEventExceptionStamp;
 
@@ -47,6 +48,9 @@ import org.osaf.cosmo.model.hibernate.HibEventExceptionStamp;
  * Contains methods common to EventStamp.
  */
 public class EventStampPrototype {
+    
+    protected static final TimeZoneRegistry TIMEZONE_REGISTRY =
+        TimeZoneRegistryFactory.getInstance().createRegistry();
     
     private EventStamp stamp = null;
     
@@ -76,17 +80,17 @@ public class EventStampPrototype {
         }
         
         // check start/end date tz is included, and add if it isn't
-        String tzid = getTzId(stamp.getStartDate());
+        String tzid = getTzId(stamp. getStartDate());
         if(tzid!=null && !tzMap.containsKey(tzid)) {
-            VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, stamp.getStartDate().getTime());
-            masterCal.getComponents().add(0, vtz);
+            VTimeZone vtz = TIMEZONE_REGISTRY.getTimeZone(tzid).getVTimeZone();
+            masterCal.getComponents().add(vtz);
             tzMap.put(tzid, vtz);
         }
         
         tzid = getTzId(stamp.getEndDate());
         if(tzid!=null && !tzMap.containsKey(tzid)) {
-            VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, stamp.getEndDate().getTime());
-            masterCal.getComponents().add(0, vtz);
+            VTimeZone vtz = TIMEZONE_REGISTRY.getTimeZone(tzid).getVTimeZone();
+            masterCal.getComponents().add(vtz);
             tzMap.put(tzid, vtz);
         }
         
@@ -161,15 +165,15 @@ public class EventStampPrototype {
             // verify that timezones are present for exceptions, and add if not
             tzid = getTzId(exceptionStamp.getStartDate());
             if(tzid!=null && !tzMap.containsKey(tzid)) {
-                VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, exceptionStamp.getStartDate().getTime());
-                masterCal.getComponents().add(0, vtz);
+                VTimeZone vtz = TIMEZONE_REGISTRY.getTimeZone(tzid).getVTimeZone();
+                masterCal.getComponents().add(vtz);
                 tzMap.put(tzid, vtz);
             }
             
             tzid = getTzId(exceptionStamp.getEndDate());
             if(tzid!=null && !tzMap.containsKey(tzid)) {
-                VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, exceptionStamp.getEndDate().getTime());
-                masterCal.getComponents().add(0, vtz);
+                VTimeZone vtz = TIMEZONE_REGISTRY.getTimeZone(tzid).getVTimeZone();
+                masterCal.getComponents().add(vtz);
                 tzMap.put(tzid, vtz);
             }
         }

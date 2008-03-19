@@ -67,21 +67,6 @@ public class CalendarUtils implements ICalendarConstants {
         StringReader sr = new StringReader(calendar);
         return builder.build(sr);
     }
-    
-    /**
-     * Parse icalendar string into calendar component
-     * @param calendar icalendar string
-     * @return Component object
-     */
-    public static Component parseComponent(String component) 
-        throws ParserException, IOException {
-        if (component == null)
-            return null;
-        CalendarBuilder builder = CalendarBuilderDispenser.getCalendarBuilder();
-        StringReader sr = new StringReader("BEGIN:VCALENDAR\n" + component + "END:VCALENDAR");
-        
-        return (Component) builder.build(sr).getComponents().get(0);
-    }
 
     /**
      * Parse icalendar data from Reader into Calendar object.

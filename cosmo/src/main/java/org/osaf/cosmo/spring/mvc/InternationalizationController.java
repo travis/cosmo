@@ -18,7 +18,6 @@ package org.osaf.cosmo.spring.mvc;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,10 +45,6 @@ public class InternationalizationController extends AbstractController {
     public ModelAndView handleRequestInternal(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         ModelAndView mav = new ModelAndView("i18n");
-        ResourceBundle bundle = ResourceBundle.getBundle("PimMessageResources",
-                request.getLocale());
-        Enumeration messages = bundle.getKeys();
-        mav.addObject("messages", messages);
         mav.addObject("configProperties", properties);
         return mav;
     }

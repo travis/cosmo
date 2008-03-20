@@ -20,7 +20,6 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
-<fmt:setBundle basename="PimMessageResources"/>
 <cosmo:standardLayout prefix="Account.Activate." showNav="false" stylesheets="activation">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 

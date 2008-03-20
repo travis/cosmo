@@ -19,7 +19,6 @@ dojo.provide("cosmo.ui.conf");
 dojo.require("cosmo.env");
 // Configurable UI options
 
-
 dojo.global.TEMPLATE_DIRECTORY = "/" + (djConfig.templateName || 'default'); // Template directory to use
 dojo.global.DISPLAY_WIDTH_PERCENT = 1.0; // Percent of window width to draw entire display
 dojo.global.DISPLAY_HEIGHT_PERCENT = 1.0; // Percent of window height to draw entire display
@@ -64,31 +63,17 @@ cosmo.ui.conf.httpSupported="false";
 // Are terms of service required?
 cosmo.ui.conf.tosRequired = "false";
 
-// Should we take extra steps to prevent data caching?
-// Once we fix bug 9715, this should not be true.
-cosmo.ui.conf.preventDataCaching = "true";
-
 //****************** End Overidable Defaults. *********************************
 
 cosmo.ui.conf.load = function (uri){
-    var d = dojo.xhrGet({url: uri, sync: true});
-    d.addCallback(function(s){
-        var propertymaps = eval("(" + s + ")");
-        cosmo.ui.conf._localtext = propertymaps[0];
-        
-        var configProperties = propertymaps[1];
-        dojo.mixin(cosmo.ui.conf, configProperties);
+    dojo._loadPath(uri, null, function(s){
+        dojo.mixin(cosmo.ui.conf, dojo.fromJson(s));
     });
-    return d;
 }
 
 // Return the hash of localization keys to localized strings
 cosmo.ui.conf.getLocalText = function () {
     return this._localtext;
-}
-
-cosmo.ui.conf.init = function (uri){
-    cosmo.ui.conf.load(uri);
 }
 
 cosmo.ui.conf.getBooleanValue = function(propertyName){
@@ -100,6 +85,6 @@ cosmo.ui.conf.getBooleanValue = function(propertyName){
     return (""+rawValue).toLowerCase().charAt(0) == "t";
 } 
 
-if (djConfig['i18nLocation']){
-    cosmo.ui.conf.init(djConfig['i18nLocation']);
+if (djConfig['confLocation']){
+    cosmo.ui.conf.load(djConfig['confLocation']);
 }

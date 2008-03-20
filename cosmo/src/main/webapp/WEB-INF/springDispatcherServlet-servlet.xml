@@ -70,7 +70,7 @@
             /=appEntryController
             /welcome=appEntryController
             /browse/**=accountBrowsingController
-            /i18n.js=i18nController
+            /conf.js=confController
             /account/activate=accountActivationController
             /pim/collection/*=collectionBookmarkController
             
@@ -80,7 +80,7 @@
 </bean> 
 
 <!-- TODO set cache settings here.... -->
-<bean id="i18nController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" >
+<bean id="confController" class="org.osaf.cosmo.spring.mvc.InternationalizationController" >
     <property name="propertyPlaceholderConfigurer">
         <ref bean="propertyPlaceholderConfigurer"/>
     </property>

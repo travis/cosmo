@@ -377,7 +377,7 @@
 
   <servlet-mapping>
     <servlet-name>springDispatcherServlet</servlet-name>
-     <url-pattern>/i18n.js</url-pattern>
+     <url-pattern>/conf.js</url-pattern>
   </servlet-mapping>
 
   <!-- 

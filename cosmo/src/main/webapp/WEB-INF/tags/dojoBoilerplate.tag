@@ -29,10 +29,6 @@
         type="org.osaf.cosmo.CosmoConstants"
         field="PRODUCT_VERSION"/>
         
-<fmt:setBundle basename="PimMessageResources"/>
-<fmt:message key="App.TemplateName" var="templateName"/>
-        
-
 <c:if test="${empty timezones}">
   <c:set var="timezones" value="false"/>
 </c:if>
@@ -42,13 +38,12 @@
 </c:if>
 
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
-<script type="text/javascript" src="${dojoPath}/dojo.js"
+<script type="text/javascript" src="${dojoPath}/dojo.js.uncompressed.js"
         djConfig="isDebug: true,
                   parseOnLoad: ${parseWidgets},
                   staticBaseUrlTemplate: '${cosmoui:getStaticHostUrlTemplate()}',
                   staticBaseUrlRange: '${cosmoui:getStaticHostUrlRange()}',
-                  i18nLocation: '${baseUrl}/i18n.js',
-                  templateName: '${templateName}',
+                  confLocation: '${baseUrl}/conf.js',
                   serverBaseUrl: '${baseUrl}'">
 </script>
 <c:forEach var="layerName" items="${dojoLayers}">

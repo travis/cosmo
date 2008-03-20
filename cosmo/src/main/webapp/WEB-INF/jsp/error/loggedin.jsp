@@ -27,7 +27,7 @@
 
 <cosmoui:user var="user"/>
 <cosmo:baseurl var="baseUrl"/>
-<fmt:setBundle basename="PimMessageResources"/>
+
 <cosmo:standardLayout prefix="Error.LoggedIn." showNav="false" stylesheets="error">
 	<div class="loggedInMessage">
 	<fmt:message key="Error.LoggedIn">

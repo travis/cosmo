@@ -20,35 +20,26 @@
 
 dojo.provide("cosmo.i18n");
 dojo.require("cosmo.ui.conf");
+dojo.require("dojo.string");
 dojo.requireLocalization("cosmo", "global");
-var l10n = dojo.i18n.getLocalization("cosmo", "global");
 
 cosmo.i18n = {
+    l10n: dojo.i18n.getLocalization("cosmo", "global"),
     getText: function () {
-        if (!this._localtext) {
-            this.setLocalizationMessages(cosmo.ui.conf.getLocalText());
-        }
-        
         var args = Array.prototype.slice.apply(arguments);
         var key = args.shift();
-        var str = this._localtext[key] || "[[" + key + "]]";
-        for (var i in args){
-            str = str.replace(new RegExp("\{" + i + "\\}", "g"), args[i]);
-        }
-        return str;
-    },
-    
-    setLocalizationMessages: function(messages){
-        this._localtext = messages || {};
+        var str = this.l10n[key] || "[[" + key + "]]";
+        return dojo.string.substitute(str, args);
     },
 
     messageExists: function (str){
-        if (cosmo.i18n._localtext[str]){
+        if (this.l10n[str]){
             return true;
         } else {
             return false;
         }
     },
+
     weekdayKeys: ['App.Sun', 'App.Mon', 'App.Tue', 'App.Wed', 'App.Thu', 'App.Fri', 'App.Sat'],
     monthKeys: ['App.January', 'App.February', 'App.March', 'App.April', 'App.May', 'App.June',
                 'App.July', 'App.August', 'App.September', 'App.October', 'App.November', 'App.December'],

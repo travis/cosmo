@@ -19,7 +19,7 @@ dojo.provide('cosmo.app');
 dojo.require('cosmo.ui.widget.ModalDialog');
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.timeout");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.topics");
 dojo.require("cosmo.convenience");

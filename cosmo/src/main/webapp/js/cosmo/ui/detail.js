@@ -27,7 +27,7 @@ dojo.provide("cosmo.ui.detail");
 dojo.require("dojox.fx");
 dojo.require("dojox.date.posix");
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
 dojo.require('cosmo.datetime.timezone');

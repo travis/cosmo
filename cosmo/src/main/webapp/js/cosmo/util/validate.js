@@ -15,7 +15,7 @@
 */
 dojo.provide("cosmo.util.validate");
 
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("dojox.validate.web");
 
@@ -51,7 +51,7 @@ cosmo.util.validate = new function () {
             // Day 31 for correct months
             if ((month == 4 || month == 6 || month == 9 || month == 11) 
                 && day == 31) {
-                errMsg += Date.fullMonth[month-1] + ' does not have 31 days.\n';
+                errMsg += _(cosmo.i18n.monthKeys[month-1]) + ' does not have 31 days.\n';
             }
             // Leap year stuff
             if (month == 2) {

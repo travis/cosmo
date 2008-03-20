@@ -95,8 +95,8 @@ cosmo.datetime.util = new function () {
      * @return String of either 'AM' or 'PM' based on hour number
      */
     this.getMeridian = function (h) {
-        return h > 11 ? cosmo.datetime.meridian.PM :
-            cosmo.datetime.meridian.AM;
+        return h > 11 ? _(cosmo.i18n.meridianKeys.PM) :
+            _(cosmo.i18n.meridianKeys.AM);
     }
     /**
      * Adjust from 0-6 base week to 1-7 base week

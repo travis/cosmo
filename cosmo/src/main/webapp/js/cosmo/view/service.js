@@ -17,7 +17,7 @@
 dojo.provide('cosmo.view.service');
 
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.model");

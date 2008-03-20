@@ -41,22 +41,16 @@
   <c:set var="parseWidgets" value="true"/>
 </c:if>
 
-<script type="text/javascript">
-
-    // Set isDebug to true to get nice dojo debugging messages
-    // and to grab javascript from /js/cosmo instead of /js/lib/dojo/cosmo
-    var djConfig = {isDebug: false, 
-                    staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
-                    staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
-                    i18nLocation: "${baseUrl}/i18n.js",
-                    confLocation: "${baseUrl}/webui.conf",
-                    templateName: "${templateName}",
-                    parseOnLoad: ${parseWidgets},
-                    serverBaseUrl: "${baseUrl}"}
-</script>
-
 <c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
-<script type="text/javascript" src="${dojoPath}/dojo.js"></script>
+<script type="text/javascript" src="${dojoPath}/dojo.js"
+        djConfig="isDebug: true,
+                  parseOnLoad: ${parseWidgets},
+                  staticBaseUrlTemplate: '${cosmoui:getStaticHostUrlTemplate()}',
+                  staticBaseUrlRange: '${cosmoui:getStaticHostUrlRange()}',
+                  i18nLocation: '${baseUrl}/i18n.js',
+                  templateName: '${templateName}',
+                  serverBaseUrl: '${baseUrl}'">
+</script>
 <c:forEach var="layerName" items="${dojoLayers}">
 <script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>
 </c:forEach>
@@ -82,7 +76,6 @@
         var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${baseUrl}/js-${PRODUCT_VERSION}/lib/olson-tzdata/");
         cosmo.datetime.timezone.setTimezoneRegistry(registry);
     }
-    dojo.require('cosmo.ui.conf');
 })();
 </script>
 

@@ -29,7 +29,7 @@ dojo.require("dijit.form.ValidationTextBox");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.CheckBox");
 
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.convenience");
 

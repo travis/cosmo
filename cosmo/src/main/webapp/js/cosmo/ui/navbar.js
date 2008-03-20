@@ -19,7 +19,7 @@ dojo.provide('cosmo.ui.navbar');
 dojo.require("dojox.date.posix");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.deferred");

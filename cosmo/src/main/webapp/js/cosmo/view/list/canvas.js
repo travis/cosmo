@@ -24,7 +24,7 @@ dojo.require("cosmo.app.pim.layout");
 dojo.require("cosmo.view.common");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.view.list.sort");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.ContentBox");

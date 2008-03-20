@@ -1,7 +1,7 @@
 dojo.provide("cosmo.ui.widget.About");
 
 dojo.require("cosmo.env");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.convenience");
 
 dojo.declare("cosmo.ui.widget.About", [dijit._Widget, dijit._Templated], {

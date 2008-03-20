@@ -4,7 +4,7 @@ dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.env");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.account.login");
 dojo.require("cosmo.convenience");

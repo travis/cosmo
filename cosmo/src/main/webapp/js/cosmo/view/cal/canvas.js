@@ -25,7 +25,7 @@ dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.datetime.Date");
 dojo.require('cosmo.ui.event.handlers');
 dojo.require('cosmo.view.cal.draggable');
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.model");
@@ -113,7 +113,6 @@ cosmo.view.cal.canvas = new function () {
 
         /**
          * Shows list of days at the head of each column in the week view
-         * Uses the Date.abbrWeekday array of names in date.js
          * @return Boolean, true.
          */
         function showDayNameHeaders() {
@@ -138,7 +137,7 @@ cosmo.view.cal.canvas = new function () {
                     '" style="left:' + start + 'px; width:' + (self.dayUnitWidth-1) +
                     'px; height:' + (DAY_LIST_DIV_HEIGHT-1) + 'px;';
                 str += '">';
-                str += cosmo.datetime.abbrWeekday[i] + '&nbsp;' + calcDay.getDate();
+                str += _(cosmo.i18n.weekdayKeys[i]) + '&nbsp;' + calcDay.getDate();
                 str += '</div>\n';
                 start += self.dayUnitWidth;
             }

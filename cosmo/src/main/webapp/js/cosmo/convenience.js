@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 
 dojo.provide("cosmo.convenience");
 
@@ -27,4 +27,4 @@ dojo.global._createElem = function (s) {
 dojo.global._createText = function (s) {
     return document.createTextNode(s);
 }
-dojo.global._ = dojo.hitch(cosmo.util.i18n, cosmo.util.i18n.getText);
+dojo.global._ = dojo.hitch(cosmo.i18n, cosmo.i18n.getText);

@@ -32,7 +32,7 @@ dojo.provide("cosmo.ui.widget.ModalDialog");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");

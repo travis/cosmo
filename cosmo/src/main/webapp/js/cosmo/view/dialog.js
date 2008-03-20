@@ -16,7 +16,7 @@
 
 dojo.provide('cosmo.view.dialog');
 
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.view.service");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.widget.Button");

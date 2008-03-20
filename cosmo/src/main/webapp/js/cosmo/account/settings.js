@@ -17,7 +17,7 @@ dojo.provide("cosmo.account.settings");
 
 
 dojo.require("cosmo.env");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.validate");

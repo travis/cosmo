@@ -29,7 +29,7 @@ dojo.provide("cosmo.ui.minical");
 dojo.require("cosmo.ui.ContentBox"); // Superclass
 
 dojo.require("cosmo.convenience");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.ui.widget.Button");
@@ -415,8 +415,9 @@ cosmo.ui.minical.MiniCal = function (p) {
             //create daynames
             var content = '';
             for (var i = 0; i < 7; i++)
-            content += dayHeadHTML.replace(/%content%/,
-                cosmo.datetime.abbrWeekday[i].substr(0, 1));
+            content += dayHeadHTML.replace(
+                    /%content%/,
+                _(cosmo.i18n.weekdayKeys[i]).substr(0, 1));
             monthHTML = monthHTML.replace(/%daynames%/, content);
 
             // Create days and weeks

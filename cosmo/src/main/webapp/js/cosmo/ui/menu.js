@@ -19,7 +19,7 @@ dojo.provide('cosmo.ui.menu');
 dojo.require("cosmo.env");
 dojo.require('cosmo.app');
 dojo.require('cosmo.account.preferences');
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.util.popup");

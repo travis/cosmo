@@ -19,7 +19,7 @@ dojo.provide("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.env");
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.widget.Button");
@@ -280,7 +280,7 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
             var x = 1;
             while (true){
                 var key = "Main.CollectionDetails.Instructions." + client + "." + x;
-                if (cosmo.util.i18n.messageExists(key)){
+                if (cosmo.i18n.messageExists(key)){
                     strings.push(_(key));
                 } else {
                     break;

@@ -17,7 +17,7 @@
 dojo.provide("cosmo.view.loading");
 
 dojo.require("cosmo.ui.ContentBox");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 
 cosmo.view.loading.statusProcessing = false;

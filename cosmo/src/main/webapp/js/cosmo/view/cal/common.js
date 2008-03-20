@@ -17,7 +17,7 @@
 dojo.provide('cosmo.view.cal.common');
 
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.deferred");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.hash");

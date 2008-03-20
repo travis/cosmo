@@ -18,7 +18,7 @@
  * NOT for use in production - merely useful for situations w/o a server - like unit testing!
  */
 dojo.provide("cosmo.util.jsi18n");
-dojo.provide("cosmo.util.i18n");
+dojo.provide("cosmo.i18n");
 
 cosmo.util.jsi18n.init = function(uri){
     var d = dojo.xhrGet({url: uri, sync: true});
@@ -45,7 +45,7 @@ function getText(str) {
     return cosmo.util.jsi18n._localtext[str] || "[[" + str + "]]";
 }
 
-cosmo.util.i18n.messageExists = function(str){
+cosmo.i18n.messageExists = function(str){
      if (cosmo.util.jsi18n._localtext[str]){
          return true;
      } else {
@@ -54,4 +54,4 @@ cosmo.util.i18n.messageExists = function(str){
 }
 
 
-cosmo.util.i18n.getText = getText
+cosmo.i18n.getText = getText

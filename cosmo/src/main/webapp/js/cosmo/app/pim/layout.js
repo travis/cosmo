@@ -23,7 +23,7 @@ dojo.require("cosmo.ui.ContentBox");
 
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 dojo.require('cosmo.convenience');
 // --

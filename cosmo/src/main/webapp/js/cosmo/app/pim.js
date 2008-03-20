@@ -18,7 +18,7 @@ dojo.provide("cosmo.app.pim");
 
 // -- Create global vars, do not remove despite lack of refs in code
 dojo.require("cosmo.ui.conf");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require('cosmo.convenience');
 // --
 
@@ -112,8 +112,6 @@ cosmo.app.pim = dojo.mixin(new function () {
         // ===============================
         // Create and init the Cosmo service
         this.serv = cosmo.service.tickler.wrapService(cosmo.service.conduits.getAtomPlusEimConduit());
-        // Localized date strings
-        this.loadLocaleDateInfo();
         // Tell the calendar view what week we're on
         //cosmo.view.cal.setQuerySpan(this.currDate)
         // Load collections for this user
@@ -148,43 +146,6 @@ cosmo.app.pim = dojo.mixin(new function () {
         }));
     };
 
-    // ==========================
-    // Localization
-    // ==========================
-    /**
-     * Loads localized datetime info for the UI
-     */
-    this.loadLocaleDateInfo = function () {
-        var keys = null;
-        var newArr = null;
-        // Use the default set of days as the keys to create an array of
-        // localized versions -- e.g., 'Main.Wed' or 'Main.Thu'
-        // Replace the default set with the localized set
-        // --------------------
-        // Weekday abbreviations array
-        // ============
-        keys = cosmo.datetime.abbrWeekday;
-        newArr = [];
-        for (var i = 0; i < keys.length; i++) {
-            newArr.push(_('App.' + keys[i]));
-        }
-        cosmo.datetime.abbrWeekday = newArr;
-        // Full month names array
-        // ============
-        keys = cosmo.datetime.fullMonth;
-        newArr = [];
-        for (var i = 0; i < keys.length; i++) {
-            newArr.push(_('App.' + keys[i]));
-        }
-        cosmo.datetime.fullMonth = newArr;
-        // AM/PM
-        // ============
-        newArr = [];
-        newArr['AM'] = _('App.AM');
-        newArr['PM'] = _('App.PM');
-        Date.meridian = newArr;
-        return true;
-    };
     // ==========================
     // Timeout and keepalive
     // ==========================

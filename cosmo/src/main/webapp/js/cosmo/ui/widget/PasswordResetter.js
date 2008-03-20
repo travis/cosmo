@@ -27,7 +27,7 @@ dojo.provide("cosmo.ui.widget.PasswordResetter");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.ui.widget.Button");
 dojo.require("dijit._Widget");

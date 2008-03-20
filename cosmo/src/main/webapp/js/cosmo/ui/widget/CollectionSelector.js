@@ -20,7 +20,7 @@ dojo.require("dijit._Templated");
 dojo.require("cosmo.env");
 dojo.require("cosmo.app.pim");
 dojo.require("cosmo.app.pim.layout");
-dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.topics");

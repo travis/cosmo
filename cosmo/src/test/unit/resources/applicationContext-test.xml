@@ -27,9 +27,11 @@
     </constructor-arg>
   </bean>
 
-  <!-- we don't need this, but we have to override the bean definition
+  <!-- we don't need these, but we have to override the bean definition
        from applicationContext.xml -->
   <bean id="mailSession"
+        class="java.lang.String"/>  
+  <bean id="exporter"
         class="java.lang.String"/>
 
   <bean id="mailSender"

@@ -67,6 +67,7 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.server.SpaceUsageReport;
 import org.osaf.cosmo.server.StatusSnapshot;
 import org.osaf.cosmo.server.UserPath;
+import org.osaf.cosmo.spring.CosmoPropertyPlaceholderConfigurer;
 import org.osaf.cosmo.util.PageCriteria;
 
 import org.springframework.beans.BeansException;
@@ -106,7 +107,10 @@ public class CmpServlet extends HttpServlet {
     private static final String BEAN_ACCOUNT_ACTIVATOR = "accountActivator";
     private static final String BEAN_OOTB_HELPER = "ootbHelper";
     private static final String BEAN_ENTITY_FACTORY = "cosmoEntityFactory";
+    private static final String BEAN_PROPERTIES = "propertyPlaceholderConfigurer";
 
+    private static final String PROPERTY_CREATE_OOB_COLS = "cosmo.service.account.createOutOfBoxCollections";
+    
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
     private static final boolean DEFAULT_SORT_ASCENDING = true;
@@ -122,6 +126,7 @@ public class CmpServlet extends HttpServlet {
     private PasswordRecoverer passwordRecoverer;
     private AccountActivator accountActivator;
     private OutOfTheBoxHelper ootbHelper;
+    private boolean createOutOfBoxCollections = false;
 
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
@@ -163,6 +168,16 @@ public class CmpServlet extends HttpServlet {
             if (entityFactory == null)
                 entityFactory = (EntityFactory)
                     getBean(BEAN_ENTITY_FACTORY, EntityFactory.class);
+            
+            // Determine if out-of-box collections should be created
+            // by looking in properties
+            CosmoPropertyPlaceholderConfigurer cppc = 
+                (CosmoPropertyPlaceholderConfigurer) getBean(BEAN_PROPERTIES, CosmoPropertyPlaceholderConfigurer.class);
+            if(cppc!=null) {
+                String createOobCols = cppc.getProperties().getProperty(PROPERTY_CREATE_OOB_COLS);
+                if(createOobCols!=null && "true".equalsIgnoreCase(createOobCols))
+                    createOutOfBoxCollections = true;
+            }
         }
 
         if (contentService == null)
@@ -857,7 +872,13 @@ public class CmpServlet extends HttpServlet {
             User user = resource.getUser();
             user.setAdmin(Boolean.FALSE);
             user.setLocked(Boolean.FALSE);
-            user = userService.createUser(user, createSignupListeners(req));
+            
+            // create user (with or without out-of-box collections)
+            if(createOutOfBoxCollections)
+                user = userService.createUser(user, createSignupListeners(req));
+            else
+                user = userService.createUser(user);
+            
             resource = new UserResource(user, getUrlBase(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("Content-Location", resource.getHomedirUrl());
@@ -961,7 +982,12 @@ public class CmpServlet extends HttpServlet {
                                "Username does not match request URI");
                 return;
             }
-            userService.createUser(user, createUserCreateListeners(req));
+            
+            // create user (with or without out-of-box collections)
+            if(createOutOfBoxCollections)
+                user = userService.createUser(user, createSignupListeners(req));
+            else
+                user = userService.createUser(user);    
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {

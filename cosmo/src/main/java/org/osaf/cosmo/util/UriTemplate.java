@@ -283,6 +283,8 @@ public class UriTemplate {
 
     public static final String unescapeSegment(String escaped) {
         try {
+            // URI doesn't unescape '+' as a space
+            escaped = escaped.replace('+', ' ');
             return new URI(null, null, "/" + escaped, null).getPath().substring(1);
         } catch (Exception e) {
             throw new RuntimeException("Could not unescape string " + escaped, e);

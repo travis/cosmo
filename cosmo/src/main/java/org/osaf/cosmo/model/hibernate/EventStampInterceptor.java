@@ -25,6 +25,7 @@ import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.Type;
 import org.osaf.cosmo.calendar.RecurrenceExpander;
 import org.osaf.cosmo.calendar.util.Dates;
+import org.osaf.cosmo.model.EventStamp;
 
 /**
  * Hibernate Interceptor that updates BaseEventStamp timeRangeIndexes.
@@ -94,9 +95,14 @@ public class EventStampInterceptor extends EmptyInterceptor {
             // and use with the startDate of the modification to calculate
             // the endDate of the modification
             HibEventExceptionStamp exceptionStamp = (HibEventExceptionStamp) eventStamp;
-            Dur duration = exceptionStamp.getMasterStamp().getDuration();
-            if(duration!=null)
-                endDate = Dates.getInstance(duration.getTime(startDate), startDate);
+            EventStamp masterStamp = exceptionStamp.getMasterStamp();
+            
+            // Make sure master EventStamp exists
+            if(masterStamp!=null) {
+                Dur duration = masterStamp.getDuration();
+                if(duration!=null)
+                    endDate = Dates.getInstance(duration.getTime(startDate), startDate);
+            }
         }
         
         

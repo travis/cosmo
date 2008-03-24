@@ -19,6 +19,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
+import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
@@ -73,6 +74,64 @@ public class EventStampInterceptorTest extends TestCase {
         Assert.assertFalse(index.getIsFloating().booleanValue());
     }
     
+    public void testEventStampHandlerAllDay() throws Exception {
+        
+        HibNoteItem master = new HibNoteItem();
+        HibEventStamp eventStamp = new HibEventStamp(master);
+        eventStamp.createCalendar();
+        eventStamp.setStartDate(new Date("20070212"));
+        eventStamp.setEndDate(new Date("20070213"));
+        master.addStamp(eventStamp);
+        
+        HibEventTimeRangeIndex index = interceptor.calculateEventStampIndexes(eventStamp);
+        
+        Assert.assertEquals("20070212", index.getStartDate());
+        Assert.assertEquals("20070213", index.getEndDate());
+        Assert.assertTrue(index.getIsFloating().booleanValue());
+      
+        String recur1 = "FREQ=DAILY;";
+        
+        List recurs = EimValueConverter.toICalRecurs(recur1);
+        eventStamp.setRecurrenceRules(recurs);
+        
+        index = interceptor.calculateEventStampIndexes(eventStamp);
+        
+        Assert.assertEquals("20070212", index.getStartDate());
+        Assert.assertEquals(HibEventStamp.TIME_INFINITY, index.getEndDate());
+        Assert.assertTrue(index.getIsFloating().booleanValue());
+    }
+    
+    public void testEventStampHandlerMods() throws Exception {
+        
+        HibNoteItem master = new HibNoteItem();
+        HibEventStamp eventStamp = new HibEventStamp(master);
+        eventStamp.createCalendar();
+        eventStamp.setStartDate(new DateTime("20070212T074500"));
+        eventStamp.setEndDate(new DateTime("20070212T094500"));
+        eventStamp.setRecurrenceRules(EimValueConverter.toICalRecurs("FREQ=DAILY;"));
+        master.addStamp(eventStamp);
+        
+        HibNoteItem mod = new HibNoteItem();
+        mod.setModifies(master);
+        HibEventExceptionStamp eventExceptionStamp = new HibEventExceptionStamp(mod);
+        eventExceptionStamp.createCalendar();
+        eventExceptionStamp.setStartDate(new DateTime("20070213T084500"));
+       
+        mod.addStamp(eventStamp);
+        
+        HibEventTimeRangeIndex index = interceptor.calculateEventStampIndexes(eventExceptionStamp);
+        
+        Assert.assertEquals("20070213T084500", index.getStartDate());
+        Assert.assertEquals("20070213T104500", index.getEndDate());
+        Assert.assertTrue(index.getIsFloating().booleanValue());
+        
+        // handle case where master isn't an event anymore
+        master.removeStamp(eventStamp);
+        index = interceptor.calculateEventStampIndexes(eventExceptionStamp);
+        
+        Assert.assertEquals("20070213T084500", index.getStartDate());
+        Assert.assertEquals("20070213T084500", index.getEndDate());
+    }
    
     
     

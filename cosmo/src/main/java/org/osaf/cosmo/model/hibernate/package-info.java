@@ -65,6 +65,7 @@
     @NamedQuery(name="item.by.ownerId.nullParent.name", query="select item from HibItem item where item.owner.id=:ownerid and size(item.parentDetails)=0 and item.name=:name"),
     @NamedQuery(name="item.by.ownerId.nullParent.name.minusItem", query="select item from HibItem item where item.id!=:itemid and item.owner.id=:ownerid and size(item.parentDetails)=0 and item.name=:name"),
     @NamedQuery(name="item.by.ownerId.parentId.name.minusItem", query="select item from HibItem item join item.parentDetails pd where item.id!=:itemid and item.owner.id=:ownerid and pd.primaryKey.collection.id=:parentid and item.name=:name"),
+    @NamedQuery(name="itemId.by.parentId.name", query="select item.id from HibItem item join item.parentDetails pd where pd.primaryKey.collection.id=:parentid and item.name=:name"),
     @NamedQuery(name="item.by.uid", query="from HibItem i where i.uid=:uid"),
     @NamedQuery(name="itemid.by.uid", query="select i.id from HibItem i where i.uid=:uid"),
     @NamedQuery(name="collectionItem.by.uid", query="from HibCollectionItem i where i.uid=:uid"),

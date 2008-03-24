@@ -17,6 +17,7 @@ package org.osaf.cosmo.dao.hibernate;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.id.IdentifierGenerator;
@@ -38,6 +39,7 @@ import org.osaf.cosmo.dao.hibernate.query.ItemFilterProcessor;
 import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionItemDetails;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ICalendarItem;
@@ -642,6 +644,25 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         for (Item nextItem: collection.getChildren())
             verifyNotInLoop(nextItem, newParent);
     }
+    
+    /**
+     * Verifies that name is unique in collection, meaning no item exists
+     * in collection with the same item name.
+     * @param name item name to check
+     * @param collection collection to check against
+     * @throws DuplicateItemNameException if item with same name exists
+     *         in collection
+     */
+    protected void verifyItemNameUnique(String name, CollectionItem collection) {
+        Query hibQuery = getSession().getNamedQuery("itemId.by.parentId.name");
+        hibQuery.setParameter("name", name).setParameter("parentid",
+                ((HibItem) collection).getId());
+        List<Long> results = hibQuery.list();
+        if(results.size()>0) {
+            throw new DuplicateItemNameException("item name " + name + 
+                    " already exists in collection " + collection.getUid());
+        } 
+    }
 
     /**
      * Find the DbItem with the specified dbId
@@ -800,7 +821,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     protected void addItemToCollectionInternal(Item item,
             CollectionItem collection) {
-
+        verifyItemNameUnique(item.getName(), collection);
         getSession().update(item);
         getSession().update(collection);
         ((HibCollectionItem)collection).removeTombstone(item);

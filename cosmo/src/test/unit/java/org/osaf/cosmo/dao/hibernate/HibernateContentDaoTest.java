@@ -43,6 +43,7 @@ import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
+import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
@@ -1178,6 +1179,44 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
         queryItem = contentDao.findContentByUid(newItem.getUid());
         Assert.assertNull(queryItem);
+    }
+    
+    public void testItemInMutipleCollectionsError() throws Exception {
+        User user = getUser(userDao, "testuser");
+        CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
+
+        CollectionItem a = new HibCollectionItem();
+        a.setName("a");
+        a.setOwner(user);
+
+        a = contentDao.createCollection(root, a);
+        
+        ContentItem item = generateTestContent();
+        item.setName("test");
+
+        ContentItem newItem = contentDao.createContent(a, item);
+
+        clearSession();
+
+        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        Assert.assertEquals(queryItem.getParents().size(), 1);
+        
+        CollectionItem b = new HibCollectionItem();
+        b.setName("b");
+        b.setOwner(user);
+        
+        b = contentDao.createCollection(root, b);
+        
+        ContentItem item2 = generateTestContent();
+        item2.setName("test");
+        contentDao.createContent(b, item2);
+        
+        // should get DuplicateItemName here
+        try {
+            contentDao.addItemToCollection(queryItem, b);
+            Assert.fail("able to add item with same name to collection");
+        } catch (DuplicateItemNameException e) {   
+        }
     }
     
     public void testItemInMutipleCollectionsDeleteCollection() throws Exception {

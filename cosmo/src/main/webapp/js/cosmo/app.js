@@ -213,7 +213,7 @@ cosmo.app = new function () {
         if (kwArgs.content) content = kwArgs.content;
         else {
             content = _createElem("div");
-            content.innerHTML = "<input type='text' id='getValueInput' className='inputText' value='" + (defaultValue || "") + "'/>";
+            content.innerHTML = "<input type='text' id='getValueInput' class='inputText' value='" + (defaultValue || "") + "'/>";
         }
         retryConditions = retryConditions || [];
         var deferred = new dojo.Deferred();

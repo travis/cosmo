@@ -156,11 +156,12 @@ dojo.declare(
 
         _confirmSubscribe: function(){
             confirmContent = _createElem("div");
+            confirmContent.style.lineHeight = "1.5";
             confirmContent.innerHTML = 
-                this.l10n.confirmAddPre +
-                "<input type='text' id='getValueInput' className='inputText' value='" + 
-                this.collection.getDisplayName()  + "'/>" + 
-                this.l10n.confirmAddPost;
+                [this.l10n.confirmAddPre, 
+                 "<input type='text' id='getValueInput' class='inputText' value='",
+                 this.collection.getDisplayName(), "'/>",
+                 this.l10n.confirmAddPost].join("");
             return cosmo.app.getValue(
                 "", "", [],
                 {

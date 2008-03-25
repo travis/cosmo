@@ -3,6 +3,7 @@
 {"params": {"jsid": "{$calView}"}, "method": "click"}
 {"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": 40000}}
 {"params": {"link": "Add to my account..."}, "method": "click"}
+{"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"link": "Sign up."}, "method": "click"}
 {"params": {"text": "{$random2}", "id": "username"}, "method": "type"}
 {"params": {"text": "signup", "id": "firstName"}, "method": "type"}

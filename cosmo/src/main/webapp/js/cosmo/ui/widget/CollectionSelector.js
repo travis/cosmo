@@ -29,6 +29,8 @@ dojo.require("cosmo.ui.widget.AuthBox");
 
 dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");
 
+dojo.declare("cosmo.AlreadySubscribedException", Error);
+
 dojo.declare(
     "cosmo.ui.widget.CollectionSelector", 
     [dijit._Widget, dijit._Templated],
@@ -79,7 +81,9 @@ dojo.declare(
                     var message = alreadySubscribed == "cosmo.model.Collection"
                         ? this.l10n.subscribedOwn
                         : this.l10n.subscribed;
-                    return cosmo.app.showAndWait(message);
+                    var showD = cosmo.app.showAndWait(message);
+                    showD.addCallback(function(){throw new cosmo.AlreadySubscribedException()});
+                    return showD;
                 } 
                 
                 if (!this._collectionWithDisplayNameExists(collections, displayName)) return displayName;
@@ -126,7 +130,9 @@ dojo.declare(
             deferred.addCallback(dojo.hitch(this, this.subscribe));
             deferred.addCallback(dojo.hitch(this, this._redirectFunction));
             deferred.addErrback(dojo.hitch(this, function (err) {
-                cosmo.app.showErr(this.l10n.addError, err);
+                if (!err instanceof cosmo.AlreadySubscribedException){
+                    cosmo.app.showErr(this.l10n.addError, err);
+                }
             }));
         },
 

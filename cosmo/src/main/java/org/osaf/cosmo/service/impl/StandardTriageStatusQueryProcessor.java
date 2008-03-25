@@ -287,8 +287,14 @@ public class StandardTriageStatusQueryProcessor implements
         // Now process recurring events
         for(Item item: contentDao.findItems(eventFilter)) {
             NoteItem note = (NoteItem) item;
-            if(note.getModifies()!=null)
+            
+            // per bug 10623:
+            // return all modifications for later
+            if(note.getModifies()!=null) {
+                qr.getResults().add(note);
+                qr.getMasters().add(note.getModifies());
                 continue;
+            }
            
             NoteItem laterItem =
                 getLaterFromRecurringNote(note, context);

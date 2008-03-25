@@ -52,7 +52,7 @@ cosmo.account.getFieldList = function (accountInfo, subscription) {
             return (cosmo.util.validate.required(elem) ||
                     cosmo.util.validate.minLength(elem, 3) || 
                     cosmo.util.validate.doesNotMatch(
-                        elem, new RegExp(":|\u007F"), "Signup.Error.UsernameIllegalChar") ||
+                        elem, /[:\u007F/;]/, "Signup.Error.UsernameIllegalChar") ||
                     cosmo.util.validate.inBMP(elem, "Signup.Error.UsernameBMP") ||
                     cosmo.util.validate.noControl(elem, "Signup.Error.UsernameControl")
                    ); };

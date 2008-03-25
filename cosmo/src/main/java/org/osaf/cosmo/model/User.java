@@ -243,27 +243,7 @@ public interface User extends AuditableObject{
 
     /**
      */
-    public void validate();
-
-    /**
-     */
-    public void validateUsername();
-
-    /**
-     */
     public void validateRawPassword();
-
-    /**
-     */
-    public void validateFirstName();
-
-    /**
-     */
-    public void validateLastName();
-
-    /**
-     */
-    public void validateEmail();
 
     public Set<Preference> getPreferences();
 

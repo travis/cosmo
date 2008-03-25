@@ -117,7 +117,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
 
     public void testSignupInvalidUsersCase() throws Exception {
 
-        String[] testStrings = { "a", "aaa/bbb/c", "j/b/c", "vvv/v/v" };
+        String[] testStrings = { "a", "aa", "lkjsldfjslkfjlskjfklsjlfksjldfsdflksjlksdjfsd" };
 
         for(int i=0; i < testStrings.length; i++) {
             User u1 = testHelper.makeDummyUser();

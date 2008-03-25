@@ -165,7 +165,7 @@ public class MockUserDao implements UserDao {
             ((MockAuditableObject) p).setCreationDate(new Date());
         }
             
-        user.validate();
+        ((MockUser) user).validate();
         if (usernameIdx.containsKey(user.getUsername())) {
             throw new DuplicateUsernameException("username in use");
         }
@@ -209,7 +209,7 @@ public class MockUserDao implements UserDao {
                 ((MockAuditableObject) p).setCreationDate(new Date());
         }
         
-        user.validate();
+        ((MockUser) user).validate();
         String key = user.isUsernameChanged() ?
             user.getOldUsername() :
             user.getUsername();

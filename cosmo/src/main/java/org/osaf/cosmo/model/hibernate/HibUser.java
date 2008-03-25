@@ -17,8 +17,6 @@ package org.osaf.cosmo.model.hibernate;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,11 +57,7 @@ public class HibUser extends HibAuditableObject implements User {
     /**
      */
     public static final int USERNAME_LEN_MAX = 32;
-    /**
-     */
-    public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$");
-    
+   
     /**
      */
     public static final int FIRSTNAME_LEN_MIN = 1;
@@ -93,7 +87,11 @@ public class HibUser extends HibAuditableObject implements User {
     @Index(name="idx_username")
     @NotNull
     @Length(min=USERNAME_LEN_MIN, max=USERNAME_LEN_MAX)
-    @org.hibernate.validator.Pattern(regex="^[^\\t\\n\\r\\f\\a\\e\\p{Cntrl}/]+$")
+    //per bug 11599:
+    // Usernames must be between 3 and 32 characters; may contain any Unicode
+    //character in the following range of unicode code points: [#x20-#xD7FF] |
+    //[#xE000-#xFFFD] EXCEPT #x7F or #x3A
+    @org.hibernate.validator.Pattern(regex="^[\\u0020-\\ud7ff\\ue000-\\ufffd&&[^\\u007f\\u003a]]+$")
     private String username;
     
     private transient String oldUsername;
@@ -378,37 +376,7 @@ public class HibUser extends HibAuditableObject implements User {
             toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.User#validate()
-     */
-    public void validate() {
-        validateUsername();
-        validateFirstName();
-        validateLastName();
-        validateEmail();
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.User#validateUsername()
-     */
-    public void validateUsername() {
-        if (username == null) {
-            throw new ModelValidationException("Username not specified");
-        }
-        if (username.length() < USERNAME_LEN_MIN ||
-            username.length() > USERNAME_LEN_MAX) {
-            throw new ModelValidationException("Username must be " +
-                                               USERNAME_LEN_MIN + " to " +
-                                               USERNAME_LEN_MAX +
-                                               " characters in length");
-        }
-        Matcher m = USERNAME_PATTERN.matcher(username);
-        if (! m.matches()) {
-            throw new ModelValidationException("Username contains illegal " +
-                                               "characters");
-        }
-    }
-
+   
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.User#validateRawPassword()
      */
@@ -424,55 +392,6 @@ public class HibUser extends HibAuditableObject implements User {
                                                " characters in length");
         }
     }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.User#validateFirstName()
-     */
-    public void validateFirstName() {
-        if (firstName == null) {
-            throw new ModelValidationException("First name is null");
-        }
-        if (firstName.length() < FIRSTNAME_LEN_MIN ||
-            firstName.length() > FIRSTNAME_LEN_MAX) {
-            throw new ModelValidationException("First name must be " +
-                                               FIRSTNAME_LEN_MIN + " to " +
-                                               FIRSTNAME_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.User#validateLastName()
-     */
-    public void validateLastName() {
-        if (lastName == null) {
-            throw new ModelValidationException("Last name is null");
-        }
-        if (lastName.length() < LASTNAME_LEN_MIN ||
-            lastName.length() > LASTNAME_LEN_MAX) {
-            throw new ModelValidationException("Last name must be " +
-                                               LASTNAME_LEN_MIN + " to " +
-                                               LASTNAME_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.User#validateEmail()
-     */
-    public void validateEmail() {
-        if (email == null) {
-            throw new ModelValidationException("Email is null");
-        }
-        if (email.length() < EMAIL_LEN_MIN ||
-            email.length() > EMAIL_LEN_MAX) {
-            throw new ModelValidationException("Email must be " +
-                                               EMAIL_LEN_MIN + " to " +
-                                               EMAIL_LEN_MAX +
-                                               " characters in length");
-        }
-    }
-
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.User#getPreferences()

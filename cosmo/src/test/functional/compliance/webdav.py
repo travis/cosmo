@@ -1,4 +1,4 @@
-#  Copyright 2006 Open Source Applications Foundation
+#  Copyright 2003-2008 Open Source Applications Foundation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 __revision__  = "$Revision$"
 __date__      = "$Date$"
-__copyright__ = "Copyright (c) 2003-2004 Open Source Applications Foundation"
+__copyright__ = "Copyright (c) 2003-2008 Open Source Applications Foundation"
 __license__   = "http://osafoundation.org/Chandler_0.1_license_terms.htm"
 
 import unittest

@@ -371,9 +371,9 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
-        var widget = new cosmo.ui.widget.CollectionSelector({
-            collection: cosmo.app.pim.getSelectedCollection(),
-            ticketKey: cosmo.app.pim.ticketKey });
+        var widget = new cosmo.ui.widget.CollectionSelector(
+            cosmo.app.pim.getSelectedCollection(),
+            cosmo.app.pim.ticketKey);
         selectorDiv.appendChild(widget.domNode);
         cB.widget = widget;
     }

@@ -27,198 +27,148 @@ dojo.require("cosmo.topics");
 dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
 
+dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");
 
 dojo.declare(
     "cosmo.ui.widget.CollectionSelector", 
     [dijit._Widget, dijit._Templated],
     {
-        templateString: '<span></span>',
-        verticalHeight: 18,
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/CollectionSelector.html"),
         collection: null,
         ticketKey: '',
-        MAX_DISPLAY_NAME_LENGTH: 18,
-        _origSelectIndex: 0,
+        displayName: "",
 
-        strings: {
-            collectionAddPrompt: _('Main.CollectionAdd.Prompt'),
-            collectionAddAuthPrompt: _('Main.CollectionAdd.AuthPrompt'),
-            collectionAddTooltip: _('Main.CollectionAdd.Tooltip'),
-            imgTitleInfo: _('Main.CollectionDetail.Tooltip'),
-            attemptPrompt: _('Main.CollectionAdd.AttemptPrompt'),
-            collectionAddError: _('Main.CollectionAdd.ErrorPrompt'),
-            successPrompt: _('Main.CollectionAdd.SuccessPrompt')
-        },
+        l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSelector"),
 
         //references to various DOM nodes
         displayNameText: null, 
 
-        postCreate: function () {
-            var self = this;
-            var collection = cosmo.app.pim.getSelectedCollection();
-            var passedKey = this.ticketKey; // Indicates we're in ticket view
+        constructor: function(collection, ticketKey){
+            this.setCollection(collection);
+            this.ticketKey = ticketKey;
+        },
 
-            // Collection selector / label and 'add'/'info' icons
-            var selectorNode = _createElem('div');
-            selectorNode.id = 'collectionSelectorOrLabel';
+        setCollection: function(collection){
+            this.collection = collection;
+            this.displayName = collection.getDisplayName();
+        },
 
-            // Ticket view
-            function renderSingleCollectionName() {
-                var imgPath = 'subscribe';
-                var imgTitle = self.strings.imgTitleAdd;
-                // Set up callback for deferred -- this is the action to take
-                // if auth succeeds
-                var subscribeFunction = function () {
-                        cosmo.app.showDialog({"content" : _("Main.CollectionAdd.LoadingInfo")})
-                        var collectionsDeferred = cosmo.app.pim.serv.getCollections();
-                        var subscriptionsDeferred = cosmo.app.pim.serv.getSubscriptions();
-                        var dList = new dojo.DeferredList(
-                            [collectionsDeferred, subscriptionsDeferred]
-                            );
-                        dList.addCallback(function (results) {
-                            var collections = results[0][1];
-                            collections = collections.concat(results[1][1]);
-                            return collections;
-                        })
-                        dList.addCallback(function (collections){
-                            cosmo.app.hideDialog();
-                            var alreadySubscribed = self._collectionWithUidExists(collections, collection.getUid());
-                            if (alreadySubscribed) {
-                                var message = alreadySubscribed == "cosmo.model.Collection"
-                                    ? _("Main.CollectionAdd.AlreadySubscribedOwnCollection")
-                                    : _("Main.CollectionAdd.AlreadySubscribedToSubscription");
-                                return cosmo.app.showAndWait(message, null);
-                            }
-
-                            var displayName = "";
-
-                            var displayNameDeferred = cosmo.app.getValue(_("Main.CollectionAdd.EnterDisplayNamePrompt"),
-                                               collection.getDisplayName(), [
-                                               function (displayName){
-                                                   if (!self._validateDisplayName(displayName)){
-                                                       return _("Main.CollectionAdd.EnterDisplayNamePrompt");
-                                                   }
-                                                },
-                                               function (displayName){
-                                                    if (self._collectionWithDisplayNameExists(collections, displayName)){
-                                                       return _("Main.CollectionAdd.DisplayNameExistsPrompt", displayName);
-                                                    }
-                                                }
-                                               ]);
-
-                            displayNameDeferred.addCallback(function(displayName){
-                                if (displayName == null) {
-                                    return null;
-                                }
-
-                                var subscription = new cosmo.model.Subscription({
-                                    displayName: displayName,
-                                    uid: collection.getUid(),
-                                    ticketKey: passedKey
-                                })
-
-                                return cosmo.app.pim.serv.createSubscription(subscription);
-                            });
-                            return displayNameDeferred;
-                        });
-                        return dList;
-                };
-                var redirectFunction = function () {
-                    // Make sure the modal dialog is hidden
-                    try {
-                        cosmo.app.hideDialog()
-                    } catch (e){
-                        // don't do anything on error
-                    }
-                    cosmo.app.showDialog(
-                        {"prompt":_("Main.CollectionAdd.RedirectPrompt")}
-                    );
-                    // Log the user into Cosmo and display the current collection
-                    location = cosmo.env.getBaseUrl() + '/pim/collection/' + collection.getUid();
-                }
-
-                // Called by clicking on the "Add to my account...: link
-                var clickFunction = function () {
-                    if (!cosmo.util.auth.currentlyAuthenticated()) {
-                        var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties({
-                            authInitPrompt: self.strings.collectionAddAuthPrompt,
-                            authProcessingPrompt: null, // Use the default
-                            attemptPrompt: self.strings.attemptPrompt,
-                            successPrompt: self.strings.successPrompt,
-                            subscription: new cosmo.model.Subscription({
-                                displayName: collection.getDisplayName(),
-                                uid: collection.getUid(),
-                                ticketKey: passedKey
-                            })
-                        });
-                        // If authDeferred callback fires, user is authenticated
-                        // If authDeferred errback fires, there was an error authenticating
-                        var authDeferred = cosmo.app.showDialog(authBoxProps);
-                        cosmo.app.modalDialog.content.usernameInput.focus();
-                        
-                        authDeferred.addCallback(function () {
-                            // Hide the auth dialog, as we will be opening a new one
-                            // to get the subscription name.
-                            cosmo.app.hideDialog();
-                            var deferred = subscribeFunction();
-                            
-                            deferred.addCallback(redirectFunction);
-                            deferred.addErrback(dojo.hitch(this, function (err) {
-                                cosmo.app.hideDialog();
-                                cosmo.app.showErr(self.strings.collectionAddError, err.message);
-                                return false;
-                            }));
-                        });
-                    } else {
-                        var deferred = subscribeFunction();
-                        if (deferred == null) {
-                            return;
-                        }
-                        deferred.addCallback(redirectFunction);
-                        deferred.addErrback(function (err) {
-                            cosmo.app.showErr(self.strings.collectionAddError, err);
-                        });
-                    }
-                };
-
-
-                // Collection name label
-                // ---
-                var displayName = collection ? collection.getDisplayName() : "";
-                var d = _createElem("div");
-                d.id = 'collectionLabelName';
-                d.className = 'labelTextHoriz';
-                if (displayName.length > self.MAX_DISPLAY_NAME_LENGTH) {
-                    var textNode = _createText(displayName.substr(0, self.MAX_DISPLAY_NAME_LENGTH - 1) + '\u2026');
-                    d.title = collection.getDisplayName();
-                }
+        // Grab subscription information from server, make sure displayName is not a duplicate
+        // and add the current collection to the user's subscriptions
+        subscribe: function (subscription) {
+            var displayName = subscription.getDisplayName()
+            var collection = this.collection;
+            cosmo.app.showDialog({"content" : this.l10n.loadingInfo})
+            var collectionsDeferred = cosmo.app.pim.serv.getCollections();
+            var subscriptionsDeferred = cosmo.app.pim.serv.getSubscriptions();
+            var dList = new dojo.DeferredList(
+                [collectionsDeferred, subscriptionsDeferred]
+            );
+            dList.addBoth(function(args){
+                cosmo.app.hideDialog();
+                return args;
+            });
+            dList.addCallback(function (results) {
+                var collections = results[0][1];
+                collections = collections.concat(results[1][1]);
+                return collections;
+            })
+            dList.addCallback(dojo.hitch(this, function (collections){
+                var alreadySubscribed = this._collectionWithUidExists(collections, collection.getUid());
+                if (alreadySubscribed) {
+                    var message = alreadySubscribed == "cosmo.model.Collection"
+                        ? this.l10n.subscribedOwn
+                        : this.l10n.subscribed;
+                    return cosmo.app.showAndWait(message);
+                } 
+                
+                if (!this._collectionWithDisplayNameExists(collections, displayName)) return displayName;
                 else {
-                    var textNode = _createText(displayName);
+                    var displayNameDeferred = cosmo.app.getValue(
+                        dojo.string.substitute(this.l10n.nameExists, [displayName]),
+                        collection.getDisplayName(), 
+                        [
+                            dojo.hitch(this, function (displayName){
+                                if (!this._validateDisplayName(displayName)){
+                                    return this.l10n.enterNamePrompt;
+                                }
+                            }),
+                            dojo.hitch(this, function (displayName){
+                                if (this._collectionWithDisplayNameExists(collections, displayName)){
+                                    return dojo.string.substitute(this.l10n.nameExists, [displayName]);
+                                }
+                            })
+                        ]);
+                    
+                    return displayNameDeferred;
                 }
-                d.appendChild(textNode);
-                selectorNode.appendChild(d);
-                self.displayNameText = textNode;
+            }));
+            dList.addCallback(dojo.hitch(this, function(displayName){
+                subscription.setDisplayName(displayName);
+                return cosmo.app.pim.serv.createSubscription(subscription);
+            }));
+            return dList;
+        },
 
-                // Set up addCollectionPromptNode
-                // -----
-                var addCollectionPromptNode = _createElem('div');
-                addCollectionPromptNode.id = 'addCollectionPrompt';
-                var anchor = _createElem('a');
-                anchor.title = self.strings.collectionAddTooltip;
-                dojo.connect(anchor, 'onclick', clickFunction);
-                anchor.appendChild(_createText(self.strings.collectionAddPrompt));
-                addCollectionPromptNode.appendChild(anchor);
+        // Called by clicking on the "Add to my account...: link
+        _onClickAdd: function () {
+            var deferred = this._confirmSubscribe();
+            deferred.addCallback(dojo.hitch(this, function(displayName){
+                return new cosmo.model.Subscription({
+                    displayName: displayName,
+                    uid: this.collection.getUid(),
+                    ticketKey: this.ticketKey
+                })
+            }));
+            if (!cosmo.util.auth.currentlyAuthenticated()) 
+                deferred.addCallback(dojo.hitch(this, this._authenticate));
+            
+            deferred.addCallback(dojo.hitch(this, this.subscribe));
+            deferred.addCallback(dojo.hitch(this, this._redirectFunction));
+            deferred.addErrback(dojo.hitch(this, function (err) {
+                cosmo.app.showErr(this.l10n.addError, err);
+            }));
+        },
 
-                // Append to widget domNode
-                self.domNode.appendChild(selectorNode);
-                self.domNode.appendChild(addCollectionPromptNode);
-            }
+        _redirectFunction: function (collection) {
+            cosmo.app.showDialog(
+                {"prompt": this.l10n.redirectPrompt}
+            );
+            // Log the user into Cosmo and display the current collection
+            location = cosmo.env.getBaseUrl() + '/pim/collection/' + this.collection.getUid();
+        },
 
-            // The content is several left-floated
-            // divs -- this allows for correct vertical alignment of
-            // the icon images with the text they sit beside
-            // -----
-            // Show the collection name
-            renderSingleCollectionName();
+        _authenticate: function(subscription){
+            var authBoxProps = cosmo.ui.widget.AuthBox.getInitProperties({
+                authInitPrompt: this.l10n.authPrompt,
+                authProcessingPrompt: null, // Use the default
+                attemptPrompt: this.l10n.attemptPrompt,
+                successPrompt: this.l10n.successPrompt,
+                subscription: subscription
+            });
+            var authD = cosmo.app.showDialog(authBoxProps);
+            cosmo.app.modalDialog.content.usernameInput.focus();
+            authD.addCallback(function(){cosmo.app.hideDialog()});
+            // Return subscription for callback chain
+            authD.addCallback(function(){return subscription});
+            return authD;
+        },
+
+        _confirmSubscribe: function(){
+            confirmContent = _createElem("div");
+            confirmContent.innerHTML = 
+                this.l10n.confirmAddPre +
+                "<input type='text' id='getValueInput' className='inputText' value='" + 
+                this.collection.getDisplayName()  + "'/>" + 
+                this.l10n.confirmAddPost;
+            return cosmo.app.getValue(
+                "", "", [],
+                {
+                    content: confirmContent,
+                    showCancel: true,
+                    defaultActionButtonText: this.l10n.confirmOkay
+                }
+            );
         },
 
         _getIndexByDisplayName: function(collections, displayName){

@@ -140,7 +140,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         String[] testStrings = { "abcdefghijklmnopqrstuvwxyz",
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
                                  "1234567890", "!@#$%^&*(){}\"?><",
-                                 ",.\\;'[]=-",
+                                 ",.'[]=-",
         };
 
 

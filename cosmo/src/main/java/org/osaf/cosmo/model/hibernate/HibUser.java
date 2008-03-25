@@ -91,7 +91,9 @@ public class HibUser extends HibAuditableObject implements User {
     // Usernames must be between 3 and 32 characters; may contain any Unicode
     //character in the following range of unicode code points: [#x20-#xD7FF] |
     //[#xE000-#xFFFD] EXCEPT #x7F or #x3A
-    @org.hibernate.validator.Pattern(regex="^[\\u0020-\\ud7ff\\ue000-\\ufffd&&[^\\u007f\\u003a]]+$")
+    // Oh and don't allow ';' or '/' because there are problems with encoding
+    // them in urls (tomcat doesn't support it)
+    @org.hibernate.validator.Pattern(regex="^[\\u0020-\\ud7ff\\ue000-\\ufffd&&[^\\u007f\\u003a;/\\\\]]+$")
     private String username;
     
     private transient String oldUsername;

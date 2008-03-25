@@ -44,7 +44,7 @@ public class MockUser extends MockAuditableObject implements User {
     /**
      */
     public static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[\\u0020-\\ud7ff\\ue000-\\ufffd&&[^\\u007f\\u003a]]+$");
+        Pattern.compile("^[\\u0020-\\ud7ff\\ue000-\\ufffd&&[^\\u007f\\u003a;/\\\\]]+$");
     
     /**
      */

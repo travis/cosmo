@@ -72,6 +72,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemSecurityException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
+import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
@@ -211,6 +212,10 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();
 
+        // handle case where item is an occurrence, return unknown
+        if(item instanceof NoteOccurrence)
+            return this.unknown(getAbdera(), request, "Item not found");
+        
         if (log.isDebugEnabled())
             log.debug("deleting entry for item " + item.getUid());
 

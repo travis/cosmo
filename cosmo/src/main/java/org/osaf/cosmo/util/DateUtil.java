@@ -73,7 +73,6 @@ public class DateUtil {
      * formats, returning a UTC date:
      * 
      * 2002-10-10T00:00:00+05:00
-     * 2002-10-09T19:00:00Z
      * 2002-10-10T00:00:00GMT+05:00
      * 
      * @param date string

@@ -23,6 +23,7 @@ import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
+import org.osaf.cosmo.acegisecurity.providers.wsse.WsseAuthenticationToken;
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.security.BaseSecurityContext;
@@ -56,6 +57,11 @@ public class CosmoSecurityContextImpl extends BaseSecurityContext {
                 ((Authentication) getPrincipal()).getPrincipal();
             setUser(details.getUser());
             setAdmin(details.getUser().getAdmin().booleanValue());
+        }   else if (getPrincipal() instanceof WsseAuthenticationToken) {
+                CosmoUserDetails details = (CosmoUserDetails)
+                    ((Authentication) getPrincipal()).getPrincipal();
+                setUser(details.getUser());
+                setAdmin(details.getUser().getAdmin().booleanValue());
         } else if (getPrincipal() instanceof TicketAuthenticationToken) {
             Ticket ticket = (Ticket)
                 ((Authentication) getPrincipal()).getPrincipal();

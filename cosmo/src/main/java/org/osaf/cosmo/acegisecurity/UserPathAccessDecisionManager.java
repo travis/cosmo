@@ -28,6 +28,7 @@ import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
+import org.osaf.cosmo.acegisecurity.providers.wsse.WsseAuthenticationToken;
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.server.UserPath;
@@ -62,7 +63,8 @@ public class UserPathAccessDecisionManager
         HttpServletRequest request =
             ((FilterInvocation)object).getHttpRequest();
 
-        if (!((authentication instanceof UsernamePasswordAuthenticationToken) || (authentication instanceof TicketAuthenticationToken)))
+        if (!((authentication instanceof UsernamePasswordAuthenticationToken) || (authentication instanceof TicketAuthenticationToken)
+                || (authentication instanceof WsseAuthenticationToken)))
             throw new InsufficientAuthenticationException(
                     "Unrecognized authentication token");
         
@@ -70,7 +72,8 @@ public class UserPathAccessDecisionManager
         UserPath up = UserPath.parse(request.getPathInfo());
         if(up!=null) {
             // Must be user
-            if(! (authentication instanceof UsernamePasswordAuthenticationToken))
+            if(! (authentication instanceof UsernamePasswordAuthenticationToken) &&
+               ! (authentication instanceof WsseAuthenticationToken))
                 throw new AccessDeniedException("principal cannot access resource");
             
             CosmoUserDetails details = (CosmoUserDetails) authentication.getPrincipal();

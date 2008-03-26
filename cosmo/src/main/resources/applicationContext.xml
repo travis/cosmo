@@ -734,6 +734,13 @@
       <ref bean="contentDao"/>
     </property>
   </bean>
+  
+  <bean id="wsseAuthenticationProvider"
+        class="org.osaf.cosmo.acegisecurity.providers.wsse.WsseAuthenticationProvider">
+    <property name="userDao">
+      <ref bean="userDao"/>
+    </property>
+  </bean>
 
   <bean id="authenticationManager"
         class="org.acegisecurity.providers.ProviderManager">
@@ -742,6 +749,7 @@
         <ref local="daoAuthenticationProvider"/>
         <ref local="anonymousAuthenticationProvider"/>
         <ref local="ticketAuthenticationProvider"/>
+        <ref local="wsseAuthenticationProvider"/>
       </list>
     </property>
   </bean>
@@ -950,6 +958,9 @@
     <property name="createSessionAllowed" value="false"/>
   </bean>
 
+  <bean id="protocolWsseProcessingFilter"
+        class="org.osaf.cosmo.acegisecurity.providers.wsse.WsseTokenProcessingFilter"/>
+  
   <!-- Logging resources -->
   <bean id="httpLoggingFormat" class="java.lang.String">
     <constructor-arg type="java.lang.String"><value>${cosmo.log.HttpLoggingFilter.format}</value></constructor-arg>

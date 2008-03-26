@@ -50,7 +50,7 @@
       <value>
         CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
         PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
+        /**=protocolHttpRequestContextIntegrationFilter,protocolWsseProcessingFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
       </value>
     </property>
   </bean>

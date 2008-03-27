@@ -80,7 +80,7 @@ public class UserPathAccessDecisionManager
             User user = details.getUser();
             
             // User must be admin or the User that matches path
-            if(user.getUsername().equals(up.getUsername()) || user.getAdmin().booleanValue())
+            if(user.getUsername().equalsIgnoreCase(up.getUsername()) || user.getAdmin().booleanValue())
                 return;
             
             // otherwise request is unauthorized

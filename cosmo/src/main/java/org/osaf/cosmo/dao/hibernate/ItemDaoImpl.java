@@ -761,7 +761,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
 
             // if uid is in use throw exception
             if (itemId != null) {
-                throw new UidInUseException("uid " + item.getUid()
+                throw new UidInUseException(item.getUid(), "uid " + item.getUid()
                         + " already in use");
             }
         }

@@ -21,14 +21,15 @@ package org.osaf.cosmo.model;
  */
 public class UidInUseException extends RuntimeException {
 
+    String uid = null;
+    
     /** */
-    public UidInUseException(String message) {
+    public UidInUseException(String uid, String message) {
         super(message);
+        this.uid = uid;
     }
 
-    /** */
-    public UidInUseException(String message,
-                             Throwable cause) {
-        super(message, cause);
+    public String getUid() {
+        return uid;
     }
 }

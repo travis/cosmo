@@ -68,7 +68,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         if (collection == null)
             throw new IllegalArgumentException("collection cannot be null");
         if (getStorage().getItemByUid(collection.getUid()) != null)
-            throw new UidInUseException(collection.getUid());
+            throw new UidInUseException(collection.getUid(), collection.getUid());
 
         ((MockItem) collection).addParent(parent);
 
@@ -164,7 +164,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new ConcurrencyFailureException("fail!");
 
         if (getStorage().getItemByUid(content.getUid()) != null)
-            throw new UidInUseException("Uid " + content.getUid() + " already in use");
+            throw new UidInUseException(content.getUid(), "Uid " + content.getUid() + " already in use");
         
         ((MockItem) content).addParent(parent);
         
@@ -190,7 +190,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
 
         Item stored = getStorage().getItemByUid(content.getUid());
         if (stored != null && stored != content)
-            throw new UidInUseException("Uid " + content.getUid() + " already in use");
+            throw new UidInUseException(content.getUid(), "Uid " + content.getUid() + " already in use");
         
         getStorage().updateItem((Item) content);
 
@@ -275,7 +275,7 @@ public class MockContentDao extends MockItemDao implements ContentDao {
             throw new ConcurrencyFailureException("fail!");
         
         if (getStorage().getItemByUid(content.getUid()) != null)
-            throw new UidInUseException("Uid " + content.getUid() + " already in use");
+            throw new UidInUseException(content.getUid(), "Uid " + content.getUid() + " already in use");
         
         for(CollectionItem parent: parents)
             ((MockItem) content).addParent(parent);

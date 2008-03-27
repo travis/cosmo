@@ -216,10 +216,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 }
                 return;
             } catch (XMLStreamException e) {
-                String msg = "Error writing XML stream";
-                log.error(msg, e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               msg + ": " + e.getMessage());
+                String msg = "Error writing XML stream: " + e.getMessage();
+                handleGeneralException(new MorseCodeException(msg, e), resp);
                 return;
             } catch (MorseCodeException e) {    
                 handleGeneralException(e, resp);
@@ -288,16 +286,12 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 }
                 return;
             } catch (EimmlStreamException e) {
-                String msg = "Error writing EIMML stream";
-                log.error(msg, e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               msg + ": " + e.getMessage());
+                String msg = "Error writing EIMML stream: " + e.getMessage();
+                handleGeneralException(new MorseCodeException(msg, e), resp);
                 return;
             } catch (EimException e) {
-                String msg = "Error translating items to EIM records";
-                log.error(msg, e);
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               msg + ": " + e.getMessage());
+                String msg = "Error translating items to EIM records: " + e.getMessage();
+                handleGeneralException(new MorseCodeException(msg, e), resp);
                 return;
             } catch (MorseCodeException e) {    
                 handleGeneralException(e, resp);
@@ -323,8 +317,8 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
         if (cp != null) {
             String tokenStr = req.getHeader(HEADER_SYNC_TOKEN);
             if (StringUtils.isBlank(tokenStr)) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Missing sync token");
+                String msg = "Missing sync token";
+                handleGeneralException(new BadRequestException(msg), resp);
                 return;
             }
 
@@ -337,11 +331,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 
                 reader = new EimmlStreamReader(req.getReader());
                 if (! reader.getCollectionUuid().equals(cp.getUid())) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   "EIMML collection uid " +
-                                   reader.getCollectionUuid() +
-                                   " does not match target collection uid " +
-                                   cp.getUid());
+                    String msg = "EIMML collection uid "
+                            + reader.getCollectionUuid()
+                            + " does not match target collection uid "
+                            + cp.getUid();
+                    handleGeneralException(new BadRequestException(msg), resp);
                     return;
                 }
 
@@ -366,11 +360,10 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 }
                 return;
             } catch (EimmlStreamException e) {
-                log.warn("Unable to read EIM stream", e);
                 Throwable cause = e.getCause();
                 String msg = "Unable to read EIM stream: " + e.getMessage();
                 msg += cause != null ? ": " + cause.getMessage() : "";
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+                handleGeneralException(new BadRequestException(msg, e), resp);
                 return;
             } catch (CollectionLockedException e) {
                 resp.sendError(SC_LOCKED, "Collection is locked for update");
@@ -382,18 +375,16 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             } catch (MorseCodeException e) {
                 Throwable root = e.getCause();
                 if (root != null && root instanceof EimmlStreamException) {
-                    log.warn("Unable to read EIM stream", root);
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   "Unable to read EIM stream: " +
-                                   root.getMessage());
+                    String msg = "Unable to read EIM stream: " + root.getMessage();
+                    handleGeneralException(new BadRequestException(msg, e), resp);
                     return;
                 }
                 if (root != null && root instanceof EimSchemaException) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   "Unable to process EIM records: " +
-                                   root.getMessage());
+                    String msg = "Unable to process EIM records: " + root.getMessage();
+                    handleGeneralException(new BadRequestException(msg, e), resp);
                     return;
                 }
+                
                 handleGeneralException(e, resp);
                 return;
             } catch (RuntimeException e) {    
@@ -428,11 +419,11 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
 
                 reader = new EimmlStreamReader(req.getReader());
                 if (! reader.getCollectionUuid().equals(cp.getUid())) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   "EIMML collection uid " +
-                                   reader.getCollectionUuid() +
-                                   " does not match target collection uid " +
-                                   cp.getUid());
+                    
+                    String msg = "EIMML collection uid "
+                            + reader.getCollectionUuid()
+                            + " does not match target collection uid " + cp.getUid();
+                    handleGeneralException(new BadRequestException(msg), resp);
                     return;
                 }
 
@@ -446,8 +437,7 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 try {
                     ticketTypes = parseTicketTypes(req);
                 } catch (IllegalArgumentException e) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   e.getMessage());
+                    handleGeneralException(new BadRequestException(e), resp);
                     return;
                 }
 
@@ -472,18 +462,17 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
                 }
                 return;
             } catch (IllegalArgumentException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                               "Parent uid must be specified when authenticated principal is not a user");
+                String msg = "Parent uid must be specified when authenticated principal is not a user";
+                handleGeneralException(new BadRequestException(msg), resp);
                 return;
             } catch (EimmlStreamException e) {
-                log.warn("Unable to read EIM stream", e);
                 Throwable cause = e.getCause();
                 String msg = "Unable to read EIM stream: " + e.getMessage();
                 msg += cause != null ? ": " + cause.getMessage() : "";
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+                handleGeneralException(new BadRequestException(msg, e), resp);
                 return;
             } catch (UidInUseException e) {
-                resp.sendError(HttpServletResponse.SC_CONFLICT, "Uid in use");
+                handleGeneralException(new MorseCodeException(HttpServletResponse.SC_CONFLICT, e), resp);
                 return;
             } catch (ServerBusyException e){
                     log.debug("received ServerBusyException during PUT");
@@ -494,16 +483,13 @@ public class MorseCodeServlet extends HttpServlet implements EimmlConstants {
             } catch (MorseCodeException e) {
                 Throwable root = e.getCause();
                 if (root != null && root instanceof EimmlStreamException) {
-                    log.warn("Unable to read EIM stream", root);
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   "Unable to read EIM stream: " +
-                                   root.getMessage());
+                    String msg = "Unable to read EIM stream: " + root.getMessage();
+                    handleGeneralException(new BadRequestException(msg, e), resp);
                     return;
                 }
                 if (root != null && root instanceof EimSchemaException) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                                   "Unable to process EIM records: " +
-                                   root.getMessage());
+                    String msg = "Unable to process EIM records: " + root.getMessage();
+                    handleGeneralException(new BadRequestException(msg, e), resp);
                     return;
                 }
                 handleGeneralException(e, resp);

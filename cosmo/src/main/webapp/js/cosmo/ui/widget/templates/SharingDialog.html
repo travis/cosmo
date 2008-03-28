@@ -1,0 +1,32 @@
+<div>
+<style type="text/css">
+.linkDiv{
+width: 40px;
+height: 20px;
+color: white;
+font-weight: bolder;
+padding: 2px;
+}
+.linkDiv a:hover{
+text-decoration: none;
+}
+.atomLinkDiv {
+background: orange;
+}
+.webcalLinkDiv {
+background: green;
+}
+.htmlLinkDiv {
+background: blue;
+}
+.davLinkDiv {
+background: red;
+}
+</style>
+<div id="${id}DisplayName">${displayName}</div>
+<a href="${urls.atom}"><span class="linkDiv atomLinkDiv">${l10n.atom}</span></a>
+<a href="${urls.webcal}"><span class="linkDiv webcalLinkDiv">${l10n.webcal}</span></a>
+<a href="${urls.dav}"><span class="linkDiv davLinkDiv">${l10n.dav}</span></a>
+<a href="${urls.html}"><span class="linkDiv htmlLinkDiv">${l10n.html}</span></a>
+</div>
+

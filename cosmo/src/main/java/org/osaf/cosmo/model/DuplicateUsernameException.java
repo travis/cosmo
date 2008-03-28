@@ -23,19 +23,19 @@ public class DuplicateUsernameException extends ModelValidationException {
 
     /**
      */
-    public DuplicateUsernameException() {
-        super("duplicate username");
+    public DuplicateUsernameException(User user) {
+        super(user, "duplicate username: " + user.getUsername());
     }
 
     /**
      */
-    public DuplicateUsernameException(String message) {
-        super(message);
+    public DuplicateUsernameException(User user, String message) {
+        super(user, message);
     }
 
     /**
      */
-    public DuplicateUsernameException(String message, Throwable cause) {
-        super(message, cause);
+    public DuplicateUsernameException(User user, String message, Throwable cause) {
+        super(user, message, cause);
     }
 }

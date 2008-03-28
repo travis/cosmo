@@ -609,7 +609,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
             note.getModifies().addModification(note);
             
             if(!note.getModifies().getParents().contains(parent))
-                throw new ModelValidationException("cannot create modification "
+                throw new ModelValidationException(note, "cannot create modification "
                         + note.getUid() + " in collection " + parent.getUid()
                         + ", master must be created or added first");
             
@@ -675,7 +675,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
                     modParents.append(p.getUid() + ",");
                 for (CollectionItem p : note.getModifies().getParents())
                     masterParents.append(p.getUid() + ",");
-                throw new ModelValidationException(
+                throw new ModelValidationException(note,
                         "cannot create modification " + note.getUid()
                                 + " in collections " + modParents.toString()
                                 + " because master's parents are different: "
@@ -735,7 +735,7 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         // Don't allow note modifications to be added to a collection
         // When a master is added, all the modifications are added
         if (isNoteModification(item))
-            throw new ModelValidationException("cannot add modification "
+            throw new ModelValidationException(item, "cannot add modification "
                     + item.getUid() + " to collection " + collection.getUid()
                     + ", only master");
         

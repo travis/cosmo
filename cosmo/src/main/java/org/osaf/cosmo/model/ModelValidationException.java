@@ -24,15 +24,29 @@ import org.springframework.dao.DataIntegrityViolationException;
 public class ModelValidationException
     extends DataIntegrityViolationException {
 
+    public Object offendingObject = null;
+    
     /**
      */
     public ModelValidationException(String message) {
         super(message);
     }
+    
+    /**
+     */
+    public ModelValidationException(Object offendingObject, String message) {
+        super(message);
+        this.offendingObject = offendingObject;
+    }
 
     /**
      */
-    public ModelValidationException(String message, Throwable cause) {
+    public ModelValidationException(Object offendingObject, String message, Throwable cause) {
         super(message, cause);
+        this.offendingObject = offendingObject;
+    }
+
+    public Object getOffendingObject() {
+        return offendingObject;
     }
 }

@@ -631,7 +631,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         // need to verify that the new parent is not a child
         // of the item, otherwise we get a loop
         if (getBaseModelObject(item).getId().equals(getBaseModelObject(newParent).getId()))
-            throw new ModelValidationException(
+            throw new ModelValidationException(newParent,
                     "Invalid parent - will cause loop");
         
         // If item is not a collection then all is good
@@ -653,13 +653,13 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
      * @throws DuplicateItemNameException if item with same name exists
      *         in collection
      */
-    protected void verifyItemNameUnique(String name, CollectionItem collection) {
+    protected void verifyItemNameUnique(Item item, CollectionItem collection) {
         Query hibQuery = getSession().getNamedQuery("itemId.by.parentId.name");
-        hibQuery.setParameter("name", name).setParameter("parentid",
+        hibQuery.setParameter("name", item.getName()).setParameter("parentid",
                 ((HibItem) collection).getId());
         List<Long> results = hibQuery.list();
         if(results.size()>0) {
-            throw new DuplicateItemNameException("item name " + name + 
+            throw new DuplicateItemNameException(item, "item name " + item.getName() + 
                     " already exists in collection " + collection.getUid());
         } 
     }
@@ -821,7 +821,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     
     protected void addItemToCollectionInternal(Item item,
             CollectionItem collection) {
-        verifyItemNameUnique(item.getName(), collection);
+        verifyItemNameUnique(item, collection);
         getSession().update(item);
         getSession().update(collection);
         ((HibCollectionItem)collection).removeTombstone(item);

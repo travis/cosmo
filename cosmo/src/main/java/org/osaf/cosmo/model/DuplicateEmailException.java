@@ -23,19 +23,19 @@ public class DuplicateEmailException extends ModelValidationException {
 
     /**
      */
-    public DuplicateEmailException() {
-        super("duplicate email");
+    public DuplicateEmailException(User user) {
+        super(user, "duplicate email: " + user.getEmail());
     }
 
     /**
      */
-    public DuplicateEmailException(String message) {
-        super(message);
+    public DuplicateEmailException(User user, String message) {
+        super(user, message);
     }
 
     /**
      */
-    public DuplicateEmailException(String message, Throwable cause) {
-        super(message, cause);
+    public DuplicateEmailException(User user, String message, Throwable cause) {
+        super(user, message, cause);
     }
 }

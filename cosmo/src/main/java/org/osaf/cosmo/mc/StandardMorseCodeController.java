@@ -219,7 +219,12 @@ public class StandardMorseCodeController implements MorseCodeController {
         } catch (IcalUidInUseException e) {
             throw new UidConflictException(e);
         } catch (ModelValidationException e) {
-            throw new ValidationException(e.getMessage());
+            if(e.getOffendingObject() instanceof Item) {
+                Item item = (Item) e.getOffendingObject();
+                throw new ValidationException(item.getUid(), e.getMessage());
+            } else {
+                throw new ValidationException(null, e.getMessage());
+            } 
         }
         
         return new PubCollection(collection);
@@ -398,7 +403,12 @@ public class StandardMorseCodeController implements MorseCodeController {
         } catch (IcalUidInUseException e) {
             throw new UidConflictException(e);
         } catch (ModelValidationException e) {
-            throw new ValidationException(e.getMessage());
+            if(e.getOffendingObject() instanceof Item) {
+                Item oi = (Item) e.getOffendingObject();
+                throw new ValidationException(oi.getUid(), e.getMessage());
+            } else {
+                throw new ValidationException(null, e.getMessage());
+            }
         }
 
         
@@ -487,7 +497,7 @@ public class StandardMorseCodeController implements MorseCodeController {
                     Item item =
                         contentService.findItemByUid(recordset.getUuid());
                     if (item != null && ! (item instanceof ContentItem))
-                        throw new ValidationException("Child item " + recordset.getUuid() + " is not a content item");
+                        throw new ValidationException(recordset.getUuid(), "Child item " + recordset.getUuid() + " is not a content item");
                    
                     ContentItem child = (ContentItem) item;
                     
@@ -503,7 +513,7 @@ public class StandardMorseCodeController implements MorseCodeController {
                     // Handle case where recordset is to be deleted, but the
                     // target item doesn't exist.
                     if(child==null && recordset.isDeleted()==true)
-                        throw new ValidationException(
+                        throw new ValidationException(recordset.getUuid(),
                                 "Tried to delete child item "
                                         + recordset.getUuid()
                                         + " , but it does not exist");
@@ -518,7 +528,7 @@ public class StandardMorseCodeController implements MorseCodeController {
                     new ItemTranslator(child).applyRecords(recordset);
                     
                 } catch (EimValidationException e) {
-                    throw new ValidationException("could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
+                    throw new ValidationException(recordset.getUuid(), "could not apply EIM recordset " + recordset.getUuid() + " due to invalid data", e);
                 }
             }
             
@@ -570,7 +580,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         try {
             modUid = new ModificationUid(noteMod.getUid());
         } catch (ModelValidationException e) {
-            throw new ValidationException("invalid modification uid: "
+            throw new ValidationException(noteMod.getUid(), "invalid modification uid: "
                     + noteMod.getUid());
         }
         
@@ -587,7 +597,7 @@ public class StandardMorseCodeController implements MorseCodeController {
         noteMod.setIcalUid(null);
         
         log.debug("could not find parent item for " + noteMod.getUid());
-        throw new ValidationException("no parent found for " + noteMod.getUid());
+        throw new ValidationException(noteMod.getUid(), "no parent found for " + noteMod.getUid());
     }
      
     private List<ContentItem> getAllItems(CollectionItem collection) {

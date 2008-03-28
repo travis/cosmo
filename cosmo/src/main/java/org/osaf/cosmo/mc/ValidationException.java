@@ -24,15 +24,19 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class ValidationException extends MorseCodeException {
     
+    String uid = null;
+    
     /** */
-    public ValidationException(String message) {
+    public ValidationException(String uid, String message) {
         super(400, message);
+        this.uid = uid;
     }
 
     /** */
-    public ValidationException(String message,
+    public ValidationException(String uid, String message,
                                Throwable cause) {
         super(400, message, cause);
+        this.uid = uid;
     }
     
     protected void writeContent(XMLStreamWriter writer)
@@ -43,6 +47,11 @@ public class ValidationException extends MorseCodeException {
             msgBuffer.append(": " + cause.getMessage());
             
         writer.writeStartElement(NS_MC, "data-validation-error");
+        if(uid!=null) {
+            writer.writeStartElement(NS_MC, "item-uuid");
+            writer.writeCharacters(uid);
+            writer.writeEndElement();
+        }
         writer.writeStartElement(NS_MC, "message");
         writer.writeCharacters(msgBuffer.toString());
         writer.writeEndElement();

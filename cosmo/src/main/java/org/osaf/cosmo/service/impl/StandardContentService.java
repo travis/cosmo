@@ -192,7 +192,7 @@ public class StandardContentService implements ContentService {
 
         Item toItem = findItemByPath(path);
         if(toItem!=null)
-            throw new DuplicateItemNameException(path + " exists");
+            throw new DuplicateItemNameException(null, path + " exists");
         
         // handle case of copying ContentItem (need to sync on dest collection)
         if(item != null && item instanceof ContentItem) {

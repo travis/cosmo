@@ -23,19 +23,19 @@ public class DuplicateItemNameException extends ModelValidationException {
 
     /**
      */
-    public DuplicateItemNameException() {
-        super("duplicate item name");
+    public DuplicateItemNameException(Item item) {
+        super(item, "duplicate item name: " + item.getName());
     }
 
     /**
      */
-    public DuplicateItemNameException(String message) {
-        super(message);
+    public DuplicateItemNameException(Item item, String message) {
+        super(item, message);
     }
 
     /**
      */
-    public DuplicateItemNameException(String message, Throwable cause) {
-        super(message, cause);
+    public DuplicateItemNameException(Item item, String message, Throwable cause) {
+        super(item, message, cause);
     }
 }

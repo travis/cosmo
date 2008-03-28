@@ -345,18 +345,18 @@ public class MockUser extends MockAuditableObject implements User {
      */
     public void validateUsername() {
         if (username == null) {
-            throw new ModelValidationException("Username not specified");
+            throw new ModelValidationException(this,"Username not specified");
         }
         if (username.length() < USERNAME_LEN_MIN ||
             username.length() > USERNAME_LEN_MAX) {
-            throw new ModelValidationException("Username must be " +
+            throw new ModelValidationException(this,"Username must be " +
                                                USERNAME_LEN_MIN + " to " +
                                                USERNAME_LEN_MAX +
                                                " characters in length");
         }
         Matcher m = USERNAME_PATTERN.matcher(username);
         if (! m.matches()) {
-            throw new ModelValidationException("Username contains illegal " +
+            throw new ModelValidationException(this,"Username contains illegal " +
                                                "characters");
         }
     }
@@ -366,11 +366,11 @@ public class MockUser extends MockAuditableObject implements User {
      */
     public void validateRawPassword() {
         if (password == null) {
-            throw new ModelValidationException("Password not specified");
+            throw new ModelValidationException(this,"Password not specified");
         }
         if (password.length() < PASSWORD_LEN_MIN ||
             password.length() > PASSWORD_LEN_MAX) {
-            throw new ModelValidationException("Password must be " +
+            throw new ModelValidationException(this,"Password must be " +
                                                PASSWORD_LEN_MIN + " to " +
                                                PASSWORD_LEN_MAX +
                                                " characters in length");
@@ -382,11 +382,11 @@ public class MockUser extends MockAuditableObject implements User {
      */
     public void validateFirstName() {
         if (firstName == null) {
-            throw new ModelValidationException("First name is null");
+            throw new ModelValidationException(this,"First name is null");
         }
         if (firstName.length() < FIRSTNAME_LEN_MIN ||
             firstName.length() > FIRSTNAME_LEN_MAX) {
-            throw new ModelValidationException("First name must be " +
+            throw new ModelValidationException(this,"First name must be " +
                                                FIRSTNAME_LEN_MIN + " to " +
                                                FIRSTNAME_LEN_MAX +
                                                " characters in length");
@@ -398,11 +398,11 @@ public class MockUser extends MockAuditableObject implements User {
      */
     public void validateLastName() {
         if (lastName == null) {
-            throw new ModelValidationException("Last name is null");
+            throw new ModelValidationException(this,"Last name is null");
         }
         if (lastName.length() < LASTNAME_LEN_MIN ||
             lastName.length() > LASTNAME_LEN_MAX) {
-            throw new ModelValidationException("Last name must be " +
+            throw new ModelValidationException(this,"Last name must be " +
                                                LASTNAME_LEN_MIN + " to " +
                                                LASTNAME_LEN_MAX +
                                                " characters in length");
@@ -414,11 +414,11 @@ public class MockUser extends MockAuditableObject implements User {
      */
     public void validateEmail() {
         if (email == null) {
-            throw new ModelValidationException("Email is null");
+            throw new ModelValidationException(this,"Email is null");
         }
         if (email.length() < EMAIL_LEN_MIN ||
             email.length() > EMAIL_LEN_MAX) {
-            throw new ModelValidationException("Email must be " +
+            throw new ModelValidationException(this,"Email must be " +
                                                EMAIL_LEN_MIN + " to " +
                                                EMAIL_LEN_MAX +
                                                " characters in length");

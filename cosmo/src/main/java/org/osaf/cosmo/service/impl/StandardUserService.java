@@ -169,9 +169,9 @@ public class StandardUserService extends BaseService implements UserService {
             log.info("created new user:" + user.toString());
         } catch (DataIntegrityViolationException e) {
             if (userDao.getUser(user.getUsername()) != null)
-                throw new DuplicateUsernameException(user.getUsername());
+                throw new DuplicateUsernameException(user);
             if (userDao.getUserByEmail(user.getEmail()) != null)
-                throw new DuplicateEmailException(user.getEmail());
+                throw new DuplicateEmailException(user);
             throw e;
         }
 

@@ -150,7 +150,7 @@ public class MockDaoStorage {
         if(item.getParent()!=null) {
             for (Item sibling : item.getParent().getChildren()) {
                 if (sibling.getName().equals(item.getName()))
-                    throw new DuplicateItemNameException();
+                    throw new DuplicateItemNameException(item);
             }
             
             ((MockCollectionItem) item.getParent()).addChild(item);
@@ -190,7 +190,7 @@ public class MockDaoStorage {
             for (Item sibling : parentItem.getChildren()) {
                 if (sibling.getName().equals(item.getName()) &&
                     ! (sibling.getUid().equals(item.getUid())))
-                    throw new DuplicateItemNameException();
+                    throw new DuplicateItemNameException(item);
             }
         }
 

@@ -167,10 +167,10 @@ public class MockUserDao implements UserDao {
             
         ((MockUser) user).validate();
         if (usernameIdx.containsKey(user.getUsername())) {
-            throw new DuplicateUsernameException("username in use");
+            throw new DuplicateUsernameException(user);
         }
         if (emailIdx.containsKey(user.getEmail())) {
-            throw new DuplicateEmailException("email in use");
+            throw new DuplicateEmailException(user);
         }
         
         usernameIdx.put(user.getUsername(), user);
@@ -218,10 +218,10 @@ public class MockUserDao implements UserDao {
         }
         if (user.isUsernameChanged() &&
             usernameIdx.containsKey(user.getUsername())) {
-            throw new DuplicateUsernameException("username in use");
+            throw new DuplicateUsernameException(user);
         }
         if (user.isEmailChanged() && emailIdx.containsKey(user.getEmail())) {
-            throw new DuplicateEmailException("email in use");
+            throw new DuplicateEmailException(user);
         }
         usernameIdx.put(user.getUsername(), user);
         if (user.isUsernameChanged()) {

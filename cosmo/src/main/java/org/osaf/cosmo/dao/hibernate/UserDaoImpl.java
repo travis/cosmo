@@ -64,10 +64,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
                 throw new IllegalArgumentException("new user is required");
             
             if (findUserByUsernameIgnoreCase(user.getUsername()) != null)
-                throw new DuplicateUsernameException(user.getUsername());
+                throw new DuplicateUsernameException(user);
 
             if (findUserByEmailIgnoreCase(user.getEmail()) != null)
-                throw new DuplicateEmailException(user.getEmail());
+                throw new DuplicateEmailException(user);
 
             if (user.getUid() == null || "".equals(user.getUid()))
                 user.setUid(getIdGenerator().nextIdentifier().toString());
@@ -197,9 +197,9 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
             if (findUser != null) {
                 if (findUser.getEmail().equals(user.getEmail()))
-                    throw new DuplicateEmailException(user.getEmail());
+                    throw new DuplicateEmailException(user);
                 else
-                    throw new DuplicateUsernameException(user.getUsername());
+                    throw new DuplicateUsernameException(user);
             }
 
             user.updateTimestamp();

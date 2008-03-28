@@ -41,7 +41,7 @@ cosmo@osafoundation.org. Sign up at
 <http://lists.osafoundation.org/mailman/listinfo/cosmo>.
 
 
-Copyright 2005-2008 Open Source Applications Foundation
+Copyright 2005-2007 Open Source Applications Foundation
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

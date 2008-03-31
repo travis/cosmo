@@ -177,8 +177,7 @@ public class ThisAndFutureHelper {
             
             // determine if modification start date is "missing", which
             // translates to the recurrenceId being the same as the dtstart
-            boolean isDtStartMissing = event.getStartDate()
-                    .equals(recurrenceId)
+            boolean isDtStartMissing = dtStart.equals(recurrenceId)
                     && event.isAnyTime() == null;
             
             // Account for shift in startDate by calculating a new
@@ -186,17 +185,12 @@ public class ThisAndFutureHelper {
             if(delta!=0) {
                 java.util.Date newRidTime =
                     new java.util.Date(recurrenceId.getTime() + delta);
-                recurrenceId = (DateTime)
-                    Dates.getInstance(newRidTime, recurrenceId);
+                recurrenceId = Dates.getInstance(newRidTime, recurrenceId);
                 
-                // If dtStart is missing and there is a shift, we need
-                // to shift dtstart also so that dtStart will be "missing"
-                // for the new series
+                // If dtStart is missing then set it to recurrenceId
                 if(isDtStartMissing) {
-                    java.util.Date newDtStart =
-                        new java.util.Date(event.getStartDate().getTime() + delta);
                     dtStart = 
-                        Dates.getInstance(newDtStart, dtStart);
+                        Dates.getInstance(recurrenceId, dtStart);
                 }
             }
             

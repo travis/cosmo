@@ -165,7 +165,7 @@ public class ThisAndFutureHelperTest extends TestCase {
         NoteItem oldSeries = createEvent("oldmaster", cal1);
         NoteItem newSeries = createEvent("newmaster", cal2);
         
-        Date lastRecurrenceId = new Date("20070808");
+        Date lastRecurrenceId = new Date("20070813");
         
         ThisAndFutureHelper helper = new ThisAndFutureHelper();
         
@@ -175,15 +175,15 @@ public class ThisAndFutureHelperTest extends TestCase {
         EventStamp eventStamp = StampUtils.getEventStamp(oldSeries);
         Recur recur = eventStamp.getRecurrenceRules().get(0);
         
-        Assert.assertEquals(new Date("20070807"), recur.getUntil());
+        Assert.assertEquals(new Date("20070812"), recur.getUntil());
         
         Assert.assertEquals(4, results.size());
         
-        assertContains("oldmaster:20070809", results, false);
-        assertContains("oldmaster:20070810", results, false);
+        assertContains("oldmaster:20070820", results, false);
+        assertContains("oldmaster:20070827", results, false);
         
-        assertContains("newmaster:20070809", results, true);
-        assertContains("newmaster:20070810", results, true);
+        assertContains("newmaster:20070824", results, true);
+        assertContains("newmaster:20070831", results, true);
     }
     
     protected void assertContains(String uid, Collection<NoteItem> notes, boolean isActive) {

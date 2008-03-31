@@ -272,6 +272,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             entry = generator.generateEntry(item);
 
             return updated(entry, item, locator, false);
+        } catch (CosmoSecurityException e) {
+            if(e instanceof ItemSecurityException)
+                return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
+            else
+                return this.forbidden(getAbdera(), request, e.getMessage());
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);

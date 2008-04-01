@@ -74,11 +74,11 @@ public class EventApplicator extends BaseStampApplicator
             eventStamp.createCalendar();
         }
         else {
-            EventStamp masterEventStamp = ((EventExceptionStamp) eventStamp).getMasterStamp();
-           
             eventStamp = getItem().getFactory().createEventExceptionStamp(note);
             getItem().addStamp(eventStamp);
             eventStamp.createCalendar();
+            
+            EventStamp masterEventStamp = ((EventExceptionStamp) eventStamp).getMasterStamp();
             
             ModificationUid modUid = new ModificationUid(note.getUid());
             Date recurrenceId = modUid.getRecurrenceId();

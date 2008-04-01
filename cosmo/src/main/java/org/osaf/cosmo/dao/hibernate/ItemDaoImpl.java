@@ -309,8 +309,8 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
     public void removeTicket(Item item, Ticket ticket) {
         try {
             getSession().update(item);
-            getSession().refresh(item);
             item.removeTicket(ticket);
+            getSession().flush();
         } catch (HibernateException e) {
             getSession().clear();
             throw convertHibernateAccessException(e);

@@ -56,7 +56,7 @@
       
   <bean id="eventStampInterceptor"
       class="org.osaf.cosmo.model.hibernate.EventStampInterceptor"/>
-  
+      
   <bean id="cosmoHibernateInterceptor"
       class="org.osaf.cosmo.hibernate.CompoundInterceptor">
       <property name="interceptors">

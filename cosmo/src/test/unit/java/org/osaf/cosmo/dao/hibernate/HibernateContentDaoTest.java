@@ -1432,7 +1432,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         }
         
         items.clear();
-      
+        
         // now make sure master is processed before mod
         items.add(note1);
         items.add(note2);

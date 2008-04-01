@@ -47,10 +47,9 @@ public class AbstractHibernateDaoTestCase extends AbstractSpringDaoTestCase {
 
 
     protected void clearSession() {
-        session.flush();
+        //session.flush();
         session.clear();
     }
-
 
     @Override
     protected void onSetUpBeforeTransaction() throws Exception {

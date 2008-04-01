@@ -80,6 +80,7 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
         Assert.assertTrue(((AttributeTombstone) ts).getQName().equals(new HibQName("customattribute")));
         
         queryItem.addAttribute(new HibStringAttribute(new HibQName("customattribute"),"customattributevalue"));
+        contentDao.updateContent(queryItem);
         clearSession();
 
         queryItem = contentDao.findContentByUid(newItem.getUid());
@@ -158,6 +159,7 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
        
         Assert.assertNotNull(getItemTombstone(b, note1.getUid()));
         Assert.assertNotNull(getItemTombstone(b, note2.getUid()));
+        
     }
     
     public void testContentDaoStampTombstones() throws Exception {

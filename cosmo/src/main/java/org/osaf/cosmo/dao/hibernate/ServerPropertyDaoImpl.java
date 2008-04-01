@@ -68,6 +68,8 @@ public class ServerPropertyDaoImpl extends HibernateDaoSupport implements
                 prop = new HibServerProperty(property, value);
                 getSession().save(prop);
             }
+            
+            getSession().flush();
            
         } catch (HibernateException e) {
             throw SessionFactoryUtils.convertHibernateAccessException(e);

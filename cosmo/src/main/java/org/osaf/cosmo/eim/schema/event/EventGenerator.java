@@ -30,6 +30,7 @@ import org.osaf.cosmo.eim.schema.EimValueConverter;
 import org.osaf.cosmo.eim.schema.text.DurationFormat;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.EventExceptionStamp;
+import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.StampUtils;
 
@@ -95,9 +96,10 @@ public class EventGenerator extends BaseStampGenerator
             Boolean isAnyTime = stamp.isAnyTime();
             
             // Shouldn't happen, but prevent NPE if it does
-            if(isAnyTime==null)
-                isAnyTime = ((EventExceptionStamp) stamp).getMasterStamp().isAnyTime();
-            
+            if(isAnyTime==null) {
+                EventStamp masterEventStamp = ((EventExceptionStamp) stamp).getMasterStamp();
+                isAnyTime = masterEventStamp !=null ? masterEventStamp.isAnyTime() : false;
+            }
             value = EimValueConverter.fromICalDate(startDate, isAnyTime);
             record.addField(new TextField(FIELD_DTSTART, value));
         }

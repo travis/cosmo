@@ -68,6 +68,8 @@ public class ThisAndFutureHelper {
             lastRid = ((NoteOccurrence) occurrence).getOccurrenceDate();
         else {
             EventExceptionStamp ees = StampUtils.getEventExceptionStamp(occurrence);
+            if(ees==null)
+                throw new IllegalArgumentException("occurence must have an event stamp");
             lastRid = ees.getRecurrenceId();
         }
         
@@ -172,6 +174,11 @@ public class ThisAndFutureHelper {
         // recurrenceIds for the new series
         for(NoteItem mod: oldSeries.getModifications()) {
             EventExceptionStamp event = StampUtils.getEventExceptionStamp(mod);
+            
+            // only interested in mods with event stamps
+            if(event==null)
+                continue;
+            
             Date recurrenceId = event.getRecurrenceId();
             Date dtStart = event.getStartDate();
             

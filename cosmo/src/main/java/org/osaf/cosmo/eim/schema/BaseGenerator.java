@@ -160,11 +160,11 @@ public abstract class BaseGenerator implements EimSchemaConstants {
             Object value = PropertyUtils.getProperty(modification, attribute);
             return (value==null);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("error copying attribute " + attribute);
+            throw new RuntimeException("error getting attribute " + attribute);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException("error copying attribute " + attribute);
+            throw new RuntimeException("error getting attribute " + attribute);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException("error copying attribute " + attribute);
+            throw new RuntimeException("error getting attribute " + attribute);
         }
     }
     

@@ -791,6 +791,11 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     Iterator<NoteItem> mi = item.getModifications().iterator();
                     while (mi.hasNext()) {
                         NoteItem mod = mi.next();
+                       
+                        // ignore modifications without event stamp
+                        if(StampUtils.getEventExceptionStamp(mod)==null)
+                            continue;
+                        
                         mod.setIsActive(false);
                         removals.add(mod);
     

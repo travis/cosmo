@@ -409,7 +409,14 @@
         <a href="${browseUrl}">[browse]</a><a href="${removeUrl}">[remove]</a>
       </td>
       <td class="smTableData">
-        <fmt:formatDate value="${stamp.recurrenceId}" type="both"/>
+        <c:choose>
+          <c:when test='stamp != null">
+          <fmt:formatDate value="${stamp.recurrenceId}" type="both"/>
+          </c:when>
+          <c:otherwise>
+            -
+          </otherwise>
+        </c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">         
         <fmt:formatDate value="${modification.creationDate}" type="both"/>

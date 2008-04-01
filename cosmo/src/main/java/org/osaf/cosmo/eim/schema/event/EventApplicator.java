@@ -74,6 +74,8 @@ public class EventApplicator extends BaseStampApplicator
             eventStamp.createCalendar();
         }
         else {
+            EventStamp masterEventStamp = ((EventExceptionStamp) eventStamp).getMasterStamp();
+           
             eventStamp = getItem().getFactory().createEventExceptionStamp(note);
             getItem().addStamp(eventStamp);
             eventStamp.createCalendar();
@@ -86,11 +88,11 @@ public class EventApplicator extends BaseStampApplicator
             // date properties.
             if(recurrenceId instanceof DateTime) {
                 // Get master's start date
-                Date masterStart = ((EventExceptionStamp) eventStamp)
-                        .getMasterStamp().getStartDate();
+                Date masterStart = masterEventStamp != null ? masterEventStamp
+                        .getStartDate() : null;
                 
                 // Master's start date must be a DateTime also
-                if((masterStart instanceof DateTime) ) {
+                if((masterStart != null && masterStart instanceof DateTime) ) {
                     DateTime modDt = (DateTime) recurrenceId;
                     DateTime masterDt = (DateTime) masterStart;
                     

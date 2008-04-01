@@ -371,7 +371,7 @@ public class EntityConverter {
         for (NoteItem noteItem : masterNote.getModifications()) {
             EventExceptionStamp eventException =
                 StampUtils.getEventExceptionStamp(noteItem);
-            if (!exceptions.containsKey(eventException.getRecurrenceId()))
+            if (eventException==null || !exceptions.containsKey(eventException.getRecurrenceId()))
                 noteItem.setIsActive(false);
         }
     }
@@ -395,6 +395,9 @@ public class EntityConverter {
         for (NoteItem mod : masterNote.getModifications()) {
             EventExceptionStamp exceptionStamp =
                 StampUtils.getEventExceptionStamp(mod);
+            // only interested in mods with event stamp
+            if(exceptionStamp==null)
+                continue;
             if (exceptionStamp.getRecurrenceId().equals(recurrenceId))
                 return mod;
         }

@@ -116,6 +116,8 @@ public class EventStampPrototype {
         TreeMap<String, VEvent> sortedMap = new TreeMap<String, VEvent>();
         for(NoteItem exception : note.getModifications()) {
             EventExceptionStamp exceptionStamp = HibEventExceptionStamp.getStamp(exception);
+            
+            // if modification isn't stamped as an event then ignore
             if(exceptionStamp==null)
                 continue;
             

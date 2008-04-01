@@ -48,6 +48,13 @@ public class CompoundInterceptor extends EmptyInterceptor {
         
         return modified;
     }
+    
+    @Override
+    public void onDelete(Object entity, Serializable id, Object[] state,
+            String[] propertyNames, Type[] types) {
+        for(Interceptor i: interceptors)
+            i.onDelete(entity, id, state, propertyNames, types);
+    }
 
     public void setInterceptors(List<Interceptor> interceptors) {
         this.interceptors = interceptors;

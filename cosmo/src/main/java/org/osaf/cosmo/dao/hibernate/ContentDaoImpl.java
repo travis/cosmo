@@ -698,6 +698,9 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         if (content == null)
             throw new IllegalArgumentException("content cannot be null");
          
+        if(content.getIsActive()==Boolean.FALSE)
+            throw new IllegalArgumentException("content must be active");
+        
         getSession().update(content);
         
         if (content.getOwner() == null)

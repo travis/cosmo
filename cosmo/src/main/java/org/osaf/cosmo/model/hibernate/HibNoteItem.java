@@ -207,6 +207,10 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
         this.modifies = modifies;
     }
     
+    public boolean hasModifications() {
+        return hasModifications;
+    }
+    
     @Override
     public String calculateEntityTag() {
         String uid = getUid() != null ? getUid() : "-";

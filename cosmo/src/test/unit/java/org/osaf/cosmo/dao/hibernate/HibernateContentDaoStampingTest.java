@@ -175,6 +175,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         
         stamp = queryItem.getStamp(EventStamp.class);
         EventStamp es = (EventStamp) stamp;
+        queryItem.setClientModifiedDate(new Date());
         es.setEventCalendar(helper.getCalendar("cal2.ics"));
         Calendar newCal = es.getCalendar();
         

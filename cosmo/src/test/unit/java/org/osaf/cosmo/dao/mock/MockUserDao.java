@@ -287,4 +287,8 @@ public class MockUserDao implements UserDao {
         return passwordRecoveryIdx.get(key);
     }
 
+    public Set<User> findUsersByPreference(String key, String value) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
 }

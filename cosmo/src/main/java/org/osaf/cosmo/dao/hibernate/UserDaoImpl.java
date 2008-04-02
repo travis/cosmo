@@ -161,6 +161,22 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
         }
     }
 
+      
+    public Set<User> findUsersByPreference(String key, String value) {
+        try {
+            Query hibQuery = getSession().getNamedQuery("users.byPreference");
+            hibQuery.setParameter("key", key).setParameter("value", value);
+            List<User> results = hibQuery.list();
+
+            Set<User> users = new HashSet<User>();
+            users.addAll(results);
+            return users;
+        } catch (HibernateException e) {
+            getSession().clear();
+            throw convertHibernateAccessException(e);
+        }
+    }
+
     public void removeUser(String username) {
         try {
             User user = findUserByUsername(username);

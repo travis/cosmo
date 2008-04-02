@@ -84,6 +84,16 @@ public interface UserDao extends Dao {
      * exist
      */
     public User getUserByEmail(String email);
+    
+    /**
+     * Returns a set of users that contain a user preference that
+     * matches a specific key and value.
+     * @param key user preference key to match
+     * @param value user preference value to match
+     * @return set of users containing a user preference that matches
+     *         key and value
+     */
+    public Set<User> findUsersByPreference(String key, String value);
 
     /**
      * Creates a user account in the repository. Returns a new

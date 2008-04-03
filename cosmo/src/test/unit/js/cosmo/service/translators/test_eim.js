@@ -215,7 +215,7 @@ cosmotest.service.translators.test_eim = {
         '<updated>2007-05-01T21:01:59.535Z</updated><published>2007-05-01T21:01:59.535Z</published>' +
         '<link rel="self" type="application/atom+xml" href="item/' + uuid + '/full/eim-json" />' +
         '<content type="text/eim+json">' + 
-        dojo.json.serialize(content) + 
+        dojo.toJson(content) + 
         '</content>' +
         '<link rel="edit" type="application/atom+xml" href="item/' + uuid + '"/>' +
         '<link rel="parent" type="application/atom+xml" href="collection/56599b95-6676-4823-8c88-1eec17058f48/full/eim-json" />' +

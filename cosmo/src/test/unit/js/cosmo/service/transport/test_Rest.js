@@ -23,13 +23,12 @@ dojo.require("cosmo.service.transport.Rest");
 
 cosmotest.service.transport.test_Rest = {
     test_getDefaultRequest: function (){
-        dojo.require("dojo.Deferred");
         dojo.require("cosmo.util.auth");
 
         cosmo.util.auth.clearAuth();
 
         var t = new cosmo.service.transport.Rest();
-        var request = t.getDefaultRequest(new dojo.Deferred(), {});
+        var request = t.getDefaultRequest("", {});
         jum.assertEquals("default content type", "text/xml", request.contentType);
         jum.assertEquals("default sync", false, request.sync);
         jum.assertEquals("default transport", "XMLHTTPTransport", request.transport);
@@ -37,7 +36,7 @@ cosmotest.service.transport.test_Rest = {
         jum.assertEquals("default auth", undefined, headers["Authorization"])
         
         cosmo.util.auth.setCred("foo", "bar");
-        request = t.getDefaultRequest(new dojo.Deferred(), {});
+        request = t.getDefaultRequest("", {});
         headers = request.headers
         jum.assertEquals("foo:bar auth", "Basic Zm9vOmJhcg==", headers["Authorization"]);
         

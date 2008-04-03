@@ -16,7 +16,7 @@
 
 dojo.provide("cosmotest.data.test_UserStore");
 
-dojo.require("cosmotest.testutils");
+dojo.require("cosmo.testutils");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.data.UserStore");
 dojo.require("dojox.uuid.generateRandomUuid");
@@ -49,7 +49,7 @@ doh.registerGroup(
                 
 //                d.addCallback(dojo.hitch(this, this._deleteUsers));
 //                d.addCallback(this._assertCount(cosmotest.test_cmp._initUserCount));
-                return cosmotest.testutils.defcon(d);
+                return cosmo.testutils.defcon(d);
             },
             
             _assertCount: function(n){
@@ -235,7 +235,7 @@ doh.registerGroup(
                 d.addCallback(dojo.hitch(this, this._getAccount));
                 d.addCallback(dojo.hitch(this, this._modifyAccount));
                 
-                return cosmotest.testutils.defcon(d);
+                return cosmo.testutils.defcon(d);
             },
             
             _signup: function(){

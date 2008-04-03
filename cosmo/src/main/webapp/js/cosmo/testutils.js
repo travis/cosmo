@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.testutils");
+dojo.provide("cosmo.testutils");
 dojo.require("dojox.uuid.generateRandomUuid");
 
 // Object to provide compatibility with old jum framework
@@ -49,7 +49,7 @@ JUM.prototype = {
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
 
-cosmotest.testutils = {
+cosmo.testutils = {
     init: function initCosmoTests(/*Array*/ testModules){
 
         for (var i = 0; i < testModules.length; i++){
@@ -97,7 +97,7 @@ cosmotest.testutils = {
     },
 
     createTestAccount: function(){
-        return cosmotest.testutils.createUser(
+        return cosmo.testutils.createUser(
             dojox.uuid.generateRandomUuid().slice(0, 8)
         );
     },

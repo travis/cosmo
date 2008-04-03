@@ -16,7 +16,7 @@
 
 dojo.provide("cosmotest.service.conduits.test_conduits");
 
-dojo.require("cosmotest.testutils");
+dojo.require("cosmo.testutils");
 dojo.require("cosmo.service.conduits.common");
 dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.auth");
@@ -24,7 +24,7 @@ dojo.require("cosmo.util.auth");
 cosmotest.service.conduits.test_conduits = {
     test_Note: function(){
         try{
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             // number of starting items;
             var startingItems = 3;
             // test getCollections
@@ -171,13 +171,13 @@ cosmotest.service.conduits.test_conduits = {
             });
         }
         finally{
-            cosmotest.testutils.cleanupUser(user);            
+            cosmo.testutils.cleanupUser(user);            
         }
     },
     
     test_Event: function(){
         try {
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             var collections = conduit.getCollections({sync: true}).results[0];
@@ -332,13 +332,13 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertTrue("Removing stamp didn't work", !masterItem.getStamp('event'));
 
         } finally {
-           cosmotest.testutils.cleanupUser(user);            
+           cosmo.testutils.cleanupUser(user);            
         }
     },
     
     test_ThisAndFutureCal: function(){
         try {
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             var collections = conduit.getCollections({sync: true}).results[0];
@@ -399,13 +399,13 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertEquals("wrong number of old item occurrences", 3, item0Occurrences.length);
 
         } finally {
-           cosmotest.testutils.cleanupUser(user);            
+           cosmo.testutils.cleanupUser(user);            
         }
     },
 
     test_ThisAndFutureDash: function(){
         try {
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             var collections = conduit.getCollections({sync: true}).results[0];
@@ -450,13 +450,13 @@ cosmotest.service.conduits.test_conduits = {
             conduit.getDashboardItems(newMaster);
 
         } finally {
-           cosmotest.testutils.cleanupUser(user);            
+           cosmo.testutils.cleanupUser(user);            
         }
     },
     
     test_Mail: function(){
         try {
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             var collections = conduit.getCollections({sync: true}).results[0];
@@ -509,13 +509,13 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertEquals("references doesn't match", references, mStamp.getReferences());
     
         } finally {
-           cosmotest.testutils.cleanupUser(user);            
+           cosmo.testutils.cleanupUser(user);            
         }
     },
     
     test_Preferences: function(){
         try {
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             
@@ -542,13 +542,13 @@ cosmotest.service.conduits.test_conduits = {
             
     
         } finally {
-           cosmotest.testutils.cleanupUser(user);            
+           cosmo.testutils.cleanupUser(user);            
         }
     },
     
     test_Collections: function(){
         try {
-            var user = cosmotest.testutils.createTestAccount();
+            var user = cosmo.testutils.createTestAccount();
             
             var conduit = cosmo.service.conduits.getAtomPlusEimConduit();
             
@@ -561,7 +561,7 @@ cosmotest.service.conduits.test_conduits = {
             jum.assertEquals("collection name didn't save", "foobar", c0.getDisplayName())
     
         } finally {
-           cosmotest.testutils.cleanupUser(user);            
+           cosmo.testutils.cleanupUser(user);            
         }
     }
 };

@@ -16,7 +16,7 @@
 
 dojo.provide("cosmotest.test_unicode");
 
-dojo.require("cosmotest.testutils");
+dojo.require("cosmo.testutils");
 dojo.require("cosmo.service.conduits.common");
 
 function createUsername(i){
@@ -40,7 +40,7 @@ cosmotest.test_unicode = {
             var un = createUsername(i);
             try{
                 try{
-                    user = cosmotest.testutils.createUser(un, i + "fooz@example.com");
+                    user = cosmo.testutils.createUser(un, i + "fooz@example.com");
                 } catch (e){
                     dojo.debug(i.toString(16))
                 }
@@ -49,7 +49,7 @@ cosmotest.test_unicode = {
                 
                 jum.assertTrue("collections length", collections.length > 0);
             } finally {
-                cosmotest.testutils.cleanupUser({username: un});
+                cosmo.testutils.cleanupUser({username: un});
             }
         }
     }

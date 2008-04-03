@@ -15,7 +15,7 @@
                   dojo.require("cosmo.env");
                   cosmo.env.setBaseUrl(baseUrl);
                   dojo.require("cosmo.util.debug");
-                  dojo.require("cosmotest.testutils");
+                  dojo.require("cosmo.testutils");
                   dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
                   var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(dojo.moduleUrl("dojo", "../../../lib/olson-tzdata/"));
                   cosmo.datetime.timezone.setTimezoneRegistry(registry);
@@ -24,7 +24,7 @@
                  <script type="text/javascript">
                         dojo.require("doh.runner");
                         dojo.addOnLoad(function(){
-                        cosmotest.testutils.init(
+                        cosmo.testutils.init(
                         [
                         "cosmotest.test_unicode",
                         "cosmotest.service.conduits.test_conduits",

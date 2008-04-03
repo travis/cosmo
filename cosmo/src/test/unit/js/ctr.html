@@ -10,7 +10,7 @@
                   dojo.registerModulePath("cosmo", "../../../cosmo");
                   dojo.registerModulePath("cosmotest", "../../../../../../test/unit/js/cosmo");
                   dojo.require("cosmo.util.debug");
-                  dojo.require("cosmotest.testutils");
+                  dojo.require("cosmo.testutils");
                   dojo.require("cosmo.env");
                   cosmo.env.setBaseUrl("../../../main/webapp/");
                 </script>
@@ -18,8 +18,8 @@
                  <script type="text/javascript">
                         dojo.require("doh.runner");
                         dojo.addOnLoad(function(){
-                        cosmotest.testutils.init(
-                        [/*"cosmotest.model.test_delta",
+                        cosmo.testutils.init(
+                        ["cosmotest.model.test_delta",
                         "cosmotest.model.test_model",
                         "cosmotest.model.test_modelTriage",
                         "cosmotest.model.test_common",
@@ -36,7 +36,7 @@
                         "cosmotest.util.test_i18n",
                         "cosmotest.cmp.test_cmp",
                         "cosmotest.account.test_preferences",
-                        "cosmotest.util.encoding.test_base64"*/
+                        "cosmotest.util.encoding.test_base64",
                         "cosmotest.model.test_delta",
                         "cosmotest.model.test_eventStamp",
                         "cosmotest.model.test_model",

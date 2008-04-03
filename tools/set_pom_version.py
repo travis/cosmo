@@ -23,20 +23,26 @@ def add_base(path):
 
 def usage():
     print """Usage:
-    %s -v cosmo_version -d dojo_version [-b base_directory]
-""" % sys.argv[0]
+    Print current version numbers:
+        %s -n 
+    Change version numbers:
+        %s -v cosmo_version -d dojo_version [-b base_directory]
+""" % (sys.argv[0], sys.argv[0])
 
 def get_new_versions():
     version = None
     dojo_version = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "v:d:b:")
+        opts, args = getopt.getopt(sys.argv[1:], "v:d:b:n")
     except getopt.GetoptError:
         # print help information and exit:
         usage()
         sys.exit(2)
         
     for o,a in opts:
+        if o == "-n":
+            print "Cosmo version:%s\n Dojo version:%s" % get_old_versions()
+            sys.exit(0)
         if o == "-v":
             version = a
         if o == "-d":

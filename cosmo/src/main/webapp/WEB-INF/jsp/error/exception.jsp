@@ -22,8 +22,10 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:standardLayout prefix="Error.Exception." showNav="false">
+<div id="contentWrapper">  
 <p>
   <fmt:message key="Error.Exception.ErrorOccurred"/>
 </p>
 <cosmo:stacktrace exception="${Exception}"/>
+</div>
 </cosmo:standardLayout>

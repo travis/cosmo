@@ -23,7 +23,7 @@
 <fmt:setBundle basename="PimMessageResources"/>
 <cosmo:standardLayout prefix="Account.Activate." showNav="false" stylesheets="activation">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
-
+<div id="contentWrapper">
 <span id="congratulations"><fmt:message key="Account.Activate.Congrats"/></span>
 <span id="activatedMessage"><fmt:message key="Account.Activate.ActivatedMessage"/></span>
 <table id="user">
@@ -38,5 +38,5 @@
 <hr class="seperator"/>
 
 <span class="publishInstructions"><fmt:message key="Help.PublishInstructions"/></span>
-
+</div>
 </cosmo:standardLayout>

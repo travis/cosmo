@@ -26,9 +26,11 @@
 </c:if>
 
 <cosmo:standardLayout prefix="Error.General." showNav="${showNav}">
+<div id="contentWrapper">  
 <c:forEach var="message" items="${messages}">
 <p>
   <fmt:message key="${message}"/>
 </p>
 </c:forEach>
+</div>
 </cosmo:standardLayout>

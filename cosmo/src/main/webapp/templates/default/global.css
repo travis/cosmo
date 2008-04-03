@@ -690,3 +690,8 @@ position: absolute;
     top: 30%;
     padding: 0.1em;
 }
+
+#contentWrapper {
+    width: 100%; 
+    text-align: center;
+}

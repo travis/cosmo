@@ -23,10 +23,12 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:standardLayout prefix="Error.NotFound." showNav="false">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
+<div id="contentWrapper">  
 <p>
   <fmt:message key="Error.Activated.AlreadyActivated"/>
 </p>
 <p>
 <a id="login" href="${staticBaseUrl}/login"><fmt:message key="Error.Activated.Login"/></a>
 </p>
+</div>
 </cosmo:standardLayout>

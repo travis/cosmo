@@ -30,6 +30,7 @@ import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
 import org.osaf.cosmo.dav.impl.DavAvailability;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
+import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavFile;
@@ -125,7 +126,19 @@ public class StandardResourceFactory
                 return new DavEvent(locator, this, entityFactory);
             return new DavFile(locator, this, entityFactory);
         }
-
+        
+        // handle OPTIONS for non-existent resource
+        if(request.getMethod().equals("OPTIONS")) { 
+            // ensure parent exists first
+            DavResource parent = resolve(locator.getParentLocator());
+            if(parent!=null && parent.exists()) {
+                if(parent instanceof DavCalendarCollection)
+                    return new DavEvent(locator, this, entityFactory);
+                else
+                    return new DavCollectionBase(locator, this, entityFactory);
+            }
+        }
+    
         throw new NotFoundException();
     }
 

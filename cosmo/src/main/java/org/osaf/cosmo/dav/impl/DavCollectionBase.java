@@ -117,7 +117,11 @@ public class DavCollectionBase extends DavItemResourceBase
     // Jackrabbit DavResource
 
     public String getSupportedMethods() {
-        return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH, COPY, DELETE, MOVE, MKTICKET, DELTICKET, MKCOL, MKCALENDAR, REPORT";
+        // If resource doesn't exist, then options are limited
+        if(!exists())
+            return "OPTIONS, TRACE, PUT, MKCOL, MKCALENDAR";
+        else
+            return "OPTIONS, GET, HEAD, PROPFIND, PROPPATCH, TRACE, COPY, DELETE, MOVE, MKTICKET, DELTICKET, REPORT";
     }
 
     public boolean isCollection() {

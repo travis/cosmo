@@ -84,7 +84,10 @@ public abstract class DavCalendarResource extends DavContentBase
     // DavResource methods
 
     public String getSupportedMethods() {
-        return "OPTIONS, GET, HEAD, POST, TRACE, PROPFIND, PROPPATCH, COPY, PUT, DELETE, MOVE, MKTICKET, DELTICKET, REPORT";
+        if(exists())
+            return "OPTIONS, GET, HEAD, TRACE, PROPFIND, PROPPATCH, COPY, PUT, DELETE, MOVE, MKTICKET, DELTICKET, REPORT";
+        else
+            return "OPTIONS, TRACE, PUT, MKCOL";
     }
 
     /** */

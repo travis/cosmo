@@ -16,10 +16,8 @@
 package org.osaf.cosmo.dav.impl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Date;
-import java.util.HashSet;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -27,12 +25,9 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.abdera.util.EntityTag;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
@@ -40,8 +35,6 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
-
-import org.osaf.cosmo.dav.BadGatewayException;
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavRequest;
@@ -53,14 +46,11 @@ import org.osaf.cosmo.dav.acl.AclConstants;
 import org.osaf.cosmo.dav.acl.DavPrivilege;
 import org.osaf.cosmo.dav.acl.DavPrivilegeSet;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
-import org.osaf.cosmo.dav.caldav.InvalidCalendarDataException;
-import org.osaf.cosmo.dav.caldav.property.SupportedCalendarComponentSet;
 import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.util.BufferedServletInputStream;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

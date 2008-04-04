@@ -1,7 +1,7 @@
 #!/bin/bash
 DOJO_VERSION="release-1.0.2"
 if [ ! -d "$DOJO_VERSION" ]; then
-    svn co http://svn.dojotoolkit.org/dojo/tags/$DOJO_VERSION
+    svn co http://svn.dojotoolkit.org/tags/$DOJO_VERSION
     patch -p0 -d release-1.0.2 < dojo.patch 
 fi
 

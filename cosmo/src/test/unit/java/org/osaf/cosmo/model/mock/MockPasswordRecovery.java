@@ -20,7 +20,6 @@ import java.util.Date;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 
@@ -30,7 +29,7 @@ import org.osaf.cosmo.model.User;
  * There should be a single password change request corresponding
  * to each password recovery request in the system. 
  */
-public class MockPasswordRecovery extends BaseModelObject implements PasswordRecovery {
+public class MockPasswordRecovery implements PasswordRecovery {
 
     private static final long serialVersionUID = 854107654491442548L;
 

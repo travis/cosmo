@@ -21,7 +21,6 @@ import java.io.InputStream;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.osaf.cosmo.io.BufferedContent;
-import org.osaf.cosmo.model.BaseModelObject;
 
 
 
@@ -30,7 +29,7 @@ import org.osaf.cosmo.model.BaseModelObject;
  * as a BufferedContent, either in memory (small content) or
  * on disk (large content).
  */
-public class MockContentData extends BaseModelObject {
+public class MockContentData {
 
     /**
      * 

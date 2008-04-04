@@ -24,7 +24,6 @@ import javax.persistence.MappedSuperclass;
 import org.apache.commons.codec.binary.Base64;
 import org.hibernate.annotations.Type;
 import org.osaf.cosmo.model.AuditableObject;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.EntityFactory;
 
 /**

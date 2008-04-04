@@ -26,7 +26,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.hibernate.annotations.Type;
 import org.osaf.cosmo.io.BufferedContent;
-import org.osaf.cosmo.model.BaseModelObject;
 
 
 

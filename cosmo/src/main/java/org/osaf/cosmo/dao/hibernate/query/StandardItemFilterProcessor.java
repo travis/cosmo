@@ -37,6 +37,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrenceUtil;
 import org.osaf.cosmo.model.filter.AttributeFilter;
+import org.osaf.cosmo.model.filter.BetweenExpression;
 import org.osaf.cosmo.model.filter.ContentItemFilter;
 import org.osaf.cosmo.model.filter.EqualsExpression;
 import org.osaf.cosmo.model.filter.EventStampFilter;
@@ -269,6 +270,15 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
             formatExpression(whereBuf, params, alias + ".value", filter.getBody());
         }
         
+        // filter by reminderTime
+        if(filter.getReminderTime()!=null) {
+            String alias = "tsa" + params.size();
+            selectBuf.append(", HibTimestampAttribute " + alias);
+            appendWhere(whereBuf, alias + ".item=i and " + alias +".qname=:" + alias + "qname");
+            params.put(alias + "qname", HibNoteItem.ATTR_REMINDER_TIME);
+            formatExpression(whereBuf, params, alias + ".value", filter.getReminderTime());
+        }
+        
         //filter by master NoteItem
         if(filter.getMasterNoteItem()!=null) {
             appendWhere(whereBuf, "(i=:masterItem or i.modifies=:masterItem)");
@@ -446,7 +456,20 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
                 expBuf.append(" is not null");
             else
                 expBuf.append(" is null");
-        } else {
+        } else if (exp instanceof BetweenExpression) {
+            BetweenExpression be = (BetweenExpression) exp;
+            expBuf.append(propName);
+            if(exp.isNegated())
+                expBuf.append(" not");
+            
+            String param = "param" + params.size();
+            expBuf.append(" between :" + param );
+            params.put(param, be.getValue1());
+            param = "param" + params.size();
+            expBuf.append(" and :" + param);
+            params.put(param, be.getValue2());
+        } 
+        else {
             String param = "param" + params.size();
             if (exp instanceof EqualsExpression) {
                 expBuf.append(propName);
@@ -473,7 +496,7 @@ public class StandardItemFilterProcessor implements ItemFilterProcessor {
                     expBuf.append(" like ");
 
                 params.put(param, formatForLike(exp.getValue().toString().toLowerCase()));
-            }
+            } 
 
             expBuf.append(":" + param);
         }

@@ -31,7 +31,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Type;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Tombstone;
 

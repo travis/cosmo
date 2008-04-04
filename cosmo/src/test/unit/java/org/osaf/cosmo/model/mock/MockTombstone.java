@@ -19,7 +19,6 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Tombstone;
 
@@ -27,7 +26,7 @@ import org.osaf.cosmo.model.Tombstone;
  * When an Item is removed from a collection, a tombstone is attached
  * to the collection to track when this removal ocurred.
  */
-public abstract class MockTombstone extends BaseModelObject implements Tombstone {
+public abstract class MockTombstone implements Tombstone {
     
    
     private Date timestamp = null;

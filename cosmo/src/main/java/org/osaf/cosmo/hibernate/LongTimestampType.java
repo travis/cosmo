@@ -22,6 +22,7 @@ import java.sql.Types;
 import java.util.Date;
 
 import org.hibernate.HibernateException;
+import org.hibernate.dialect.Dialect;
 import org.hibernate.type.TimestampType;
 
 /**
@@ -33,6 +34,12 @@ import org.hibernate.type.TimestampType;
 public class LongTimestampType extends TimestampType {
 
    
+    @Override
+    public String objectToSQLString(Object value, Dialect dialect)
+            throws Exception {
+        return "" + ((Date) value).getTime();
+    }
+
     @Override
     public Object get(ResultSet rs, String index) throws HibernateException, SQLException {
         return new Date(rs.getLong(index));

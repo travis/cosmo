@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.hibernate;
 
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
@@ -88,6 +89,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         note.setBody("find me");
         note.setIcalUid("find me");
         note.setDisplayName("find me");
+        note.setReminderTime(new Date(123456789));
         note.getTriageStatus().setCode(TriageStatus.CODE_DONE);
         
         note = (NoteItem) contentDao.createContent(calendar1, note);
@@ -183,6 +185,16 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
         filter.setMaxResults(5);
         results = contentDao.findItems(filter);
         Assert.assertEquals(5, results.size());
+        
+        // find notes by reminderTime
+        filter = new NoteItemFilter();
+        filter.setReminderTime(Restrictions.between(new Date(12345678),new Date(1234567890)));
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(1, results.size());
+        
+        filter.setReminderTime(Restrictions.between(new Date(1000),new Date(2000)));
+        results = contentDao.findItems(filter);
+        Assert.assertEquals(0, results.size());
     }
     
     public void testFilterByParent() throws Exception {

@@ -21,7 +21,6 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Index;
 import org.hibernate.validator.NotNull;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.ServerProperty;
 
 /**

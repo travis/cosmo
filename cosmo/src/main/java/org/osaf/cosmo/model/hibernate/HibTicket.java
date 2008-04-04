@@ -35,7 +35,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Index;
 import org.hibernate.validator.NotNull;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;

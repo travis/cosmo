@@ -15,13 +15,12 @@
  */
 package org.osaf.cosmo.model.mock;
 
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.ServerProperty;
 
 /**
  * Represents a Cosmo Server Property
  */
-public class MockServerProperty extends BaseModelObject implements
+public class MockServerProperty implements
         java.io.Serializable, ServerProperty {
 
     /**

@@ -15,6 +15,8 @@
  */
 package org.osaf.cosmo.dao.hibernate.query;
 
+import java.util.Date;
+
 import junit.framework.Assert;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
@@ -160,6 +162,14 @@ public class StandardItemFilterProcessorTest extends AbstractHibernateDaoTestCas
         filter.setMasterNoteItem(new HibNoteItem());
         query =  queryBuilder.buildQuery(session, filter);
         Assert.assertEquals("select i from HibNoteItem i where (i=:masterItem or i.modifies=:masterItem)", query.getQueryString());
+    
+        filter = new NoteItemFilter();
+        Date date1 = new Date(1000);
+        Date date2 = new Date(2000);
+        filter.setReminderTime(Restrictions.between(date1,date2));
+        query =  queryBuilder.buildQuery(session, filter);
+        Assert.assertEquals("select i from HibNoteItem i, HibTimestampAttribute tsa0 where tsa0.item=i and tsa0.qname=:tsa0qname and tsa0.value between :param1 and :param2", query.getQueryString());
+    
     }
     
     public void testEventStampQuery() throws Exception {

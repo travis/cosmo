@@ -24,6 +24,7 @@ import org.osaf.cosmo.model.NoteItem;
 public class NoteItemFilter extends ContentItemFilter {
     private FilterCriteria icalUid = null;
     private FilterCriteria body = null;
+    private FilterCriteria reminderTime = null;
     
     private Boolean hasModifications = null;
     private Boolean isModification = null;
@@ -92,5 +93,17 @@ public class NoteItemFilter extends ContentItemFilter {
      */
     public void setMasterNoteItem(NoteItem masterNoteItem) {
         this.masterNoteItem = masterNoteItem;
+    }
+
+    public FilterCriteria getReminderTime() {
+        return reminderTime;
+    }
+
+    /**
+     * Matches notes with reminderTime matching the specified criteria.
+     * @param reminderTime
+     */
+    public void setReminderTime(FilterCriteria reminderTime) {
+        this.reminderTime = reminderTime;
     }
 }

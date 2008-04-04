@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;
@@ -39,7 +38,7 @@ import org.osaf.cosmo.model.User;
  * Similarly, the class does not know how to convert itself to or from
  * XML.
  */
-public class MockTicket extends BaseModelObject implements Comparable<Ticket>, Ticket {
+public class MockTicket implements Comparable<Ticket>, Ticket {
 
     /**
      * 

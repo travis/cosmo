@@ -30,7 +30,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
-import org.osaf.cosmo.model.BaseModelObject;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 

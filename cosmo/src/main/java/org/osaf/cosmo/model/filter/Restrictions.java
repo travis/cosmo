@@ -24,6 +24,10 @@ public class Restrictions {
         return new EqualsExpression(value);
     }
     
+    public static FilterCriteria between(Object value1, Object value2) {
+        return new BetweenExpression(value1, value2);
+    }
+    
     public static FilterCriteria neq(Object value) {
         EqualsExpression exp = new EqualsExpression(value);
         exp.setNegated(true);

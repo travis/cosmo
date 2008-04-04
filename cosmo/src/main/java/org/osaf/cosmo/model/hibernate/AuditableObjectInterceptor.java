@@ -36,13 +36,13 @@ public class AuditableObjectInterceptor extends EmptyInterceptor {
         // Set new modifyDate so that calculateEntityTag()
         // has access to it
         HibAuditableObject ao = (HibAuditableObject) object;
-        Date curDate = new Date();
+        Date curDate = new Date(System.currentTimeMillis());
         ao.setModifiedDate(curDate);
         
         // update modifiedDate and entityTag
         for ( int i=0; i < propertyNames.length; i++ ) {
             if ( "modifiedDate".equals( propertyNames[i] ) ) {
-                currentState[i] = new Date(System.currentTimeMillis());
+                currentState[i] = curDate;
             } else if("etag".equals( propertyNames[i] )) {
                 currentState[i] = ao.calculateEntityTag();
             }
@@ -59,7 +59,7 @@ public class AuditableObjectInterceptor extends EmptyInterceptor {
         // Set new modifyDate so that calculateEntityTag()
         // has access to it
         HibAuditableObject ao = (HibAuditableObject) object;
-        Date curDate = new Date();
+        Date curDate = new Date(System.currentTimeMillis());
         ao.setModifiedDate(curDate);
         
         // initialize modifiedDate, creationDate and entityTag

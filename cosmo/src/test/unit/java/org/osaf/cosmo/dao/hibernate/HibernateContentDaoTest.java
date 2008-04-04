@@ -534,13 +534,20 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         queryItem = (FileItem) contentDao.updateContent(queryItem);
 
         clearSession();
-
+        Thread.sleep(200);
         ContentItem queryItem2 = contentDao.findContentByUid(newItem.getUid());
         Assert.assertTrue(queryItem2.getVersion().intValue() > 0);
         
         // debug info for instances where this fails
-        System.out.println("MODIFIED1 = " + queryItem.getModifiedDate().getTime());
-        System.out.println("MODIFIED2 = " + queryItem2.getModifiedDate().getTime());
+        if(!queryItem.getModifiedDate().equals(queryItem2.getModifiedDate())) {
+        	System.out.println("MODIFIED1 = " + queryItem.getModifiedDate().getTime());
+        	System.out.println("MODIFIED2 = " + queryItem2.getModifiedDate().getTime());
+        	
+        	Object result = session.createSQLQuery("select i.modifydate from item i where i.uid=:uid").setParameter("uid", queryItem.getUid()).uniqueResult();
+        	System.out.println("FROMDB = " + result);
+        }
+        
+        
         
         helper.verifyItem(queryItem, queryItem2);
 

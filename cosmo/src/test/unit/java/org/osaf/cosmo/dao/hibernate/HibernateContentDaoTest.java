@@ -531,7 +531,10 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         // Make sure modified date changes
         Thread.sleep(1000);
+        
+        System.out.println("MODIFIED BEFORE = " + queryItem.getModifiedDate().getTime());
         queryItem = (FileItem) contentDao.updateContent(queryItem);
+        System.out.println("MODIFIED AFTER = " + queryItem.getModifiedDate().getTime());
 
         clearSession();
         Thread.sleep(200);

@@ -537,6 +537,11 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem queryItem2 = contentDao.findContentByUid(newItem.getUid());
         Assert.assertTrue(queryItem2.getVersion().intValue() > 0);
+        
+        // debug info for instances where this fails
+        System.out.println("MODIFIED1 = " + queryItem.getModifiedDate().getTime());
+        System.out.println("MODIFIED2 = " + queryItem2.getModifiedDate().getTime());
+        
         helper.verifyItem(queryItem, queryItem2);
 
         Assert.assertTrue(newItemModifyDate.before(

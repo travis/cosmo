@@ -18,33 +18,6 @@ dojo.provide("cosmotest.ui.widget.SharingDialog");
 
 // cosmo/src/test/unit/js/ui-tester.html?widget=cosmo.ui.widget.SharingDialog&extraContextModule=cosmotest.ui.widget.SharingDialog&extraContext=cosmotest.ui.widget.SharingDialog.initContext
 
-dojo.require("cosmo.model.Item");
-dojo.require("dojo.data.ItemFileWriteStore");
-dojo.require("dojox.data.dom");
-var baseUri = "http://localhost";
-var collectionJson = {items: [
-    {
-        uid: "item0",
-        displayName: "Test collection",
-        urls: new function(){
-            this.atom = (new dojo._Url(baseUri, "collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-            this.mc =  (new dojo._Url(baseUri, "http://localhost:8080/chandler/mc/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-            this.dav = (new dojo._Url(baseUri, "http://localhost:8080/chandler/dav/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-            this.webcal = (new dojo._Url(baseUri,"http://localhost:8080/chandler/webcal/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-            this.html = (new dojo._Url(baseUri,"http://localhost:8080/chandler/pim/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-        }
-    }
-],
-                      identifier: "uid"};
-var collectionStore = new dojo.data.ItemFileWriteStore({
-    data: collectionJson
-});
-var collection;
-collectionStore.fetchItemByIdentity(
-    {identity: "item0",
-     onItem: function(item){collection = item},
-     onError: function(e){console.log(e)}
-    })
 cosmotest.ui.widget.SharingDialog = {
     initContext: {
         store: collectionStore,
@@ -71,5 +44,5 @@ cosmotest.ui.widget.SharingDialog = {
                 '  <link rel="alternate" type="text/html" href="http://localhost:8080/chandler/pim/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0" />' +
                 '  <cosmo:ticket cosmo:type="read-only">jyc09uq9e0</cosmo:ticket>' +
                 '</feed>')
- 
+
 */

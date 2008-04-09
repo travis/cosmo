@@ -34,10 +34,10 @@ dojo.require("cosmo.util.html");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     COSMO_NS: "http://osafoundation.org/cosmo/Atom",
-    
+
     constructor: function (urlCache){
         this.urlCache = urlCache;
-        
+
         with (this.rruleConstants) {
         with (cosmo.model.RRULE_FREQUENCIES){
             this.rruleFrequenciesToRruleConstants = {};
@@ -48,19 +48,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             this.rruleFrequenciesToRruleConstants[FREQUENCY_YEARLY] = YEARLY;
         }}
     },
-    
+
     getDateFormatString: dojo.hitch(cosmo.service, cosmo.service.getDateFormatString),
-    
+
     // a hash from link rels to useful url names
     urlNameHash: {
         "edit": "atom-edit",
-        "self": "self", 
-        "alternate": "pim", 
-        "morse code": "mc", 
+        "self": "self",
+        "alternate": "pim",
+        "morse code": "mc",
         "dav": "dav",
         "webcal": "webcal"
     },
-    
+
     getUrls: function (xml){
             var urls = {};
             var links = cosmo.util.html.getElementsByTagName(xml, "link");
@@ -70,22 +70,22 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 var href = link.getAttribute("href");
                 urls[this.urlNameHash[rel] || rel] = href;
             }
-            
+
             // Handle regular atom feed url differently.
             // This seems like kind of an ugly way to do this, but it works for now.
             if (urls['atom-edit']){
-                var url = 
-                   location.protocol + "//" + location.host + 
-                   cosmo.env.getBaseUrl() + "/atom/" + urls['atom-edit'] 
+                var url =
+                   location.protocol + "//" + location.host +
+                    cosmo.env.getBaseUrl() + "/atom/" + urls['atom-edit'] ;
                 var urlParts = url.split("?");
                 urlParts[0] = urlParts[0] + "/basic";
                 url = urlParts.join("?");
                 urls.atom = url;
             }
-            
+
             return urls;
     },
-    
+
     RID_FMT: "%Y%m%dT%H%M%S",
 
     translateGetCollection: function (atomXml, oldCollection){
@@ -94,10 +94,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var collection = oldCollection || new cosmo.model.Collection();
         collection.setUid(uid);
         collection.setDisplayName(displayName);
-        var urls = this.getUrls(atomXml)
+        var urls = this.getUrls(atomXml);
         collection.setUrls(urls);
         this.urlCache.setUrls(collection, urls);
-        
+
         var selfUrl = collection.getUrls()['self'];
         if (!selfUrl.match(/.*ticket=.*/)) collection.setWriteable(true);
         else {
@@ -107,7 +107,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 if (permission == "read-write") collection.setWriteable(true);
             }
         }
-        
+
         return collection;
     },
 
@@ -118,19 +118,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return ticketEl.getAttribute("cosmo:type");
         }
     },
-          
+
     translateGetCollections: function (atomXml, kwArgs){
         kwArgs = kwArgs || {};
         var workspaces = atomXml.getElementsByTagName("workspace");
         var collections = [];
         for (var i = 0; i < workspaces.length; i++){
             var workspace = workspaces[i];
-            
+
             var title = cosmo.util.html.getElementsByTagName(workspace, "atom", "title")[0];
 
             if (title.firstChild.nodeValue == "home"){
                 var collectionElements = workspace.getElementsByTagName("collection");
-                
+
                 for (var j = 0; j < collectionElements.length; j++){
                     var collection = this.collectionXmlToCollection(collectionElements[j]);
                     collection.href = collectionElements[j].getAttribute("href");
@@ -140,7 +140,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         return collections;
     },
-    
+
     translateGetSubscriptions: function (atomXml, kwArgs){
         // TODO: redo this with query api
         kwArgs = kwArgs || {};
@@ -167,7 +167,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 uid: uid
             });
             collection.href = "collection/" + uid + "?ticket=" + ticket;
-            
+
             var subscription = new cosmo.model.Subscription({
                 displayName: displayName,
                 ticketKey: ticket,
@@ -183,7 +183,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         return subscriptions;
     },
-    
+
     translateGetPreferences: function(atomXml, kwArgs){
         kwArgs = kwArgs || {};
         var entries = atomXml.getElementsByTagName("entry");
@@ -207,13 +207,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return preference[1];
 
     },
-    
+
     // this is really weird, but ie7 appears to be having trouble with getAttribute
     // TODO: examine problem further
     getPreferenceDiv: function(xml){
         return this.getChildrenByClassName(xml, "preference", "div")[0];
     },
-    
+
     getChildrenByClassName: function (xml, className, tagName){
         var nodes = xml.childNodes;
         var returnNodes = [];
@@ -227,18 +227,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         return returnNodes;
     },
-    
+
     preferenceXmlToPreference: function(xml){
         var keyEl = this.getChildrenByClassName(xml, "key")[0];
         var key = keyEl.firstChild.nodeValue;
         var valueEl = this.getChildrenByClassName(xml, "value")[0];
         var value = valueEl.firstChild.nodeValue;
-        
+
         // A little type converting
         if (value == "false") value = false;
         return [key,value];
     },
-    
+
     collectionXmlToCollection: function (collectionXml){
         return collection = new cosmo.model.Collection(
             {
@@ -247,7 +247,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }
         );
     },
-    
+
     translateExpandRecurringItem: function(atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
@@ -260,7 +260,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                ParseError("Could not find content element for entry " + (i+1));
         }
         var content = cosmo.util.html.getElementTextContent(contentEl);
-        
+
         var recordSets = dojo.fromJson(content);
 
         var masterItem = this.recordSetToObject(recordSets[0]);
@@ -276,32 +276,32 @@ dojo.declare("cosmo.service.translators.Eim", null, {
            if (item.hasModification()){
               item.setUrls({"atom-edit": "item/" + this.getUid(item)});
            }
-           items.push(item); 
+           items.push(item);
         }
         return items;
     },
-    
+
     translateGetItem: function(atomXml, kwArgs){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
-        
+
         var entry = atomXml.getElementsByTagName("entry")[0];
         return this.entryToItem(entry, null, kwArgs);
-          
+
     },
-    
+
     translateSaveCreateItem: function(atomXml, kwArgs){
         kwArgs = kwArgs || {};
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
-        
+
         var entry = atomXml.getElementsByTagName("entry")[0];
         return this.entryToItem(entry, kwArgs.masterItem, kwArgs);
-          
+
     },
-    
+
     translateGetItems: function (atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
@@ -309,14 +309,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var entries = atomXml.getElementsByTagName("entry");
         return this.entriesToItems(entries);
     },
-    
+
     translateGetDashboardItems: function (atomXml){
         if (!atomXml){
             throw new cosmo.service.translators.ParseError("Cannot parse null, undefined, or false");
         }
         return atomXml.getElementsByTagName("entry");
     },
-    
+
     entriesToItems: function(entries){
         var items = {};
         var mods = {};
@@ -330,15 +330,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 mods[uuid] = entry;
             }
         }
-        
+
         // Remove the master events at the end, cause they're returned as occurrences
         var masterRemoveList = {};
 
         for (var uuid in mods){
             var masterUuid = uuid.split(":")[0];
             var masterItem = items[uuid.split(":")[0]];
-            
-            // Per Jeffrey's suggestion, fail silently here, logging 
+
+            // Per Jeffrey's suggestion, fail silently here, logging
             // an error message to the debug console.
             if (!masterItem) console.debug(
               "Could not find master event for modification " +
@@ -350,7 +350,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         for (var uuid in masterRemoveList){
             delete items[uuid];
         }
-        
+
         var itemArray = [];
         for (var uid in items){
             itemArray.push(items[uid]);
@@ -375,7 +375,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             // If we have a second part to the uid, this entry is a
             // recurrence modification.
             if (masterItem){
-                item = this.recordSetToModification(dojo.fromJson(content), masterItem, kwArgs); 
+                item = this.recordSetToModification(dojo.fromJson(content), masterItem, kwArgs);
             }
             else {
                 item = this.recordSetToObject(dojo.fromJson(content), kwArgs);
@@ -387,7 +387,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             this.urlCache.setUrls(item, urls);
             return item;
     },
-    
+
     recordSetToObject: function (/*Object*/ recordSet, kwArgs){
         kwArgs = kwArgs || {};
         //TODO
@@ -434,14 +434,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return note;
 
     },
-    
+
     /*
-     * 
+     *
      */
     recordSetToModification: function (recordSet, masterItem, kwArgs){
         kwArgs = kwArgs || {};
         var uidParts = recordSet.uuid.split(":");
-        
+
         var modifiedProperties = {};
         var modifiedStamps = {};
         var deletedStamps = {};
@@ -453,9 +453,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             deletedStamps[recordName] = false;
             with (cosmo.service.eim.constants){
                var record = recordSet.records[recordName];
-                
+
                switch(recordName){
-    
+
                case prefix.ITEM:
                    dojo.mixin(modifiedProperties, this.itemRecordToItemProps(record));
                    break;
@@ -478,10 +478,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }
         }
         var recurrenceId = this.recurrenceIdToDate(uidParts[1], masterItem.getEventStamp().getStartDate());
-        
+
         if (!cosmo.util.lang.isEmpty(modifiedProperties)
             || !cosmo.util.lang.isEmpty(modifiedStamps)){
-            
+
             var mod = new cosmo.model.Modification(
                 {
                     "recurrenceId": recurrenceId,
@@ -492,10 +492,10 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             );
             masterItem.addModification(mod);
         }
-        
+
         return kwArgs.oldObject || masterItem.getNoteOccurrence(recurrenceId);
     },
-    
+
     recurrenceIdToDate: function (/*String*/ rid, masterItemStartDate){
          return cosmo.datetime.fromIso8601(rid, masterItemStartDate.tzId);
     },
@@ -505,7 +505,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '<content type="xhtml">',
           '<div xmlns="http://www.w3.org/1999/xhtml">',
             '<div class="local-subscription">',
-                 '<span class="name">', cosmo.util.string.escapeXml(subscription.getDisplayName()), '</span>', 
+                 '<span class="name">', cosmo.util.string.escapeXml(subscription.getDisplayName()), '</span>',
               '<div class="collection">',
                  '<span class="uuid">', cosmo.util.string.escapeXml(subscription.getUid()), '</span>',
               '</div>',
@@ -517,19 +517,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
          '</content>',
          '</entry>'].join("");
     },
-    
+
     collectionToSaveRepresentation: function(collection){
          return ['<entry xmlns="http://www.w3.org/2005/Atom" xmlns:cosmo="http://osafoundation.org/cosmo/Atom">',
          '<content type="xhtml">',
           '<div xmlns="http://www.w3.org/1999/xhtml">',
             '<div class="collection">',
-                 '<span class="name">', cosmo.util.string.escapeXml(collection.getDisplayName()), '</span>', 
+                 '<span class="name">', cosmo.util.string.escapeXml(collection.getDisplayName()), '</span>',
             '</div>',
           '</div>',
          '</content>',
          '</entry>'].join("");
     },
-    
+
     keyValToPreference: function(key, val){
         return this.createEntry({
             contentType: "xhtml",
@@ -539,21 +539,21 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                         '<span class="key">', key, '</span>', '<span class="value">', val, '</span>',
                     '</div>',
                 '</div>'].join("")
-                
+
         });
     },
-    
+
     createEntry: function(fields){
         var entryList = ['<entry xmlns="http://www.w3.org/2005/Atom">'];
-        if (fields.title) entryList = 
+        if (fields.title) entryList =
             entryList.concat(['<title>', fields.title, '</title>']);
-        if (fields.id) entryList = 
+        if (fields.id) entryList =
             entryList.concat(['<id>',  fields.id, '</id>']);
-        if (fields.updated) entryList = 
+        if (fields.updated) entryList =
             entryList.concat(['<updated>', fields.updated, '</updated>']);
-        if (fields.authorName) entryList = 
+        if (fields.authorName) entryList =
             entryList.concat(['<author><name>', fields.authorName, '</name></author>']);
-        if (fields.content) entryList = 
+        if (fields.content) entryList =
             entryList.concat(['<content type="', fields.contentType, '">', fields.content, '</content>']);
         entryList.push('</entry>');
         return entryList.join("");
@@ -568,9 +568,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                  '<content type="text/eim+json"><![CDATA[', dojo.toJson(this.objectToRecordSet(object)), ']]></content>',
                  '</entry>'].join("");
     },
-    
+
     getUid: dojo.hitch(cosmo.service, cosmo.service.getUid),
-    
+
     getRid: dojo.hitch(cosmo.service, cosmo.service.getRid),
 
     objectToRecordSet: function (note){
@@ -584,7 +584,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             )
         }
     },
-    
+
     addStampsToDelete: function (recordSet, note){
         var stampsToDelete = note.getStampsToDelete();
         if (stampsToDelete.length > 0){
@@ -597,7 +597,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             note.clearStampsToDelete();
         }
     },
-    
+
     noteToRecordSet: function(note){
         var records = {
             item: this.noteToItemRecord(note),
@@ -608,14 +608,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         if (note.getEventStamp()) records.event = this.noteToEventRecord(note);
         if (note.getTaskStamp()) records.task = this.noteToTaskRecord(note);
         if (note.getMailStamp()) records.mail = this.noteToMailRecord(note);
-        
+
         var recordSet =  {
             uuid: this.getUid(note),
             records: records
         };
-        
+
         this.addStampsToDelete(recordSet, note);
-        
+
         return recordSet;
     },
 
@@ -624,20 +624,20 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var records = {
             modby: this.noteToModbyRecord(noteOccurrence)
         }
-        if (this.modificationHasItemModifications(modification))  
+        if (this.modificationHasItemModifications(modification))
             records.item =  this.modifiedOccurrenceToItemRecord(noteOccurrence);
         else records.item = this.generateEmptyItem(noteOccurrence);
 
         if (this.modificationHasNoteModifications(modification))
             records.note = this.modifiedOccurrenceToNoteRecord(noteOccurrence);
         else records.note = this.generateEmptyNote(noteOccurrence);
-        
+
         // There will always be an event stamp
         records.event = this.modifiedOccurrenceToEventRecord(noteOccurrence);
-        
+
         if (modification.getModifiedStamps().task || noteOccurrence.getMaster().getTaskStamp()){
             records.task = this.noteToTaskRecord(noteOccurrence);
-        } 
+        }
         if (modification.getModifiedStamps().mail || noteOccurrence.getMaster().getMailStamp()){
             records.mail = this.modifiedOccurrenceToMailRecord(noteOccurrence);
         }
@@ -646,16 +646,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             uuid: this.getUid(noteOccurrence),
             records: records
         };
-        
+
         this.addStampsToDelete(recordSet, noteOccurrence);
-        
+
         return recordSet;
-        
+
     },
-    
+
     modificationHasItemModifications: function (modification){
         var props = modification.getModifiedProperties();
-        return (props.displayName || props.triageRank || props.triageStatus || props.autoTriage)    
+        return (props.displayName || props.triageRank || props.triageStatus || props.autoTriage)
     },
 
     noteToItemRecord: function(note){
@@ -668,7 +668,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         props.uuid = this.getUid(note);
         return this.propsToItemRecord(props);
     },
-    
+
     modifiedOccurrenceToItemRecord: function(modifiedOccurrence){
         var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId)
         var props = modification.getModifiedProperties();
@@ -681,7 +681,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         record.missingFields = missingFields;
         return record;
     },
-    
+
     generateEmptyItem: function(note){
         var record = this.propsToItemRecord({uuid: note.getUid()});
         record.missingFields = [
@@ -692,16 +692,16 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         ]
         return record;
     },
-    
+
     propsToItemRecord: function(props){
         var fields = {};
         with (cosmo.service.eim.constants){
-        
+
             if (props.displayName !== undefined) fields.title = [type.TEXT, props.displayName];
             if (props.creationDate !== undefined) fields.createdOn = [type.DECIMAL, props.creationDate/1000];
             if (props.triageStatus)
                 fields.triage =  [type.TEXT, [props.triageStatus, this.fixTriageRank(props.rank), props.autoTriage? 1 : 0].join(" ")];
-            
+
             return {
                 prefix: prefix.ITEM,
                 ns: ns.ITEM,
@@ -711,9 +711,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 fields: fields
             }
         }
-    
+
     },
-    
+
     // Make sure triage rank ends in two decimals
     fixTriageRank: function(rank){
         rank = rank || "0";
@@ -729,13 +729,13 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         props.uuid = uid;
         return this.propsToNoteRecord(props);
     },
-    
+
     modificationHasNoteModifications: function (modification){
         var props = modification.getModifiedProperties();
         return (props.body || props.icalUid);
     },
-    
-    
+
+
     modifiedOccurrenceToNoteRecord: function(modifiedOccurrence){
         var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId)
         var props = modification.getModifiedProperties();
@@ -747,7 +747,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         record.missingFields = missingFields;
         return record;
     },
-    
+
     generateEmptyNote: function (note){
         var record = this.propsToNoteRecord({uuid: note.getUid()});
         record.missingFields = [
@@ -756,7 +756,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         ];
         return record;
     },
-    
+
     propsToNoteRecord: function (props){
         with (cosmo.service.eim.constants){
             var fields = {};
@@ -810,7 +810,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         record.missingFields = missingFields;
         return record;
     },
-    
+
     propsToMailRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
@@ -825,7 +825,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (props.dateSent !== undefined) fields.dateSent = [type.TEXT, props.dateSent];
             if (props.inReplyTo !== undefined) fields.inReplyTo = [type.TEXT, props.inReplyTo];
             if (props.references !== undefined) fields.references = [type.CLOB, props.references];
-            
+
             return record = {
                 prefix: prefix.MAIL,
                 ns: ns.MAIL,
@@ -835,9 +835,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 fields: fields
             }
             return record;
-        }   
+        }
     },
-    
+
     noteToEventRecord: function(note){
         var props = {};
         stamp = note.getEventStamp();
@@ -857,7 +857,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     modifiedOccurrenceToEventRecord: function(modifiedOccurrence){
         var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId);
         var props = modification.getModifiedStamps().event || {};
-        if (props.allDay || props.anyTime) props.startDate = 
+        if (props.allDay || props.anyTime) props.startDate =
             modifiedOccurrence.getEventStamp().getStartDate();
         props.uuid = modifiedOccurrence.getUid();
         var record = this.propsToEventRecord(props);
@@ -869,19 +869,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         record.missingFields = missingFields;
         return record;
     },
-    
+
     propsToEventRecord: function(props){
         with (cosmo.service.eim.constants){
             var fields = {};
-            if (props.startDate !== undefined) fields.dtstart = 
+            if (props.startDate !== undefined) fields.dtstart =
                 [type.TEXT, this.dateToEimDtstart(props.startDate, props.allDay, props.anyTime)];
             if (props.status !== undefined) fields.status = [type.TEXT, props.status];
             if (props.location !== undefined) fields.location = [type.TEXT, props.location];
             if (props.duration !== undefined) fields.duration = [type.TEXT, props.duration == null? cosmo.model.ZERO_DURATION : props.duration.toIso8601()];
             if (props.rrule !== undefined) fields.rrule = [type.TEXT, this.rruleToICal(props.rrule)];
-            if (props.exdates && props.exdates.length != 0) fields.exdate = 
+            if (props.exdates && props.exdates.length != 0) fields.exdate =
                 [type.TEXT, this.exdatesToEim(props.exdates, props.startDate, props.allDay, props.anyTime)];
-            
+
             return record = {
                 prefix: prefix.EVENT,
                 ns: ns.EVENT,
@@ -892,18 +892,18 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             }
         }
 
-        
+
     },
 
     exdatesToEim: function(exdates, start, allDay, anyTime){
         return this.datesToEim(exdates, start, allDay, anyTime);
     },
-    
+
     dateToEimDtstart: function (start, allDay, anyTime){
         return (anyTime? ";X-OSAF-ANYTIME=TRUE" : "") +
                this.datesToEim([start], start, allDay, anyTime);
     },
-    
+
     datesToEim: function (dates, start, allDay, anyTime){
           var date = [(start.tzId? ";TZID=" + start.tzId : ""),
                 ";VALUE=",
@@ -942,7 +942,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 ns: ns.MODBY,
                 key:{
                     uuid: [type.TEXT, this.getUid(note)],
-                    userid: [type.TEXT, note.getModifiedBy().getUserId() || 
+                    userid: [type.TEXT, note.getModifiedBy().getUserId() ||
                                         cosmo.util.auth.getUsername()],
                     action: [type.INTEGER, note.getModifiedBy().getAction()],
                     timestamp: [type.DECIMAL, new Date().getTime()/1000]
@@ -987,7 +987,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
         return {};
     },
- 
+
     getMailStampProperties: function (record){
         var properties = {};
         if (record.fields){
@@ -1004,12 +1004,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         return properties;
     },
-    
+
     parseList: function(listString){
        if (!listString) return listString;
        else return listString.split(",");
     },
-    
+
     itemRecordToItemProps: function(record){
         var props = {};
         if (record.fields){
@@ -1085,7 +1085,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         returnVal.allDay = (returnVal.value == "date") && !returnVal.anyTime;
         return returnVal;
     },
-    
+
     rruleToICal: function (rrule){
         if (rrule === null) return rrule;
         if (rrule.isSupported()){
@@ -1099,14 +1099,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 var dateString = this._createRecurrenceEndDateString(rrule.getEndDate())
                 recurrenceRuleList.push(dateString);
              }
-            
+
             return recurrenceRuleList.join("");
-        } 
+        }
         else {
             return rrulePropsToICal(rrule.getUnsupportedRule());
         }
     },
-    
+
     _createRecurrenceEndDateString: function (date){
         date = date.clone();
         date.setHours(23);
@@ -1142,7 +1142,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         }
         return this.rPropsToRRule(this.parseRRuleToHash(rule), startDate);
     },
-    
+
     parseExdate: function (exdate){
         if (!exdate) return null;
         return dojo.map(
@@ -1180,7 +1180,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
       WEEKLY:  "WEEKLY",
       YEARLY: "YEARLY"
     },
-    
+
     isRRuleUnsupported: function (recur){
 
         with (this.rruleConstants){
@@ -1287,15 +1287,15 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 endDate.setSeconds(0);
                 recurrenceRule.endDate = endDate;
             }
-            
+
             recurrenceRule = new cosmo.model.RecurrenceRule(recurrenceRule);
-            
+
 
             return recurrenceRule;
         }
 
     },
-    
+
     getEntryUuid: function (entry){
         try {
             var uuid = entry.getElementsByTagName("id")[0];

@@ -734,8 +734,8 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>generate</id>
-                                <phase>generate-resources</phase>
+                                <id>js-dev</id>
+                                <phase>compile</phase>
                                 <configuration>
                                     <tasks>
                                         <exec executable="${basedir}/tools/js-dev.sh">

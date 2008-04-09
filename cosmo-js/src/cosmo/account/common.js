@@ -50,9 +50,9 @@ cosmo.account.getFieldList = function (accountInfo, subscription) {
         };
         f.validators = function (elem) {
             return (cosmo.util.validate.required(elem) ||
-                    cosmo.util.validate.minLength(elem, 3) || 
+                    cosmo.util.validate.minLength(elem, 3) ||
                     cosmo.util.validate.doesNotMatch(
-                        elem, /[:\u007F/;]/, "Signup.Error.UsernameIllegalChar") ||
+                        elem, /[:\u007F\/;]/, "Signup.Error.UsernameIllegalChar") ||
                     cosmo.util.validate.inBMP(elem, "Signup.Error.UsernameBMP") ||
                     cosmo.util.validate.noControl(elem, "Signup.Error.UsernameControl")
                    ); };
@@ -140,7 +140,7 @@ cosmo.account.getFieldList = function (accountInfo, subscription) {
         f.value = a[f.elemName];
         list.push(f);
     }
-    
+
     if (subscription){
         f = {label: _('Signup.Form.Subscription.Name'),
              elemName: 'subscriptionName',
@@ -155,7 +155,7 @@ cosmo.account.getFieldList = function (accountInfo, subscription) {
              elemName: 'subscriptionTicket',
              elemType: 'text',
              disabled: true
-              
+
         };
         f.validators = function (elem) {
             return cosmo.util.validate.required(elem); };
@@ -205,7 +205,7 @@ cosmo.account.getFormTable = function (fieldList, callingContext) {
         table.style.width = '100%';
     }
     table.style.margin = 'auto';
-    
+
     table.appendChild(body);
     form.appendChild(table);
 

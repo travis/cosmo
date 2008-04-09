@@ -24,7 +24,7 @@ dojo.require("dojo.date.stamp");
 
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
-var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/lib/olson-tzdata/");
+var registry = new cosmo.datetime.timezone.SimpleTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/olson-tzdata/");
 var D = cosmo.datetime.Date;
 
 registry.init(["northamerica"]);
@@ -34,7 +34,7 @@ cosmotest.datetime.test_date = {
 test_dateConstructor: function () {
     var dt = null;
     var dtComp = new Date(2006, 9, 23);
-    
+
     // Floating
     dt = new D(2006, 9, 23);
     jum.assertEquals(2006, dt.getFullYear());
@@ -43,7 +43,7 @@ test_dateConstructor: function () {
     jum.assertEquals(null, dt.tzId);
     jum.assertEquals(false, dt.utc);
     jum.assertEquals(dtComp.getTimezoneOffset(), dt.getTimezoneOffset());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -55,7 +55,7 @@ test_dateConstructor: function () {
     jum.assertEquals(null, dt.tzId);
     jum.assertEquals(false, dt.utc);
     jum.assertEquals(dtComp.getTimezoneOffset(), dt.getTimezoneOffset());
-    
+
     dt = new D('10/23/2006');
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -63,7 +63,7 @@ test_dateConstructor: function () {
     jum.assertEquals(null, dt.tzId);
     jum.assertEquals(false, dt.utc);
     jum.assertEquals(dtComp.getTimezoneOffset(), dt.getTimezoneOffset());
-    
+
     dt = new D(1161659575006);
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -80,7 +80,7 @@ test_dateConstructor: function () {
     jum.assertEquals('America/New_York', dt.tzId);
     jum.assertEquals(false, dt.utc);
     jum.assertEquals(240, dt.getTimezoneOffset());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6, 'America/New_York');
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -92,7 +92,7 @@ test_dateConstructor: function () {
     jum.assertEquals('America/New_York', dt.tzId);
     jum.assertEquals(false, dt.utc);
     jum.assertEquals(240, dt.getTimezoneOffset());
-    
+
     dt = new D('10/23/2006', 'America/New_York');
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -100,8 +100,8 @@ test_dateConstructor: function () {
     jum.assertEquals('America/New_York', dt.tzId);
     jum.assertEquals(false, dt.utc);
     jum.assertEquals(240, dt.getTimezoneOffset());
-    
-    // UTC, by timezone 
+
+    // UTC, by timezone
     dt = new D(2006, 9, 23, 'Etc/UTC');
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -109,7 +109,7 @@ test_dateConstructor: function () {
     jum.assertEquals('Etc/UTC', dt.tzId);
     jum.assertEquals(true, dt.utc);
     jum.assertEquals(0, dt.getTimezoneOffset());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6, 'Etc/UTC');
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -121,7 +121,7 @@ test_dateConstructor: function () {
     jum.assertEquals('Etc/UTC', dt.tzId);
     jum.assertEquals(true, dt.utc);
     jum.assertEquals(0, dt.getTimezoneOffset());
-    
+
     dt = new D('10/23/2006', 'Etc/UTC');
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -129,7 +129,7 @@ test_dateConstructor: function () {
     jum.assertEquals('Etc/UTC', dt.tzId);
     jum.assertEquals(true, dt.utc);
     jum.assertEquals(0, dt.getTimezoneOffset());
-    
+
     // UTC, by flag
     dt = new D(2006, 9, 23, null, true);
     jum.assertEquals(2006, dt.getFullYear());
@@ -138,7 +138,7 @@ test_dateConstructor: function () {
     jum.assertEquals(null, dt.tzId);
     jum.assertEquals(true, dt.utc);
     jum.assertEquals(0, dt.getTimezoneOffset());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6, null, true);
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -150,7 +150,7 @@ test_dateConstructor: function () {
     jum.assertEquals(null, dt.tzId);
     jum.assertEquals(true, dt.utc);
     jum.assertEquals(0, dt.getTimezoneOffset());
-    
+
     dt = new D('10/23/2006', null, true);
     jum.assertEquals(2006, dt.getFullYear());
     jum.assertEquals(9, dt.getMonth());
@@ -162,54 +162,54 @@ test_dateConstructor: function () {
 
 test_dateGetOffset: function () {
     var dt = null;
-    
+
     dt = new D(2006, 9, 29, 1, 59, 'America/Los_Angeles');
     jum.assertEquals(420, dt.getTimezoneOffset());
-    
+
     dt = new D(2006, 9, 29, 2, 0, 'America/Los_Angeles');
     jum.assertEquals(480, dt.getTimezoneOffset());
 },
 
 test_dateSetters: function () {
     var dt = null;
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
     dt.setMilliseconds(2112);
     jum.assertEquals(57, dt.getSeconds());
     jum.assertEquals(112, dt.getMilliseconds());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
     dt.setSeconds(124);
     jum.assertEquals(14, dt.getMinutes());
     jum.assertEquals(4, dt.getSeconds());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
     dt.setMinutes(-20);
     jum.assertEquals(21, dt.getHours());
     jum.assertEquals(40, dt.getMinutes());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
     dt.setHours(52);
     jum.assertEquals(25, dt.getDate());
     jum.assertEquals(4, dt.getHours());
-    
+
     dt = new D(2006, 9, 23, 22, 12, 55, 6);
     dt.setDate(35);
     jum.assertEquals(10, dt.getMonth());
     jum.assertEquals(4, dt.getDate());
-    
+
     // Leap year
     dt = new D(2004, 1, 28);
     dt.setDate(29);
     jum.assertEquals(1, dt.getMonth());
     jum.assertEquals(29, dt.getDate());
-    
+
     // Non-leap-year
     dt = new D(2005, 1, 28);
     dt.setDate(29);
     jum.assertEquals(2, dt.getMonth());
     jum.assertEquals(1, dt.getDate());
-    
+
     // Wraparound broken in Safari 2, see WebKit bug 4892
     // http://bugs.webkit.org/show_bug.cgi?id=489
     // Safari 2 == Safari/412 to Safari/419.3
@@ -219,7 +219,7 @@ test_dateSetters: function () {
         dt.setMonth(14);
         jum.assertEquals(2007, dt.getYear());
         jum.assertEquals(2, dt.getMonth());
-        
+
         // Date wraparoud -- Set month to Feb with date of 31st
         // should wrap date to March 3rd
         dt = new D(2006, 0, 31);
@@ -231,7 +231,7 @@ test_dateSetters: function () {
 
 test_dateUTCSetters: function () {
     var dt = null;
-    
+
     // UTC date
     dt = new D(2006, 9, 23, 22, 12, 55, 6, 'Etc/UTC');
     dt.setUTCHours(54);
@@ -240,7 +240,7 @@ test_dateUTCSetters: function () {
     jum.assertEquals(25, dt.getDate());
     jum.assertEquals(6, dt.getUTCHours());
     jum.assertEquals(6, dt.getHours());
-    
+
     // Wraparound broken in Safari 2, see WebKit bug 4892
     // http://bugs.webkit.org/show_bug.cgi?id=489
     // Safari 2 == Safari/412 to Safari/419.3
@@ -256,6 +256,6 @@ test_dateUTCSetters: function () {
     }
 },
 
-  
+
 
 }

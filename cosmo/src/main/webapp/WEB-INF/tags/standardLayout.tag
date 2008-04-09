@@ -78,9 +78,9 @@
     <style type="text/css">
       /* tundraGrid.css matches Dijit Tundra style.  Others forthcoming.
       Use Grid.css on the same path for a more color-neutral theme */
-      @import "${staticBaseUrl}/js/lib/dojo/dojox/grid/_grid/tundraGrid.css";
-      @import "${staticBaseUrl}/js/lib/dojo/dijit/themes/tundra/tundra.css";
-      @import "${staticBaseUrl}/js/lib/dojo/dojo/resources/dojo.css";
+      @import "${staticBaseUrl}/js/dojox/grid/_grid/tundraGrid.css";
+      @import "${staticBaseUrl}/js/dijit/themes/tundra/tundra.css";
+      @import "${staticBaseUrl}/js/dojo/resources/dojo.css";
 
 #head {
 position: absolute;

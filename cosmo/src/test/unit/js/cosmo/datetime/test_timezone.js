@@ -22,7 +22,7 @@ dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 
-var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/lib/olson-tzdata/");
+var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/olson-tzdata/");
 
 cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
@@ -51,7 +51,7 @@ cosmotest.datetime.test_timezone = {
         jum.assertEquals(12, getDateField(cosmoDate, "hours"));
         jum.assertEquals(33, getDateField(cosmoDate, "minutes"));
         jum.assertEquals(30, getDateField(cosmoDate, "seconds"));
-    
+
         var jsDate = new Date(2006, 11, 10, 12, 33, 30);
         jum.assertEquals(2006, getDateField(jsDate, "year"));
         jum.assertEquals(11, getDateField(jsDate, "month"));
@@ -59,24 +59,24 @@ cosmotest.datetime.test_timezone = {
         jum.assertEquals(12, getDateField(jsDate, "hours"));
         jum.assertEquals(33, getDateField(jsDate, "minutes"));
         jum.assertEquals(30, getDateField(jsDate, "seconds"));
-    
+
         var fullHashDate = { year: 2006,
                              month: 11,
                              date: 10,
                              hours: 12,
                              minutes: 33,
                              seconds: 30};
-    
+
         jum.assertEquals(2006, getDateField(fullHashDate, "year"));
         jum.assertEquals(11, getDateField(fullHashDate, "month"));
         jum.assertEquals(10, getDateField(fullHashDate, "date"));
         jum.assertEquals(12, getDateField(fullHashDate, "hours"));
         jum.assertEquals(33, getDateField(fullHashDate, "minutes"));
         jum.assertEquals(30, getDateField(fullHashDate, "seconds"));
-    
+
         var sparseHashDate = { year: 2006,
                                month: 11 };
-    
+
         jum.assertEquals(2006, getDateField(sparseHashDate, "year"));
         jum.assertEquals(11, getDateField(sparseHashDate, "month"));
         jum.assertEquals(1, getDateField(sparseHashDate, "date"));
@@ -90,19 +90,19 @@ cosmotest.datetime.test_timezone = {
         var jsDate1 = new Date(2006, 11, 10, 12, 33, 30);
         var jsDate2 = new Date(2007, 11, 10, 12, 33, 30);
         jum.assertTrue(compareDates(jsDate1, jsDate2) < 0);
-    
+
         jsDate1 = new Date(2006, 11, 10, 12, 33, 30);
         jsDate2 = new Date(2006, 11, 10, 12, 33, 30);
         jum.assertTrue(compareDates(jsDate1, jsDate2) == 0);
-    
+
         jsDate1 = new Date(2006, 11, 10, 12, 33, 31);
         jsDate2 = new Date(2006, 11, 10, 12, 33, 30);
         jum.assertTrue(compareDates(jsDate1, jsDate2)  > 0);
-    
+
         jsDate1 = new Date(2006, 11, 10, 13, 33, 31);
         jsDate2 = new Date(2006, 11, 10, 12, 33, 31);
         jum.assertTrue(compareDates(jsDate1, jsDate2)  > 0);
-    
+
         var sparseHashDate = { year: 2006,
                                month: 11 };
         jsDate2 = new Date(2006, 11, 1, 1, 1, 1, 1);
@@ -114,20 +114,20 @@ cosmotest.datetime.test_timezone = {
         var date = new Date(2006, 1, 1);
         var zoneItem = tz._getZoneItemForDate(date);
         jum.assertEquals(null, zoneItem.untilDate);
-    
+
         date = new Date(1966, 11, 31);
         zoneItem = tz._getZoneItemForDate(date);
         jum.assertEquals(1967, zoneItem.untilDate.year);
-    
+
         date = new Date(1800, 1, 1);
         zoneItem = tz._getZoneItemForDate(date);
         jum.assertEquals(1883, zoneItem.untilDate.year);
-    
+
         date = new Date(1920, 1, 1);
         zoneItem = tz._getZoneItemForDate(date);
         jum.assertEquals(1942, zoneItem.untilDate.year);
         },
-    
+
         test_getRulesForYear:     function (){
         var rs = cosmotest.datetime.test_timezone.getUsRs();
         var rules = rs._getRulesForYear(1999);
@@ -137,15 +137,15 @@ cosmotest.datetime.test_timezone = {
 
     test_DayGreateThanNForMonthAndYear: function (){
         var func = cosmo.datetime.timezone._getDayGreaterThanNForMonthAndYear;
-    
+
         //"get me the date of the first thursday that is greater than or equal to the 8th in November"
         var date = func(8, 4, 10, 2006);
         jum.assertEquals(9, date);
-    
+
         //"get me the date of the first wednesday that is greater than or equal to the 8th in November"
         date = func(8, 3, 10, 2006);
         jum.assertEquals(8, date);
-    
+
         //"get me the date of the first tuesday that is greater than or equal to the 8th in November"
         date = func(8, 2, 10, 2006);
         jum.assertEquals(14, date);
@@ -153,15 +153,15 @@ cosmotest.datetime.test_timezone = {
 
     test_DayLessThanNForMonthAndYear: function (){
         var func = cosmo.datetime.timezone._getDayLessThanNForMonthAndYear;
-    
+
         //"get me the date of the last thursday that is less than or equal to the 8th in November"
         var date = func(8,4,10,2006);
         jum.assertEquals(2, date);
-    
+
         //"get me the date of the last wednesday that is less than or equal to the 8th in November"
         var date = func(8,3,10,2006);
         jum.assertEquals(8, date);
-    
+
         //"get me the date of the last tuesday that is less than or equal to the 8th in November"
         var date = func(8,2,10,2006);
         jum.assertEquals(7, date);
@@ -171,29 +171,29 @@ cosmotest.datetime.test_timezone = {
       //to test: cosmo.datetime.timezone.Rule.prototype._getStartDateForYear = function(year)
       var rs = cosmotest.datetime.test_timezone.getUsRs();
       var sorter = function(a,b){return a.startMonth - b.startMonth};
-    
+
       var rules = rs._getRulesForYear(1967);
       rules.sort(sorter);
       var startDate = rules[0]._getStartDateForYear(2006);
-    
+
       //for sanity's sake, make sure it's APR
       jum.assertEquals(3, startDate.month);
-    
+
       //rule says Apr, lastSun - last sunday in april which is the 30th
       jum.assertEquals(30, startDate.date);
-    
+
       rules = rs._getRulesForYear(1974);
       rules.sort(sorter);
       startDate = rules[0]._getStartDateForYear(1974);
-    
+
       //rule says "jan 6"
       jum.assertEquals(0, startDate.month);
       jum.assertEquals(6, startDate.date);
-    
+
       rules = rs._getRulesForYear(2007);
       rules.sort(sorter);
       startDate = rules[0]._getStartDateForYear(2007);
-    
+
       //rule sun>=8 - first sunday after or on the eighth which is the 11th
       jum.assertEquals(2, startDate.month);
       jum.assertEquals(11, startDate.date);
@@ -229,16 +229,16 @@ cosmotest.datetime.test_timezone = {
         jum.assertTrue(rule != null);
         jum.assertTrue(rule.startYear == 1980);
         jum.assertTrue(rule.letter == "S");
-        
+
     },
 
     getPrefixes: function (){
     var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
     var prefixes = {};
-    
+
     function spit(file){
         var content = dojo.hostenv.getText(cosmo.datetime.timezone._timezoneRegistry.timezoneFileRoot + "/" + file);
-        cosmo.datetime.timezone.parse(content, 
+        cosmo.datetime.timezone.parse(content,
             function(tz){
                 var prefix = tz.tzId.split("\/")[0];
                 var prefixRecord = prefixes[prefix];
@@ -252,15 +252,15 @@ cosmotest.datetime.test_timezone = {
                         prefixRecord[file] = prefixRecord[file] + 1;
                     }
                 }
-               
+
             }, function(){}, function(){});
     }
-    
+
     for (var x = 0; x < files.length; x++){
         spit(files[x]);
     }
-    
-    return prefixes;    
+
+    return prefixes;
 },
 
 getPrefixToFileMap: function (){
@@ -284,7 +284,7 @@ getPrefixToFileMap: function (){
         var record = prefixes[prefix];
         map[prefix] = getFileNameWithMostTzids(record);
     }
-    
+
     return map;
 },
 
@@ -303,18 +303,18 @@ getExceptionMap: function (){
    var prefixToFileMap = getPrefixToFileMap();
    var files = ["northamerica", "africa", "antarctica", "asia", "australasia", "europe", "pacificnew", "southamerica", "backward"];
    var map = {};
-   
+
    for (var x = 0; x < files.length; x++){
        var file = files[x];
        var content = dojo.hostenv.getText(cosmo.datetime.timezone._timezoneRegistry.timezoneFileRoot + "/" + file);
        cosmo.datetime.timezone.parse(content, function(timezone){
            var prefix = timezone.tzId.split("\/")[0];
            if (prefixToFileMap[prefix] != file ){
-              map[timezone.tzId] = file;               
+              map[timezone.tzId] = file;
            }
        }, function(){}, function(){});
    }
-   
+
    return map;
 }
 }

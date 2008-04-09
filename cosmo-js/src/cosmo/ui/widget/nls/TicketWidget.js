@@ -1,0 +1,1 @@
+({"ticket":"Ticket","read":"Read","ticketSeconds":"seconds (leave blank for no expiration)","readWrite":"Read/Write","ticketInvalid":"Ticket duration must be an integer.","privileges":"Privileges","grantTicket":"Grant Ticket","freeBusy":"Free/Busy"})

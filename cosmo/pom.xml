@@ -478,7 +478,7 @@
                       <!-- TODO: META-INF shouldn't be required, seems to be an issue with the current war plugin -->
                       <include>META-INF</include>
                       <include>WEB-INF/classes</include>
-                      <include>js/lib</include>
+                      <include>js/*</include>
                       <!-- Classes and Resources from other wars -->
                       <include>WEB-INF/lib</include>
                       <!-- Dependencies from other wars -->
@@ -605,8 +605,8 @@
                                <artifactItems>
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
-                                    <artifactId>dojo</artifactId>
-                                    <version>1.0.2-0E0-SNAPSHOT</version>
+                                    <artifactId>cosmo-js</artifactId>
+                                    <version>0.15-SNAPSHOT</version>
                                     <type>jar</type>
                                   </artifactItem>
                                   <artifactItem>
@@ -616,7 +616,7 @@
                                      <type>jar</type>
                                    </artifactItem>
                                 </artifactItems>
-                              <outputDirectory>${project.build.directory}/${project.build.finalName}/js/lib</outputDirectory>
+                              <outputDirectory>${project.build.directory}/${project.build.finalName}/js</outputDirectory>
                            </configuration>
                          </execution>
                        </executions>
@@ -645,8 +645,8 @@
                                <artifactItems>
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
-                                    <artifactId>dojo</artifactId>
-                                    <version>1.0.2-0E0-SNAPSHOT</version>
+                                    <artifactId>cosmo-js</artifactId>
+                                    <version>0.15-SNAPSHOT</version>
                                     <type>jar</type>
                                   </artifactItem>
                                   <artifactItem>
@@ -656,7 +656,7 @@
                                      <type>jar</type>
                                    </artifactItem>
                                 </artifactItems>
-                              <outputDirectory>${basedir}/src/main/webapp/js/lib</outputDirectory>
+                              <outputDirectory>${basedir}/src/main/webapp/js</outputDirectory>
                            </configuration>
                          </execution>
                        </executions>
@@ -689,6 +689,62 @@
                              </execution>
                          </executions>
                      </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>js-dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                       <groupId>org.codehaus.mojo</groupId>
+                       <artifactId>dependency-maven-plugin</artifactId>
+                       <executions>
+                         <execution>
+                           <id>unpack-inplace</id>
+                           <phase>compile</phase>
+                           <goals>
+                             <goal>unpack</goal>
+                           </goals>
+                           <configuration>
+                               <artifactItems>
+                                 <artifactItem>
+                                    <groupId>org.osaf.cosmo</groupId>
+                                    <artifactId>cosmo-js</artifactId>
+                                    <version>0.15-SNAPSHOT</version>
+                                    <type>jar</type>
+                                  </artifactItem>
+                                  <artifactItem>
+                                     <groupId>org.osaf.cosmo</groupId>
+                                     <artifactId>olson-tzdata</artifactId>
+                                     <version>2007h</version>
+                                     <type>jar</type>
+                                   </artifactItem>
+                                </artifactItems>
+                              <outputDirectory>${basedir}/src/main/webapp/js</outputDirectory>
+                           </configuration>
+                         </execution>
+                       </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <exec executable="${basedir}/tools/js-dev.sh">
+                                        </exec>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

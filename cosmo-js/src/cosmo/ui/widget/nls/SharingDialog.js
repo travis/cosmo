@@ -1,0 +1,1 @@
+({"atom":"Atom","webcal":"iCal","dav":"CalDAV","html":"HTML"})

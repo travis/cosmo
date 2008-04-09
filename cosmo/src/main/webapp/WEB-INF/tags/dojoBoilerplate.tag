@@ -44,7 +44,6 @@
 <script type="text/javascript">
 
     // Set isDebug to true to get nice dojo debugging messages
-    // and to grab javascript from /js/cosmo instead of /js/lib/dojo/cosmo
     var djConfig = {isDebug: false, 
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
@@ -55,7 +54,7 @@
                     serverBaseUrl: "${baseUrl}"}
 </script>
 
-<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/lib/dojo/dojo"/>
+<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <c:forEach var="layerName" items="${dojoLayers}">
 <script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>
@@ -63,7 +62,7 @@
 
 <script type="text/javascript">
 (function bootstrap(){
-    if (djConfig.isDebug) dojo.registerModulePath("cosmo", "../../../cosmo");
+    if (djConfig.isDebug) dojo.registerModulePath("cosmo", "../cosmo-src");
     dojo.require("cosmo.env");
     cosmo.env.setVersion("${PRODUCT_VERSION}");
     dojo.require("cosmo.ui.conf");

@@ -1,0 +1,360 @@
+if(!dojo._hasResource["cosmo.ui.widget.CollectionDetailsDialog"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource["cosmo.ui.widget.CollectionDetailsDialog"] = true;
+/*
+ * Copyright 2006 Open Source Applications Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
+dojo.provide("cosmo.ui.widget.CollectionDetailsDialog");
+
+dojo.require("cosmo.env");
+dojo.require("cosmo.app");
+dojo.require("cosmo.app.pim");
+dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.convenience");
+dojo.require("cosmo.util.html");
+dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.widget.ModalDialog");
+dojo.require("cosmo.topics");
+
+dojo.declare("cosmo.ui.widget.CollectionDetailsDialog", 
+             [dijit._Widget, dijit._Templated], 
+//Prototype Properties
+{
+        //User supplied properties:
+        collection: /*cosmo.model.Collection || cosmo.model.Subscription*/ null,
+        displayedSelection: '', // The selection item to display if invoked from ticket view
+
+        // Template stuff
+    templateString:"<div style=\"text-align: center;\">\n  <div style=\"width: 400px; text-align: left; margin: auto;\">\n  <table dojoAttachPoint=\"table\">\n  <colgroup>\n    <col style=\"width: 130px;\"/>\n    <col/>\n  </colgroup>\n    <tr>\n      <td class=\"labelTextHoriz labelTextCell\">\n         ${strings.nameLabel}:\n      </td>\n      <td>\n        <div class=\"floatLeft\">\n          <span dojoAttachPoint=\"collectionNameText\" \n            style=\"display: none\">\n            '${displayName}' ${strings.calendarLabel}\n          </span>\n        </div>\n        <div class=\"floatLeft\">\n          <span dojoAttachPoint=\"collectionNameInputSpan\" \n            style=\"display: none\">\n             <input class=\"inputText\" id=\"${id}CollectionNameInput\" dojoAttachPoint=\"collectionNameInput\"\n                type=\"text\"\n                value=\"${displayName}\"/>&nbsp;\n               <input  dojoAttachPoint=\"collectionNameChangeButton\" \n                type=\"button\" class=\"btnElemBaseSm\" \n                style=\"width: 86px;\" value=\"${strings.changeNameButton}\"\n                dojoAttachEvent=\"onclick: _handleSave\"/>\n          </span>\n        </div>\n        <div class=\"floatLeft\">\n          &nbsp;&nbsp;\n        </div>\n        <div class=\"floatLeft\">\n          <a href=\"${protocolUrls.pim}\">\n            <span dojoAttachPoint=\"linkSpan\"></span>\n          </a>\n        </div>\n        <div class=\"clearBoth\"></div>\n      </td>\n    </tr>\n  <tr>\n    <td>\n    </td>\n    <td>\n      <input  dojoAttachPoint=\"deleteCollectionButton\" \n              type=\"button\" class=\"btnElemBaseSm\" id=\"deleteCollectionButton\"\n              style=\"width: 86px;\" value=\"${strings.deleteCollectionButton}\"\n              dojoAttachEvent=\"onclick: _handleDelete\"/>\n    </td>\n  </tr>\n    <tr>\n      <td class=\"labelTextHoriz labelTextCell\">\n         ${strings.selectYourClient}:\n      </td>\n      <td>\n        <div>\n          <select class=\"selectElem\" dojoAttachPoint=\"clientSelector\"\n              dojoAttachEvent=\"onchange: _handleClientChanged\">\n          </select>\n        </div>\n      </td>\n    </tr>\n    <tbody dojoAttachPoint=\"clientInstructionRows\"\n      style=\"display: none;\">\n      <tr>\n       <td colspan=\"2\" style=\"padding-top: 12px; padding-bottom: 8px;\">\n         <span dojoAttachPoint=\"clientInstructions\"> </span>\n       </td>\n      </tr>\n      <tr>\n      <td class=\"labelTextHoriz labelTextCell\">\n         ${strings.collectionAddress}:\n      </td>\n      <td >\n        <input class=\"inputText\" style=\"display: none;\" size=\"40\" type=\"text\" \n        dojoAttachPoint=\"clientCollectionAddress\" value=\"\" readonly=\"readonly\"/>\n        <a style=\"display: none\" dojoAttachPoint=\"clientCollectionLink\" \n        href=\"\">\n          ${strings.clickHere}\n        </a>\n      </td>\n      </tr>\n     </tbody>\n     <tbody dojoAttachPoint=\"protocolRows\" style=\"display: none\">\n       <tr>\n         <td colspan=\"2\" style=\"padding-top: 12px; padding-bottom: 8px;\">\n           ${strings.protocolInstructions}\n         </td>\n       </tr>\n       <tr>\n        <td class=\"labelTextHoriz labelTextCell\">\n           ${strings.caldav}:\n        </td>\n        <td>\n           <input class=\"inputText\" size=\"40\" type=\"text\" \n             readonly=\"readonly\" value=\"${protocolUrls.dav}\"/>\n        </td>\n       </tr>\n       <tr>\n        <td class=\"labelTextHoriz labelTextCell\">\n           ${strings.webcal}:\n        </td>\n        <td>\n           <input class=\"inputText\" size=\"40\" type=\"text\" \n            readonly=\"readonly\" value=\"${protocolUrls.webcal}\"/>\n        </td>\n       </tr>\n       <tr>\n        <td class=\"labelTextHoriz labelTextCell\">\n           ${strings.atom}:\n        </td>\n        <td>\n           <input class=\"inputText\" size=\"40\" type=\"text\" \n            readonly=\"readonly\" value=\"${protocolUrls.atom}\"/>\n        </td>\n       </tr>\n     </tbody>\n  </table>\n  </div>\n  <div dojoAttachPoint=\"helpText\" style=\"visibility: hidden; \n    position:absolute; top:0px; left:0px; width: 420px; padding-left: 12px; text-align: left;\">\n    <a href=\"${strings.helpLink}\" \n      onclick=\"window.open('${strings.helpLink}'); \n      return false;\">${strings.help}</a>\n    <span dojoAttachPoint=\"chandlerPlug\" style=\"display:none\"><!--\n      Don't use Dojo widget string substitution with anchor tags -\n      it 'helpfully' escapes the quotes in the href prop\n      Have to insert as innerHTML during fillInTemplate\n      --></span>\n  </div>\n</div>\n\n",
+
+        // Attach points
+        table: null, //the table, which has pretty much all the content
+        clientSelector: null, //Selector for different client apps
+        clientInstructions: null, //Instructions for the selected client
+        clientCollectionAddress: null, //The link for the selected client
+        clientCollectionLink: null, //The anchor element with client collection address
+        clientInstructionRows: null, //The instructions for the selected client
+        protocolRows: null, //The rows for all the protocols
+        collectionNameText: null, //Label with the collection name
+        collectionNameInputSpan: null, //span with textbox with the collection name
+        collectionNameInput: null, //Textbox with the collection name
+        collectionNameChangeButton: null, // Button for changing the collection name
+        linkSpan: null, //where to put the link image
+        chandlerPlug: null, //span with info about downloading chandler
+
+        //i18n
+        strings: {
+            nameLabel: _("Main.CollectionDetails.NameLabel"),
+            changeNameButton: _("Main.CollectionDetails.ChangeName"),
+            calendarLabel: _("Main.CollectionDetails.CalendarLabel"),
+            selectYourClient: _("Main.CollectionDetails.SelectYourClient"),
+            collectionAddress: _("Main.CollectionDetails.CollectionAddress"),
+            instructions1: _("Main.CollectionDetails.Instructions.1"),
+            instructions2: _("Main.CollectionDetails.Instructions.2"),
+            close: _("Main.CollectionDetails.Close"),
+            caldav:_("Main.CollectionDetails.caldav"),
+            webcal:_("Main.CollectionDetails.webcal"),
+            atom:_("Main.CollectionDetails.atom"),
+            protocolInstructions:_("Main.CollectionDetails.protocolInstructions"),
+            helpLink:_("Main.CollectionDetails.HelpUrl"),
+            help:_("Main.CollectionDetails.Help"),
+            clickHere:_("Main.CollectionDetails.ClickHere"),
+            helpLink:_("Main.CollectionDetails.HelpLink"),
+            chandlerPlug: _('Main.CollectionDetails.ChandlerPlug',
+                            '<a href="'+ _('Main.CollectionDetails.ChandlerPlugDownload') +'">',
+                            '</a>'),
+            deleteCollectionButton: _('Main.CollectionDetails.Delete')
+        },
+
+        clientsToProtocols: {
+            Chandler: "mc",
+            iCal: "webcal",
+            FeedReader: "atom",
+            Download: "webcal",
+            Pim: "pim"
+        },
+
+        protocolUrls: null,
+        displayName: null,
+        httpSupported: !cosmo.util.string.startsWith("" + location, "https", true) || cosmo.ui.conf.getBooleanValue("httpSupported"),
+
+        // Lifecycle functions
+        postMixInProperties: function(){
+           this.protocolUrls = ((this.collection instanceof cosmo.model.Subscription)?
+                                this.collection.getCollection().getUrls() : this.collection.getUrls());
+           this.displayName = this.collection.getDisplayName();
+           this.saveable = this.isCollectionSaveable(this.collection);
+        },
+
+        isCollectionSaveable: function(/*cosmo.model.[Collection|Subscription]*/collection){
+           return !(collection instanceof cosmo.model.Collection && !collection.isWriteable())
+        },
+
+        postCreate: function () {
+            var options = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
+            cosmo.util.html.setSelectOptions(this.clientSelector, options);
+
+            if (this.saveable){
+               this.collectionNameInputSpan.style.display = "";
+            } else {
+               this.collectionNameText.style.display = "";
+            }
+
+            var linkImg = cosmo.util.html.createRollOverMouseDownImage(cosmo.env.getImageUrl("link.png"));
+            var toolTip = _("Main.CollectionDetails.LinkImageToolTip", this.displayName);
+            linkImg.title = toolTip;
+            linkImg.alt = toolTip;
+            this.linkSpan.appendChild(linkImg);
+
+            // Show the selection choice if passed from the selector in
+            // ticket view -- otherwise default to 'Chandler'
+            var selectedIndex = 0;
+            if (this.displayedSelection) {
+               selectedIndex = cosmo.ui.widget.CollectionDetailsDialog.clientMappings[
+                   this.displayedSelection];
+            }
+            this.clientSelector.selectedIndex = selectedIndex;
+
+            // Chandler plug contains a URL path with quotes. The Dojo widget
+            // template variable substitution 'helpfully' escapes these into
+            // two quotes each
+            this.chandlerPlug.innerHTML = '<span class="menuBarDivider">|</span> ' + this.strings.chandlerPlug;
+
+            this._showChandlerPlug(true);
+            this._handleClientChanged();
+
+            // Add behaviors to the form inputs to select all the text
+            // automatically on field focus
+            var inputs = this.domNode.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+                var inp = inputs[i];
+                if (inp.type == 'text') {
+                    dojo.connect(inp, "onfocus", cosmo.util.html.handleTextInputFocus);
+                }
+            }
+
+        },
+
+        saveDisplayName: function(){
+            this.collection.setDisplayName(this._getDisplayName());
+            cosmo.app.pim.serv.saveCollection(this.collection);
+            //TODO - This should not here. The publishing should happen at the service level,
+            //otherwise everyone who wants to user a service level method has to publish. Hard to do right
+            //now with current RPC setup
+            if (this.collection instanceof cosmo.model.Subscription){
+                 cosmo.topics.publish(cosmo.topics.SubscriptionUpdatedMessage,[this.collection]);
+            } else {
+                 cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage,[this.collection]);
+            }
+        },
+
+        appendedToParent: function(parent){
+            //this.table.style.height = parent.contentNode.offsetHeight + "px";
+            var helpHeight = this.helpText.offsetHeight;
+            var contentHeight = parent.contentNode.offsetHeight;
+            var top = contentHeight - helpHeight;
+            this.helpText.style.top = top + "px";
+            this.helpText.style.left = "18px";
+            this.helpText.style.visibility = "visible";
+        },
+
+        _handleSave: function () {
+              this.saveDisplayName();
+              cosmo.app.hideDialog();
+        },
+
+        _handleDelete: function () {
+            cosmo.app.hideDialog();
+            var collectionToDelete = this.collection;
+            var isSubscription = this.collection instanceof cosmo.model.Subscription;
+            var confirmDeferred = cosmo.app.confirm(
+                _(isSubscription? "Main.DeleteSubscription.Confirm" :"Main.DeleteCollection.Confirm", collectionToDelete.getDisplayName()),
+                {cancelDefault: true}
+            );
+            // This errback will fire if the user selects "no".
+            confirmDeferred.addErrback(
+                function(e){
+                    cosmo.app.hideDialog();
+                    return e;
+                });
+            confirmDeferred.addCallback(
+                function(confirmed){
+                    if (confirmed){
+                        cosmo.app.modalDialog.setPrompt(_('App.Status.Processing'));
+                        var deleteDeferred =
+                            cosmo.app.pim.serv[isSubscription? "deleteSubscription":"deleteCollection"](collectionToDelete);
+                        deleteDeferred.addCallback(function () {
+                            // FIXME: Need to reorg the collections-related code
+                            // to behave similarly to CalItem/ListItem Items
+                            // with add/remove, update view (the collection selector), etc.
+                            var deleteId = collectionToDelete.getUid();
+                            // Remove the collection from the list of collections
+                            cosmo.app.pim.collections.removeItem(deleteId);
+                            // Remove the collection's entry in the list of renderable
+                            // collections for the cal canvas overlay
+                            delete cosmo.view.cal.collectionItemRegistries[deleteId];
+
+                            // Re-render collections, update selected collection
+                            // if necessary, and update the view
+                            var reloadDeferred = cosmo.app.pim.reloadCollections({ 
+                                removedCollection: collectionToDelete,
+                                removeByThisUser: true });
+                            reloadDeferred.addCallback(function(){
+                                var f = function () {
+                                    cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage);
+                                }
+                                setTimeout(f, 0);
+                                cosmo.app.hideDialog();
+                            });
+                            return reloadDeferred;
+                        });
+                    } else {
+                        cosmo.app.hideDialog();
+                    }
+                }
+            );
+
+            // Errback to catch any other errors.
+            confirmDeferred.addErrback(function(e){
+                cosmo.app.showErr(
+                    _("Main.DeleteCollection.Failed",
+                      collectionToDelete.getDisplayName()),
+                    e.message, e);
+            });
+            return confirmDeferred;
+        },
+
+        //handles when the user selects a client
+        _handleClientChanged: function(){
+            var client = this._getClientChoice();
+            if (client == "Download"){
+                this._setClientCollectionAddress(client);
+                this._showClientInstructionsAndAddress(true, true);
+                this._setClientInstructions(client);
+                this._showProtocolRows(false);
+            } else if (client == "Other"){
+                this._showClientInstructionsAndAddress(false, false);
+                this._showProtocolRows(true);
+            } else {
+                this._showClientInstructionsAndAddress(true, false);
+                this._showProtocolRows(false);
+                this._setClientInstructions(client);
+                this._setClientCollectionAddress(client);
+            }
+        },
+
+        // Instance methods
+        _showClientInstructionsAndAddress: function(show, showLink){
+            var hideshow = show ? "" : "none";
+            this.clientInstructionRows.style.display = hideshow;
+            this.clientCollectionAddress.style.display = (showLink ? "none" : "") ;
+            this.clientCollectionLink.style.display = (!showLink ? "none" : "");
+        },
+
+        _showProtocolRows: function(show){
+            var hideshow = show ? "" : "none";
+            this.protocolRows.style.display = hideshow;
+        },
+
+        _getClientChoice: function(){
+            var selectedIndex = this.clientSelector.selectedIndex;
+            return this.clientSelector.options[selectedIndex].value;
+        },
+
+        _setClientInstructions: function(client){
+            if (!this.httpSupported && client == "iCal"){
+                client = "icalNotSupported";
+            }
+            var strings = [];
+            var x = 1;
+            while (true){
+                var key = "Main.CollectionDetails.Instructions." + client + "." + x;
+                if (cosmo.util.i18n.messageExists(key)){
+                    strings.push(_(key));
+                } else {
+                    break;
+                }
+                x++;
+            }
+            strings.push("");
+            this.clientInstructions.innerHTML = strings.join("<br/>");
+        },
+
+        _setClientCollectionAddress: function(client){
+            var url =  this.protocolUrls[this.clientsToProtocols[client]];
+            if (client == "iCal"){
+                if (this.httpSupported){
+                    url = url.replace("https://", "http://").replace(":443/", "/");
+                } else {
+                    url = _("Main.CollectionDetails.na");
+                }
+            }
+            this.clientCollectionAddress.value = url;
+            this.clientCollectionLink.href = url;
+        },
+
+        _getDisplayName: function(){
+            return this.collectionNameInput.value;
+        },
+
+        _showChandlerPlug: function(show){
+            this.chandlerPlug.style.display = (show ? "" : "none");
+        }
+ }
+ );
+
+ cosmo.ui.widget.CollectionDetailsDialog.getInitProperties =
+    function(/*cosmo.model.Collection || cosmo.model.Subscription*/ collection,/* string */ displayedSelection, id) {
+        var contentWidget = new cosmo.ui.widget.CollectionDetailsDialog(
+            { collection: collection,
+              displayedSelection: displayedSelection,
+              id: id
+            });
+
+        var closeButton = new cosmo.ui.widget.Button(
+            { text: _("Main.CollectionDetails.Close"),
+              width: 74,
+              handleOnClick: cosmo.app.hideDialog });
+
+    return {
+        content: contentWidget,
+        height: "320",
+        width: "500",
+        btnsLeft: [closeButton]
+    };
+ };
+
+// Clients -- note: the order in which they appear here is the order in
+// they will appear in the select box
+cosmo.ui.widget.CollectionDetailsDialog.clients =
+    ["Chandler", "iCal", "FeedReader", "Download", "Other"];
+// Reverse mappings -- set up when getClientOptions is called
+cosmo.ui.widget.CollectionDetailsDialog.clientMappings = {};
+
+cosmo.ui.widget.CollectionDetailsDialog.getClientOptions = function () {
+    var options = [];
+    var clients = cosmo.ui.widget.CollectionDetailsDialog.clients;
+    for (var i = 0; i < clients.length; i++) {
+        var c = clients[i];
+        options.push({
+            value: c,
+            text: _("Main.CollectionDetails.Client." + c)
+        });
+        cosmo.ui.widget.CollectionDetailsDialog.clientMappings[c] = i;
+    }
+    return options;
+}
+
+}

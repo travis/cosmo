@@ -94,6 +94,7 @@
             <value>org.osaf.cosmo.model.hibernate.HibDecimalAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibDictionaryAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibEventExceptionStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibEventLogEntry</value>
             <value>org.osaf.cosmo.model.hibernate.HibEventStamp</value>
             <value>org.osaf.cosmo.model.hibernate.HibFileItem</value>
             <value>org.osaf.cosmo.model.hibernate.HibFreeBusyItem</value>
@@ -152,7 +153,7 @@
     </property>
   </bean>
 
-	
+  
   <bean id="jdbcDataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName">

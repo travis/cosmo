@@ -136,6 +136,7 @@
             <value>org.osaf.cosmo.model.hibernate.HibDecimalAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibDictionaryAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibEventExceptionStamp</value>
+            <value>org.osaf.cosmo.model.hibernate.HibEventLogEntry</value> 
             <value>org.osaf.cosmo.model.hibernate.HibEventStamp</value>
             <value>org.osaf.cosmo.model.hibernate.HibFileItem</value>
             <value>org.osaf.cosmo.model.hibernate.HibFreeBusyItem</value>
@@ -270,6 +271,19 @@
     <property name="enabled" value="true"/>
   </bean>
   
+  <!--  Intercepts service calls and logs events
+   -->
+  <bean id="eventLogAspect" init-method="init" class="org.osaf.cosmo.event.aop.EventLogAdvice">
+    <property name="securityManager">
+      <ref local="securityManager" />
+    </property>
+    <property name="eventLogDao">
+      <ref local="eventLogDao" />
+    </property>
+    <property name="order" value="6"/>
+    <property name="enabled" value="true"/>
+  </bean>
+  
   <!-- Timing advice, useful for timing operations -->
   <bean id="timingAdvice" class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
     <property name="loggerName" value="org.osaf.cosmo.perf" />
@@ -324,6 +338,15 @@
 
   <bean id="standardItemFilterProcessor"
         class="org.osaf.cosmo.dao.hibernate.query.StandardItemFilterProcessor" />
+
+  <bean id="eventLogDao"
+        class="org.osaf.cosmo.dao.hibernate.EventLogDaoImpl"
+        init-method="init"
+        destroy-method="destroy">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+  </bean>
 
   <bean id="contentDao"
         class="org.osaf.cosmo.dao.hibernate.ContentDaoImpl"

@@ -101,7 +101,10 @@
     @NamedQuery(name="passwordRecovery.delete.byUser", query="delete from HibPasswordRecovery where user=:user"),
     
     // Event Queries
-    @NamedQuery(name="event.by.calendar.icaluid", query="select i from HibNoteItem i join i.parentDetails pd join i.stamps stamp where pd.primaryKey.collection=:calendar and stamp.class=HibEventStamp and i.icalUid=:uid")
+    @NamedQuery(name="event.by.calendar.icaluid", query="select i from HibNoteItem i join i.parentDetails pd join i.stamps stamp where pd.primaryKey.collection=:calendar and stamp.class=HibEventStamp and i.icalUid=:uid"),
+    
+    // Event Log Queries
+    @NamedQuery(name="logEntry.by.collection.date", query="from HibEventLogEntry e where id1=:parentId and entryDate between :startDate and :endDate")
     
 })
 package org.osaf.cosmo.model.hibernate;

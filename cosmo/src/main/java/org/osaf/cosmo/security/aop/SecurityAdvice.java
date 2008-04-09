@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.osaf.cosmo.aop.OrderedAdvice;
 import org.osaf.cosmo.dao.ContentDao;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CollectionItem;
@@ -50,10 +51,9 @@ import org.springframework.core.Ordered;
  * will be logged as insecure.
  */
 @Aspect
-public class SecurityAdvice implements Ordered {
+public class SecurityAdvice extends OrderedAdvice {
 
     private boolean enabled = true;
-    private int order = 0;
     private CosmoSecurityManager securityManager = null;
     private ContentDao contentDao = null;
     private UserDao userDao = null;
@@ -71,14 +71,6 @@ public class SecurityAdvice implements Ordered {
         if(userDao==null)
             throw new IllegalStateException("userDao must not be null");
         securityHelper = new SecurityHelper(contentDao, userDao);
-    }
-    
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
     }
     
     public static void setSecured(boolean isSecured) {

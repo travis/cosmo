@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.tickler"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.tickler"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -56,5 +54,3 @@ cosmo.service.tickler._wrapMethod = function(service, wrappedService, methodName
     }
 }
  
-
-}

@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.service']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.service'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -627,5 +625,3 @@ cosmo.view.service = new function () {
     };
 };
 
-
-}

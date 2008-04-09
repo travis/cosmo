@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.SharingDialog"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.SharingDialog"] = true;
 /*
  * Copyright 2008 Open Source Applications Foundation
  *
@@ -18,7 +16,7 @@ dojo._hasResource["cosmo.ui.widget.SharingDialog"] = true;
 
 dojo.provide("cosmo.ui.widget.SharingDialog");
 dojo.require("dijit._Templated");
-dojo.requireLocalization("cosmo.ui.widget", "SharingDialog", null, "ROOT");
+dojo.requireLocalization("cosmo.ui.widget", "SharingDialog");
 
 dojo.declare(
     "cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
@@ -30,7 +28,7 @@ dojo.declare(
         displayName: "",
         urls: null,
 
-        templateString:"<div>\n<style type=\"text/css\">\n.linkDiv{\nwidth: 40px;\nheight: 20px;\ncolor: white;\nfont-weight: bolder;\npadding: 2px;\n}\n.linkDiv a:hover{\ntext-decoration: none;\n}\n.atomLinkDiv {\nbackground: orange;\n}\n.webcalLinkDiv {\nbackground: green;\n}\n.htmlLinkDiv {\nbackground: blue;\n}\n.davLinkDiv {\nbackground: red;\n}\n</style>\n<div id=\"${id}DisplayName\">${displayName}</div>\n<a href=\"${urls.atom}\"><span class=\"linkDiv atomLinkDiv\">${l10n.atom}</span></a>\n<a href=\"${urls.webcal}\"><span class=\"linkDiv webcalLinkDiv\">${l10n.webcal}</span></a>\n<a href=\"${urls.dav}\"><span class=\"linkDiv davLinkDiv\">${l10n.dav}</span></a>\n<a href=\"${urls.html}\"><span class=\"linkDiv htmlLinkDiv\">${l10n.html}</span></a>\n</div>\n\n",
+        templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/SharingDialog.html'),
         l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "SharingDialog"),
 
         postMixInProperties: function(){
@@ -43,5 +41,3 @@ dojo.declare(
         }
     }
 );
-
-}

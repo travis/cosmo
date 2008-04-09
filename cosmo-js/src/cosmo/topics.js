@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.topics"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.topics"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -171,6 +169,4 @@ cosmo.topics.publish = function (/*Function*/messageConstructor,
         message = new messageConstructor(initializerArg);
     }
     dojo.publish(message.topicName, [message]);
-}
-
 }

@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.account.preferences"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.account.preferences"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -56,5 +54,3 @@ cosmo.account.preferences = new function () {
     };
 
 };
-
-}

@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.resize_area"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.resize_area"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -119,5 +117,3 @@ cosmo.ui.resize_area.ResizeArea = function (content, handle) {
     };
 }
 
-
-}

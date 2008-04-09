@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.ui.event.listeners']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.ui.event.listeners'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  * 
@@ -32,6 +30,4 @@ cosmo.ui.event.listeners.hookUpListeners = function (){
 	dojo.addOnLoad(cosmo.app.init);
 	dojo.addOnUnload(cosmo.ui.event.handlers.cleanup);
 	dojo.connect(window, "onresize", cosmo.ui.event.handlers.resize);
-}
-
 }

@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.AccountActivator"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.AccountActivator"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -36,7 +34,8 @@ dojo.require("dijit._Templated");
 dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
     {
 
-        templateString:"\n    <table dojoAttachPoint=\"tableContainer\" class=\"baseWidget\">\n<!--\n  Copyright 2006 Open Source Applications Foundation\n\n  Licensed under the Apache License, Version 2.0 (the \"License\");\n  you may not use this file except in compliance with the License.\n  You may obtain a copy of the License at\n\n      http://www.apache.org/licenses/LICENSE-2.0\n\n  Unless required by applicable law or agreed to in writing, software\n  distributed under the License is distributed on an \"AS IS\" BASIS,\n  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n  See the License for the specific language governing permissions and\n  limitations under the License.\n-->\n\n        <tbody>\n            <tr>\n                <td dojoAttachPoint=\"usernameLabel\" class=\"labelTextCell\">\n                Username:\n                </td>\n                <td dojoAttachPoint=\"usernameText\"></td>\n            </tr>\n            <tr>\n                <td dojoAttachPoint=\"nameLabel\" class=\"labelTextCell\">\n                Name:\n                </td>\n                <td dojoAttachPoint=\"nameText\"></td>\n            </tr>\n            <tr>\n                <td dojoAttachPoint=\"emailLabel\" class=\"labelTextCell\">\n                Email:\n                </td>\n                <td dojoAttachPoint=\"emailText\"></td>\n            </tr>\n            <tr>\n                <td dojoAttachPoint=\"urlLabel\" class=\"labelTextCell\">\n                Url:\n                </td>\n                <td dojoAttachPoint=\"urlText\"></td>\n            </tr>\n            <tr>\n                <td dojoAttachPoint=\"homedirUrlLabel\" class=\"labelTextCell\">\n                Home Directory Url:\n                </td>\n                <td dojoAttachPoint=\"homedirUrlText\"></td>\n            </tr>\n            <tr>\n                <td></td>\n                <td dojoAttachPoint=\"activateButtonContainer\" id=\"activateButtonContainer\"></td>\n            </tr>\n\n        </tbody>\n    </table>\n\n",
+        templatePath: dojo.moduleUrl(
+            "cosmo", "/ui/widget/templates/AccountActivator.html"),
 
         //properties to be set by tag or constructor
         activationId: "",
@@ -112,5 +111,3 @@ dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
         }
     }
 );
-
-}

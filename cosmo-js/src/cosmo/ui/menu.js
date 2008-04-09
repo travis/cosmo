@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.ui.menu']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.ui.menu'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -772,5 +770,3 @@ dojo.connect(document, 'onclick',
         'hideHierarchicalMenu');
 
 
-
-}

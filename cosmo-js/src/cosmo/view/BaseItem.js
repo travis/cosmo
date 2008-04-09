@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.view.BaseItem"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.view.BaseItem"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -75,5 +73,3 @@ cosmo.view.BaseItem.prototype.recurrenceRemoved = function () {
         !this.data.hasRecurrence() && this.dataOrig.hasRecurrence());
 };
 
-
-}

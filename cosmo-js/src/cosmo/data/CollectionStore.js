@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.data.UserStore"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.data.UserStore"] = true;
 dojo.provide("cosmo.data.UserStore");
 dojo.require("cosmo.cmp");
 dojo.require("dojo.data.api.Write");
@@ -337,5 +335,3 @@ dojo.declare("cosmo.data.UserStore", dojo.data.api.Write, {
     }
 });
 
-
-}

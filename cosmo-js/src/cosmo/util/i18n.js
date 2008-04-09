@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.i18n"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.i18n"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -50,6 +48,4 @@ cosmo.util.i18n.messageExists = function (str){
      } else {
          return false;
      }
-}
-
 }

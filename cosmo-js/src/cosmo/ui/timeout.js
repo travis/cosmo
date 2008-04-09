@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.timeout"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.timeout"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -33,6 +31,4 @@ cosmo.ui.timeout.setTimeout = function (func, timeout){
    if (func) this.timeoutFunction = func;
    timeout = timeout || cosmo.env.getTimeoutSeconds() * 1000;
    this.timeoutObject = setTimeout(dojo.hitch(this, "timeoutFunction"), timeout);
-}
-
 }

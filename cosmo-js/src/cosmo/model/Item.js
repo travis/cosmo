@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.model.Item"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.model.Item"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -867,5 +865,3 @@ dojo.mixin(cosmo.model.Item.prototype, cosmo.model._urlsMixin);
 dojo.mixin(cosmo.model.Note.prototype, cosmo.model._deletedStampsMixin);
 dojo.mixin(cosmo.model.Modification.prototype, cosmo.model._urlsMixin);
 dojo.mixin(cosmo.model.Modification.prototype, cosmo.model._deletedStampsMixin);
-
-}

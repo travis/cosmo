@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.eim"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.eim"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -45,6 +43,4 @@ cosmo.service.eim.constants = {
         CLOB: "clob",
         DECIMAL: "decimal"
     }
-}
-
 }

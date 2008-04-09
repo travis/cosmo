@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.account.create']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.account.create'] = true;
 /*
  * Copyright 2006-2007 Open Source Applications Foundation
  *
@@ -294,6 +292,4 @@ cosmo.account.create = new function () {
         // Return the div containing the content
         return dO;
     }
-}
-
 }

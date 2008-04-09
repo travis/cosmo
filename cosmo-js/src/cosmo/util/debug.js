@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.debug"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.debug"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -103,5 +101,3 @@ genericToString = function (){
     dojo.deprecated("genericToString", "Use cosmo.util.debug.genericToString instead", "Version 0.6 Final Release");
     return cosmo.util.debug.genericToString.apply(this, arguments);
 };
-
-}

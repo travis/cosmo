@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.view.list.ListItem"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.view.list.ListItem"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -54,5 +52,3 @@ cosmo.view.list.ListItem.prototype.cancelSave = function () {
 
 
 
-
-}

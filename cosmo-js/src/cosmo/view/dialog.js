@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.dialog']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.dialog'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -335,5 +333,3 @@ cosmo.view.dialog.UnsavedChangesDialog.prototype =
     new cosmo.view.dialog.BaseDialog();
 
 
-
-}

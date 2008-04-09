@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.ButtonPanel"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.ButtonPanel"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -35,7 +33,7 @@ dojo.declare(
     [dijit._Widget, dijit._Templated],
     {
 
-        templateString:"<span>\n<!--\n  Copyright 2006 Open Source Applications Foundation\n  \n  Licensed under the Apache License, Version 2.0 (the \"License\");\n  you may not use this file except in compliance with the License.\n  You may obtain a copy of the License at\n  \n      http://www.apache.org/licenses/LICENSE-2.0\n  \n  Unless required by applicable law or agreed to in writing, software\n  distributed under the License is distributed on an \"AS IS\" BASIS,\n  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n  See the License for the specific language governing permissions and\n  limitations under the License.\n-->\n    <table dojoAttachPoint=\"panelContainer\"\n           border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n        <tbody>\n            <tr>\n                <td style=\"width:33%;\">\n                    <div dojoAttachPoint=\"leftContainer\" \n                        align=\"left\" style=\"width:100%;\">\n                    </div>\n                </td>\n                <td style=\"width:33%;\">\n                    <div dojoAttachPoint=\"centerContainer\" \n                        align=\"center\" style=\"width:100%;\">\n                    </div>\n                </td>\n                <td style=\"width:33%;\">\n                    <div dojoAttachPoint=\"rightContainer\" \n                        align=\"right\" style=\"width:100%;\">\n                    </div>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n</span>\n",
+        templatePath: dojo.moduleUrl("cosmo",  "ui/widget/templates/ButtonPanel.html"),
 
     // Attach points
     leftContainer: null,
@@ -94,5 +92,3 @@ dojo.declare(
     }
   } 
 );
-
-}

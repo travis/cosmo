@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.validate"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.validate"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -208,5 +206,3 @@ cosmo.util.validate = new function () {
 
 cosmo.util.validate.constructor = null;
 Validate = cosmo.util.validate;
-
-}

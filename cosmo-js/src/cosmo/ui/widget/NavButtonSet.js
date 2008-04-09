@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.NavButtonSet"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.NavButtonSet"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -26,7 +24,7 @@ dojo.require("dijit._Templated");
 dojo.declare(
     "cosmo.ui.widget.NavButtonSet", [dijit._Widget, dijit._Templated],
     {
-        templateString:"<table cellpadding=\"0px\" cellspacing=\"0px\" style=\"width: 45px; height: 16px;\">\n  <tbody>\n    <tr>\n      <td id=\"${id}CenterLeft\" class=\"btnElemBaseSm\" dojoAttachPoint=\"leftButtonNode\"\n          dojoAttachEvent=\"onmouseover: _morphButton, onmouseout: _morphButton, onmousedown: _morphButton, onmouseup: _morphButton, onclick: leftClickHandler\"\n          style=\"width: 13px; height: 15px; line-height: 0px; text-align: left; background-image: url(${bgImgUrl}); border-width: 1px 0 1px 1px;\">\n        <img src=\"${leftImgUrl}\"/ \n             style=\"padding: 2px 5px 0 5px; \">\n      </td>\n      <td id=\"${id}ButtonDivider\" style=\"width: 1px; height: 16px; line-height: 1px\"\n          class=\"btnSetDividerBase\"></td>\n      <td id=\"${id}CenterRight\" class=\"btnElemBaseSm\" dojoAttachPoint=\"rightButtonNode\"\n          dojoAttachEvent=\"onmouseover: _morphButton, onmouseout: _morphButton, onmousedown: _morphButton, onmouseup: _morphButton, onclick: rightClickHandler\"\n          style=\"width: 13px; height: 15px; line-height: 0px; text-align: right; background-image: url(${bgImgUrl}); border-width: 1px 1px 1px 0;\">\n        <img src=\"${rightImgUrl}\"/ \n             style=\"padding: 2px 5px 0 5px; \">\n      </td>\n    </tr>\n  </tbody>\n</table>\n",
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/NavButtonSet.html"),
         bgImgUrl: cosmo.env.getImageUrl("button_bgs.png"),
         leftImgUrl: cosmo.env.getImageUrl("nav_arrow_left.gif"),
         rightImgUrl: cosmo.env.getImageUrl("nav_arrow_right.gif"),
@@ -59,5 +57,3 @@ dojo.declare(
         }
     }
 );
-
-}

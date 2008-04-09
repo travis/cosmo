@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.translators.eim"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.translators.eim"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -1309,5 +1307,3 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return uuid;
     }
 });
-
-}

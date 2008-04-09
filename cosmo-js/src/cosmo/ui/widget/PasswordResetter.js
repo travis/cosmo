@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.PasswordResetter"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.PasswordResetter"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -39,7 +37,8 @@ dojo.declare("cosmo.ui.widget.PasswordResetter",
              [dijit._Widget, dijit._Templated],
     {
 
-        templateString:"<div>\n<!--\n  Copyright 2006 Open Source Applications Foundation\n\n  Licensed under the Apache License, Version 2.0 (the \"License\");\n  you may not use this file except in compliance with the License.\n  You may obtain a copy of the License at\n\n      http://www.apache.org/licenses/LICENSE-2.0\n\n  Unless required by applicable law or agreed to in writing, software\n  distributed under the License is distributed on an \"AS IS\" BASIS,\n  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n  See the License for the specific language governing permissions and\n  limitations under the License.\n-->\n\n\t<p dojoAttachPoint=\"infoBox\" class=\"infoText\"></p>\n\t<p dojoAttachPoint=\"errorBox\" class=\"errorText\"></p>\n\t\n    <table dojoAttachPoint=\"tableContainer\" id=\"passwordResetterInputForm\" style=\"margin-left: auto; margin-right: auto; margin-top: 1em;\">\n\n        <tbody>\n            <tr>\n                <td dojoAttachPoint=\"passwordLabel\" class=\"labelTextCell\">\n                </td>\n                <td dojoAttachPoint=\"passwordInputContainer\">\n                \t<input type=\"password\" dojoAttachPoint=\"passwordInput\"/>\n                </td>\n            </tr>\n            <tr>\n                <td dojoAttachPoint=\"confirmLabel\" class=\"labelTextCell\">\n                </td>\n                <td dojoAttachPoint=\"confirmInputContainer\">\n                \t<input type=\"password\" dojoAttachPoint=\"confirmInput\"/>\n               \t</td>\n            </tr>\n            <tr>\n                <td></td>\n                <td dojoAttachPoint=\"sendButtonContainer\" id=\"sendButtonContainer\" style=\"text-align: right\">\n                \t<input dojoType=\"cosmo.ui.widget.Button\" type=\"button\" i18nText=\"Account.PasswordReset.Submit\" dojoAttachEvent=\"handleOnClick:resetPassword\"/>\n                </td>\n            </tr>\n\n        </tbody>\n    </table>\n</div>\n",
+        templatePath: dojo.moduleUrl(
+            "cosmo", "ui/widget/templates/PasswordResetter.html"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
@@ -98,5 +97,3 @@ dojo.declare("cosmo.ui.widget.PasswordResetter",
 
     }
 );
-
-}

@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.transport.Atom"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.transport.Atom"] = true;
 /* * Copyright 2006-2007 Open Source Applications Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -308,5 +306,3 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         return ret;
     }
 });
-
-}

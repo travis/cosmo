@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.conf"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.conf"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -104,6 +102,4 @@ cosmo.ui.conf.getBooleanValue = function(propertyName){
 
 if (djConfig['i18nLocation']){
     cosmo.ui.conf.init(djConfig['i18nLocation']);
-}
-
 }

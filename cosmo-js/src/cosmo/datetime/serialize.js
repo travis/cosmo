@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.datetime.serialize"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.datetime.serialize"] = true;
 /*
  * Copyright 2006-2007 Open Source Applications Foundation
  *
@@ -155,6 +153,4 @@ function durationHashToIso8601(/*Object*/dur){
         if (dur.second) ret += dur.second + "S";
     }
     return ret;
-}
-
 }

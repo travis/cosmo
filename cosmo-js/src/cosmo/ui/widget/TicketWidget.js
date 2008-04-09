@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.TicketWidget"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.TicketWidget"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -35,10 +33,10 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.convenience");
 
-dojo.requireLocalization("cosmo.ui.widget", "TicketWidget", null, "ROOT");
+dojo.requireLocalization("cosmo.ui.widget", "TicketWidget");
 
 dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], {
-    templateString:"<div>\n<form dojoType=\"dijit.form.Form\" dojoAttachEvent=\"execute: execute\" dojoAttachPoint=\"form\">\n  <span>\n    ${l10n.ticket}\n  </span>\n  \n  <span>\n    <input dojoType=\"dijit.form.ValidationTextBox\" regExp=\"${timeoutRE}\" name=\"timeout\" invalidMessage=\"${l10n.ticketInvalid}\"/>\n    ${l10n.ticketSeconds}\n  </span>\n  <span>\n    ${l10n.privileges}\n  </span>\n  <span>\n    <input type=\"radio\" dojoType=\"dijit.form.RadioButton\" \n           name=\"privileges\" value=\"ro\" id=\"${id}ReadRadio\" checked=\"true\"/> ${l10n.read}\n    <input type=\"radio\" dojoType=\"dijit.form.RadioButton\" \n           name=\"privileges\" value=\"rw\" id=\"${id}ReadWriteRadio\"/> ${l10n.readWrite}\n    <input type=\"radio\" dojoType=\"dijit.form.RadioButton\" \n           name=\"privileges\" value=\"fb\" id=\"${id}FreeBusyRadio\"/> ${l10n.freeBusy}\n  </span>\n  <button styleClass=\"buttonInput\"  type=\"submit\" name=\"submit\" id=\"${id}GrantTicketButton\" dojoType=\"dijit.form.Button\">\n    ${l10n.grantTicket}\n  </button>\n</span>\n</form>\n</div>\n",
+    templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/TicketWidget.html"),
 
     widgetsInTemplate: true,
     itemId: "",
@@ -87,5 +85,3 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
 		alert("Ticket not created. Error: " + error.message);
    	}
 });
-
-}

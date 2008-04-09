@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.model.util"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.model.util"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -469,6 +467,4 @@ cosmo.model.clone = function (thing){
         return clone;
    }
    throw new Error("unclonable!?")
-}
-
 }

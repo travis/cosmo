@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.convenience"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.convenience"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -30,5 +28,3 @@ dojo.global._createText = function (s) {
     return document.createTextNode(s);
 }
 dojo.global._ = dojo.hitch(cosmo.util.i18n, cosmo.util.i18n.getText);
-
-}

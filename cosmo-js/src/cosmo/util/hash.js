@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.hash"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.hash"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -274,5 +272,3 @@ cosmo.util.hash.Hash = function () {
     };
 }
 Hash = cosmo.util.hash.Hash;
-
-}

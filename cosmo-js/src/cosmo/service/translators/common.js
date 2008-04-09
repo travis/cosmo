@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.translators.common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.translators.common"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -19,5 +17,3 @@ dojo._hasResource["cosmo.service.translators.common"] = true;
  dojo.provide("cosmo.service.translators.common");
  
  dojo.declare("cosmo.service.translators.ParseError", Error);
-
-}

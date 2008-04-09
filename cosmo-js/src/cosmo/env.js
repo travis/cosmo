@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.env"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.env"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -267,5 +265,3 @@ cosmo.env.setStaticBaseUrlTemplate(djConfig['staticBaseUrlTemplate']);
 cosmo.env.setStaticBaseUrlRange(djConfig['staticBaseUrlRange']);
 
 
-
-}

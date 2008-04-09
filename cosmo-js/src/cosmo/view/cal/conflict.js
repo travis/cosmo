@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.cal.conflict']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.cal.conflict'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -313,5 +311,3 @@ cosmo.view.cal.conflict = new function() {
 }
 cosmo.view.cal.conflict.constructor = null;
 
-
-}

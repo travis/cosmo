@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.app.pim"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.app.pim"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -486,5 +484,3 @@ cosmo.app.pim = dojo.mixin(new function () {
 
 Cal = cosmo.app.pim;
 
-
-}

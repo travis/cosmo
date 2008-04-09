@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.common"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.common"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -64,6 +62,4 @@ cosmo.service.getRid = function(/*cosmo.datetime.Date*/date, allDay, anyTime){
 
 cosmo.service.getDateFormatString = function (allDay, anyTime){
         return (allDay || anyTime) ? "%Y%m%d": "%Y%m%dT%H%M%S";
-}
-
 }

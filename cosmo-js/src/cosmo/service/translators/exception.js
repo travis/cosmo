@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.translators.exception"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.translators.exception"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -25,5 +23,3 @@ dojo.declare("cosmo.service.translators.exception.TranslationException", Error, 
 dojo.declare("cosmo.service.translators.exception.ModelToRecordSetException", 
              cosmo.service.translators.exception.TranslationException, {});
 
-
-}

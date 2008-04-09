@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.AuthBox"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.AuthBox"] = true;
 dojo.provide("cosmo.ui.widget.AuthBox");
 
 dojo.require("dijit._Widget");
@@ -199,5 +197,3 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
             deferred: c.deferred,
             defaultAction: function () { c.doAuth.apply(c) } };
 };
-
-}

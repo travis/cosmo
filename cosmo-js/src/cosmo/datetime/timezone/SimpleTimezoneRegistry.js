@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.datetime.timezone.SimpleTimezoneRegistry"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.datetime.timezone.SimpleTimezoneRegistry"] = true;
 /*
  * Copyright 2006-2007 Open Source Applications Foundation
  *
@@ -91,5 +89,3 @@ cosmo.datetime.timezone.SimpleTimezoneRegistry.prototype._parseUri = function(ur
     var content = dojo._getText(this.timezoneFileRoot + "/" + uri);
     cosmo.datetime.timezone.parse(content, dojo.hitch(this, this.addTimezone), dojo.hitch(this, this.addRuleSet), dojo.hitch(this, this.addLink));
 };
-
-}

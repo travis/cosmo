@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.lang"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.lang"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -87,6 +85,4 @@ cosmo.util.lang.unnest = function () {
         else { out.push(arguments[i]); } 
     } 
     return out; 
-}
-
 }

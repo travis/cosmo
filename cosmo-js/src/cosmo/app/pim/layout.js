@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.app.pim.layout"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.app.pim.layout"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -408,5 +406,3 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     rightSidebar.render();
 
 };
-
-}

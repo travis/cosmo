@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.About"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.About"] = true;
 dojo.provide("cosmo.ui.widget.About");
 
 dojo.require("cosmo.env");
@@ -66,5 +64,3 @@ dojo.declare("cosmo.ui.widget.About", [dijit._Widget, dijit._Templated], {
 
 
 
-
-}

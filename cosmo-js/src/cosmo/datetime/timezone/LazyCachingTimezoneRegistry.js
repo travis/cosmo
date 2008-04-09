@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.datetime.timezone.LazyCachingTimezoneRegistry"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.datetime.timezone.LazyCachingTimezoneRegistry"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -102,5 +100,3 @@ dojo.declare("cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
 
 
 });
-
-}

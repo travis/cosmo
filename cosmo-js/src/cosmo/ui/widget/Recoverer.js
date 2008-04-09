@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.Recoverer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.Recoverer"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -38,7 +36,8 @@ dojo.require("dijit._Templated");
 dojo.declare("cosmo.ui.widget.Recoverer", [dijit._Widget, dijit._Templated],
     {
 
-        templateString:"<div>\n<!--\n  Copyright 2006 Open Source Applications Foundation\n\n  Licensed under the Apache License, Version 2.0 (the \"License\");\n  you may not use this file except in compliance with the License.\n  You may obtain a copy of the License at\n\n      http://www.apache.org/licenses/LICENSE-2.0\n\n  Unless required by applicable law or agreed to in writing, software\n  distributed under the License is distributed on an \"AS IS\" BASIS,\n  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n  See the License for the specific language governing permissions and\n  limitations under the License.\n-->\n\n\t<p dojoAttachPoint=\"infoBox\" class=\"infoText\"></p>\n\t<p dojoAttachPoint=\"errorBox\" class=\"errorText\"></p>\n\t\n    <table dojoAttachPoint=\"tableContainer\" id=\"recovererInputForm\" style=\"margin-left: auto; margin-right: auto; margin-top: 1em;\">\n\n        <tbody>\n            <tr>\n                <td dojoAttachPoint=\"usernameLabel\" class=\"labelTextCell\">\n                </td>\n                <td dojoAttachPoint=\"usernameInputContainer\">\n                \t<input type=\"text\" dojoAttachPoint=\"usernameInput\"/>\n                </td>\n            </tr>\n            <tr>\n            \t<td class=\"labelTextCell\">${orText}</td>\n            \t<td>&nbsp;</td>\n            </tr>\n            <tr>\n                <td dojoAttachPoint=\"emailLabel\" class=\"labelTextCell\">\n                </td>\n                <td dojoAttachPoint=\"emailInputContainer\">\n                \t<input type=\"text\" dojoAttachPoint=\"emailInput\"/>\n               \t</td>\n            </tr>\n            <tr>\n                <td></td>\n                <td dojoAttachPoint=\"sendButtonContainer\" id=\"sendButtonContainer\" style=\"text-align: right\">\n                   \t<input dojoType=\"cosmo.ui.widget.Button\" dojoAttachPoint=\"sendButton\" type=\"button\" i18nText=\"${i18nPrefix}Submit\" dojoAttachEvent=\"handleOnClick:recover\" value=\"Submit\"/>\n                </td>\n            </tr>\n\n        </tbody>\n    </table>\n</div>\n",
+        templatePath: dojo.moduleUrl(
+            "cosmo" ,"ui/widget/templates/Recoverer.html"),
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
@@ -105,5 +104,3 @@ dojo.declare("cosmo.ui.widget.Recoverer", [dijit._Widget, dijit._Templated],
         }
     }
 );
-
-}

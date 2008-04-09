@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.encoding"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.encoding"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -140,5 +138,3 @@ cosmo.util.encoding._utf8_encode = function (string) {
          }  
          return utftext;  
 } 
-
-}

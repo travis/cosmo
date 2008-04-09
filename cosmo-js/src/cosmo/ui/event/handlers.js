@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.ui.event.handlers']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.ui.event.handlers'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -182,5 +180,3 @@ cosmo.ui.event.handlers.resize = function () {
 	    cosmo.app.pim.baseLayout.render();
 }
 
-
-}

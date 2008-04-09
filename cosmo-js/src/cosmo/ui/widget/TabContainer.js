@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.TabContainer"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.TabContainer"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -167,5 +165,3 @@ dojo.declare("cosmo.ui.widget.TabContainer", [dijit._Widget, dijit._Templated], 
     }
 } );
 
-
-}

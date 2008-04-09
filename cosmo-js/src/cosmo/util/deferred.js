@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.deferred"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.deferred"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -59,5 +57,3 @@ cosmo.util.deferred = {
     }    
 }
 
-
-}

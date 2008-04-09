@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.model"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.model"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -82,5 +80,3 @@ cosmo.model._eventComparator = function (a, b) {
         }
     }
 };
-
-}

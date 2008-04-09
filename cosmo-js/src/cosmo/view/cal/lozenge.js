@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.cal.lozenge']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.cal.lozenge'] = true;
 /* * Copyright 2006 Open Source Applications Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1243,5 +1241,3 @@ cosmo.view.cal.lozenge.NoTimeLozenge.prototype.composite = function () {
     return false;
 }
 
-
-}

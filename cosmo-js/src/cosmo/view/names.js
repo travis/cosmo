@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.names']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.names'] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -22,5 +20,3 @@ dojo.mixin(cosmo.view.names, {
     CAL: "cal" ,
     LIST: "list"
 });
-
-}

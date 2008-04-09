@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.account.login']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.account.login'] = true;
 /*
  * Copyright 2006-2007 Open Source Applications Foundation
  *
@@ -41,5 +39,3 @@ cosmo.account.login.doLogin = function(un, pw){
     });
     return d;
 };
-
-}

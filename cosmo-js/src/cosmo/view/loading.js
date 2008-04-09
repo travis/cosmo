@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.view.loading"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.view.loading"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -67,5 +65,3 @@ cosmo.view.loading.StatusMessage = function (p) {
 cosmo.view.loading.StatusMessage.prototype =
     new cosmo.ui.ContentBox();
 
-
-}

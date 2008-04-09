@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.CollectionSelector"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.CollectionSelector"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -29,7 +27,7 @@ dojo.require("cosmo.topics");
 dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
 
-dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector", null, "ROOT");
+dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");
 
 dojo.declare("cosmo.AlreadySubscribedException", Error);
 
@@ -37,7 +35,7 @@ dojo.declare(
     "cosmo.ui.widget.CollectionSelector", 
     [dijit._Widget, dijit._Templated],
     {
-        templateString:"<div>\n  <div id=\"collectionLabelName\" class=\"labelTextHoriz\" title=\"${displayName}\">\n    ${displayName}\n  </div>\n  <div id=\"addCollectionPrompt\">\n    <a title=\"${l10n.collectionAddTooltip}\" dojoAttachEvent=\"onclick: _onClickAdd\">\n       ${l10n.addPrompt}</a>\n  </div>\n</div>\n\n",
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/CollectionSelector.html"),
         collection: null,
         ticketKey: '',
         displayName: "",
@@ -209,5 +207,3 @@ dojo.declare(
         }
 } );
 
-
-}

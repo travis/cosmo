@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.LoginDialog"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.LoginDialog"] = true;
 dojo.provide("cosmo.ui.widget.LoginDialog");
 
 dojo.require("dijit._Widget");
@@ -16,7 +14,7 @@ dojo.declare(
     [dijit._Widget, dijit._Templated],
     {
         stylesheet: "",
-        templateString:"<div id=\"loginDialog\">\n    <div id=\"loginDialogLogo\" dojoattachpoint=\"logoContainer\"></div>\n    <div id=\"loginDialogLoginPrompt\" class=\"promptText\"\n        dojoattachpoint=\"loginPromptContainer\">${loginPrompt}</div>\n    <div id=\"loginDialogFormContainer\">\n    <form id=\"loginDialogForm\" dojoattachpoint=\"loginForm\" onsubmit=\"return false;\">\n        <table id=\"loginDialogInputsBox\">\n            <tr id=\"loginDialogUsernameWidget\">\n                <td id=\"loginDialogUsernameLabel\" class=\"labelTextHoriz labelTextCell\"\n                    dojoattachpoint=\"usernameLabelContainer\">${usernameLabel}</td>\n                <td id=\"loginDialogUsernameInputContainer\">\n                    <input type=\"text\" id=\"loginDialogUsernameInput\" class=\"inputText\"\n                        dojoAttachPoint=\"usernameInput\" />\n                </td>\n            </tr>\n            <tr id=\"loginDialogPasswordWidget\">\n                <td id=\"loginDialogPasswordLabel\" class=\"labelTextHoriz labelTextCell\"\n                    dojoattachpoint=\"passwordLabelContainer\">${passwordLabel}</td>\n                <td id=\"loginDialogPasswordInputContainer\">\n                <input type=\"password\" id=\"loginDialogPasswordInput\" class=\"inputText\"\n                    dojoAttachPoint=\"passwordInput\"/>\n                </td>\n            </tr>\n        </table>\n        <div id=\"loginDialogSubmitButton\" dojoattachpoint=\"submitButtonContainer\"></div>\n\t\t<div style=\"clear:both;\"></div>\n    </form>\n    </div>\n</div>\n",
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/LoginDialog.html"),
 
         // Props from template or set in constructor
         passwordLabel: _("Login.Password"),
@@ -137,5 +135,3 @@ dojo.declare(
         }
     }
 );
-
-}

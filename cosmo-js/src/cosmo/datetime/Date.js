@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.datetime.Date"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.datetime.Date"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -587,6 +585,4 @@ cosmo.datetime.Date.add = function(dt, interv, incr) {
     else {
         throw('dt is not a usable Date object.');
     }
-}
-
 }

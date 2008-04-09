@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.list.canvas']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.list.canvas'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -662,5 +660,3 @@ cosmo.view.list.canvas.Canvas = function (p) {
 cosmo.view.list.canvas.Canvas.prototype =
   new cosmo.ui.ContentBox();
 
-
-}

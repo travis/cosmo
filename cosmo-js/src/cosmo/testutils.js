@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.testutils"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.testutils"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -137,6 +135,4 @@ cosmo.testutils = {
             dojo.hitch(d2, d2.errback));
         return d2;
     }
-}
-
 }

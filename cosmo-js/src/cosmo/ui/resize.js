@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.resize"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.resize"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -551,5 +549,3 @@ cosmo.ui.resize.Handle = function (el) {
 
     //self.listen(window,"unload",self.cleanupListeners)
 
-
-}

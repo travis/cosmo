@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.GraphicRadioButtonSet"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.GraphicRadioButtonSet"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -134,6 +132,4 @@ cosmo.ui.widget.GraphicRadioButtonSet.Button = function (p) {
     this.mouseoverImgPos = [];
     this.downStateImgPos = [];
     for (var n in params) { this[n] = params[n]; }
-}
-
 }

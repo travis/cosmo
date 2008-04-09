@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.model.Delta"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.model.Delta"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -544,5 +542,3 @@ dojo.declare("cosmo.model.Delta", null, {
             'yearly': [cosmo.datetime.util.dateParts.YEAR, 1]
     }
 });
-
-}

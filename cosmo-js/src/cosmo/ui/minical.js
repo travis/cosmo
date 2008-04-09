@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.minical"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.minical"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -797,5 +795,3 @@ cosmo.ui.minical.MiniCal = function (p) {
 cosmo.ui.minical.MiniCal.prototype =
     new cosmo.ui.ContentBox();
 
-
-}

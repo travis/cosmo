@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.string"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.string"] = true;
 /* * Copyright 2006-2007 Open Source Applications Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +47,4 @@ cosmo.util.string.escapeXml = function(/*string*/str){
 		.replace(/>/gm, "&gt;").replace(/"/gm, "&quot;")
         .replace(/'/gm, "&#39;");
 	return str;
-}
-
 }

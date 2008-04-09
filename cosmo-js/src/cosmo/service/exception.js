@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.service.exception"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.service.exception"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -67,5 +65,3 @@ dojo.declare("cosmo.service.exception.ResourceNotFoundException", cosmo.service.
         return "The resource " + this.id + " does not exist";
     }
 });
-
-}

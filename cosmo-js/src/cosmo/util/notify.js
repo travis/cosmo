@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.util.notify"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.util.notify"] = true;
 /*
  * Copyright 2008 Open Source Applications Foundation
  *
@@ -75,6 +73,4 @@ cosmo.util.notify = {
         return d;
     }
     
-}
-
 }

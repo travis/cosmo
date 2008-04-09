@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.model.EventStamp"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.model.EventStamp"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -163,5 +161,3 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         }
     }
 );
-
-}

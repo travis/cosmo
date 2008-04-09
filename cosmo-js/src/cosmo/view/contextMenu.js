@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.contextMenu']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.contextMenu'] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -57,5 +55,3 @@ cosmo.view.contextMenu = new function () {
     };
 };
 
-
-}

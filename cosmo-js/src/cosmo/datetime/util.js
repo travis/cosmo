@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.datetime.util"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.datetime.util"] = true;
 /*
  * Copyright 2006-2007 Open Source Applications Foundation
  *
@@ -138,5 +136,3 @@ cosmo.datetime.util = new function () {
 };
 
 
-
-}

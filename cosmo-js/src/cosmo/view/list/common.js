@@ -1,5 +1,3 @@
-if(!dojo._hasResource['cosmo.view.list.common']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['cosmo.view.list.common'] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -248,5 +246,3 @@ cosmo.view.list.createNoteItem = function (s) {
 };
 
 
-
-}

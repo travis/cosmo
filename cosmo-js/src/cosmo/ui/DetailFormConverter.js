@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.DetailFormConverter"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.DetailFormConverter"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -465,5 +463,3 @@ dojo.declare("cosmo.ui.ErrorList", null, {
 
 
 })
-
-}

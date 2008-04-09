@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.ui.widget.Button"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.ui.widget.Button"] = true;
 /*
  * Copyright 2006 Open Source Applications Foundation
  *
@@ -123,5 +121,3 @@ dojo.declare("cosmo.ui.widget.Button", [dijit._Widget, dijit._Templated], {
         }
     }
   } );
-
-}

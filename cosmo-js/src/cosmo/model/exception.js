@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.model.exception"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.model.exception"] = true;
 /*
  * Copyright 2007 Open Source Applications Foundation
  *
@@ -19,5 +17,3 @@ dojo.provide("cosmo.model.exception");
 
 dojo.declare("cosmo.model.exception.DetailItemNotDeltaItemException", Error, {
 });
-
-}

@@ -1,5 +1,3 @@
-if(!dojo._hasResource["cosmo.datetime.timezone"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["cosmo.datetime.timezone"] = true;
 /*
  * Copyright 2006-2007 Open Source Applications Foundation
  *
@@ -638,5 +636,3 @@ cosmo.datetime.timezone._parseTimeString = function(str) {
     minutes = minutes * (hms.negative ? -1 : 1);
     return minutes;
  };
-
-}

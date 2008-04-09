@@ -21,9 +21,9 @@ dojo.require("cosmo.util.auth");
 dojo.require("cosmo.convenience");
 
 cosmo.account.login.doLogin = function(un, pw){
-    var postData = 
-        {"j_username": encodeURIComponent(un), 
-         "j_password": encodeURIComponent(pw)};
+    var postData =
+        {"j_username": un,
+         "j_password": pw};
 
     var d = dojo.xhrPost({
         url: cosmo.env.getFullUrl("Auth"),

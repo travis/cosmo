@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -51,6 +54,28 @@ public class StringPropertyUtilsTest extends TestCase {
         
         childKeys = StringPropertyUtils.getChildKeys("ldksf", testKeys);
         Assert.assertEquals(0, childKeys.length);
+       
+    }
+    
+    public void testGetChildProperties() throws Exception {
+        HashMap<String, String> testProps = new HashMap<String, String>();
+        testProps.put("a.b.c", "foo1");
+        testProps.put("a.b.d", "foo2");
+        testProps.put("a.b.e.f", "foo3");
+        
+        Map<String, String> childProps = StringPropertyUtils.getChildProperties("a.b", testProps);
+        Assert.assertEquals(2, childProps.size());
+        Assert.assertEquals("foo1", childProps.get("c"));
+        Assert.assertEquals("foo2", childProps.get("d"));
+        
+        childProps = StringPropertyUtils.getChildProperties("a.b.c", testProps);
+        Assert.assertEquals(0, childProps.size());
+        
+        childProps = StringPropertyUtils.getChildProperties("a", testProps);
+        Assert.assertEquals(0, childProps.size());
+        
+        childProps = StringPropertyUtils.getChildProperties("afsdfasd", testProps);
+        Assert.assertEquals(0, childProps.size());
        
     }
     

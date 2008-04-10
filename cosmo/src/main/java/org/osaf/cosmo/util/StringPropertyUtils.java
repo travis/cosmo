@@ -15,7 +15,10 @@
  */
 package org.osaf.cosmo.util;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -48,4 +51,31 @@ public class StringPropertyUtils {
         
         return children.toArray(new String[0]);
     }
+    
+    /**
+     * Return a map of child properties.  For example for the
+     * map of [a.b.c->foo1, a.b.d->foo2, a.b.e.f->foo3] the map
+     * of childKeys for parent a.b is [c->foo1, d->foo2]
+     * @param parent parent key
+     * @param props properties to search
+     * @return map of child properties
+     */
+    public static Map<String, String> getChildProperties(String parent, Map<String, String> props) {
+        HashMap<String, String> childProps = new HashMap<String, String>();
+        if(!parent.endsWith("."))
+            parent = parent + ".";
+        for(Entry<String, String> entry: props.entrySet()) {
+            if(entry.getKey().startsWith(parent)) {
+                String end = StringUtils.substringAfter(entry.getKey(), parent);
+                if(end!=null && !"".equals(end) && !end.contains(".")) {
+                    childProps.put(end, entry.getValue());
+                }
+                    
+            }
+        }
+        
+        return childProps;
+    }
+    
+    
 }

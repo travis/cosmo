@@ -109,6 +109,10 @@ public interface AtomConstants {
 
     public static final UriTemplate TEMPLATE_COLLECTION =
         new UriTemplate("/collection/{uid}/{projection}?/{format}?");
+    public static final UriTemplate TEMPLATE_TICKETS =
+        new UriTemplate("/collection/{uid}/tickets");
+    public static final UriTemplate TEMPLATE_TICKET =
+        new UriTemplate("/collection/{uid}/ticket/{key}");
     public static final UriTemplate TEMPLATE_ITEM =
         new UriTemplate("/item/{uid}/{projection}?/{format}?");
     public static final UriTemplate TEMPLATE_EXPANDED =

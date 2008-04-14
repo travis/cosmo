@@ -78,6 +78,14 @@ public class StandardTargetResolver
         if (match != null)
             return createCollectionTarget(context, match);
 
+        match = TEMPLATE_TICKETS.match(uri);
+        if (match != null)
+            return createTicketsTarget(context, match);
+
+        match = TEMPLATE_TICKET.match(uri);
+        if (match != null)
+            return createTicketTarget(context, match);
+
         match = TEMPLATE_ITEM.match(uri);
         if (match != null)
             return createItemTarget(context, match);
@@ -132,6 +140,37 @@ public class StandardTargetResolver
         return new CollectionTarget(context, (CollectionItem) item,
                                     match.get("projection"),
                                     match.get("format"));
+    }
+    
+    /**
+     * Creates a target representing a collection of tickets
+     */
+    protected Target createTicketsTarget(RequestContext context,
+                                         UriTemplate.Match match){
+        Item item = contentService.findItemByUid(match.get("uid"));
+        if (item == null)
+            return null;
+        if (! (item instanceof CollectionItem))
+            return null;
+        return new TicketsTarget(context, (CollectionItem) item);
+
+    }
+    
+    /**
+     * Creates a target representing a ticket
+     */
+    protected Target createTicketTarget(RequestContext context,
+                                        UriTemplate.Match match){
+        Item item = contentService.findItemByUid(match.get("uid"));
+        if (item == null)
+            return null;
+        if (! (item instanceof CollectionItem))
+            return null;
+        Ticket ticket = contentService.getTicket(item, match.get("key"));
+        if (ticket == null)
+            return null;
+        return new TicketTarget(context, (CollectionItem) item, ticket);
+        
     }
 
     /**

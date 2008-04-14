@@ -22,7 +22,7 @@ import java.util.Set;
  * Represents a ticket that is used to grant access to
  * an Item.
  */
-public interface Ticket {
+public interface Ticket extends AuditableObject {
 
     /** */
     public static final String TIMEOUT_INFINITE = "Infinite";

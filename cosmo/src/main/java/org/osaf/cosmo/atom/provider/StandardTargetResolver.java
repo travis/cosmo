@@ -33,6 +33,7 @@ import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.service.UserService;
 import org.osaf.cosmo.util.UriTemplate;
@@ -74,10 +75,6 @@ public class StandardTargetResolver
 
         UriTemplate.Match match = null;
 
-        match = TEMPLATE_COLLECTION.match(uri);
-        if (match != null)
-            return createCollectionTarget(context, match);
-
         match = TEMPLATE_TICKETS.match(uri);
         if (match != null)
             return createTicketsTarget(context, match);
@@ -85,6 +82,10 @@ public class StandardTargetResolver
         match = TEMPLATE_TICKET.match(uri);
         if (match != null)
             return createTicketTarget(context, match);
+
+        match = TEMPLATE_COLLECTION.match(uri);
+        if (match != null)
+            return createCollectionTarget(context, match);
 
         match = TEMPLATE_ITEM.match(uri);
         if (match != null)

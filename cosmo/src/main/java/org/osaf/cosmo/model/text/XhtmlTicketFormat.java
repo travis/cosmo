@@ -44,8 +44,8 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
     public Ticket parse(String source, EntityFactory entityFactory)
         throws ParseException {
 
-        String key;
-        TicketType type;
+        String key = null;
+        TicketType type = null;
         try {
             if (source == null)
                 throw new ParseException("Source has no XML data", -1);

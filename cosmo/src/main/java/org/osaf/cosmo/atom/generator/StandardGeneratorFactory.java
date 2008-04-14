@@ -151,6 +151,19 @@ public class StandardGeneratorFactory
         return new StandardPreferencesFeedGenerator(this, locator);
     }
 
+    /**
+     * Creates an instance of
+     * <code>StandardTicketsFeedGenerator</code>.
+     *
+     * @param locator the service locator from which feed URLs
+     * are calculated
+     * @return the feed generator
+     */
+    public TicketsFeedGenerator
+        createTicketsFeedGenerator(ServiceLocator locator) {
+        return new StandardTicketsFeedGenerator(this, locator);
+    }
+
     // our methods
 
     public Abdera getAbdera() {

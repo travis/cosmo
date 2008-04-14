@@ -29,6 +29,7 @@ public class StandardProviderManager
     private ItemProvider itemProvider;
     private SubscriptionProvider subscriptionProvider;
     private PreferencesProvider preferencesProvider;
+    private TicketsProvider ticketsProvider;
     private UserProvider userProvider;
 
     // Manager methods
@@ -50,7 +51,10 @@ public class StandardProviderManager
             return subscriptionProvider;
         if (target instanceof PreferencesTarget ||
             target instanceof PreferenceTarget)
-            return preferencesProvider;
+                return preferencesProvider;
+        if (target instanceof TicketsTarget ||
+            target instanceof TicketTarget)
+                return ticketsProvider;
         if (target instanceof UserTarget)
             return userProvider;
         throw new IllegalArgumentException("No provider for " + target.getClass().getName());
@@ -100,6 +104,14 @@ public class StandardProviderManager
         this.preferencesProvider = provider;
     }
 
+    public TicketsProvider getTicketsProvider() {
+        return ticketsProvider;
+    }
+
+    public void setTicketsProvider(TicketsProvider provider) {
+        this.ticketsProvider = provider;
+    }
+
     public UserProvider getUserProvider() {
         return userProvider;
     }
@@ -119,6 +131,8 @@ public class StandardProviderManager
             throw new IllegalStateException("subscriptionProvider is required");
         if (preferencesProvider == null)
             throw new IllegalStateException("preferencesProvider is required");
+        if (preferencesProvider == null)
+            throw new IllegalStateException("ticketsProvider is required");
         if (userProvider == null)
             throw new IllegalStateException("userProvider is required");
     }

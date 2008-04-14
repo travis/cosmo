@@ -17,6 +17,7 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.DefaultTarget;
 
 import org.osaf.cosmo.model.CollectionItem;
 
@@ -25,10 +26,14 @@ import org.osaf.cosmo.model.CollectionItem;
  * A target that identifies the tickets collection.
  * </p>
  */
-public class TicketsTarget extends CollectionTarget {
-
+public class TicketsTarget extends DefaultTarget {
+    private CollectionItem collection;
     public TicketsTarget(RequestContext request,
                              CollectionItem collection) {
-        super(request, collection);
+        super(TargetType.TYPE_COLLECTION,  request);
+        this.collection = collection;
+    }
+    public CollectionItem getCollection() {
+        return collection;
     }
 }

@@ -19,6 +19,7 @@ import java.util.Date;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.impl.DefaultTarget;
 import org.apache.abdera.util.EntityTag;
 
 import org.osaf.cosmo.model.Ticket;
@@ -29,15 +30,17 @@ import org.osaf.cosmo.model.CollectionItem;
  * A target that identifies a particular user preference.
  * </p>
  */
-public class TicketTarget extends CollectionTarget implements AuditableTarget {
+public class TicketTarget extends DefaultTarget implements AuditableTarget{
 
     private Ticket ticket;
+    private CollectionItem collection;
 
     public TicketTarget(RequestContext request,
                             CollectionItem collection,
                             Ticket ticket) {
-        super(request, collection);
+        super(TargetType.TYPE_ENTRY, request);
         this.ticket = ticket;
+        this.collection = collection;
     }
 
     // AuditableTarget methods
@@ -58,5 +61,9 @@ public class TicketTarget extends CollectionTarget implements AuditableTarget {
 
     public Ticket getTicket() {
         return ticket;
+    }
+
+    public CollectionItem getCollection() {
+        return collection;
     }
 }

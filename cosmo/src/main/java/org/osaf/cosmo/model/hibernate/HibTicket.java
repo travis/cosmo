@@ -45,7 +45,7 @@ import org.osaf.cosmo.model.User;
  */
 @Entity
 @Table(name="tickets")
-public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ticket {
+public class HibTicket extends HibAuditableObject implements Comparable<Ticket>, Ticket {
 
     /**
      * 
@@ -307,5 +307,10 @@ public class HibTicket extends BaseModelObject implements Comparable<Ticket>, Ti
      */
     public void setItem(Item item) {
         this.item = item;
+    }
+    
+    public String calculateEntityTag() {
+        // Tickets are globally unique by key and are immutable
+        return encodeEntityTag(this.key.getBytes());
     }
 }

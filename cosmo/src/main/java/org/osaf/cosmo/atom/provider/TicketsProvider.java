@@ -32,11 +32,10 @@ import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.TicketsFeedGenerator;
 import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.text.XhtmlTicketFormat;
 import org.osaf.cosmo.server.ServiceLocator;
-import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.service.ContentService;
 
 public class TicketsProvider extends BaseProvider
     implements AtomConstants {
@@ -46,7 +45,7 @@ public class TicketsProvider extends BaseProvider
     private static final String[] ALLOWED_ENTRY_METHODS =
         new String[] { "GET", "HEAD", "OPTIONS" };
 
-    private UserService userService;
+    private ContentService contentService;
 
     // Provider methods
 
@@ -61,22 +60,24 @@ public class TicketsProvider extends BaseProvider
         try {
             Ticket ticket = readTicket(request);
 
-            if (user.getPreference(pref.getKey()) != null)
-                return conflict(getAbdera(), request, "Preference exists");
+            if (contentService.getTicket(collection, ticket.getKey()) != null)
+                return conflict(getAbdera(), request, "Ticket exists on " + 
+                                collection.getDisplayName());
 
             if (log.isDebugEnabled())
-                log.debug("creating preference " + pref.getKey() +
-                          " for user " + user.getUsername());
+                log.debug("creating preference " + ticket.getKey() +
+                          " for collection " + collection.getDisplayName());
 
-            user.addPreference(pref);
-            user = userService.updateUser(user);
+            contentService.createTicket(collection, ticket);
+            collection = contentService.updateCollection(collection);
+            
 
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Entry entry = generator.generateEntry(pref);
+            TicketsFeedGenerator generator =
+                createTicketsFeedGenerator(locator);
+            Entry entry = generator.generateEntry(ticket);
             
-            return created(entry, pref, locator);
+            return created(entry, ticket, locator);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
@@ -94,15 +95,14 @@ public class TicketsProvider extends BaseProvider
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
-        PreferenceTarget target = (PreferenceTarget) request.getTarget();
-        User user = target.getUser();
-        Preference pref = target.getPreference();
+        TicketTarget target = (TicketTarget) request.getTarget();
+        CollectionItem collection= target.getCollection();
+        Ticket ticket = target.getTicket();
         if (log.isDebugEnabled())
-            log.debug("deleting entry for preference " + pref.getKey() +
-                      " for user " + user.getUsername());
-
-        user.removePreference(pref);
-        userService.updateUser(user);
+            log.debug("deleting entry for ticket " + ticket.getKey() +
+                      " for collection " + collection.getDisplayName());
+        contentService.removeTicket(collection, ticket);
+        contentService.updateCollection(collection);
 
         return deleted();
     }
@@ -112,51 +112,7 @@ public class TicketsProvider extends BaseProvider
     }
 
     public ResponseContext updateEntry(RequestContext request) {
-        PreferenceTarget target = (PreferenceTarget) request.getTarget();
-        User user = target.getUser();
-        Preference pref = target.getPreference();
-        if (log.isDebugEnabled())
-            log.debug("upudating preference " + pref.getKey() + " for user " +
-                      user.getUsername());
-
-        ResponseContext frc = checkEntryWritePreconditions(request);
-        if (frc != null)
-            return frc;
-
-        try {
-            Preference newpref = readPreference(request);
-
-            if (user.getPreference(newpref.getKey()) != null &&
-                ! user.getPreference(newpref.getKey()).equals(pref))
-                return conflict(getAbdera(), request, "Preference exists");
-
-            String oldKey = pref.getKey();
-            pref.setKey(newpref.getKey());
-            pref.setValue(newpref.getValue());
-
-            user = userService.updateUser(user);
-
-            ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Entry entry = generator.generateEntry(pref);
-
-            boolean locationChanged = ! oldKey.equals(pref.getKey());
-            return updated(entry, pref, locator, locationChanged);
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
-        } catch (ValidationException e) {
-            String msg = "Invalid entry: " + e.getMessage();
-            if (e.getCause() != null)
-                msg += e.getCause().getMessage();
-            return badrequest(getAbdera(), request, msg);
-        } catch (GeneratorException e) {
-            String reason = "Unknown entry generation error: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
-        }
+        throw new UnsupportedOperationException();
     }
   
     public ResponseContext updateMedia(RequestContext request) {
@@ -168,17 +124,17 @@ public class TicketsProvider extends BaseProvider
     }
 
     public ResponseContext getFeed(RequestContext request) {
-        PreferencesTarget target = (PreferencesTarget) request.getTarget();
-        User user = target.getUser();
+        TicketsTarget target = (TicketsTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
-            log.debug("getting preferences feed for user " +
-                      user.getUsername());
+            log.debug("getting tickets feed for collection " +
+                      collection.getDisplayName());
 
         try {
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Feed feed = generator.generateFeed(user);
+            TicketsFeedGenerator generator =
+                createTicketsFeedGenerator(locator);
+            Feed feed = generator.generateFeed(collection);
 
             return ok(feed);
         } catch (GeneratorException e) {
@@ -189,20 +145,20 @@ public class TicketsProvider extends BaseProvider
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        PreferenceTarget target = (PreferenceTarget) request.getTarget();
-        User user = target.getUser();
-        Preference pref = target.getPreference();
+        TicketTarget target = (TicketTarget) request.getTarget();
+        CollectionItem collection = target.getCollection();
+        Ticket ticket = target.getTicket();
         if (log.isDebugEnabled())
-            log.debug("getting entry for preference " +
-                      pref.getKey() + " for user " + user.getUsername());
+            log.debug("getting entry for ticket " +
+                      ticket.getKey() + " for collection " + collection.getDisplayName());
 
         try {
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Entry entry = generator.generateEntry(pref);
+            TicketsFeedGenerator generator =
+                createTicketsFeedGenerator(locator);
+            Entry entry = generator.generateEntry(ticket);
 
-            return ok(entry, pref);
+            return ok(entry, ticket);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
@@ -242,27 +198,27 @@ public class TicketsProvider extends BaseProvider
 
     // our methods
 
-    public UserService getUserService() {
-        return userService;
+    public ContentService getContentService() {
+        return contentService;
     }
 
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setContentService(ContentService contentService) {
+        this.contentService = contentService;
     }
 
     public void init() {
         super.init();
-        if (userService == null)
-            throw new IllegalStateException("userService is required");
+        if (contentService == null)
+            throw new IllegalStateException("contentService is required");
     }
 
-    protected PreferencesFeedGenerator
-        createPreferencesFeedGenerator(ServiceLocator locator) {
+    protected TicketsFeedGenerator
+        createTicketsFeedGenerator(ServiceLocator locator) {
         return getGeneratorFactory().
-            createPreferencesFeedGenerator(locator);
+            createTicketsFeedGenerator(locator);
     }
 
-    private Preference readPreference(RequestContext request)
+    private Ticket readTicket(RequestContext request)
         throws IOException, ValidationException {
         Entry entry = (Entry) request.getDocument().getRoot();
         if (entry.getContentType() == null ||
@@ -270,13 +226,13 @@ public class TicketsProvider extends BaseProvider
             throw new ValidationException("Content must be XHTML");
 
         try {
-            XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
-            Preference pref = formatter.parse(entry.getContent(), getEntityFactory());
-            if (pref.getKey() == null)
-                throw new ValidationException("Preference requires a key");
-            if (pref.getValue() == null)
-                pref.setValue("");
-            return pref;
+            XhtmlTicketFormat formatter = new XhtmlTicketFormat();
+            Ticket ticket = formatter.parse(entry.getContent(), getEntityFactory());
+            if (ticket.getKey() == null)
+                throw new ValidationException("Ticket requires a key");
+            if (ticket.getType() == null)
+                throw new ValidationException("Ticket requires a type");
+            return ticket;
         } catch (ParseException e) {
             throw new ValidationException("Error parsing XHTML content", e);
         }

@@ -614,6 +614,14 @@
     </property>
   </bean>
 
+  <bean id="atomTicketsProvider"
+        class="org.osaf.cosmo.atom.provider.TicketsProvider"
+        init-method="init" parent="atomBaseProvider">
+    <property name="contentService">
+      <ref local="contentService"/>
+    </property>
+  </bean>
+
   <bean id="atomUserProvider" class="org.osaf.cosmo.atom.provider.UserProvider"
         init-method="init" parent="atomBaseProvider"/>
 
@@ -637,6 +645,9 @@
         </property>
         <property name="preferencesProvider">
           <ref local="atomPreferencesProvider"/>
+        </property>
+        <property name="ticketsProvider">
+          <ref local="atomTicketsProvider"/>
         </property>
         <property name="userProvider">
           <ref local="atomUserProvider"/>

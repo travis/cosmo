@@ -242,7 +242,7 @@ public class MockDaoStorage {
 
     /** */
     public void createTicket(Item item, Ticket ticket) {
-        ticket.setKey(calculateTicketKey());
+        if (ticket.getKey() == null) ticket.setKey(calculateTicketKey());
         findItemTickets(item).add(ticket);
     }
 

@@ -15,6 +15,7 @@
  */
 package org.osaf.cosmo.dao.mock;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.ItemFilterEvaluater;
 import org.osaf.cosmo.model.filter.ItemFilterPostProcessor;
+import org.osaf.cosmo.model.mock.MockAuditableObject;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockItem;
 import org.osaf.cosmo.util.PathUtil;
@@ -270,6 +272,7 @@ public class MockItemDao implements ItemDao {
     public void createTicket(Item item,
                              Ticket ticket) {
         item.addTicket(ticket);
+        ((MockAuditableObject) ticket).setModifiedDate(new Date());
         storage.createTicket(item, ticket);
     }
 

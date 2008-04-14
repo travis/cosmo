@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.PreferencesFeedGenerator;
+import org.osaf.cosmo.atom.generator.TicketsFeedGenerator;
 import org.osaf.cosmo.atom.generator.ServiceGenerator;
 import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
@@ -114,6 +115,18 @@ public class MockGeneratorFactory implements GeneratorFactory {
     public PreferencesFeedGenerator
         createPreferencesFeedGenerator(ServiceLocator locator) {
         return new MockPreferencesFeedGenerator(this, locator);
+    }
+
+    /**
+     * Creates an instance of <code>MockTicketsFeedGenerator</code>.
+     *
+     * @param locator the service locator from which feed URLs
+     * are calculated
+     * @return the feed generator
+     */
+    public TicketsFeedGenerator
+        createTicketsFeedGenerator(ServiceLocator locator) {
+        return new MockTicketsFeedGenerator(this, locator);
     }
 
     // our methods

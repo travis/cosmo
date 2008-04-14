@@ -38,7 +38,7 @@ import org.osaf.cosmo.model.User;
  * Similarly, the class does not know how to convert itself to or from
  * XML.
  */
-public class MockTicket implements Comparable<Ticket>, Ticket {
+public class MockTicket extends MockAuditableObject implements Comparable<Ticket>, Ticket {
 
     /**
      * 
@@ -286,5 +286,10 @@ public class MockTicket implements Comparable<Ticket>, Ticket {
      */
     public void setItem(Item item) {
         this.item = item;
+    }
+    
+    public String calculateEntityTag() {
+        // Tickets are globally unique by key and are immutable
+        return encodeEntityTag(this.key.getBytes());
     }
 }

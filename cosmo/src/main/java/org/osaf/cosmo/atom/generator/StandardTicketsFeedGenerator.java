@@ -15,10 +15,7 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -70,7 +67,7 @@ public class StandardTicketsFeedGenerator
         Feed feed = createFeed(collection);
 
         for (Ticket ticket : visibleTickets(collection))
-            feed.addEntry(createEntry(ticket));
+            feed.addEntry(createEntry(collection, ticket));
 
         return feed;
     }
@@ -82,9 +79,9 @@ public class StandardTicketsFeedGenerator
      * @param ticket the ticket
      * @throws GeneratorException
      */
-    public Entry generateEntry(Ticket ticket)
+    public Entry generateEntry(CollectionItem collection, Ticket ticket)
         throws GeneratorException {
-        return createEntry(ticket, true);
+        return createEntry(collection, ticket, true);
     }
 
     // our methods
@@ -118,9 +115,9 @@ public class StandardTicketsFeedGenerator
      * @param ticket the ticket
      * @throws GeneratorException
      */
-    protected Entry createEntry(Ticket ticket)
+    protected Entry createEntry(CollectionItem collection, Ticket ticket)
         throws GeneratorException {
-        return createEntry(ticket, false);
+        return createEntry(collection, ticket, false);
     }
 
     /**
@@ -132,13 +129,13 @@ public class StandardTicketsFeedGenerator
      * document or is attached to a feed document
      * @throws GeneratorException
      */
-    protected Entry createEntry(Ticket ticket,
+    protected Entry createEntry(CollectionItem collection, Ticket ticket,
                                 boolean isDocument)
         throws GeneratorException {
         String uid = ticket.getKey();
         Entry entry = newEntry(uid, isDocument);
 
-        String iri = ticketIri(ticket);
+        String iri = ticketIri(collection, ticket);
         Date now = new Date();
 
         entry.setTitle(ticket.getKey());
@@ -154,38 +151,6 @@ public class StandardTicketsFeedGenerator
         entry.setContentAsXhtml(formatter.format(ticket));
 
         return entry;
-    }
-
-    /**
-     * Returns the IRI of the given user's preferences collection.
-     *
-     * @param user the user
-     */
-    protected String ticketsIri(CollectionItem collection) {
-        StringBuffer iri = new StringBuffer(selfIri(collection));
-        iri.append("/tickets");
-        return iri.toString();
-    }
-
-    /**
-     * Returns the IRI of the given preference.
-     *
-     * @param pref the preference
-     */
-    protected String ticketIri(Ticket ticket) {
-        try {
-            StringBuffer iri = new StringBuffer(selfIri(ticket.getItem()));
-            iri.append("/ticket/").
-                append(URLEncoder.encode(ticket.getKey(), "UTF-8"));
-            return iri.toString();
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Could not encode ticket key " + ticket.getKey(), e);
-        }
-    }
-    
-    private Set<Ticket> visibleTickets(CollectionItem collection) {
-        return getFactory().getSecurityManager().getSecurityContext().
-            findVisibleTickets(collection);
     }
 
     @Override

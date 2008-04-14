@@ -32,7 +32,7 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;
 
 /**
- * Parses and formats preferences in XHTML with a custom microformat
+ * Parses and formats tickets in XHTML with a custom microformat
  * (yet to be described.)
  */
 public class XhtmlTicketFormat extends BaseXhtmlFormat
@@ -76,20 +76,20 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
                     continue;
                 }
 
-                if (inTicket && hasClass(reader, "permission")) {
+                if (inTicket && hasClass(reader, "type")) {
                     if (log.isDebugEnabled())
-                        log.debug("found permission element");
+                        log.debug("found type element");
 
-                    String permission = reader.getAttributeValue(null, "title");
+                    String typeId = reader.getAttributeValue(null, "title");
                     if (StringUtils.isBlank(key))
-                        handleParseException("Ticket permission title must not be empty", reader);
-                    type = TicketType.createInstance(permission);
+                        handleParseException("Ticket type title must not be empty", reader);
+                    type = TicketType.createInstance(typeId);
                     
                     continue;
                 }
             }
             if (type == null || key == null)
-                handleParseException("Ticket must have permission and key", reader);
+                handleParseException("Ticket must have type and key", reader);
             reader.close();
         } catch (XMLStreamException e) {
             handleXmlException("Error reading XML", e);
@@ -106,12 +106,13 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
             StringWriter sw = new StringWriter();
             XMLStreamWriter writer = createXmlWriter(sw);
 
+            writer.writeCharacters("Ticket: ");
             writer.writeStartElement("div");
             writer.writeAttribute("class", "ticket");
 
-            writer.writeCharacters("Ticket: ");
 
             if (ticket.getKey() != null) {
+                writer.writeCharacters("Key: ");
                 writer.writeStartElement("span");
                 writer.writeAttribute("class", "key");
                 writer.writeCharacters(ticket.getKey());
@@ -119,8 +120,9 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
             }
 
             if (ticket.getType() != null) {
+                writer.writeCharacters("Type: ");
                 writer.writeStartElement("span");
-                writer.writeAttribute("class", "permission");
+                writer.writeAttribute("class", "type");
                 writer.writeAttribute("title", ticket.getType().toString());
                 writer.writeCharacters(ticket.getType().toString());
                 writer.writeEndElement();

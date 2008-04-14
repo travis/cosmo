@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.atom.generator;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -35,6 +38,7 @@ import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
@@ -340,6 +344,19 @@ public abstract class BaseItemFeedGenerator
     }
 
     /**
+     * Creates a <code>Link</code> for the Webal IRI of the given
+     * collection.
+     *
+     * @param collection the collection to link
+     * @throws GeneratorException
+     */
+    protected Link newTicketsLink(CollectionItem collection)
+        throws GeneratorException {
+        return newLink(REL_TICKET, MEDIA_TYPE_ATOM,
+                       ticketsIri(collection));
+    }
+
+    /**
      * Creates a <code>Link</code> for the self IRI of the given item.
      *
      * @param item the item to link
@@ -527,4 +544,39 @@ public abstract class BaseItemFeedGenerator
     public NoteItemFilter getFilter() {
         return filter;
     }
+
+    protected Set<Ticket> visibleTickets(CollectionItem collection) {
+        return getFactory().getSecurityManager().getSecurityContext().
+            findVisibleTickets(collection);
+    }
+
+    /**
+     * Returns the IRI of the given ticket
+     *
+     * @param collection the collection the ticket grants access to
+     * @param ticket the ticket
+     */
+    protected String ticketIri(CollectionItem collection, Ticket ticket) {
+        try {
+            StringBuffer iri = new StringBuffer(selfIri(collection, false));
+            iri.append("/ticket/").
+                append(URLEncoder.encode(ticket.getKey(), "UTF-8"));
+            return iri.toString();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Could not encode ticket key " + ticket.getKey(), e);
+        }
+    }
+    
+    /**
+     * Returns the IRI of the given collection's ticket feed.
+     *
+     * @param collection the collection
+     */
+    protected String ticketsIri(CollectionItem collection) {
+        StringBuffer iri = new StringBuffer(selfIri(collection, false));
+        iri.append("/tickets");
+        return iri.toString();
+    }
+
+
 }

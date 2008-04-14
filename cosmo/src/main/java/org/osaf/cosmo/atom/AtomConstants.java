@@ -60,6 +60,7 @@ public interface AtomConstants {
     public static final String REL_EXPANDED = "expanded";
     public static final String REL_MASTER = "master";
     public static final String REL_DETACHED = "detached";
+    public static final String REL_TICKET = "ticket";
 
     // projection constants
 

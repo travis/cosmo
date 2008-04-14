@@ -75,7 +75,7 @@ public class TicketsProvider extends BaseProvider
             ServiceLocator locator = createServiceLocator(request);
             TicketsFeedGenerator generator =
                 createTicketsFeedGenerator(locator);
-            Entry entry = generator.generateEntry(ticket);
+            Entry entry = generator.generateEntry(collection, ticket);
             
             return created(entry, ticket, locator);
         } catch (IOException e) {
@@ -156,7 +156,7 @@ public class TicketsProvider extends BaseProvider
             ServiceLocator locator = createServiceLocator(request);
             TicketsFeedGenerator generator =
                 createTicketsFeedGenerator(locator);
-            Entry entry = generator.generateEntry(ticket);
+            Entry entry = generator.generateEntry(collection, ticket);
 
             return ok(entry, ticket);
         } catch (GeneratorException e) {

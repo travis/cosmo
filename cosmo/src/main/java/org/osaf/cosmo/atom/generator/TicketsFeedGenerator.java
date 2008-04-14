@@ -46,6 +46,6 @@ public interface TicketsFeedGenerator {
      * @param ticket the ticket
      * @throws GeneratorException
      */
-    public Entry generateEntry(Ticket ticket)
+    public Entry generateEntry(CollectionItem collection, Ticket ticket)
         throws GeneratorException;
 }

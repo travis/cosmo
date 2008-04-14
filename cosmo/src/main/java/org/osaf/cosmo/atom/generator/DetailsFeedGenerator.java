@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -68,9 +67,10 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
         feed.addLink(newDavLink(collection));
         feed.addLink(newWebcalLink(collection));
         feed.addLink(newPimLink(collection));
+        feed.addLink(newTicketsLink(collection));
 
         for (Ticket ticket : visibleTickets(collection))
-            addTicket(feed, ticket);
+            addTicket(feed, collection, ticket);
 
         return feed;
     }
@@ -99,12 +99,8 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
         return PROJECTION_DETAILS;
     }
 
-    private Set<Ticket> visibleTickets(CollectionItem collection) {
-        return getFactory().getSecurityManager().getSecurityContext().
-            findVisibleTickets(collection);
-    }
-
     private void addTicket(Feed feed,
+                           CollectionItem collection,
                            Ticket ticket)
         throws GeneratorException {
         Element extension = getFactory().getAbdera().getFactory().
@@ -112,6 +108,7 @@ public class DetailsFeedGenerator extends BaseItemFeedGenerator {
         extension.setAttributeValue(AtomConstants.QN_TYPE,
                                     ticket.getType().toString());
         extension.setText(ticket.getKey());
+        extension.setAttributeValue("href", ticketIri(collection, ticket)); 
         feed.addExtension(extension);
     }
 }

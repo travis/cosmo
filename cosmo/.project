@@ -1,11 +1,13 @@
 <projectDescription>
   <name>cosmo</name>
-  <comment/>
+  <comment>The Chandler Server team is working on both the Chandler Server (CalDAV server), the Chandler Server Administrator
+        web interface and the end-user shared information management web application. Chandler Server is the software that
+        powers the Chandler Hub Sharing Service. The Chandler Server code is also available for download as a standalone
+        server.</comment>
   <projects/>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
-      <arguments/>
     </buildCommand>
   </buildSpec>
   <natures>

@@ -70,7 +70,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
         var ticket = this.ticketStore.newItem({permission: permission, key: key});
         this.ticketStore.save({
             onComplete: dojo.hitch(this, function(){this.onTicket(ticket);}),
-            onError: function(e){console.debug(e);}
+            onError: dojo.hitch(this, function(e){console.debug(e);})
         });
     },
 

@@ -78,6 +78,15 @@
   <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink">${l10n.dav}</span></a>
   <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink">${l10n.html}</span></a>
   <h2 class="sharingSectionHead">${l10n.shareHead}</h2>
+  <div dojoType="dijit.form.DropDownButton">
+    <span>${l10n.newTicket}</span>
+    <div dojoType="dijit.Menu" id="${id}NewTicketMenu">
+      <div dojoType="dijit.MenuItem" label="${l10n.newReadTicket}" id="${id}NewReadTicket"
+           dojoAttachEvent="onClick: createReadTicket"></div>
+      <div dojoType="dijit.MenuItem" label="${l10n.newReadWriteTicket}" id="${id}NewReadWriteTicket"
+           dojoAttachEvent="onClick: createReadWriteTicket"></div>
+    </div>
+  </div>
   <table id="${id}Tickets" dojoAttachPoint="ticketContainer">
     <thead><tr><th>${l10n.ticketKeyHead}</th><th>${l10n.ticketPermissionHead}</th></tr></thead>
     

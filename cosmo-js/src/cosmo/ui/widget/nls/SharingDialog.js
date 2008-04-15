@@ -33,4 +33,7 @@
      ticketUrlsToggle: "Urls",
      ticketKeyHead: "Key",
      ticketPermissionHead: "Permission",
+     newTicket: "New",
+     newReadTicket: "Read-only Ticket",
+     newReadWriteTicket: "Read-write ticket"
 })

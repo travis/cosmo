@@ -16,11 +16,14 @@
 
 dojo.provide("cosmo.ui.widget.SharingDialog");
 dojo.require("dijit._Templated");
-dojo.require("dijit.layout.AccordionContainer");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.Menu");
+dojo.require("dojo.fx");
 dojo.requireLocalization("cosmo.ui.widget", "SharingDialog");
 
 dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
 {
+    widgetsInTemplate: true,
     templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/SharingDialog.html'),
     l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "SharingDialog"),
 
@@ -51,6 +54,18 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
              l10n: this.l10n
             });
         dojo.place(t.domNode, this.ticketContainer, "last");
+    },
+
+    createReadTicket: function(){
+        this.createTicket("read-only");
+    },
+
+    createReadWriteTicket: function(){
+        this.createTicket("read-write");
+    },
+
+    createTicket: function(permission){
+        var ticket = this.ticketStore.newItem({permission: permission, key: null});
     },
 
     // lifecycle methods
@@ -111,6 +126,6 @@ dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Temp
             var url = collectionUrls[urlName];
             this.urls[urlName] = new dojo._Url(url.uri + (url.uri.indexOf("?") == -1 ? "?" : "&") + "ticket=" + this.key);
         }
-	dojo.addOnLoad(dojo.hitch(this, function(){this.hideUrls({duration: 1})}));
+        dojo.addOnLoad(dojo.hitch(this, function(){this.hideUrls({duration: 1});}));
     }
 });

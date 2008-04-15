@@ -35,5 +35,13 @@
      ticketPermissionHead: "Permission",
      newTicket: "New",
      newReadTicket: "Read-only Ticket",
-     newReadWriteTicket: "Read-write ticket"
+     newReadWriteTicket: "Read-write ticket",
+     showTicketRevokers: "Revoke",
+     hideTicketRevokers: "Hide Revoke",
+     urlTogglerTitle: "Show URLs",
+     revokerTitle: "Revoke this ticket",
+     atomLinkTitle: "Feed reader URL",
+     webcalLinkTitle: "iCal URL",
+     davLinkTitle: "CalDAV URL",
+     htmlLinkTitle: "Web URL"
 })

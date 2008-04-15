@@ -2,18 +2,23 @@
   <tr>
     <td class="ticketKey">${key}</td>
     <td class="ticketPermission">${permission}</td>
-    <td class="urlToggler" dojoAttachPoint="urlToggler" dojoAttachEvent="onclick: toggleUrls">
+    <td class="urlToggler" dojoAttachPoint="urlToggler" 
+        dojoAttachEvent="onclick: toggleUrls" title="${l10n.urlTogglerTitle}">
       <span class='arrowTextUp' waiRole="presentation">&#9650;</span>
       <span class='arrowTextDown' waiRole="presentation">&#9660;</span>
+    </td>
+    <td class="ticketRevoker" dojoAttachEvent="onclick: revoke" 
+        dojoAttachPoint="revoker" title="${l10n.revokerTitle}">
+      -
     </td>
   </tr>
   <tr >
     <td colspan="3">
       <div id="${id}Urls" dojoAttachPoint="urlsContainer" class="sharingUrlsContainer">
-        <a href="${urls.atom.uri}"><span class="sharingLink atomSharingLink">${l10n.atom}</span></a>
-        <a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink">${l10n.webcal}</span></a>
-        <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink">${l10n.dav}</span></a>
-        <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink">${l10n.html}</span></a>
+        <a href="${urls.atom.uri}"><span class="sharingLink atomSharingLink" title="${l10n.atomLinkTitle}">${l10n.atom}</span></a>
+        <a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink" title="${l10n.webcalLinkTitle}">${l10n.webcal}</span></a>
+        <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink" title="${l10n.davLinkTitle}">${l10n.dav}</span></a>
+        <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink" title="${l10n.htmlLinkTitle}">${l10n.html}</span></a>
       </div>
     </td>
   </tr>

@@ -106,10 +106,8 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
             StringWriter sw = new StringWriter();
             XMLStreamWriter writer = createXmlWriter(sw);
 
-            writer.writeCharacters("Ticket: ");
             writer.writeStartElement("div");
             writer.writeAttribute("class", "ticket");
-
 
             if (ticket.getKey() != null) {
                 writer.writeCharacters("Key: ");

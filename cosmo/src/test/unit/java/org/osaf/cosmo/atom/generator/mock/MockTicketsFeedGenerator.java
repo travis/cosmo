@@ -61,7 +61,7 @@ public class MockTicketsFeedGenerator
         return factory.getAbdera().getFactory().newFeed();
     }
 
-    public Entry generateEntry(Ticket ticket)
+    public Entry generateEntry(CollectionItem collection, Ticket ticket)
         throws GeneratorException {
         if (factory.isFailureMode())
             throw new GeneratorException("Failure mode");

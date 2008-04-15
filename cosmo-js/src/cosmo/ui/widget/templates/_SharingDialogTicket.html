@@ -1,0 +1,14 @@
+<div class="sharingDialogTicket">
+  <span id="${id}Details"><span class="ticketKey">${key}</span><span class="ticketPermission">${permission}</span><span class=""></span>
+    <div class="urlToggler" dojoAttachPoint="urlToggler" dojoAttachEvent="onclick: toggleUrls">
+      <div class='arrowTextUp' waiRole="presentation">&#9650;</div>
+      <div class='arrowTextDown' waiRole="presentation">&#9660;</div>
+    </div>
+
+    <div id="${id}Urls" dojoAttachPoint="urlsContainer" style="visibility: hidden; height: 0">
+      <a href="${urls.atom.uri}"><span class="sharingLink atomSharingLink">${l10n.atom}</span></a>
+      <a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink">${l10n.webcal}</span></a>
+      <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink">${l10n.dav}</span></a>
+      <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink">${l10n.html}</span></a>
+    </div>
+</div>

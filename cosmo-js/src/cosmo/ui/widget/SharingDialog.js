@@ -16,7 +16,7 @@
 
 dojo.provide("cosmo.ui.widget.SharingDialog");
 dojo.require("dijit._Templated");
-dojo.require("dijit.form.ComboBox");
+dojo.require("dijit.layout.AccordionContainer");
 dojo.requireLocalization("cosmo.ui.widget", "SharingDialog");
 
 dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
@@ -50,7 +50,6 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
              urls: this.urls,
              l10n: this.l10n
             });
-        var x = this.ticketContainer;
         dojo.place(t.domNode, this.ticketContainer, "last");
     },
 
@@ -63,24 +62,16 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             this.urls = store.getValue(collection, "urls");
             dojo.addOnLoad(dojo.hitch(this, function(){
                 this.tickets = this.ticketStore.fetch({
-                onItem: dojo.hitch(this, "onTicket"),
-                onError: function(e){console.debug(e);
-            }})}));
+                    onItem: dojo.hitch(this, "onTicket"),
+                    onError: function(e){console.debug(e);}
+                });
+            }));
         }
     }
 });
 
 dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Templated], {
-    templateString: '<div class="sharingDialogTicket">'
-                    + '<div id="${id}Details"><span class="ticketKey">${key}</span><span class="ticketPermission">${permission}</span><span class=""></span></div>'
-                    + '<div id="${id}Urls" dojoAttachPoint="urlsContainer">'
-                     + '<a href="${urls.atom.uri}"><span class="sharingLink atomSharingLink">${l10n.atom}</span></a>'
-                     + '<a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink">${l10n.webcal}</span></a>'
-                     + '<a href="${urls.dav.uri}"><span class="sharingLink davSharingLink">${l10n.dav}</span></a>'
-                     + '<a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink">${l10n.html}</span></a>'
-
-                    + '</div>'
-                    + '</div>',
+    templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/_SharingDialogTicket.html'),
 
     ticketStore: null,
     ticket: null,
@@ -88,7 +79,27 @@ dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Temp
 
     key: null,
     permission: null,
+    urlsShowing: false,
 
+    toggleUpUrl: dojo.moduleUrl(""),
+    toggleDownUrl: dojo.moduleUrl(""),
+
+    toggleUrls: function(){
+        if(!this.urlsShowing) this.showUrls();
+        else this.hideUrls();
+    },
+
+    showUrls: function(){
+        this.urlsShowing = true;
+        dojo.addClass(this.urlToggler,"urlToggler-expanded");
+        dojo.fx.wipeIn({node: this.urlsContainer}).play();
+    },
+
+    hideUrls: function(){
+        this.urlsShowing = false;
+        dojo.removeClass(this.urlToggler,"urlToggler-expanded");
+        dojo.fx.wipeOut({node: this.urlsContainer}).play();
+    },
 
     postMixInProperties: function(){
         this.key = this.ticketStore.getValue(this.ticket, "key");

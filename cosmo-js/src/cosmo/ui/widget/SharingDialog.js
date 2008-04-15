@@ -89,16 +89,16 @@ dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Temp
         else this.hideUrls();
     },
 
-    showUrls: function(){
+    showUrls: function(args){
         this.urlsShowing = true;
         dojo.addClass(this.urlToggler,"urlToggler-expanded");
-        dojo.fx.wipeIn({node: this.urlsContainer}).play();
+        dojo.fx.wipeIn(dojo.mixin({node: this.urlsContainer, duration: 250}, args)).play();
     },
 
-    hideUrls: function(){
+    hideUrls: function(args){
         this.urlsShowing = false;
         dojo.removeClass(this.urlToggler,"urlToggler-expanded");
-        dojo.fx.wipeOut({node: this.urlsContainer}).play();
+        dojo.fx.wipeOut(dojo.mixin({node: this.urlsContainer, duration: 250}, args)).play();
     },
 
     postMixInProperties: function(){
@@ -111,5 +111,6 @@ dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Temp
             var url = collectionUrls[urlName];
             this.urls[urlName] = new dojo._Url(url.uri + (url.uri.indexOf("?") == -1 ? "?" : "&") + "ticket=" + this.key);
         }
+	dojo.addOnLoad(dojo.hitch(this, function(){this.hideUrls({duration: 1})}));
     }
 });

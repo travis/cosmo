@@ -30,5 +30,7 @@
      iCalInstructions: "Instructions for subscribing with iCal",
      webInstructions: "Instructions for subscribing from the web",
      davInstructions: "Instructions for subscribing with a CalDAV client",
-     ticketUrlsToggle: "Urls"
+     ticketUrlsToggle: "Urls",
+     ticketKeyHead: "Key",
+     ticketPermissionHead: "Permission",
 })

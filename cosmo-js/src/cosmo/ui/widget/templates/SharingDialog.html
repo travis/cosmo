@@ -36,6 +36,9 @@
     padding: 0.1em;
     display: inline;
     }
+    .sharingUrlsContainer{
+    height: 0px;
+    }
 
 .urlToggler .arrowTextDown {
 	display: inline;
@@ -75,8 +78,9 @@
   <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink">${l10n.dav}</span></a>
   <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink">${l10n.html}</span></a>
   <h2 class="sharingSectionHead">${l10n.shareHead}</h2>
-  <div id="${id}Tickets" dojoAttachPoint="ticketContainer">
+  <table id="${id}Tickets" dojoAttachPoint="ticketContainer">
+    <thead><tr><th>${l10n.ticketKeyHead}</th><th>${l10n.ticketPermissionHead}</th></tr></thead>
     
-  </div>
+  </table>
 </div>
 

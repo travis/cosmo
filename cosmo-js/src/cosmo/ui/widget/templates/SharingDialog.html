@@ -1,32 +1,52 @@
 <div>
-<style type="text/css">
-.linkDiv{
-width: 40px;
-height: 20px;
-color: white;
-font-weight: bolder;
-padding: 2px;
-}
-.linkDiv a:hover{
-text-decoration: none;
-}
-.atomLinkDiv {
-background: orange;
-}
-.webcalLinkDiv {
-background: green;
-}
-.htmlLinkDiv {
-background: blue;
-}
-.davLinkDiv {
-background: red;
-}
-</style>
-<div id="${id}DisplayName">${displayName}</div>
-<a href="${urls.atom}"><span class="linkDiv atomLinkDiv">${l10n.atom}</span></a>
-<a href="${urls.webcal}"><span class="linkDiv webcalLinkDiv">${l10n.webcal}</span></a>
-<a href="${urls.dav}"><span class="linkDiv davLinkDiv">${l10n.dav}</span></a>
-<a href="${urls.html}"><span class="linkDiv htmlLinkDiv">${l10n.html}</span></a>
+  <style type="text/css">
+    .sharingLink{
+    width: 40px;
+    height: 20px;
+    color: white;
+    font-weight: bolder;
+    padding: 2px;
+    }
+    .sharingLink a:hover{
+    text-decoration: none;
+    }
+    .atomSharingLink {
+    background: orange;
+    }
+    .webcalSharingLink {
+    background: green;
+    }
+    .htmlSharingLink {
+    background: blue;
+    }
+    .davSharingLink {
+    background: red;
+    }
+    
+    
+  </style>
+  <div id="${id}DisplayName">${displayName}</div>
+  <h2 class="sharingSectionHead">${l10n.subscribeHead}</h2>
+  <select name="instructionsSelector"
+          dojoAttachEvent="onchange: changeInstructions"
+          dojoAttachPoint="instructionsSelector">
+
+    <option value="chandler" selected="selected">${l10n.chandlerLabel}</option>
+    <option value="feedReader">${l10n.feedReaderLabel}</option>
+    <option value="iCal">${l10n.iCalLabel}</option>
+    <option value="web">${l10n.webLabel}</option>
+    <option value="dav">${l10n.davLabel}</option>
+  </select>
+  <div id="${id}Instructions" class="instructions" dojoAttachPoint="instructionsContainer">
+    ${l10n.chandlerInstructions}
+  </div>
+  <a href="${urls.atom.uri}"><span class="sharingLink atomSharingLink">${l10n.atom}</span></a>
+  <a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink">${l10n.webcal}</span></a>
+  <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink">${l10n.dav}</span></a>
+  <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink">${l10n.html}</span></a>
+  <h2 class="sharingSectionHead">${l10n.shareHead}</h2>
+  <div id="${id}Tickets" dojoAttachPoint="ticketContainer">
+    
+  </div>
 </div>
 

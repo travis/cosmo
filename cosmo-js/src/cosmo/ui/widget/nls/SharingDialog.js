@@ -14,8 +14,20 @@
  * limitations under the License.
 */
 ({
-    atom: "Atom",
-    webcal: "iCal",
-    dav: "CalDAV",
-    html: "HTML"
+     subscribeHead: "Subscribe",
+     shareHead: "Share",
+     atom: "Atom",
+     webcal: "iCal",
+     dav: "CalDAV",
+     html: "HTML",
+     feedReaderLabel: "Feed Reader",
+     chandlerLabel: "Chandler Desktop",
+     iCalLabel: "Apple iCal",
+     webLabel: "Web",
+     davLabel: "CalDAV",
+     chandlerInstructions: "Instructions for subscribing from Chandler Desktop",
+     feedReaderInstructions: "Instructions for subscribing with a  feed reader",
+     iCalInstructions: "Instructions for subscribing with iCal",
+     webInstructions: "Instructions for subscribing from the web",
+     davInstructions: "Instructions for subscribing with a CalDAV client"
 })

@@ -2,11 +2,13 @@
 		"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-
 	<title>Sharing Dialog</title>
-
-	<script type="text/javascript" src="../../../../lib/dojo/dojo/dojo.js" djConfig="isDebug: true, parseOnLoad: true"></script>
+	<script type="text/javascript" src="../../../../dojo/dojo.js" djConfig="isDebug: true, parseOnLoad: true"></script>
 	<script type="text/javascript" src="../../../cosmo.js"></script>
+    <style type="text/css">
+        @import "../../../../dijit/themes/tundra/tundra.css";
+        @import "../../../../dojo/resources/dojo.css";
+    </style>
 	<script type="text/javascript">
         dojo.require("doh.runner");
         dojo.require("cosmo.ui.widget.SharingDialog");
@@ -19,11 +21,11 @@
                 uid: "item0",
                 displayName: "Test collection",
                 urls: new function(){
-                    this.atom = (new dojo._Url(baseUri, "collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-                    this.mc =  (new dojo._Url(baseUri, "http://localhost:8080/chandler/mc/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-                    this.dav = (new dojo._Url(baseUri, "http://localhost:8080/chandler/dav/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-                    this.webcal = (new dojo._Url(baseUri,"http://localhost:8080/chandler/webcal/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
-                    this.html = (new dojo._Url(baseUri,"http://localhost:8080/chandler/pim/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0")).uri;
+                    this.atom = (new dojo._Url(baseUri, "collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
+                    this.mc =  (new dojo._Url(baseUri, "http://localhost:8080/chandler/mc/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
+                    this.dav = (new dojo._Url(baseUri, "http://localhost:8080/chandler/dav/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
+                    this.webcal = (new dojo._Url(baseUri,"http://localhost:8080/chandler/webcal/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
+                    this.html = (new dojo._Url(baseUri,"http://localhost:8080/chandler/pim/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
                 }
             }
         ],
@@ -36,12 +38,28 @@
         {identity: "item0",
         onItem: function(item){collection = item},
         onError: function(e){console.log(e)}
-        })
+        });
+        var ticketJson = {items: [
+            {
+                key: "readTicket",
+                permission: "read-only"
+            },
+            {
+                key: "readWriteTicket",
+                permission: "read-write"
+            }
+        ],
+        identifier: "key"};
+        var ticketStore = new dojo.data.ItemFileWriteStore({
+            data: ticketJson
+        });
+
     </script>
 </head>
 <body class="tundra">
 	<div id="sharingDialog" dojoType="cosmo.ui.widget.SharingDialog"
-         store="collectionStore" collection="collection">
+         store="collectionStore" collection="collection",
+         ticketStore="ticketStore">
 	</div>
 </body>
 </html>

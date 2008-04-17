@@ -95,21 +95,25 @@ cosmo.tests.xml.bookstoreNS =
 doh.register("cosmo.tests.xPath",
 	[
         function testElement(t){
-            t.is(4, cosmo.xml.query("cosmo:foo", cosmo.tests.xml.doc1.firstChild, cosmo.tests.xml.doc1ns).length);
+            t.is(4, cosmo.xml.query("cosmo:foo", cosmo.tests.xml.doc1.documentElement, cosmo.tests.xml.doc1ns).length);
         },
+
         function testAttribute(t){
+            var ns = cosmo.tests.xml.atomns;
+            var entries = cosmo.xml.query("atom:entry", cosmo.tests.xml.atomFeed.documentElement, ns);
+            t.is(1, entries.length);
             t.is("http://example.org/2003/12/13/atom03/edit",
-                 cosmo.xml.query("atom:link[@rel='edit']/@href", cosmo.tests.atompub.entry1, cosmo.tests.xml.atomns)[0].value);
+                 cosmo.xml.query("atom:link[@rel='edit']/@href", entries[0], ns)[0].value);
         },
 
         // Test examples on w3 schools page
         function testW3(t){
             var ns = cosmo.tests.xml.bookstoreNS;
-            var node = cosmo.tests.xml.bookstore.firstChild;
+            var node = cosmo.tests.xml.bookstore.documentElement;
             t.is(4, cosmo.xml.query("/bs:bookstore/bs:book/bs:title", node, ns, "bs").length);
             var title1 = cosmo.xml.query("/bs:bookstore/bs:book[1]/bs:title", node, ns)[0];
             t.is("en", title1.getAttribute("lang"));
-            t.is("Everyday Italian", title1.textContent);
+            t.is("Everyday Italian", dojox.data.dom.textContent(title1));
             cosmo.xml.query("/bookstore/book/price/text()", node, ns)
             cosmo.xml.query("/bookstore/book[price>35]/price", node, ns)
             cosmo.xml.query("/bookstore/book[price>35]/title", node, ns)

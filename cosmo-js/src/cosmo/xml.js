@@ -23,21 +23,24 @@ dojo.provide("cosmo.xml");
 
 dojo.mixin(cosmo.xml,
 {
-    query: function(/*String*/query, node, nsMap, nsDefault){
+    query: function xpathQuery(/*String*/query, node, nsMap, nsDefault){
         // summary:
         //     Accepts an XPath query string (http://www.w3.org/TR/xpath)
         //     and returns a dojo.NodeList of nodes that match.
+        var result = new dojo.NodeList();
+        var queryResult;
         if (dojo.isIE){
             var ns = "";
-            for (var pre in nsMap) ns.append("xmlns:" + pre + "='" + nsMap[pre] + "'");
+            for (var pre in nsMap) ns += "xmlns:" + pre + "='" + nsMap[pre] + "' ";
             node.ownerDocument.setProperty("SelectionLanguage", "XPath");
             node.ownerDocument.setProperty("SelectionNamespaces", ns);
-            return new dojo.NodeList(node.selectNodes(query));
+            queryResult = node.selectNodes(query);
+            for (var i = 0; i < queryResult.length; i++) result.push(queryResult[i]);
+            return result;
         } else {
-            var queryResult = node.ownerDocument.evaluate(query, node,
+            queryResult = node.ownerDocument.evaluate(query, node,
                 function(pre){return nsMap[pre] || (nsDefault? nsMap[nsDefault] : null);},
                 XPathResult.ANY_TYPE, null);
-            var result = new dojo.NodeList();
             var value = queryResult.iterateNext();
             while(value){
                 result.push(value);

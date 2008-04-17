@@ -20,30 +20,60 @@
  */
 dojo.provide("cosmo.atompub");
 dojo.require("dojox.data.dom");
-
 (function(){
-// Put this in closure scope to make it wicked frickin fast.
-var ns = {
-    atom: "http://www.w3.org/2005/Atom",
-    app: "http://www.w3.org/2007/app"
+// XPath wrappers
+var nsMap = {
+        atom: "http://www.w3.org/2005/Atom",
+        app: "http://www.w3.org/2007/app"
 };
-function nsResolver(pre){
-    return ns[pre] || ns.atom;
+function xPathQueryFunc(query, node){
+    return cosmo.xml.query(query, node, nsMap, "atom");
 }
-var ieSelectionNS = "xmlns:atom='" + ns.atom +
-    "' xmlns:app='" + ns.app + "'";
+
+function noop(query){
+    return function(node){
+        xPathQueryFunc(query, node);
+    };
+}
+function singleValue(query){
+    return function(node){
+       return xPathQueryFunc(query, node)[0];
+    };
+}
+function singleTextValue(query){
+    return function(node){
+        var r = xPathQueryFunc(query, node)[0];
+        return r? r.nodeValue : null;
+    };
+}
+var xpFunctions = {
+    "id": singleTextValue("atom:id/text()"),
+    "title": singleTextValue("atom:title/text()"),
+    "updated": singleTextValue("atom:updated/text()"),
+    "author": noop("atom:author"),
+    "link": noop("atom:link"),
+    "content": singleValue("atom:content"),
+    "category" : singleTextValue("atom:category/text()"),
+    "contributor" : singleTextValue("atom:contributor/text()"),
+    "generator" : singleTextValue("atom:generator/text()"),
+    "icon" : singleTextValue("atom:icon/text()"),
+    "logo" : singleTextValue("atom:logo/text()"),
+    "rights" : singleTextValue("atom:rights/text()"),
+    "subtitle" : singleTextValue("atom:subtitle/text()")
+};
 
 dojo.mixin(cosmo.atompub,
 {
     getEditIri: function(entry){
-        var href = this.evalXPath("atom:link[@rel='edit']/@href", entry)[0];
-        if (href) return href.value;
-        else return null;
+        var href = this.query("atom:link[@rel='edit']/@href", entry)[0];
+        return href? href.value : null;
     },
 
-    evalXPath: function(query, node){
-        return cosmo.xml.query(query, node, ns, "atom");
-    },
+    ns: nsMap,
+
+    query: xPathQueryFunc,
+
+    attr: xpFunctions,
 
     newEntry: function(iri, entry){
         if (entry instanceof Element) entry = dojox.data.dom.innerXML(entry);

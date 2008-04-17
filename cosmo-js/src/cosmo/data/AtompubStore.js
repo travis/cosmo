@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmo.data.AtomStore");
+dojo.provide("cosmo.data.AtompubStore");
 
 dojo.require("dojo.data.api.Write");
 dojo.require("cosmo.atompub");
@@ -30,17 +30,86 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
     constructor: function(/*Object*/ keywordParameters) {
         // summary: constructor
         // example:
+        keywordParameters = keywordParameters || {};
         this.xhrArgs = keywordParameters.xhrArgs;
         this.iri = keywordParameters.iri;
+        this.contentProcessors = this.contentProcessors || {};
+        var kwCP = keywordParameters.contentProcessors;
+        if (kwCP) for (var type in kwCP) this.contentProcessors[type] = kwCP[type];
     },
 
     /* dojo.data.api.Read */
+
+	getValue: function(	/* item */ item,
+						/* attribute-name-string */ attribute,
+						/* value? */ defaultValue){
+        return this.getValues(item, attribute)[0] || defaultValue;
+    },
+
+	getValues: function getValues(/* item */ item,
+						/* attribute-name-string */ attribute){
+        var result = this._callOnContentProcessor("getValues", item, attribute);
+        if (!result) result = this._getValuesFromEntry(item, attribute);
+        return result || [];
+    },
+
+    _getContent: function(item){
+        return cosmo.atompub.attr.content(item);
+    },
+
+    _getValuesFromEntry: function(/* item */ item,
+                                  /* attribute-name-string */ attribute){
+        var f = cosmo.atompub.attr[attribute];
+        return f? [f(item)] : null;
+    },
+
+    getAttributes: function(/* item */ item){
+        var attrs = [];
+        for (var key in cosmo.atompub.attr){
+            var val = cosmo.atompub.attr[key]();
+            if (val) attrs.push(key);
+        }
+        return attrs.concat(this._callOnContentProcessor("getAttributes", item));
+    },
+
+	hasAttribute: function(	/* item */ item,
+							/* attribute-name-string */ attribute){
+        if (this.getValues(item, attribute).length > 0) return true;
+        else return this._callOnContentProcessor("hasAttribute", item, attribute);
+	},
+
+    _callOnContentProcessor: function(funcName, item, attribute){
+        var content = cosmo.atompub.attr.content(item);
+        return content?
+            this.contentProcessors[content.getAttribute("type") || "text"][funcName](content, attribute):
+            null;
+    },
+
+	containsValue: function(/* item */ item,
+							/* attribute-name-string */ attribute,
+							/* anything */ value){
+        var values = this.getValues(item, attribute);
+        for (var i = 0; i < values.length; i++){
+            if (values[i] == value) return true;
+        }
+        return false;
+	},
+
+	isItem: function(/* anything */ something){
+        return (something instanceof Element || something.nodeName == "entry");
+	},
+
+	isItemLoaded: function(/* anything */ something) {
+		return !!cosmo.atompub.getEditIri(something);
+	},
 
 	loadItem: function(/* object */ kwArgs){
 		//	summary:
 		//		Load a user
 		//	keywordArgs:
 		//		object containing the args for loadItem.  See dojo.data.api.Read.loadItem()
+
+        //TODO: load item from server
         var scope = keywordArgs.scope || dojo.global();
         // If the item isn't loaded
         if (!this.isItemLoaded(kwArgs.item)){
@@ -61,9 +130,8 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
                 var items = entries.forEach(dojo.hitch(
                     this,
                     function(entry){
-                        var item = this.entryProcessor(entry);
-                        if (request.onItem) request.onItem.call(scope, item, request);
-                        return item;
+                        if (request.onItem) request.onItem.call(scope, entry, request);
+                        return entry;
                     }));
                 return items;
             }));

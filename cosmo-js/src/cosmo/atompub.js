@@ -21,14 +21,28 @@
 dojo.provide("cosmo.atompub");
 dojo.require("dojox.data.dom");
 
+(function(){
+// Put this in closure scope to make it wicked frickin fast.
+var ns = {
+    atom: "http://www.w3.org/2005/Atom",
+    app: "http://www.w3.org/2007/app"
+};
+function nsResolver(pre){
+    return ns[pre] || ns.atom;
+}
+var ieSelectionNS = "xmlns:atom='" + ns.atom +
+    "' xmlns:app='" + ns.app + "'";
+
 dojo.mixin(cosmo.atompub,
 {
     getEditIri: function(entry){
-        // dojo.query attribute query failing for xml documents
-        // so do this manually
-        var editLinks = dojo.query('link', entry).filter(function(link){return link.getAttribute("rel") == "edit";});
-        if (editLinks.length < 1) return null;
-        else return editLinks[0].getAttribute("href");
+        var href = this.evalXPath("atom:link[@rel='edit']/@href", entry)[0];
+        if (href) return href.value;
+        else return null;
+    },
+
+    evalXPath: function(query, node){
+        return cosmo.xml.query(query, node, ns, "atom");
     },
 
     newEntry: function(iri, entry){
@@ -43,5 +57,5 @@ dojo.mixin(cosmo.atompub,
     deleteEntry: function(){
         return dojo.xhrDelete({url: this.getEditLink(entry)});
     }
-
 });
+}());

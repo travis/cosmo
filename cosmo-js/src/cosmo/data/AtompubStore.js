@@ -19,6 +19,8 @@ dojo.provide("cosmo.data.AtompubStore");
 dojo.require("dojo.data.api.Write");
 dojo.require("cosmo.atompub");
 dojo.require("dojo.DeferredList");
+dojo.require("dojox.data.dom");
+dojo.require("dojox.uuid");
 
 dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
 {
@@ -161,23 +163,48 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
     _modifiedEntries: [],
 
 	newItem: function(/* Object? */ item){
-        var entry = this.entryGenerator(item);
-        this._newEntries.push(entry);
+        var entry = (item instanceof Element)? item : this._generateEntry(item);
+		this._newEntries[this.getValue(entry, "id")] = entry;
         item._storeProp = this;
         return item;
 	},
 
+    _generateEntry: function(item){
+        return dojox.dom.createDocument([
+            '<?xml version="1.0" encoding="utf-8"?>',
+            "<entry xmlns='http://www.w3.org/2005/Atom'>",
+            "<id>", (item.id || this.getEntryId(item) || "urn:uuid:" + dojox.uuid.generateTimeBasedUuid()), "</id>",
+            "<title>", (item.title || this.getEntryTitle(item) || "New Entry"), "</title>",
+            this.generateContent(item),
+            "</entry>"
+            ].join("")).documentElement;
+
+    },
+
+    getEntryId: function(item){
+        return null;
+    },
+
+    getEntryTitle: function(item){
+        return null;
+    },
+
 	deleteItem: function(/* item */ item){
-        if (!this.isItem(item)) throw new Error(item  + " is not a user from this store.");
-        var entry = this.entryGenerator(item);
-		this._deletedEntries.push(entry);
+        if (!this.isItem(item)) throw new Error(item  + " is not an item from this store.");
+		this._deletedEntries[this.getValue(item, "id")] = item;
 		return true; //boolean
 	},
 
 	setValue: function(/* item */ item, /* string */ attribute, /* string */ value){
-        item[attribute] = value;
-        var entry = this.entryGenerator(item);
-        this._modifiedEntries.push(entry);
+        var setFunc = cosmo.atompub.set[attribute];
+
+        // Set value
+        cosmo.atompub.setValue(item, attribute, value);
+
+        // Store for save
+        var id = this.getValue(item, "id");
+        if (this._newEntries[id]) this._newEntries[id] = item;
+        else this._modifiedEntries[id] = item;
 		return true; //boolean
 	},
 
@@ -201,14 +228,15 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
 		}
         var deferreds = [];
         var iri = this.iri;
+        var xhrArgs = this.xhrArgs;
         dojo.forEach(this._modifiedEntries, function(entry){
-            deferreds.push(cosmo.atompub.modifyEntry(entry));
+            deferreds.push(cosmo.atompub.modifyEntry(entry, xhrArgs));
 		});
         dojo.forEach(this._newEntries, function(entry){
-            deferreds.push(cosmo.atompub.newEntry(iri, entry));
+            deferreds.push(cosmo.atompub.newEntry(iri, entry, xhrArgs));
 		});
         dojo.forEach(this._deletedEntries, function(entry){
-            deferreds.push(cosmo.atompub.deleteEntry(entry));
+            deferreds.push(cosmo.atompub.deleteEntry(entry, xhrArgs));
 		});
         var dl = new dojo.DeferredList(deferreds);
         var scope = keywordArgs.scope || dojo.global();

@@ -46,20 +46,33 @@ function singleTextValue(query){
         return r? r.nodeValue : null;
     };
 }
-var xpFunctions = {
-    "id": singleTextValue("atom:id/text()"),
-    "title": singleTextValue("atom:title/text()"),
-    "updated": singleTextValue("atom:updated/text()"),
-    "author": noop("atom:author"),
-    "link": noop("atom:link"),
-    "content": singleValue("atom:content"),
-    "category" : singleTextValue("atom:category/text()"),
-    "contributor" : singleTextValue("atom:contributor/text()"),
-    "generator" : singleTextValue("atom:generator/text()"),
-    "icon" : singleTextValue("atom:icon/text()"),
-    "logo" : singleTextValue("atom:logo/text()"),
-    "rights" : singleTextValue("atom:rights/text()"),
-    "subtitle" : singleTextValue("atom:subtitle/text()")
+function setText(query){
+    return function(entry, value){
+        var node = xPathQueryFunc(query, entry)[0];
+        node.nodeValue = value;
+    };
+}
+function setNode(query){
+    return function(entry, value){
+        var node = xPathQueryFunc(query, entry)[0];
+        node.parentNode.replaceChild(value, node);
+    };
+}
+
+var xp = {
+    "id": [singleTextValue, setText, "atom:id/text()"],
+    "title": [singleTextValue, setText, "atom:title/text()"],
+    "updated": [singleTextValue, setText, "atom:updated/text()"],
+    "author": [noop, setNode, "atom:author"],
+    "link": [noop, setNode, "atom:link"],
+    "content": [singleValue, setNode, "atom:content"],
+    "category" : [singleTextValue, setText, "atom:category/text()"],
+    "contributor" : [singleTextValue, setText, "atom:contributor/text()"],
+    "generator" : [singleTextValue, setText, "atom:generator/text()"],
+    "icon" : [singleTextValue, setText, "atom:icon/text()"],
+    "logo" : [singleTextValue, setText, "atom:logo/text()"],
+    "rights" : [singleTextValue, setText, "atom:rights/text()"],
+    "subtitle" : [singleTextValue, setText, "atom:subtitle/text()"]
 };
 
 dojo.mixin(cosmo.atompub,
@@ -69,23 +82,38 @@ dojo.mixin(cosmo.atompub,
         return href? href.value : null;
     },
 
+    getEditLink: function(entry){
+        return this.query("atom:link[@rel='edit']", entry)[0];
+    },
+
     ns: nsMap,
 
     query: xPathQueryFunc,
 
-    attr: xpFunctions,
+    attr: function(){var r = {}; for (var k in xp) r[k] = xp[k][0](xp[k][2]); return r;}(),
 
-    newEntry: function(iri, entry){
-        if (entry instanceof Element) entry = dojox.data.dom.innerXML(entry);
-        return dojo.xhrRawPost({url: iri, postData: entry});
+    set: function(){var r = {}; for (var k in xp) r[k] = xp[k][1](xp[k][2]); return r;}(),
+
+    newEntry: function(iri, entry, request){
+        var entryString = (entry instanceof Element)? dojox.data.dom.innerXML(entry) : entry;
+        var d = dojo.xhrRawPost(dojo.mixin({url: iri, postData: entryString, handleAs: "xml"}, request));
+        d.addCallback(dojo.hitch(this, this.updateEntry, entry));
+        return d;
     },
 
-    modifyEntry: function(entry){
-        return dojo.xhrRawPut({url: this.getEditLink(entry), putData: entry});
+    updateEntry: function(oldEntry, newEntry){
+        var link = this.getEditLink(newEntry).cloneNode();
+        oldEntry.appendChild(link);
+        return oldEntry;
+    },
+
+    modifyEntry: function(entry, iri, request){
+        var entryString = (entry instanceof Element)? dojox.data.dom.innerXML(entry) : entry;
+        return dojo.xhrRawPut(dojo.mixin({url: this.getEditLink(entry), putData: entryString, handleAs: "xml"}, request));
     },
 
     deleteEntry: function(){
-        return dojo.xhrDelete({url: this.getEditLink(entry)});
+        return dojo.xhrDelete(dojo.mixin({url: this.getEditLink(entry), handleAs: "xml"}, request));
     }
 });
 }());

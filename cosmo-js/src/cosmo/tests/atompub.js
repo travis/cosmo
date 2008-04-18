@@ -52,6 +52,13 @@ doh.register("cosmo.tests.atompub",
             var e = cosmo.tests.atompub.entry1;
             t.is("urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a", cosmo.atompub.attr.id(e));
             t.is("Atom-Powered Robots Run Amok", cosmo.atompub.attr.title(e));
+        },
+
+        function testSetValue(t){
+            var e = cosmo.tests.atompub.entry1;
+            cosmo.atompub.set.id(e, "foo");
+            t.is("foo", cosmo.atompub.attr.id(e));
+
         }
     ]);
 

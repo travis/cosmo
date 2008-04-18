@@ -114,9 +114,9 @@ doh.register("cosmo.tests.xPath",
             var title1 = cosmo.xml.query("/bs:bookstore/bs:book[1]/bs:title", node, ns)[0];
             t.is("en", title1.getAttribute("lang"));
             t.is("Everyday Italian", dojox.data.dom.textContent(title1));
-            cosmo.xml.query("/bookstore/book/price/text()", node, ns)
-            cosmo.xml.query("/bookstore/book[price>35]/price", node, ns)
-            cosmo.xml.query("/bookstore/book[price>35]/title", node, ns)
+            cosmo.xml.query("/bs:bookstore/bs:book/bs:price/text()", node, ns);
+            cosmo.xml.query("/bs:bookstore/bs:book[bs:price>35]/bs:price", node, ns);
+            cosmo.xml.query("/bs:bookstore/bs:book[bs:price>35]/bs:title", node, ns);
         }
     ]);
 

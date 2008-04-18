@@ -17,6 +17,9 @@ dojo.provide("cosmo.data.tests.TicketStore");
 
 dojo.require("cosmo.data.TicketStore");
 dojo.require("dojox.data.dom");
+dojo.require("cosmo.tests.util");
+dojo.require("cosmo.util.auth");
+
 cosmo.data.tests.ticketmfns = {xhtml :"http://www.w3.org/1999/xhtml"};
 cosmo.data.tests.ticketmf = dojox.data.dom.createDocument(
     '<?xml version="1.0" encoding="utf-8"?>' +
@@ -75,6 +78,29 @@ doh.register("cosmo.data.tests.TicketStore",
             var e = cosmo.data.tests.ticketEntry1;
             t.is("xvm7udwf30", s.getValue(e, "key"));
             t.is("read-only", s.getValue(e, "type"));
+        },
+
+        {
+            name: "integrationTests",
+            timeout: 10000,
+            setUp: function(){
+                this.serverRunning = cosmo.tests.util.serverRunning();
+            },
+            runTest: function(){
+                if (this.serverRunning){
+                    var d = cosmo.tests.util.createUser();
+                    d.addCallback(dojo.hitch(this, this.initStore));
+                    return d;
+                }
+            },
+            initStore: function(){
+                var s = new cosmo.data.TicketStore(
+                    {
+                        iri: this.ticketsUrl,
+                        xhrArgs: cosmo.util.auth.getAuthorizedRequest()
+                    });
+            }
         }
     ]);
+
 

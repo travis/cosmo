@@ -55,13 +55,30 @@ dojo.declare("cosmo.data.TicketProcessor", null,
 							/* attribute-name-string */ attribute){
         if (this.getValues(item, attribute).length > 0) return true;
         else return false;
-    }
+    },
 
+	setValue: function(/* item */ item, /* string */ attribute, /* string */ value){
+    }
 });
 }());
 
 dojo.declare("cosmo.data.TicketStore", cosmo.data.AtompubStore,
 {
-    contentProcessors: {"xhtml": new cosmo.data.TicketProcessor()}
+    contentProcessors: {"xhtml": new cosmo.data.TicketProcessor()},
+
+    generateContent: function(item){
+        return ['<content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><div class="ticket"><span class="key">',
+                item.key ,'</span><span class="type" title="',
+                item.type, '"></span></div></div></content>'].join();
+    },
+
+    getEntryId: function(item){
+        return "urn:uuid:" + item.key;
+    },
+
+    getEntryTitle: function(item){
+        return item.key;
+    }
+
 });
 

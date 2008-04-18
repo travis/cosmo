@@ -30,7 +30,7 @@ function _JUM_first_arg_string_func(n, name){
         } else if (arguments.length == n + 1){
             s = arguments[0];
             args = Array.prototype.slice.apply(arguments, [1]);
-        } 
+        }
         try {
             return doh[name].apply(doh, args);
         } catch (e){
@@ -58,7 +58,7 @@ cosmo.testutils = {
                 dojo.require(moduleName);
                 var module = dojo.getObject(moduleName);
                 var functionNames = this.getFunctionNames(module);
-                
+
                 var testFunctions = [];
                 for (var j in functionNames){
                     var name = functionNames[j];
@@ -74,7 +74,7 @@ cosmo.testutils = {
                     );
                 }
             } catch (error){
-                doh.register(moduleName, 
+                doh.register(moduleName,
                              [function failure(){
                                  throw(error);
                              }]);
@@ -85,7 +85,7 @@ cosmo.testutils = {
         jum = new JUM();
 
     },
-    
+
     getFunctionNames: function getFunctionNames(scope){
         var fNames = [];
         for (var name in scope){
@@ -93,7 +93,7 @@ cosmo.testutils = {
                 fNames.push(name);
             }
         }
-        return fNames; 
+        return fNames;
     },
 
     createTestAccount: function(){
@@ -118,20 +118,20 @@ cosmo.testutils = {
         d.addErrback(function(e){
             console.debug(e);
         });
-        return user;
+        return this.defcon(d);
     },
-    
+
     cleanupUser: function(user){
         cosmo.util.auth.setCred("root", "cosmo");
         cosmo.cmp.deleteUser(user.username, {handle: function(){}}, true);
         cosmo.util.auth.clearAuth();
     },
- 
+
     // convert dojo.Deferred into doh.Deferred in able to return from test
     defcon: function(dojoDeferred){
         var d2 = new doh.Deferred()
         dojoDeferred.addCallbacks(
-            dojo.hitch(d2, d2.callback), 
+            dojo.hitch(d2, d2.callback),
             dojo.hitch(d2, d2.errback));
         return d2;
     }

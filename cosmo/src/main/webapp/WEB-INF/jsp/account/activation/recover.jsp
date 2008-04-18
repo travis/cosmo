@@ -21,5 +21,3 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:recover prefix="Account.RecoverActivation." recoverFunctionModule="cosmo.cmp"
                recoverFunctionName="sendActivation"/>
-
-

@@ -872,12 +872,7 @@ public class CmpServlet extends HttpServlet {
             User user = resource.getUser();
             user.setAdmin(Boolean.FALSE);
             user.setLocked(Boolean.FALSE);
-            
-            // create user (with or without out-of-box collections)
-            if(createOutOfBoxCollections)
-                user = userService.createUser(user, createSignupListeners(req));
-            else
-                user = userService.createUser(user);
+            user = userService.createUser(user, createSignupListeners(req));
             
             resource = new UserResource(user, getUrlBase(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -983,11 +978,8 @@ public class CmpServlet extends HttpServlet {
                 return;
             }
             
-            // create user (with or without out-of-box collections)
-            if(createOutOfBoxCollections)
-                user = userService.createUser(user, createSignupListeners(req));
-            else
-                user = userService.createUser(user);    
+            user = userService.createUser(user, createUserCreateListeners(req));
+
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setHeader("ETag", resource.getEntityTag());
         } catch (SAXException e) {
@@ -1285,12 +1277,18 @@ public class CmpServlet extends HttpServlet {
     }
 
     private ServiceListener[] createSignupListeners(HttpServletRequest req) {
-        return new ServiceListener[] { createActivationListener(req),
-                                       createOotbListener(req) };
+        if (this.createOutOfBoxCollections)
+            return new ServiceListener[] { createActivationListener(req),
+                createOotbListener(req) };
+        else
+            return new ServiceListener[] { createActivationListener(req)};
     }
 
     private ServiceListener[] createUserCreateListeners(HttpServletRequest req) {
-        return new ServiceListener[] { createOotbListener(req) };
+        if (this.createOutOfBoxCollections)
+            return new ServiceListener[] {createOotbListener(req) };
+        else
+            return new ServiceListener[] {};
     }
 
     private ActivationListener createActivationListener(HttpServletRequest req) {

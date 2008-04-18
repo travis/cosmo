@@ -152,7 +152,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          */
         createUser: function (userHash, ioArgs){
             var request_content = this.userHashToXML(userHash);
-            
+
 
             requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/user/" +
@@ -174,7 +174,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
-            
+
             var request_content = this.userHashToXML(userHash);
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/user/" +
@@ -200,9 +200,9 @@ dojo.declare("cosmo.cmp.Cmp", null,
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
-            
+
             var requestDict = this.getDefaultCMPRequest(ioArgs);
-            
+
             requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(username);
             return dojo.xhrDelete(requestDict);
@@ -221,7 +221,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
-            
+
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/user/delete";
             var usernameArgs = [];
@@ -230,7 +230,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     encodeURIComponent(usernames[i]);
             }
             var requestContent = usernameArgs.join("&");
-            
+
             requestDict.postData = requestContent;
             requestDict.contentType = "application/x-www-form-urlencoded";
             return dojo.rawXhrPost(requestDict);
@@ -304,7 +304,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
         getAccountXML: function(/*Object*/ ioArgs){
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/account";
-            
+
             return dojo.xhrGet(requestDict);
         },
 
@@ -317,17 +317,17 @@ dojo.declare("cosmo.cmp.Cmp", null,
             // If the user is changing his password,
             // make sure to wrap this in the credential
             // change-on-success function
-         
+
             if (dojo.isIE){
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
-            
+
             var requestContent = this.userHashToXML(userHash)
-            
+
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/account";
             requestDict.putData = requestContent;
-            
+
             var d = dojo.rawXhrPut(requestDict);
             if (userHash.password){
                 d.addCallback(this._changeCredCB(null, userHash.password));
@@ -388,18 +388,18 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 throw new cosmo.cmp.SubscriptionInfoMissingException(
                     name, ticket, uuid);
             }
-            return '<subscription name="' + cosmo.util.string.escapeXml(name) + 
-                '" ticket="' + ticket + '">' + 
+            return '<subscription name="' + cosmo.util.string.escapeXml(name) +
+                '" ticket="' + ticket + '">' +
                 uuid + '</subscription>';
         },
 
         sendActivation: function(username, email, ioArgs){
-            this._recover(this._baseUrl + "/account/activation/send", 
+            return this._recover(this._baseUrl + "/account/activation/send",
                           username, email, ioArgs);
         },
 
         recoverPassword: function(username, email, ioArgs){
-            return this._recover(this._baseUrl + "/account/password/recover", 
+            return this._recover(this._baseUrl + "/account/password/recover",
                                  username, email, ioArgs);
         },
 
@@ -434,7 +434,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
 
         cmpUserXMLToJSON: function (/*Element*/ cmpUserXml){
             var user = cmpUserXml;
-            
+
             var obj = {};
             obj.firstName = user.getElementsByTagName("firstName")[0].firstChild.nodeValue;
             obj.lastName = user.getElementsByTagName("lastName")[0].firstChild.nodeValue;
@@ -450,7 +450,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
             obj.unactivated = (user.getElementsByTagName("unactivated").length > 0)?
                 true : null;
 
-            obj.homedirUrl = (user.getElementsByTagName("homedirUrl").length > 0)? 
+            obj.homedirUrl = (user.getElementsByTagName("homedirUrl").length > 0)?
                 user.getElementsByTagName("homedirUrl")[0].firstChild.nodeValue: null;
 
             return obj;
@@ -527,7 +527,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 }
                 return result;
             }
-        } 
+        }
     }
 );
 

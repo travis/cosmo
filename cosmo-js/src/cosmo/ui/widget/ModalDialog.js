@@ -38,12 +38,12 @@ dojo.require("cosmo.ui.widget.ButtonPanel");
 dojo.require("cosmo.ui.widget.Button");
 
 dojo.declare(
-    "cosmo.ui.widget.ModalDialog", 
+    "cosmo.ui.widget.ModalDialog",
     [dijit._Widget, dijit._Templated],
     {
         // Template stuff
         templateString: '<div id="modalDialog"></div>',
-        
+
         // Attach points
         dropShadowOuterNode: null,
         dropShadowRightNode: null,
@@ -54,7 +54,7 @@ dojo.declare(
         imageNode: null,
         contentNode: null,
         buttonPanelNode: null,
-        
+
         INFO: 'info',
         ERROR: 'error',
         CONFIRM: 'confirm',
@@ -71,7 +71,7 @@ dojo.declare(
         uiFullMask: null,
         defaultAction: null,
         isDisplayed: false,
-        
+
         // Instance methods
         setTop: function (n) {
             var s = n.toString();
@@ -103,7 +103,7 @@ dojo.declare(
             var s = this.dropShadowOuterNode.offsetHeight;
             // Stash container height since Safari's DOM lookups
             // don't seem to happen in any particular order
-            this._containerHeight = s; 
+            this._containerHeight = s;
             this.containerNode.style.height = s + 'px';
             s += 16;
             this.dropShadowOuterNode.style.height = s + 'px';
@@ -135,8 +135,8 @@ dojo.declare(
             }
             var o = this._containerHeight;
             this.contentNode.style.height = (o - spacer) + 'px';
-            
-            // BANDAID: Hack to get Safari to render the height of the 
+
+            // BANDAID: Hack to get Safari to render the height of the
             // content area properly
             if (navigator.userAgent.indexOf('Safari') > -1) {
                 this.contentNode.style.border = '1px solid #ffffff';
@@ -192,23 +192,23 @@ dojo.declare(
             this.btnsLeft = l || this.btnsLeft;
             this.btnsCenter = c || this.btnsCenter;
             this.btnsRight = r || this.btnsRight;
-            
+
             if (this.btnPanel){
                 // Only clean up if btnPanel.domNode exists
                 // otherwise cleanup already occurred
                 if (this.btnPanel.domNode){
-                    this.btnPanel.destroyRecursive()
+                    this.btnPanel.destroyRecursive();
                 }
                 this.btnPanel = null;
             }
-           
+
             // Create and append the panel
             // Append the panel as part of instantiation -- if done without
             // a parent element to append to, the widget parser uses document.body,
             // which causes the doc to reflow -- and
             // scrolling canvas scrollOffset gets reset
             this.btnPanel = new cosmo.ui.widget.ButtonPanel(
-                { btnsLeft: this.btnsLeft, 
+                { btnsLeft: this.btnsLeft,
                   btnsCenter: this.btnsCenter,
                   btnsRight: this.btnsRight });
             this.buttonPanelNode.appendChild(this.btnPanel.domNode);
@@ -261,23 +261,23 @@ dojo.declare(
             table.className = 'dropShadowTable';
 
             row = _createElem('tr');
-            
+
             cell = _createElem('td');
             cell.colSpan = 4;
             cell.className = 'dropShadowTop';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-            
+
             body.appendChild(row);
-            
+
             row = _createElem('tr');
-            
+
             cell = _createElem('td');
             cell.rowSpan = 3;
             cell.className = 'dropShadowLeft';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-            
+
             cell = _createElem('td');
             cell.rowSpan = 2;
             cell.colSpan = 2;
@@ -285,9 +285,9 @@ dojo.declare(
             cell.className = 'dropShadowCenter';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-            
+
             this.containerNode = cell;
-            
+
             var d = _createElem('div');
             d.id = "modalDialogTitle";
             this.titleNode = d;
@@ -297,17 +297,17 @@ dojo.declare(
             d.id = "modalDialogPrompt";
             this.promptNode = d;
             cell.appendChild(d);
-            
+
             var d = _createElem('div');
             d.id = "modalDialogImage";
             this.imageNode = d;
             cell.appendChild(d);
-            
+
             var d = _createElem('div');
             d.id = "modalDialogContent";
             this.contentNode = d;
             cell.appendChild(d);
-            
+
             var d = _createElem('div');
             d.id = "modalDialogButtonPanel";
             d.className = 'dialogButtonPanel';
@@ -318,50 +318,50 @@ dojo.declare(
             cell.className = 'dropShadowTopRightCorner';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-            
+
             body.appendChild(row);
 
             row = _createElem('tr');
-            
+
             cell = _createElem('td');
             cell.className = 'dropShadowRight';
             cell.innerHTML = '&nbsp;';
             this.dropShadowRightNode = cell;
             row.appendChild(cell);
-            
+
             body.appendChild(row);
 
             row = _createElem('tr');
-            
+
             cell = _createElem('td');
             cell.className = 'dropShadowBottomLeft';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-            
+
             cell = _createElem('td');
             cell.className = 'dropShadowBottom';
             //cell.style.width = (w - 48) + 'px';
             cell.innerHTML = '&nbsp;';
             this.dropShadowBottomNode = cell;
             row.appendChild(cell);
-            
+
             cell = _createElem('td');
             cell.className = 'dropShadowBottomRightCorner';
             cell.innerHTML = '&nbsp;';
             row.appendChild(cell);
-            
+
             body.appendChild(row);
             table.appendChild(body);
             this.dropShadowOuterNode = table;
-            
+
             this.domNode.appendChild(table);
         },
-        
+
         // Lifecycle functions
         postMixInProperties: function () {
             // reference to original show method
             this.showOrig = this.show;
-            
+
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
@@ -370,7 +370,7 @@ dojo.declare(
                 // want to see stuff shifting around after we can see the
                 // dialog box
                 this.domNode.style.visibility = 'hidden';
-                
+
                 // Accommodate either original multiple param or
                 // object param input
                 // FIXME: 'content' passed could be a DOM node, which is
@@ -392,7 +392,7 @@ dojo.declare(
                 }
                 // Sizing
                 this.width = this.width || DIALOG_BOX_WIDTH;
-                this.height = this.height || DIALOG_BOX_HEIGHT;                
+                this.height = this.height || DIALOG_BOX_HEIGHT;
                 this._setUpDialog();
                 var waitForIt = this.render() && this.center();
                 this.renderUiMask();
@@ -407,10 +407,10 @@ dojo.declare(
                     && this.content.appendedToParent){
                     this.content.appendedToParent(this);
                 }
-                
+
                 // Re-set visibility to visible now that everything is sized/positioned
                 this.domNode.style.visibility = 'visible';
-                
+
                 this.isDisplayed = true;
 
             };
@@ -424,7 +424,7 @@ dojo.declare(
                     this.btnPanel.destroyRecursive();
                     this.btnPanel = null;
                 }
- 
+
                 this.title = '';
                 this.prompt = '';
                 this.btnsLeft = [];
@@ -440,16 +440,16 @@ dojo.declare(
                 this.content = null;
                 // Cleanup -- wipe DOM inside container
                 this.domNode.innerHTML = '';
-                
+
             };
         },
-        
+
         postCreate: function(){
             dojo.body().appendChild(this.domNode);
 			this.inherited("postCreate", arguments);
         },
-        
+
         // Toggling visibility
-        toggle: 'plain' 
-    } 
+        toggle: 'plain'
+    }
 );

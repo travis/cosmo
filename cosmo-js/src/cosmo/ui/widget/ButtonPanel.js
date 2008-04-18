@@ -29,7 +29,7 @@ dojo.require("cosmo.env");
 dojo.require("cosmo.ui.widget.Button");
 
 dojo.declare(
-    "cosmo.ui.widget.ButtonPanel", 
+    "cosmo.ui.widget.ButtonPanel",
     [dijit._Widget, dijit._Templated],
     {
 
@@ -39,7 +39,7 @@ dojo.declare(
     leftContainer: null,
     centerContainer: null,
     rightContainer: null,
-    panelContainer: null,
+    containerNode: null,
     btnsLeft: [],
     btnsCenter: [],
     btnsRight: [],
@@ -85,10 +85,10 @@ dojo.declare(
     setWidth: function (width) {
         this.width = width;
         if (width) {
-            this.panelContainer.style.width = parseInt(width) + 'px';
+            this.containerNode.style.width = parseInt(width) + 'px';
         } else {
-            this.panelContainer.style.width = '100%';
+            this.containerNode.style.width = '100%';
         }
     }
-  } 
+  }
 );

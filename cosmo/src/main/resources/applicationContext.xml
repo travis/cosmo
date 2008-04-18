@@ -620,6 +620,9 @@
     <property name="contentService">
       <ref local="contentService"/>
     </property>
+    <property name="securityManager">
+      <ref local="securityManager"/>
+    </property>
   </bean>
 
   <bean id="atomUserProvider" class="org.osaf.cosmo.atom.provider.UserProvider"

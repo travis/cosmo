@@ -34,6 +34,7 @@ import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.text.XhtmlTicketFormat;
+import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
@@ -46,6 +47,7 @@ public class TicketsProvider extends BaseProvider
         new String[] { "GET", "HEAD", "OPTIONS" };
 
     private ContentService contentService;
+    private CosmoSecurityManager securityManager;
 
     // Provider methods
 
@@ -59,13 +61,13 @@ public class TicketsProvider extends BaseProvider
 
         try {
             Ticket ticket = readTicket(request);
-
+            ticket.setOwner(securityManager.getSecurityContext().getUser());
             if (contentService.getTicket(collection, ticket.getKey()) != null)
                 return conflict(getAbdera(), request, "Ticket exists on " + 
                                 collection.getDisplayName());
 
             if (log.isDebugEnabled())
-                log.debug("creating preference " + ticket.getKey() +
+                log.debug("creating ticket " + ticket.getKey() +
                           " for collection " + collection.getDisplayName());
 
             contentService.createTicket(collection, ticket);
@@ -205,11 +207,13 @@ public class TicketsProvider extends BaseProvider
     public void setContentService(ContentService contentService) {
         this.contentService = contentService;
     }
-
+    
     public void init() {
         super.init();
         if (contentService == null)
             throw new IllegalStateException("contentService is required");
+        if (securityManager == null)
+            throw new IllegalStateException("securityManager is required");
     }
 
     protected TicketsFeedGenerator
@@ -236,5 +240,13 @@ public class TicketsProvider extends BaseProvider
         } catch (ParseException e) {
             throw new ValidationException("Error parsing XHTML content", e);
         }
+    }
+
+    public CosmoSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    public void setSecurityManager(CosmoSecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 }

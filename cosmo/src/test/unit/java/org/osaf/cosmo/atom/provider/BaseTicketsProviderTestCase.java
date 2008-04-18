@@ -33,6 +33,7 @@ public abstract class BaseTicketsProviderTestCase
     protected BaseProvider createProvider() {
         TicketsProvider provider = new TicketsProvider();
         provider.setContentService(helper.getContentService());
+        provider.setSecurityManager(helper.getSecurityManager());
         return provider;
     }
 

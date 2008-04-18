@@ -46,6 +46,7 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
 
         String key = null;
         TicketType type = null;
+        Integer timeout = null;
         try {
             if (source == null)
                 throw new ParseException("Source has no XML data", -1);
@@ -81,9 +82,20 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
                         log.debug("found type element");
 
                     String typeId = reader.getAttributeValue(null, "title");
-                    if (StringUtils.isBlank(key))
+                    if (StringUtils.isBlank(typeId))
                         handleParseException("Ticket type title must not be empty", reader);
                     type = TicketType.createInstance(typeId);
+                    
+                    continue;
+                }
+                if (inTicket && hasClass(reader, "timeout")) {
+                    if (log.isDebugEnabled())
+                        log.debug("found timeout element");
+
+                    String timeoutString = reader.getAttributeValue(null, "title");
+                    if (StringUtils.isBlank(timeoutString))
+                        timeout = null;
+                    else timeout = Integer.getInteger(timeoutString);
                     
                     continue;
                 }
@@ -97,6 +109,8 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
         
         Ticket ticket = entityFactory.createTicket(type);
         ticket.setKey(key);
+        if (timeout == null) ticket.setTimeout(Ticket.TIMEOUT_INFINITE);
+        else ticket.setTimeout(timeout);
 
         return ticket;
     }

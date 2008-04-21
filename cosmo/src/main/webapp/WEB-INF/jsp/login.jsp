@@ -20,84 +20,86 @@
 
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
+
 <fmt:setBundle basename="PimMessageResources"/>
-<!DOCTYPE html
-  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<cosmo:staticbaseurl var="staticBaseUrl"/>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>
-      <fmt:message key="Login.HeadTitle">
-        <c:forEach var="p" items="${TitleParam}">
-          <fmt:param><c:out value="${p}"/></fmt:param>
-        </c:forEach>
-      </fmt:message>
-      
-    </title>
-    <cosmo:staticbaseurl var="staticBaseUrl"/>
-    <cosmo:dojoBoilerplate dojoLayers="login"/>
-    <cosmo:stylesheets stylesheets="login"/>
-    <link rel="self" type="text/html" href="${staticBaseUrl}/login"/>
+<fmt:message key="Login.DownloadLink" var="downloadLink"/>
+<fmt:message key="Login.HomeLink" var="homeLink"/>
+<cosmo:threeColumnLayout prefix="Login." stylesheets="login" dojoLayers="login"
+                         selfLink="${staticBaseUrl}/login">
 
-    <%--
-        Login and account-creation stuff
-    --%>
-    <script type="text/javascript">
+  <script type="text/javascript">
 
-        dojo.require("cosmo.app");
-        dojo.require("cosmo.account.create");
-        dojo.require("cosmo.convenience");
-        dojo.require("cosmo.ui.widget.LoginDialog");
-        dojo.require("cosmo.ui.widget.ModalDialog");
-        dojo.require("dojo.cookie");
-        dojo.addOnLoad(init);
+    dojo.require("cosmo.app");
+    dojo.require("cosmo.account.create");
+    dojo.require("cosmo.convenience");
+    dojo.require("cosmo.ui.widget.LoginDialog");
+    dojo.require("cosmo.ui.widget.ModalDialog");
+    dojo.require("dojo.cookie");
+    dojo.addOnLoad(init);
 
-        function init() {
-            dojo.cookie('JSESSIONID', null, {expires: -1});
-            dojo.cookie('inputTimestamp', null, {expires: -1});
-            dojo.cookie('username', null, {expires: -1});
-            cosmo.util.auth.clearAuth();
-            cosmo.app.init();
-            if (dojo.queryToObject(location.search.substring(1))['signup']
-                == 'true'){
-                dojo.addOnLoad(function(){cosmo.account.create.showForm()});
-            }
-                        
-        }
-    </script>
-  </head>
-  <body>
-    <div>
-      <div dojoType="cosmo.ui.widget.LoginDialog" id="loginDialog">
-      </div>
-      <div style="padding-top:24px; text-align:center">
-        <fmt:message key="Login.CreateAccount"/>
-        <a href="javascript:cosmo.account.create.showForm();">
-        <fmt:message key="Login.CreateClickHere"/>
-        </a>
-      </div>
+    function init() {
+    dojo.cookie('JSESSIONID', null, {expires: -1});
+    dojo.cookie('inputTimestamp', null, {expires: -1});
+    dojo.cookie('username', null, {expires: -1});
+    cosmo.util.auth.clearAuth();
+    cosmo.app.init();
+    if (dojo.queryToObject(location.search.substring(1))['signup']
+    == 'true'){
+    dojo.addOnLoad(function(){cosmo.account.create.showForm()});
+    }
+    
+    }
+  </script>
 
-      <div style="padding-top:4px; text-align:center;">
-        <fmt:message key="Login.Forgot"/>
-        <a href="${staticBaseUrl}/account/password/recover">
-        <fmt:message key="Login.ForgotClickHere"/>
-        </a>
-      </div>
-      <c:if test="${cosmoui:getConfigProperty('cosmo.service.account.requireActivation')}">      
-      <div style="padding-top:4px; text-align:center;">
-        <fmt:message key="Login.LostActivation"/>
-        <a href="${staticBaseUrl}/account/activation/recover">
-        <fmt:message key="Login.LostActivationClickHere"/>
-        </a>
-      </div>
-      </c:if>
-      <div style="padding-top:36px; text-align:center;">
-          <cosmo:aboutPopupLink/>
-      </div>
-      <div style="padding-top:36px; text-align:center;">
-	      <fmt:message key="Login.Extra"/>
-      </div>
+  <div id="center" class="column">
+    <div dojoType="cosmo.ui.widget.LoginDialog" id="loginDialog">
     </div>
-  </body>
-</html>
+    <div class="bigger separate">
+      <fmt:message key="Login.CreateAccount"/>
+      <a class="biggest" href="javascript:cosmo.account.create.showForm();">
+        <fmt:message key="Login.CreateClickHere"/>
+      </a>
+    </div>
+
+    <div class="lightText">
+      <a href="${staticBaseUrl}/account/password/recover">
+        <fmt:message key="Login.Forgot"/>
+      </a>
+      <c:if test="${cosmoui:getConfigProperty('cosmo.service.account.requireActivation')}">
+        |
+        <a href="${staticBaseUrl}/account/activation/recover">
+          <fmt:message key="Login.LostActivation"/>
+        </a>
+      </c:if>
+    </div>
+
+    <div id="gallery"></div>
+    
+    <div class="padtop">
+      <cosmo:aboutPopupLink/>
+    </div>
+    <div class="tallLine">
+	  <fmt:message key="Login.Extra"/>
+    </div>
+  </div>
+
+  <div id="left" class="column"></div>
+  <div id="right" class="column">
+    <div id="promo">
+      <p class="biggest">
+        <a href="${downloadLink}">
+          <fmt:message key="Login.PromoClickHere"/>
+        </a>            
+        <fmt:message key="Login.Promo"/>
+      </p>
+      <p class="bigger separate">
+        <a href="${homeLink}">
+          <fmt:message key="Login.HomeClickHere"/>
+        </a>
+      </p>
+    </div>
+  </div>
+</cosmo:threeColumnLayout>
+

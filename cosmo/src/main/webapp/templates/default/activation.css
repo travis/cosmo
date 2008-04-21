@@ -31,16 +31,11 @@
 /* Post account activation page
  * ------------------- */
 
-a#login {
-	font-size: 2em;	
-	
-}
-
 table#user {
 	text-align: left;
 	margin: auto;
-	padding-top: 1em;
-	padding-bottom: 1em;
+    padding-top: 8px;
+    padding-bottom: 0px;
 }
 
 span#activatedMessage {
@@ -62,4 +57,22 @@ hr.seperator{
 
 td.label {
 	text-align: right;
+}
+
+.close, #container li {
+    line-height: 1.1em;
+}
+
+#container li {
+    padding-top: 8px;
+}
+
+#container ol {
+    margin-left: 30px;
+    margin-top:6px;
+    margin-bottom:12px;
+}
+
+.learn {
+    text-align: center;
 }

@@ -25,6 +25,7 @@
     color: #aa3333;
 }
 #loginDialog{
+    text-align: left;
     margin: auto;
     width: 364px;
     padding-top: 16px;
@@ -37,13 +38,14 @@
 }
 
 #loginDialogLogo {
+    display: none;
     text-align: center;
     padding-bottom: 12px;
 }
 #loginDialogFormContainer {
     margin: auto;
     padding: 12px;
-    border: 1px solid #999;
+    border: 1px solid #CCCCCC;
     width: 340px;
 }
 
@@ -76,4 +78,3 @@
     margin-top: 16px;
     float: right;
 }
- 

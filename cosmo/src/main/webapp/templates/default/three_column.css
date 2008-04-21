@@ -1,0 +1,154 @@
+/* Three column login/activate details */ 
+
+#logoHeader {
+    width: 216px;
+    height: 45px;
+    background-image: url(images/image_grid.png);
+    left: 6px;
+    background-position: 0px 0px;
+    margin-bottom: 8px;
+}
+
+#promo {
+    width: 210px;
+    padding: 10px;
+    padding-top: 15px;
+}
+
+#promo a {
+    white-space: nowrap;
+}
+
+.bigger {
+    font-size: 12px;
+}
+
+.biggest {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+p.biggest {
+    line-height: 1em;
+}
+
+.separate {
+    padding-top: 5px;
+}
+
+.lightText {
+    color: #CCCCCC;
+}
+
+#container {
+    text-align: center;
+    padding-left: 249px;   /* LC width */
+    padding-right: 251px;  /* RC width */
+    overflow-x: hidden; /* Fix IE7 horizontal scrollbar */
+    border-bottom-style: solid;
+    border-top-style: solid;
+}
+
+#container, #center {
+    border-color: #CCCCCC;
+    border-width: 1px;
+}
+
+#container p {
+    margin: 0px;
+}
+
+#left, #right {
+    border-style: none;
+}
+
+#container .column {
+    position: relative;
+    float: left;
+}
+#center {
+    width: 100%;
+    padding-top: 27px;
+    border-left-style: solid;
+    border-right-style: solid;
+    border-width: 1px;
+    padding-bottom: 10px;
+}
+
+#left {
+    width: 249px; /* LC width */
+    margin-left: -100%;
+    left: 249px; /* LC width for IE6 */
+}
+#container > #left {
+    left: -249px; /* -LC width for others */
+    margin-left: expression(document.all.center.offsetWidth * -1); /* Fix for IE7 */
+}
+
+#right {
+    text-align: left;
+    width: 249px;          /* RC width - 2*border-width */
+    margin-right: -251px;  /* RC width */
+}
+
+/* CSS for widget gallery */
+
+#gallery {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#gallery .inline {
+    /* for Firefox, Safari doesn't need it */
+    display:inline;
+}
+
+/* For some reason IE needs galleryBox to be in a span, not a div */
+span.galleryBox {
+	display:table-cell; /* for Firefox */
+	display:inline-block; /* for Safari and IE */
+    padding-top: 15px;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 10px;
+    background: #f8f8f8;
+}
+
+span.galleryBox a {
+    font-weight: normal;
+    font-size: 12px;
+}
+
+span.galleryBox p {
+    margin-bottom: 10px;
+    color: #585858;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+#container .separateBig {
+    margin-top: 30px;
+}
+
+.huge {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.restrictWidth {
+    width : 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.padbottom {
+    padding-bottom: 40px;
+}
+
+.padtop {
+    padding-top: 40px;
+}
+
+.tallLine {
+    line-height:1.6em;
+}

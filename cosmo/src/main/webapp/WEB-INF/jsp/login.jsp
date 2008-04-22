@@ -58,7 +58,7 @@
     </div>
     <div class="bigger separate">
       <fmt:message key="Login.CreateAccount"/>
-      <a class="biggest" href="javascript:cosmo.account.create.showForm();">
+      <a class="biggest" id="signup" href="javascript:cosmo.account.create.showForm();">
         <fmt:message key="Login.CreateClickHere"/>
       </a>
     </div>

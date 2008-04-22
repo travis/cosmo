@@ -1,4 +1,4 @@
-create_user_json = """{"method": "click", "params": {"link" : "Create a new account"}}
+create_user_json = """{"method": "click", "params": {"id" : "signup"}}
 {"method": "waits.forElement", "params": {"id": "loginDialogFormContainer"}}
 {"params": {"milliseconds": 6000},  "method": "waits.sleep"}
 {"method": "waits.forElement", "params": {"id": "modalDialogTitle", "timeout": 40000}}
@@ -25,7 +25,7 @@ create_user_json = """{"method": "click", "params": {"link" : "Create a new acco
 {"params": {"validator": "You have successfully created your Chandler Server account.", "id": "modalDialogPrompt"},  "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"},  "method": "click"}"""
 
-create_user_json_lab = """{"params": {"link": "Sign up."},  "method": "click"}
+create_user_json_lab = """{"method": "click", "params": {"id" : "signup"}}
 {"params": {"id": "modalDialogTitle"},  "method": "asserts.assertNode"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
 {"params": {"id": "tos"},  "method": "check"}

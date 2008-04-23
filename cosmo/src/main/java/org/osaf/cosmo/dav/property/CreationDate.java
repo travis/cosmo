@@ -15,23 +15,34 @@
  */
 package org.osaf.cosmo.dav.property;
 
+import java.text.DateFormat;
 import java.util.Date;
 
-import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
+import org.apache.jackrabbit.webdav.util.HttpDateFormat;
 
 /**
  * Represents the DAV:creationdate property.
  */
 public class CreationDate extends StandardDavProperty {
 
+    private static ThreadLocal<DateFormat> dateFormatLocal = new ThreadLocal<DateFormat>();
+    
     public CreationDate(Date date) {
         super(DavPropertyName.CREATIONDATE, dateToString(date), false);
     }
 
     private static String dateToString(Date date) {
+        // need one DateFormat instance per thread
+        DateFormat df = dateFormatLocal.get();
+        if(df==null) {
+            // Simple date format for the creation date ISO representation (partial).
+            df =  new HttpDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            dateFormatLocal.set(df);
+        }
         if (date == null)
             date = new Date();
-        return IOUtil.getCreated(date.getTime());
+        
+        return df.format(date);
     }
 }

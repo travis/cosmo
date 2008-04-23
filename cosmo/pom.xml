@@ -160,7 +160,7 @@
         <dependency>
             <groupId>net.fortuna</groupId>
             <artifactId>ical4j</artifactId>
-            <version>1.0-beta5-osaf-20080205</version>
+            <version>1.0-beta5-osaf-20080410</version>
         </dependency>
         <!-- required by jcr-server -->
         <!-- XXX: should be 1.0 release version -->

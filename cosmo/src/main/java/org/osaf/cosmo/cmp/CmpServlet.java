@@ -1084,7 +1084,13 @@ public class CmpServlet extends HttpServlet {
 
                 user.setPassword(newPassword);
 
-                userService.updateUser(user);
+                try {
+                    userService.updateUser(user);
+                } catch (ModelValidationException e) {
+                    // can happen when password is bad
+                    handleModelValidationError(resp, e);
+                    return;
+                }
 
                 userService.deletePasswordRecovery(passwordRecovery);
 

@@ -78,7 +78,7 @@
 
     if (${timezones}){
         dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
-        var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${baseUrl}/js-${PRODUCT_VERSION}/lib/olson-tzdata/");
+        var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("${baseUrl}/js-${PRODUCT_VERSION}/olson-tzdata");
         cosmo.datetime.timezone.setTimezoneRegistry(registry);
     }
     dojo.require('cosmo.ui.conf');

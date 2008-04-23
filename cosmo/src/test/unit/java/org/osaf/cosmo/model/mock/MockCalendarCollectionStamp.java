@@ -16,7 +16,6 @@
 package org.osaf.cosmo.model.mock;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -27,13 +26,10 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Version;
 
-import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.hibernate.validator.Timezone;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
+import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -165,46 +161,7 @@ public class MockCalendarCollectionStamp extends MockStamp implements
 
     private Calendar loadCalendar()
         throws IOException, ParserException {
-        Calendar calendar = new Calendar();
-        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
-        calendar.getProperties().add(Version.VERSION_2_0);
-        calendar.getProperties().add(CalScale.GREGORIAN);
-
-        // extract the supported calendar components for each child item and
-        // add them to the collection calendar object.
-        // index the timezones by tzid so that we only include each tz
-        // once. if for some reason different calendar items have
-        // different tz definitions for a tzid, *shrug* last one wins
-        // for this same reason, we use a single calendar builder/time
-        // zone registry.
-        HashMap tzIdx = new HashMap();
-        Set<EventStamp> eventStamps = getEventStamps();
-        for (EventStamp eventStamp : eventStamps) {
-            
-            Calendar childCalendar = eventStamp.getCalendar();
-
-            for (Iterator j=childCalendar.getComponents().
-                     getComponents(Component.VEVENT).iterator();
-                 j.hasNext();) {
-                calendar.getComponents().add((Component) j.next());
-            }
-
-            for (Iterator j=childCalendar.getComponents().
-                     getComponents(Component.VTIMEZONE).iterator();
-                 j.hasNext();) {
-                Component tz = (Component) j.next();
-                Property tzId = tz.getProperties().getProperty(Property.TZID);
-                if (! tzIdx.containsKey(tzId.getValue())) {
-                    tzIdx.put(tzId.getValue(), tz);
-                }
-            }
-        }
-
-        for (Iterator i=tzIdx.values().iterator(); i.hasNext();) {
-            calendar.getComponents().add((Component) i.next());
-        }
-
-        return calendar;
+        return ICalendarOutputter.getCalendarFromCollection((CollectionItem)getItem());
     }
     
     /* (non-Javadoc)

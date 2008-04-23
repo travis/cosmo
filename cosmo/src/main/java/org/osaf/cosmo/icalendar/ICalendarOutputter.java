@@ -15,22 +15,29 @@
  */
 package org.osaf.cosmo.icalendar;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.ICalendarItem;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TaskStamp;
@@ -72,12 +79,71 @@ public class ICalendarOutputter {
         CalendarOutputter outputter = new CalendarOutputter();
         outputter.setValidating(false);
         try {
-            outputter.output(stamp.getCalendar(), out);
-        } catch (ParserException e) {
-            throw new IllegalStateException("unable to compose collection calendar from child items' calendars", e);
+            outputter.output(getCalendarFromCollection(collection), out);
         } catch (ValidationException e) {
             throw new IllegalStateException("unable to validate collection calendar", e);
         }
+    }
+    
+    /**
+     * Returns an icalendar representation of a calendar collection.  
+     * @param collection calendar collection
+     * @return icalendar representation of collection
+     */
+    public static Calendar getCalendarFromCollection(CollectionItem collection) {
+        
+        // verify collection is a calendar
+        CalendarCollectionStamp ccs = StampUtils
+                .getCalendarCollectionStamp(collection);
+
+        if (ccs == null)
+            return null;
+        
+        Calendar calendar = new Calendar();
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+
+        // extract the supported calendar components for each child item and
+        // add them to the collection calendar object.
+        // index the timezones by tzid so that we only include each tz
+        // once. if for some reason different calendar items have
+        // different tz definitions for a tzid, *shrug* last one wins
+        // for this same reason, we use a single calendar builder/time
+        // zone registry.
+        HashMap tzIdx = new HashMap();
+        
+        for(Item item: collection.getChildren()) {
+           if(!(item instanceof ContentItem))
+               continue;
+           
+           ContentItem contentItem = (ContentItem) item;
+           Calendar childCalendar = getCalendar(contentItem);
+           
+           // ignore items that can't be converted
+           if(childCalendar==null)
+               continue;
+           
+           // index VTIMEZONE and add all other components
+           for (Iterator j=childCalendar.getComponents().iterator();
+               j.hasNext();) {
+               Component comp = (Component) j.next();
+               if(Component.VTIMEZONE.equals(comp.getName())) {
+                   Property tzId = comp.getProperties().getProperty(Property.TZID);
+                   if (! tzIdx.containsKey(tzId.getValue()))
+                       tzIdx.put(tzId.getValue(), comp);
+               } else {
+                   calendar.getComponents().add(comp);
+               }
+           }
+        }
+        
+        // add VTIMEZONEs
+        for (Iterator<Component> i=tzIdx.values().iterator(); i.hasNext();) {
+            calendar.getComponents().add(0,i.next());
+        }
+       
+        return calendar;
     }
     
     /**

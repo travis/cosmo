@@ -1,7 +1,7 @@
 #!/bin/bash
 DOJO_VERSION="release-1.1.0"
 if [ ! -d dojo-src ]; then
-    svn co http://svn.dojotoolkit.org/tags/$DOJO_VERSION dojo-src
+    svn co http://svn.dojotoolkit.org/src/tags/$DOJO_VERSION dojo-src
 fi
 
 cd dojo-src/util/buildscripts

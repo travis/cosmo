@@ -20,7 +20,7 @@ dojo.require("cosmo.env");
 // Configurable UI options
 
 
-dojo.global.TEMPLATE_DIRECTORY = "/" + (djConfig.templateName || 'default'); // Template directory to use
+dojo.global.TEMPLATE_DIRECTORY = "/" + (dojo.config.templateName || 'default'); // Template directory to use
 dojo.global.DISPLAY_WIDTH_PERCENT = 1.0; // Percent of window width to draw entire display
 dojo.global.DISPLAY_HEIGHT_PERCENT = 1.0; // Percent of window height to draw entire display
 dojo.global.TOP_MENU_HEIGHT = 48; // Height for top menubar 
@@ -100,6 +100,6 @@ cosmo.ui.conf.getBooleanValue = function(propertyName){
     return (""+rawValue).toLowerCase().charAt(0) == "t";
 } 
 
-if (djConfig['i18nLocation']){
-    cosmo.ui.conf.init(djConfig['i18nLocation']);
+if (dojo.config['i18nLocation']){
+    cosmo.ui.conf.init(dojo.config['i18nLocation']);
 }

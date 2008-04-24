@@ -132,14 +132,14 @@ cosmo.env.getStaticBaseUrlRangeHigh = function(){
 }
 
 cosmo.env._doesHaveRange = function(){
-    return !!cosmo.env._cosmoConfig["rangeLow"];    
+    return !!cosmo.env._cosmoConfig["rangeLow"];
 }
 
 cosmo.env._getNextSuffix = function(){
     var current = this._currentSuffix;
     var low = this.getStaticBaseUrlRangeLow();
     var high = this.getStaticBaseUrlRangeHigh();
-    
+
     if (!current || (current == high)){
         current =  low;
     } else {
@@ -150,27 +150,27 @@ cosmo.env._getNextSuffix = function(){
 }
 
 /**
- * Returns the url for a static resource. Uses a round-robin algorithm to 
+ * Returns the url for a static resource. Uses a round-robin algorithm to
  * distribute urls across various hosts.
  */
 cosmo.env.getStaticUrl = function(resourcePath){
     var url = this.getStaticBaseUrlTemplate();
     if (!url){
-        return this.getBaseUrl() + resourcePath;   
+        return this.getBaseUrl() + resourcePath;
     }
-    
+
     var cached = this._staticUrlPathCache[resourcePath];
     if (cached){
         return cached;
     }
-    
-    
+
+
     if (this._doesHaveRange()){
         var suffix = this._getNextSuffix();
         url = url.replace("*", suffix);
     }
     url += resourcePath;
-    this._staticUrlPathCache[resourcePath] = url; 
+    this._staticUrlPathCache[resourcePath] = url;
     return url;
 }
 
@@ -259,9 +259,9 @@ cosmo.env.getTimeoutMinutes = function (){
     return ret;
 }
 
-//initialize from djConfig
-cosmo.env.setBaseUrl(djConfig['serverBaseUrl']);
-cosmo.env.setStaticBaseUrlTemplate(djConfig['staticBaseUrlTemplate']);
-cosmo.env.setStaticBaseUrlRange(djConfig['staticBaseUrlRange']);
+//initialize from dojo.config
+cosmo.env.setBaseUrl(dojo.config['serverBaseUrl']);
+cosmo.env.setStaticBaseUrlTemplate(dojo.config['staticBaseUrlTemplate']);
+cosmo.env.setStaticBaseUrlRange(dojo.config['staticBaseUrlRange']);
 
 

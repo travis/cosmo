@@ -49,17 +49,17 @@ cosmo.app = new function () {
         self.maskNode = $('maskDiv');
         self.showMask();
         // Set up the modal dialog box for the app
-        
+
         self.modalDialog = new cosmo.ui.widget.ModalDialog({id: "modalDialog"});
         self.modalDialog.startup();
         dojo.subscribe(
             cosmo.topics.PreferencesUpdatedMessage.topicName, self, 'updateUIFromPrefs');
         // Initialize the default view
-        if (typeof self.initObj.init == 'function') { 
+        if (typeof self.initObj.init == 'function') {
             self.initObj.init(self.initParams);
         };
     };
-    
+
     this.updateUIFromPrefs = function(){};
 
     // ==========================
@@ -72,8 +72,8 @@ cosmo.app = new function () {
      */
     this.showErr = function (primaryMessage, secondaryMessage, error) {
         var msg = '';
-        
-        var verboseInfo = null; 
+
+        var verboseInfo = null;
         if (error){
             verboseInfo = this._extractVerboseErrorInfo(error);
         }
@@ -82,7 +82,7 @@ cosmo.app = new function () {
         if (this.modalDialog.isDisplayed) {
             this.errorList.push(primaryMessage);
         }  // Otherwise display the error dialog
-        else {  
+        else {
             // If there are errors waiting in the queue, prepend them to the error msg
             if (this.errorList.length) {
                 var currErr = '';
@@ -123,9 +123,9 @@ cosmo.app = new function () {
                     d = _createElem('div');
                     d.style.marginTop = '8px';
                     var a = document.createElement('a');
-                    // Avoid use of the ugly hack of '#' href prop 
+                    // Avoid use of the ugly hack of '#' href prop
                     // Give the anchor some help to act like a real link
-                    a.className = 'jsLink'; 
+                    a.className = 'jsLink';
                     dojo.connect(a, 'onclick', f);
                     a.appendChild(_createText('Click here for details ...'));
                     d.appendChild(a);
@@ -141,12 +141,12 @@ cosmo.app = new function () {
             this.showDialog();
         }
     };
-    
+
     this._extractVerboseErrorInfo = function(error){
         if (error.toStringVerbose){
             return error.toStringVerbose();
         }
-        
+
         if (error instanceof Error){
             return "message: \n " + error.message + "\n\n"
                   +"name: \n" + error.name + "\n\n"
@@ -154,10 +154,10 @@ cosmo.app = new function () {
                   +"lineNumber: \n" + error.lineNumber + "\n\n"
                   +"stack: \n" + error.stack + "\n\n";
         }
-        
+
         return null;
     };
-    
+
     /**
      * Displays the mask that covers the entire browser window
      * until the UI is completely rendered
@@ -217,7 +217,7 @@ cosmo.app = new function () {
         }
         retryConditions = retryConditions || [];
         var deferred = new dojo.Deferred();
-        var submitFunc = dojo.hitch(this, function () { 
+        var submitFunc = dojo.hitch(this, function () {
             var valueInput = dojo.query("#getValueInput")[0];
             var value = valueInput.value;
             for (var i = 0; i < retryConditions.length; i++){
@@ -243,7 +243,7 @@ cosmo.app = new function () {
         }
 
         buttons.push( new cosmo.ui.widget.Button(
-            { text: kwArgs.defaultActionButtonText || _('App.Button.Submit'), 
+            { text: kwArgs.defaultActionButtonText || _('App.Button.Submit'),
               id: "getValueSubmit",
               width:74,
               handleOnClick: submitFunc
@@ -263,12 +263,12 @@ cosmo.app = new function () {
     };
     this.showAndWait = function (message, returnValue){
         var deferred = new dojo.Deferred();
-        var submitFunc = dojo.hitch(this, function () { 
+        var submitFunc = dojo.hitch(this, function () {
             this.hideDialog();
             deferred.callback(returnValue);
         })
         var button = new cosmo.ui.widget.Button(
-                              { text:_('App.Button.OK'), 
+                              { text:_('App.Button.OK'),
                                 width:74,
                                 handleOnClick: submitFunc
                               });
@@ -284,27 +284,27 @@ cosmo.app = new function () {
     };
 
     /**
-     *  kwArgs: 
+     *  kwArgs:
      *    cancelDefault: make default action "No"
      */
     this.confirm = function (message, kwArgs){
         kwArgs = kwArgs || {};
         var deferred = new dojo.Deferred();
-        var yesFunc = dojo.hitch(this, function () { 
+        var yesFunc = dojo.hitch(this, function () {
             this.hideDialog();
             deferred.callback(true);
         })
-        var noFunc = dojo.hitch(this, function () { 
+        var noFunc = dojo.hitch(this, function () {
             this.hideDialog();
             deferred.callback(false);
         })
         var yesButton = new cosmo.ui.widget.Button(
-                              { text:_('App.Button.Yes'), 
+                              { text:_('App.Button.Yes'),
                                 width:74,
                                 handleOnClick: yesFunc
                               });
         var noButton = new cosmo.ui.widget.Button(
-                              { text:_('App.Button.No'), 
+                              { text:_('App.Button.No'),
                                 width:74,
                                 handleOnClick: noFunc
                               });
@@ -397,32 +397,32 @@ cosmo.app = new function () {
         }
     };
     this.handleTimeout = function (){
-        
+
         var logoutFunction = function () {
             location = cosmo.env.getRedirectUrl();
         }
-        
-        var autoLogoutTimeout = 
+
+        var autoLogoutTimeout =
             setTimeout(logoutFunction,
                        cosmo.ui.conf.timeoutDialogAutoLogout * 1000)
-        
+
         var dialogHash = {};
-        var cancelLogoutButton = new cosmo.ui.widget.Button({ text:_('App.Button.Cancel'), width:74,
-            handleOnClick: function () { 
+        var cancelLogoutButton = new cosmo.ui.widget.Button({ text:_('Timeout.Cancel'), width:74,
+            handleOnClick: function () {
                 cosmo.app.hideDialog();
                 clearTimeout(autoLogoutTimeout)
-                cosmo.ui.timeout.updateLastActionTime() 
+                cosmo.ui.timeout.updateLastActionTime()
             } });
         dialogHash.btnsLeft = [cancelLogoutButton];
-        var logoutButton = new cosmo.ui.widget.Button({ text:_('App.Button.OK'), width:74,
+        var logoutButton = new cosmo.ui.widget.Button({ text:_('Timeout.OK'), width:74,
             handleOnClick: logoutFunction
             });
         dialogHash.btnsRight = [logoutButton];
         dialogHash.title = _('App.Timeout.Title');
-        dialogHash.prompt = _('App.Timeout.Prompt', 
-                              cosmo.env.getTimeoutMinutes(), 
+        dialogHash.prompt = _('App.Timeout.Prompt',
+                              cosmo.env.getTimeoutMinutes(),
                               cosmo.ui.conf.timeoutDialogAutoLogout);
         self.showDialog(dialogHash);
-        
+
     };
 };

@@ -26,13 +26,12 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.topics");
 dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
-
 dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");
 
 dojo.declare("cosmo.AlreadySubscribedException", Error);
 
 dojo.declare(
-    "cosmo.ui.widget.CollectionSelector", 
+    "cosmo.ui.widget.CollectionSelector",
     [dijit._Widget, dijit._Templated],
     {
         templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/CollectionSelector.html"),
@@ -43,7 +42,7 @@ dojo.declare(
         l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSelector"),
 
         //references to various DOM nodes
-        displayNameText: null, 
+        displayNameText: null,
 
         constructor: function(collection, ticketKey){
             this.setCollection(collection);
@@ -84,13 +83,13 @@ dojo.declare(
                     var showD = cosmo.app.showAndWait(message);
                     showD.addCallback(function(){throw new cosmo.AlreadySubscribedException()});
                     return showD;
-                } 
-                
+                }
+
                 if (!this._collectionWithDisplayNameExists(collections, displayName)) return displayName;
                 else {
                     var displayNameDeferred = cosmo.app.getValue(
                         dojo.string.substitute(this.l10n.nameExists, [displayName]),
-                        collection.getDisplayName(), 
+                        collection.getDisplayName(),
                         [
                             dojo.hitch(this, function (displayName){
                                 if (!this._validateDisplayName(displayName)){
@@ -103,7 +102,7 @@ dojo.declare(
                                 }
                             })
                         ]);
-                    
+
                     return displayNameDeferred;
                 }
             }));
@@ -124,9 +123,9 @@ dojo.declare(
                     ticketKey: this.ticketKey
                 })
             }));
-            if (!cosmo.util.auth.currentlyAuthenticated()) 
+            if (!cosmo.util.auth.currentlyAuthenticated())
                 deferred.addCallback(dojo.hitch(this, this._authenticate));
-            
+
             deferred.addCallback(dojo.hitch(this, this.subscribe));
             deferred.addCallback(dojo.hitch(this, this._redirectFunction));
             deferred.addErrback(dojo.hitch(this, function (err) {
@@ -163,8 +162,8 @@ dojo.declare(
         _confirmSubscribe: function(){
             confirmContent = _createElem("div");
             confirmContent.style.lineHeight = "1.5";
-            confirmContent.innerHTML = 
-                [this.l10n.confirmAddPre, 
+            confirmContent.innerHTML =
+                [this.l10n.confirmAddPre,
                  "<input type='text' id='getValueInput' class='inputText' value='",
                  this.collection.getDisplayName(), "'/>",
                  this.l10n.confirmAddPost].join("");

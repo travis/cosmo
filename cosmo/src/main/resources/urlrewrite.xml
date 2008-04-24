@@ -33,8 +33,8 @@
   <rule enabled="true">
   <condition name="accept-encoding" operator="equal" next="and">.*gzip.*</condition>
   <condition name="user-agent" operator="notequal">.*MSIE 6.0.*</condition>
-  <from>dojo/((?:dojo/dojo)|(?:cosmo/login)|(?:cosmo/userlist)|(?:cosmo/pim)).js$</from>
-  <to>dojo/$1.js.gzip-compressed.js</to>
+  <from>((?:dojo/dojo)|(?:cosmo/login)|(?:cosmo/userlist)|(?:cosmo/pim)).js$</from>
+  <to>$1.js.gzip-compressed.js</to>
   <set type="response-header" name="Vary">Accept-Encoding</set>
   <set type="response-header" name="Content-Encoding">gzip</set>
   <set type="content-type">text/javascript</set>

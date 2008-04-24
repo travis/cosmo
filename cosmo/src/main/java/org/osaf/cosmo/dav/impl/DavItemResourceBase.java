@@ -65,6 +65,7 @@ import org.osaf.cosmo.dav.property.StandardDavProperty;
 import org.osaf.cosmo.dav.property.Uuid;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.dav.ticket.property.TicketDiscovery;
+import org.osaf.cosmo.icalendar.ICalendarClientFilterManager;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionLockedException;
@@ -344,6 +345,10 @@ public abstract class DavItemResourceBase extends DavResourceBase
     
     protected CalendarQueryProcessor getCalendarQueryProcesor() {
         return getResourceFactory().getCalendarQueryProcessor();
+    }
+    
+    protected ICalendarClientFilterManager getClientFilterManager() {
+        return getResourceFactory().getClientFilterManager();
     }
 
     /**

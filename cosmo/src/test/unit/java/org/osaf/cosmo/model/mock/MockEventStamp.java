@@ -25,7 +25,6 @@ import net.fortuna.ical4j.model.component.VEvent;
 
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.EventStampPrototype;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
@@ -42,11 +41,9 @@ public class MockEventStamp extends MockBaseEventStamp implements
      */
     private static final long serialVersionUID = 3992468809776886156L;
     
-    private EventStampPrototype prototype = null;
     
     /** default constructor */
     public MockEventStamp() {
-        prototype = new EventStampPrototype(this);
     }
     
     public MockEventStamp(Item item) {
@@ -66,14 +63,7 @@ public class MockEventStamp extends MockBaseEventStamp implements
         return getMasterEvent();
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceEventStamp#getCalendar()
-     */
-    public Calendar getCalendar() {
-       return prototype.getCalendar();
-    }
-
-   
+  
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.copy.InterfaceEventStamp#getExceptions()
      */

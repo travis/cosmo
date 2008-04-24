@@ -21,6 +21,7 @@ import net.fortuna.ical4j.model.ComponentList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.dav.DavException;
 import org.osaf.cosmo.dav.DavResourceFactory;
 import org.osaf.cosmo.dav.DavResourceLocator;
@@ -66,7 +67,11 @@ public class DavEvent extends DavCalendarResource {
      * Returns the calendar object associated with this resource.
      */
     public Calendar getCalendar() {
-        return getEventStamp().getCalendar();
+        Calendar calendar = new EntityConverter(null).convertNote((NoteItem)getItem());
+        // run through client filter because unfortunatley
+        // all clients don't adhere to the spec
+        getClientFilterManager().filterCalendar(calendar);
+        return calendar;
     }
     
     public EventStamp getEventStamp() {

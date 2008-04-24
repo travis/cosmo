@@ -321,24 +321,26 @@ public class StandardContentServiceTest extends TestCase {
             Assert.assertEquals(masterEvent.getUid().getValue(), exceptionEvent.getUid().getValue());
         }
         
-        Assert.assertNotNull(getEvent("20060104T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060105T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060106T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060107T140000", eventStamp.getCalendar()));
+        Calendar fullCal = converter.convertNote(masterNote);
+      
+        Assert.assertNotNull(getEvent("20060104T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060105T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060106T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060107T140000", fullCal));
         
         Assert.assertNotNull(getEventException("20060104T140000", masterNote.getModifications()));
         Assert.assertNotNull(getEventException("20060105T140000", masterNote.getModifications()));
         Assert.assertNotNull(getEventException("20060106T140000", masterNote.getModifications()));
         Assert.assertNotNull(getEventException("20060107T140000", masterNote.getModifications()));
         
-        
-        Calendar fullCal = eventStamp.getCalendar();
         Assert.assertEquals(fullCal.getComponents().getComponents(Component.VEVENT).size(), 5);
         
         // now update
         calendar = getCalendar("event_with_exceptions2.ics"); 
         toUpdate.addAll(converter.convertEventCalendar(masterNote, calendar));
         service.updateContentItems(masterNote.getParents(), toUpdate);
+        
+        fullCal = converter.convertNote(masterNote);
         
         // should have removed 1, added 2 so that makes 4-1+2=5
         Assert.assertEquals(masterNote.getModifications().size(), 5);
@@ -349,12 +351,12 @@ public class StandardContentServiceTest extends TestCase {
         Assert.assertNotNull(getEventException("20060108T140000", masterNote.getModifications()));
         Assert.assertNotNull(getEventException("20060109T140000", masterNote.getModifications()));
         
-        Assert.assertNotNull(getEvent("20060104T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060105T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060106T140000", eventStamp.getCalendar()));
-        Assert.assertNull(getEvent("20060107T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060108T140000", eventStamp.getCalendar()));
-        Assert.assertNotNull(getEvent("20060109T140000", eventStamp.getCalendar()));
+        Assert.assertNotNull(getEvent("20060104T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060105T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060106T140000", fullCal));
+        Assert.assertNull(getEvent("20060107T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060108T140000", fullCal));
+        Assert.assertNotNull(getEvent("20060109T140000", fullCal));
     }
     
     

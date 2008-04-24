@@ -32,6 +32,7 @@ import net.fortuna.ical4j.model.ValidationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.dao.NoSuchResourceException;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
@@ -72,6 +73,7 @@ public class AccountBrowsingController extends MultiActionController
     private static final Log log =
         LogFactory.getLog(AccountBrowsingController.class);
 
+    private EntityConverter entityConverter = new EntityConverter(null);
     private ContentService contentService;
     private UserService userService;
     private CosmoSecurityManager securityManager;
@@ -462,10 +464,12 @@ public class AccountBrowsingController extends MultiActionController
         // spool data
         CalendarOutputter outputter = new CalendarOutputter();
              
+        NoteItem note = (NoteItem) stamp.getItem();
+        
         // since the content was validated when the event item was
         // imported, there's no need to do it here
         outputter.setValidating(false);
-        outputter.output(stamp.getCalendar(), response.getOutputStream());
+        outputter.output(entityConverter.convertNote(note), response.getOutputStream());
         response.flushBuffer();
     }
     
@@ -486,10 +490,13 @@ public class AccountBrowsingController extends MultiActionController
         // spool data
         CalendarOutputter outputter = new CalendarOutputter();
         
+        CollectionItem collection = (CollectionItem) calendar.getItem();
+        
         // since the content was validated when the event item was
         // imported, there's no need to do it here
         outputter.setValidating(false);
-        outputter.output(calendar.getCalendar(), response.getOutputStream());
+        outputter.output(entityConverter
+                .convertCollection(collection), response.getOutputStream());
         response.flushBuffer();
     }
 

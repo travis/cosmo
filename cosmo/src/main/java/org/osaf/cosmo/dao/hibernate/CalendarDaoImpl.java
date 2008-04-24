@@ -49,7 +49,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
     private static final Log log = LogFactory.getLog(CalendarDaoImpl.class);
 
     private ItemFilterProcessor itemFilterProcessor = null;
-  
+    private EntityConverter entityConverter = new EntityConverter(null);
    
    
     /* (non-Javadoc)
@@ -92,7 +92,7 @@ public class CalendarDaoImpl extends HibernateDaoSupport implements CalendarDao 
                 if (child instanceof ICalendarItem) {
                     
                     ICalendarItem content = (ICalendarItem) child;
-                    Calendar calendar = EntityConverter.convertContent(content);
+                    Calendar calendar = entityConverter.convertContent(content);
                         
                     if(calendar!=null) {
                         if (evaluater.evaluate(calendar, filter) == true)

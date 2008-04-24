@@ -83,8 +83,8 @@ public class MockCalendarDao extends MockItemDao implements CalendarDao {
             if (child instanceof ICalendarItem) {
                 
                 ICalendarItem content = (ICalendarItem) child;
-                Calendar calendar = EntityConverter.convertContent(content);
-                    
+                Calendar calendar = new EntityConverter(null).convertContent(content);
+                
                 if(calendar!=null) {
                     if (evaluater.evaluate(calendar, filter) == true)
                         results.add(content);

@@ -194,6 +194,38 @@
     </property>
   </bean>
 
+  <!--  ICalendar Client Filter Manager 
+        The ICalendar Client Filter Manager provides a way
+        for cosmo to tailor the icalendar data depending
+        on the client requesting the data.
+  -->
+  
+  <!--  filter for iCal clients -->
+  <bean id="ical3ClientFilter" 
+        class="org.osaf.cosmo.icalendar.ICal3ClientFilter"/>
+  
+  <bean id="iCalendarClientFilterManager" 
+        class="org.osaf.cosmo.icalendar.ICalendarClientFilterManager">
+     <property name="clientFilters">
+       <map>
+         <entry key="ical2" value-ref="ical3ClientFilter"/>
+         <entry key="ical3" value-ref="ical3ClientFilter"/>
+       </map>
+     </property>
+  </bean>
+  
+  <!--  servlet filter to determine client and initialize the manager -->
+  <bean id="clientICalendarFilterManagerFilter"
+        class="org.osaf.cosmo.filters.ClientICalendarFilter">
+        <property name="filterManager" ref="iCalendarClientFilterManager"/>
+        <property name="clientKeyMap">
+            <map>
+                <entry key=".*iCal 2.*" value="ical2"/>
+                <entry key=".*iCal 3.*" value="ical3"/>
+            </map>
+        </property>
+  </bean>
+  
   <!-- Define MBeans to export -->
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
     <property name="beans">
@@ -524,6 +556,7 @@
     <constructor-arg><ref local="securityManager"/></constructor-arg>
     <constructor-arg><ref local="cosmoEntityFactory"/></constructor-arg>
     <constructor-arg><ref local="calendarQueryProcessor"/></constructor-arg>
+    <constructor-arg><ref local="iCalendarClientFilterManager"/></constructor-arg>
   </bean>
 
   <bean id="davResourceLocatorFactory"

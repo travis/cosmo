@@ -67,6 +67,7 @@ public class StandardCalendarQueryProcessor implements CalendarQueryProcessor {
         new VersionFourGenerator();
     
     private CalendarDao calendarDao = null;
+    private EntityConverter entityConverter = new EntityConverter(null);
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.calendar.query.CalendarQueryProcessor#filterQuery(org.osaf.cosmo.model.CollectionItem, org.osaf.cosmo.calendar.query.CalendarFilter)
@@ -89,7 +90,7 @@ public class StandardCalendarQueryProcessor implements CalendarQueryProcessor {
         if (log.isDebugEnabled())
             log.debug("matching item " + item.getUid() + " to filter " + filter);
         
-        Calendar calendar = EntityConverter.convertContent(item);
+        Calendar calendar = entityConverter.convertContent(item);
         if(calendar!=null)
             return new CalendarFilterEvaluater().evaluate(calendar, filter);
         else
@@ -119,7 +120,7 @@ public class StandardCalendarQueryProcessor implements CalendarQueryProcessor {
         PeriodList busyTentativePeriods = new PeriodList();
         PeriodList busyUnavailablePeriods = new PeriodList();
         
-        Calendar calendar = EntityConverter.convertContent(item);
+        Calendar calendar = entityConverter.convertContent(item);
         
         // Add busy details from the calendar data
         addBusyPeriods(calendar, null, period, busyPeriods,
@@ -147,7 +148,7 @@ public class StandardCalendarQueryProcessor implements CalendarQueryProcessor {
             results.addAll(calendarDao.findCalendarItems(collection, filter));
         
         for(ContentItem content: results) {
-            Calendar calendar = EntityConverter.convertContent(content);
+            Calendar calendar = entityConverter.convertContent(content);
             if(calendar==null)
                 continue;
             // Add busy details from the calendar data

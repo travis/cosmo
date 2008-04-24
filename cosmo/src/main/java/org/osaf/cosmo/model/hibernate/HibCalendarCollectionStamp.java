@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.model.hibernate;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -23,7 +22,6 @@ import java.util.Set;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
@@ -34,7 +32,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.osaf.cosmo.hibernate.validator.Timezone;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -61,9 +58,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
     
     public static final QName ATTR_CALENDAR_LANGUAGE = new HibQName(
             CalendarCollectionStamp.class, "language");
-    
-    private transient Calendar calendar;
-    
+   
     /** default constructor */
     public HibCalendarCollectionStamp() {
     }
@@ -155,22 +150,6 @@ public class HibCalendarCollectionStamp extends HibStamp implements
         // timezone stored as ICalendarAttribute on Item
         HibICalendarAttribute.setValue(getItem(), ATTR_CALENDAR_TIMEZONE, timezone);
     }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getCalendar()
-     */
-    public Calendar getCalendar()
-        throws IOException, ParserException {
-        if (calendar == null) {
-            calendar = loadCalendar();
-        }
-        return calendar;
-    }
-
-    private Calendar loadCalendar()
-        throws IOException, ParserException {
-        return ICalendarOutputter.getCalendarFromCollection((CollectionItem)getItem());
-    }
     
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.CalendarCollectionStamp#getEventStamps()
@@ -185,6 +164,7 @@ public class HibCalendarCollectionStamp extends HibStamp implements
         }
         return events;
     }
+
     
     /**
      * Return CalendarCollectionStamp from Item

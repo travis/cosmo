@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -30,6 +31,7 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.TimeZone;
@@ -41,20 +43,34 @@ import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.component.VJournal;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.parameter.XParameter;
+import net.fortuna.ical4j.model.property.Action;
+import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.DateListProperty;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtStamp;
+import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
+import org.osaf.cosmo.CosmoConstants;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
+import org.osaf.cosmo.calendar.util.TimeZoneUtils;
+import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.BaseEventStamp;
+import org.osaf.cosmo.model.CalendarCollectionStamp;
+import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.ICalendarItem;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
@@ -62,6 +78,7 @@ import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.TriageStatusUtil;
+import org.osaf.cosmo.model.hibernate.HibEventExceptionStamp;
 
 /**
  * A component that converts iCalendar objects to entities and vice versa.
@@ -252,6 +269,67 @@ public class EntityConverter {
     }
 
     /**
+     * Returns an icalendar representation of a calendar collection.  
+     * @param collection calendar collection
+     * @return icalendar representation of collection
+     */
+    public Calendar convertCollection(CollectionItem collection) {
+        
+        // verify collection is a calendar
+        CalendarCollectionStamp ccs = StampUtils
+                .getCalendarCollectionStamp(collection);
+
+        if (ccs == null)
+            return null;
+        
+        Calendar calendar = new Calendar();
+        calendar.getProperties().add(new ProdId(CosmoConstants.PRODUCT_ID));
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+
+        // extract the supported calendar components for each child item and
+        // add them to the collection calendar object.
+        // index the timezones by tzid so that we only include each tz
+        // once. if for some reason different calendar items have
+        // different tz definitions for a tzid, *shrug* last one wins
+        // for this same reason, we use a single calendar builder/time
+        // zone registry.
+        HashMap tzIdx = new HashMap();
+        
+        for(Item item: collection.getChildren()) {
+           if(!(item instanceof ContentItem))
+               continue;
+           
+           ContentItem contentItem = (ContentItem) item;
+           Calendar childCalendar = convertContent(contentItem);
+           
+           // ignore items that can't be converted
+           if(childCalendar==null)
+               continue;
+           
+           // index VTIMEZONE and add all other components
+           for (Iterator j=childCalendar.getComponents().iterator();
+               j.hasNext();) {
+               Component comp = (Component) j.next();
+               if(Component.VTIMEZONE.equals(comp.getName())) {
+                   Property tzId = comp.getProperties().getProperty(Property.TZID);
+                   if (! tzIdx.containsKey(tzId.getValue()))
+                       tzIdx.put(tzId.getValue(), comp);
+               } else {
+                   calendar.getComponents().add(comp);
+               }
+           }
+        }
+        
+        // add VTIMEZONEs
+        for (Iterator<Component> i=tzIdx.values().iterator(); i.hasNext();) {
+            calendar.getComponents().add(0,i.next());
+        }
+       
+        return calendar;
+    }
+    
+    /**
      * Returns a calendar representing the item.
      * <p>
      * If the item is a {@link NoteItem}, delegates to
@@ -260,7 +338,7 @@ public class EntityConverter {
      * returns null.
      * </p>
      */
-    public static Calendar convertContent(ContentItem item) {
+    public Calendar convertContent(ContentItem item) {
 
         if(item instanceof NoteItem)
             return convertNote((NoteItem) item);
@@ -279,7 +357,7 @@ public class EntityConverter {
      * Otherwise, returns a calendar containing a journal.
      * </p>
      */
-    public static Calendar convertNote(NoteItem note) {
+    public Calendar convertNote(NoteItem note) {
 
         // must be a master note
         if(note.getModifies()!=null)
@@ -287,13 +365,274 @@ public class EntityConverter {
 
         EventStamp event = StampUtils.getEventStamp(note);
         if(event!=null)
-            return event.getCalendar();
+            return getCalendarFromEventStamp(event);
 
         TaskStamp task = StampUtils.getTaskStamp(note);
         if(task!=null)
-            return task.getCalendar();
+            return getCalendarFromTaskStamp(task);
 
-        return note.getFullCalendar();
+        return getCalendarFromNote(note);
+    }
+    
+   
+    protected Calendar getCalendarFromNote(NoteItem  note) {
+        // Start with existing calendar if present
+        Calendar calendar = note.getJournalCalendar();
+        
+        // otherwise, start with new calendar
+        if (calendar == null)
+            calendar = ICalendarUtils.createBaseCalendar(new VJournal());
+        else
+            // use copy when merging calendar with item properties
+            calendar = CalendarUtils.copyCalendar(calendar);
+        
+        // merge in displayName,body
+        VJournal journal = (VJournal) calendar.getComponent(Component.VJOURNAL);
+        mergeCalendarProperties(journal, note);
+        
+        return calendar;
+    }
+   
+    protected Calendar getCalendarFromTaskStamp(TaskStamp taskStamp) {
+        // Start with existing calendar if present
+        Calendar calendar = taskStamp.getTaskCalendar();
+        
+        // otherwise, start with new calendar
+        if (calendar == null)
+            calendar = ICalendarUtils.createBaseCalendar(new VToDo());
+        else
+            // use copy when merging calendar with item properties
+            calendar = CalendarUtils.copyCalendar(calendar);
+        
+        // merge in displayName,body
+        VToDo task = (VToDo) calendar.getComponent(Component.VTODO);
+        mergeCalendarProperties(task, (NoteItem) taskStamp.getItem());
+        
+        return calendar;
+    }
+    
+    protected Calendar getCalendarFromEventStamp(EventStamp stamp) {
+        Calendar masterCal = CalendarUtils.copyCalendar(stamp.getEventCalendar());
+        if (masterCal == null)
+            return null;
+       
+        // the master calendar might not have any events; for
+        // instance, a client might be trying to save a VTODO
+        if (masterCal.getComponents(Component.VEVENT).isEmpty())
+            return masterCal;
+
+        VEvent masterEvent = (VEvent) masterCal.getComponents(Component.VEVENT).get(0);
+        VAlarm masterAlarm = getDisplayAlarm(masterEvent);
+        
+        // build timezone map that includes all timezones in master calendar
+        ComponentList timezones = masterCal.getComponents(Component.VTIMEZONE);
+        HashMap<String, VTimeZone> tzMap = new HashMap<String, VTimeZone>();
+        for(Iterator it = timezones.iterator(); it.hasNext();) {
+            VTimeZone vtz = (VTimeZone) it.next();
+            tzMap.put(vtz.getTimeZoneId().getValue(), vtz);
+        }
+        
+        // check start/end date tz is included, and add if it isn't
+        String tzid = getTzId(stamp.getStartDate());
+        if(tzid!=null && !tzMap.containsKey(tzid)) {
+            VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, stamp.getStartDate().getTime());
+            masterCal.getComponents().add(0, vtz);
+            tzMap.put(tzid, vtz);
+        }
+        
+        tzid = getTzId(stamp.getEndDate());
+        if(tzid!=null && !tzMap.containsKey(tzid)) {
+            VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, stamp.getEndDate().getTime());
+            masterCal.getComponents().add(0, vtz);
+            tzMap.put(tzid, vtz);
+        }
+        
+        // merge item properties to icalendar props
+        mergeCalendarProperties(masterEvent, (NoteItem) stamp.getItem());
+        
+        // bug 10558: remove redundant VALUE=DATE-TIME params because
+        // some clients don't like them
+        fixDateTimeProperties(masterEvent);
+        
+        // bug 9606: handle displayAlarm with no trigger by not including
+        // in exported icalendar
+        if(masterAlarm!=null) {
+            if(stamp.getDisplayAlarmTrigger()==null) {
+                masterEvent.getAlarms().remove(masterAlarm);
+                masterAlarm = null;
+            }
+        }
+        
+        // If event is not recurring, skip all the event modification
+        // processing
+        if(!stamp.isRecurring())
+            return masterCal;
+        
+        // add all exception events
+        NoteItem note = (NoteItem) stamp.getItem();
+        TreeMap<String, VEvent> sortedMap = new TreeMap<String, VEvent>();
+        for(NoteItem exception : note.getModifications()) {
+            EventExceptionStamp exceptionStamp = HibEventExceptionStamp.getStamp(exception);
+            
+            // if modification isn't stamped as an event then ignore
+            if(exceptionStamp==null)
+                continue;
+            
+            // Get exception event copy
+            VEvent exceptionEvent = (VEvent) CalendarUtils
+                    .copyComponent(exceptionStamp.getExceptionEvent());
+
+            // ensure DURATION or DTEND exists on modfication
+            if (ICalendarUtils.getDuration(exceptionEvent) == null) {
+                ICalendarUtils.setDuration(exceptionEvent, ICalendarUtils
+                        .getDuration(masterEvent));
+            }
+            
+            // merge item properties to icalendar props
+            mergeCalendarProperties(exceptionEvent, exception);
+            
+            // bug 10558: remove redundant VALUE=DATE-TIME params because
+            // some clients don't like them
+            fixDateTimeProperties(masterEvent);
+            
+            // check for inherited anyTime
+            if(exceptionStamp.isAnyTime()==null) {
+                DtStart modDtStart = exceptionEvent.getStartDate();
+                // remove "missing" value
+                modDtStart.getParameters().remove(modDtStart.getParameter(ICalendarConstants.PARAM_X_OSAF_ANYTIME));
+                // add inherited value
+                if(stamp.isAnyTime()) {
+                    modDtStart.getParameters().add(getAnyTimeXParam());
+                }
+            }
+                
+            // Check for inherited displayAlarm, which is represented
+            // by a valarm with no TRIGGER
+            VAlarm displayAlarm = getDisplayAlarm(exceptionEvent);
+            if(displayAlarm !=null && exceptionStamp.getDisplayAlarmTrigger()==null) {
+                exceptionEvent.getAlarms().remove(displayAlarm);
+                if(masterAlarm!=null)
+                    exceptionEvent.getAlarms().add(masterAlarm);
+            }
+            
+            sortedMap.put(exceptionStamp.getRecurrenceId().toString(), exceptionEvent);
+            
+            // verify that timezones are present for exceptions, and add if not
+            tzid = getTzId(exceptionStamp.getStartDate());
+            if(tzid!=null && !tzMap.containsKey(tzid)) {
+                VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, exceptionStamp.getStartDate().getTime());
+                masterCal.getComponents().add(0, vtz);
+                tzMap.put(tzid, vtz);
+            }
+            
+            tzid = getTzId(exceptionStamp.getEndDate());
+            if(tzid!=null && !tzMap.containsKey(tzid)) {
+                VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, exceptionStamp.getEndDate().getTime());
+                masterCal.getComponents().add(0, vtz);
+                tzMap.put(tzid, vtz);
+            }
+        }
+        
+        masterCal.getComponents().addAll(sortedMap.values());
+        
+        return masterCal;
+    }
+    
+    private void mergeCalendarProperties(VJournal journal, NoteItem note) {
+        //uid = icaluid or uid
+        //summary = displayName
+        //description = body
+        //dtstamp = clientModifiedDate
+        String icalUid = note.getIcalUid();
+        if(icalUid==null)
+            icalUid = note.getUid();
+        
+        if(note.getClientModifiedDate()!=null)
+            ICalendarUtils.setDtStamp(note.getClientModifiedDate(), journal);
+        else
+            ICalendarUtils.setDtStamp(note.getModifiedDate(), journal);
+        
+        ICalendarUtils.setUid(icalUid, journal);
+        ICalendarUtils.setSummary(note.getDisplayName(), journal);
+        ICalendarUtils.setDescription(note.getBody(), journal);
+    }
+    
+    private void mergeCalendarProperties(VEvent event, NoteItem note) {
+        //summary = displayName
+        //description = body
+        //uid = icalUid
+        //dtstamp = clientModifiedDate/modifiedDate
+        if(note.getModifies()!=null)
+            ICalendarUtils.setUid(note.getModifies().getIcalUid(), event);
+        else
+            ICalendarUtils.setUid(note.getIcalUid(), event);
+        
+        ICalendarUtils.setSummary(note.getDisplayName(), event);
+        ICalendarUtils.setDescription(note.getBody(), event);
+        
+        if(note.getClientModifiedDate()!=null)
+            ICalendarUtils.setDtStamp(note.getClientModifiedDate(), event);
+        else
+            ICalendarUtils.setDtStamp(note.getModifiedDate(), event);
+    }
+    
+    private void mergeCalendarProperties(VToDo task, NoteItem note) {
+        //uid = icaluid or uid
+        //summary = displayName
+        //description = body
+        //dtstamp = clientModifiedDate/modifiedDate
+        
+        String icalUid = note.getIcalUid();
+        if(icalUid==null)
+            icalUid = note.getUid();
+        
+        if(note.getClientModifiedDate()!=null)
+            ICalendarUtils.setDtStamp(note.getClientModifiedDate(), task);
+        else
+            ICalendarUtils.setDtStamp(note.getModifiedDate(), task);
+        
+        ICalendarUtils.setUid(icalUid, task);
+        ICalendarUtils.setSummary(note.getDisplayName(), task);
+        ICalendarUtils.setDescription(note.getBody(), task);
+    }
+    
+    // Remove VALUE=DATE-TIME because it is redundant and some clients
+    // don't like when its present.
+    private void fixDateTimeProperties(VEvent event) {
+        PropertyList props = event.getProperties();
+        for(Iterator<Property> it = props.iterator(); it.hasNext();) {
+            Property prop = it.next();
+            if(prop instanceof DateProperty || prop instanceof DateListProperty) {
+                Value v = (Value) prop.getParameter(Parameter.VALUE);
+                if(v!=null && Value.DATE_TIME.equals(v))
+                    prop.getParameters().remove(v);
+            }
+        }
+    }
+    
+    private VAlarm getDisplayAlarm(VEvent event) {
+        for(Iterator it = event.getAlarms().iterator();it.hasNext();) {
+            VAlarm alarm = (VAlarm) it.next();
+            if (alarm.getProperties().getProperty(Property.ACTION).equals(
+                    Action.DISPLAY))
+                return alarm;
+        }
+        
+        return null;
+    }
+    
+    private String getTzId(Date date) {
+        if(date instanceof DateTime) {
+            DateTime dt = (DateTime) date;
+            if(dt.getTimeZone()!=null)
+                return dt.getTimeZone().getID();
+        }
+        
+        return null;
+    }
+    
+    private Parameter getAnyTimeXParam() {
+        return new XParameter(ICalendarConstants.PARAM_X_OSAF_ANYTIME, ICalendarConstants.VALUE_TRUE);
     }
     
     private void updateEventInternal(NoteItem masterNote,

@@ -24,6 +24,7 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.calendar.query.CalendarFilter;
 import org.osaf.cosmo.calendar.query.ComponentFilter;
 import org.osaf.cosmo.calendar.query.IsNotDefinedFilter;
@@ -111,7 +112,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         EventStamp evs = (EventStamp) queryEvent.getStamp(EventStamp.class);
         
         Assert.assertEquals("test.ics", queryEvent.getName());
-        Assert.assertEquals(getCalendar(event).toString(), evs.getCalendar().toString());
+        Assert.assertEquals(getCalendar(event).toString(), getCalendar(queryEvent).toString());
 
         // test update event
         queryEvent.setName("test2.ics");
@@ -119,7 +120,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         
         queryEvent = contentDao.updateContent(queryEvent);
 
-        Calendar cal = evs.getCalendar();
+        Calendar cal = evs.getEventCalendar();
         
         clearSession();
 
@@ -127,7 +128,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         evs = (EventStamp) queryEvent.getStamp(EventStamp.class);
         
         Assert.assertEquals("test2.ics", queryEvent.getName());
-        Assert.assertEquals(evs.getCalendar().toString(), cal.toString());
+        Assert.assertEquals(evs.getEventCalendar().toString(), cal.toString());
         
 
         // test delete
@@ -433,8 +434,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
     }
     
     private Calendar getCalendar(ContentItem item) {
-        EventStamp evs = (EventStamp) item.getStamp(EventStamp.class);
-        return evs.getCalendar();
+        return new EntityConverter(null).convertContent(item);
     }
     
     private void verifyItemNameInSet(Set<ContentItem> items, String name) {

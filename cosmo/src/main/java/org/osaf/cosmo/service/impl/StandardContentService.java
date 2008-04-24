@@ -989,7 +989,7 @@ public class StandardContentService implements ContentService {
         
         // verify that occurrence date is valid
         RecurrenceExpander expander = new RecurrenceExpander();
-        if(expander.isOccurrence(eventStamp.getCalendar(), recurrenceId))
+        if(expander.isOccurrence(eventStamp.getEventCalendar(), recurrenceId))
             return NoteOccurrenceUtil.createNoteOccurrence(recurrenceId, parent);
         
         return null;

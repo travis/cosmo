@@ -19,16 +19,11 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.component.VToDo;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.osaf.cosmo.calendar.ICalendarUtils;
-import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Task;
 import org.osaf.cosmo.model.Item;
-import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.TaskStamp;
@@ -78,27 +73,6 @@ public class HibTaskStamp extends HibStamp implements
         // calendar stored as ICalendarAttribute on Item
         HibICalendarAttribute.setValue(getItem(), ATTR_ICALENDAR, calendar);
     }
-   
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.TaskStamp#getCalendar()
-     */
-    public Calendar getCalendar() {
-        // Start with existing calendar if present
-        Calendar calendar = getTaskCalendar();
-        
-        // otherwise, start with new calendar
-        if (calendar == null)
-            calendar = ICalendarUtils.createBaseCalendar(new VToDo());
-        else
-            // use copy when merging calendar with item properties
-            calendar = CalendarUtils.copyCalendar(calendar);
-        
-        // merge in displayName,body
-        VToDo task = (VToDo) calendar.getComponent(Component.VTODO);
-        mergeCalendarProperties(task);
-        
-        return calendar;
-    }
     
     /**
      * Return TaskStamp from Item
@@ -114,25 +88,4 @@ public class HibTaskStamp extends HibStamp implements
         return stamp;
     }
     
-    private void mergeCalendarProperties(VToDo task) {
-        //uid = icaluid or uid
-        //summary = displayName
-        //description = body
-        //dtstamp = clientModifiedDate/modifiedDate
-        
-        NoteItem note = (NoteItem) getItem();
-        
-        String icalUid = note.getIcalUid();
-        if(icalUid==null)
-            icalUid = getItem().getUid();
-        
-        if(note.getClientModifiedDate()!=null)
-            ICalendarUtils.setDtStamp(note.getClientModifiedDate(), task);
-        else
-            ICalendarUtils.setDtStamp(note.getModifiedDate(), task);
-        
-        ICalendarUtils.setUid(icalUid, task);
-        ICalendarUtils.setSummary(note.getDisplayName(), task);
-        ICalendarUtils.setDescription(note.getBody(), task);
-    }
 }

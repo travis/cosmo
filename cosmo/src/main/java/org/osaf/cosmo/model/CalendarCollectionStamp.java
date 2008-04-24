@@ -15,10 +15,8 @@
  */
 package org.osaf.cosmo.model;
 
-import java.io.IOException;
 import java.util.Set;
 
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.TimeZone;
 
@@ -61,15 +59,7 @@ public interface CalendarCollectionStamp extends Stamp{
      *            timezone definition in ical format
      */
     public void setTimezoneCalendar(Calendar timezone);
-
-    /**
-     * Returns a <code>Calendar</code> representing all of the events
-     * in this calendar collection. This method will only calculate
-     * the aggregate calendar once; subsequent recalls will return the
-     * same calendar unless it is dumped by another method.
-     */
-    public Calendar getCalendar() throws IOException, ParserException;
-
+    
     /**
      * Return a set of all EventStamps for the collection's children.
      * @return set of EventStamps contained in children

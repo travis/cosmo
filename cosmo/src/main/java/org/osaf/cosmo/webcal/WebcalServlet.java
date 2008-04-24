@@ -22,8 +22,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.calendar.EntityConverter;
+import org.osaf.cosmo.icalendar.ICalendarClientFilterManager;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CollectionItem;
@@ -43,9 +47,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class WebcalServlet extends HttpServlet implements ICalendarConstants {
     private static final Log log = LogFactory.getLog(WebcalServlet.class);
     private static final String BEAN_CONTENT_SERVICE = "contentService";
+    private static final String BEAN_CLIENT_FILTER_MANAGER = "iCalendarClientFilterManager";
 
+    
     private WebApplicationContext wac;
     private ContentService contentService;
+    private ICalendarClientFilterManager clientFilterManager;
+    private EntityConverter entityConverter = new EntityConverter(null);
 
     // HttpServlet methods
 
@@ -116,7 +124,16 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
         resp.setHeader("Content-Disposition",
                        "attachment; filename=\"" + filename + "\"");
 
-        ICalendarOutputter.output(collection, resp.getOutputStream());
+        // get icalendar
+        Calendar calendar = entityConverter.convertCollection(collection);
+        
+        // Filter if necessary so we play nicely with clients
+        // that don't adhere to spec
+        if(clientFilterManager!=null)
+            clientFilterManager.filterCalendar(calendar);
+        
+        // spool
+        ICalendarOutputter.output(calendar, resp.getOutputStream());
     }
 
     // GenericServlet methods
@@ -139,6 +156,10 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
             if (contentService == null)
                 contentService = (ContentService)
                     getBean(BEAN_CONTENT_SERVICE, ContentService.class);
+            if (clientFilterManager == null)
+                clientFilterManager = (ICalendarClientFilterManager) getBean(
+                        BEAN_CLIENT_FILTER_MANAGER,
+                        ICalendarClientFilterManager.class);
         }
         
         if (contentService == null)
@@ -156,6 +177,15 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
     public void setContentService(ContentService contentService) {
         this.contentService = contentService;
     }
+    
+    public ICalendarClientFilterManager getClientFilterManager() {
+        return clientFilterManager;
+    }
+
+    public void setClientFilterManager(
+            ICalendarClientFilterManager clientFilterManager) {
+        this.clientFilterManager = clientFilterManager;
+    }
 
     // private methods
 
@@ -167,4 +197,5 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
             throw new ServletException("Error retrieving bean " + name + " of type " + clazz + " from web application context", e);
         }
     }
+    
 }

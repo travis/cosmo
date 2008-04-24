@@ -184,8 +184,11 @@ public abstract class DavCalendarResource extends DavContentBase
             IOUtil.buildContentType(ICALENDAR_MEDIA_TYPE, "UTF-8");
         outputContext.setContentType(contentType);
   
-        // convert Calendar object to String, then to bytes (UTF-8)
-        byte[] calendarBytes = getCalendar().toString().getBytes("UTF-8");
+        // Get calendar
+        Calendar calendar = getCalendar();
+        
+        // convert Calendar object to String, then to bytes (UTF-8)    
+        byte[] calendarBytes = calendar.toString().getBytes("UTF-8");
         outputContext.setContentLength(calendarBytes.length);
         outputContext.setModificationTime(getModificationTime());
         outputContext.setETag(getETag());

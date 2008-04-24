@@ -17,20 +17,11 @@ package org.osaf.cosmo.dav;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.calendar.query.CalendarQueryProcessor;
-import org.osaf.cosmo.dav.DavException;
-import org.osaf.cosmo.dav.DavRequest;
-import org.osaf.cosmo.dav.DavResource;
-import org.osaf.cosmo.dav.DavResourceFactory;
-import org.osaf.cosmo.dav.DavResourceLocator;
-import org.osaf.cosmo.dav.ExtendedDavConstants;
-import org.osaf.cosmo.dav.NotFoundException;
-import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
+import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.impl.DavAvailability;
 import org.osaf.cosmo.dav.impl.DavCalendarCollection;
-import org.osaf.cosmo.dav.impl.DavCalendarResource;
 import org.osaf.cosmo.dav.impl.DavCollectionBase;
 import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavFile;
@@ -38,6 +29,7 @@ import org.osaf.cosmo.dav.impl.DavFreeBusy;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
 import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
+import org.osaf.cosmo.icalendar.ICalendarClientFilterManager;
 import org.osaf.cosmo.model.AvailabilityItem;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
@@ -71,17 +63,20 @@ public class StandardResourceFactory
     private CosmoSecurityManager securityManager;
     private EntityFactory entityFactory;
     private CalendarQueryProcessor calendarQueryProcessor;
+    private ICalendarClientFilterManager clientFilterManager;
 
     public StandardResourceFactory(ContentService contentService,
                                    UserService userService,
                                    CosmoSecurityManager securityManager,
                                    EntityFactory entityFactory,
-                                   CalendarQueryProcessor calendarQueryProcessor) {
+                                   CalendarQueryProcessor calendarQueryProcessor,
+                                   ICalendarClientFilterManager clientFilterManager) {
         this.contentService = contentService;
         this.userService = userService;
         this.securityManager = securityManager;
         this.entityFactory = entityFactory;
         this.calendarQueryProcessor = calendarQueryProcessor;
+        this.clientFilterManager = clientFilterManager;
     }
 
     /**
@@ -265,5 +260,9 @@ public class StandardResourceFactory
 
     public CosmoSecurityManager getSecurityManager() {
         return securityManager;
+    }
+
+    public ICalendarClientFilterManager getClientFilterManager() {
+        return clientFilterManager;
     }
 }

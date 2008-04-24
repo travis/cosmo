@@ -23,6 +23,7 @@ import net.fortuna.ical4j.model.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.validator.InvalidStateException;
+import org.osaf.cosmo.calendar.EntityConverter;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
@@ -54,6 +55,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
     }
 
     public void testStampsCreate() throws Exception {
+        EntityConverter entityConverter = new EntityConverter(null);
         User user = getUser(userDao, "testuser");
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
@@ -87,7 +89,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertTrue(stamp instanceof EventStamp);
         Assert.assertEquals("event", stamp.getType());
         EventStamp es = (EventStamp) stamp;
-        Assert.assertEquals(es.getCalendar().toString(), event.getCalendar()
+        Assert.assertEquals(es.getEventCalendar().toString(), event.getEventCalendar()
                 .toString());
         
         Assert.assertEquals("icaluid", ((NoteItem) queryItem).getIcalUid());
@@ -177,7 +179,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         EventStamp es = (EventStamp) stamp;
         queryItem.setClientModifiedDate(new Date());
         es.setEventCalendar(helper.getCalendar("cal2.ics"));
-        Calendar newCal = es.getCalendar();
+        Calendar newCal = es.getEventCalendar();
         
         contentDao.updateContent(queryItem);
         
@@ -189,11 +191,11 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         es = (EventStamp) stamp;
        
         Assert.assertTrue(stamp.getModifiedDate().after(stamp.getCreationDate()));
-        if(!es.getCalendar().toString().equals(newCal.toString())) {
-            log.error(es.getCalendar().toString());
+        if(!es.getEventCalendar().toString().equals(newCal.toString())) {
+            log.error(es.getEventCalendar().toString());
             log.error(newCal.toString());
         }
-        Assert.assertEquals(es.getCalendar().toString(), newCal.toString());
+        Assert.assertEquals(es.getEventCalendar().toString(), newCal.toString());
     }
     
     public void testEventStampValidation() throws Exception {
@@ -292,7 +294,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         Assert.assertEquals(testCal.toString(), ccs.getTimezoneCalendar().toString());
         Assert.assertEquals("en", ccs.getLanguage());
         
-        Calendar cal = ccs.getCalendar();
+        Calendar cal = new EntityConverter(null).convertCollection(queryCol);
         Assert.assertEquals(1, cal.getComponents().getComponents(Component.VEVENT).size());
     }
     

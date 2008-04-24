@@ -31,7 +31,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.osaf.cosmo.hibernate.validator.Event;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.EventStampPrototype;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Stamp;
@@ -51,11 +50,9 @@ public class HibEventStamp extends HibBaseEventStamp implements
      */
     private static final long serialVersionUID = 3992468809776886156L;
     
-    private transient EventStampPrototype prototype = null;
     
     /** default constructor */
     public HibEventStamp() {
-        prototype = new EventStampPrototype(this);
     }
     
     public HibEventStamp(Item item) {
@@ -78,14 +75,7 @@ public class HibEventStamp extends HibBaseEventStamp implements
         return getEventCalendar();
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.EventStamp#getCalendar()
-     */
-    public Calendar getCalendar() {
-       return prototype.getCalendar();
-    }
-
-    
+   
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.EventStamp#getExceptions()
      */

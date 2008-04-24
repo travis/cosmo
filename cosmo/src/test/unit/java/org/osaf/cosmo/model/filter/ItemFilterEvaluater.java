@@ -220,7 +220,7 @@ public class ItemFilterEvaluater {
         
         BaseEventStamp es = (BaseEventStamp) s;
      
-        Calendar cal = EntityConverter.convertNote((NoteItem) s.getItem());
+        Calendar cal = new EntityConverter(null).convertNote((NoteItem) s.getItem());
         CalendarFilter cf = getCalendarFilter(esf);
         CalendarFilterEvaluater cfe = new CalendarFilterEvaluater();
         

@@ -47,7 +47,8 @@ public class DavTestHelper extends MockHelper
                                         getUserService(),
                                         getSecurityManager(),
                                         getEntityFactory(),
-                                        getCalendarQueryProcessor());
+                                        getCalendarQueryProcessor(),
+                                        getClientFilterManager());
         locatorFactory = new StandardResourceLocatorFactory();
         try {
             baseUrl = new URL("http", "localhost", -1, "/dav");

@@ -55,13 +55,6 @@ public interface NoteItem extends ICalendarItem{
      */
     public void setJournalCalendar(Calendar calendar);
 
-    /**
-     * Return icalendar representation of NoteItem.  A note is serialized
-     * as a VJOURNAL.
-     * @return Calendar representation of NoteItem
-     */
-    public Calendar getFullCalendar();
-
     public Set<NoteItem> getModifications();
 
     public void addModification(NoteItem mod);

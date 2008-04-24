@@ -30,15 +30,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.component.VJournal;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.osaf.cosmo.calendar.ICalendarUtils;
-import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.hibernate.validator.Journal;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -132,26 +128,7 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     public void setJournalCalendar(Calendar calendar) {
         setCalendar(calendar);
     }
-  
-    @Override
-    public Calendar getFullCalendar() {
-        // Start with existing calendar if present
-        Calendar calendar = getJournalCalendar();
-        
-        // otherwise, start with new calendar
-        if (calendar == null)
-            calendar = ICalendarUtils.createBaseCalendar(new VJournal());
-        else
-            // use copy when merging calendar with item properties
-            calendar = CalendarUtils.copyCalendar(calendar);
-        
-        // merge in displayName,body
-        VJournal journal = (VJournal) calendar.getComponent(Component.VJOURNAL);
-        mergeCalendarProperties(journal);
-        
-        return calendar;
-    }
-    
+   
     public Item copy() {
         NoteItem copy = new HibNoteItem();
         copyToItem(copy);
@@ -230,24 +207,5 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
         }
       
         return encodeEntityTag(etag.toString().getBytes());
-    }
-
-    private void mergeCalendarProperties(VJournal journal) {
-        //uid = icaluid or uid
-        //summary = displayName
-        //description = body
-        //dtstamp = clientModifiedDate
-        String icalUid = getIcalUid();
-        if(icalUid==null)
-            icalUid = getUid();
-        
-        if(getClientModifiedDate()!=null)
-            ICalendarUtils.setDtStamp(getClientModifiedDate(), journal);
-        else
-            ICalendarUtils.setDtStamp(getModifiedDate(), journal);
-        
-        ICalendarUtils.setUid(icalUid, journal);
-        ICalendarUtils.setSummary(getDisplayName(), journal);
-        ICalendarUtils.setDescription(getBody(), journal);
     }
 }

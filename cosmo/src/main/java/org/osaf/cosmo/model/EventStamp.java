@@ -17,7 +17,6 @@ package org.osaf.cosmo.model;
 
 import java.util.List;
 
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -26,14 +25,7 @@ import net.fortuna.ical4j.model.component.VEvent;
  */
 public interface EventStamp extends BaseEventStamp{
 
-    /**
-     * Generate full Calendar object representing event.
-     * For recurring events, this Calendar also includes VEvents
-     * for each event modification.
-     * @return full Calendar for event
-     */
-    public Calendar getCalendar();
-
+    
     /**
      * Returns a list of exception components for a recurring event.
      * If the event is not recurring, the list will be empty.

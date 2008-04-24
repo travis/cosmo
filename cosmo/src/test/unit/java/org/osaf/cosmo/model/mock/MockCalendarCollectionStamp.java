@@ -15,12 +15,10 @@
  */
 package org.osaf.cosmo.model.mock;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
@@ -29,7 +27,6 @@ import net.fortuna.ical4j.model.component.VTimeZone;
 
 import org.osaf.cosmo.hibernate.validator.Timezone;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-import org.osaf.cosmo.icalendar.ICalendarOutputter;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
@@ -149,23 +146,7 @@ public class MockCalendarCollectionStamp extends MockStamp implements
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getCalendar()
-     */
-    public Calendar getCalendar()
-        throws IOException, ParserException {
-        if (calendar == null) {
-            calendar = loadCalendar();
-        }
-        return calendar;
-    }
-
-    private Calendar loadCalendar()
-        throws IOException, ParserException {
-        return ICalendarOutputter.getCalendarFromCollection((CollectionItem)getItem());
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceCalendarCollectionStamp#getEventStamps()
+     * @see org.osaf.cosmo.model.CalendarCollectionStamp#getEventStamps()
      */
     public Set<EventStamp> getEventStamps() {
         Set<EventStamp> events = new HashSet<EventStamp>();

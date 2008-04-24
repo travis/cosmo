@@ -24,6 +24,7 @@ import org.osaf.cosmo.dao.mock.MockCalendarDao;
 import org.osaf.cosmo.dao.mock.MockContentDao;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;
 import org.osaf.cosmo.dao.mock.MockUserDao;
+import org.osaf.cosmo.icalendar.ICalendarClientFilterManager;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.ContentItem;
@@ -56,6 +57,7 @@ public class MockHelper extends TestHelper {
     private ServiceLocatorFactory serviceLocatorFactory;
     private StandardContentService contentService;
     private StandardUserService userService;
+    private ICalendarClientFilterManager clientFilterManager;
     private StandardCalendarQueryProcessor calendarQueryProcessor;
     private User user;
     private HomeCollectionItem homeCollection;
@@ -91,6 +93,8 @@ public class MockHelper extends TestHelper {
        
         contentService.init();
 
+        clientFilterManager = new ICalendarClientFilterManager();
+        
         calendarQueryProcessor = new StandardCalendarQueryProcessor();
         calendarQueryProcessor.setCalendarDao(calendarDao);
         
@@ -252,5 +256,9 @@ public class MockHelper extends TestHelper {
 
     public CollectionSubscription findSubscription(String displayName) {
         return user.getSubscription(displayName);
+    }
+
+    public ICalendarClientFilterManager getClientFilterManager() {
+        return clientFilterManager;
     }
 }

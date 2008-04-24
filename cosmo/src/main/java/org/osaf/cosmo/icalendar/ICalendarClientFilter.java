@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Open Source Applications Foundation
+ * Copyright 2008 Open Source Applications Foundation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,31 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.model;
+package org.osaf.cosmo.icalendar;
 
 import net.fortuna.ical4j.model.Calendar;
 
-import org.osaf.cosmo.hibernate.validator.Task;
-
 /**
- * Represents a Task Stamp.  When added to a NoteItem, the note
- * becomes a task. Also represents VTODO.
+ * Interface for client filters, which given a calendar instance,
+ * return an equivalent instance tailored to a specific client.
  */
-public interface TaskStamp extends Stamp{
-
+public interface ICalendarClientFilter {
+    
     /**
-     * Return the Calendar object containing a VTODO component.
-     * @return calendar
-     */
-    @Task
-    public Calendar getTaskCalendar();
-
-    /**
-     * Set the Calendar object containing a VOTODO component.
-     * This allows non-standard icalendar properties to be stored 
-     * with the task.
+     * Manipulate Calendar instance.
      * @param calendar
      */
-    public void setTaskCalendar(Calendar calendar);
-
+    public void filterCalendar(Calendar calendar);
 }

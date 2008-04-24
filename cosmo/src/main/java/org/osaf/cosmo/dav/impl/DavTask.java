@@ -75,7 +75,7 @@ public class DavTask extends DavCalendarResource {
      * </ul>
      */
     public Calendar getCalendar() {
-        return getTaskStamp().getCalendar();
+        return new EntityConverter(null).convertNote((NoteItem)getItem());
     }
     
     public TaskStamp getTaskStamp() {

@@ -410,12 +410,12 @@
       </td>
       <td class="smTableData">
         <c:choose>
-          <c:when test='stamp != null">
+          <c:when test="${stamp != null}">
           <fmt:formatDate value="${stamp.recurrenceId}" type="both"/>
           </c:when>
           <c:otherwise>
             -
-          </otherwise>
+          </c:otherwise>
         </c:choose>
       </td>
       <td class="smTableData" style="text-align:center;">         

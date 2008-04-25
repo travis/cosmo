@@ -62,7 +62,8 @@ public class ClientICalendarFilter implements Filter {
         String userAgent = translateUserAgent(httpRequest.getHeader("User-Agent"));
         
         try {
-            log.debug("setting client to: " + userAgent);
+            if(log.isDebugEnabled())
+                log.debug("setting client to: " + userAgent);
             filterManager.setClient(userAgent);
             chain.doFilter(request, response);
         } finally {

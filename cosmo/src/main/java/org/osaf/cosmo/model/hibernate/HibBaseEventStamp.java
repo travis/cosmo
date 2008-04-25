@@ -256,8 +256,11 @@ public abstract class HibBaseEventStamp extends HibStamp
             prop.getParameters().getParameter(Parameter.VALUE);
         if (value != null)
             prop.getParameters().remove(value);
-        value = date instanceof DateTime ? Value.DATE_TIME : Value.DATE;
-        prop.getParameters().add(value);
+        
+        // Add VALUE=DATE for Date values, otherwise
+        // leave out VALUE=DATE-TIME because it is redundant
+        if(! (date instanceof DateTime))
+            prop.getParameters().add(Value.DATE);
     }
     
     protected void setDateListPropertyValue(DateListProperty prop) {
@@ -269,7 +272,10 @@ public abstract class HibBaseEventStamp extends HibStamp
             prop.getParameters().remove(value);
         
         value = prop.getDates().getType();
-        prop.getParameters().add(value);
+        
+        // set VALUE=DATE but not VALUE=DATE-TIME as its redundant
+        if(value.equals(Value.DATE))
+            prop.getParameters().add(value);
         
         // update timezone for now because ical4j DateList doesn't
         Parameter param = (Parameter) prop.getParameters().getParameter(

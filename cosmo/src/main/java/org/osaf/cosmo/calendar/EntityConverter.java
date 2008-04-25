@@ -43,7 +43,6 @@ import net.fortuna.ical4j.model.component.VFreeBusy;
 import net.fortuna.ical4j.model.component.VJournal;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
@@ -451,10 +450,6 @@ public class EntityConverter {
         // merge item properties to icalendar props
         mergeCalendarProperties(masterEvent, (NoteItem) stamp.getItem());
         
-        // bug 10558: remove redundant VALUE=DATE-TIME params because
-        // some clients don't like them
-        fixDateTimeProperties(masterEvent);
-        
         // bug 9606: handle displayAlarm with no trigger by not including
         // in exported icalendar
         if(masterAlarm!=null) {
@@ -491,11 +486,7 @@ public class EntityConverter {
             
             // merge item properties to icalendar props
             mergeCalendarProperties(exceptionEvent, exception);
-            
-            // bug 10558: remove redundant VALUE=DATE-TIME params because
-            // some clients don't like them
-            fixDateTimeProperties(masterEvent);
-            
+          
             // check for inherited anyTime
             if(exceptionStamp.isAnyTime()==null) {
                 DtStart modDtStart = exceptionEvent.getStartDate();
@@ -605,20 +596,6 @@ public class EntityConverter {
         }
         
         ICalendarUtils.setCompleted(completeDate, task);
-    }
-    
-    // Remove VALUE=DATE-TIME because it is redundant and some clients
-    // don't like when its present.
-    private void fixDateTimeProperties(VEvent event) {
-        PropertyList props = event.getProperties();
-        for(Iterator<Property> it = props.iterator(); it.hasNext();) {
-            Property prop = it.next();
-            if(prop instanceof DateProperty || prop instanceof DateListProperty) {
-                Value v = (Value) prop.getParameter(Parameter.VALUE);
-                if(v!=null && Value.DATE_TIME.equals(v))
-                    prop.getParameters().remove(v);
-            }
-        }
     }
     
     private VAlarm getDisplayAlarm(VEvent event) {

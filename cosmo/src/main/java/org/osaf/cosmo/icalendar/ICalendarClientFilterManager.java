@@ -66,7 +66,8 @@ public class ICalendarClientFilterManager {
         
         ICalendarClientFilter filter = clientFilters.get(clientId);
         if(filter!=null) {
-            log.debug("applying icalendar filter for client: " + clientId );
+            if(log.isDebugEnabled())
+                log.debug("applying icalendar filter for client: " + clientId );
             filter.filterCalendar(calendar);
         }
         

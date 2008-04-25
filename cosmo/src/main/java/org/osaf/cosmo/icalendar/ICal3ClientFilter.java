@@ -22,25 +22,33 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Date;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.DateListProperty;
+import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.ExDate;
 
 /**
  * ICalendar filter that tailors VEVENTs for
  * iCal 3 clients.  This includes fixing EXDATE
- * with multiple dates into multiple single EXDATE.
+ * with multiple dates into multiple single EXDATE 
+ * and removing redundant VALUE=DATE-TIME params
+ * from date properties.
  */
 public class ICal3ClientFilter implements ICalendarClientFilter{
 
     public void filterCalendar(Calendar calendar) {
        
         try {
-            // fix EXDATEs
             ComponentList events = calendar.getComponents(Component.VEVENT);
             for(Iterator i = events.iterator(); i.hasNext();) {
                 VEvent event = (VEvent) i.next();
+                // fix VALUE=DATE-TIME instances
+                fixDateTimeProperties(event);
+                // fix EXDATEs
                 if(event.getRecurrenceId()==null)
                     fixExDates(event);
             }
@@ -79,6 +87,20 @@ public class ICal3ClientFilter implements ICalendarClientFilter{
         
         // Add all single exdates
         comp.getProperties().addAll(toAdd);
+    }
+    
+    // Remove VALUE=DATE-TIME because it is redundant and for 
+    // some reason ical doesn't like it
+    private void fixDateTimeProperties(Component component) {
+        PropertyList props = component.getProperties();
+        for(Iterator<Property> it = props.iterator(); it.hasNext();) {
+            Property prop = it.next();
+            if(prop instanceof DateProperty || prop instanceof DateListProperty) {
+                Value v = (Value) prop.getParameter(Parameter.VALUE);
+                if(v!=null && Value.DATE_TIME.equals(v))
+                    prop.getParameters().remove(v);
+            }
+        }
     }
 
 }

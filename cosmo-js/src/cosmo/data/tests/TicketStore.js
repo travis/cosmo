@@ -118,8 +118,9 @@ doh.register("cosmo.data.tests.TicketStore",
 
             newTicket: function(){
                 this.store.newItem({type: "read-only", key: dojox.uuid.generateTimeBasedUuid().slice(0,8)});
-                this.store.save();
-                return true;
+                var d = new dojo.Deferred();
+                this.store.save({onComplete: dojo.hitch(d, d.callback), onError: dojo.hitch(d, d.errback)});
+                return d;
             }
         }
     ]);

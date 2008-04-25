@@ -15,6 +15,7 @@ dojo.provide("cosmo.data.tests.module");
 try{
     dojo.require("cosmo.tests.init");
     dojo.require("cosmo.data.tests.TicketStore");
+    dojo.require("cosmo.data.tests.CollectionStore");
 }catch(e){
 	doh.debug(e);
 }

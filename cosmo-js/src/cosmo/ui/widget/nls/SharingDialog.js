@@ -15,7 +15,6 @@
 */
 ({
      subscribeHead: "Subscribe",
-     shareHead: "Share",
      atom: "Atom",
      webcal: "iCal",
      dav: "CalDAV",
@@ -30,18 +29,14 @@
      iCalInstructions: "Instructions for subscribing with iCal",
      webInstructions: "Instructions for subscribing from the web",
      davInstructions: "Instructions for subscribing with a CalDAV client",
-     ticketUrlsToggle: "Urls",
-     ticketKeyHead: "Key",
-     ticketPermissionHead: "Permission",
-     newTicket: "New",
-     newReadTicket: "Read-only Ticket",
-     newReadWriteTicket: "Read-write ticket",
-     showTicketRevokers: "Revoke",
-     hideTicketRevokers: "Hide Revoke",
      urlTogglerTitle: "Show URLs",
      revokerTitle: "Revoke this ticket",
      atomLinkTitle: "Feed reader URL",
      webcalLinkTitle: "iCal URL",
      davLinkTitle: "CalDAV URL",
-     htmlLinkTitle: "Web URL"
+     htmlLinkTitle: "Web URL",
+     invite: "Invite",
+     dismiss: "X",
+     newReadTicket: "View only",
+     newReadWriteTicket: "View and edit"
 })

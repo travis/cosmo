@@ -1,0 +1,31 @@
+<div>
+  <table id="${id}TicketControls" dojoAttachPoint="ticketControls">
+    <tr>
+      <td>
+        <div dojoType="dijit.form.DropDownButton" id="${id}NewTicket">
+          <span>${l10n.newTicket}</span>
+          <div dojoType="dijit.Menu" id="${id}NewTicketMenu">
+            <div dojoType="dijit.MenuItem" label="${l10n.newReadTicket}" id="${id}NewReadTicket"
+                 dojoAttachEvent="onClick: createReadTicket"></div>
+            <div dojoType="dijit.MenuItem" label="${l10n.newReadWriteTicket}" id="${id}NewReadWriteTicket"
+                 dojoAttachEvent="onClick: createReadWriteTicket"></div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div dojoType="dijit.form.Button" dojoAttachEvent="onClick: showTicketRevokers" 
+             dojoAttachPoint="showRevokeButton" class="showRevokeButton ticketRevokeControl">
+          ${l10n.showTicketRevokers}
+        </div>
+        <div dojoType="dijit.form.Button" dojoAttachEvent="onClick: hideTicketRevokers" 
+             dojoAttachPoint="hideRevokeButton" class="hideRevokeButton ticketRevokeControl">
+          ${l10n.hideTicketRevokers}
+        </div>
+      </td>
+    </tr>
+  </table>
+  <table id="${id}Tickets" dojoAttachPoint="ticketContainer">
+    <thead><tr><th>${l10n.ticketKeyHead}</th><th>${l10n.ticketPermissionHead}</th></tr></thead>
+    
+  </table>
+</div>

@@ -309,7 +309,8 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                             xhrArgs: cosmo.util.auth.getAuthorizedRequest(),
                             id: "collectionSharingDialog"
                         });
-                    cosmo.app.pim.baseLayout.mainApp.addChild(dialog);
+
+                    cosmo.app.pim.baseLayout.mainApp.leftSidebar.addChild(dialog);
 /*                    cosmo.app.showDialog({content: dialog,
                                           className: "sharingDialog",
                                           height: "30em",

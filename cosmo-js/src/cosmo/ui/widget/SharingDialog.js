@@ -44,27 +44,32 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     instructionsSelector: null,
     ticketContainer: null,
 
+    readTicket: null,
+    readWriteTicket: null,
+
     changeInstructions: function(e){
         this.instructionsContainer.innerHTML =
             this.l10n[this.instructionsSelector.value + "Instructions"];
     },
 
     onTicket: function(ticket){
-        var t = new cosmo.ui.widget._SharingDialogTicket(
-            {ticketStore: this.ticketStore,
-             ticket: ticket,
-             urls: this.urls,
-             l10n: this.l10n
-            });
-        dojo.place(t.domNode, this.ticketContainer, "last");
+        if (this.readTicket)        console.debug(ticket);
+    },
+
+    inviteReadOnly: function(){
+
+    },
+
+    inviteReadWrite: function(){
+
     },
 
     createReadTicket: function(){
-        this.createTicket("read-only");
+            this.createTicket("read-only");
     },
 
     createReadWriteTicket: function(){
-        this.createTicket("read-write");
+            this.createTicket("read-write");
     },
 
     createTicket: function(type){
@@ -74,36 +79,6 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             onComplete: dojo.hitch(this, function(){this.onTicket(ticket);}),
             onError: dojo.hitch(this, function(e){console.debug(e);})
         });
-    },
-
-    showTicketRevokers: function(){
-        this.forEachTicket(
-            function(node){
-                dijit.byNode(node).showRevoker();
-            });
-        this.showHideRevokeButton();
-    },
-
-    hideTicketRevokers: function(){
-        this.forEachTicket(
-            function(node){
-                dijit.byNode(node).hideRevoker();
-            });
-        this.showShowRevokeButton();
-    },
-
-    showShowRevokeButton: function(){
-        dojo.style(this.hideRevokeButton.domNode, "display", "none");
-        dojo.style(this.showRevokeButton.domNode, "display", "block");
-    },
-
-    showHideRevokeButton: function(){
-        dojo.style(this.showRevokeButton.domNode, "display", "none");
-        dojo.style(this.hideRevokeButton.domNode, "display", "block");
-    },
-
-    forEachTicket: function(f){
-        dojo.query(".sharingDialogTicket", this.ticketContainer).forEach(f);
     },
 
     // lifecycle methods
@@ -127,72 +102,3 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     }
 });
 
-dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Templated], {
-    templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/_SharingDialogTicket.html'),
-
-    ticketStore: null,
-    ticket: null,
-    urls: null,
-
-    key: null,
-    permission: null,
-    urlsShowing: false,
-
-    toggleUpUrl: dojo.moduleUrl(""),
-    toggleDownUrl: dojo.moduleUrl(""),
-
-    toggleUrls: function(){
-        if(!this.urlsShowing) this.showUrls();
-        else this.hideUrls();
-    },
-
-    showUrls: function(args){
-        this.urlsShowing = true;
-        dojo.addClass(this.urlToggler,"urlToggler-expanded");
-        dojo.fx.wipeIn(dojo.mixin({node: this.urlsContainer, duration: 250}, args)).play();
-    },
-
-    hideUrls: function(args){
-        this.urlsShowing = false;
-        dojo.removeClass(this.urlToggler,"urlToggler-expanded");
-        dojo.fx.wipeOut(dojo.mixin({node: this.urlsContainer, duration: 250}, args)).play();
-    },
-
-    showRevoker: function(){
-        dojo.style(this.revoker, "visibility", "visible");
-    },
-
-    hideRevoker: function(){
-        dojo.style(this.revoker, "visibility", "hidden");
-    },
-
-    revoke: function(){
-        this.ticketStore.deleteItem(this.ticket);
-        this.ticketStore.save(
-            {
-                onComplete: dojo.hitch(this, function(){
-                    this.destroy();
-                }),
-                onError: function(e){
-                    console.debug(e);
-                }
-            }
-        );
-    },
-
-    postMixInProperties: function(){
-        this.key = this.ticketStore.getValue(this.ticket, "key");
-        this.type = this.ticketStore.getValue(this.ticket, "type");
-        if (!this.id) this.id = this.key + "SharingDialogTicket";
-        var collectionUrls = this.urls;
-        this.urls = {};
-        for (urlName in collectionUrls){
-            var url = collectionUrls[urlName];
-            this.urls[urlName] = new dojo._Url(url.uri + (url.uri.indexOf("?") == -1 ? "?" : "&") + "ticket=" + this.key);
-        }
-    },
-
-    postCreate: function(){
-        this.hideUrls({duration: 1});
-    }
-});

@@ -6,7 +6,15 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
-    padding: 4em;
+}
+
+#collectionSharingDialogDismiss{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1em;
+    height: 1em;
+    border: 1px grey solid;
 }
 
 .sharingLink{

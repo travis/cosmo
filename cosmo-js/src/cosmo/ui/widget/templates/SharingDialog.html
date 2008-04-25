@@ -1,5 +1,6 @@
 <div>
-  <div id="${id}DisplayName">${displayName}</div>
+  <span id="${id}DisplayName">${displayName}</span>
+  <span id="${id}Dismiss" dojoAttachEvent="onclick: destroy">${l10n.dismiss}</span>
   <h2 class="sharingSectionHead">${l10n.subscribeHead}</h2>
   <select name="instructionsSelector"
           dojoAttachEvent="onchange: changeInstructions"
@@ -18,35 +19,15 @@
   <a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink" title="${l10n.webcalLinkTitle}">${l10n.webcal}</span></a>
   <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink" title="${l10n.davLinkTitle}">${l10n.dav}</span></a>
   <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink" title="${l10n.htmlLinkTitle}">${l10n.html}</span></a>
-  <h2 class="sharingSectionHead">${l10n.shareHead}</h2>
-  <table id="${id}TicketControls" dojoAttachPoint="ticketControls">
-    <tr>
-      <td>
-        <div dojoType="dijit.form.DropDownButton" id="${id}NewTicket">
-          <span>${l10n.newTicket}</span>
-          <div dojoType="dijit.Menu" id="${id}NewTicketMenu">
-            <div dojoType="dijit.MenuItem" label="${l10n.newReadTicket}" id="${id}NewReadTicket"
-                 dojoAttachEvent="onClick: createReadTicket"></div>
-            <div dojoType="dijit.MenuItem" label="${l10n.newReadWriteTicket}" id="${id}NewReadWriteTicket"
-                 dojoAttachEvent="onClick: createReadWriteTicket"></div>
-          </div>
-        </div>
-      </td>
-      <td>
-        <div dojoType="dijit.form.Button" dojoAttachEvent="onClick: showTicketRevokers" 
-             dojoAttachPoint="showRevokeButton" class="showRevokeButton ticketRevokeControl">
-          ${l10n.showTicketRevokers}
-        </div>
-        <div dojoType="dijit.form.Button" dojoAttachEvent="onClick: hideTicketRevokers" 
-             dojoAttachPoint="hideRevokeButton" class="hideRevokeButton ticketRevokeControl">
-          ${l10n.hideTicketRevokers}
-        </div>
-      </td>
-    </tr>
-  </table>
-  <table id="${id}Tickets" dojoAttachPoint="ticketContainer">
-    <thead><tr><th>${l10n.ticketKeyHead}</th><th>${l10n.ticketPermissionHead}</th></tr></thead>
-    
-  </table>
+  <div dojoType="dijit.form.DropDownButton" id="${id}NewTicket">
+    <div id="${id}InviteButton">${l10n.invite}</div>
+    <div dojoType="dijit.Menu" id="${id}InviteMenu">
+      <div dojoType="dijit.MenuItem" label="${l10n.newReadTicket}" id="${id}NewReadTicket"
+           dojoAttachEvent="onClick: inviteReadOnly"></div>
+      <div dojoType="dijit.MenuItem" label="${l10n.newReadWriteTicket}" id="${id}NewReadWriteTicket"
+           dojoAttachEvent="onClick: inviteReadWrite"></div>
+    </div>
+  </div>
+  
 </div>
 

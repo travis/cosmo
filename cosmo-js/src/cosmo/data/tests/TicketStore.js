@@ -17,6 +17,7 @@ dojo.provide("cosmo.data.tests.TicketStore");
 
 dojo.require("cosmo.data.TicketStore");
 dojo.require("dojox.data.dom");
+dojo.require("dojox.uuid.generateTimeBasedUuid");
 dojo.require("cosmo.tests.util");
 dojo.require("cosmo.util.auth");
 
@@ -32,7 +33,7 @@ cosmo.data.tests.ticketmf = dojox.data.dom.createDocument(
 
 cosmo.data.tests.ticketFeed1 = dojox.data.dom.createDocument(
     "<?xml version='1.0' encoding='UTF-8'?>" +
-    '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:base="http://localhost:8080/chandler/atom/">' +
+    '<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://localhost:8080/chandler/atom/">' +
     '<id>urn:uuid:8ea99c40-0bfb-11dd-8b67-f61a36a4de45</id>' +
     '<title type="text">Tickets on Untitled</title>' +
     '<updated>2008-04-16T23:38:04.965Z</updated>' +
@@ -61,8 +62,7 @@ cosmo.data.tests.ticketFeed1 = dojox.data.dom.createDocument(
     '</entry>' +
     '</feed>');
 
-cosmo.data.tests.ticketEntry1 = dojo.query("entry", cosmo.data.tests.ticketFeed1)[0];
-
+cosmo.data.tests.ticketEntry1 = cosmo.atompub.query("atom:entry", cosmo.data.tests.ticketFeed1.documentElement)[0];
 
 doh.register("cosmo.data.tests.TicketStore",
 	[
@@ -93,8 +93,7 @@ doh.register("cosmo.data.tests.TicketStore",
                     d.addCallback(dojo.hitch(this, this.initStore));
                     d.addCallback(dojo.hitch(this, this.newTicket));
 
-
-                    d.addErrback(function(e){console.debug(e);});
+                    d.addErrback(function(e){console.debug(e); return e;});
                     return cosmo.tests.util.defcon(d);
                 }
             },
@@ -103,7 +102,7 @@ doh.register("cosmo.data.tests.TicketStore",
                 var d = cosmo.tests.util.getCollection(user, "/details");
                 d.addCallback(function(cXml){
                     var attr = cosmo.atompub.query("atom:link[@rel='ticket']/@href", cXml.documentElement)[0];
-                    return attr? attr.baseURI + attr.value : null;
+                    return attr? cosmo.xml.getBaseUri(attr) + attr.value : null;
                 });
                 return d;
             },
@@ -118,7 +117,7 @@ doh.register("cosmo.data.tests.TicketStore",
             },
 
             newTicket: function(){
-                this.store.newItem({type: "read-only", key: "foobarbaz"});
+                this.store.newItem({type: "read-only", key: dojox.uuid.generateTimeBasedUuid().slice(0,8)});
                 this.store.save();
                 return true;
             }

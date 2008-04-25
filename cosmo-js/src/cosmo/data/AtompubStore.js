@@ -98,7 +98,7 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
 	},
 
 	isItem: function(/* anything */ something){
-        return (something instanceof Element || something.nodeName == "entry");
+        return something.nodeName == "entry";
 	},
 
 	isItemLoaded: function(/* anything */ something) {
@@ -162,11 +162,11 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
     /* Users to modify on a call to save() */
     _modifiedEntries: {},
 
-	newItem: function(/* Object? */ item){
-        var entry = (item instanceof Element)? item : this._generateEntry(item);
-		this._newEntries[this.getValue(entry, "id")] = entry;
-        item._storeProp = this;
-        return item;
+	newItem: function(/* Object? */ properties){
+        var entry = this._generateEntry(properties);
+        var id = this.getValue(entry, "id");
+		this._newEntries[id] = entry;
+        return entry;
 	},
 
     _generateEntry: function(item){

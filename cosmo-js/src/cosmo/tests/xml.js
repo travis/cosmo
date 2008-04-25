@@ -19,7 +19,7 @@ dojo.require("dojox.data.dom");
 
 cosmo.tests.xml.doc1 = dojox.data.dom.createDocument(
     '<?xml version="1.0" encoding="utf-8"?>' +
-    '<cosmo xmlns="http://chandlerproject.org/ns/test/cosmo">' +
+    '<cosmo xmlns="http://chandlerproject.org/ns/test/cosmo" xml:base="http://chandlerproject.org/">' +
     '<foo></foo>' +
     '<foo></foo>' +
     '<foo></foo>' +
@@ -120,3 +120,10 @@ doh.register("cosmo.tests.xPath",
         }
     ]);
 
+doh.register("cosmo.tests.xml",
+	[
+        function testGetBaseUri(t){
+            var foo = cosmo.xml.query("cosmo:foo", cosmo.tests.xml.doc1.documentElement, cosmo.tests.xml.doc1ns)[0];
+            t.is("http://chandlerproject.org/", cosmo.xml.getBaseUri(foo));
+        }
+    ]);

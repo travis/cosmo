@@ -27,6 +27,7 @@ var nsMap = {
         app: "http://www.w3.org/2007/app"
 };
 function xPathQueryFunc(query, node){
+    console.debug("xp");
     return cosmo.xml.query(query, node, nsMap, "atom");
 }
 
@@ -95,7 +96,7 @@ dojo.mixin(cosmo.atompub,
     set: function(){var r = {}; for (var k in xp) r[k] = xp[k][1](xp[k][2]); return r;}(),
 
     newEntry: function(iri, entry, request){
-        var entryString = (entry instanceof Element)? dojox.data.dom.innerXML(entry) : entry;
+        var entryString = dojox.data.dom.innerXML(entry);
         var d = dojo.rawXhrPost(dojo.mixin({url: iri, postData: entryString,
                                             handleAs: "xml", contentType: "application/atom+xml"}, request));
         d.addCallback(dojo.hitch(this, this.updateEntry, entry));
@@ -103,13 +104,13 @@ dojo.mixin(cosmo.atompub,
     },
 
     updateEntry: function(oldEntry, newEntry){
-        var link = this.getEditLink(newEntry).cloneNode();
+        var link = this.getEditLink(newEntry.documentElement).cloneNode(false);
         oldEntry.appendChild(link);
         return oldEntry;
     },
 
     modifyEntry: function(entry, iri, request){
-        var entryString = (entry instanceof Element)? dojox.data.dom.innerXML(entry) : entry;
+        var entryString = dojox.data.dom.innerXML(entry);
         return dojo.rawXhrPut(dojo.mixin({url: this.getEditLink(entry), putData: entryString,
                                           handleAs: "xml", contentType: "application/atom+xml"}, request));
     },

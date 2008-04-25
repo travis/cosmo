@@ -48,5 +48,14 @@ dojo.mixin(cosmo.xml,
             }
             return result;
         }
+    },
+
+    getBaseUri: function(node){
+        return node.baseURI || this._findBaseUri(node);
+    },
+
+    // Assumes node.baseURI doesn't exist and tries harder to find it
+    _findBaseUri: function(node){
+        return node.ownerDocument.documentElement.getAttribute("xml:base");
     }
 });

@@ -42,7 +42,6 @@ dojo.declare("cosmo.data.TicketProcessor", null,
     getValues: function(/* item */ item,
                         /* attribute-name-string */ attribute){
         var f = this.attr[attribute];
-        console.debug(f);
         return f? [f(item)] : null;
     },
 

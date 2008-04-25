@@ -35,6 +35,8 @@ import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Completed;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,12 +48,17 @@ import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
+import org.osaf.cosmo.model.TaskStamp;
+import org.osaf.cosmo.model.TriageStatus;
+import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.model.mock.MockCalendarCollectionStamp;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.osaf.cosmo.model.mock.MockEventExceptionStamp;
 import org.osaf.cosmo.model.mock.MockEventStamp;
 import org.osaf.cosmo.model.mock.MockNoteItem;
+import org.osaf.cosmo.model.mock.MockTaskStamp;
+import org.osaf.cosmo.model.mock.MockTriageStatus;
 
 /**
  * Test EntityConverter.
@@ -66,6 +73,26 @@ public class EntityConverterTest extends TestCase {
     
     protected EntityFactory entityFactory = new MockEntityFactory();
     protected EntityConverter converter = new EntityConverter(entityFactory);
+    
+    public void testEntityConverterTask() throws Exception {
+        Calendar calendar = getCalendar("vtodo.ics");
+        
+        NoteItem note = converter.convertTaskCalendar(calendar);
+        
+        Assert.assertNotNull(StampUtils.getTaskStamp(note));
+        Assert.assertTrue(TriageStatus.CODE_NOW==note.getTriageStatus().getCode());
+        
+        // add COMPLETED
+        DateTime completeDate = new DateTime("20080122T100000Z");
+        
+        VToDo vtodo = (VToDo) calendar.getComponents(Component.VTODO).get(0);
+        ICalendarUtils.setCompleted(completeDate, vtodo);
+        note = converter.convertTaskCalendar(calendar);
+        
+        TriageStatus ts = note.getTriageStatus();
+        Assert.assertTrue(TriageStatus.CODE_DONE==ts.getCode());
+        Assert.assertTrue(TriageStatusUtil.getDateFromRank(ts.getRank()).getTime()==completeDate.getTime());
+    }
     
     public void testEntityConverterEvent() throws Exception {
         
@@ -216,6 +243,41 @@ public class EntityConverterTest extends TestCase {
         Assert.assertEquals(1, fullCal.getComponents(Component.VTIMEZONE).size());
         Assert.assertEquals(1, fullCal.getComponents(Component.VEVENT).size());
         Assert.assertEquals(1, fullCal.getComponents(Component.VTODO).size());
+    }
+    
+    public void testConvertTask() throws Exception {
+        TimeZoneRegistry registry =
+            TimeZoneRegistryFactory.getInstance().createRegistry();
+        NoteItem master = new MockNoteItem();
+        master.setDisplayName("displayName");
+        master.setBody("body");
+        master.setIcalUid("icaluid");
+        master.setClientModifiedDate(new DateTime("20070101T100000Z"));
+        TaskStamp taskStamp = new MockTaskStamp();
+        master.addStamp(taskStamp);
+        master.setTriageStatus(TriageStatusUtil.initialize(new MockTriageStatus()));
+        
+        Calendar cal = converter.convertNote(master);
+        
+        Assert.assertEquals(1, cal.getComponents().size());
+        
+        ComponentList comps = cal.getComponents(Component.VTODO);
+        Assert.assertEquals(1, comps.size());
+        VToDo task = (VToDo) comps.get(0);
+        
+        Assert.assertNull(task.getDateCompleted());
+        
+        DateTime completeDate = new DateTime("20080122T100000Z");
+        
+        master.getTriageStatus().setCode(TriageStatus.CODE_DONE);
+        master.getTriageStatus().setRank(TriageStatusUtil.getRank(completeDate.getTime()));
+        
+        cal = converter.convertNote(master);
+        task = (VToDo) cal.getComponents().get(0);
+        
+        Completed completed = task.getDateCompleted();
+        Assert.assertNotNull(completed);
+        Assert.assertEquals(completeDate.getTime(), completed.getDate().getTime());
     }
     
     public void testConvertEvent() throws Exception {

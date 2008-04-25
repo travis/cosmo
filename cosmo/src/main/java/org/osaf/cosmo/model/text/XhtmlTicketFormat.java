@@ -140,6 +140,15 @@ public class XhtmlTicketFormat extends BaseXhtmlFormat
                 writer.writeEndElement();
             }
 
+            if (ticket.getTimeout() != null) {
+                writer.writeCharacters("Timeout: ");
+                writer.writeStartElement("span");
+                writer.writeAttribute("class", "timeout");
+                writer.writeAttribute("title", ticket.getTimeout().toString());
+                writer.writeCharacters(ticket.getTimeout().toString());
+                writer.writeEndElement();
+            }
+
             writer.writeEndElement();
             writer.close();
 

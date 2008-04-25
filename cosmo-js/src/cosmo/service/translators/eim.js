@@ -20,6 +20,7 @@
  */
 dojo.provide("cosmo.service.translators.eim");
 
+dojo.require("cosmo.xml");
 dojo.require("dojo.date.stamp");
 dojo.require("dojox.date.posix");
 dojo.require("cosmo.util.string");

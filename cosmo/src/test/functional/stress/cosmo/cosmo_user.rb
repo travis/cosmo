@@ -295,6 +295,62 @@ module Cosmo
       0.upto(length) { |i| random_string << chars[rand(chars.size)] }
       return random_string
     end 
+    
+     def random_datetime
+      date = ";VALUE=DATE-TIME:2007" + random_integer_string(12) + random_integer_string(28) +
+        "T" + random_integer_string(23) + random_integer_string(59) + "00"
+      tz = random_timezone
+      if (tz != "float")
+        date = ";TZID=#{tz}#{date}" 
+      end
+      return date
+    end
+    
+    def random_timezone
+      tzs = ["float", "America/Chicago", "America/Los_Angeles", "America/New_York"]
+      return tzs[rand(tzs.size)]
+    end
+    
+    def random_duration
+      durs = ["PT30M", "PT60M", "PT90M", "PT2H"]
+      return durs[rand(durs.size)]
+    end
+    
+    def random_date
+      date = ";VALUE=DATE:2007" + random_integer_string(12) + random_integer_string(28)
+    end
+    
+    def random_day_duration
+      if rand < 0.01
+        return "P#{random_integer(5)}D"
+      else
+        return "P1D"
+      end
+    end
+    
+    def random_integer_string(max)
+      randInt = rand(max)
+      while randInt==0
+        randInt = rand(max)
+      end
+      
+      if(randInt < 10)
+        randInt = "0" + randInt.to_s
+      else
+        randInt = randInt.to_s
+      end
+    
+      return randInt  
+    end
+    
+    def random_integer(max)
+      randInt = rand(max)
+      while randInt==0
+        randInt = rand(max)
+      end
+      return randInt
+    end
+    
   end
   
   # Base HTTP Client that initializes a Net::HTTP object

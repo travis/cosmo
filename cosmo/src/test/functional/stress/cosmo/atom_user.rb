@@ -245,8 +245,11 @@ EOF
     end
   
     def generateEventEntry(uid)
-      if(rand<0.04)
+      prob = rand
+      if prob < 0.05
         generateRecurringEventEntry(uid)
+      elsif prob <0.07
+        generateRegularAllDayEventEntry(uid)
       else
         generateRegularEventEntry(uid)
       end
@@ -255,8 +258,17 @@ EOF
     def generateRegularEventEntry(uid)
       entry = <<EOF
       "event":{"prefix":"event","ns":"http://osafoundation.org/eim/event/0",
-      "key":{"uuid":["text","#{uid}"]},"fields":{"dtstart":["text","#{random_date}"],
+      "key":{"uuid":["text","#{uid}"]},"fields":{"dtstart":["text","#{random_datetime}"],
       "duration":["text","#{random_duration}"]}}
+EOF
+  
+    end
+    
+     def generateRegularAllDayEventEntry(uid)
+      entry = <<EOF
+      "event":{"prefix":"event","ns":"http://osafoundation.org/eim/event/0",
+      "key":{"uuid":["text","#{uid}"]},"fields":{"dtstart":["text","#{random_date}"],
+      "duration":["text","#{random_day_duration}"]}}
 EOF
   
     end
@@ -270,32 +282,7 @@ EOF
 EOF
   
     end
-  
-    def random_date
-      date = ";VALUE=DATE-TIME:2007" + random_integer_string(12) + random_integer_string(28) +
-        "T" + random_integer_string(23) + random_integer_string(59) + "00Z"
-    end
-    
-    def random_duration
-      durs = ["PT30M", "PT60M"]
-      return durs[rand(durs.size)]
-    end
-    
-    def random_integer_string(max)
-      randInt = rand(max)
-      while randInt==0
-        randInt = rand(max)
-      end
-      
-      if(randInt < 10)
-        randInt = "0" + randInt.to_s
-      else
-        randInt = randInt.to_s
-      end
-    
-      return randInt  
-    end
-    
+   
     def random_collection_size
       return 20
       # generate exponentially distributed number

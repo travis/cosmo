@@ -262,8 +262,11 @@ EOF
     end
     
     def generateEventXml(uid)
-      if rand < 0.05
+      prob = rand
+      if prob < 0.05
         return generateRecurringEventXml(uid)
+      elsif prob < 0.07
+        return generateStandardAllDatEventtXml(uid)
       else
         return generateStandardEventXml(uid)
       end
@@ -273,8 +276,24 @@ EOF
       recordset = <<EOF
       <event:record xmlns:event="http://osafoundation.org/eim/event/0">
           <event:uuid eim:key="true" eim:type="text">#{uid}</event:uuid>
-          <event:dtstart eim:type="text">#{random_date}</event:dtstart>
+          <event:dtstart eim:type="text">#{random_datetime}</event:dtstart>
           <event:duration eim:type="text">#{random_duration}</event:duration>
+          <event:location eim:type="text"/>
+          <event:rrule eim:type="text"/>
+          <event:exrule eim:type="text" />
+          <event:rdate eim:type="text" />
+          <event:exdate eim:type="text" />
+          <event:status eim:type="text">CONFIRMED</event:status>
+        </event:record>
+EOF
+    end
+    
+    def generateStandardAllDatEventtXml(uid)
+      recordset = <<EOF
+      <event:record xmlns:event="http://osafoundation.org/eim/event/0">
+          <event:uuid eim:key="true" eim:type="text">#{uid}</event:uuid>
+          <event:dtstart eim:type="text">#{random_date}</event:dtstart>
+          <event:duration eim:type="text">#{random_day_duration}</event:duration>
           <event:location eim:type="text"/>
           <event:rrule eim:type="text"/>
           <event:exrule eim:type="text" />
@@ -327,31 +346,6 @@ EOF
         <mail:references eim:type='clob'>#{random_string}</mail:references>
       </mail:record>
 EOF
-    end
-    
-    def random_date
-      date = ";VALUE=DATE-TIME:2007" + random_integer_string(12) + random_integer_string(28) +
-        "T" + random_integer_string(23) + random_integer_string(59) + "00Z"
-    end
-    
-    def random_duration
-      durs = ["PT30M", "PT60M"]
-      return durs[rand(durs.size)]
-    end
-    
-    def random_integer_string(max)
-      randInt = rand(max)
-      while randInt==0
-        randInt = rand(max)
-      end
-      
-      if(randInt < 10)
-        randInt = "0" + randInt.to_s
-      else
-        randInt = randInt.to_s
-      end
-    
-      return randInt  
     end
     
     def random_collection_size

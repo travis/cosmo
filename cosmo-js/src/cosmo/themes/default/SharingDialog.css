@@ -1,0 +1,62 @@
+#collectionSharingDialog {
+    background: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.cosmoSharingDialog {
+    padding: 0 7px;
+}
+
+.cosmoSubscribeButton{
+    display: block;
+    color: white;
+    font-weight: bold;
+    padding: 0 7px;
+    margin-bottom: 5px;
+    height: 18px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.cosmoSubscribeButton a:hover{
+    text-decoration: none;
+}
+.cosmoAtomSubscribeButton {
+    background: orange;
+}
+.cosmoICalSubscribeButton {
+    background: green;
+}
+.cosmoChandlerSubscribeButton {
+    background: red;
+}
+.cosmoDavSubscribeButton {
+    background: blue;
+}
+.cosmoInviteSection{
+    display: none;
+}
+.cosmoInviteInstructions {
+    
+}
+.cosmoReadOnlyInviteLink {
+    display: block;
+}
+.cosmoReadWriteInviteLink {
+    display: block;
+}
+.cosmoSharingDownloadLink {
+    color: black;
+    text-decoration: none;
+}
+.cosmoSharingDownloadLink:visited {
+    color: black;
+}
+.cosmoSharingDownloadButton {
+    display: block;
+}
+.cosmoSharingDoneButton {
+    display: block;
+}

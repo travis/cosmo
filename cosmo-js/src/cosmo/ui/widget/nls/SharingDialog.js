@@ -15,28 +15,44 @@
 */
 ({
      subscribeHead: "Subscribe",
-     atom: "Atom",
-     webcal: "iCal",
+
+     atom: "Feed Reader",
+     iCal: "Apple iCal",
      dav: "CalDAV",
-     html: "HTML",
+     chandler: "Chandler Desktop",
+     html: "Link here",
+
      feedReaderLabel: "Feed Reader",
      chandlerLabel: "Chandler Desktop",
      iCalLabel: "Apple iCal",
      webLabel: "Web",
      davLabel: "CalDAV",
-     chandlerInstructions: "Instructions for subscribing from Chandler Desktop",
+
+     chandlerInstructions: "<a href=${mc} onclick='return false'>${mc}</a>"
+                           + "<ol><li>From Chandler Desktop, go to <b>Share>>Subscribe</b></li>"
+                           + "<li>Paste the above link into the <b>URL:</b> field</li>"
+                           + "<li>Click <b>[Subscribe]</b></li></ol>",
      feedReaderInstructions: "Instructions for subscribing with a  feed reader",
-     iCalInstructions: "Instructions for subscribing with iCal",
-     webInstructions: "Instructions for subscribing from the web",
+     iCalInstructions: "Instructions for subscribing with Apple iCal",
      davInstructions: "Instructions for subscribing with a CalDAV client",
-     urlTogglerTitle: "Show URLs",
-     revokerTitle: "Revoke this ticket",
-     atomLinkTitle: "Feed reader URL",
-     webcalLinkTitle: "iCal URL",
-     davLinkTitle: "CalDAV URL",
-     htmlLinkTitle: "Web URL",
+
+     chandlerInstructionsTitle: "Subscribe with Chandler Desktop",
+     feedReaderInstructionsTitle: "Subscribe with a feed reader",
+     iCalInstructionsTitle: "Subscribe with Apple iCal",
+     davInstructionsTitle: "Subscribe with a CalDAV client",
+
+     htmlLinkTitle: "Link to this collection",
+     atomSubscribeTitle: "Feed reader URL",
+     iCalSubscribeTitle: "Apple iCal",
+     davSubscribeTitle: "CalDAV Subscribe Instructions",
+     chandlerSubscribeTitle: "Chandler Desktop Subscribe Instructions",
+
      invite: "Invite",
-     dismiss: "X",
-     newReadTicket: "View only",
-     newReadWriteTicket: "View and edit"
+     inviteInstructions: "Give out the URLs below to invite others to subscribe.",
+     inviteReadOnly: "View-only",
+     inviteReadWrite: "View and edit",
+
+     download: "Download",
+
+     dismiss: "Done"
 })

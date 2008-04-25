@@ -9,6 +9,7 @@
         @import "../../../../dijit/themes/dijit.css";
         @import "../../../../dijit/themes/tundra/tundra.css";
         @import "../../../../dojo/resources/dojo.css";
+        @import "../../../../cosmo/themes/default/SharingDialog.css";
     </style>
 	<script type="text/javascript">
         dojo.require("doh.runner");
@@ -16,17 +17,17 @@
         dojo.require("cosmo.model.Item");
         dojo.require("dojo.data.ItemFileWriteStore");
         dojo.require("dojox.data.dom");
-        var baseUri = "http://localhost";
+        var baseUri = "http://localhost:8080/";
         var collectionJson = {items: [
             {
                 uid: "item0",
                 displayName: "Test collection",
                 urls: new function(){
-                    this.atom = (new dojo._Url(baseUri, "collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
-                    this.mc =  (new dojo._Url(baseUri, "http://localhost:8080/chandler/mc/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
-                    this.dav = (new dojo._Url(baseUri, "http://localhost:8080/chandler/dav/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
-                    this.webcal = (new dojo._Url(baseUri,"http://localhost:8080/chandler/webcal/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
-                    this.html = (new dojo._Url(baseUri,"http://localhost:8080/chandler/pim/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586?ticket=jyc09uq9e0"));
+                    this.atom = (new dojo._Url(baseUri, "collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586"));
+                    this.mc =  (new dojo._Url(baseUri, "http://localhost:8080/chandler/mc/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586"));
+                    this.dav = (new dojo._Url(baseUri, "http://localhost:8080/chandler/dav/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586"));
+                    this.webcal = (new dojo._Url(baseUri,"http://localhost:8080/chandler/webcal/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586"));
+                    this.html = (new dojo._Url(baseUri,"http://localhost:8080/chandler/pim/collection/dfdf46f0-fa03-11dc-9a86-aa3ec84a3586"));
                 }
             }
         ],

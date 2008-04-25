@@ -1,33 +1,29 @@
-<div>
+<div class="cosmoSharingDialog">
   <span id="${id}DisplayName">${displayName}</span>
-  <span id="${id}Dismiss" dojoAttachEvent="onclick: destroy">${l10n.dismiss}</span>
-  <h2 class="sharingSectionHead">${l10n.subscribeHead}</h2>
-  <select name="instructionsSelector"
-          dojoAttachEvent="onchange: changeInstructions"
-          dojoAttachPoint="instructionsSelector">
+  <h2 class="cosmoSharingSectionHead">${l10n.subscribeHead}</h2>
+  <div><span  class="sharingHtmlLinkIcon"></span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
+  <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span></a>
 
-    <option value="chandler" selected="selected">${l10n.chandlerLabel}</option>
-    <option value="feedReader">${l10n.feedReaderLabel}</option>
-    <option value="iCal">${l10n.iCalLabel}</option>
-    <option value="web">${l10n.webLabel}</option>
-    <option value="dav">${l10n.davLabel}</option>
-  </select>
-  <div id="${id}Instructions" class="instructions" dojoAttachPoint="instructionsContainer">
-    ${l10n.chandlerInstructions}
+  <span class="cosmoSubscribeButton cosmoICalSubscribeButton" title="${l10n.iCalSubscribeTitle}" dojoAttachEvent="onclick: iCalOnClick">${l10n.iCal}</span>
+
+  <a href="${urls.atom.uri}" dojoAttachEvent="onclick: atomOnClick"><span class="cosmoSubscribeButton cosmoAtomSubscribeButton" title="${l10n.atomSubscribeTitle}">${l10n.atom}</span></a>
+
+  <a href="${urls.dav.uri}" dojoAttachEvent="onclick: davOnClick"><span class="cosmoSubscribeButton cosmoDavSubscribeButton" title="${l10n.davSubscribeTitle}">${l10n.dav}</span></a>
+
+  <div dojoType="dijit.form.Button" id="${id}Invite" dojoAttachEvent="onClick: invite" class="cosmoInviteButton">
+    ${l10n.invite}
   </div>
-  <a href="${urls.atom.uri}"><span class="sharingLink atomSharingLink" title="${l10n.atomLinkTitle}">${l10n.atom}</span></a>
-  <a href="${urls.webcal.uri}"><span class="sharingLink webcalSharingLink" title="${l10n.webcalLinkTitle}">${l10n.webcal}</span></a>
-  <a href="${urls.dav.uri}"><span class="sharingLink davSharingLink" title="${l10n.davLinkTitle}">${l10n.dav}</span></a>
-  <a href="${urls.html.uri}"><span class="sharingLink htmlSharingLink" title="${l10n.htmlLinkTitle}">${l10n.html}</span></a>
-  <div dojoType="dijit.form.DropDownButton" id="${id}NewTicket">
-    <div id="${id}InviteButton">${l10n.invite}</div>
-    <div dojoType="dijit.Menu" id="${id}InviteMenu">
-      <div dojoType="dijit.MenuItem" label="${l10n.newReadTicket}" id="${id}NewReadTicket"
-           dojoAttachEvent="onClick: inviteReadOnly"></div>
-      <div dojoType="dijit.MenuItem" label="${l10n.newReadWriteTicket}" id="${id}NewReadWriteTicket"
-           dojoAttachEvent="onClick: inviteReadWrite"></div>
+
+  <div dojoAttachPoint="inviteSection" class="cosmoInviteSection">
+    <div class="cosmoInviteInstructions">${l10n.inviteInstructions}</div>
+    <a href="" class="cosmoReadOnlyInviteLink" dojoAttachPoint="readOnlyInviteLink">${l10n.inviteReadOnly}</a>
+    <a href="" class="cosmoReadWriteInviteLink" dojoAttachPoint="readWriteInviteLink">${l10n.inviteReadWrite}</a>
+  </div>
+      
+  <a href="${urls.webcal.uri}" target="_blank" class="cosmoSharingDownloadLink">
+    <div dojoType="dijit.form.Button" id="${id}Download" class="cosmoSharingDownloadButton">
+      ${l10n.download}
     </div>
-  </div>
-  
+  </a>
+  <span id="${id}Dismiss" dojoAttachEvent="onClick: destroy" dojoType="dijit.form.Button" class="cosmoSharingDoneButton">${l10n.dismiss}</span>
 </div>
-

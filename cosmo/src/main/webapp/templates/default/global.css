@@ -534,7 +534,10 @@ Link styles
 
 /* Buttons
  * --------------------- */
-.btnElemBase {
+.dijitToggleButtonIconChar {
+	display:none !important;
+}
+.dijitButtonNode, .btnElemBase {
     width: 76px;
     margin: auto;
     text-align: center;

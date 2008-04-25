@@ -23,7 +23,6 @@ dependencies.layers = [
     },
     {
         name: "../cosmo/userlist.js",
-        layerDependencies:["../cosmo/userlist.js"],
         dependencies: [
             "cosmo.ui.widget.UserList"
         ]

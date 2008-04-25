@@ -4,12 +4,21 @@ if [ ! -d dojo-src ]; then
     svn co http://svn.dojotoolkit.org/src/tags/$DOJO_VERSION dojo-src
 fi
 
+case "$1" in
+    "release")
+        profile=cosmo
+         ;;
+    "widgets")
+        profile=cosmo-widgets
+         ;;
+    *)
+        profile=cosmo-dev
+         ;;
+esac
+
+##### build dojo files #####
 cd dojo-src/util/buildscripts
-if [ "$1" == "release" ]; then
-    ./build.sh profile=../../../../cosmo action=clean,release
-else
-    ./build.sh profile=../../../../cosmo-dev action=clean,release
-fi
+./build.sh profile=../../../../$profile action=clean,release
 
 cd ../../../
 
@@ -21,8 +30,27 @@ fi
 
 mv dojo-src/release/dojo/* release
 
-gzip -9c release/dojo/dojo.js > release/dojo/dojo.js.gzip-compressed.js
-gzip -9c release/cosmo/pim.js > release/cosmo/pim.js.gzip-compressed.js
-gzip -9c release/cosmo/login.js > release/cosmo/login.js.gzip-compressed.js
-gzip -9c release/cosmo/userlist.js > release/cosmo/userlist.js.gzip-compressed.js
+files="release/dojo/dojo.js\
+       release/cosmo/pim.js\
+       release/cosmo/login.js\
+       release/cosmo/userlist.js"
 
+##### move widgets layer, if appropriate #####
+if [ "$1" == "widgets" -a "$WIDGETS_HOME" ]; then
+    if [ -d $WIDGETS_HOME/widgets_build ]; then
+        rm -rf $WIDGETS_HOME/widgets_build
+    fi
+    mv release/widgets_build $WIDGETS_HOME
+    # add widgets.js to list of files to be gzipped
+    files="$files $WIDGETS_HOME/widgets_build/widgets.js"
+fi
+
+##### gzip selected files #####
+for f in $files
+do
+    if [ -f $f ]; then
+        gzip -9c $f > $f.gzip-compressed.js
+    else
+        echo "File not found: $f"
+    fi
+done

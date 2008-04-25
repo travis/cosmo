@@ -96,7 +96,8 @@ dojo.mixin(cosmo.atompub,
 
     newEntry: function(iri, entry, request){
         var entryString = (entry instanceof Element)? dojox.data.dom.innerXML(entry) : entry;
-        var d = dojo.xhrRawPost(dojo.mixin({url: iri, postData: entryString, handleAs: "xml"}, request));
+        var d = dojo.rawXhrPost(dojo.mixin({url: iri, postData: entryString,
+                                            handleAs: "xml", contentType: "application/atom+xml"}, request));
         d.addCallback(dojo.hitch(this, this.updateEntry, entry));
         return d;
     },
@@ -109,11 +110,26 @@ dojo.mixin(cosmo.atompub,
 
     modifyEntry: function(entry, iri, request){
         var entryString = (entry instanceof Element)? dojox.data.dom.innerXML(entry) : entry;
-        return dojo.xhrRawPut(dojo.mixin({url: this.getEditLink(entry), putData: entryString, handleAs: "xml"}, request));
+        return dojo.rawXhrPut(dojo.mixin({url: this.getEditLink(entry), putData: entryString,
+                                          handleAs: "xml", contentType: "application/atom+xml"}, request));
     },
 
-    deleteEntry: function(){
-        return dojo.xhrDelete(dojo.mixin({url: this.getEditLink(entry), handleAs: "xml"}, request));
+    deleteEntry: function(request){
+        return dojo.xhrDelete(dojo.mixin({url: this.getEditLink(entry), handleAs: "xml",
+                                          contentType: "application/atom+xml"}, request));
+    },
+
+    // Service doc util functions
+    getWorkspaces: function(serviceXml, title){
+        var q = "app:workspace" + title? "[atom:title='" + title + "']" : "";
+        return this.query(q, serviceXml);
+    },
+
+    getCollections: function(serviceXml, workspaceTitle, collectionTitle){
+        var q = "app:workspace" + (workspaceTitle? "[atom:title='" + workspaceTitle + "']" : "") +
+            "/app:collection" + (collectionTitle? "[atom:title='" + collectionTitle + "']": "");
+        return this.query(q, serviceXml);
     }
+
 });
 }());

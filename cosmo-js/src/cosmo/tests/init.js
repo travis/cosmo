@@ -1,4 +1,6 @@
-/* * Copyright 2008 Open Source Applications Foundation *
+/*
+ * Copyright 2008 Open Source Applications Foundation
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,11 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-dojo.provide("cosmo.data.tests.module");
-try{
-    dojo.require("cosmo.tests.init");
-    dojo.require("cosmo.data.tests.TicketStore");
-}catch(e){
-	doh.debug(e);
-}
+*/
+dojo.provide("cosmo.tests.init");
+djConfig = dojo.mixin({
+    serverBaseUrl: dojo.moduleUrl("cosmo", "../../")
+}, window.djConfig);

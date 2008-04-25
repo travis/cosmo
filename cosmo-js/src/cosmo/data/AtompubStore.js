@@ -112,7 +112,7 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
 		//		object containing the args for loadItem.  See dojo.data.api.Read.loadItem()
 
         //TODO: load item from server
-        var scope = keywordArgs.scope || dojo.global();
+        var scope = keywordArgs.scope || dojo.global;
         // If the item isn't loaded
         if (!this.isItemLoaded(kwArgs.item)){
 	        throw new Error('Unimplemented API: dojo.data.api.Read.isItemLoaded');
@@ -122,7 +122,7 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
     fetch: function(/* Object */request){
         //TODO: support paging
 
-        var scope = request.scope || dojo.global();
+        var scope = request.scope || dojo.global;
         var getDeferred = dojo.xhrGet(dojo.mixin({url: this.iri}, this.xhrArgs));
         getDeferred.addCallback(dojo.hitch(
             this,
@@ -154,13 +154,13 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
 
 /* dojo.data.api.Write */
     /* Entries to create on a call to save() */
-    _newEntries: [],
+    _newEntries: {},
 
     /* Users to delete on a call to save() */
-    _deletedEntries: [],
+    _deletedEntries: {},
 
     /* Users to modify on a call to save() */
-    _modifiedEntries: [],
+    _modifiedEntries: {},
 
 	newItem: function(/* Object? */ item){
         var entry = (item instanceof Element)? item : this._generateEntry(item);
@@ -170,7 +170,7 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
 	},
 
     _generateEntry: function(item){
-        return dojox.dom.createDocument([
+        return dojox.data.dom.createDocument([
             '<?xml version="1.0" encoding="utf-8"?>',
             "<entry xmlns='http://www.w3.org/2005/Atom'>",
             "<id>", (item.id || this.getEntryId(item) || "urn:uuid:" + dojox.uuid.generateTimeBasedUuid()), "</id>",
@@ -229,19 +229,25 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
         var deferreds = [];
         var iri = this.iri;
         var xhrArgs = this.xhrArgs;
-        dojo.forEach(this._modifiedEntries, function(entry){
+        for (var id in this._modifiedEntries){
+            var entry = this._modifiedEntries[id];
             deferreds.push(cosmo.atompub.modifyEntry(entry, xhrArgs));
-		});
-        dojo.forEach(this._newEntries, function(entry){
+            delete this._modifiedEntries[id];
+		}
+        for (var id in this._newEntries){
+            var entry = this._newEntries[id];
             deferreds.push(cosmo.atompub.newEntry(iri, entry, xhrArgs));
-		});
-        dojo.forEach(this._deletedEntries, function(entry){
+            delete this._newEntries[id];
+		}
+        for (var id in this._deletedEntries){
+            var entry = this._deletedEntries[id];
             deferreds.push(cosmo.atompub.deleteEntry(entry, xhrArgs));
-		});
+            delete this._deletedEntries[id];
+		}
         var dl = new dojo.DeferredList(deferreds);
-        var scope = keywordArgs.scope || dojo.global();
-        dl.addCallback(dojo.hitch(scope, keywordArgs.onComplete));
-        dl.addErrback(dojo.hitch(scope, keywordArgs.onError));
+        var scope = keywordArgs.scope || dojo.global;
+        if (keywordArgs.onComplete) dl.addCallback(dojo.hitch(scope, keywordArgs.onComplete));
+        if (keywordArgs.onError) dl.addErrback(dojo.hitch(scope, keywordArgs.onError));
         return dl;
 	},
 

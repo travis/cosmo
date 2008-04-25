@@ -88,17 +88,39 @@ doh.register("cosmo.data.tests.TicketStore",
             },
             runTest: function(){
                 if (this.serverRunning){
-                    var d = cosmo.tests.util.createUser();
+                    var d = cosmo.tests.util.setupTestUser();
+                    d.addCallback(dojo.hitch(this, this.getTicketsUrl));
                     d.addCallback(dojo.hitch(this, this.initStore));
-                    return d;
+                    d.addCallback(dojo.hitch(this, this.newTicket));
+
+
+                    d.addErrback(function(e){console.debug(e);});
+                    return cosmo.tests.util.defcon(d);
                 }
             },
-            initStore: function(){
-                var s = new cosmo.data.TicketStore(
+
+            getTicketsUrl: function(user){
+                var d = cosmo.tests.util.getCollection(user, "/details");
+                d.addCallback(function(cXml){
+                    var attr = cosmo.atompub.query("atom:link[@rel='ticket']/@href", cXml.documentElement)[0];
+                    return attr? attr.baseURI + attr.value : null;
+                });
+                return d;
+            },
+
+            initStore: function(url){
+                this.store = new cosmo.data.TicketStore(
                     {
-                        iri: this.ticketsUrl,
+                        iri: url,
                         xhrArgs: cosmo.util.auth.getAuthorizedRequest()
                     });
+                return this.store;
+            },
+
+            newTicket: function(){
+                this.store.newItem({type: "read-only", key: "foobarbaz"});
+                this.store.save();
+                return true;
             }
         }
     ]);

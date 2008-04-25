@@ -40,9 +40,27 @@ cosmo.tests.atompub.feed1 = dojox.data.dom.createDocument(
     '</feed>');
 
 cosmo.tests.atompub.entry1 = dojo.query("entry", cosmo.tests.atompub.feed1)[0];
+cosmo.tests.atompub.service1 = dojox.data.dom.createDocument(
+    "<?xml version='1.0' encoding='UTF-8'?>" +
+    '<service xmlns:atom="http://www.w3.org/2005/Atom" xmlns="http://www.w3.org/2007/app" xml:base="http://localhost:8080/chandler/atom/">' +
+    '<workspace>' +
+    '<atom:title type="text">home</atom:title>' +
+    '</workspace>' +
+    '<workspace>' +
+    '<atom:title type="text">account</atom:title>' +
+    '<collection href="user/travis/subscriptions">' +
+    '<accept>application/atom+xml;type=entry</accept>' +
+    '<atom:title type="text">subscriptions</atom:title>' +
+    '</collection>' +
+    '<collection href="user/travis/preferences">' +
+    '<accept>application/atom+xml;type=entry</accept>' +
+    '<atom:title type="text">preferences</atom:title>' +
+    '</collection>' +
+    '</workspace>' +
+    '</service>');
 
 doh.register("cosmo.tests.atompub",
-	[
+	 [
         function getEditIri(t){
             t.is("http://example.org/2003/12/13/atom03/edit",
                  cosmo.atompub.getEditIri(cosmo.tests.atompub.entry1));
@@ -58,7 +76,13 @@ doh.register("cosmo.tests.atompub",
             var e = cosmo.tests.atompub.entry1;
             cosmo.atompub.set.id(e, "foo");
             t.is("foo", cosmo.atompub.attr.id(e));
-
+        },
+        function testServiceHelpers(t){
+            var s = cosmo.tests.atompub.service1.documentElement;
+            var homeColls = cosmo.atompub.getCollections(s, "home");
+            t.is(0, homeColls.length);
+            var accountColls = cosmo.atompub.getCollections(s, "account");
+            t.is(2, accountColls.length);
         }
     ]);
 

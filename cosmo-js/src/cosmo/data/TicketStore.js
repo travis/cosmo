@@ -29,6 +29,10 @@ dojo.declare("cosmo.data.TicketProcessor", null,
             var title = cosmo.xml.query("//*[@class='ticket']/*[@class='type']/@title", node, xmlns)[0];
             return title? title.value : null;
         },
+        timeout: function(node){
+            var title = cosmo.xml.query("//*[@class='ticket']/*[@class='timeout']/@title", node, xmlns)[0];
+            return title? title.value : null;
+        },
         key: function(node){
             var n = cosmo.xml.query("//*[@class='ticket']/*[@class='key']/text()", node)[0];
             return n? n.nodeValue : null;
@@ -69,7 +73,9 @@ dojo.declare("cosmo.data.TicketStore", cosmo.data.AtompubStore,
     generateContent: function(item){
         return ['<content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><div class="ticket"><span class="key">',
                 item.key ,'</span><span class="type" title="',
-                item.type, '"></span></div></div></content>'].join();
+                item.type, '"></span>',
+                (item.timeout? '<span class="type" title="' + item.timeout + '"></span>' : ""),
+                '</div></div></content>'].join("");
     },
 
     getEntryId: function(item){

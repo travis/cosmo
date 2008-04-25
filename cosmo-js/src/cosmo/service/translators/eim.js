@@ -31,6 +31,7 @@ dojo.require("cosmo.service.translators.common");
 dojo.require("cosmo.service.common");
 dojo.require("cosmo.datetime.serialize");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.atompub");
 
 dojo.declare("cosmo.service.translators.Eim", null, {
     COSMO_NS: "http://osafoundation.org/cosmo/Atom",
@@ -53,37 +54,26 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     // a hash from link rels to useful url names
     urlNameHash: {
-        "edit": "atom-edit",
+        "edit": "atom",
         "self": "self",
-        "alternate": "pim",
+        "alternate": "html",
         "morse code": "mc",
         "dav": "dav",
         "webcal": "webcal"
     },
 
     getUrls: function (xml){
-            var urls = {};
-            var links = cosmo.util.html.getElementsByTagName(xml, "link");
-            for (var i = 0; i < links.length; i++){
-                var link = links[i];
-                var rel = link.getAttribute("rel");
-                var href = link.getAttribute("href");
-                urls[this.urlNameHash[rel] || rel] = href;
-            }
-
-            // Handle regular atom feed url differently.
-            // This seems like kind of an ugly way to do this, but it works for now.
-            if (urls['atom-edit']){
-                var url =
-                   location.protocol + "//" + location.host +
-                    cosmo.env.getBaseUrl() + "/atom/" + urls['atom-edit'] ;
-                var urlParts = url.split("?");
-                urlParts[0] = urlParts[0] + "/basic";
-                url = urlParts.join("?");
-                urls.atom = url;
-            }
-
-            return urls;
+        var urls = {};
+        cosmo.atompub.query("atom:link", xml.documentElement).forEach(
+            dojo.hitch(this, function(linkEl){
+                var rel = linkEl.getAttribute("rel");
+                urls[this.urlNameHash[rel] || rel] =
+                    (new dojo._Url(cosmo.xml.getBaseUri(linkEl), linkEl.getAttribute("href")));
+                }
+            )
+        );
+        //Set up some aliases to urls
+        return urls;
     },
 
     RID_FMT: "%Y%m%dT%H%M%S",
@@ -98,7 +88,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         collection.setUrls(urls);
         this.urlCache.setUrls(collection, urls);
 
-        var selfUrl = collection.getUrls()['self'];
+        var selfUrl = collection.getUrls().self.uri;
         if (!selfUrl.match(/.*ticket=.*/)) collection.setWriteable(true);
         else {
             var ticketElements = cosmo.util.html.getElementsByTagName(atomXml, "cosmo", "ticket");
@@ -132,8 +122,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 var collectionElements = workspace.getElementsByTagName("collection");
 
                 for (var j = 0; j < collectionElements.length; j++){
-                    var collection = this.collectionXmlToCollection(collectionElements[j]);
-                    collection.href = collectionElements[j].getAttribute("href");
+                    var cEl = collectionElements[j];
+                    var collection = this.collectionXmlToCollection(cEl);
+                    collection.href = new dojo._Url(cosmo.xml.getBaseUri(cEl), cEl.getAttribute("href"));
                     collections.push(collection);
                 }
             }
@@ -264,19 +255,19 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         var recordSets = dojo.fromJson(content);
 
         var masterItem = this.recordSetToObject(recordSets[0]);
-        var urls = this.getUrls(entry)
+        var urls = this.getUrls(entry);
         masterItem.setUrls(urls);
         this.urlCache.setUrls(masterItem, urls);
 
         var items = [];
         // All record sets after the first are occurrences
         for (var i = 1; i < recordSets.length; i++){
-           var item = this.recordSetToModification(recordSets[i], masterItem)
-           //TODO: remove this hack to get edit urls into modifications
-           if (item.hasModification()){
-              item.setUrls({"atom-edit": "item/" + this.getUid(item)});
-           }
-           items.push(item);
+            var item = this.recordSetToModification(recordSets[i], masterItem);
+            //TODO: remove this hack to get edit urls into modifications
+            if (item.hasModification()){
+                item.setUrls({"atom": "item/" + this.getUid(item)});
+            }
+            items.push(item);
         }
         return items;
     },
@@ -380,7 +371,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             else {
                 item = this.recordSetToObject(dojo.fromJson(content), kwArgs);
             }
-            var urls = this.getUrls(entry)
+            var urls = this.getUrls(entry);
             if (item.isMaster() || (item.isOccurrence() && item.hasModification())){
                 item.setUrls(urls);
             }

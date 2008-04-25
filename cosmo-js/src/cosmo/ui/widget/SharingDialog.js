@@ -20,6 +20,8 @@ dojo.require("dijit.form.Button");
 dojo.require("dijit.Menu");
 dojo.require("dojo.fx");
 dojo.require("dojox.uuid");
+dojo.require("cosmo.data.TicketStore");
+
 dojo.requireLocalization("cosmo.ui.widget", "SharingDialog");
 
 dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
@@ -65,9 +67,9 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
         this.createTicket("read-write");
     },
 
-    createTicket: function(permission){
+    createTicket: function(type){
         var key = dojox.uuid.generateTimeBasedUuid().slice(0, 8);
-        var ticket = this.ticketStore.newItem({permission: permission, key: key});
+        var ticket = this.ticketStore.newItem({type: type, key: key});
         this.ticketStore.save({
             onComplete: dojo.hitch(this, function(){this.onTicket(ticket);}),
             onError: dojo.hitch(this, function(e){console.debug(e);})
@@ -111,6 +113,10 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             var collection = this.collection;
             this.displayName = store.getValue(collection, "displayName");
             this.urls = store.getValue(collection, "urls");
+            if ((!this.ticketStore) && this.urls.ticket){
+                this.ticketStore =
+                    new cosmo.data.TicketStore({iri: this.urls.ticket, xhrArgs: this.xhrArgs});
+            }
             dojo.addOnLoad(dojo.hitch(this, function(){
                 this.tickets = this.ticketStore.fetch({
                     onItem: dojo.hitch(this, "onTicket"),
@@ -176,7 +182,7 @@ dojo.declare("cosmo.ui.widget._SharingDialogTicket", [dijit._Widget, dijit._Temp
 
     postMixInProperties: function(){
         this.key = this.ticketStore.getValue(this.ticket, "key");
-        this.permission = this.ticketStore.getValue(this.ticket, "permission");
+        this.type = this.ticketStore.getValue(this.ticket, "type");
         if (!this.id) this.id = this.key + "SharingDialogTicket";
         var collectionUrls = this.urls;
         this.urls = {};

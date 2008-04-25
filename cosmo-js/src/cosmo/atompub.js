@@ -27,7 +27,6 @@ var nsMap = {
         app: "http://www.w3.org/2007/app"
 };
 function xPathQueryFunc(query, node){
-    console.debug("xp");
     return cosmo.xml.query(query, node, nsMap, "atom");
 }
 

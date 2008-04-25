@@ -365,12 +365,12 @@ dojo.declare(
             // Do sizing, positioning, content update
             // before calling stock Dojo show
             this.show = function (content, l, c, r, title, prompt) {
+                this.domNode.className = this.className || "";
                 // Set style visibility to hidden -- display needs to be
                 // block in order to do sizing/positioning, but we don't
                 // want to see stuff shifting around after we can see the
                 // dialog box
                 this.domNode.style.visibility = 'hidden';
-
                 // Accommodate either original multiple param or
                 // object param input
                 // FIXME: 'content' passed could be a DOM node, which is
@@ -440,6 +440,7 @@ dojo.declare(
                 this.content = null;
                 // Cleanup -- wipe DOM inside container
                 this.domNode.innerHTML = '';
+                this.domNode.className = '';
 
             };
         },

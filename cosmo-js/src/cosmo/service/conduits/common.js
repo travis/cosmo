@@ -26,7 +26,6 @@
  */
 dojo.provide("cosmo.service.conduits.common");
 //TODO: remove once we move create/delete into Atom
-dojo.require("cosmo.caldav");
 dojo.require("dojo.DeferredList");
 
 dojo.declare("cosmo.service.conduits.Conduit", null, {
@@ -50,7 +49,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             var collectionDetailDeferreds = [];
             for (var i = 0; i < collections.length; i++){
                 collectionDetailDeferreds.push(
-                    this.getCollection(collections[i].href, kwArgs)
+                    this.getCollection(collections[i].href.uri, kwArgs)
                 );
             }
             return new dojo.DeferredList(collectionDetailDeferreds);
@@ -60,7 +59,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         return deferred;
     },
-    
+
     _extractDeferredListResults: function (results){
         var list = [];
         for (var i = 0; i < results.length; i++){
@@ -87,7 +86,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
                 //capturing scope
                 (dojo.hitch(this, function (){
                     var subscription = subscriptions[i];
-                    var deferred = this.getCollection(subscription.getCollection().href, kwArgs);
+                    var deferred = this.getCollection(subscription.getCollection().href.uri, kwArgs);
                     deferred.addCallback(function(collection){
                         subscription.setCollection(collection);
                     });
@@ -116,7 +115,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         //TODO: do topic notifications
         return deferred;
     },
-    
+
     saveCollection: function(collection, kwArgs){
        if (collection instanceof cosmo.model.Subscription){
            return this._transport.saveSubscription(collection, this._translator.subscriptionToAtomEntry(collection), kwArgs);
@@ -124,12 +123,12 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
            return this._transport.saveCollection(collection, this._translator.collectionToSaveRepresentation(collection), kwArgs);
        }
     },
-    
+
     getDashboardItems: function(item, kwArgs){
         var transportFunc = "";
-        if (item instanceof cosmo.model.Collection || 
+        if (item instanceof cosmo.model.Collection ||
             item instanceof cosmo.model.Subscription){
-            
+
             transportFunc = "getItems";
         } else if (item instanceof cosmo.model.Note
                    && !!item.getEventStamp()
@@ -138,17 +137,16 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         } else {
             throw new Error("Can not get dashboard items for " + item);
         }
-
         var deferred = this._transport[transportFunc](item, {projection: "/dashboard/eim-json"}, kwArgs);
         this._addTranslation(deferred, "translateGetItems");
-        
+
         return deferred;
     },
 
     getItems: function (collection, searchCriteria, kwArgs){
         kwArgs = kwArgs || {};
         var deferred = this._transport.getItems(collection, searchCriteria, kwArgs);
-        
+
         this._addTranslation(deferred, "translateGetItems");
 
         // do topic notifications
@@ -161,17 +159,17 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         var deferred = this._transport.getItem(uid, kwArgs);
 
         this._addTranslation(deferred, "translateGetItem");
-        
+
         return deferred;
     },
-    
+
     expandRecurringItem: function(item, start, end, kwArgs){
         kwArgs = kwArgs || {};
-        var deferred = this._transport.expandRecurringItem(item, 
+        var deferred = this._transport.expandRecurringItem(item,
             {start: start, end: end}, kwArgs);
 
         this._addTranslation(deferred, "translateGetItems");
-        
+
         return deferred;
     },
 
@@ -194,11 +192,11 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
             translationArgs.oldObject = item;
         }
         this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
-        
+
         return deferred;
 
     },
-    
+
     saveThisAndFuture: function(oldOccurrence, newItem, kwArgs){
         kwArgs = kwArgs || {};
         newItem.getModifiedBy().setAction(cosmo.model.ACTION_CREATED);
@@ -206,14 +204,14 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         oldOccurrence.getModifiedBy().setAction(cosmo.model.ACTION_EDITED);
         this.setModbyUser(oldOccurrence);
         var x = this._translator.itemToAtomEntry(newItem)
-        var deferred = this._transport.saveThisAndFuture(oldOccurrence, 
+        var deferred = this._transport.saveThisAndFuture(oldOccurrence,
             x, kwArgs);
-            
+
         var translationArgs = {
             "oldObject": newItem
         };
         this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
-        
+
         return deferred;
     },
 
@@ -225,7 +223,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         var deferred =  this._transport.createItem(item, this._translator.itemToAtomEntry(item),
                                           parentCollection, kwArgs);
-        var translationArgs = {};                                  
+        var translationArgs = {};
         if (item instanceof cosmo.model.NoteOccurrence) {
             translationArgs.masterItem = item.getMaster();
             translationArgs.oldObject = item;
@@ -234,7 +232,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         }
         this._addTranslation(deferred, "translateSaveCreateItem", translationArgs);
         return deferred;
-        
+
     },
 
     deleteItem: function(item, kwArgs){
@@ -246,19 +244,19 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         return this._transport.removeItem(item, collection, kwArgs);
     },
-    
+
     createSubscription: function(subscription, kwArgs){
         kwArgs = kwArgs || {};
-        
-        return this._transport.createSubscription(subscription, 
-            this._translator.subscriptionToAtomEntry(subscription), 
+
+        return this._transport.createSubscription(subscription,
+            this._translator.subscriptionToAtomEntry(subscription),
             kwArgs);
     },
 
     deleteSubscription: function(subscription, kwArgs){
         return this._transport.deleteSubscription(subscription, kwArgs);
     },
-    
+
     createCollection: function (name, kwArgs){
         return this._transport.createCollection(name, kwArgs);
     },
@@ -267,7 +265,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     deleteCollection: function (collection, kwArgs){
         return this._transport.deleteCollection(collection, kwArgs);
     },
-    
+
     getPreference: function (key, kwArgs){
        var deferred = this._transport.getPreference(key, kwArgs);
        this._addTranslation(deferred, "translateGetPreference");
@@ -283,7 +281,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
        this._addTranslation(deferred, "translateGetPreferences");
        return deferred;
     },
-    
+
     deletePreference: function(key, kwArgs){
        return this._transport.deletePreference(key, kwArgs);
     },
@@ -294,22 +292,22 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
                 return this[translationFunction](obj, kwArgs);
             })
         );
-        
+
         deferred.addErrback(function (e, xhr){
             console.debug("Translation error:")
             console.debug(e);
             return e;
         });
-        
+
     }
-    
+
 });
 
 cosmo.service.conduits.getAtomPlusEimConduit = function (){
     dojo.require("cosmo.service.translators.eim");
     dojo.require("cosmo.service.transport.Atom");
     var urlCache = new cosmo.service.UrlCache();
-    
+
     return new cosmo.service.conduits.Conduit(
         new cosmo.service.transport.Atom(urlCache),
         new cosmo.service.translators.Eim(urlCache)

@@ -123,11 +123,11 @@ dojo.declare("cosmo.data.AtompubStore", dojo.data.api.Write,
         //TODO: support paging
 
         var scope = request.scope || dojo.global;
-        var getDeferred = dojo.xhrGet(dojo.mixin({url: this.iri}, this.xhrArgs));
+        var getDeferred = dojo.xhrGet(dojo.mixin({url: this.iri, handleAs: "xml"}, this.xhrArgs));
         getDeferred.addCallback(dojo.hitch(
             this,
             function(result){
-                var entries = dojo.query("entry", result);
+                var entries = cosmo.atompub.query("atom:entry", result.documentElement);
                 if (request.onBegin) request.onBegin.call(scope, entries.length, request);
                 var items = entries.forEach(dojo.hitch(
                     this,

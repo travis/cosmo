@@ -18,7 +18,7 @@ dojo.provide("cosmo.app.pim.layout");
 
 dojo.require("cosmo.app");
 dojo.require("cosmo.app.pim");
-dojo.require('cosmo.ui.resize')
+dojo.require('cosmo.ui.resize');
 dojo.require("cosmo.ui.ContentBox");
 
 // -- Create global vars, do not remove despite lack of refs in code

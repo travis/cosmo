@@ -41,8 +41,12 @@
 <head>
 
 <title><fmt:message key="App.Welcome"/></title>
+<style type="text/css">
+    @import "${baseUrl}/js/dijit/themes/dijit.css";
+    @import "${baseUrl}/js/dijit/themes/tundra/tundra.css";
+    @import "${baseUrl}/js/dojo/resources/dojo.css";
+</style>
 <cosmo:stylesheets stylesheets="pim"/>
-
 <!--[if IE]>
 <style type="text/css">
   html, body { overflow: hidden; }
@@ -101,7 +105,7 @@ cosmo.ui.event.listeners.hookUpListeners();
 
 </head>
 
-<body id="body">
+<body id="body" class="tundra">
     <div id="baseLayout" style="position: absolute;"></div>
     <div id="maskDiv">
       <div id="appLoadingMessage">

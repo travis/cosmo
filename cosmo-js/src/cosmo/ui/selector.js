@@ -25,6 +25,9 @@ dojo.require("cosmo.topics");
 dojo.require("cosmo.view.names");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.menu");
+dojo.require("cosmo.ui.widget.SharingDialog");
+dojo.require("cosmo.data.CollectionStore");
+
 
 cosmo.ui.selector.CollectionSelector = function (p) {
     var _this = this;
@@ -298,13 +301,27 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 var newCurrColl = null;;
                 if (targ.id.indexOf(prefix + 'Details_') > -1) {
                     var id = targ.id.replace(prefix + 'Details_', '');
-                    cosmo.app.showDialog(
-                        cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                            cosmo.app.pim.collections.getItem(id),
-                            null,
-                            "collectionDetailsDialog"
-                        )
-                    );
+                    var collection = cosmo.app.pim.collections.getItem(id);
+                    var dialog = new cosmo.ui.widget.SharingDialog(
+                        {
+                            store: new cosmo.data.CollectionStore(cosmo.app.pim.serv),
+                            collection: collection,
+                            xhrArgs: cosmo.util.auth.getAuthorizedRequest(),
+                            id: "collectionSharingDialog"
+                        });
+                    cosmo.app.pim.baseLayout.mainApp.addChild(dialog);
+/*                    cosmo.app.showDialog({content: dialog,
+                                          className: "sharingDialog",
+                                          height: "30em",
+                                          width: "40em",
+                                          btnsLeft: [new cosmo.ui.widget.Button(
+                                              {
+                                                  text: _("Main.CollectionDetails.Close"),
+                                                  width: 74,
+                                                  handleOnClick: cosmo.app.hideDialog
+                                              }
+                                          )]
+                                         });*/
                     return true;
                 }
                 // Selector

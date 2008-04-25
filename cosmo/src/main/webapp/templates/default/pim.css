@@ -16,6 +16,7 @@
 /* Styles for the PIM ui.
  *
  */
+@import url("SharingDialog.css");
 
 /* Calendar-specific styles, classes
  * ==================================== */
@@ -641,5 +642,4 @@
     overflow: hidden;
     white-space: nowrap;
 }
-
 

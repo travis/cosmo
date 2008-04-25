@@ -30,7 +30,7 @@ dojo.require("cosmo.util.debug");
 
 cosmo.view.service = new function () {
     var self = this;
-    
+
     this._ranges = {
         'daily': [cosmo.datetime.util.dateParts.DAY, 1],
         'weekly': [cosmo.datetime.util.dateParts.WEEK, 1],
@@ -253,7 +253,7 @@ cosmo.view.service = new function () {
                     self.processingQueue.push(requestId);
 
 
-                    
+
                     newItemDeferred.addCallback(function(){
                         handleSaveItem(item,
                             null,
@@ -338,18 +338,18 @@ cosmo.view.service = new function () {
         var OPTIONS = self.recurringEventOptions;
         var errMsg = '';
         var act = '';
-         
+
         if (err){
             // Failure -- display exception info
             act = 'cosmo:calSaveFailed';
-            
+
             if (err instanceof cosmo.service.exception.ResourceNotFoundException){
                 //let's see if it was the collection that got deleted, or the item
                 //itself.
                 var collection = cosmo.app.pim.getSelectedCollection();
-                var deferred = cosmo.app.pim.serv.getCollection(collection.getUrls().self);
+                var deferred = cosmo.app.pim.serv.getCollection(collection.getUrls().self.uri);
                 deferred.addErrback(function (){
-                    //reload collections will handle showing the error message, as it will try and load the 
+                    //reload collections will handle showing the error message, as it will try and load the
                     //original collection
                     return cosmo.app.pim.reloadCollections({ removedCollection: collection,
                         removedByThisUser: false });
@@ -358,7 +358,7 @@ cosmo.view.service = new function () {
                     errMsg = _('Main.Error.EventEditSaveFailed.EventRemoved');
                     cosmo.app.showErr(errMsg);
                     //easiest thing to do here just reload the collections, since it would be a pain to figure
-                    //out if you need to re-expand if the removed item was an occurrence, etc. 
+                    //out if you need to re-expand if the removed item was an occurrence, etc.
                     var reloadDeferred = cosmo.app.pim.reloadCollections();
                     reloadDeferred.addCallback(function(){self.processingQueue.shift()});
                     return reloadDeferred;
@@ -569,7 +569,7 @@ cosmo.view.service = new function () {
         var callback = function () {
             handleRemoveResult(item, null, reqId, opts);
         };
-        
+
         var errback = function(error){
             handleRemoveResult(item, error, reqId, opts);
         }

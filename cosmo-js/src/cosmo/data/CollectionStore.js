@@ -20,8 +20,8 @@ dojo.require("cosmo.service.conduits.common");
 dojo.require("cosmo.data.ItemStore");
 
 dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
-    constructor: function(){
-        this._serv = cosmo.service.conduits.getAtomPlusEimConduit();
+    constructor: function(service){
+        this._serv = service || cosmo.service.conduits.getAtomPlusEimConduit();
     },
     isItem: function(/* anything */ something){
         return something instanceof cosmo.model.Collection;

@@ -111,18 +111,18 @@ public class MockCollectionItem extends MockItem implements CollectionItem {
      * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#isExcludeFreeBusyRollup()
      */
     public boolean isExcludeFreeBusyRollup() {
-        Boolean val =
-            (Boolean) getAttributeValue(ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
-        if (val != null)
-            return val.booleanValue();
-        return false;
+        Boolean bv =  MockBooleanAttribute.getValue(this, ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
+        if(bv==null)
+            return false;
+        else
+            return bv.booleanValue();
     }
 
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.copy.InterfaceCollectionItem#setExcludeFreeBusyRollup(boolean)
      */
     public void setExcludeFreeBusyRollup(boolean flag) {
-        setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
+        MockBooleanAttribute.setValue(this, ATTR_EXCLUDE_FREE_BUSY_ROLLUP, flag);
     }
     
     /* (non-Javadoc)

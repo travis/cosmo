@@ -132,7 +132,6 @@
             <value>org.osaf.cosmo.model.hibernate.HibCollectionSubscription</value>
             <value>org.osaf.cosmo.model.hibernate.HibContentData</value>
             <value>org.osaf.cosmo.model.hibernate.HibContentItem</value>
-            <value>org.osaf.cosmo.model.hibernate.HibDateAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibDecimalAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibDictionaryAttribute</value>
             <value>org.osaf.cosmo.model.hibernate.HibEventExceptionStamp</value>

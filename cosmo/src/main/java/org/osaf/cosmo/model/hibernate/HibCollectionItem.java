@@ -24,8 +24,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.osaf.cosmo.model.CollectionItem;
@@ -115,18 +113,18 @@ public class HibCollectionItem extends HibItem implements CollectionItem {
      * @see org.osaf.cosmo.model.CollectionItem#isExcludeFreeBusyRollup()
      */
     public boolean isExcludeFreeBusyRollup() {
-        Boolean val =
-            (Boolean) getAttributeValue(ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
-        if (val != null)
-            return val.booleanValue();
-        return false;
+        Boolean bv =  HibBooleanAttribute.getValue(this, ATTR_EXCLUDE_FREE_BUSY_ROLLUP);
+        if(bv==null)
+            return false;
+        else
+            return bv.booleanValue();
     }
 
     /* (non-Javadoc)
      * @see org.osaf.cosmo.model.CollectionItem#setExcludeFreeBusyRollup(boolean)
      */
     public void setExcludeFreeBusyRollup(boolean flag) {
-        setAttribute(ATTR_EXCLUDE_FREE_BUSY_ROLLUP, Boolean.valueOf(flag));
+       HibBooleanAttribute.setValue(this, ATTR_EXCLUDE_FREE_BUSY_ROLLUP, flag);
     }
     
     /* (non-Javadoc)

@@ -21,6 +21,7 @@ import javax.persistence.Entity;
 
 import org.hibernate.validator.Length;
 import org.osaf.cosmo.model.Attribute;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
@@ -120,5 +121,11 @@ public class HibStringAttribute extends HibAttribute implements
             item.removeAttribute(qname);
         else
             attr.setValue(value);
+    }
+    
+    @Override
+    public void validate() {
+        if (value!= null && value.length() > VALUE_LEN_MAX)
+            throw new DataSizeException("String attribute " + getQName() + " too large");
     }
 }

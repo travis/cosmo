@@ -19,8 +19,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import org.w3c.dom.Element;
-
 /**
  * Represents an item on server.  All
  * content in cosmo extends from Item.
@@ -125,104 +123,6 @@ public interface Item extends AuditableObject{
     public Object getAttributeValue(QName qname);
 
     /**
-     * Add new StringAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value String value of attribute to add
-     */
-    public void addStringAttribute(String name, String value);
-
-    /**
-     * Add new StringAttribute
-     * @param qname qualified name of attribute to add
-     * @param value String value of attribute to add
-     */
-    public void addStringAttribute(QName qname, String value);
-
-    /**
-     * Add new IntegerAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value Integer value of attribute to add
-     */
-    public void addIntegerAttribute(String name, Long value);
-
-    /**
-     * Add new IntegerAttribute
-     * @param qname qualified name of attribute to add
-     * @param value Integer value of attribute to add
-     */
-    public void addIntegerAttribute(QName qname, Long value);
-
-    /**
-     * Add new BooleanAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value Boolean value of attribute to add
-     */
-    public void addBooleanAttribute(String name, Boolean value);
-
-    /**
-     * Add new BooleanAttribute
-     * @param qname qualified name of attribute to addd
-     * @param value Boolean value of attribute to add
-     */
-    public void addBooleanAttribute(QName qname, Boolean value);
-
-    /**
-     * Add new DateAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value Date value of attribute to add
-     */
-    public void addDateAttribute(String name, Date value);
-
-    /**
-     * Add new DateAttribute
-     * @param qname qualified name of attribute to add
-     * @param value Date value of attribute to add
-     */
-    public void addDateAttribute(QName qname, Date value);
-
-    /**
-     * Add new MultiValueStringAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value Set value of attribute to add
-     */
-    public void addMultiValueStringAttribute(String name, Set<String> value);
-
-    /**
-     * Add new MultiValueStringAttribute
-     * @param qname qualified name of attribute to add
-     * @param value Set value of attribute to add
-     */
-    public void addMultiValueStringAttribute(QName qname, Set<String> value);
-
-    /**
-     * Add new DictionaryAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value Map value of attribute to add
-     */
-    public void addDictionaryAttribute(String name, Map<String, String> value);
-
-    /**
-     * Add new DictionaryAttribute
-     * @param qname qualified name of attribute to add
-     * @param value Map value of attribute to add
-     */
-    public void addDictionaryAttribute(QName qname, Map<String, String> value);
-
-    /**
-     * Add new XmlAttribute in default namespace
-     * @param name local name of attribute to add
-     * @param value Element value of attribute to add
-     */
-    public void addXmlAttribute(String name, Element value);
-
-    /**
-     * Add new XmlAttribute
-     * @param qname qualified name of attribute to add
-     * @param value Element value of attribute to add
-     */
-    public void addXmlAttribute(QName qname, Element value);
-
-    /**
      * Set attribute value of attribute with local name in default
      * namespace.
      * @param name local name of attribute
@@ -275,8 +175,6 @@ public interface Item extends AuditableObject{
     public String getUid();
 
     public void setUid(String uid);
-
-    public Integer getVersion();
 
     public Set<CollectionItem> getParents();
     

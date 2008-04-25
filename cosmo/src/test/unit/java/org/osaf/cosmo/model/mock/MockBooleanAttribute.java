@@ -17,6 +17,8 @@ package org.osaf.cosmo.model.mock;
 
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BooleanAttribute;
+import org.osaf.cosmo.model.IntegerAttribute;
+import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
 
@@ -71,6 +73,41 @@ public class MockBooleanAttribute extends MockAttribute implements java.io.Seria
             throw new ModelValidationException(
                     "attempted to set non Boolean value on attribute");
         setValue((Boolean) value);
+    }
+    
+    /**
+     * Convienence method for returning a Boolean value on a BooleanAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch BooleanAttribute from
+     * @param qname QName of attribute
+     * @return Boolean value of IntegerAttribute
+     */
+    public static Boolean getValue(Item item, QName qname) {
+        BooleanAttribute ba = (BooleanAttribute) item.getAttribute(qname);
+        if(ba==null)
+            return null;
+        else
+            return ba.getValue();
+    }
+    
+    /**
+     * Convienence method for setting a Boolean value on a BooleanAttribute
+     * with a given QName stored on the given item.
+     * @param item item to fetch BooleanAttribute from
+     * @param qname QName of attribute
+     * @param value value to set on BooleanAttribute
+     */
+    public static void setValue(Item item, QName qname, Boolean value) {
+        BooleanAttribute attr = (BooleanAttribute) item.getAttribute(qname);
+        if(attr==null && value!=null) {
+            attr = new MockBooleanAttribute(qname,value);
+            item.addAttribute(attr);
+            return;
+        }
+        if(value==null)
+            item.removeAttribute(qname);
+        else
+            attr.setValue(value);
     }
 
 }

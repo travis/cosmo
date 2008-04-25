@@ -24,7 +24,4 @@ public interface BooleanAttribute extends Attribute{
     public Boolean getValue();
 
     public void setValue(Boolean value);
-
-    public void setValue(Object value);
-
 }

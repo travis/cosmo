@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
 
@@ -35,9 +36,12 @@ public class MockBinaryAttribute extends MockAttribute implements java.io.Serial
      * 
      */
     private static final long serialVersionUID = 6296196539997344427L;
-
+    
     private byte[] value;
 
+    public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
+    
+    
     /** default constructor */
     public MockBinaryAttribute() {
     }
@@ -116,6 +120,12 @@ public class MockBinaryAttribute extends MockAttribute implements java.io.Serial
         if (value != null)
             attr.setValue(value.clone());
         return attr;
+    }
+    
+    @Override
+    public void validate() {
+        if (value!=null && value.length > MAX_BINARY_ATTR_SIZE)
+            throw new DataSizeException("Binary attribute " + getQName() + " too large");
     }
 
 }

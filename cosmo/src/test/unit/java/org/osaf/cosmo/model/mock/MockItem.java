@@ -27,20 +27,15 @@ import java.util.Map.Entry;
 
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AttributeTombstone;
-import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionItemDetails;
-import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.StampTombstone;
-import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.model.hibernate.HibCollectionItemDetails;
-import org.w3c.dom.Element;
 
 
 /**
@@ -49,10 +44,7 @@ import org.w3c.dom.Element;
  */
 public abstract class MockItem extends MockAuditableObject implements Item {
 
-    public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
-    public static final long MAX_STRING_ATTR_SIZE = 1 * 1024;
-
-    
+   
     private String uid;
     
    
@@ -212,7 +204,7 @@ public abstract class MockItem extends MockAuditableObject implements Item {
                     it.remove();
         }
         
-        validateAttribute(attribute);
+        ((MockAttribute) attribute).validate();
         attribute.setItem(this);
         attributes.put(attribute.getQName(), attribute);
     }
@@ -280,142 +272,25 @@ public abstract class MockItem extends MockAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addStringAttribute(java.lang.String, java.lang.String)
-     */
-    public void addStringAttribute(String name, String value) {
-        addStringAttribute(new MockQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addStringAttribute(org.osaf.cosmo.model.copy.QName, java.lang.String)
-     */
-    public void addStringAttribute(QName qname, String value) {
-        addAttribute(new MockStringAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addIntegerAttribute(java.lang.String, java.lang.Long)
-     */
-    public void addIntegerAttribute(String name, Long value) {
-        addIntegerAttribute(new MockQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addIntegerAttribute(org.osaf.cosmo.model.copy.QName, java.lang.Long)
-     */
-    public void addIntegerAttribute(QName qname, Long value) {
-        addAttribute(new MockIntegerAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addBooleanAttribute(java.lang.String, java.lang.Boolean)
-     */
-    public void addBooleanAttribute(String name, Boolean value) {
-        addBooleanAttribute(new MockQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addBooleanAttribute(org.osaf.cosmo.model.copy.QName, java.lang.Boolean)
-     */
-    public void addBooleanAttribute(QName qname, Boolean value) {
-        addAttribute(new MockBooleanAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDateAttribute(java.lang.String, java.util.Date)
-     */
-    public void addDateAttribute(String name, Date value) {
-        addDateAttribute(new MockQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDateAttribute(org.osaf.cosmo.model.copy.QName, java.util.Date)
-     */
-    public void addDateAttribute(QName qname, Date value) {
-        addAttribute(new MockDateAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addMultiValueStringAttribute(java.lang.String, java.util.Set)
-     */
-    public void addMultiValueStringAttribute(String name, Set<String> value) {
-        addMultiValueStringAttribute(new MockQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addMultiValueStringAttribute(org.osaf.cosmo.model.copy.QName, java.util.Set)
-     */
-    public void addMultiValueStringAttribute(QName qname, Set<String> value) {
-        addAttribute(new MockMultiValueStringAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDictionaryAttribute(java.lang.String, java.util.Map)
-     */
-    public void addDictionaryAttribute(String name, Map<String, String> value) {
-        addDictionaryAttribute(new MockQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addDictionaryAttribute(org.osaf.cosmo.model.copy.QName, java.util.Map)
-     */
-    public void addDictionaryAttribute(QName qname, Map<String, String> value) {
-        addAttribute(new MockDictionaryAttribute(qname, value));
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addXmlAttribute(java.lang.String, org.w3c.dom.Element)
-     */
-    public void addXmlAttribute(String name, Element value) {
-        addXmlAttribute(new MockQName(name), value);
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#addXmlAttribute(org.osaf.cosmo.model.copy.QName, org.w3c.dom.Element)
-     */
-    public void addXmlAttribute(QName qname, Element value) {
-        addAttribute(new MockXmlAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setAttribute(java.lang.String, java.lang.Object)
+     * @see org.osaf.cosmo.model.Item#setAttribute(java.lang.String, java.lang.Object)
      */
     public void setAttribute(String name, Object value) {
         setAttribute(new MockQName(name),value);
     }
     
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceItem#setAttribute(org.osaf.cosmo.model.copy.QName, java.lang.Object)
+     * @see org.osaf.cosmo.model.Item#setAttribute(org.osaf.cosmo.model.QName, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
     public void setAttribute(QName key, Object value) {
-        Attribute attr = (Attribute) attributes.get(key);
+        MockAttribute attr = (MockAttribute) attributes.get(key);
     
-        if(attr==null)
-        {
-            if(value instanceof String)
-                attr = new MockStringAttribute(key, (String) value);
-            else if(value instanceof byte[])
-                attr = new MockBinaryAttribute(key, (byte[]) value);
-            else if(value instanceof Long)
-                attr = new MockIntegerAttribute(key, (Long) value);
-            else if(value instanceof Boolean)
-                attr = new MockBooleanAttribute(key, (Boolean) value);
-            else if(value instanceof Date)
-                attr = new MockDateAttribute(key, (Date) value);
-            else if(value instanceof Set)
-                attr = new MockMultiValueStringAttribute(key, (Set) value);
-            else if(value instanceof Map)
-                attr = new MockDictionaryAttribute(key, (Map) value);
-            else if(value instanceof Element)
-                attr = new MockXmlAttribute(key, (Element) value);
-            else
-                attr = new MockStringAttribute(key, value.toString());
-            addAttribute(attr);
-        } else {
-            validateAttribute(attr, value);
+        if(attr!=null) {
             attr.setValue(value);
+            attr.validate();
         }
+        else
+           throw new IllegalArgumentException("attribute " + key + " not found");
     }
 
     /* (non-Javadoc)
@@ -429,29 +304,6 @@ public abstract class MockItem extends MockAuditableObject implements Item {
         }
         
         return attrs;
-    }
-    
-    // TODO: move to hibernate validator
-    protected void validateAttribute(Attribute attribute,
-                                     Object value) {
-        if (value == null)
-            return;
-
-        if (attribute instanceof BinaryAttribute) {
-            byte[] v = (byte[]) value;
-            if (v.length > MAX_BINARY_ATTR_SIZE)
-                throw new DataSizeException("Binary attribute " + attribute.getQName() + " too large");
-        }
-
-        if (attribute instanceof StringAttribute) {
-            String v = (String) value;
-            if (v.length() > MAX_STRING_ATTR_SIZE)
-                throw new DataSizeException("String attribute " + attribute.getQName() + " too large");
-        }
-    }
-
-    protected void validateAttribute(Attribute attribute) {
-        validateAttribute(attribute, attribute.getValue());
     }
     
 

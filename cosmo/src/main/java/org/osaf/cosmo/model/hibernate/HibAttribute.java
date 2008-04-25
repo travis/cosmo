@@ -129,5 +129,9 @@ public abstract class HibAttribute extends HibAuditableObject implements java.io
             return "null";
         return value.toString();
     }
+    
+    public void validate() {
+        // subclasses can override
+    }
 
 }

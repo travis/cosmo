@@ -50,19 +50,15 @@ import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AttributeTombstone;
-import org.osaf.cosmo.model.BinaryAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionItemDetails;
-import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
 import org.osaf.cosmo.model.StampTombstone;
-import org.osaf.cosmo.model.StringAttribute;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.Tombstone;
 import org.osaf.cosmo.model.User;
-import org.w3c.dom.Element;
 
 
 /**
@@ -81,9 +77,7 @@ import org.w3c.dom.Element;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public abstract class HibItem extends HibAuditableObject implements Item {
 
-    public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
-    public static final long MAX_STRING_ATTR_SIZE = 1 * 1024;
-
+   
     @Column(name = "uid", nullable = false, unique=true, length=255)
     @NotNull
     @Length(min=1, max=255)
@@ -268,7 +262,7 @@ public abstract class HibItem extends HibAuditableObject implements Item {
                     it.remove();
         }
         
-        validateAttribute(attribute);
+        ((HibAttribute) attribute).validate();
         attribute.setItem(this);
         attributes.put(attribute.getQName(), attribute);
     }
@@ -336,104 +330,6 @@ public abstract class HibItem extends HibAuditableObject implements Item {
     }
 
     /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addStringAttribute(java.lang.String, java.lang.String)
-     */
-    public void addStringAttribute(String name, String value) {
-        addStringAttribute(new HibQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addStringAttribute(org.osaf.cosmo.model.QName, java.lang.String)
-     */
-    public void addStringAttribute(QName qname, String value) {
-        addAttribute(new HibStringAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addIntegerAttribute(java.lang.String, java.lang.Long)
-     */
-    public void addIntegerAttribute(String name, Long value) {
-        addIntegerAttribute(new HibQName(name), value);
-    }
-   
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addIntegerAttribute(org.osaf.cosmo.model.QName, java.lang.Long)
-     */
-    public void addIntegerAttribute(QName qname, Long value) {
-        addAttribute(new HibIntegerAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addBooleanAttribute(java.lang.String, java.lang.Boolean)
-     */
-    public void addBooleanAttribute(String name, Boolean value) {
-        addBooleanAttribute(new HibQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addBooleanAttribute(org.osaf.cosmo.model.QName, java.lang.Boolean)
-     */
-    public void addBooleanAttribute(QName qname, Boolean value) {
-        addAttribute(new HibBooleanAttribute(qname, value));
-    }
-   
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addDateAttribute(java.lang.String, java.util.Date)
-     */
-    public void addDateAttribute(String name, Date value) {
-        addDateAttribute(new HibQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addDateAttribute(org.osaf.cosmo.model.QName, java.util.Date)
-     */
-    public void addDateAttribute(QName qname, Date value) {
-        addAttribute(new HibDateAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addMultiValueStringAttribute(java.lang.String, java.util.Set)
-     */
-    public void addMultiValueStringAttribute(String name, Set<String> value) {
-        addMultiValueStringAttribute(new HibQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addMultiValueStringAttribute(org.osaf.cosmo.model.QName, java.util.Set)
-     */
-    public void addMultiValueStringAttribute(QName qname, Set<String> value) {
-        addAttribute(new HibMultiValueStringAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addDictionaryAttribute(java.lang.String, java.util.Map)
-     */
-    public void addDictionaryAttribute(String name, Map<String, String> value) {
-        addDictionaryAttribute(new HibQName(name), value);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addDictionaryAttribute(org.osaf.cosmo.model.QName, java.util.Map)
-     */
-    public void addDictionaryAttribute(QName qname, Map<String, String> value) {
-        addAttribute(new HibDictionaryAttribute(qname, value));
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addXmlAttribute(java.lang.String, org.w3c.dom.Element)
-     */
-    public void addXmlAttribute(String name, Element value) {
-        addXmlAttribute(new HibQName(name), value);
-    }
-
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.Item#addXmlAttribute(org.osaf.cosmo.model.QName, org.w3c.dom.Element)
-     */
-    public void addXmlAttribute(QName qname, Element value) {
-        addAttribute(new HibXmlAttribute(qname, value));
-    }
-    
-    /* (non-Javadoc)
      * @see org.osaf.cosmo.model.Item#setAttribute(java.lang.String, java.lang.Object)
      */
     public void setAttribute(String name, Object value) {
@@ -445,33 +341,14 @@ public abstract class HibItem extends HibAuditableObject implements Item {
      */
     @SuppressWarnings("unchecked")
     public void setAttribute(QName key, Object value) {
-        Attribute attr = (Attribute) attributes.get(key);
+        HibAttribute attr = (HibAttribute) attributes.get(key);
     
-        if(attr==null)
-        {
-            if(value instanceof String)
-                attr = new HibStringAttribute(key, (String) value);
-            else if(value instanceof byte[])
-                attr = new HibBinaryAttribute(key, (byte[]) value);
-            else if(value instanceof Long)
-                attr = new HibIntegerAttribute(key, (Long) value);
-            else if(value instanceof Boolean)
-                attr = new HibBooleanAttribute(key, (Boolean) value);
-            else if(value instanceof Date)
-                attr = new HibDateAttribute(key, (Date) value);
-            else if(value instanceof Set)
-                attr = new HibMultiValueStringAttribute(key, (Set) value);
-            else if(value instanceof Map)
-                attr = new HibDictionaryAttribute(key, (Map) value);
-            else if(value instanceof Element)
-                attr = new HibXmlAttribute(key, (Element) value);
-            else
-                attr = new HibStringAttribute(key, value.toString());
-            addAttribute(attr);
-        } else {
-            validateAttribute(attr, value);
+        if(attr!=null) {
             attr.setValue(value);
+            attr.validate();
         }
+        else
+           throw new IllegalArgumentException("attribute " + key + " not found");
     }
 
     /* (non-Javadoc)
@@ -485,29 +362,6 @@ public abstract class HibItem extends HibAuditableObject implements Item {
         }
         
         return attrs;
-    }
-    
-    // TODO: move to hibernate validator
-    protected void validateAttribute(Attribute attribute,
-                                     Object value) {
-        if (value == null)
-            return;
-
-        if (attribute instanceof BinaryAttribute) {
-            byte[] v = (byte[]) value;
-            if (v.length > MAX_BINARY_ATTR_SIZE)
-                throw new DataSizeException("Binary attribute " + attribute.getQName() + " too large");
-        }
-
-        if (attribute instanceof StringAttribute) {
-            String v = (String) value;
-            if (v.length() > MAX_STRING_ATTR_SIZE)
-                throw new DataSizeException("String attribute " + attribute.getQName() + " too large");
-        }
-    }
-
-    protected void validateAttribute(Attribute attribute) {
-        validateAttribute(attribute, attribute.getValue());
     }
     
 

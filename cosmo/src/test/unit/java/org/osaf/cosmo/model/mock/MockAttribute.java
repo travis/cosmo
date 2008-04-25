@@ -105,5 +105,9 @@ public abstract class MockAttribute extends MockAuditableObject implements java.
             return "null";
         return value.toString();
     }
+    
+    public void validate() {
+        
+    }
 
 }

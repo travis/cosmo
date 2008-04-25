@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.hibernate.annotations.Type;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.BinaryAttribute;
+import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.QName;
 
@@ -43,6 +44,8 @@ public class HibBinaryAttribute extends HibAttribute implements java.io.Serializ
      */
     private static final long serialVersionUID = 6296196539997344427L;
 
+    public static final long MAX_BINARY_ATTR_SIZE = 100 * 1024 * 1024;
+    
     @Column(name = "binvalue", length=102400000)
     @Type(type="bytearray_blob")
     private byte[] value;
@@ -129,6 +132,12 @@ public class HibBinaryAttribute extends HibAttribute implements java.io.Serializ
         if (value != null)
             attr.setValue(value.clone());
         return attr;
+    }
+    
+    @Override
+    public void validate() {
+        if (value!=null && value.length > MAX_BINARY_ATTR_SIZE)
+            throw new DataSizeException("Binary attribute " + getQName() + " too large");
     }
 
 }

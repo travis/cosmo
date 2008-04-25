@@ -231,8 +231,7 @@ public class StandardContentServiceTest extends TestCase {
         assertNotNull(bar2);
         
         bar1.setIsActive(false);
-        bar2.addStringAttribute("foo", "bar");
-        
+       
         ContentItem bar3 = new MockNoteItem();
         bar3.setName("bar3");
         bar3.setOwner(user);
@@ -252,8 +251,6 @@ public class StandardContentServiceTest extends TestCase {
         
         assertNull(bar1);
         assertNotNull(bar2);
-        assertEquals(1,bar2.getAttributes().size());
-        assertEquals("bar", bar2.getAttributeValue("foo"));
         assertNotNull(bar3);
     }
     
@@ -277,13 +274,10 @@ public class StandardContentServiceTest extends TestCase {
         
         assertEquals(1, dummyCollection.generateHash());
         
-   
-        dummyContent.addStringAttribute("foo", "bar");
         dummyContent = service.updateContent(dummyContent);
            
         assertEquals(2, dummyCollection.generateHash());
         
-        dummyContent.addStringAttribute("foo2", "bar2");
         dummyContent = service.updateContent(dummyContent);
         assertEquals(3, dummyCollection.generateHash());
     }

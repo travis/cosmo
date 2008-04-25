@@ -39,20 +39,24 @@ import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.dao.UserDao;
 import org.osaf.cosmo.model.Attribute;
 import org.osaf.cosmo.model.AvailabilityItem;
+import org.osaf.cosmo.model.BooleanAttribute;
 import org.osaf.cosmo.model.CalendarAttribute;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
 import org.osaf.cosmo.model.DecimalAttribute;
+import org.osaf.cosmo.model.DictionaryAttribute;
 import org.osaf.cosmo.model.DuplicateItemNameException;
 import org.osaf.cosmo.model.FileItem;
 import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.ICalendarAttribute;
 import org.osaf.cosmo.model.IcalUidInUseException;
+import org.osaf.cosmo.model.IntegerAttribute;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemNotFoundException;
 import org.osaf.cosmo.model.ItemTombstone;
 import org.osaf.cosmo.model.ModelValidationException;
+import org.osaf.cosmo.model.MultiValueStringAttribute;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TimestampAttribute;
@@ -63,13 +67,18 @@ import org.osaf.cosmo.model.UidInUseException;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.XmlAttribute;
 import org.osaf.cosmo.model.hibernate.HibAvailabilityItem;
+import org.osaf.cosmo.model.hibernate.HibBooleanAttribute;
 import org.osaf.cosmo.model.hibernate.HibCalendarAttribute;
 import org.osaf.cosmo.model.hibernate.HibCollectionItem;
+import org.osaf.cosmo.model.hibernate.HibContentItem;
 import org.osaf.cosmo.model.hibernate.HibDecimalAttribute;
+import org.osaf.cosmo.model.hibernate.HibDictionaryAttribute;
 import org.osaf.cosmo.model.hibernate.HibFileItem;
 import org.osaf.cosmo.model.hibernate.HibFreeBusyItem;
 import org.osaf.cosmo.model.hibernate.HibICalendarAttribute;
+import org.osaf.cosmo.model.hibernate.HibIntegerAttribute;
 import org.osaf.cosmo.model.hibernate.HibItem;
+import org.osaf.cosmo.model.hibernate.HibMultiValueStringAttribute;
 import org.osaf.cosmo.model.hibernate.HibNoteItem;
 import org.osaf.cosmo.model.hibernate.HibQName;
 import org.osaf.cosmo.model.hibernate.HibStringAttribute;
@@ -194,8 +203,10 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         CollectionItem root = (CollectionItem) contentDao.getRootItem(user);
 
         ContentItem item = generateTestContent();
-        item.addIntegerAttribute("intattribute", new Long(22));
-        item.addBooleanAttribute("booleanattribute", Boolean.TRUE);
+        IntegerAttribute ia = new HibIntegerAttribute(new HibQName("intattribute"), new Long(22));
+        item.addAttribute(ia);
+        BooleanAttribute ba = new HibBooleanAttribute(new HibQName("booleanattribute"), Boolean.TRUE);
+        item.addAttribute(ba);
         
         DecimalAttribute decAttr = 
             new HibDecimalAttribute(new HibQName("decimalattribute"),new BigDecimal("1.234567"));
@@ -208,12 +219,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         HashSet<String> values = new HashSet<String>();
         values.add("value1");
         values.add("value2");
-        item.addMultiValueStringAttribute("multistringattribute", values);
+        MultiValueStringAttribute mvs = new HibMultiValueStringAttribute(new HibQName("multistringattribute"), values);
+        item.addAttribute(mvs);
 
         HashMap<String, String> dictionary = new HashMap<String, String>();
         dictionary.put("key1", "value1");
         dictionary.put("key2", "value2");
-        item.addDictionaryAttribute("dictionaryattribute", dictionary);
+        DictionaryAttribute da = new HibDictionaryAttribute(new HibQName("dictionaryattribute"), dictionary);
+        item.addAttribute(da);
 
         ContentItem newItem = contentDao.createContent(root, item);
 
@@ -518,7 +531,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         clearSession();
 
-        FileItem queryItem = (FileItem) contentDao.findContentByUid(newItem.getUid());
+        HibFileItem queryItem = (HibFileItem) contentDao.findContentByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
         Assert.assertEquals(0, queryItem.getVersion().intValue());
@@ -532,25 +545,12 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         // Make sure modified date changes
         Thread.sleep(1000);
         
-        System.out.println("MODIFIED BEFORE = " + queryItem.getModifiedDate().getTime());
-        queryItem = (FileItem) contentDao.updateContent(queryItem);
-        System.out.println("MODIFIED AFTER = " + queryItem.getModifiedDate().getTime());
-
+        queryItem = (HibFileItem) contentDao.updateContent(queryItem);
+        
         clearSession();
         Thread.sleep(200);
-        ContentItem queryItem2 = contentDao.findContentByUid(newItem.getUid());
+        HibContentItem queryItem2 = (HibContentItem) contentDao.findContentByUid(newItem.getUid());
         Assert.assertTrue(queryItem2.getVersion().intValue() > 0);
-        
-        // debug info for instances where this fails
-        if(!queryItem.getModifiedDate().equals(queryItem2.getModifiedDate())) {
-        	System.out.println("MODIFIED1 = " + queryItem.getModifiedDate().getTime());
-        	System.out.println("MODIFIED2 = " + queryItem2.getModifiedDate().getTime());
-        	
-        	Object result = session.createSQLQuery("select i.modifydate from item i where i.uid=:uid").setParameter("uid", queryItem.getUid()).uniqueResult();
-        	System.out.println("FROMDB = " + result);
-        }
-        
-        
         
         helper.verifyItem(queryItem, queryItem2);
 
@@ -665,7 +665,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
         helper.verifyItem(newItem, queryItem);
         
-        Assert.assertTrue(queryItem.getVersion().equals(0));
+        Assert.assertTrue(((HibItem)queryItem).getVersion().equals(0));
 
         contentDao.removeContent(queryItem);
 
@@ -754,14 +754,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         a.setOwner(user);
 
         a = contentDao.createCollection(root, a);
-        Integer ver = a.getVersion();
+        Integer ver = ((HibItem) a).getVersion();
         Date timestamp = a.getModifiedDate();
         
         clearSession();
         Thread.sleep(1);
         
         a = contentDao.updateCollectionTimestamp(a);
-        Assert.assertTrue(a.getVersion()==ver + 1);
+        Assert.assertTrue(((HibItem) a).getVersion()==ver + 1);
         Assert.assertTrue(timestamp.before(a.getModifiedDate()));
     }
 

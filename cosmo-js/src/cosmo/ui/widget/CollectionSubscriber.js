@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-dojo.provide("cosmo.ui.widget.CollectionSelector");
+dojo.provide("cosmo.ui.widget.CollectionSubscriber");
 
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
@@ -24,22 +24,24 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.topics");
-dojo.require("cosmo.ui.widget.CollectionDetailsDialog");
+dojo.require("cosmo.ui.widget.SharingDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
-dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");
+dojo.requireLocalization("cosmo.ui.widget", "CollectionSubscriber");
 
 dojo.declare("cosmo.AlreadySubscribedException", Error);
 
 dojo.declare(
-    "cosmo.ui.widget.CollectionSelector",
+    "cosmo.ui.widget.CollectionSubscriber",
     [dijit._Widget, dijit._Templated],
     {
-        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/CollectionSelector.html"),
+        widgetsInTemplate: true,
+        templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/CollectionSubscriber.html"),
         collection: null,
         ticketKey: '',
         displayName: "",
+        store: null,
 
-        l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSelector"),
+        l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSubscriber"),
 
         //references to various DOM nodes
         displayNameText: null,
@@ -57,9 +59,9 @@ dojo.declare(
         // Grab subscription information from server, make sure displayName is not a duplicate
         // and add the current collection to the user's subscriptions
         subscribe: function (subscription) {
-            var displayName = subscription.getDisplayName()
+            var displayName = subscription.getDisplayName();
             var collection = this.collection;
-            cosmo.app.showDialog({"content" : this.l10n.loadingInfo})
+            cosmo.app.showDialog({"content" : this.l10n.loadingInfo});
             var collectionsDeferred = cosmo.app.pim.serv.getCollections();
             var subscriptionsDeferred = cosmo.app.pim.serv.getSubscriptions();
             var dList = new dojo.DeferredList(
@@ -73,7 +75,7 @@ dojo.declare(
                 var collections = results[0][1];
                 collections = collections.concat(results[1][1]);
                 return collections;
-            })
+            });
             dList.addCallback(dojo.hitch(this, function (collections){
                 var alreadySubscribed = this._collectionWithUidExists(collections, collection.getUid());
                 if (alreadySubscribed) {
@@ -81,7 +83,7 @@ dojo.declare(
                         ? this.l10n.subscribedOwn
                         : this.l10n.subscribed;
                     var showD = cosmo.app.showAndWait(message);
-                    showD.addCallback(function(){throw new cosmo.AlreadySubscribedException()});
+                    showD.addCallback(function(){throw new cosmo.AlreadySubscribedException();});
                     return showD;
                 }
 
@@ -121,7 +123,7 @@ dojo.declare(
                     displayName: displayName,
                     uid: this.collection.getUid(),
                     ticketKey: this.ticketKey
-                })
+                });
             }));
             if (!cosmo.util.auth.currentlyAuthenticated())
                 deferred.addCallback(dojo.hitch(this, this._authenticate));
@@ -153,9 +155,9 @@ dojo.declare(
             });
             var authD = cosmo.app.showDialog(authBoxProps);
             cosmo.app.modalDialog.content.usernameInput.focus();
-            authD.addCallback(function(){cosmo.app.hideDialog()});
+            authD.addCallback(function(){cosmo.app.hideDialog();});
             // Return subscription for callback chain
-            authD.addCallback(function(){return subscription});
+            authD.addCallback(function(){return subscription;});
             return authD;
         },
 
@@ -203,6 +205,14 @@ dojo.declare(
         _validateDisplayName: function (displayName) {
             //is there anything else?
             return displayName != "";
+        },
+
+        postCreate: function(){
+            var sharingD = new cosmo.ui.widget.SharingDialog({
+                store: this.store
+            }, this.sharingDialog);
+            sharingD.inviteButton.destroy();
+            sharingD.destroyButton.destroy();
         }
 } );
 

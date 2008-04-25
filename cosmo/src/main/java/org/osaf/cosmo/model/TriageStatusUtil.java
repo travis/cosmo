@@ -16,6 +16,7 @@
 package org.osaf.cosmo.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Contains static helper methods for dealing with TriageStatus
@@ -44,10 +45,17 @@ public class TriageStatusUtil {
     
     public static TriageStatus initialize(TriageStatus ts) {
         ts.setCode(new Integer(TriageStatus.CODE_NOW));
-        // XXX there's gotta be a better way!
-        String time = (System.currentTimeMillis() / 1000) + ".00";
-        ts.setRank(new BigDecimal(time).negate());
+        ts.setRank(getRank(System.currentTimeMillis()));
         ts.setAutoTriage(Boolean.TRUE);
         return ts;
+    }
+    
+    public static BigDecimal getRank(long date) {
+        String time = (date / 1000) + ".00";
+        return new BigDecimal(time).negate();
+    }
+    
+    public static Date getDateFromRank(BigDecimal rank) {
+        return new Date(rank.negate().scaleByPowerOfTen(3).longValue());
     }
 }

@@ -47,6 +47,7 @@ import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.DateListProperty;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtStamp;
@@ -93,7 +94,7 @@ public class EntityConverter {
         TimeZoneRegistryFactory.getInstance().createRegistry();
 
     private EntityFactory entityFactory;
-
+    
     public EntityConverter(EntityFactory entityFactory) {
         this.entityFactory = entityFactory;
     }
@@ -581,6 +582,7 @@ public class EntityConverter {
         //summary = displayName
         //description = body
         //dtstamp = clientModifiedDate/modifiedDate
+        //completed = triageStatus==DONE/triageStatusRank
         
         String icalUid = note.getIcalUid();
         if(icalUid==null)
@@ -594,6 +596,15 @@ public class EntityConverter {
         ICalendarUtils.setUid(icalUid, task);
         ICalendarUtils.setSummary(note.getDisplayName(), task);
         ICalendarUtils.setDescription(note.getBody(), task);
+        
+        // Set COMPLETED if triagestatus is DONE
+        TriageStatus ts = note.getTriageStatus();
+        DateTime completeDate = null;
+        if(ts!=null && ts.getCode()==TriageStatus.CODE_DONE && ts.getRank()!=null) {
+            completeDate =  new DateTime(TriageStatusUtil.getDateFromRank(ts.getRank())); 
+        }
+        
+        ICalendarUtils.setCompleted(completeDate, task);
     }
     
     // Remove VALUE=DATE-TIME because it is redundant and some clients
@@ -860,6 +871,28 @@ public class EntityConverter {
             if (reminderTime != null)
                 note.setReminderTime(reminderTime);
         }
+        
+        // look at COMPLETED
+        Completed completed = task.getDateCompleted();
+        TriageStatus ts = note.getTriageStatus();
+        
+        // Initialize TriageStatus if necessary
+        if(completed!=null) {
+            if (ts == null) {
+                ts = TriageStatusUtil.initialize(entityFactory
+                        .createTriageStatus());
+                note.setTriageStatus(ts);
+            }
+            
+            // TriageStatus.code will be DONE
+            note.getTriageStatus().setCode(TriageStatus.CODE_DONE);
+            // TriageStatus.rank will be the COMPLETED date
+            // in order to preserve it
+            note.getTriageStatus().setRank(
+                    TriageStatusUtil.getRank(completed.getDate().getTime()));
+        }
+        
+        // TODO: handle DUE
     }
     
     private void setCalendarAttributes(NoteItem note, VJournal journal) {

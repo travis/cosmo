@@ -42,11 +42,10 @@
 
 <title><fmt:message key="App.Welcome"/></title>
 <style type="text/css">
-    @import "${baseUrl}/js/dijit/themes/dijit.css";
-    @import "${baseUrl}/js/dijit/themes/tundra/tundra.css";
     @import "${baseUrl}/js/dojo/resources/dojo.css";
+    @import "${baseUrl}/js/cosmo/themes/default/pim.css";
 </style>
-<cosmo:stylesheets stylesheets="pim"/>
+<cosmo:stylesheets stylesheets=""/>
 <!--[if IE]>
 <style type="text/css">
   html, body { overflow: hidden; }
@@ -74,13 +73,13 @@ dojo.require('cosmo.account.settings');
 cosmo.app.initObj = cosmo.app.pim;
 cosmo.app.initParams = {};
 
-var collectionUrlIndex = location.pathname.indexOf("collection");
-if (collectionUrlIndex >= 0){
-	cosmo.app.initParams.collectionUrl = 
-		location.pathname.substring(collectionUrlIndex) + location.search
-	cosmo.app.initParams.collectionUid = 
-		location.pathname.substring(collectionUrlIndex + 11);
+var atomCollectionLink = dojo.query("link[rel=alternate][type='application/atom+xml']")[0];
+if (atomCollectionLink) {
+   var url = atomCollectionLink.getAttribute('href');
+   cosmo.app.initParams.collectionUrl = url;
+   cosmo.app.initParams.collectionUid = url.match(/collection\/(.*)/)[1].split("?")[0];
 }
+
 var params = (location.search)? dojo.queryToObject(location.search.substring(1)) : {};
 
 if (params.ticket) 

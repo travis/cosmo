@@ -63,8 +63,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     getUrls: function (xml){
+        var node = xml.documentElement? xml.documentElement : xml;
         var urls = {};
-        cosmo.atompub.query("atom:link", xml.documentElement).forEach(
+        cosmo.atompub.query("atom:link", node).forEach(
             dojo.hitch(this, function(linkEl){
                 var rel = linkEl.getAttribute("rel");
                 urls[this.urlNameHash[rel] || rel] =
@@ -72,7 +73,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 }
             )
         );
-        //Set up some aliases to urls
         return urls;
     },
 

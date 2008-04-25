@@ -74,18 +74,18 @@ public class CollectionBookmarkController extends AbstractController {
         model.put("collection", collection);
         
         CosmoSecurityContext csc = securityManager.getSecurityContext();
+        Map<String, String> relationLinks = serviceLocatorFactory
+        .createServiceLocator(request, false)
+        .getCollectionUrls(collection);
+        model.put("relationLinks", relationLinks);
         
         // First try to find a ticket principal
         if (csc.getTicket() != null) {
-            Map<String, String> relationLinks = serviceLocatorFactory
-                    .createServiceLocator(request, csc.getTicket(), false)
-                    .getCollectionUrls(collection);
-            model.put("relationLinks", relationLinks);
             model.put("ticketKey", csc.getTicket().getKey());
             return new ModelAndView(pimView, model);
         } else {
             // If we can't find a ticket principal, use the current user.
-            User authUser = securityManager.getSecurityContext().getUser();
+            User authUser = csc.getUser();
             if (authUser != null) {
                 return new ModelAndView(pimView, model);
             }

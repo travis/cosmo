@@ -240,7 +240,7 @@ cosmo.app.pim = dojo.mixin(new function () {
             var getRGB = function (h, s, v) {
                 var rgb = dojox.color.fromHsv(h, s, v).toRgb();
                 return 'rgb(' + rgb.join() + ')';
-            }
+            };
             var lozengeColors = {};
             var o = {
                 darkSel: [100, 80],
@@ -261,7 +261,6 @@ cosmo.app.pim = dojo.mixin(new function () {
         if (params.ticketKey) {
             collectionsLoadedDeferred = this.serv.getCollection(params.collectionUrl);
             collectionsLoadedDeferred.addCallback(function (collection) {
-                selectUid = collection.getUid();
                 collections.push(collection);
             });
 

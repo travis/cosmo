@@ -17,6 +17,7 @@
 dojo.provide("cosmo.ui.widget.SharingDialog");
 dojo.require("dijit._Templated");
 dojo.require("dijit.form.Button");
+dojo.require("dijit.InlineEditBox");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.uuid");
 dojo.require("cosmo.data.TicketStore");
@@ -33,18 +34,23 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     store: null,
     collection: null,
     ticketStore: null,
+    hideInvite: true,
+    hideDestroy: true,
 
     // collection or subscription object
     displayName: "",
     urls: null,
 
     // attach points
+    displayName: null,
     instructionsContainer: null,
     instructionsSelector: null,
     ticketContainer: null,
     inviteSection: null,
     readOnlyInviteLink: null,
     readWriteInviteLink: null,
+    inviteButton: null,
+    destroyButton: null,
 
     readOnlyTicket: null,
     readWriteTicket: null,
@@ -165,6 +171,29 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
         return d;
     },
 
+    changeDisplayName: function(value){
+        //TODO: Once we have a Writeable collection store, move to that
+        this.store.setValue(this.collection, value);
+        var d = this.store.save();
+        d.addCallback(dojo.hitch(this, function(){this.onDisplayNameChange(value);}));
+    },
+
+    deleteCollection: function(){
+        this.store.deleteItem(this.collection);
+        var d = this.store.save();
+        d.addCallback(dojo.hitch(this, function(){this.onDeleteCollection();}));
+        d.addCallback(dojo.hitch(this, function(){this.onDestroy();}));
+    },
+
+    // Extension points
+    onDisplayNameChange: function(value){
+
+    },
+
+    onDeleteCollection: function(){
+
+    },
+
     // lifecycle methods
     postMixInProperties: function(){
         var store = this.store;
@@ -172,17 +201,23 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             var collection = this.collection;
             this.displayName = store.getValue(collection, "displayName");
             this.urls = store.getValue(collection, "urls");
-            if ((!this.ticketStore) && this.urls.ticket){
-                this.ticketStore =
-                    new cosmo.data.TicketStore({iri: this.urls.ticket, xhrArgs: this.xhrArgs});
+            if (!this.noInvite){
+                if ((!this.ticketStore) && this.urls.ticket){
+                    this.ticketStore =
+                        new cosmo.data.TicketStore({iri: this.urls.ticket, xhrArgs: this.xhrArgs});
+                }
+                dojo.addOnLoad(dojo.hitch(this, function(){
+                    this.tickets = this.ticketStore.fetch({
+                        onItem: dojo.hitch(this, "onTicket"),
+                        onError: function(e){console.debug(e);}
+                    });
+                }));
             }
-            dojo.addOnLoad(dojo.hitch(this, function(){
-                this.tickets = this.ticketStore.fetch({
-                    onItem: dojo.hitch(this, "onTicket"),
-                    onError: function(e){console.debug(e);}
-                });
-            }));
         }
+    },
+
+    postCreate: function(){
+        if (this.noInvite) this.inviteButton.destroy();
     }
 });
 

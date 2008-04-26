@@ -34,7 +34,7 @@ dojo.require('cosmo.view.cal.canvas');
 dojo.require('cosmo.view.list.canvas');
 
 // -- Widget includes, may not always find proper namespaced refs
-// -- ie, cosmo:CollectionSelector
+dojo.require("cosmo.data.CollectionStore");
 dojo.require("cosmo.ui.widget.CollectionSubscriber");
 // --
 dojo.require("cosmo.ui.minical");
@@ -372,8 +372,10 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
         var widget = new cosmo.ui.widget.CollectionSubscriber(
-            cosmo.app.pim.getSelectedCollection(),
-            cosmo.app.pim.ticketKey);
+            {collection: cosmo.app.pim.getSelectedCollection(),
+             ticketKey: cosmo.app.pim.ticketKey,
+             store: new cosmo.data.CollectionStore(cosmo.app.pim.serv)
+            });
         selectorDiv.appendChild(widget.domNode);
         cB.widget = widget;
     }

@@ -46,14 +46,8 @@ dojo.declare(
         //references to various DOM nodes
         displayNameText: null,
 
-        constructor: function(collection, ticketKey){
-            this.setCollection(collection);
-            this.ticketKey = ticketKey;
-        },
-
-        setCollection: function(collection){
-            this.collection = collection;
-            this.displayName = collection.getDisplayName();
+        postMixInProperties: function(){
+            this.displayName = this.store.getValue(this.collection, "displayName");
         },
 
         // Grab subscription information from server, make sure displayName is not a duplicate
@@ -209,9 +203,11 @@ dojo.declare(
 
         postCreate: function(){
             var sharingD = new cosmo.ui.widget.SharingDialog({
-                store: this.store
+                store: this.store,
+                collection: this.collection,
+                noInvite: true
             }, this.sharingDialog);
-            sharingD.inviteButton.destroy();
+            sharingD.displayName.destroy();
             sharingD.destroyButton.destroy();
         }
 } );

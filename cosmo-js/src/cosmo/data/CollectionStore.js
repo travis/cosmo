@@ -54,5 +54,46 @@ dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
             var ignoreCase = !!keywordArgs.queryOptions.ignoreCase;
         collections = this.filterByQuery(collections, keywordArgs.query, ignoreCase);
         this.handleFetch(collections, keywordArgs);
+    },
+
+    _newItems: {},
+
+    newItem: function(properties){
+        var c = new cosmo.model.Collection();
+        this._newItems[c.getUid()] = c;
+        return c;
+    },
+
+    _modifiedItems: {},
+
+    setValue: function(item, attribute, value){
+        item['set' + this._capitalize(attribute)](value);
+        this._modifiedItems[item.getUid()] = item;
+        return true;
+    },
+
+    _deletedItems: {},
+
+    deleteItem: function(item){
+        this._deletedItems[item.getUid()] = item;
+        return true;
+    },
+
+    save: function(keywordArgs){
+        var deferreds = [];
+        for (var nid in this._newItems){
+            deferred.push(this._serv.createCollection(this._newItems[nid]));
+        }
+        for (var mid in this._modifiedItems){
+            deferred.push(this._serv.saveCollection(this._modifiedItems[mid]));
+        }
+        for (var did in this._deletedItems){
+            deferred.push(this._serv.deleteCollection(this._deletedItems[did]));
+        }
+        var dl = new dojo.DeferredList(deferreds);
+        var scope = keywordArgs.scope || dojo.global;
+        if (keywordArgs.onComplete) dl.addCallback(dojo.hitch(scope, keywordArgs.onComplete));
+        if (keywordArgs.onError) dl.addErrback(dojo.hitch(scope, keywordArgs.onError));
+        return dl;
     }
-})
+});

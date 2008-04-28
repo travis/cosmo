@@ -30,6 +30,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
 import org.osaf.cosmo.dao.UserDao;
@@ -38,6 +39,7 @@ import org.osaf.cosmo.model.DuplicateUsernameException;
 import org.osaf.cosmo.model.PasswordRecovery;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.hibernate.BaseModelObject;
+import org.osaf.cosmo.model.hibernate.HibUser;
 import org.osaf.cosmo.util.ArrayPagedList;
 import org.osaf.cosmo.util.PageCriteria;
 import org.osaf.cosmo.util.PagedList;
@@ -284,12 +286,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     }
 
     private User findUserByUsername(String username) {
-        Session session = getSession();
-        Query hibQuery = session.getNamedQuery("user.byUsername").setParameter(
-                "username", username);
-        hibQuery.setCacheable(true);
-        hibQuery.setFlushMode(FlushMode.MANUAL);
-        return (User) hibQuery.uniqueResult();
+        // take advantage of optimized caching with naturalId
+        return (User) getSession().createCriteria(HibUser.class).add(
+                Restrictions.naturalId().set("username", username))
+                .setCacheable(true).setFlushMode(FlushMode.MANUAL)
+                .uniqueResult();
     }
     
     private User findUserByUsernameIgnoreCase(String username) {

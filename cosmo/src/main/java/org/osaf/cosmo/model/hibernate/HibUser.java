@@ -30,6 +30,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.Email;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
@@ -83,9 +84,10 @@ public class HibUser extends HibAuditableObject implements User {
     @Index(name="idx_useruid")
     private String uid;
     
-    @Column(name = "username", nullable=false, unique=true)
+    @Column(name = "username", nullable=false)
     @Index(name="idx_username")
     @NotNull
+    @NaturalId
     @Length(min=USERNAME_LEN_MIN, max=USERNAME_LEN_MAX)
     //per bug 11599:
     // Usernames must be between 3 and 32 characters; may contain any Unicode

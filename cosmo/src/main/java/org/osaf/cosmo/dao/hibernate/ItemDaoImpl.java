@@ -31,6 +31,7 @@ import org.hibernate.ObjectDeletedException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.UnresolvableObjectException;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
@@ -126,14 +127,15 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         try {
             // prevent auto flushing when looking up item by uid
             getSession().setFlushMode(FlushMode.MANUAL);
-            Query hibQuery = getSession().getNamedQuery("item.by.uid")
-                    .setParameter("uid", uid);
-            hibQuery.setCacheable(true);
-            hibQuery.setFlushMode(FlushMode.MANUAL);
-            Item item = (Item) hibQuery.uniqueResult();
             
+            // take advantage of optimized caching with naturalId
+            Item item = (Item) getSession().createCriteria(HibItem.class).add(
+                    Restrictions.naturalId().set("uid", uid))
+                    .setCacheable(true).setFlushMode(FlushMode.MANUAL)
+                    .uniqueResult();
+
             // Prevent proxied object from being returned
-            if(item instanceof HibernateProxy)
+            if (item instanceof HibernateProxy)
                 item = (Item) ((HibernateProxy) item).getHibernateLazyInitializer().getImplementation();
         
             return item;

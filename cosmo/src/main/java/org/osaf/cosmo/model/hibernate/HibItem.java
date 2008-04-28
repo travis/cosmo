@@ -45,6 +45,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.MapKey;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
@@ -78,10 +79,11 @@ import org.osaf.cosmo.model.User;
 public abstract class HibItem extends HibAuditableObject implements Item {
 
    
-    @Column(name = "uid", nullable = false, unique=true, length=255)
+    @Column(name = "uid", nullable = false, length=255)
     @NotNull
     @Length(min=1, max=255)
     @Index(name="idx_itemuid")
+    @NaturalId
     private String uid;
     
     @Column(name = "itemname", nullable = false, length=255)

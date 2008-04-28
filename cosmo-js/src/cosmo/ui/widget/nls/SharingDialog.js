@@ -54,5 +54,7 @@
 
      download: "Download",
 
+     deleteCollection: "Delete",
+
      dismiss: "Done"
 })

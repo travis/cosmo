@@ -1,5 +1,5 @@
 <div class="cosmoSharingDialog">
-  <span id="${id}DisplayName">${displayName}</span>
+  <span id="${id}DisplayName" dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" dojoAttachPoint="displayName">${displayName}</span>
   <h2 class="cosmoSharingSectionHead">${l10n.subscribeHead}</h2>
   <div><span  class="sharingHtmlLinkIcon"></span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
   <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span></a>
@@ -10,7 +10,7 @@
 
   <a href="${urls.dav.uri}" dojoAttachEvent="onclick: davOnClick"><span class="cosmoSubscribeButton cosmoDavSubscribeButton" title="${l10n.davSubscribeTitle}">${l10n.dav}</span></a>
 
-  <div dojoType="dijit.form.Button" id="${id}Invite" dojoAttachEvent="onClick: invite" class="cosmoInviteButton">
+  <div dojoType="dijit.form.Button" id="${id}Invite" dojoAttachEvent="onClick: invite" class="cosmoInviteButton" dojoAttachPoint="inviteButton">
     ${l10n.invite}
   </div>
 
@@ -25,5 +25,10 @@
       ${l10n.download}
     </div>
   </a>
-  <span id="${id}Dismiss" dojoAttachEvent="onClick: destroy" dojoType="dijit.form.Button" class="cosmoSharingDoneButton">${l10n.dismiss}</span>
+
+  <span id="${id}Delete" dojoAttachEvent="onClick: deleteCollection" dojoType="dijit.form.Button" 
+        class="cosmoSharingDeleteButton" dojoAttachPoint="deleteButton">${l10n.deleteCollection}</span>
+
+  <span id="${id}Dismiss" dojoAttachEvent="onClick: destroy" dojoType="dijit.form.Button" 
+        class="cosmoSharingDoneButton" dojoAttachPoint="destroyButton">${l10n.dismiss}</span>
 </div>

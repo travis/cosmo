@@ -133,36 +133,6 @@ cosmo.ui.menu.urls = {
 // make it easy to rearrange order, or leave items out
 // based on display mode, user permissions, and user prefs
 cosmo.ui.menu.allItems = [
-    { id: 'subscribeWithMenuItem',
-      createFunc: function(){
-        var s = _createElem('span');
-        s.id = 'subscribeSelector';
-        var form = _createElem('form');
-        s.appendChild(form);
-        var clientOpts = cosmo.ui.widget.CollectionDetailsDialog.getClientOptions();
-        clientOpts.unshift({ text: _('Main.SubscribeWith'), value: '' });
-        var selOpts = { name: 'subscriptionSelect', id: 'subscriptionSelect',
-           options: clientOpts, className: 'selectElem' };
-        var subscrSel = cosmo.util.html.createSelect(selOpts);
-        var f = function (e) {
-            // Show the subcription dialog if the empty "Subscribe with ..."
-            // option is not the one selected
-            var sel = e.target;
-            if (sel.selectedIndex != 0) {
-            cosmo.app.showDialog(
-                cosmo.ui.widget.CollectionDetailsDialog.getInitProperties(
-                    cosmo.app.pim.getSelectedCollection(),
-                    sel.options[sel.selectedIndex].value));
-            }
-        };
-        dojo.connect(subscrSel, 'onchange', f);
-        form.appendChild(subscrSel)
-        return s;
-      },
-      displayMode: cosmo.ui.menu.displayModes.ANON,
-      requiredRoles: [],
-      dividerText: "\u00A0\u00A0"
-    },
     { id: 'welcomeMenuItem',
         displayText: _('Main.Welcome', [cosmo.app.currentUsername]),
         displayMode: cosmo.ui.menu.displayModes.AUTH,

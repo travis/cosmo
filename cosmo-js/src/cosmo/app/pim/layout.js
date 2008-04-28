@@ -35,7 +35,7 @@ dojo.require('cosmo.view.list.canvas');
 
 // -- Widget includes, may not always find proper namespaced refs
 // -- ie, cosmo:CollectionSelector
-dojo.require("cosmo.ui.widget.CollectionSelector");
+dojo.require("cosmo.ui.widget.CollectionSubscriber");
 // --
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.menu");
@@ -371,7 +371,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
         var cB = new cosmo.ui.ContentBox({ domNode: selectorDiv, id: selectorDiv.id });
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;
-        var widget = new cosmo.ui.widget.CollectionSelector(
+        var widget = new cosmo.ui.widget.CollectionSubscriber(
             cosmo.app.pim.getSelectedCollection(),
             cosmo.app.pim.ticketKey);
         selectorDiv.appendChild(widget.domNode);

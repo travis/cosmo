@@ -1,12 +1,13 @@
 /* Three column login/activate details */ 
 
 #logoHeader {
-    width: 216px;
-    height: 45px;
-    background-image: url(images/image_grid.png);
-    left: 6px;
-    background-position: 0px 0px;
-    margin-bottom: 8px;
+    z-index: 5;
+    height: 75px;
+    background: url(images/big_logo.png) center no-repeat;
+    position:relative;
+    top: 22px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #promo {
@@ -15,7 +16,7 @@
     padding-top: 15px;
 }
 
-#promo a {
+#promo a, #center a {
     white-space: nowrap;
 }
 
@@ -68,7 +69,7 @@ p.biggest {
 }
 #center {
     width: 100%;
-    padding-top: 27px;
+    padding-top: 45px;
     border-left-style: solid;
     border-right-style: solid;
     border-width: 1px;
@@ -94,7 +95,7 @@ p.biggest {
 /* CSS for widget gallery */
 
 #gallery {
-    margin-top: 20px;
+    margin-top: 50px;
     text-align: center;
 }
 
@@ -151,4 +152,8 @@ span.galleryBox p {
 
 .tallLine {
     line-height:1.6em;
+}
+
+.ie6spacer { /* IE6 won't expand for floating contents, empty div fix */
+    clear: both;
 }

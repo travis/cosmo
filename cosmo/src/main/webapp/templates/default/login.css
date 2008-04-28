@@ -27,8 +27,10 @@
 #loginDialog{
     text-align: left;
     margin: auto;
-    width: 364px;
-    padding-top: 16px;
+    padding-top: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+
 }
 #loginDialogInputsBox td {
     padding-bottom: 4px;
@@ -42,11 +44,27 @@
     text-align: center;
     padding-bottom: 12px;
 }
-#loginDialogFormContainer {
+
+#loginDialogFormContainer { /* IE6 doesn't support max-width */
+    width: 300px;
     margin: auto;
     padding: 12px;
     border: 1px solid #CCCCCC;
-    width: 340px;
+    background: #FF6600;
+}
+
+#loginDialog > #loginDialogFormContainer {
+    width: inherit;
+    min-width: 210px;
+    max-width: 300px;
+}
+
+#loginDialogFormContainer .labelTextHoriz {
+    color: white;
+}
+
+#loginDialogLoginPrompt {
+    display: none;
 }
 
 #loginDialogInputsBox{

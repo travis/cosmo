@@ -198,7 +198,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testFilterByParent() throws Exception {
-        CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
+        CollectionItem calendar1 = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID_1);
         ItemFilter filter = new NoteItemFilter();
         filter.setParent(calendar1);
         
@@ -207,7 +207,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testFilterByNoStamp() throws Exception {
-        CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
+        CollectionItem calendar1 = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID_1);
         ItemFilter filter = new NoteItemFilter();
         filter.setParent(calendar1);
         StampFilter missingStamp = new StampFilter();
@@ -221,8 +221,8 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testFilterByEventStamp() throws Exception {
-        CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
-        CollectionItem calendar2 = contentDao.findCollectionByUid(CALENDAR_UID_2);
+        CollectionItem calendar1 = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID_1);
+        CollectionItem calendar2 = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID_2);
         ItemFilter filter = new NoteItemFilter();
         EventStampFilter eventFilter = new EventStampFilter();
         filter.getStampFilters().add(eventFilter);
@@ -324,7 +324,7 @@ public class HibernateItemDaoFilterTest extends AbstractHibernateDaoTestCase {
     }
     
     public void testMultipleFilters() throws Exception {
-        CollectionItem calendar1 = contentDao.findCollectionByUid(CALENDAR_UID_1);
+        CollectionItem calendar1 = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID_1);
  
         NoteItemFilter filter1 = new NoteItemFilter();
         EventStampFilter eventFilter = new EventStampFilter();

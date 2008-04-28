@@ -100,7 +100,7 @@ public class HibernateContentDaoConcurrencyTest extends AbstractHibernateDaoTest
         txThread2.addRunnable("1", new TxRunnable() {
             public Object run() {
                 
-                ContentItem item = contentDao.findContentByUid("test");
+                ContentItem item = (ContentItem) contentDao.findItemByUid("test");
                 return item;
             }
         });
@@ -109,7 +109,7 @@ public class HibernateContentDaoConcurrencyTest extends AbstractHibernateDaoTest
         txThread3.addRunnable("1", new TxRunnable() {
             public Object run() {
                 
-                ContentItem item = contentDao.findContentByUid("test");
+                ContentItem item = (ContentItem) contentDao.findItemByUid("test");
                 return item;
             }
         });
@@ -195,7 +195,7 @@ public class HibernateContentDaoConcurrencyTest extends AbstractHibernateDaoTest
         txThread2.addRunnable("1", new TxRunnable() {
             public Object run() {
                 
-                ContentItem item = contentDao.findContentByUid("test");
+                ContentItem item = (ContentItem) contentDao.findItemByUid("test");
                 return item;
             }
         });
@@ -204,7 +204,7 @@ public class HibernateContentDaoConcurrencyTest extends AbstractHibernateDaoTest
         txThread3.addRunnable("1", new TxRunnable() {
             public Object run() {
                 
-                ContentItem item = contentDao.findContentByUid("test");
+                ContentItem item = (ContentItem) contentDao.findItemByUid("test");
                 return item;
             }
         });

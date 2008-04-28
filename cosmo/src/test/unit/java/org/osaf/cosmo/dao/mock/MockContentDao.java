@@ -94,29 +94,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
     }
 
     /**
-     * Find collection by hierachical path. Path must be in the form:
-     * /username/parent1/parent2/collectionname
-     *
-     * @param path
-     *            path of collection
-     * @return collection represented by path
-     */
-    public CollectionItem findCollectionByPath(String path) {
-        return (CollectionItem) findItemByPath(path);
-    }
-
-    /**
-     * Find collection by uid.
-     *
-     * @param uid
-     *            uid of collection
-     * @return collection represented by uid
-     */
-    public CollectionItem findCollectionByUid(String uid) {
-        return (CollectionItem) findItemByUid(uid);
-    }
-
-    /**
      * Find all children for collection. Children can consist of ContentItem and
      * CollectionItem objects.
      *
@@ -218,28 +195,6 @@ public class MockContentDao extends MockItemDao implements ContentDao {
         getStorage().updateItem(item);
     }
 
-    /**
-     * Find content item by path. Path is of the format:
-     * /username/parent1/parent2/itemname.
-     *
-     * @param path
-     *            path of content to find
-     * @return content item represented by hierachical path
-     */
-    public ContentItem findContentByPath(String path) {
-        return (ContentItem) findItemByPath(path);
-    }
-
-    /**
-     * Find content item by uid.
-     *
-     * @param uid
-     *            uid of content to find
-     * @return content item represented by uid
-     */
-    public ContentItem findContentByUid(String uid) {
-        return (ContentItem) findItemByUid(uid);
-    }
 
     /**
      * Remove content item

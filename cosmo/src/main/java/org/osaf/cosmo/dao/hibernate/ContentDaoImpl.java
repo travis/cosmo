@@ -221,76 +221,10 @@ public class ContentDaoImpl extends ItemDaoImpl implements ContentDao {
         }
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dao.ContentDao#findCollectionByUid(java.lang.String)
+
+    /* (non-Javadoc)
+     * @see org.osaf.cosmo.dao.ContentDao#updateCollectionTimestamp(org.osaf.cosmo.model.CollectionItem)
      */
-    public CollectionItem findCollectionByUid(String uid) {
-        try {
-            Query hibQuery = getSession()
-                    .getNamedQuery("collectionItem.by.uid").setParameter("uid",uid);
-            hibQuery.setFlushMode(FlushMode.MANUAL);
-            return (CollectionItem) hibQuery.uniqueResult();
-        } catch (HibernateException e) {
-            getSession().clear();
-            throw convertHibernateAccessException(e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dao.ContentDao#findCollectionByPath(java.lang.String)
-     */
-    public CollectionItem findCollectionByPath(String path) {
-        try {
-            Item item = getItemPathTranslator().findItemByPath(path);
-            if (item == null || !(item instanceof CollectionItem) )
-                return null;
-
-            return (CollectionItem) item;
-        } catch (HibernateException e) {
-            getSession().clear();
-            throw convertHibernateAccessException(e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dao.ContentDao#findContentByPath(java.lang.String)
-     */
-    public ContentItem findContentByPath(String path) {
-        try {
-            Item item = getItemPathTranslator().findItemByPath(path);
-            if (item == null || !(item instanceof ContentItem) )
-                return null;
-
-            return (ContentItem) item;
-        } catch (HibernateException e) {
-            getSession().clear();
-            throw convertHibernateAccessException(e);
-        } 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.osaf.cosmo.dao.ContentDao#findContentByUid(java.lang.String)
-     */
-    public ContentItem findContentByUid(String uid) {
-        try {
-            Query hibQuery = getSession().getNamedQuery("contentItem.by.uid")
-                    .setParameter("uid", uid);
-            hibQuery.setFlushMode(FlushMode.MANUAL);
-            return (ContentItem) hibQuery.uniqueResult();
-        } catch (HibernateException e) {
-            getSession().clear();
-            throw convertHibernateAccessException(e);
-        }
-    }
-
     public CollectionItem updateCollectionTimestamp(CollectionItem collection) {
         try {
             if(!getSession().contains(collection))

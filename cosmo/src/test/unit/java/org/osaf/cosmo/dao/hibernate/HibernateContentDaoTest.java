@@ -112,7 +112,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
     }
@@ -235,7 +235,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         Attribute attr = queryItem.getAttribute(new HibQName("decimalattribute"));
         Assert.assertNotNull(attr);
@@ -269,7 +269,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         querySet = (Set) queryItem.getAttributeValue("multistringattribute");
         queryDictionary = (Map) queryItem
                 .getAttributeValue("dictionaryattribute");
@@ -296,7 +296,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         Attribute attr = queryItem.getAttribute(new HibQName("calendarattribute"));
         Assert.assertNotNull(attr);
@@ -312,7 +312,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Attribute queryAttr = queryItem.getAttribute(new HibQName("calendarattribute"));
         Assert.assertNotNull(queryAttr);
         Assert.assertTrue(queryAttr instanceof CalendarAttribute);
@@ -336,7 +336,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         Attribute attr = queryItem.getAttribute(new HibQName("timestampattribute"));
         Assert.assertNotNull(attr);
@@ -352,7 +352,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Attribute queryAttr = queryItem.getAttribute(new HibQName("timestampattribute"));
         Assert.assertNotNull(queryAttr);
         Assert.assertTrue(queryAttr instanceof TimestampAttribute);
@@ -382,7 +382,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         Attribute attr = queryItem.getAttribute(new HibQName("xmlattribute"));
         Assert.assertNotNull(attr);
@@ -401,7 +401,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
         
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         attr = queryItem.getAttribute(new HibQName("xmlattribute"));
         
@@ -418,7 +418,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
         
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         attr = queryItem.getAttribute(new HibQName("xmlattribute"));
         Assert.assertNotNull(attr);
@@ -446,7 +446,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         Attribute attr = queryItem.getAttribute(new HibQName("icalattribute"));
         Assert.assertNotNull(attr);
@@ -465,7 +465,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         clearSession();
         
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         
         ICalendarAttribute ica = (ICalendarAttribute) queryItem.getAttribute(new HibQName("icalattribute"));
         Assert.assertFalse(expected.toString().equals(ica.getValue().toString()));
@@ -504,7 +504,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         ContentItem item = generateTestContent();
         
-        a = contentDao.findCollectionByUid(a.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
         item = contentDao.createContent(a, item);
 
         clearSession();
@@ -531,7 +531,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         clearSession();
 
-        HibFileItem queryItem = (HibFileItem) contentDao.findContentByUid(newItem.getUid());
+        HibFileItem queryItem = (HibFileItem) contentDao.findItemByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
         Assert.assertEquals(0, queryItem.getVersion().intValue());
@@ -549,7 +549,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         clearSession();
         Thread.sleep(200);
-        HibContentItem queryItem2 = (HibContentItem) contentDao.findContentByUid(newItem.getUid());
+        HibContentItem queryItem2 = (HibContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertTrue(queryItem2.getVersion().intValue() > 0);
         
         helper.verifyItem(queryItem, queryItem2);
@@ -568,14 +568,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         helper.verifyItem(newItem, queryItem);
 
         contentDao.removeContent(queryItem);
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(queryItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(queryItem.getUid());
         Assert.assertNull(queryItem);
         
         clearSession();
@@ -620,14 +620,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         helper.verifyItem(newItem, queryItem);
 
         contentDao.removeItemByPath("/testuser/test");
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(queryItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(queryItem.getUid());
         Assert.assertNull(queryItem);
     }
 
@@ -641,14 +641,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         helper.verifyItem(newItem, queryItem);
 
         contentDao.removeItemByUid(queryItem.getUid());
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(queryItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(queryItem.getUid());
         Assert.assertNull(queryItem);
     }
     
@@ -662,7 +662,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         helper.verifyItem(newItem, queryItem);
         
         Assert.assertTrue(((HibItem)queryItem).getVersion().equals(0));
@@ -671,7 +671,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertNull(queryItem);
         
         root = (CollectionItem) contentDao.getRootItem(user);
@@ -689,7 +689,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
         
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         
         Assert.assertNotNull(queryItem);
         
@@ -713,7 +713,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        CollectionItem queryItem = contentDao.findCollectionByUid(a.getUid());
+        CollectionItem queryItem = (CollectionItem) contentDao.findItemByUid(a.getUid());
         Assert.assertEquals(new Long(1), queryItem.getHue());
         helper.verifyItem(a, queryItem);
     }
@@ -733,7 +733,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         Assert.assertTrue(getHibItem(a).getId() > -1);
         Assert.assertNotNull(a.getUid());
 
-        CollectionItem queryItem = contentDao.findCollectionByUid(a.getUid());
+        CollectionItem queryItem = (CollectionItem) contentDao.findItemByUid(a.getUid());
         helper.verifyItem(a, queryItem);
 
         queryItem.setName("b");
@@ -741,7 +741,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        queryItem = contentDao.findCollectionByUid(a.getUid());
+        queryItem = (CollectionItem) contentDao.findItemByUid(a.getUid());
         Assert.assertEquals("b", queryItem.getName());
     }
     
@@ -777,14 +777,14 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        CollectionItem queryItem = contentDao.findCollectionByUid(a.getUid());
+        CollectionItem queryItem = (CollectionItem) contentDao.findItemByUid(a.getUid());
         Assert.assertNotNull(queryItem);
 
         contentDao.removeCollection(queryItem);
 
         clearSession();
 
-        queryItem = contentDao.findCollectionByUid(a.getUid());
+        queryItem = (CollectionItem) contentDao.findItemByUid(a.getUid());
         Assert.assertNull(queryItem);
     }
 
@@ -815,10 +815,10 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        a = contentDao.findCollectionByUid(a.getUid());
-        b = contentDao.findCollectionByUid(b.getUid());
-        c = contentDao.findContentByUid(c.getUid());
-        d = contentDao.findContentByUid(d.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
+        c = (ContentItem) contentDao.findItemByUid(c.getUid());
+        d = (ContentItem) contentDao.findItemByUid(d.getUid());
         root = contentDao.getRootItem(testuser2);
 
         Assert.assertNotNull(a);
@@ -837,7 +837,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         verifyContains(children, a);
 
         // test get by path
-        ContentItem queryC = contentDao.findContentByPath("/testuser2/a/b/c");
+        ContentItem queryC = (ContentItem) contentDao.findItemByPath("/testuser2/a/b/c");
         Assert.assertNotNull(queryC);
         helper.verifyInputStream(
                 helper.getInputStream("testdata1.txt"), ((FileItem) queryC)
@@ -855,15 +855,15 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         // test delete
         contentDao.removeContent(c);
-        queryC = contentDao.findContentByUid(c.getUid());
+        queryC = (ContentItem) contentDao.findItemByUid(c.getUid());
         Assert.assertNull(queryC);
 
         contentDao.removeCollection(a);
 
-        CollectionItem queryA = contentDao.findCollectionByUid(a.getUid());
+        CollectionItem queryA = (CollectionItem) contentDao.findItemByUid(a.getUid());
         Assert.assertNull(queryA);
 
-        ContentItem queryD = contentDao.findContentByUid(d.getUid());
+        ContentItem queryD = (ContentItem) contentDao.findItemByUid(d.getUid());
         Assert.assertNull(queryD);
     }
 
@@ -914,8 +914,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         root = (CollectionItem) contentDao.getRootItem(testuser2);
-        e = contentDao.findCollectionByUid(e.getUid());
-        b = contentDao.findCollectionByUid(b.getUid());
+        e = (CollectionItem) contentDao.findItemByUid(e.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
 
         // verify can't move root collection
         try {
@@ -941,21 +941,21 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         // verify that move works
-        b = contentDao.findCollectionByPath("/testuser2/a/b");
+        b = (CollectionItem) contentDao.findItemByPath("/testuser2/a/b");
 
         contentDao.moveItem("/testuser2/a/b", "/testuser2/a/e/b");
 
         clearSession();
 
-        CollectionItem queryCollection = contentDao
-                .findCollectionByPath("/testuser2/a/e/b");
+        CollectionItem queryCollection = (CollectionItem) contentDao
+                .findItemByPath("/testuser2/a/e/b");
         Assert.assertNotNull(queryCollection);
 
         contentDao.moveItem("/testuser2/a/e/b", "/testuser2/a/e/bnew");
 
         clearSession();
-        queryCollection = contentDao
-                .findCollectionByPath("/testuser2/a/e/bnew");
+        queryCollection = (CollectionItem) contentDao
+                .findItemByPath("/testuser2/a/e/bnew");
         Assert.assertNotNull(queryCollection);
 
         Item queryItem = contentDao.findItemByPath("/testuser2/a/e/bnew/c/d");
@@ -999,8 +999,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         root = (CollectionItem) contentDao.getRootItem(testuser2);
-        e = contentDao.findCollectionByUid(e.getUid());
-        b = contentDao.findCollectionByUid(b.getUid());
+        e = (CollectionItem) contentDao.findItemByUid(e.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
 
         // verify can't copy root collection
         try {
@@ -1026,23 +1026,23 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         clearSession();
 
         // verify that copy works
-        b = contentDao.findCollectionByPath("/testuser2/a/b");
+        b = (CollectionItem) contentDao.findItemByPath("/testuser2/a/b");
 
         contentDao.copyItem(b, "/testuser2/a/e/bcopy", true);
 
         clearSession();
 
-        CollectionItem queryCollection = contentDao
-                .findCollectionByPath("/testuser2/a/e/bcopy");
+        CollectionItem queryCollection = (CollectionItem) contentDao
+                .findItemByPath("/testuser2/a/e/bcopy");
         Assert.assertNotNull(queryCollection);
 
-        queryCollection = contentDao
-                .findCollectionByPath("/testuser2/a/e/bcopy/c");
+        queryCollection = (CollectionItem) contentDao
+                .findItemByPath("/testuser2/a/e/bcopy/c");
         Assert.assertNotNull(queryCollection);
 
-        d = contentDao.findContentByUid(d.getUid());
-        ContentItem dcopy = contentDao
-                .findContentByPath("/testuser2/a/e/bcopy/c/d");
+        d = (ContentItem) contentDao.findItemByUid(d.getUid());
+        ContentItem dcopy = (ContentItem) contentDao
+                .findItemByPath("/testuser2/a/e/bcopy/c/d");
         Assert.assertNotNull(dcopy);
         Assert.assertEquals(d.getName(), dcopy.getName());
         Assert.assertNotSame(d.getUid(), dcopy.getUid());
@@ -1050,27 +1050,27 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        b = contentDao.findCollectionByPath("/testuser2/a/b");
+        b = (CollectionItem) contentDao.findItemByPath("/testuser2/a/b");
 
         contentDao.copyItem(b,"/testuser2/a/e/bcopyshallow", false);
 
         clearSession();
 
-        queryCollection = contentDao
-                .findCollectionByPath("/testuser2/a/e/bcopyshallow");
+        queryCollection = (CollectionItem) contentDao
+                .findItemByPath("/testuser2/a/e/bcopyshallow");
         Assert.assertNotNull(queryCollection);
 
-        queryCollection = contentDao
-                .findCollectionByPath("/testuser2/a/e/bcopyshallow/c");
+        queryCollection = (CollectionItem) contentDao
+                .findItemByPath("/testuser2/a/e/bcopyshallow/c");
         Assert.assertNull(queryCollection);
 
         clearSession();
-        d = contentDao.findContentByUid(d.getUid());
+        d = (ContentItem) contentDao.findItemByUid(d.getUid());
         contentDao.copyItem(d,"/testuser2/dcopy", true);
 
         clearSession();
 
-        dcopy = contentDao.findContentByPath("/testuser2/dcopy");
+        dcopy = (ContentItem) contentDao.findItemByPath("/testuser2/dcopy");
         Assert.assertNotNull(dcopy);
     }
 
@@ -1083,7 +1083,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem newItem = contentDao.createContent(root, item);
 
         clearSession();
-        newItem = contentDao.findContentByUid(newItem.getUid());
+        newItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         Ticket ticket1 = new HibTicket();
         ticket1.setKey("ticket1");
@@ -1115,7 +1115,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         clearSession();
         
-        newItem = contentDao.findContentByUid(newItem.getUid());
+        newItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         
         queryTicket1 = contentDao.getTicket(newItem,"ticket1");
         Assert.assertNotNull(queryTicket1);
@@ -1129,7 +1129,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         contentDao.removeTicket(newItem, ticket1);
         clearSession();
         
-        newItem = contentDao.findContentByUid(newItem.getUid());
+        newItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         
         tickets = contentDao.getTickets(newItem);
         Assert.assertEquals(1, tickets.size());
@@ -1145,7 +1145,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         contentDao.removeTicket(newItem, ticket2);
         
         clearSession();
-        newItem = contentDao.findContentByUid(newItem.getUid());
+        newItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         tickets = contentDao.getTickets(newItem);
         Assert.assertEquals(0, tickets.size());
@@ -1168,7 +1168,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
         CollectionItem b = new HibCollectionItem();
@@ -1180,19 +1180,19 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         contentDao.addItemToCollection(queryItem, b);
         
         clearSession();
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 2);
         
-        b = contentDao.findCollectionByUid(b.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
         contentDao.removeItemFromCollection(queryItem, b);
         clearSession();
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
-        a = contentDao.findCollectionByUid(a.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
         contentDao.removeItemFromCollection(queryItem, a);
         clearSession();
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertNull(queryItem);
     }
     
@@ -1213,7 +1213,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
         CollectionItem b = new HibCollectionItem();
@@ -1251,7 +1251,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
         CollectionItem b = new HibCollectionItem();
@@ -1263,24 +1263,24 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         contentDao.addItemToCollection(queryItem, b);
         
         clearSession();
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(queryItem.getParents().size(), 2);
         
-        b = contentDao.findCollectionByUid(b.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
         contentDao.removeCollection(b);
         
         clearSession();
-        b = contentDao.findCollectionByUid(b.getUid());
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertNull(b);
         Assert.assertEquals(queryItem.getParents().size(), 1);
         
-        a = contentDao.findCollectionByUid(a.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
         contentDao.removeCollection(a);
         clearSession();
         
-        a = contentDao.findCollectionByUid(a.getUid());
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertNull(a);
         Assert.assertNull(queryItem);
     }
@@ -1302,7 +1302,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         TriageStatus triageStatus = queryItem.getTriageStatus();
         Assert.assertEquals(initialTriageStatus, triageStatus);
 
@@ -1314,7 +1314,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         contentDao.updateContent(queryItem);
         clearSession();
         
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         triageStatus = queryItem.getTriageStatus();
         Assert.assertEquals(triageStatus.getAutoTriage(), Boolean.FALSE);
         Assert.assertEquals(triageStatus.getCode(),
@@ -1325,7 +1325,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         contentDao.updateContent(queryItem);
         clearSession();
         // should be null triagestatus
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         triageStatus = queryItem.getTriageStatus();
         Assert.assertNull(triageStatus);
     }
@@ -1351,7 +1351,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
     }
@@ -1377,7 +1377,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         helper.verifyItem(newItem, queryItem);
     }
@@ -1400,8 +1400,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
 
         items.clear();
         
-        note1 = (NoteItem) contentDao.findContentByUid("1");
-        note2 = (NoteItem) contentDao.findContentByUid("2");
+        note1 = (NoteItem) contentDao.findItemByUid("1");
+        note2 = (NoteItem) contentDao.findItemByUid("2");
         
         items.add(note1);
         items.add(note2);
@@ -1414,8 +1414,8 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
        
         contentDao.updateCollection(root, items);
         
-        note1 = (NoteItem) contentDao.findContentByUid("1");
-        note2 = (NoteItem) contentDao.findContentByUid("2");
+        note1 = (NoteItem) contentDao.findItemByUid("1");
+        note2 = (NoteItem) contentDao.findItemByUid("2");
         
         Assert.assertNotNull(note1);
         Assert.assertEquals("changed", note1.getDisplayName());
@@ -1454,10 +1454,10 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
        
         contentDao.updateCollection(root, items);
         
-        note1 = (NoteItem) contentDao.findContentByUid("1");
+        note1 = (NoteItem) contentDao.findItemByUid("1");
         Assert.assertNotNull(note1);
         Assert.assertTrue(1==note1.getModifications().size());
-        note2 = (NoteItem) contentDao.findContentByUid("1:20070101");
+        note2 = (NoteItem) contentDao.findItemByUid("1:20070101");
         Assert.assertNotNull(note2);
         Assert.assertNotNull(note2.getModifies());  
         
@@ -1502,7 +1502,7 @@ public class HibernateContentDaoTest extends AbstractHibernateDaoTestCase {
         
         // adding master should add mods too
         clearSession();
-        b = contentDao.findCollectionByUid("b");
+        b = (CollectionItem) contentDao.findItemByUid("b");
         Assert.assertNotNull(b);
         Assert.assertEquals(2, b.getChildren().size());
     }

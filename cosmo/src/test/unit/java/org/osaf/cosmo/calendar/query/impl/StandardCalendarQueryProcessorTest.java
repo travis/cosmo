@@ -144,7 +144,7 @@ public class StandardCalendarQueryProcessorTest extends TestCase {
         
         Period period = new Period(start, end);
         
-        CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
+        CollectionItem calendar = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID);
         
         // verify we get resuts from VEVENTS in collection
         VFreeBusy vfb = queryProcessor.freeBusyQuery(calendar, period);

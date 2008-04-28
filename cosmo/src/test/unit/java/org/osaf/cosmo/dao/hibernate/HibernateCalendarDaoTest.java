@@ -102,7 +102,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
         ContentItem event = generateEvent("test.ics", "cal1.ics",
                 "testuser");
         
-        calendar = contentDao.findCollectionByUid(calendar.getUid());
+        calendar = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
         ContentItem newEvent = contentDao.createContent(calendar, event);
         
         clearSession();
@@ -213,7 +213,7 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
 
         clearSession();
         
-        calendar = contentDao.findCollectionByUid(calendar.getUid());
+        calendar = (CollectionItem) contentDao.findItemByUid(calendar.getUid());
 
         // Should match ics.1
         Set<ICalendarItem> queryEvents = calendarDao.findCalendarItems(calendar,

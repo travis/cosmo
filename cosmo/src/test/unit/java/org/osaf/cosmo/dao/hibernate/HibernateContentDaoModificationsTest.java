@@ -44,8 +44,8 @@ public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTe
         itemB = (NoteItem) contentDao.createContent(root, itemB);
         clearSession();
         
-        itemA = (NoteItem) contentDao.findContentByUid(itemA.getUid());
-        itemB = (NoteItem) contentDao.findContentByUid(itemB.getUid());
+        itemA = (NoteItem) contentDao.findItemByUid(itemA.getUid());
+        itemB = (NoteItem) contentDao.findItemByUid(itemB.getUid());
         
         Assert.assertEquals(1, itemA.getModifications().size());
         Assert.assertTrue(itemA.getModifications().contains(itemB));
@@ -61,9 +61,9 @@ public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTe
         contentDao.createContent(root, itemC);
         
         clearSession();
-        itemA = (NoteItem) contentDao.findContentByUid(itemA.getUid());
-        itemB = (NoteItem) contentDao.findContentByUid(itemB.getUid());
-        itemC = (NoteItem) contentDao.findContentByUid(itemC.getUid());
+        itemA = (NoteItem) contentDao.findItemByUid(itemA.getUid());
+        itemB = (NoteItem) contentDao.findItemByUid(itemB.getUid());
+        itemC = (NoteItem) contentDao.findItemByUid(itemC.getUid());
         
         Assert.assertEquals(1, itemA.getModifications().size());
         Assert.assertTrue(itemA.getModifications().contains(itemC));
@@ -87,15 +87,15 @@ public class HibernateContentDaoModificationsTest extends AbstractHibernateDaoTe
         itemC = (NoteItem) contentDao.createContent(root, itemC);
         clearSession();
         
-        itemA = (NoteItem) contentDao.findContentByUid(itemA.getUid());
+        itemA = (NoteItem) contentDao.findItemByUid(itemA.getUid());
         
         Assert.assertEquals(2, itemA.getModifications().size());
         contentDao.removeContent(itemA);
         clearSession();
         
-        itemA = (NoteItem) contentDao.findContentByUid(itemA.getUid());
-        itemB = (NoteItem) contentDao.findContentByUid(itemB.getUid());
-        itemC = (NoteItem) contentDao.findContentByUid(itemC.getUid());
+        itemA = (NoteItem) contentDao.findItemByUid(itemA.getUid());
+        itemB = (NoteItem) contentDao.findItemByUid(itemB.getUid());
+        itemC = (NoteItem) contentDao.findItemByUid(itemC.getUid());
         
         Assert.assertNull(itemA);
         Assert.assertNull(itemB);

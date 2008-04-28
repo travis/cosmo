@@ -63,7 +63,7 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
         
         clearSession();
 
-        ContentItem queryItem = contentDao.findContentByUid(newItem.getUid());
+        ContentItem queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
 
         queryItem.removeAttribute(new HibQName("customattribute"));
 
@@ -71,7 +71,7 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
 
         clearSession();
 
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(0, queryItem.getAttributes().size());
         Assert.assertEquals(1, queryItem.getTombstones().size());
         
@@ -83,7 +83,7 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
         contentDao.updateContent(queryItem);
         clearSession();
 
-        queryItem = contentDao.findContentByUid(newItem.getUid());
+        queryItem = (ContentItem) contentDao.findItemByUid(newItem.getUid());
         Assert.assertEquals(1, queryItem.getAttributes().size());
         Assert.assertEquals(0, queryItem.getTombstones().size());
     }
@@ -126,32 +126,32 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
        
         clearSession();
         
-        a = (CollectionItem) contentDao.findCollectionByUid(a.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
         
         // should be two because of master/mod
         Assert.assertNotNull(getItemTombstone(a, note1.getUid()));
         Assert.assertNotNull(getItemTombstone(a, note2.getUid()));
         
         // now re-add
-        note1 = (NoteItem) contentDao.findContentByUid(note1.getUid());
+        note1 = (NoteItem) contentDao.findItemByUid(note1.getUid());
         
         contentDao.addItemToCollection(note1, a);
         
         clearSession();
-        a = (CollectionItem) contentDao.findCollectionByUid(a.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
         
         // should none now
         Assert.assertEquals(0, a.getTombstones().size());
         
         
-        note1 = (NoteItem) contentDao.findContentByUid(note1.getUid());
+        note1 = (NoteItem) contentDao.findItemByUid(note1.getUid());
         // remove note from all collections
         contentDao.removeItem(note1);
         
         clearSession();
         
-        a = (CollectionItem) contentDao.findCollectionByUid(a.getUid());
-        b = (CollectionItem) contentDao.findCollectionByUid(b.getUid());
+        a = (CollectionItem) contentDao.findItemByUid(a.getUid());
+        b = (CollectionItem) contentDao.findItemByUid(b.getUid());
         
         // should be two for each collection because of master/mod
         Assert.assertNotNull(getItemTombstone(a, note1.getUid()));
@@ -177,13 +177,13 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
         contentDao.createContent(root, item);
         clearSession();
 
-        item = (NoteItem) contentDao.findContentByUid(item.getUid());
+        item = (NoteItem) contentDao.findItemByUid(item.getUid());
         Assert.assertEquals(0, item.getTombstones().size());
         
         item.removeStamp(item.getStamp(TaskStamp.class));
         
         contentDao.updateContent(item);
-        item = (NoteItem) contentDao.findContentByUid(item.getUid());
+        item = (NoteItem) contentDao.findItemByUid(item.getUid());
         Assert.assertEquals(1, item.getTombstones().size());
         
         Assert.assertTrue(item.getTombstones().contains(new HibStampTombstone(item, "task")));
@@ -196,7 +196,7 @@ public class HibernateContentDaoTombstonesTest extends AbstractHibernateDaoTestC
         
         clearSession();
         
-        item = (NoteItem) contentDao.findContentByUid(item.getUid());
+        item = (NoteItem) contentDao.findItemByUid(item.getUid());
         Assert.assertEquals(0, item.getTombstones().size());
     }
     

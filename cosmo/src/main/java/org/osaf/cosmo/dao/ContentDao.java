@@ -63,24 +63,6 @@ public interface ContentDao extends ItemDao {
      */
     public CollectionItem updateCollection(CollectionItem collection);
 
-    /**
-     * Find collection by hierachical path. Path must be in the form:
-     * /username/parent1/parent2/collectionname
-     * 
-     * @param path
-     *            path of collection
-     * @return collection represented by path
-     */
-    public CollectionItem findCollectionByPath(String path);
-
-    /**
-     * Find collection by uid.
-     * 
-     * @param uid
-     *            uid of collection
-     * @return collection represented by uid
-     */
-    public CollectionItem findCollectionByUid(String uid);
 
     /**
      * Create new content item. A content item represents a piece of content or
@@ -117,25 +99,6 @@ public interface ContentDao extends ItemDao {
     public ContentItem updateContent(ContentItem content);
 
    
-    /**
-     * Find content item by path. Path is of the format:
-     * /username/parent1/parent2/itemname.
-     * 
-     * @param path
-     *            path of content to find
-     * @return content item represented by hierachical path
-     */
-    public ContentItem findContentByPath(String path);
-
-    /**
-     * Find content item by uid.
-     * 
-     * @param uid
-     *            uid of content to find
-     * @return content item represented by uid
-     */
-    public ContentItem findContentByUid(String uid);
-
     /**
      * Remove content item
      * 

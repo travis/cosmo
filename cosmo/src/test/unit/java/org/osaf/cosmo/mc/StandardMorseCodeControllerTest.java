@@ -59,7 +59,6 @@ import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.mock.MockCollectionItem;
 import org.osaf.cosmo.model.mock.MockEntityFactory;
 import org.osaf.cosmo.model.mock.MockTriageStatus;
-import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.security.mock.MockSecurityManager;
 import org.osaf.cosmo.service.impl.StandardContentService;
 import org.osaf.cosmo.service.impl.StandardTriageStatusQueryProcessor;
@@ -146,13 +145,13 @@ public class StandardMorseCodeControllerTest extends TestCase {
         PubCollection pubCol = mcController.publishCollection("col1", null, pubRecords, types);
         SyncToken token = pubCol.getToken();
         
-        CollectionItem col = contentDao.findCollectionByUid("col1");
+        CollectionItem col = (CollectionItem) contentDao.findItemByUid("col1");
         Assert.assertNotNull(col);
         Assert.assertTrue(token.isValid(col));
         Assert.assertFalse(token.hasItemChanged(col));
         Assert.assertEquals(2, col.getChildren().size());
-        Assert.assertNotNull(contentDao.findContentByUid("1"));
-        Assert.assertNotNull(contentDao.findContentByUid("2"));
+        Assert.assertNotNull(contentDao.findItemByUid("1"));
+        Assert.assertNotNull(contentDao.findItemByUid("2"));
         
         Assert.assertEquals(col.getTickets().size(), 2);
     }
@@ -200,11 +199,11 @@ public class StandardMorseCodeControllerTest extends TestCase {
         }
         
         mcController.updateCollection("col1", SyncToken.generate(collection) , pubRecords);
-        CollectionItem col = contentDao.findCollectionByUid("col1");
+        CollectionItem col = (CollectionItem) contentDao.findItemByUid("col1");
         Assert.assertNotNull(col);
         Assert.assertEquals(2, col.getChildren().size());
-        Assert.assertNotNull(contentDao.findContentByUid("1"));
-        Assert.assertNotNull(contentDao.findContentByUid("2"));
+        Assert.assertNotNull(contentDao.findItemByUid("1"));
+        Assert.assertNotNull(contentDao.findItemByUid("2"));
     }
     
     public void testSubscribe() throws Exception {
@@ -399,7 +398,7 @@ public class StandardMorseCodeControllerTest extends TestCase {
         pubRecords = new PubRecords(new SimpleEimRecordSetIterator(recordSets.iterator()), "test",null);
         mcController.publishCollection("col2", null, pubRecords, types);
         
-        CollectionItem col = contentDao.findCollectionByUid("col2");
+        CollectionItem col = (CollectionItem) contentDao.findItemByUid("col2");
         Assert.assertNotNull(col);
         Assert.assertEquals(2, col.getChildren().size());
         NoteItem n = (NoteItem) col.getChild("1");
@@ -485,7 +484,7 @@ public class StandardMorseCodeControllerTest extends TestCase {
         // publish col1
         PubRecords pubRecords = new PubRecords(new SimpleEimRecordSetIterator(recordSets.iterator()), "test",null);
         mcController.publishCollection("col1", null, pubRecords, types);
-        CollectionItem col1 = contentDao.findCollectionByUid("col1");
+        CollectionItem col1 = (CollectionItem) contentDao.findItemByUid("col1");
         
         Ticket rwTicket = getTicket(col1, false);
         Assert.assertNotNull(rwTicket);
@@ -497,7 +496,7 @@ public class StandardMorseCodeControllerTest extends TestCase {
         pubRecords = new PubRecords(new SimpleEimRecordSetIterator(recordSets.iterator()), "test",null);
         mcController.publishCollection("col2", null, pubRecords, types);
         
-        CollectionItem col2 = contentDao.findCollectionByUid("col2");
+        CollectionItem col2 = (CollectionItem) contentDao.findItemByUid("col2");
         Assert.assertNotNull(col2);
         Assert.assertEquals(2, col2.getChildren().size());
         NoteItem n = (NoteItem) col2.getChild("1");
@@ -548,7 +547,7 @@ public class StandardMorseCodeControllerTest extends TestCase {
         // publish col1
         PubRecords pubRecords = new PubRecords(new SimpleEimRecordSetIterator(recordSets.iterator()), "test",null);
         mcController.publishCollection("col1", null, pubRecords, types);
-        CollectionItem col1 = contentDao.findCollectionByUid("col1");
+        CollectionItem col1 = (CollectionItem) contentDao.findItemByUid("col1");
         
         Ticket rwTicket = getTicket(col1, false);
         Assert.assertNotNull(rwTicket);
@@ -560,7 +559,7 @@ public class StandardMorseCodeControllerTest extends TestCase {
         pubRecords = new PubRecords(new SimpleEimRecordSetIterator(recordSets.iterator()), "test",null);
         mcController.publishCollection("col2", null, pubRecords, types);
         
-        CollectionItem col2 = contentDao.findCollectionByUid("col2");
+        CollectionItem col2 = (CollectionItem) contentDao.findItemByUid("col2");
         Assert.assertNotNull(col2);
         Assert.assertEquals(2, col2.getChildren().size());
         NoteItem n = (NoteItem) col2.getChild("1");
@@ -580,7 +579,7 @@ public class StandardMorseCodeControllerTest extends TestCase {
         pubRecords = new PubRecords(new SimpleEimRecordSetIterator(recordSets.iterator()), "test",null);
         mcController.publishCollection("col3", null, pubRecords, types);
         
-        CollectionItem col3 = contentDao.findCollectionByUid("col3");
+        CollectionItem col3 = (CollectionItem) contentDao.findItemByUid("col3");
         Assert.assertNotNull(col3);
         Assert.assertEquals(2, col3.getChildren().size());
         n = (NoteItem) col3.getChild("1");

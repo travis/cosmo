@@ -97,7 +97,7 @@ public class HibernateTriageStatusQueryProcessorTest extends AbstractHibernateDa
     }
 
     public void testGetAllCollection() throws Exception {
-        CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
+        CollectionItem calendar = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID);
         TriageStatusQueryContext context =
             new TriageStatusQueryContext(null, new DateTime("20070601T000000Z"), null);
         Set<NoteItem> done = queryProcessor.processTriageStatusQuery(calendar, context);
@@ -113,7 +113,7 @@ public class HibernateTriageStatusQueryProcessorTest extends AbstractHibernateDa
     }
 
     public void testGetDoneCollection() throws Exception {
-        CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
+        CollectionItem calendar = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID);
         TriageStatusQueryContext context =
             new TriageStatusQueryContext(TriageStatus.LABEL_DONE, new DateTime("20070601T000000Z"), null);
         Set<NoteItem> done = queryProcessor.processTriageStatusQuery(calendar, context);
@@ -137,7 +137,7 @@ public class HibernateTriageStatusQueryProcessorTest extends AbstractHibernateDa
     }
     
     public void testGetLaterCollection() throws Exception {
-        CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
+        CollectionItem calendar = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID);
         TriageStatusQueryContext context =
             new TriageStatusQueryContext(TriageStatus.LABEL_LATER, new DateTime("20070601T000000Z"), null);
         Set<NoteItem> later = queryProcessor.processTriageStatusQuery(calendar, context);
@@ -160,7 +160,7 @@ public class HibernateTriageStatusQueryProcessorTest extends AbstractHibernateDa
     }
     
     public void testGetNowCollection() throws Exception {
-        CollectionItem calendar = contentDao.findCollectionByUid(CALENDAR_UID);
+        CollectionItem calendar = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID);
         TriageStatusQueryContext context =
             new TriageStatusQueryContext(TriageStatus.LABEL_NOW, new DateTime("20070601T083000Z"), null);
         Set<NoteItem> now = queryProcessor.processTriageStatusQuery(calendar, context);

@@ -26,8 +26,8 @@ dojo.require("cosmo.ui.widget.Button");
 dojo.require("cosmo.ui.widget.ModalDialog");
 dojo.require("cosmo.topics");
 
-dojo.declare("cosmo.ui.widget.CollectionDetailsDialog", 
-             [dijit._Widget, dijit._Templated], 
+dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
+             [dijit._Widget, dijit._Templated],
 //Prototype Properties
 {
         //User supplied properties:
@@ -207,7 +207,7 @@ dojo.declare("cosmo.ui.widget.CollectionDetailsDialog",
 
                             // Re-render collections, update selected collection
                             // if necessary, and update the view
-                            var reloadDeferred = cosmo.app.pim.reloadCollections({ 
+                            var reloadDeferred = cosmo.app.pim.reloadCollections({
                                 removedCollection: collectionToDelete,
                                 removeByThisUser: true });
                             reloadDeferred.addCallback(function(){

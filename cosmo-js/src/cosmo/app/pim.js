@@ -396,7 +396,7 @@ cosmo.app.pim = dojo.mixin(new function () {
             // Preserve selected/overlaid state
             this.collections.each(saveState);
             // Reload collections from the server
-            var loadCollectionsDeferred = this.loadCollections({ ticketKey: this.ticketKey });
+            loadCollectionsDeferred = this.loadCollections({ ticketKey: this.ticketKey });
             loadCollectionsDeferred.addCallback(dojo.hitch(this, function () {
                 // Restore any saved state
                 for (var p in state) {

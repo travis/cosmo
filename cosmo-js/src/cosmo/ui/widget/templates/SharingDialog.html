@@ -2,11 +2,11 @@
   <span id="${id}DisplayName" dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" dojoAttachPoint="displayName">${displayName}</span>
   <h2 class="cosmoSharingSectionHead">${l10n.subscribeHead}</h2>
   <div><span  class="sharingHtmlLinkIcon"></span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
-  <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span></a>
+  <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span>
 
-  <span class="cosmoSubscribeButton cosmoICalSubscribeButton" title="${l10n.iCalSubscribeTitle}" dojoAttachEvent="onclick: iCalOnClick">${l10n.iCal}</span>
+  <a href="${urls.webcal.uri}" dojoAttachEvent="onclick: iCalOnClick"><span class="cosmoSubscribeButton cosmoICalSubscribeButton" title="${l10n.iCalSubscribeTitle}">${l10n.iCal}</span></a>
 
-  <a href="${urls.atom.uri}" dojoAttachEvent="onclick: atomOnClick"><span class="cosmoSubscribeButton cosmoAtomSubscribeButton" title="${l10n.atomSubscribeTitle}">${l10n.atom}</span></a>
+  <span dojoAttachEvent="onclick: atomOnClick" class="cosmoSubscribeButton cosmoAtomSubscribeButton" title="${l10n.atomSubscribeTitle}">${l10n.atom}</span>
 
   <a href="${urls.dav.uri}" dojoAttachEvent="onclick: davOnClick"><span class="cosmoSubscribeButton cosmoDavSubscribeButton" title="${l10n.davSubscribeTitle}">${l10n.dav}</span></a>
 

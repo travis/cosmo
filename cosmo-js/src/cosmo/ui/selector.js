@@ -298,7 +298,7 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                 var collections = cosmo.app.pim.collections;
                 var currColl = cosmo.app.pim.getSelectedCollection();
                 var currId = currColl.getUid();
-                var newCurrColl = null;;
+                var newCurrColl = null;
                 if (targ.id.indexOf(prefix + 'Details_') > -1) {
                     var id = targ.id.replace(prefix + 'Details_', '');
                     var collection = cosmo.app.pim.collections.getItem(id);
@@ -310,19 +310,21 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                             id: "collectionSharingDialog"
                         });
 
+                    // Cleanup and rerender on delete
+                    dojo.connect(dialog, "onDeleteCollection", function(collection){
+                        var deleteId = collection.getUid();
+                        cosmo.app.pim.collections.removeItem(deleteId);
+                        delete cosmo.view.cal.collectionItemRegistries[deleteId];
+                        var reloadDeferred = cosmo.app.pim.reloadCollections({
+                            removedCollection: collection,
+                            removedByThisUser: true });
+                        reloadDeferred.addCallback(function(){
+                            cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage);
+                        });
+                        return reloadDeferred;
+                    });
+
                     cosmo.app.pim.baseLayout.mainApp.leftSidebar.addChild(dialog);
-/*                    cosmo.app.showDialog({content: dialog,
-                                          className: "sharingDialog",
-                                          height: "30em",
-                                          width: "40em",
-                                          btnsLeft: [new cosmo.ui.widget.Button(
-                                              {
-                                                  text: _("Main.CollectionDetails.Close"),
-                                                  width: 74,
-                                                  handleOnClick: cosmo.app.hideDialog
-                                              }
-                                          )]
-                                         });*/
                     return true;
                 }
                 // Selector

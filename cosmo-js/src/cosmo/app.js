@@ -266,7 +266,7 @@ cosmo.app = new function () {
         var submitFunc = dojo.hitch(this, function () {
             this.hideDialog();
             deferred.callback(returnValue);
-        })
+        });
         var button = new cosmo.ui.widget.Button(
                               { text:_('App.Button.OK'),
                                 width:74,
@@ -293,11 +293,11 @@ cosmo.app = new function () {
         var yesFunc = dojo.hitch(this, function () {
             this.hideDialog();
             deferred.callback(true);
-        })
+        });
         var noFunc = dojo.hitch(this, function () {
             this.hideDialog();
             deferred.callback(false);
-        })
+        });
         var yesButton = new cosmo.ui.widget.Button(
                               { text:_('App.Button.Yes'),
                                 width:74,

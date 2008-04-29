@@ -56,10 +56,9 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     readWriteTicket: null,
 
     // Functions for subscription instructions
-
-    instructionsOnClick: function(e, instructionsKey){
+    instructionsOnClick: function(e, instructionsKey, urls){
         e.preventDefault();
-        var instructions = dojo.string.substitute(this.l10n[instructionsKey + "Instructions"], this.urls);
+        var instructions = dojo.string.substitute(this.l10n[instructionsKey + "Instructions"], urls || this.urls);
         var dialog = new dijit.Dialog({title: this.l10n[instructionsKey + "InstructionsTitle"]});
         dialog.setContent(instructions);
         dialog.startup();
@@ -67,7 +66,13 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     },
 
     atomOnClick: function(e){
-        this.instructionsOnClick(e, "feedReader");
+        var d = this.getReadOnlyTicket();
+        d.addCallback(dojo.hitch(this,
+            function(ticket){
+                this.instructionsOnClick(e, "feedReader",
+                dojo.mixin({feed: new dojo._Url(this.getTicketedUrl(this.urls.atom.uri, ticket))}));
+            }));
+        return d;
     },
 
     chandlerOnClick: function(e){
@@ -79,7 +84,9 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     },
 
     iCalOnClick: function(e){
-        this.instructionsOnClick(e, "iCal");
+        this.instructionsOnClick(e, "iCal", dojo.mixin({
+            webcalProtocol: new dojo._Url(this.urls.webcal.uri.replace("https", "webcal").replace("http", "webcal"))
+        }, this.urls));
     },
 
     onTicket: function(ticket){
@@ -87,20 +94,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             this.readOnlyTicket = ticket;
         else if (!this.readWriteTicket && (this.ticketStore.getValue(ticket, "type") == "read-write"))
             this.readWriteTicket = ticket;
-    },
-
-    inviteReadOnly: function(){
-        if (this.readTicket) this.doInvite(this.readTicket);
-        else {
-            this.createTicket("read-only", dojo.hitch(this, this.doInvite));
-        }
-    },
-
-    inviteReadWrite: function(){
-        if (this.readWriteTicket) this.doInvite(this.readWriteTicket);
-        else {
-            this.createTicket("read-write", dojo.hitch(this, this.doInvite));
-        }
+        return ticket;
     },
 
     getReadOnlyTicket: function(){
@@ -173,16 +167,35 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
 
     changeDisplayName: function(value){
         //TODO: Once we have a Writeable collection store, move to that
-        this.store.setValue(this.collection, value);
+        this.store.setValue(this.collection, "displayName", value);
         var d = this.store.save();
-        d.addCallback(dojo.hitch(this, function(){this.onDisplayNameChange(value);}));
+        d.addCallback(dojo.hitch(this, function(){
+            this.onDisplayNameChange(this.collection, value);
+        }));
+        return d;
     },
 
     deleteCollection: function(){
-        this.store.deleteItem(this.collection);
-        var d = this.store.save();
-        d.addCallback(dojo.hitch(this, function(){this.onDeleteCollection();}));
-        d.addCallback(dojo.hitch(this, function(){this.onDestroy();}));
+        var displayName = this.store.getValue(this.collection, "displayName");
+        var confirmDeleteMessage = dojo.string.substitute(this.l10n.confirmDelete, {collectionName: displayName});
+        var d = cosmo.app.confirm(confirmDeleteMessage, {cancelDefault: true});
+        d.addCallback(dojo.hitch(this, function(confirmed){
+            if (confirmed){
+                this.store.deleteItem(this.collection);
+                var sd = this.store.save();
+                sd.addErrback(function(e){
+                    cosmo.app.showErr(
+                        dojo.string.substitute(this.l10n.deleteFailed,
+                                               {collectionName: displayName}),
+                        e.message, e);
+                    return e;
+                });
+                sd.addCallback(dojo.hitch(this, function(){this.onDeleteCollection(this.collection);}));
+                sd.addCallback(dojo.hitch(this, function(){this.destroy();}));
+                return sd;
+            } else return false;
+        }));
+        return d;
     },
 
     // Extension points

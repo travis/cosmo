@@ -91,7 +91,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
 
     deleteCollection: function(collection, kwArgs){
         var r = this.getDefaultRequest(
-            collection.getUrl("atom"),
+            this.getAndCheckEditLink(collection),
             kwArgs);
         return dojo.xhrDelete(r);
     },

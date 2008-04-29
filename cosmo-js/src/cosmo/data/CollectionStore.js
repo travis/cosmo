@@ -80,15 +80,25 @@ dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
     },
 
     save: function(keywordArgs){
+        keywordArgs = keywordArgs || {};
         var deferreds = [];
         for (var nid in this._newItems){
-            deferred.push(this._serv.createCollection(this._newItems[nid]));
+            deferreds.push(this._serv.createCollection(this._newItems[nid]));
+            delete this._newItems[nid];
         }
         for (var mid in this._modifiedItems){
-            deferred.push(this._serv.saveCollection(this._modifiedItems[mid]));
+            var item = this._modifiedItems[mid];
+            var modifiedD = this._serv.saveCollection(item);
+            modifiedD.addCallback(function(x){
+                cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage, [item]);
+                return x;
+            });
+            deferreds.push(modifiedD);
+            delete this._modifiedItems[mid];
         }
         for (var did in this._deletedItems){
-            deferred.push(this._serv.deleteCollection(this._deletedItems[did]));
+            deferreds.push(this._serv.deleteCollection(this._deletedItems[did]));
+            delete this._deletedItems[did];
         }
         var dl = new dojo.DeferredList(deferreds);
         var scope = keywordArgs.scope || dojo.global;

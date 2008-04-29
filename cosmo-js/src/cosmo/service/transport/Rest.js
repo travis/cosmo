@@ -28,19 +28,19 @@ dojo.declare("cosmo.service.transport.Rest", null,
         constructor: function (translator){
 
         },
-        
+
         methodIsSupported: {
             'get': true,
             'post': true,
             'head': true
         },
-        
+
         METHOD_GET: "GET",
         METHOD_PUT: "PUT",
         METHOD_POST: "POST",
         METHOD_DELETE: "DELETE",
         METHOD_HEAD: "HEAD",
-        
+
         /**
          * summary: Return request populated with attributes common to all calls.
          */
@@ -52,13 +52,13 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 }
             }
             // Add error fo transport layer problems
-            
+
             var request = cosmo.util.auth.getAuthorizedRequest({}, kwArgs);
-            
+
             //FIXME
             if (false){
                 if (!kwArgs.noErr){
-                    deferred.addErrback(function(e) { console.debug("Transport Error: "); 
+                    deferred.addErrback(function(e) { console.debug("Transport Error: ");
                                                       console.debug(e);
                                                       return e;});
                 }
@@ -71,7 +71,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             request.headers = request.headers || {};
             request.url = url;
             request.handleAs = "xml";
-            return request
+            return request;
         },
 
         errorCallback: function(/* dojo.Deferred */ deferredRequestHandler){
@@ -91,11 +91,11 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 } else {
                     // Turns out that when we get a 204 in IE it raises an error
                     // that causes Dojo to call this function with a fake
-                    // 404 response (they return {status: 404}. Unfortunately, 
-                    // the xhr still does return with a 1223, and the 
+                    // 404 response (they return {status: 404}. Unfortunately,
+                    // the xhr still does return with a 1223, and the
                     // Deferred's load methods get called twice, raising a fatal error.
                     // This works around this, but is very tightly coupled to the Dojo
-                    // implementation. 
+                    // implementation.
                     // TODO: find a better way to do this
                     if (deferredRequestHandler.fired == -1){
                         var err = new Error(e.message);
@@ -105,7 +105,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 }
             }
         },
-        
+
         resultCallback: function(/* dojo.Deferred */ deferredRequestHandler){
             // summary
             // create callback that calls the Deferred's callback method
@@ -124,7 +124,7 @@ dojo.declare("cosmo.service.transport.Rest", null,
             );
             return tf;
         },
-        
+
         queryHashToString: function(/*Object*/ queryHash){
             var queryList = [];
             for (var key in queryHash){
@@ -150,10 +150,10 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 if (err.xhr.status == 404){
                     return new cosmo.service.exception.ResourceNotFoundException(url);
                 }
-                
+
                 if (err.xhr.status >= 400 &&  err.xhr.status <= 599){
                     return new cosmo.service.exception.ServerSideError({
-                        url: url, 
+                        url: url,
                         statusCode: err.xhr.status,
                         responseContent: err.xhr.responseText,
                         postContent: postContent,
@@ -163,6 +163,6 @@ dojo.declare("cosmo.service.transport.Rest", null,
                 return err;
             });
         }
-        
+
     }
 );

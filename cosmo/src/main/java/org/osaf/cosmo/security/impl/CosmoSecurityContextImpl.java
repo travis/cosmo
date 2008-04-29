@@ -17,9 +17,9 @@ package org.osaf.cosmo.security.impl;
 
 import java.util.Set;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.providers.anonymous.AnonymousAuthenticationToken;
+import org.springframework.security.Authentication;
+import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.providers.anonymous.AnonymousAuthenticationToken;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.acegisecurity.providers.ticket.TicketAuthenticationToken;
@@ -32,7 +32,7 @@ import org.osaf.cosmo.security.CosmoSecurityContext;
 /**
  * Standard implementation of {@link CosmoSecurityContext}. Wraps
  * an instance of Acegi Security's
- * {@link org.acegisecurity.Authentication}.
+ * {@link org.springframework.security.Authentication}.
  *
  * XXX: consider removing the direct dependency on Acegi Security,
  * instead possibly having separate implementations of

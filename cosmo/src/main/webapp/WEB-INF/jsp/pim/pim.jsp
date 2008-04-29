@@ -90,12 +90,12 @@ if (params.view)
 
 cosmo.app.initParams.authAccess = cosmo.util.auth.currentlyAuthenticated();
 
-<authz:authorize ifAnyGranted="ROLE_USER">
+<security:authorize ifAnyGranted="ROLE_USER">
 cosmo.app.initParams.roleUser = true;
-</authz:authorize>
-<authz:authorize ifAllGranted="ROLE_ROOT">
+</security:authorize>
+<security:authorize ifAllGranted="ROLE_ROOT">
 cosmo.app.initParams.roleRoot = true;
-</authz:authorize>
+</security:authorize>
 
 dojo.require("cosmo.ui.event.listeners");
 

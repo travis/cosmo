@@ -20,7 +20,7 @@ import java.util.Date;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.acegisecurity.BadCredentialsException;
+import org.springframework.security.BadCredentialsException;
 import org.osaf.cosmo.TestHelper;
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.dao.mock.MockDaoStorage;

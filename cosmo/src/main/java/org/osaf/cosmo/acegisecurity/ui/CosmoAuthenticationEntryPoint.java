@@ -22,8 +22,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.acegisecurity.AuthenticationException;
-import org.acegisecurity.ui.AuthenticationEntryPoint;
+import org.springframework.security.AuthenticationException;
+import org.springframework.security.ui.AuthenticationEntryPoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -26,16 +26,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
+import org.springframework.security.Authentication;
+import org.springframework.security.context.SecurityContext;
+import org.springframework.security.context.SecurityContextHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.server.ServerUtils;
 
 /**
  * Servlet filter that populates the
- * {@link org.acegisecurity.ContextHolder} with a
+ * {@link org.springframework.security.ContextHolder} with a
  * {@link TicketAuthenticationToken} if needed.
  */
 public class TicketProcessingFilter implements Filter {

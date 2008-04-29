@@ -19,12 +19,14 @@
 <!-- Security configuration for the Web Console -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
   <bean id="pimAccessDecisionManager"
-        class="org.acegisecurity.vote.AffirmativeBased">
+        class="org.springframework.security.vote.AffirmativeBased">
     <property name="allowIfAllAbstainDecisions">
       <value>false</value>
     </property>
@@ -39,7 +41,7 @@
   <!-- interceptor which performs authorization for web requests -->
 
    <bean id="pimFilterInvocationInterceptor"
-         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+         class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
@@ -75,26 +77,21 @@
 
   <!-- filter chain that kicks off request-time processing -->
 
-  <bean id="pimFilterChainProxy"
-        class="org.acegisecurity.util.FilterChainProxy">
-    <property name="filterInvocationDefinitionSource">
-      <value>
-        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-        PATTERN_TYPE_APACHE_ANT
-        /**=pimHttpSessionContextIntegrationFilter,protocolTicketAuthenticationClearingFilter,pimFormBasedProcessingFilter,protocolTicketProcessingFilter,pimAnonymousProcessingFilter,pimExceptionTranslationFilter,pimFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
-      </value>
-    </property>
+  <bean id="pimFilterChainProxy" class="org.springframework.security.util.FilterChainProxy">
+      <security:filter-chain-map path-type="ant">
+          <security:filter-chain pattern="/**" filters="pimHttpSessionContextIntegrationFilter,protocolTicketAuthenticationClearingFilter,pimFormBasedProcessingFilter,protocolTicketProcessingFilter,pimAnonymousProcessingFilter,pimExceptionTranslationFilter,pimFilterInvocationInterceptor,protocolExtraTicketProcessingFilter"/>
+      </security:filter-chain-map>
   </bean>
 
   <!-- filter that integrates SecurityContext into HTTP Session -->
 
   <bean id="pimHttpSessionContextIntegrationFilter"
-        class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
+        class="org.springframework.security.context.HttpSessionContextIntegrationFilter"/>
 
    <!-- filter that performs form-based authentication -->
 
   <bean id="pimFormBasedAuthenticationEntryPoint"
-        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+        class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
     <property name="loginFormUrl">
       <value>/login</value>
     </property>
@@ -104,7 +101,7 @@
   </bean>
 
   <bean id="pimFormBasedProcessingFilter"
-        class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+        class="org.springframework.security.ui.webapp.AuthenticationProcessingFilter">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
@@ -122,7 +119,7 @@
   <!-- filter that performs anonymous authentication -->
 
   <bean id="pimAnonymousProcessingFilter"
-        class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+        class="org.springframework.security.providers.anonymous.AnonymousProcessingFilter">
     <property name="key">
       <value>badgerbadgerbadger</value>
     </property>
@@ -133,7 +130,7 @@
 
   <!-- filter that converts authen/authz exceptions to web pages -->
   <bean id="pimExceptionTranslationFilter"
-        class="org.acegisecurity.ui.ExceptionTranslationFilter">
+        class="org.springframework.security.ui.ExceptionTranslationFilter">
     <property name="authenticationEntryPoint">
       <ref local="pimFormBasedAuthenticationEntryPoint"/>
     </property>

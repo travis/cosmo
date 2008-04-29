@@ -144,15 +144,15 @@ img#logo {
             <!-- main navbar -->
             <div id="menuNavItems">
               <fmt:message key="Layout.Nav.Main.Welcome"><fmt:param value="${user.username}"/></fmt:message>
-              <authz:authorize ifAnyGranted="ROLE_USER">
+              <security:authorize ifAnyGranted="ROLE_USER">
                 |
                 <c:url var="homeUrl" value="/browse/${user.username}"/>
                 <a href="${homeUrl}"><fmt:message key="Layout.Nav.Main.Home"/></a>
                 |
                 <c:url var="calendarUrl" value="/pim"/>
                 <a href="${calendarUrl}"><fmt:message key="Layout.Nav.Main.Calendar"/></a>
-              </authz:authorize>
-        <authz:authorize ifAllGranted="ROLE_ROOT">
+              </security:authorize>
+        <security:authorize ifAllGranted="ROLE_ROOT">
           <!-- admin console navbar -->
             |
             <c:choose>
@@ -167,7 +167,7 @@ img#logo {
 		    |
             <c:choose><c:when test="${fn:endsWith(body, '/status/view')}"><strong><fmt:message key="Layout.Nav.Console.ServerStatus"/></strong></c:when><c:otherwise><a href="<c:url value="/admin/status"/>"><fmt:message key="Layout.Nav.Console.ServerStatus"/></a></c:otherwise></c:choose>
             <!-- end admin console navbar -->
-        </authz:authorize>
+        </security:authorize>
               |
               <a href="<fmt:message key="Main.CollectionDetails.HelpLink" bundle="${uiBundle}"/>"><fmt:message key="Layout.Nav.Main.Help"/></a>
               |

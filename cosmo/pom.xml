@@ -37,53 +37,40 @@
             <version>1.4</version>
         </dependency>
         <dependency>
-            <groupId>org.acegisecurity</groupId>
-            <artifactId>acegi-security</artifactId>
-            <version>1.0.3</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core-tiger</artifactId>
+            <version>2.0.0</version>
             <exclusions>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-aop</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-beans</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-support</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-dao</artifactId>
                 </exclusion>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-dao</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
                 </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>2.0.0</version>
+            <exclusions>
                 <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-jdbc</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-mock</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-remoting</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-support</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                  <groupId>org.springframework</groupId>
-                  <artifactId>spring-webmvc</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -215,33 +202,33 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
             <exclusions>
                 <exclusion>
                     <artifactId>connector</artifactId>
@@ -256,12 +243,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
@@ -334,17 +321,17 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>2.5.1</version>
+            <version>2.5.3</version>
         </dependency>
         <dependency>
             <groupId>aspectj</groupId>

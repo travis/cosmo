@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
-          "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
     Copyright 2005-2008 Open Source Applications Foundation
@@ -20,11 +18,17 @@
 
 <!-- Security configuration for morse code -->
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+
 
   <!-- interceptor which performs authorization for morse code requests -->
   <bean id="mcFilterInvocationInterceptor"
-        class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+        class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
     <property name="authenticationManager">
       <ref bean="authenticationManager"/>
     </property>
@@ -41,16 +45,10 @@
   </bean>
 
   <!-- filter chain that kicks off request-time processing -->
-
-  <bean id="mcFilterChainProxy"
-        class="org.acegisecurity.util.FilterChainProxy">
-    <property name="filterInvocationDefinitionSource">
-      <value>
-        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-        PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,mcFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
-      </value>
-    </property>
+  <bean id="mcFilterChainProxy" class="org.springframework.security.util.FilterChainProxy">
+      <security:filter-chain-map path-type="ant">
+          <security:filter-chain pattern="/**" filters="protocolHttpRequestContextIntegrationFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,mcFilterInvocationInterceptor,protocolExtraTicketProcessingFilter"/>
+      </security:filter-chain-map>
   </bean>
 
 </beans>

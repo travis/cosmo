@@ -1,11 +1,11 @@
 package org.osaf.cosmo.acegisecurity;
 
-import org.acegisecurity.AccessDecisionManager;
-import org.acegisecurity.AccessDeniedException;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.ConfigAttribute;
-import org.acegisecurity.ConfigAttributeDefinition;
-import org.acegisecurity.InsufficientAuthenticationException;
+import org.springframework.security.AccessDecisionManager;
+import org.springframework.security.AccessDeniedException;
+import org.springframework.security.Authentication;
+import org.springframework.security.ConfigAttribute;
+import org.springframework.security.ConfigAttributeDefinition;
+import org.springframework.security.InsufficientAuthenticationException;
 
 public class DummyAccessDecisionManager implements AccessDecisionManager {
 

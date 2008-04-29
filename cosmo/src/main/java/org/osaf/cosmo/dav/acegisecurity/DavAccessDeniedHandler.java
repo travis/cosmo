@@ -22,8 +22,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.acegisecurity.AccessDeniedException;
-import org.acegisecurity.ui.AccessDeniedHandler;
+import org.springframework.security.AccessDeniedException;
+import org.springframework.security.ui.AccessDeniedHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -19,14 +19,16 @@
 <!-- Security configuration for feeds -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
   <!-- interceptor which performs authorization for feed requests -->
 
    <bean id="feedFilterInvocationInterceptor"
-         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+         class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
@@ -43,16 +45,11 @@
    </bean>
 
   <!-- filter chain that kicks off request-time processing -->
-
-  <bean id="feedFilterChainProxy"
-        class="org.acegisecurity.util.FilterChainProxy">
-    <property name="filterInvocationDefinitionSource">
-      <value>
-        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-        PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolWsseProcessingFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor,protocolExtraTicketProcessingFilter
-      </value>
-    </property>
+   
+  <bean id="feedFilterChainProxy" class="org.springframework.security.util.FilterChainProxy">
+      <security:filter-chain-map path-type="ant">
+          <security:filter-chain pattern="/**" filters="protocolHttpRequestContextIntegrationFilter,protocolWsseProcessingFilter,protocolBasicProcessingFilter,protocolTicketProcessingFilter,protocolExceptionTranslationFilter,feedFilterInvocationInterceptor,protocolExtraTicketProcessingFilter"/>
+      </security:filter-chain-map>
   </bean>
 
 </beans>

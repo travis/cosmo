@@ -15,7 +15,7 @@
  */
 package org.osaf.cosmo.acegisecurity.providers.ticket;
 
-import org.acegisecurity.AuthenticationException;
+import org.springframework.security.AuthenticationException;
 
 /**
  */

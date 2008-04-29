@@ -17,9 +17,9 @@ package org.osaf.cosmo.acegisecurity.providers.wsse;
 
 import java.io.Serializable;
 
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.providers.AbstractAuthenticationToken;
-import org.acegisecurity.userdetails.UserDetails;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.providers.AbstractAuthenticationToken;
+import org.springframework.security.userdetails.UserDetails;
 import org.osaf.cosmo.wsse.UsernameToken;
 
 /**

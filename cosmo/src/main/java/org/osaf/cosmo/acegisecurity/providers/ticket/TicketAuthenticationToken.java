@@ -18,15 +18,15 @@ package org.osaf.cosmo.acegisecurity.providers.ticket;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.providers.AbstractAuthenticationToken;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.providers.AbstractAuthenticationToken;
 
 import org.osaf.cosmo.model.Ticket;
 
 /**
  * Represents a ticket-based
- * {@link org.acegisecurity.Authentication}.
+ * {@link org.springframework.security.Authentication}.
  *
  * Before being authenticated, the token contains the ticket id and
  * the path of the ticketed resource. After authentication, the

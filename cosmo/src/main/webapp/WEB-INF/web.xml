@@ -71,65 +71,65 @@
   </filter>
   <filter>
     <filter-name>default-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>defaultFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>webui-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>webuiFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>dav-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>davFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>mc-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>mcFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>webcal-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>webcalFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>feed-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>feedFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>cmp-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>cmpFilterChainProxy</param-value>
     </init-param>
   </filter>
   <filter>
     <filter-name>pim-security</filter-name>
-    <filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>targetBean</param-name>
+      <param-name>targetBeanName</param-name>
       <param-value>pimFilterChainProxy</param-value>
     </init-param>
   </filter>

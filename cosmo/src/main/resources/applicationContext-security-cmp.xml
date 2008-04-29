@@ -19,12 +19,14 @@
 <!-- Security configuration for CMP -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
   <bean id="cmpAccessDecisionManager"
-        class="org.acegisecurity.vote.AffirmativeBased">
+        class="org.springframework.security.vote.AffirmativeBased">
     <property name="allowIfAllAbstainDecisions">
       <value>false</value>
     </property>
@@ -38,7 +40,7 @@
   <!-- interceptor which performs authorization for CMP requests -->
 
    <bean id="cmpFilterInvocationInterceptor"
-         class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+         class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
      <property name="authenticationManager">
        <ref bean="authenticationManager"/>
      </property>
@@ -65,15 +67,11 @@
 
   <!-- filter chain that kicks off request-time processing -->
 
-  <bean id="cmpFilterChainProxy"
-        class="org.acegisecurity.util.FilterChainProxy">
-    <property name="filterInvocationDefinitionSource">
-      <value>
-        CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
-        PATTERN_TYPE_APACHE_ANT
-        /**=protocolHttpRequestContextIntegrationFilter,protocolWsseProcessingFilter,protocolBasicProcessingFilter,defaultAnonymousProcessingFilter,protocolExceptionTranslationFilter,cmpFilterInvocationInterceptor
-      </value>
-    </property>
-  </bean>
+  
+   <bean id="cmpFilterChainProxy" class="org.springframework.security.util.FilterChainProxy">
+      <security:filter-chain-map path-type="ant">
+          <security:filter-chain pattern="/**" filters="protocolHttpRequestContextIntegrationFilter,protocolWsseProcessingFilter,protocolBasicProcessingFilter,defaultAnonymousProcessingFilter,protocolExceptionTranslationFilter,cmpFilterInvocationInterceptor"/>
+      </security:filter-chain-map>
+   </bean>
 
 </beans>

@@ -20,8 +20,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.ui.webapp.AuthenticationProcessingFilter;
+import org.springframework.security.Authentication;
+import org.springframework.security.ui.webapp.AuthenticationProcessingFilter;
 import org.osaf.cosmo.acegisecurity.userdetails.CosmoUserDetails;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.ui.UIConstants;
@@ -61,7 +61,7 @@ public class CosmoAuthenticationProcessingFilter extends
         Assert.notNull(getRememberMeServices());
         
         // Ensure sendRedirect will always be called with url = true on successful auth.
-        this.setAlwaysUseDefaultTargetUrl(true);
+        setAlwaysUseDefaultTargetUrl(true);
     }
 
     /*
@@ -87,7 +87,7 @@ public class CosmoAuthenticationProcessingFilter extends
             return;
         } else {
             targetUrl = alwaysUseUserPreferredUrl ? 
-                    null : obtainFullRequestUrl(request);
+                    null : obtainFullSavedRequestUrl(request);
         } 
         
         if (targetUrl == null) {

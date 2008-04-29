@@ -15,17 +15,14 @@
  */
 package org.osaf.cosmo.acegisecurity.userdetails;
 
-import org.osaf.cosmo.model.User;
-
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.acegisecurity.GrantedAuthority;
-import org.acegisecurity.GrantedAuthorityImpl;
-import org.acegisecurity.userdetails.UserDetails;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osaf.cosmo.model.User;
+import org.springframework.security.GrantedAuthority;
+import org.springframework.security.GrantedAuthorityImpl;
+import org.springframework.security.userdetails.UserDetails;
 
 /**
  * Wraps a Cosmo <code>User</code> to provide Acegi Security with

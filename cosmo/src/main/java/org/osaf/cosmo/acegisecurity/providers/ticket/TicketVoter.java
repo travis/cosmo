@@ -15,11 +15,11 @@
  */
 package org.osaf.cosmo.acegisecurity.providers.ticket;
 
-import org.acegisecurity.Authentication;
-import org.acegisecurity.ConfigAttribute;
-import org.acegisecurity.ConfigAttributeDefinition;
-import org.acegisecurity.intercept.web.FilterInvocation;
-import org.acegisecurity.vote.AccessDecisionVoter;
+import org.springframework.security.Authentication;
+import org.springframework.security.ConfigAttribute;
+import org.springframework.security.ConfigAttributeDefinition;
+import org.springframework.security.intercept.web.FilterInvocation;
+import org.springframework.security.vote.AccessDecisionVoter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.http.Methods;
@@ -88,7 +88,7 @@ public class TicketVoter implements AccessDecisionVoter {
 
     /**
      * Returns true if the secure object is a
-     * {@link org.acegisecurity.intercept.web.FilterInvocation}
+     * {@link org.springframework.security.intercept.web.FilterInvocation}
      */
     public boolean supports(Class clazz) {
         return (FilterInvocation.class.isAssignableFrom(clazz));

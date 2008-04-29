@@ -77,7 +77,10 @@ public class CalendarUtils implements ICalendarConstants {
         throws ParserException, IOException {
         if (component == null)
             return null;
-        CalendarBuilder builder = CalendarBuilderDispenser.getCalendarBuilder();
+        // Don't use dispenser as this method may be called from within
+        // a build() as in the case of the custom timezone registry
+        // parsing a timezone
+        CalendarBuilder builder = new CalendarBuilder();
         StringReader sr = new StringReader("BEGIN:VCALENDAR\n" + component + "END:VCALENDAR");
         
         return (Component) builder.build(sr).getComponents().get(0);

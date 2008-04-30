@@ -22,8 +22,30 @@ dojo.requireLocalization("cosmo.data", "SubscriptionStore");
 
 dojo.declare("cosmo.data.SubscriptionStore", cosmo.data.CollectionStore, {
     l10n: dojo.i18n.getLocalization("cosmo.data", "SubscriptionStore"),
+    getValue: function(item, attr, defaultValue){
+        if (attr == "urls") return this.getUrls(item);
+        else return this.inherited("getValue", arguments);
+    },
+
+    getValues: function(item, attr){
+        if (attr == "urls") return [this.getUrls(item)];
+        else return this.inherited("getValues", arguments);
+    },
+
+    getUrls: function(item){
+        var cUrls = item.getCollection().getUrls();
+        var sUrls = item.getUrls();
+        return {
+            edit: sUrls.edit,
+            atom: cUrls.atom,
+            html: cUrls.html,
+            dav: cUrls.dav,
+            webcal: cUrls.webcal,
+            mc: cUrls.mc
+        };
+    },
+
     fetch: function(/* Object */ keywordArgs){
-        console.debug("fetch");
         var scope = keywordArgs.scope || dojo.global;
         var d = this._serv.getSubscriptions();
         d.addCallback(dojo.hitch(this, function(collections){

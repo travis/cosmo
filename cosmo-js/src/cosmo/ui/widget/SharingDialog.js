@@ -232,7 +232,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
         }
     },
     postCreate: function(){
-        if (!this.ticketStore) this.inviteButton.destroy();
+        if (this.inviteButton && !this.ticketStore) this.inviteButton.destroy();
     }
 });
 

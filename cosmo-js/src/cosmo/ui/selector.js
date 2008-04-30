@@ -303,8 +303,10 @@ cosmo.ui.selector.CollectionSelector = function (p) {
                     var id = targ.id.replace(prefix + 'Details_', '');
                     var collection = cosmo.app.pim.collections.getItem(id);
                     var store;
-                    if (collection instanceof cosmo.model.Collection) store = new cosmo.data.CollectionStore(cosmo.app.pim.serv);
-                    if (collection instanceof cosmo.model.Subscription) store = new cosmo.data.SubscriptionStore(cosmo.app.pim.serv);
+                    if (collection instanceof cosmo.model.Collection)
+                        store = new cosmo.data.CollectionStore(cosmo.app.pim.serv);
+                    if (collection instanceof cosmo.model.Subscription)
+                        store = new cosmo.data.SubscriptionStore(cosmo.app.pim.serv);
                     var dialog = new cosmo.ui.widget.SharingDialog(
                         {
                             store: store,

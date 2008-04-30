@@ -55,7 +55,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
     // a hash from link rels to useful url names
     urlNameHash: {
-        "edit": "atom",
         "self": "self",
         "alternate": "html",
         "morse code": "mc",
@@ -69,8 +68,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         cosmo.atompub.query("atom:link", node).forEach(
             dojo.hitch(this, function(linkEl){
                 var rel = linkEl.getAttribute("rel");
-                urls[this.urlNameHash[rel] || rel] =
-                    (new dojo._Url(cosmo.xml.getBaseUri(linkEl), linkEl.getAttribute("href")));
+                var url = (new dojo._Url(cosmo.xml.getBaseUri(linkEl), linkEl.getAttribute("href")));
+                urls[this.urlNameHash[rel] || rel] = url;
+                if (rel == "edit") urls['atom'] = url;
                 }
             )
         );

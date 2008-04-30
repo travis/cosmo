@@ -81,7 +81,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
 
         // Flesh out each collection
         deferred.addCallback(dojo.hitch(this, function(subscriptions){
-            collectionDetailDeferreds = [];
+            var collectionDetailDeferreds = [];
             for (var i = 0; i < subscriptions.length; i++){
                 //capturing scope
                 (dojo.hitch(this, function (){

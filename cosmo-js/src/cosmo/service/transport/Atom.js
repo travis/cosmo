@@ -35,7 +35,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
         this.urlCache = urlCache;
     },
 
-    EDIT_LINK: "atom",
+    EDIT_LINK: "edit",
     DETACHED_LINK: "detached",
     PROJECTION_FULL_EIM_JSON: "/full/eim-json",
 
@@ -143,7 +143,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
     },
 
     saveThisAndFuture: function (oldOccurrence, postContent, kwArgs){
-        var r = this.getDefaultRequest(this.getAtomBase() + "/" + this.urlCache.getUrl(oldOccurrence, this.DETACHED_LINK), kwArgs);
+        var r = this.getDefaultRequest(this.urlCache.getUrl(oldOccurrence, this.DETACHED_LINK).uri, kwArgs);
         r.postData = postContent;
         r.contentType = this.CONTENT_TYPE_ATOM;
         var deferred = dojo.rawXhrPost(r);
@@ -195,7 +195,7 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
     },
 
     saveSubscription: function(subscription, postContent, kwArgs){
-        var r = this.getDefaultRequest(this.getAndCheckEditLink(subscription), kwArgs);
+        var r = this.getDefaultRequest(this.getAndCheckEditLink(subscription, {noProjection: true}), kwArgs);
         r.putData = postContent;
         r.contentType = this.CONTENT_TYPE_ATOM;
         return dojo.rawXhrPut(r);
@@ -209,8 +209,10 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
     },
 
     deleteItem: function(item, kwArgs){
-        var editLink = this.getAndCheckEditLink(item, kwArgs);
-        var deferred = dojo.xhrDelete(editLink, kwArgs);
+        var r = this.getDefaultRequest(
+            this.getAndCheckEditLink(item, kwArgs),
+            kwArgs);
+        var deferred = dojo.xhrDelete(r, kwArgs);
         this.addErrorCodeToExceptionErrback(deferred, 423, cosmo.service.exception.CollectionLockedException);
         return deferred;
     },

@@ -32,7 +32,7 @@
                            + "<ol><li>From Chandler Desktop, go to <b>Share>>Subscribe</b></li>"
                            + "<li>Paste the above link into the <b>URL:</b> field</li>"
                            + "<li>Click <b>[Subscribe]</b></li></ol>",
-     feedReaderInstructions: "<a href='${feed}' target='_blank'>${feed}</a>"
+     feedReaderInstructions: "<a href='${atom}' target='_blank'>${atom}</a>"
                              + "<p>Click on the above link to subscribe with web based feed readers like Google Reader or Bloglines, "
                              + "or copy and paste it into your favorite feed reader.</p>",
      iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>" +

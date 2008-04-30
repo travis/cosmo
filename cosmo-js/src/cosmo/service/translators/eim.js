@@ -158,7 +158,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             var collection = new cosmo.model.Collection({
                 uid: uid
             });
-            collection.href = "collection/" + uid + "?ticket=" + ticket;
+            var collectionUri = "collection/" + uid + "?ticket=" + ticket;
+            collection.href = new dojo._Url(cosmo.xml.getBaseUri(content), collectionUri);
 
             var subscription = new cosmo.model.Subscription({
                 displayName: displayName,
@@ -167,8 +168,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 collection: collection,
                 collectionDeleted: collectionDeleted,
                 ticketDeleted: ticketDeleted
-            })
-            var urls = this.getUrls(entry)
+            });
+            var urls = this.getUrls(entry);
             subscription.setUrls(urls);
             this.urlCache.setUrls(subscription, urls);
             subscriptions.push(subscription);

@@ -27,7 +27,7 @@ dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.widget.SharingDialog");
 dojo.require("cosmo.data.CollectionStore");
-
+dojo.require("cosmo.data.SubscriptionStore");
 
 cosmo.ui.selector.CollectionSelector = function (p) {
     var _this = this;

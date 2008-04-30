@@ -66,13 +66,16 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     },
 
     atomOnClick: function(e){
-        var d = this.getReadOnlyTicket();
-        d.addCallback(dojo.hitch(this,
+        if (this.ticketStore){
+            var d = this.getReadOnlyTicket();
+            d.addCallback(dojo.hitch(this,
             function(ticket){
                 this.instructionsOnClick(e, "feedReader",
-                dojo.mixin({feed: new dojo._Url(this.getTicketedUrl(this.urls.atom.uri, ticket))}));
+                {atom: new dojo._Url(this.getTicketedUrl(this.urls.atom.uri, ticket))});
             }));
-        return d;
+            return d;
+        } else this.instructionsOnClick(e, "feedReader");
+
     },
 
     chandlerOnClick: function(e){
@@ -214,8 +217,8 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             var collection = this.collection;
             this.displayName = store.getValue(collection, "displayName");
             this.urls = store.getValue(collection, "urls");
-            if (!this.noInvite){
-                if ((!this.ticketStore) && this.urls.ticket){
+            if (this.urls.ticket){
+                if (!this.ticketStore){
                     this.ticketStore =
                         new cosmo.data.TicketStore({iri: this.urls.ticket, xhrArgs: this.xhrArgs});
                 }
@@ -228,9 +231,8 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
             }
         }
     },
-
     postCreate: function(){
-        if (this.noInvite) this.inviteButton.destroy();
+        if (!this.ticketStore) this.inviteButton.destroy();
     }
 });
 

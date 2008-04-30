@@ -17,6 +17,7 @@ package org.osaf.cosmo.ui.pim;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityContext;
 import org.osaf.cosmo.security.CosmoSecurityException;
@@ -74,14 +76,18 @@ public class CollectionBookmarkController extends AbstractController {
         model.put("collection", collection);
         
         CosmoSecurityContext csc = securityManager.getSecurityContext();
-        Map<String, String> relationLinks = serviceLocatorFactory
-        .createServiceLocator(request, false)
-        .getCollectionUrls(collection);
+        Map<String, String> relationLinks;
+        Ticket ticket = findTicket(csc);
+        if (ticket != null)
+            relationLinks = serviceLocatorFactory.createServiceLocator(request, ticket, false)
+                .getCollectionUrls(collection);
+        else relationLinks = serviceLocatorFactory.createServiceLocator(request, false)
+                .getCollectionUrls(collection);
         model.put("relationLinks", relationLinks);
         
-        // First try to find a ticket principal
-        if (csc.getTicket() != null) {
-            model.put("ticketKey", csc.getTicket().getKey());
+
+        if (ticket != null) {
+            model.put("ticketKey", ticket.getKey());
             return new ModelAndView(pimView, model);
         } else {
             // If we can't find a ticket principal, use the current user.
@@ -93,6 +99,13 @@ public class CollectionBookmarkController extends AbstractController {
 
         // when all else fails...
         return new ModelAndView("error_forbidden");
+    }
+    
+    // First try to find a ticket principal
+    private Ticket findTicket(CosmoSecurityContext csc){
+        Set<Ticket> tickets = csc.getTickets();
+        if (!tickets.isEmpty()) return (Ticket)tickets.toArray()[0];
+        else return null;
     }
 
     public void setPimView(String pimView) {

@@ -14,31 +14,18 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmo.data.CollectionStore");
+dojo.provide("cosmo.data.SubscriptionStore");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.service.conduits.common");
 dojo.require("cosmo.data.ItemStore");
-dojo.requireLocalization("cosmo.data", "CollectionStore");
+dojo.requireLocalization("cosmo.data", "SubscriptionStore");
 
-dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
-    l10n: dojo.i18n.getLocalization("cosmo.data", "CollectionStore"),
-    constructor: function(service){
-        this._serv = service || cosmo.service.conduits.getAtomPlusEimConduit();
-    },
-    isItem: function(/* anything */ something){
-        return something instanceof cosmo.model.Collection;
-    },
-
-    getFeatures: function(){
-        return {'dojo.data.api.Read': true,
-                'dojo.data.api.Identity': true
-               };
-    },
-
+dojo.declare("cosmo.data.SubscriptionStore", cosmo.data.CollectionStore, {
+    l10n: dojo.i18n.getLocalization("cosmo.data", "SubscriptionStore"),
     fetch: function(/* Object */ keywordArgs){
         console.debug("fetch");
         var scope = keywordArgs.scope || dojo.global;
-        var d = this._serv.getCollections();
+        var d = this._serv.getSubscriptions();
         d.addCallback(dojo.hitch(this, function(collections){
             this.handleCollectionFetch(collections, keywordArgs);
             return collections;
@@ -51,55 +38,25 @@ dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
         return d;
     },
 
-    handleCollectionFetch: function(collections, keywordArgs){
-        if (keywordArgs.query)
-            var ignoreCase = !!keywordArgs.queryOptions.ignoreCase;
-        collections = this.filterByQuery(collections, keywordArgs.query, ignoreCase);
-        this.handleFetch(collections, keywordArgs);
-    },
-
-    _newItems: {},
-
-    newItem: function(properties){
-        var c = new cosmo.model.Collection();
-        this._newItems[c.getUid()] = c;
-        return c;
-    },
-
-    _modifiedItems: {},
-
-    setValue: function(item, attribute, value){
-        item['set' + this._capitalize(attribute)](value);
-        this._modifiedItems[item.getUid()] = item;
-        return true;
-    },
-
-    _deletedItems: {},
-
-    deleteItem: function(item){
-        this._deletedItems[item.getUid()] = item;
-        return true;
-    },
-
     save: function(keywordArgs){
         keywordArgs = keywordArgs || {};
         var deferreds = [];
         for (var nid in this._newItems){
-            deferreds.push(this._serv.createCollection(this._newItems[nid]));
+            deferreds.push(this._serv.createSubscription(this._newItems[nid]));
             delete this._newItems[nid];
         }
         for (var mid in this._modifiedItems){
             var item = this._modifiedItems[mid];
             var modifiedD = this._serv.saveCollection(item);
             modifiedD.addCallback(function(x){
-                cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage, [item]);
+                cosmo.topics.publish(cosmo.topics.SubscriptionUpdatedMessage, [item]);
                 return x;
             });
             deferreds.push(modifiedD);
             delete this._modifiedItems[mid];
         }
         for (var did in this._deletedItems){
-            deferreds.push(this._serv.deleteCollection(this._deletedItems[did]));
+            deferreds.push(this._serv.deleteSubscription(this._deletedItems[did]));
             delete this._deletedItems[did];
         }
         var dl = new dojo.DeferredList(deferreds);

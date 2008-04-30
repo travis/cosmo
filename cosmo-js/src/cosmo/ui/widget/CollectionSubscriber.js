@@ -24,7 +24,7 @@ dojo.require("cosmo.util.i18n");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.topics");
-dojo.require("cosmo.ui.widget.SharingDialog");
+dojo.require("cosmo.ui.widget.TicketedSharingDialog");
 dojo.require("cosmo.ui.widget.AuthBox");
 dojo.requireLocalization("cosmo.ui.widget", "CollectionSubscriber");
 
@@ -202,13 +202,10 @@ dojo.declare(
         },
 
         postCreate: function(){
-            var sharingD = new cosmo.ui.widget.SharingDialog({
+            var sharingD = new cosmo.ui.widget.TicketedSharingDialog({
                 store: this.store,
-                collection: this.collection,
-                noInvite: true
+                collection: this.collection
             }, this.sharingDialog);
-            sharingD.displayName.destroy();
-            sharingD.destroyButton.destroy();
         }
 } );
 

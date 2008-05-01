@@ -29,5 +29,5 @@ DOWNLOADS_HOME=/www/downloads.osafoundation.org/cosmo/releases/$VERSION_STRING
 ssh builder@$DOWNLOADS_SERVER "mkdir $DOWNLOADS_HOME"
 ssh builder@$BUILD_SERVER "cd $BUILD_HOME; export JAVA_HOME=$JAVA_HOME; svn co http://svn.osafoundation.org/server/cosmo/tags/$SVN_TAG; cd $SVN_TAG/cosmo; mvn -Prelease clean package; cd ../snarf; mvn -Prelease clean package; cd ../;"
 ssh builder@$BUILD_SERVER "eval \`ssh-agent -s\`; echo \$SSH_AUTH_SOCK; ssh-add; scp $CHANDLER_WAR $OSAF_BUNDLE $DOWNLOADS_SERVER:$DOWNLOADS_HOME"
-ssh builder@$DOWNLOADS_SERVER "python distIndex.py SR $VERSION_STRING $VERSION_STRING osaf-server-bundle-$VERSION_STRING.tar.gz"
+ssh builder@$DOWNLOADS_SERVER "python distIndex.py SR $VERSION_STRING $VERSION_STRING $OSAF_BUNDLE_FILENAME $CHANDLER_WAR_FILENAME"
 

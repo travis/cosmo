@@ -28,108 +28,57 @@ dojo.require("cosmo.env");
 
 dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Templated], {
 
-    templateString: '<span></span>',
+    templateString: '<span><table cellpadding="0" cellspacing="0" id="${id}_buttonSet class="buttonSet"><tbody><tr dojoAttachPoint="mainRow"></tr></tbody></table></span>',
 
+    mainRow: null,
+
+    buttons: null,
+    buttonProps: null,
     // Props from template or set in constructor
     selectedButtonIndex: null, // No default selected button
-    height: 0,
 
-    // Define these here so they don't end up as statics
     constructor: function () {
         this.buttons = [];
-        this.buttonNodes = [];
     },
 
     // Private
-    _getButtonIndex: function (td) {
-        var n = td.id.replace(this.id + '_button', '');
-        return parseInt(n);
-    },
-    _morphButton: function (td, over){
-        var n = this._getButtonIndex(td);
-        var b = this.buttons[n];
-        var pos = over ? b.mouseoverImgPos : 
-            (n == this.selectedButtonIndex) ? b.downStateImgPos : b.defaultImgPos;
-            td.style.backgroundPosition = 
-                pos[0] + 'px ' + pos[1] + 'px';
-    },
-    _handleMouseover: function (e) {
-        var td = e.target;
-        if (td && td.id) {
-            this._morphButton(td, true);
-        }
-    },
-    _handleMouseout: function (e) {
-        var td = e.target;
-        if (td && td.id) {
-            this._morphButton(td, false);
-        }
-    },
-    _handleClick: function (e) {
-        var td = e.target;
-        if (td && td.id) {
-            var n = this._getButtonIndex(td);
-            var buttons = this.buttons;
-            this.selectedButtonIndex = n; 
-            for (var i = 0; i < buttons.length; i++) {
-                this._morphButton(this.buttonNodes[i], false);
-            }
-            buttons[n].handleClick();
-        }
-    },
     // Public
 
     // Lifecycle
     postCreate: function () {
-        var d = this.domNode;
-        var table = null;
-        var body = null;
-        var tr = null;
-        var td = null;
-        var t = {};
-        var s = null;
-        var buttons = this.buttons;
-
-        d.style.visibility = 'hidden';
-        table = _createElem('table');
-        //table.border = '1';
-        table.cellPadding = '0';
-        table.cellSpacing = '0';
-        body = _createElem('tbody');
-        table.appendChild(body);
-        tr = _createElem('tr');
-        body.appendChild(tr);
-        table.id = this.id + '_buttonSet';
-        table.className = 'buttonSet';
-        this.buttonNodes = [];
-        for (var i = 0; i < buttons.length; i++) {
-            var b = buttons[i];
-            var td = _createElem('td');
-            td.id = this.id + '_button' + i;
-            td.style.width = b.width + 'px';
-            td.style.backgroundImage = 'url(' + cosmo.env.getImageUrl('image_grid.png')+')';
-            var pos = i == this.selectedButtonIndex ? b.downStateImgPos : b.defaultImgPos;
-            td.style.backgroundPosition = pos[0] + 'px ' + pos[1] + 'px';
-            td.style.cursor = 'pointer';
-            td.style.fontSize = '1px';
-            td.style.height = this.height + 'px';
-            td.appendChild(cosmo.util.html.nbsp());
-            dojo.connect(td, 'onmouseover', this, '_handleMouseover');
-            dojo.connect(td, 'onmouseout', this, '_handleMouseout');
-            dojo.connect(td, 'onclick', this, '_handleClick');
-            tr.appendChild(td);
-            this.buttonNodes.push(td);
+        var tr = this.mainRow;
+        for (var i = 0; i < this.buttonProps.length; i++) {
+            var button = new cosmo.ui.widget.GraphicRadioButtonSet.Button(dojo.mixin(this.buttonProps[i],
+                {parent: this, otherButtons: this.buttons, index: i, selectedIndex: this.selectedButtonIndex}));
+            this.buttons.push(button);
+            tr.appendChild(button.domNode);
         }
-        d.appendChild(table);
-        d.style.visibility = 'visible';
     }
 } );
 
-cosmo.ui.widget.GraphicRadioButtonSet.Button = function (p) {
-    params = p || {};
-    this.width = 0;
-    this.defaultImgPos = [];
-    this.mouseoverImgPos = [];
-    this.downStateImgPos = [];
-    for (var n in params) { this[n] = params[n]; }
-}
+dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet.Button", [dijit._Widget, dijit._Templated], {
+    parentId: null,
+    otherButtons: null,
+    index: null,
+    selectedIndex: null,
+    templateString: "<td id='${parent.id}_button${index}' class='cosmoGraphicRadioButton ${defaultImgSel}' "
+                    + "dojoAttachEvent='onmouseover: _handleMouseover, onmouseout: _handleMouseout, onclick: _handleClick'>&nbsp;</td>",
+    postCreate: function () {
+        if (this.index == this.selectedIndex) dojo.addClass(this.domNode, this.downStateImgSel);
+    },
+    _handleMouseover: function (e) {
+        dojo.addClass(this.domNode, this.mouseoverStateImgSel);
+    },
+    _handleMouseout: function (e) {
+        dojo.removeClass(this.domNode, this.mouseoverStateImgSel);
+    },
+    _handleClick: function (e) {
+        parent.selectedButtonIndex = this.index;
+        var buttons = this.otherButtons;
+        for (var i = 0; i < buttons.length; i++) {
+            dojo.removeClass(buttons[i].domNode, buttons[i].downStateImgSel);
+        }
+        dojo.addClass(this.domNode, this.downStateImgSel);
+        this.handleClick();
+    }
+});

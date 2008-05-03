@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,17 @@
 */
 
 /**
- * @fileoverview The event detail form that displays info for the
- * selected event
- * @author Matthew Eernisse mailto:mde@osafoundation.org
+ * @fileoverview functions to do background styling for images in image grid
+ * @author Matthew Eernisse mailto:mde@osafoundation.org, Travis Vachon mailto:travis@osafoundation.org
  * @license Apache License 2.0
  */
 
 dojo.provide("cosmo.ui.imagegrid");
 
-
-dojo.require("cosmo.env");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.util.html");
 
-cosmo.ui.imagegrid.config = {};
 cosmo.ui.imagegrid.DISABLED_OPACITY = 0.3;
-cosmo.ui.imagegrid.IMAGE_PATH = cosmo.env.getImageUrl('image_grid.png');
-
-cosmo.ui.imagegrid.readConfig = function (data) {
-    cosmo.ui.imagegrid.config = data;
-};
-
-// Get the config data file that tells us
-// which images are where, and what sizes
-
-var d = dojo.xhrGet({
-    url: cosmo.env.getBaseUrl() + "/templates" + TEMPLATE_DIRECTORY + "/images/imagegrid.json",
-    sync: true
-});
-d.addCallback(function(str){
-    cosmo.ui.imagegrid.readConfig(dojo.fromJson(str));
-});
-
-cosmo.ui.imagegrid.Image = function (p) {
-    this.row = p.row;
-    this.column = p.column;
-    this.width = p.width + 'px';
-    this.height = p.height + 'px';
-    this.left = 0 - ((this.column * 45 - 45));
-    this.top = 0 - ((this.row * 45) - 45);
-    this.bgImg = 'url(' + cosmo.ui.imagegrid.IMAGE_PATH + ')';
-    this.bgPos = cosmo.ui.imagegrid.getPosString(this);
-};
-
-cosmo.ui.imagegrid.getImage = function (key) {
-    var props = cosmo.ui.imagegrid.config[key];
-    return new cosmo.ui.imagegrid.Image(props);
-}
-
-cosmo.ui.imagegrid.getPosString = function (o) {
-    var s = o.left + 'px ' + o.top + 'px';
-    return s;
-};
 
 cosmo.ui.imagegrid.createImageIcon = function (p) {
     //domNode, iconState
@@ -83,15 +42,15 @@ cosmo.ui.imagegrid.createImageButton = function (p) {
     return cosmo.ui.imagegrid._createImageBox(params);
 };
 
+cosmo.ui.imagegrid.keyToSelector = function(key){
+    return 'cosmo' + key[0].toUpperCase() + key.slice(1);
+};
+
 cosmo.ui.imagegrid._createImageBox = function(p) {
     //domNode, defaultState, rolloverState, isButton
     var d = p.domNode;
-    var img = cosmo.ui.imagegrid.getImage(p.defaultState);
     var enabled = typeof p.enabled == 'boolean' ? p.enabled : true;
-    d.style.width = img.width;
-    d.style.height = img.height;
-    d.style.backgroundImage = img.bgImg;
-    d.style.backgroundPosition = img.bgPos;
+    dojo.addClass(d, this.keyToSelector(p.defaultState));
     if (enabled) {
         // Give buttons the hand
         if (p.isButton) {
@@ -99,22 +58,20 @@ cosmo.ui.imagegrid._createImageBox = function(p) {
         }
         // Selected/default state -- default state gets the rollover
         if (p.selected) {
-          var imgOver = cosmo.ui.imagegrid.getImage(p.rolloverState);
-          d.style.backgroundPosition = imgOver.bgPos;
+          dojo.addClass(d, cosmo.ui.imagegrid.keyToSelector(p.rolloverState));
         }
         else if (p.rolloverState) {
             var over = function (e) {
                 // Do this look up locally so the value doesn't persist
                 // in the closure
-                var imgOver = cosmo.ui.imagegrid.getImage(p.rolloverState);
-                d.style.backgroundPosition = imgOver.bgPos;
+                dojo.addClass(d, cosmo.ui.imagegrid.keyToSelector(p.rolloverState));
                 // Handle any extra mouseover function specified
                 if (p.handleMouseOver) {
                   p.handleMouseOver(e);
                 }
             };
             var out = function (e) {
-                d.style.backgroundPosition = img.bgPos;
+                dojo.removeClass(d, cosmo.ui.imagegrid.keyToSelector(p.rolloverState));
                 // Handle any extra mouseout function specified
                 if (p.handleMouseOut) {
                   p.handleMouseOut(e);

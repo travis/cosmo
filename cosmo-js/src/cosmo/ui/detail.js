@@ -227,7 +227,7 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         self.clear(true);
         self.buttonSection.setButtons(false);
     }
-    
+
     function updateItems(cmd){
         var item = cmd.data;
            if (item) {
@@ -651,7 +651,7 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
         return false;
     }
 
-    if (typeof p == 'boolean' ? p : !this.expanded) this.expand() 
+    if (typeof p == 'boolean' ? p : !this.expanded) this.expand()
     else this.shrink();
 }
 cosmo.ui.detail.StampSection.prototype.setShowHideText = function(str){
@@ -1029,7 +1029,7 @@ cosmo.ui.detail.EventFormElements= function () {
                 value: '',
                 className: 'inputText' }));
         t.appendChild(elem);
-        t.appendChild(_html.nbsp());s
+        t.appendChild(_html.nbsp());
         var elem = addToHashAndReturn(
             _html.createInput({ type: 'radio',
                 id: name + 'MeridianAM',
@@ -1091,7 +1091,7 @@ cosmo.ui.detail.EventFormElements= function () {
         var statusOpt = [];
         var opt = null;
         var str = '';
-        
+
         for (var i in cosmo.model.EventStatus) {
             opt = new Object();
             str = cosmo.model.EventStatus[i];
@@ -1496,13 +1496,13 @@ cosmo.ui.detail.Byline.prototype = new cosmo.ui.ContentBox();
 dojo.declare("cosmo.ui.detail.ButtonSection", [dijit._Widget, dijit._Templated, cosmo.ui.ContentBox],
              {
                  widgetsInTemplate: true,
-                 
+
                  // Attach points
                  removeButton: null,
                  saveButton: null,
                  removeText: _("App.Button.Remove"),
                  saveText: _("App.Button.Save"),
-                 
+
                  templateString: "<div><div class='floatLeft'><div dojoType='cosmo.ui.widget.Button' dojoAttachPoint='removeButton' id='detailRemoveButton' text='${removeText}' enabled='false' dojoAttachEvent='handleOnClick: _handleRemove'></div></div><div class='floatRight'><div dojoType='cosmo.ui.widget.Button' dojoAttachPoint='saveButton' id='detailSaveButton' text='${saveText}' enabled='false' dojoAttachEvent='handleOnClick: _handleSave'></div></div><div class='clearBoth'></div></div>",
                  setButtons: function(enabled){
                      this.saveButton.setEnabled(enabled);

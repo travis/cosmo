@@ -191,8 +191,7 @@ cosmo.env.setTimeoutSeconds = function(timeoutSeconds) {
 }
 
 cosmo.env.getImageUrl = function(image){
-    s = cosmo.env.getStaticUrl('/templates' + TEMPLATE_DIRECTORY + '/images/' + image);
-  return s;
+    return dojo.moduleUrl("cosmo", "themes/default/images/" + image);//cosmo.env.getStaticUrl('/templates' + TEMPLATE_DIRECTORY + '/images/' + image);
 }
 
 cosmo.env.urls = {

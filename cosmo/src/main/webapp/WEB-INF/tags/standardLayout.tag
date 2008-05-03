@@ -136,7 +136,7 @@ img#logo {
     <div id="head">
       <span id="mainLogoContainer">
         <a href="<c:url value="/account/view"/>">
-          <img id="logo" src="${staticBaseUrl}/templates/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
+          <img id="logo" src="${staticBaseUrl}/js/cosmo/themes/${templateName}/images/<fmt:message key="App.LogoUri" bundle="${uiBundle}"/>"
                alt="<fmt:message key="App.Name"  bundle="${uiBundle}"/>"/>
         </a>
       </span>

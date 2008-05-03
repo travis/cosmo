@@ -25,7 +25,7 @@
 <fmt:message key="App.TemplateName" var="templateName"/>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <!-- Stylesheets -->
-<link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/global.css"/>
+<link rel="stylesheet" href="${staticBaseUrl}/js/cosmo/themes/${templateName}/global.css"/>
 <c:forEach var="stylesheet" items="${stylesheets}">
-<link rel="stylesheet" href="${staticBaseUrl}/templates/${templateName}/${stylesheet}.css"/>
+<link rel="stylesheet" href="${staticBaseUrl}/js/cosmo/themes/${templateName}/${stylesheet}.css"/>
 </c:forEach>

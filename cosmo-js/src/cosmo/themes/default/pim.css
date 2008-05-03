@@ -19,6 +19,7 @@
 @import url("../../../dijit/themes/dijit.css");
 @import url("../../../dijit/themes/tundra/Dialog.css");
 @import url("SharingDialog.css");
+@import url("imagegrid.css");
 
 /* Calendar-specific styles, classes
  * ==================================== */
@@ -645,3 +646,7 @@
     white-space: nowrap;
 }
 
+.cosmoGraphicRadioButton {
+    cursor: pointer;
+    font-size: 1px;
+}

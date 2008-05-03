@@ -49,7 +49,7 @@ cosmo.ui.navbar.Bar = function (p) {
     this.defaultViewHasBeenInitialized = false;
     this.calViewNav = new cosmo.ui.navbar.CalViewNav({ parent: this });
     this.quickItemEntry = new cosmo.ui.navbar.QuickItemEntry({ parent: this });
-    this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this, 
+    this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this,
                                                          listCanvas: p.listCanvas
                                                        });
 
@@ -59,7 +59,7 @@ cosmo.ui.navbar.Bar = function (p) {
     // ===========
     // Handle published messages -- in this case just a poke
     // to let the NavBar know to re-render
-    
+
     var r = function(){self.render()};
     dojo.subscribe('cosmo:calEventsLoadSuccess', r);
     dojo.subscribe('cosmo:calNavigateLoadedCollection', r);
@@ -203,29 +203,23 @@ cosmo.ui.navbar.Bar = function (p) {
     this._addViewToggle = function () {
         var d = this.domNode;
         var _pim = cosmo.app.pim;
-        var _img = cosmo.ui.imagegrid;
         var selButtonIndex = _pim.currentView == _pim.views.LIST ? 0 : 1;
-        var _radio = cosmo.ui.widget.GraphicRadioButtonSet.Button;
-        var listBase = _img.getImage('listViewDefault');
-        var listSel = _img.getImage('listViewSelected');
-        var calBase = _img.getImage('calViewDefault');
-        var calSel = _img.getImage('calViewSelected');
+
         var w = 24;
-        var btns = [
-            new _radio({ width: w,
-                defaultImgPos: [listBase.left, listBase.top],
-                mouseoverImgPos: [listSel.left, listSel.top],
-                downStateImgPos: [listSel.left, listSel.top],
+        var btns = [{ width: w,
+                defaultImgSel: 'cosmoListViewDefault',
+                mouseoverImgSel: 'cosmoListViewSelected',
+                downStateImgSel: 'cosmoListViewSelected',
                 handleClick: function () {
                     self.displayView({ viewName: cosmo.app.pim.views.LIST }); }
-                }),
-            new _radio({ width: w,
-                defaultImgPos: [calBase.left, calBase.top],
-                mouseoverImgPos: [calSel.left, calSel.top],
-                downStateImgPos: [calSel.left, calSel.top],
+                },
+                { width: w,
+                defaultImgSel: 'cosmoCalViewDefault',
+                mouseoverImgSel: 'cosmoCalViewSelected',
+                downStateImgSel: 'cosmoCalViewSelected',
                 handleClick: function () {
                     self.displayView({ viewName:cosmo.app.pim.views.CAL }); }
-                })
+                }
         ];
 
         // Clean up if previously rendered
@@ -236,7 +230,7 @@ cosmo.ui.navbar.Bar = function (p) {
         t.className = 'floatLeft';
         this.viewToggleNode = t;
         var vT =  new cosmo.ui.widget.GraphicRadioButtonSet({
-            selectedButtonIndex: selButtonIndex, height: 35, buttons: btns,
+            selectedButtonIndex: selButtonIndex, buttonProps: btns,
             id: "viewToggle"
         });
         t.appendChild(vT.domNode);

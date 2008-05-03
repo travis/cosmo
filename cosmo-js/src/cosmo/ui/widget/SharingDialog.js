@@ -171,7 +171,8 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     changeDisplayName: function(value){
         //TODO: Once we have a Writeable collection store, move to that
         this.store.setValue(this.collection, "displayName", value);
-        var d = this.store.save();
+        var d = new dojo.Deferred();
+        this.store.save({onComplete: dojo.hitch(d, d.callback)});
         d.addCallback(dojo.hitch(this, function(){
             this.onDisplayNameChange(this.collection, value);
         }));

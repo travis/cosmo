@@ -50,7 +50,7 @@ a {
     <div>
     <a href="<fmt:message key="About.LogoLink"/>"
                onclick="goURLMainWin('<fmt:message key="About.LogoLink"/>'); 
-               return false;"><img src="${staticBaseUrl}/templates/${templateName}/images/${logoUri}" alt="<fmt:message 
+               return false;"><img src="${staticBaseUrl}/js/cosmo/themes/${templateName}/images/${logoUri}" alt="<fmt:message 
                key="About.LogoAltText"/>" style="border: 0px"/></a>    
     </div>
     <div class="smLabel"><fmt:message 

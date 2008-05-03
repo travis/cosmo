@@ -25,10 +25,19 @@
     text-align: right;
 }
 .cosmoSharingHtmlLinkIcon{
-    background: url();
+    position: absolute;
+    right: 0;
+    margin-right: 5em;
+    background-image: url(images/image_grid.png);
+    height: 18px; 
+    width: 18px; 
+    background-position: -135px -45px; 
+}
+.cosmoSharingHtmlLinkIcon:hover{
 }
 .cosmoSharingHtmlLink{
     text-decoration: none;
+    line-height: 18px;
 }
 h2.cosmoSharingSectionHead {
     margin-top: 30px;
@@ -88,7 +97,8 @@ h2.cosmoSharingSectionHead {
     display: none;
 }
 .cosmoInviteInstructions {
-    
+    margin-top: 10px;
+    margin-bottom: 15px;
 }
 .cosmoReadOnlyInviteLink {
     display: block;
@@ -105,9 +115,11 @@ h2.cosmoSharingSectionHead {
     color: black;
 }
 .cosmoSharingDownloadButton {
+    margin-top: 30px;
     display: block;
 }
 .cosmoSharingDoneButton {
+    margin-top: 15px;
     display: block;
     position: absolute;
     left: 0;

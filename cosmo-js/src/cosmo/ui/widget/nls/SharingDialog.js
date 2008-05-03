@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 ({
-     subscribeHead: "Subscribe",
+     subscribeHead: "Subscribe with...",
 
      atom: "Feed Reader",
      iCal: "Apple iCal",

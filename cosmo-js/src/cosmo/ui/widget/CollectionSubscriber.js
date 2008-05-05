@@ -41,10 +41,13 @@ dojo.declare(
         displayName: "",
         store: null,
 
-        l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSubscriber"),
-
         //references to various DOM nodes
         displayNameText: null,
+
+
+        constructor: function(){
+            this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSubscriber");
+        },
 
         postMixInProperties: function(){
             this.displayName = this.store.getValue(this.collection, "displayName");

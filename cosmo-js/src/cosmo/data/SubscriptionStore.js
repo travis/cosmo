@@ -21,7 +21,10 @@ dojo.require("cosmo.data.ItemStore");
 dojo.requireLocalization("cosmo.data", "SubscriptionStore");
 
 dojo.declare("cosmo.data.SubscriptionStore", cosmo.data.CollectionStore, {
-    l10n: dojo.i18n.getLocalization("cosmo.data", "SubscriptionStore"),
+
+    constructor: function(){
+        this.l10n = dojo.i18n.getLocalization("cosmo.data", "SubscriptionStore");
+    },
     getValue: function(item, attr, defaultValue){
         if (attr == "urls") return this.getUrls(item);
         else return this.inherited("getValue", arguments);

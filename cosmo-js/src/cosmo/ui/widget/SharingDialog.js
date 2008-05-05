@@ -28,7 +28,6 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
 {
     widgetsInTemplate: true,
     templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/SharingDialog.html'),
-    l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "SharingDialog"),
 
     // init params
     store: null,
@@ -54,6 +53,10 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
 
     readOnlyTicket: null,
     readWriteTicket: null,
+
+    constructor: function(){
+        this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "SharingDialog");
+    },
 
     // Functions for subscription instructions
     instructionsOnClick: function(e, instructionsKey, urls){
@@ -181,7 +184,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
 
     deleteCollection: function(){
         var displayName = this.store.getValue(this.collection, "displayName");
-        var confirmDeleteMessage = dojo.string.substitute(this.l10n.confirmDelete, {collectionName: displayName});
+        var confirmDeleteMessage = dojo.string.substitute(this.store.l10n.confirmDelete, {collectionName: displayName});
         var d = cosmo.app.confirm(confirmDeleteMessage, {cancelDefault: true});
         d.addCallback(dojo.hitch(this, function(confirmed){
             if (confirmed){

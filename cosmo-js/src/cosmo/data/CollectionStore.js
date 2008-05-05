@@ -21,9 +21,9 @@ dojo.require("cosmo.data.ItemStore");
 dojo.requireLocalization("cosmo.data", "CollectionStore");
 
 dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
-    l10n: dojo.i18n.getLocalization("cosmo.data", "CollectionStore"),
     constructor: function(service){
         this._serv = service || cosmo.service.conduits.getAtomPlusEimConduit();
+        this.l10n = dojo.i18n.getLocalization("cosmo.data", "CollectionStore");
     },
     isItem: function(/* anything */ something){
         return something instanceof cosmo.model.Collection;

@@ -28,13 +28,16 @@ dojo.declare("cosmo.ui.widget.TicketAdmin", [dijit._Widget, dijit._Templated],
 {
     widgetsInTemplate: true,
     templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/TicketAdmin.html'),
-    l10n: dojo.i18n.getLocalization("cosmo.ui.widget", "TicketAdmin"),
 
     // init params
     ticketStore: null,
     urls: {},
 
     ticketContainer: null,
+
+    constructor: function(){
+        this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "TicketAdmin");
+    },
 
     onTicket: function(ticket){
         var t = new cosmo.ui.widget._SingleTicket(

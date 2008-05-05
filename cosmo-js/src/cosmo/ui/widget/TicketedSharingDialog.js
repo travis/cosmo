@@ -23,8 +23,10 @@ dojo.requireLocalization("cosmo.ui.widget", "TicketedSharingDialog");
 dojo.declare("cosmo.ui.widget.TicketedSharingDialog", cosmo.ui.widget.SharingDialog,
 {
     templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/TicketedSharingDialog.html'),
-    l10n: dojo.mixin({}, dojo.i18n.getLocalization("cosmo.ui.widget", "SharingDialog"),
-                     dojo.i18n.getLocalization("cosmo.ui.widget", "TicketedSharingDialog")),
+    constructor: function(){
+        this.l10n = dojo.mixin({}, dojo.i18n.getLocalization("cosmo.ui.widget", "SharingDialog"),
+                               dojo.i18n.getLocalization("cosmo.ui.widget", "TicketedSharingDialog"));
+    },
 
     atomOnClick: function(e){
         this.instructionsOnClick(e, "feedReader");

@@ -118,6 +118,10 @@ h2.cosmoSharingSectionHead {
     margin-top: 30px;
     display: block;
 }
+.cosmoSharingDeleteButton {
+    margin-top: 30px;
+    display: block;
+}
 .cosmoSharingDoneButton {
     margin-top: 15px;
     display: block;

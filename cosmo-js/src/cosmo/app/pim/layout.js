@@ -299,8 +299,6 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
-    console.debug("pop pop pop");
-
     var menuBar = this.baseLayout.menuBar;
     var centerColumn = this.baseLayout.mainApp.centerColumn;
     var leftSidebar = this.baseLayout.mainApp.leftSidebar;

@@ -1,6 +1,5 @@
 <div class="cosmoSharingDialog">
-  <div class="cosmoSharingDisplayName"><span id="${id}DisplayName" dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" dojoAttachPoint="displayName">${displayName}</span></div>
-  <div class="cosmoSharingHtmlLinkDiv"><span  class="cosmoSharingHtmlLinkIcon"></span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
+  <div class="cosmoSharingTopDiv"><span class="cosmoSharingDisplayName" id="${id}DisplayName" title="${l10n.displayNameTitle}" dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" dojoAttachPoint="displayName">${displayName}</span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
   <h2 class="cosmoSharingSectionHead">${l10n.subscribeHead}</h2>
   <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span>
 

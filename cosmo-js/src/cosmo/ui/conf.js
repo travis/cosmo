@@ -23,7 +23,7 @@ dojo.require("cosmo.env");
 dojo.global.TEMPLATE_DIRECTORY = "/" + (dojo.config.templateName || 'default'); // Template directory to use
 dojo.global.DISPLAY_WIDTH_PERCENT = 1.0; // Percent of window width to draw entire display
 dojo.global.DISPLAY_HEIGHT_PERCENT = 1.0; // Percent of window height to draw entire display
-dojo.global.TOP_MENU_HEIGHT = 48; // Height for top menubar 
+dojo.global.TOP_MENU_HEIGHT = 48; // Height for top menubar
 dojo.global.LEFT_SIDEBAR_WIDTH = 168; // Width of lefthand sidebar
 dojo.global.RIGHT_SIDEBAR_WIDTH = 256; // Width of righthand sidebar
 dojo.global.CAL_TOP_NAV_HEIGHT = 36; // Height for top navigation area -- Month name and nav arrows, list view pager
@@ -43,6 +43,7 @@ dojo.global.PROCESSING_ANIM_WIDTH = 220;
 dojo.global.DIALOG_BOX_WIDTH = 380;
 dojo.global.DIALOG_BOX_HEIGHT = 280;
 dojo.global.COLLECTION_SELECTOR_HEIGHT = 176;
+dojo.global.COLLECTION_SUBSCRIBER_HEIGHT = 210;
 dojo.global.LOGO_GRAPHIC = 'logo_main.gif';
 dojo.global.LOGO_GRAPHIC_SM = 'logo_sm.gif';
 dojo.global.BUTTON_DIR_PATH = cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_DIRECTORY + '/images/';
@@ -57,7 +58,7 @@ dojo.global.BUTTON_DIR_PATH = cosmo.env.getBaseUrl() + '/templates' + TEMPLATE_D
 // showing and auto logout.
 cosmo.ui.conf.timeoutDialogAutoLogout = 30
 
-// Determines whether services are also availble over http on port 80, when the 
+// Determines whether services are also availble over http on port 80, when the
 // current page's url is https
 cosmo.ui.conf.httpSupported="false";
 
@@ -75,7 +76,7 @@ cosmo.ui.conf.load = function (uri){
     d.addCallback(function(s){
         var propertymaps = eval("(" + s + ")");
         cosmo.ui.conf._localtext = propertymaps[0];
-        
+
         var configProperties = propertymaps[1];
         dojo.mixin(cosmo.ui.conf, configProperties);
     });
@@ -92,13 +93,13 @@ cosmo.ui.conf.init = function (uri){
 }
 
 cosmo.ui.conf.getBooleanValue = function(propertyName){
-    //summary: called to get the boolean value of a string. 
+    //summary: called to get the boolean value of a string.
     //description: Anything starting with "t" returns true. Properties returned from the server
     //             are strings, not integers, booleans, etc, so this method is necessary to do
     //             the proper "casting"
     var rawValue = this[propertyName];
     return (""+rawValue).toLowerCase().charAt(0) == "t";
-} 
+}
 
 if (dojo.config['i18nLocation']){
     cosmo.ui.conf.init(dojo.config['i18nLocation']);

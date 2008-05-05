@@ -24,7 +24,6 @@
  */
 
 dojo.provide("cosmo.env");
-
 cosmo.env.OVERLORD_USERNAME = "root";
 
 //private variable for storing environment information. Do not access directly,
@@ -191,7 +190,7 @@ cosmo.env.setTimeoutSeconds = function(timeoutSeconds) {
 }
 
 cosmo.env.getImageUrl = function(image){
-    return dojo.moduleUrl("cosmo", "themes/default/images/" + image);//cosmo.env.getStaticUrl('/templates' + TEMPLATE_DIRECTORY + '/images/' + image);
+    return dojo.moduleUrl("cosmo", "themes/default/images/" + image);
 }
 
 cosmo.env.urls = {

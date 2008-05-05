@@ -14,13 +14,15 @@
  * limitations under the License.
 */
 ({
+     displayNameTitle: "Double click to change display name",
+
      subscribeHead: "Subscribe with...",
 
      atom: "Feed Reader",
      iCal: "Apple iCal",
      dav: "CalDAV",
      chandler: "Chandler Desktop",
-     html: "Link here",
+     html: "Link",
 
      feedReaderLabel: "Feed Reader",
      chandlerLabel: "Chandler Desktop",
@@ -29,21 +31,25 @@
      davLabel: "CalDAV",
 
      chandlerInstructions: "<a href='${mc}' onclick='return false'>${mc}</a>"
-                           + "<ol><li>From Chandler Desktop, go to <b>Share>>Subscribe</b></li>"
+                           + "<div style='margin: 1em 0em 0em 2em'><ol>"
+                           + "<li>From Chandler Desktop, go to <b>Share>>Subscribe</b></li>"
                            + "<li>Paste the above link into the <b>URL:</b> field</li>"
-                           + "<li>Click <b>[Subscribe]</b></li></ol>",
+                           + "<li>Click <b>[Subscribe]</b></li>"
+                           + "</ol></div>",
      feedReaderInstructions: "<a href='${atom}' target='_blank'>${atom}</a>"
-                             + "<p>Click on the above link to subscribe with web based feed readers like Google Reader or Bloglines, "
+                             + "<p>Click on the above link to subscribe with web based feed readers like Google Reader or Bloglines, <br/>"
                              + "or copy and paste it into your favorite feed reader.</p>",
-     iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>" +
-         "<p>Click on the above link to subscribe to this collection using any version of iCal.</p>" +
-         "<p>If that does not work, copy the above URL to the clipboard and paste it into the \"Subscribe\" dialog in iCal.</p>" +
-         "<p>If you are using iCal 3 and would like to sync and edit collections, see the settings dialog for more information.</p>",
+     iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>"
+         +"<p>Click on the above link to subscribe <b>view-only</b> to this collection with Apple iCal. "
+         + "If that fails, from Apple iCal, go to <b>Calendar>>Subscribe...</b> and paste this link "
+         + "into the <b>URL:</b> field.</p>"
+         + "<p><b>Apple iCal 3.x (Leopard) Users:</b>  Sync your account and gain <b>view and edit</b>"
+         + "access to all of your calendars from Apple iCal. See <a href='http://chandlerproject.org/Projects/GetStarted#Sync%20with%20Apple%20iCal,%20Sunbird...'>instructions</a>.</p>",
 
      davInstructions: "<a href='${dav}' onclick='return false'>${dav}</a>"
-                      + "<p>Paste the above link into a CalDAV client that supports individual collection subscriptions.</p>"
-                      + "<p>To sync and edit all collections in your account using CalDAV, see the CalDAV account setup intructions"
-                      + "in the settings dialog.</p>",
+         + "<p>Paste the above link into a CalDAV client that supports individual collection subscriptions.</p>"
+         + "<p>To sync and edit all collections in your account see "
+         + "<a href=http://chandlerproject.org/Projects/UsingOtherAppsWithChandlerHub>instructions</a>.</p>",
 
      chandlerInstructionsTitle: "Subscribe with Chandler Desktop",
      feedReaderInstructionsTitle: "Subscribe with a feed reader",
@@ -59,7 +65,7 @@
      invite: "Invite",
      inviteInstructions: "Give out the URLs below to invite others to subscribe.",
      inviteReadOnly: "View-only",
-     inviteReadWrite: "View and edit",
+     inviteReadWrite: "View and Edit",
 
      download: "Download",
 

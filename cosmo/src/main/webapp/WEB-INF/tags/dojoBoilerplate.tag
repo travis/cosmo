@@ -62,7 +62,6 @@
 
 <script type="text/javascript">
 (function bootstrap(){
-    if (djConfig.isDebug) dojo.registerModulePath("cosmo", "../cosmo-src");
     dojo.require("cosmo.env");
     cosmo.env.setVersion("${PRODUCT_VERSION}");
     dojo.require("cosmo.ui.conf");

@@ -36,7 +36,6 @@ dojo.declare("cosmo.data.CollectionStore", cosmo.data.ItemStore, {
     },
 
     fetch: function(/* Object */ keywordArgs){
-        console.debug("fetch");
         var scope = keywordArgs.scope || dojo.global;
         var d = this._serv.getCollections();
         d.addCallback(dojo.hitch(this, function(collections){

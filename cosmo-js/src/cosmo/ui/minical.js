@@ -150,7 +150,7 @@ cosmo.ui.minical.MiniCal = function (p) {
         else {
             self.renderSelf();
         }
-        
+
     });
 
     /**
@@ -228,8 +228,8 @@ cosmo.ui.minical.MiniCal = function (p) {
 
             // Button
             td = _createElem('td');
-            var buttonGoTo = new cosmo.ui.widget.Button({id: 'goToDateButton', width: 36, 
-                handleOnClick: self.doGoToDate, text: _('App.Button.Go'), 
+            var buttonGoTo = new cosmo.ui.widget.Button({id: 'goToDateButton', width: 36,
+                handleOnClick: self.doGoToDate, text: _('App.Button.Go'),
                 small: true});
             self.goToButton = buttonGoTo;
             td.appendChild(buttonGoTo.domNode);
@@ -309,7 +309,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             // we'll just use hard-coded values we know are right for
             // the collection display in ticket view, and the collection
             // selector when logged in
-            c = cosmo.app.pim.ticketKey ? 36 : COLLECTION_SELECTOR_HEIGHT;
+            c = cosmo.app.pim.ticketKey ? COLLECTION_SUBSCRIBER_HEIGHT : COLLECTION_SELECTOR_HEIGHT;
             c += 8; // A bit of spacing
             var h = self.navPanel.offsetHeight;
             h += self.goToDateNode.offsetHeight;

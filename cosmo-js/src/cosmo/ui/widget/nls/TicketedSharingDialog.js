@@ -14,11 +14,11 @@
  * limitations under the License.
 */
 ({
-     feedReaderInstructions: "<a href='${atom}' target='_blank'>${atom}</a>"
-                             + "<p>Click on the above link to subscribe with web based feed readers like Google Reader or Bloglines, "
-                             + "or copy and paste it into your favorite feed reader.</p>",
+     iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>"
+         +"<p>Click on the above link to subscribe <b>view-only</b> to this collection with Apple iCal. "
+         + "If that fails, from Apple iCal, <br/> go to <b>Calendar>>Subscribe...</b> and paste this link "
+         + "into the <b>URL:</b> field.</p>",
 
-     iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>" +
-         "<p>Click on the above link to subscribe to this collection using any version of iCal.</p>" +
-         "<p>If that does not work, copy the above URL to the clipboard and paste it into the \"Subscribe\" dialog in iCal.</p>"
+     davInstructions: "<a href='${dav}' onclick='return false'>${dav}</a>"
+         + "<p>Paste the above link into a CalDAV client that supports individual collection subscriptions.</p>"
  })

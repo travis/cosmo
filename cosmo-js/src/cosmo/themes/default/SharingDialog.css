@@ -6,43 +6,33 @@
     bottom: 0;
 }
 .cosmoSharingDialog {
+    background: white;
+}
+.cosmoSharingDialogForm {
     padding: 30px 7px 18px 7px;
     background: #EDEDED;
 }
-.cosmoSharingDisplayName {
+.cosmoSharingTopDiv {
     position: absolute;
     top: 0px;
     right: -2px;
     left: 0px;
     border: 1px solid #999999;
     padding: 2px 5px;
+    background: white;
 }
-.cosmoSharingHtmlLinkDiv{
-    position: absolute;
-    top: 2em;
-    left: 0;
-    right: 0;
-    text-align: right;
-}
-.cosmoSharingHtmlLinkIcon{
-    position: absolute;
-    right: 0;
-    margin-right: 5em;
-    background-image: url(images/image_grid.png);
-    height: 18px; 
-    width: 18px; 
-    background-position: -135px -45px; 
-}
-.cosmoSharingHtmlLinkIcon:hover{
+.cosmoSharingDisplayName {
+    font-size: 1.1em;
+    font-weight: bold;
+    float: left;
 }
 .cosmoSharingHtmlLink{
     text-decoration: none;
-    line-height: 18px;
+    float: right;
 }
 h2.cosmoSharingSectionHead {
     margin-top: 30px;
     font-size: 1em;
-    font-weight: normal;
 }
 .cosmoSubscribeButton{
     display: block;
@@ -126,9 +116,17 @@ h2.cosmoSharingSectionHead {
     margin-top: 15px;
     display: block;
     position: absolute;
-    left: 0;
-    right: 0;
+    left: -2px;
+    right: -4px;
 }
 .cosmoSharingDoneButton .dijitButtonNode{
     width: 100%
+}
+/* Ticketed dialog styles*/
+.cosmoTicketedSharingDialog {
+    border-top: 1px solid #999999;
+    padding: 7px;
+}
+.cosmoTicketedSharingDialog .cosmoSharingSectionHead {
+    margin-top: 0px
 }

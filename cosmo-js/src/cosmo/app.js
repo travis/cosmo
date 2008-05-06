@@ -301,12 +301,14 @@ cosmo.app = new function () {
         var yesButton = new cosmo.ui.widget.Button(
                               { text:_('App.Button.Yes'),
                                 width:74,
-                                handleOnClick: yesFunc
+                                handleOnClick: yesFunc,
+                                id: "cosmoModalConfirmYes"
                               });
         var noButton = new cosmo.ui.widget.Button(
                               { text:_('App.Button.No'),
                                 width:74,
-                                handleOnClick: noFunc
+                                handleOnClick: noFunc,
+                                id: "cosmoModalConfirmNo"
                               });
         var dialogProps = {
             "btnsRight": [yesButton],

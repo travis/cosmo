@@ -14,10 +14,10 @@
     ${l10n.invite}
   </div>
 
-  <div dojoAttachPoint="inviteSection" class="cosmoInviteSection">
+  <div dojoAttachPoint="inviteSection" class="cosmoInviteSection" id="${id}InviteSection">
     <div class="cosmoInviteInstructions">${l10n.inviteInstructions}</div>
-    <a href="" class="cosmoReadOnlyInviteLink" dojoAttachPoint="readOnlyInviteLink">${l10n.inviteReadOnly}</a>
-    <a href="" class="cosmoReadWriteInviteLink" dojoAttachPoint="readWriteInviteLink">${l10n.inviteReadWrite}</a>
+    <a href="" id="${id}ReadOnlyInviteLink" class="cosmoReadOnlyInviteLink" dojoAttachPoint="readOnlyInviteLink">${l10n.inviteReadOnly}</a>
+    <a href="" id="${id}ReadWriteInviteLink" class="cosmoReadWriteInviteLink" dojoAttachPoint="readWriteInviteLink">${l10n.inviteReadWrite}</a>
   </div>
       
   <a href="${urls.webcal.uri}" target="_blank" class="cosmoSharingDownloadLink">

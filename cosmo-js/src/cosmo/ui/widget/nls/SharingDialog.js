@@ -41,10 +41,10 @@
                              + "or copy and paste it into your favorite feed reader.</p>",
      iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>"
          +"<p>Click on the above link to subscribe <b>view-only</b> to this collection with Apple iCal. "
-         + "If that fails, from Apple iCal, go to <b>Calendar>>Subscribe...</b> and paste this link "
+         + "If that fails,<br/> from Apple iCal, go to <b>Calendar>>Subscribe...</b> and paste this link "
          + "into the <b>URL:</b> field.</p>"
-         + "<p><b>Apple iCal 3.x (Leopard) Users:</b>  Sync your account and gain <b>view and edit</b>"
-         + "access to all of your calendars from Apple iCal. See <a href='http://chandlerproject.org/Projects/GetStarted#Sync%20with%20Apple%20iCal,%20Sunbird...'>instructions</a>.</p>",
+         + "<p><b>Apple iCal 3.x (Leopard) Users:</b>  Sync your account and gain <b>view and edit</b> "
+         + "access to<br/> all of your calendars from Apple iCal. See <a href='http://chandlerproject.org/Projects/GetStarted#Sync%20with%20Apple%20iCal,%20Sunbird...'>instructions</a>.</p>",
 
      davInstructions: "<a href='${dav}' onclick='return false'>${dav}</a>"
          + "<p>Paste the above link into a CalDAV client that supports individual collection subscriptions.</p>"

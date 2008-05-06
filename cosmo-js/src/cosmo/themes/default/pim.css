@@ -163,6 +163,11 @@
 #mainApp {
     position: absolute;
 }
+#mainLogoContainer {
+    position: absolute;
+    top: 0px;
+    left: 6px;
+}
 
 /* Left sidebar
  * --------------------- */

@@ -43,7 +43,7 @@ cosmo.ui.imagegrid.createImageButton = function (p) {
 };
 
 cosmo.ui.imagegrid.keyToSelector = function(key){
-    return 'cosmo' + key[0].toUpperCase() + key.slice(1);
+    return 'cosmo' + key.charAt(0).toUpperCase() + key.slice(1);
 };
 
 cosmo.ui.imagegrid._createImageBox = function(p) {

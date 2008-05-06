@@ -309,9 +309,6 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     logoDiv.id = 'mainLogoContainer';
     logoDiv = cosmo.ui.imagegrid.createImageIcon({ domNode: logoDiv,
         iconState: 'mainLogoGraphic' });
-    logoDiv.style.position = 'absolute';
-    logoDiv.style.top = '0px';
-    logoDiv.style.left = '6px';
     menuBar.domNode.appendChild(logoDiv);
 
     // Main menu of links at the top of the UI

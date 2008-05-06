@@ -121,7 +121,7 @@ cosmo.ui.menu.requiredRoles = {
 };
 
 cosmo.ui.menu.urls = {
-    HELP: _("Main.CollectionDetails.HelpLink"),
+    HELP: _("Help.MainUrl"),
     ACCOUNT_BROWSER: cosmo.env.getFullUrl("Browse") + "/" +
         cosmo.app.currentUsername,
     ADMIN_CONSOLE: cosmo.env.getFullUrl("UserList")

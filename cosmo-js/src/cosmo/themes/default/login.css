@@ -36,7 +36,7 @@
     padding-bottom: 4px;
 }
 #loginDialogLoginPrompt {
-    padding-bottom: 1em;
+    padding-bottom: 0;
 }
 
 #loginDialogLogo {
@@ -47,10 +47,12 @@
 
 #loginDialogFormContainer { /* IE6 doesn't support max-width */
     width: 330px;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
     padding: 12px;
     border: 1px solid #CCCCCC;
     background: #FF6600;
+    margin-top: 10px;
 }
 
 #loginDialog > #loginDialogFormContainer {

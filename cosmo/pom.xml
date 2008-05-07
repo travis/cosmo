@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.osaf.cosmo</groupId>
         <artifactId>osaf-server</artifactId>
-        <version>0.15-SNAPSHOT</version>
+        <version>0.16-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cosmo</artifactId>
@@ -593,7 +593,7 @@
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
                                     <artifactId>cosmo-js</artifactId>
-                                    <version>0.15-SNAPSHOT</version>
+                                    <version>0.16-SNAPSHOT</version>
                                     <overWrite>false</overWrite>
                                     <type>jar</type>
                                   </artifactItem>
@@ -634,7 +634,7 @@
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
                                     <artifactId>cosmo-js</artifactId>
-                                    <version>0.15-SNAPSHOT</version>
+                                    <version>0.16-SNAPSHOT</version>
                                     <overWrite>false</overWrite>
                                     <type>jar</type>
                                   </artifactItem>
@@ -700,7 +700,7 @@
                                  <artifactItem>
                                     <groupId>org.osaf.cosmo</groupId>
                                     <artifactId>cosmo-js</artifactId>
-                                    <version>0.15-SNAPSHOT</version>
+                                    <version>0.16-SNAPSHOT</version>
                                     <overWrite>false</overWrite>
                                     <type>jar</type>
                                   </artifactItem>

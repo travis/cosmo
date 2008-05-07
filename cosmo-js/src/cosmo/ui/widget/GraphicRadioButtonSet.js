@@ -28,9 +28,9 @@ dojo.require("cosmo.env");
 
 dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Templated], {
 
-    templateString: '<span><table cellpadding="0" cellspacing="0" id="${id}_buttonSet class="buttonSet"><tbody><tr dojoAttachPoint="mainRow"></tr></tbody></table></span>',
+    templateString: '<span><table cellpadding="0" cellspacing="0" id="${id}_buttonSet class="buttonSet"><tbody><tr dojoAttachPoint="containerNode"></tr></tbody></table></span>',
 
-    mainRow: null,
+    containerNode: null,
 
     buttons: null,
     buttonProps: null,
@@ -46,7 +46,7 @@ dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet", [dijit._Widget, dijit._Tem
 
     // Lifecycle
     postCreate: function () {
-        var tr = this.mainRow;
+        var tr = this.containerNode;
         for (var i = 0; i < this.buttonProps.length; i++) {
             var button = new cosmo.ui.widget.GraphicRadioButtonSet.Button(dojo.mixin(this.buttonProps[i],
                 {parent: this, otherButtons: this.buttons, index: i, selectedIndex: this.selectedButtonIndex}));
@@ -61,7 +61,7 @@ dojo.declare("cosmo.ui.widget.GraphicRadioButtonSet.Button", [dijit._Widget, dij
     otherButtons: null,
     index: null,
     selectedIndex: null,
-    templateString: "<td id='${parent.id}_button${index}' class='cosmoGraphicRadioButton ${defaultImgSel}' "
+    templateString: "<td class='cosmoGraphicRadioButton ${defaultImgSel}' "
                     + "dojoAttachEvent='onmouseover: _handleMouseover, onmouseout: _handleMouseout, onclick: _handleClick'>&nbsp;</td>",
     postCreate: function () {
         if (this.index == this.selectedIndex) dojo.addClass(this.domNode, this.downStateImgSel);

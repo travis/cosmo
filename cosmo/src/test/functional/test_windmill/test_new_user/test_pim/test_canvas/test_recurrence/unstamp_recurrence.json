@@ -19,7 +19,7 @@
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 
 //go to list view
-{"params": {"jsid": "{$listView}"}, "method": "click"}
+{"params": {"id": "cosmoViewToggleListViewSelector"}, "method": "click"}
 {"method": "waits.forElement", "params": {"id": "listViewQuickItemEntry", "timeout": "40000"}}
 
 //select it

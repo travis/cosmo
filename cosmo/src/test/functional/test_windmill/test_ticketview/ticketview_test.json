@@ -1,6 +1,6 @@
 {"method": "waits.sleep", "params": {"milliseconds" : 4000}}
 {"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": 40000}}
-{"params": {"jsid": "{$calView}"}, "method": "click"}
+{"params": {"id": "cosmoViewToggleCalViewSelector"}, "method": "click"}
 {"method": "waits.forElement", "params": {"id": "hourDiv1-1200", "timeout": 40000}}
 {"params": {"link": "Add to my account..."}, "method": "click"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}

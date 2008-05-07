@@ -3,7 +3,7 @@ windmill.jsTest.require('shared/utilities.js');
 
 pimTest.calView.test_unsavedChanges = new function () {
   var doLozengeClickByRegistryIndex =
-    pimTest.shared.utilities.doLozengeClickByRegistryIndex; 
+    pimTest.shared.utilities.doLozengeClickByRegistryIndex;
 
   this.setup = new function () {
     // Make sure cal view is displayed
@@ -69,7 +69,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Change the title
     { method: "type", params: { id: "noteTitle", text: "Unsaved: Change View" } },
     // Change to list view
-    { method: "click", params: { id: "viewToggle_button0" } },
+    { method: "click", params: { id: "cosmoViewToggleListViewSelector" } },
     // Verify that the Unsaved Changes dialog appears
     { method: "waits.forElement", params: { id: "modalDialogContent" } },
     { method: "asserts.assertText", params: { validator:
@@ -87,7 +87,7 @@ pimTest.calView.test_unsavedChanges = new function () {
       jum.assertEquals(display, 'block');
     },
     // Change back to cal view
-    { method: "click", params: { id: "viewToggle_button1" } },
+    { method: "click", params: { id: "cosmoViewToggleCalViewSelector" } },
     { method: "waits.forElement", params: { id: "calViewNav" } },
     // Select the second event
     function () { doLozengeClickByRegistryIndex(1); },
@@ -105,7 +105,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Change the title
     { method: "type", params: { id: "noteTitle", text: "Unsaved: Change View" } },
     // Change to list view
-    { method: "click", params: { id: "viewToggle_button0" } },
+    { method: "click", params: { id: "cosmoViewToggleListViewSelector" } },
     // Verify that the Unsaved Changes dialog appears
     { method: "waits.forElement", params: { id: "modalDialogContent" } },
     { method: "asserts.assertText", params: { validator:

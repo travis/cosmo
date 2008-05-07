@@ -208,12 +208,14 @@ cosmo.ui.navbar.Bar = function (p) {
         var w = 24;
         var btns = [{ width: w,
                 defaultImgSel: 'cosmoListViewDefault',
+                id: "cosmoViewToggleListViewSelector",
                 mouseoverImgSel: 'cosmoListViewSelected',
                 downStateImgSel: 'cosmoListViewSelected',
                 handleClick: function () {
                     self.displayView({ viewName: cosmo.app.pim.views.LIST }); }
                 },
                 { width: w,
+                id: "cosmoViewToggleCalViewSelector",
                 defaultImgSel: 'cosmoCalViewDefault',
                 mouseoverImgSel: 'cosmoCalViewSelected',
                 downStateImgSel: 'cosmoCalViewSelected',
@@ -223,7 +225,7 @@ cosmo.ui.navbar.Bar = function (p) {
         ];
 
         // Clean up if previously rendered
-        if (this.viewToggle) { this.viewToggle.destroy(); }
+        if (this.viewToggle) { this.viewToggle.destroyRecursive(); }
 
         var t = _createElem('div');
         t.id = 'viewToggle';

@@ -1,4 +1,4 @@
-{"method": "click", "params": {"jsid": "{$listView}"}}
+{"method": "click", "params": {"id": "cosmoViewToggleListViewSelector"}}
 {"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": 40000}}
 {"params": {"text": "Testing Adress this item", "id": "listViewQuickItemEntry"},  "method": "type"}
 {"params": {"jsid": "{$quickCreateButton}"},  "method": "click"}

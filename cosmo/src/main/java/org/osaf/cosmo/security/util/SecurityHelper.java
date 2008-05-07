@@ -168,7 +168,7 @@ public class SecurityHelper {
         // check other tickets
         if(tickets!=null) {
             for(Ticket t: tickets)
-                if(hasReadAccess(ticket, item))
+                if(hasReadAccess(t, item))
                     return true;
         }
         
@@ -231,7 +231,7 @@ public class SecurityHelper {
         // check other tickets
         if(tickets!=null) {
             for(Ticket t: tickets)
-                if(hasWriteAccess(ticket, item))
+                if(hasWriteAccess(t, item))
                     return true;
         }
             

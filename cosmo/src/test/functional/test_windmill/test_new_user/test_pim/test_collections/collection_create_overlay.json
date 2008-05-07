@@ -4,11 +4,11 @@
 //ensuring that the events were created as expected
 //We then uncheck each of the collections and select the default collection
 
-{"params": {"id": "cosmoViewToggleListViewSelector"}, "method": "click"}
+{"params": {"id": "cosmoViewToggleCalViewSelector"}, "method": "click"}
 {"params": {"timeout": 40000, "id": "_month0_day28"}, "method": "waits.forElement"}
 {"params": {"id": "newCollectionLink"}, "method": "click"}
 {"params": {"text": "a", "id": "getValueInput"}, "method": "type"}
-{"params": {"jsid": "cosmo.app.modalDialog.btnsRight[0].domNode.id"}, "method": "click"}
+{"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"milliseconds": 5000}, "method": "waits.sleep"}
 {"params": {"jsid": "cosmo.app.pim.collections.getFirst().getUid()"}, "method": "extensions.clickCollection"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}
@@ -23,7 +23,7 @@
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
 {"params": {"id": "newCollectionLink"}, "method": "click"}
 {"params": {"text": "b", "id": "getValueInput"}, "method": "type"}
-{"params": {"jsid": "cosmo.app.modalDialog.btnsRight[0].domNode.id"}, "method": "click"}
+{"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"milliseconds": 2500}, "method": "waits.sleep"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(1).getUid()"}, "method": "extensions.clickCollection"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
@@ -38,7 +38,7 @@
 {"params": {"milliseconds": 2500}, "method": "waits.sleep"}
 {"params": {"id": "newCollectionLink"}, "method": "click"}
 {"params": {"text": "c", "id": "getValueInput"}, "method": "type"}
-{"params": {"jsid": "cosmo.app.modalDialog.btnsRight[0].domNode.id"}, "method": "click"}
+{"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"milliseconds": 5000}, "method": "waits.sleep"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(2).getUid()"}, "method": "extensions.clickCollection"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}

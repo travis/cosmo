@@ -229,7 +229,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
                 dojo.addOnLoad(dojo.hitch(this, function(){
                     this.tickets = this.ticketStore.fetch({
                         onItem: dojo.hitch(this, "onTicket"),
-                        onError: function(e){console.debug(e);}
+                        onError: function(e){console.log(e);}
                     });
                 }));
             }

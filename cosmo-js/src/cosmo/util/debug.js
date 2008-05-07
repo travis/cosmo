@@ -72,7 +72,7 @@ Timer = function (functionName) {
    var now = new Date();
    this.startTime = now.getTime();
    this.endTime = 0;
-   console.debug("Start function '" + functionName + "'");
+   console.log("Start function '" + functionName + "'");
 };
 
 Timer.prototype.end = function (message){
@@ -80,7 +80,7 @@ Timer.prototype.end = function (message){
     var now = new Date();
     this.endTime = now.getTime();
     var elapsedTime = this.endTime - this.startTime;
-    console.debug("End function '" + message + "'; elapsedTime: "
+    console.log("End function '" + message + "'; elapsedTime: "
         + elapsedTime + "ms");
 };
 

@@ -32,7 +32,7 @@ cosmo.tests.util = {
             return user;
         });
         d.addErrback(function(e){
-            console.debug(e);
+            console.log(e);
         });
         return d;
     },

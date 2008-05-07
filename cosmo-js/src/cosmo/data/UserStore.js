@@ -323,19 +323,19 @@ dojo.declare("cosmo.data.UserStore", null, {
 			keywordArgs = {};
 		}
         var deferreds = [];
-        console.debug(this._modifiedItems);
+        console.log(this._modifiedItems);
 		for(var i in this._modifiedItems){
             var user = this._modifiedItems[i];
             if (user.doActivate){deferreds.push(cosmo.cmp.activate(user.username));}
             deferreds.push(cosmo.cmp.modifyUser(user.username, user));
         }
         this._modifiedItems = {};
-        console.debug("creating " + this._newItems.length + " users");
+        console.log("creating " + this._newItems.length + " users");
 		for(var i = 0; i < this._newItems.length; i++){
             deferreds.push(cosmo.cmp.createUser(this._newItems[i]));
 		}
         this._newItems = [];
-        console.debug("deleting " + this._deletedItems.length + " users");
+        console.log("deleting " + this._deletedItems.length + " users");
         if (this._deletedItems.length > 0)
             deferreds.push(cosmo.cmp.deleteUsers(
                 dojo.map(this._deletedItems, function(user){return user.username})));

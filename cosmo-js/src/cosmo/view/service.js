@@ -91,7 +91,7 @@ cosmo.view.service = new function () {
         var change = null;
         var changeCount = 0;
         for (change in changeTypes){
-            console.debug("changeType: " +change);
+            console.log("changeType: " +change);
             if (changeTypes[change]){
                 changeCount++;
             }
@@ -116,7 +116,7 @@ cosmo.view.service = new function () {
             }
             var props = cosmo.view.recurrenceDialog.getProps(confirmType,
                 { changeTypes: changeTypes, delta: delta, saveItem: item });
-            console.debug(props.content);
+            console.log(props.content);
             cosmo.app.showDialog(props);
         }
     }
@@ -151,7 +151,7 @@ cosmo.view.service = new function () {
             switch(qual) {
                 // Changing the master item in the recurring sequence
                 case opts.ALL_EVENTS:
-                    console.debug("ALL_EVENTS");
+                    console.log("ALL_EVENTS");
                     delta.applyToMaster();
                     f = function(){
                         doSaveItem(item,
@@ -164,7 +164,7 @@ cosmo.view.service = new function () {
 
                 // Break the previous recurrence and start a new one
                 case opts.ALL_FUTURE_EVENTS:
-                    console.debug("ALL_FUTURE");
+                    console.log("ALL_FUTURE");
                     var newItem  = delta.applyToOccurrenceAndFuture();
                     f = function () {
                         doSaveItem(item,
@@ -178,7 +178,7 @@ cosmo.view.service = new function () {
 
                 // Modifications
                 case opts.ONLY_THIS_EVENT:
-                    console.debug("ONLY_THIS_EVENT");
+                    console.log("ONLY_THIS_EVENT");
                     var note = item.data;
                     var recurrenceId = note.recurrenceId;
                     var master = note.getMaster();
@@ -198,7 +198,7 @@ cosmo.view.service = new function () {
                     break;
 
                 case 'new':
-                    console.debug("doSaveChanges: new")
+                    console.log("doSaveChanges: new")
                     f = function () { doSaveItem(item, { 'new': true } ) };
                     break;
                 default:
@@ -207,12 +207,12 @@ cosmo.view.service = new function () {
         }
         // Normal one-shot item
         else {
-            console.debug("saveItemChanges: normal sone shot item");
+            console.log("saveItemChanges: normal sone shot item");
             f = function () { doSaveItem(item, { } ) };
         }
 
         // Give a sec for the processing state to show
-        console.debug("before set timeout");
+        console.log("before set timeout");
         setTimeout(f, 35);
     }
     /**
@@ -233,20 +233,20 @@ cosmo.view.service = new function () {
         var note = item.data;
         var delta = opts.delta;
         var newItem = opts.newItemNote;
-        console.debug("Do save: savetype: " + opts.saveType)
-        console.debug("Do save: iznew: " + isNew)
+        console.log("Do save: savetype: " + opts.saveType)
+        console.log("Do save: iznew: " + isNew)
 
         if (isNew){
             deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.getSelectedCollection(),{});
         } else if (opts.saveType) {
-            console.debug("opty! " + opts.saveType );
+            console.log("opty! " + opts.saveType );
             switch(opts.saveType){
                 case OPTIONS.ALL_EVENTS:
-                    console.debug("about to save note in ALL EVENTS")
+                    console.log("about to save note in ALL EVENTS")
                     deferred = cosmo.app.pim.serv.saveItem(note.getMaster());
                     break;
                 case OPTIONS.ALL_FUTURE_EVENTS:
-                    console.debug("about to save note in ALL FUTURE EVENTS")
+                    console.log("about to save note in ALL FUTURE EVENTS")
                     //saveThisAndFuture(oldOccurrence, newMaster, kwArgs)
                     var newItemDeferred = cosmo.app.pim.serv.saveThisAndFuture(note, newItem);
                     var requestId = newItemDeferred.id;
@@ -269,22 +269,22 @@ cosmo.view.service = new function () {
                         handleSaveItem(item, error, newItemDeferred.id, opts.saveType, delta);
                     });
 
-                    console.debug("about to save note in ALL FUTURE EVENTS")
+                    console.log("about to save note in ALL FUTURE EVENTS")
                     return;
                 case OPTIONS.ONLY_THIS_EVENT:
                      if (!opts.newModification){
-                         console.debug("doSaveItem: saving a previously created modificaiton")
+                         console.log("doSaveItem: saving a previously created modificaiton")
                          deferred = cosmo.app.pim.serv.saveItem(note);
                      }
                      else {
-                         console.debug("doSaveItem: creating a new modificaiton")
+                         console.log("doSaveItem: creating a new modificaiton")
                          deferred = cosmo.app.pim.serv.createItem(note, cosmo.app.pim.getSelectedCollection());
                      }
                 break;
             }
         }
         else {
-            console.debug("normal, non-recurring item")
+            console.log("normal, non-recurring item")
             deferred = cosmo.app.pim.serv.saveItem(note);
         }
 
@@ -411,7 +411,7 @@ cosmo.view.service = new function () {
      * @param item A ListItem/CalItem object, the item to be removed.
      */
     function removeItemConfirm(item) {
-        console.debug("removeItemConfirm!");
+        console.log("removeItemConfirm!");
         var confirmType = '';
         var opts = {};
         opts.masterEvent = false;
@@ -441,8 +441,8 @@ cosmo.view.service = new function () {
      * recurring items. Will be one of the three recurringEventOptions.
      */
     function removeItem(item, qual) {
-        console.debug("remove Item: item: " +item);
-        console.debug("qual: "+ qual);
+        console.log("remove Item: item: " +item);
+        console.log("qual: "+ qual);
 
         // f is a function object gets set based on what type
         // of edit is occurring -- executed from a very brief
@@ -487,7 +487,7 @@ cosmo.view.service = new function () {
         }
         // Normal one-shot item
         else {
-            console.debug("normal one shot item");
+            console.log("normal one shot item");
             f = function () { doRemoveItem(item, { 'removeType': 'singleEvent' }) }
         }
         // Give a sec for the processing state to show
@@ -501,7 +501,7 @@ cosmo.view.service = new function () {
      * @param opts A JS Object, options for the remove operation.
      */
     function doRemoveItem(item, opts) {
-        console.debug("doRemoveItem: opts.removeType:" + opts.removeType);
+        console.log("doRemoveItem: opts.removeType:" + opts.removeType);
         var OPTIONS = self.recurringEventOptions;
         var deferred = null;
         var reqId = null;

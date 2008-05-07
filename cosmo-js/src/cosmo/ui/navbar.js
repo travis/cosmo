@@ -192,7 +192,7 @@ cosmo.ui.navbar.Bar = function (p) {
                 throw(viewName + ' is not a valid view.');
             }
             displayDeferred = displayDeferred || cosmo.util.deferred.getFiredDeferred();
-            displayDeferred.addErrback(function(e){console.debug(e)});
+            displayDeferred.addErrback(function(e){console.log(e)});
             return displayDeferred;
 
         }

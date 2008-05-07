@@ -58,8 +58,8 @@ dojo.declare("cosmo.service.transport.Rest", null,
             //FIXME
             if (false){
                 if (!kwArgs.noErr){
-                    deferred.addErrback(function(e) { console.debug("Transport Error: ");
-                                                      console.debug(e);
+                    deferred.addErrback(function(e) { console.log("Transport Error: ");
+                                                      console.log(e);
                                                       return e;});
                 }
                 request.load = request.load || this.resultCallback(deferred);

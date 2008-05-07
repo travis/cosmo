@@ -93,7 +93,7 @@ doh.register("cosmo.data.tests.TicketStore",
                     d.addCallback(dojo.hitch(this, this.initStore));
                     d.addCallback(dojo.hitch(this, this.newTicket));
 
-                    d.addErrback(function(e){console.debug(e); return e;});
+                    d.addErrback(function(e){console.log(e); return e;});
                     return cosmo.tests.util.defcon(d);
                 }
             },

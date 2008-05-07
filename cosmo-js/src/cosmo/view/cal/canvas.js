@@ -89,7 +89,7 @@ cosmo.view.cal.canvas = new function () {
     // Public methods
     // ****************
     this.init = function () {
-        console.debug('init on cal canvas');
+        console.log('init on cal canvas');
         // Subscribe to the '/app' channel
         this.hasBeenInitialized = true;
     };
@@ -925,7 +925,7 @@ cosmo.view.cal.canvas = new function () {
         var item = cmd.data
         var data = item.data;
         var saveType = cmd.saveType || null;
-        console.debug("saveSuccess saveType: " + saveType);
+        console.log("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
@@ -1067,7 +1067,7 @@ cosmo.view.cal.canvas = new function () {
         }
 
         var updateEventsCallback = function () {
-            console.debug("updateEventsCallback")
+            console.log("updateEventsCallback")
             // Don't re-render when requests are still processing
             if (!cosmo.view.service.processingQueue.length) {
                 updateEventsDisplay();
@@ -1103,7 +1103,7 @@ cosmo.view.cal.canvas = new function () {
                 }
             }
             else {
-                console.debug("how many left in queue: " + cosmo.view.service.processingQueue.length);
+                console.log("how many left in queue: " + cosmo.view.service.processingQueue.length);
             }
         }
 
@@ -1124,7 +1124,7 @@ cosmo.view.cal.canvas = new function () {
     function removeSuccess(item, opts) {
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var removeType = opts.removeType;
-        console.debug("removeSuccess, removeType: " + removeType);
+        console.log("removeSuccess, removeType: " + removeType);
 
         // If the user has navigated off the week displaying the
         // current selected item, it's not in the itemRegistry,
@@ -1320,7 +1320,7 @@ cosmo.view.cal.canvas = new function () {
      * @param id A string, the id of the div on the cal canvas double-clicked
      */
     function createNewCalItem(evParam) {
-        console.debug("createNewCalItem 1");
+        console.log("createNewCalItem 1");
         var item = null; // New event
         var evSource = '';
         var lozType = ''; // Lozenge type
@@ -1346,7 +1346,7 @@ cosmo.view.cal.canvas = new function () {
         evSource = 'click';
         // Set props based on when and what canvas was clicked
         if (lozType == types.TIMED) {
-            console.debug("createNewCalItem 3");
+            console.log("createNewCalItem 3");
             startstr = getIndexFromHourDiv(evParam);
             dayind = extractDayIndexFromId(startstr);
             evdate = calcDateFromIndex(dayind);

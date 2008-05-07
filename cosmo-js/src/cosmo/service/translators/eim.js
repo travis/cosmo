@@ -333,7 +333,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
 
             // Per Jeffrey's suggestion, fail silently here, logging
             // an error message to the debug console.
-            if (!masterItem) console.debug(
+            if (!masterItem) console.log(
               "Could not find master event for modification " +
               "with uuid " + uuid);
 

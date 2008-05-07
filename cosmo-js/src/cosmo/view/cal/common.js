@@ -69,7 +69,7 @@ dojo.subscribe("cosmo:appKeyboardInput",
 
 
 cosmo.view.cal.loadItems = function (p) {
-    console.debug("trigger!");
+    console.log("trigger!");
     var _cal = cosmo.view.cal; // Scope-ness
     var params = p || {};
     var goToNav = null;
@@ -94,7 +94,7 @@ cosmo.view.cal.loadItems = function (p) {
     // --------
     if (params.goTo) {
         goToNav = params.goTo;
-        console.debug("goto");
+        console.log("goto");
         // param is 'back' or 'next'
         if (typeof goToNav == 'string') {
             var key = goToNav.toLowerCase();
@@ -275,9 +275,9 @@ cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry =
  */
 cosmo.view.cal.setQuerySpan = function (dt) {
     this.viewStart = cosmo.datetime.util.getWeekStart(dt);
-    console.debug("viewStart: " + this.viewStart)
+    console.log("viewStart: " + this.viewStart)
     this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
-    console.debug("viewEnd: " + this.viewEnd)
+    console.log("viewEnd: " + this.viewEnd)
     return true;
 };
 /**

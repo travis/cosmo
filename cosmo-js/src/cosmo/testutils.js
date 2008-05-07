@@ -116,7 +116,7 @@ cosmo.testutils = {
             cosmo.util.auth.setCred(user.username, user.password);
         });
         d.addErrback(function(e){
-            console.debug(e);
+            console.log(e);
         });
         return this.defcon(d);
     },

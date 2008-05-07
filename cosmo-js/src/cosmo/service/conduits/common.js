@@ -294,8 +294,8 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         );
 
         deferred.addErrback(function (e, xhr){
-            console.debug("Translation error:")
-            console.debug(e);
+            console.log("Translation error:")
+            console.log(e);
             return e;
         });
 

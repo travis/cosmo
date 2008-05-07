@@ -190,7 +190,7 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
         dojo.connect(userStore, "onSet", function(item, attr, oldVal, newVal){
             // make sure value has changed and, if password, value is not default
             if (oldVal != newVal){
-                console.debug("About to change "+attr+" from "+oldVal+" to "+newVal);
+                console.log("About to change "+attr+" from "+oldVal+" to "+newVal);
                 
                 this.save({
                     onComplete: function(){

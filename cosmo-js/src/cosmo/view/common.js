@@ -240,7 +240,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
     var error = deltaAndError[1];
     var delta = deltaAndError[0];
     if (error || delta.hasChanges()) {
-        console.debug(error || delta);
+        console.log(error || delta);
         // Cancel button -- just hide the dialog, do nothing
         var cancel = function () {
             // Execute any pre-cancel code passed in

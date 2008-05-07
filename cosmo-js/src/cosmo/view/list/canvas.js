@@ -464,12 +464,12 @@ cosmo.view.list.canvas.Canvas = function (p) {
      * published 'success' message
      */
     this._saveSuccess = function (cmd) {
-        console.debug("saveSuccess: ");
+        console.log("saveSuccess: ");
         var recurOpts = cosmo.view.service.recurringEventOptions;
         var item = cmd.data
         var data = item.data;
         var saveType = cmd.saveType || null;
-        console.debug("saveSuccess saveType: " + saveType);
+        console.log("saveSuccess saveType: " + saveType);
         var delta = cmd.delta;
         var deferred = null;
         var newItemNote = cmd.newItemNote; // stamped Note
@@ -478,7 +478,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         //if the event is recurring and all future or all events are changed, we need to
         //re expand the event
         if (item.data.hasRecurrence() && saveType != recurOpts.ONLY_THIS_EVENT) {
-            console.debug("saveSuccess: has recurrence");
+            console.log("saveSuccess: has recurrence");
             //first remove the event and recurrences from the registry.
             var idsToRemove = [data.getUid()];
             if (saveType == recurOpts.ALL_FUTURE_EVENTS){
@@ -535,7 +535,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
 
         var updateEventsCallback = function () {
-            console.debug("updateEventsCallback")
+            console.log("updateEventsCallback")
             // Don't re-render when requests are still processing
             if (!cosmo.view.service.processingQueue.length) {
 
@@ -572,7 +572,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 }
             }
             else {
-                console.debug("how many left in queue: " +
+                console.log("how many left in queue: " +
                     cosmo.view.service.processingQueue.length);
             }
         }

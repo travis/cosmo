@@ -62,7 +62,7 @@ dojo.declare("cosmo.ui.widget.TicketAdmin", [dijit._Widget, dijit._Templated],
         var ticket = this.ticketStore.newItem({type: type, key: key});
         this.ticketStore.save({
             onComplete: dojo.hitch(this, function(){this.onTicket(ticket);}),
-            onError: dojo.hitch(this, function(e){console.debug(e);})
+            onError: dojo.hitch(this, function(e){console.log(e);})
         });
     },
 
@@ -105,7 +105,7 @@ dojo.declare("cosmo.ui.widget.TicketAdmin", [dijit._Widget, dijit._Templated],
         dojo.addOnLoad(dojo.hitch(this, function(){
             this.tickets = this.ticketStore.fetch({
                 onItem: dojo.hitch(this, "onTicket"),
-                onError: function(e){console.debug(e);}
+                onError: function(e){console.log(e);}
             });
         }));
     }
@@ -158,7 +158,7 @@ dojo.declare("cosmo.ui.widget._SingleTicket", [dijit._Widget, dijit._Templated],
                     this.destroy();
                 }),
                 onError: function(e){
-                    console.debug(e);
+                    console.log(e);
                 }
             }
         );

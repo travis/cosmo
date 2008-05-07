@@ -106,7 +106,7 @@ dojo.declare("cosmo.data.ItemStore", null, {
     },
 
     fetchItemByIdentity: function(keywordArgs){
-        console.debug("fetch by id");
+        console.log("fetch by id");
         var fetchArgs = {
             scope: keywordArgs.scope,
             onError: keywordArgs.onError};

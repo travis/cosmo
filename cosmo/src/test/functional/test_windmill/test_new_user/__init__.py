@@ -1,4 +1,5 @@
-create_user_json = """{"method": "click", "params": {"id" : "signup"}}
+create_user_json = """{"method": "waits.forElement", "params": {"id": "signup"}}
+{"method": "click", "params": {"id" : "signup"}}
 {"method": "waits.forElement", "params": {"id": "loginDialogFormContainer"}}
 {"params": {"milliseconds": 6000},  "method": "waits.sleep"}
 {"method": "waits.forElement", "params": {"id": "modalDialogTitle", "timeout": 40000}}
@@ -25,7 +26,8 @@ create_user_json = """{"method": "click", "params": {"id" : "signup"}}
 {"params": {"validator": "You have successfully created your Chandler Server account.", "id": "modalDialogPrompt"},  "method": "asserts.assertText"}
 {"params": {"jsid": "{$btnsCenter0}"},  "method": "click"}"""
 
-create_user_json_lab = """{"method": "click", "params": {"id" : "signup"}}
+create_user_json_lab = """{"method": "waits.forElement", "params": {"id": "signup"}}
+{"method": "click", "params": {"id" : "signup"}}
 {"params": {"id": "modalDialogTitle"},  "method": "asserts.assertNode"}
 {"params": {"jsid": "{$btnsRight0}"},  "method": "click"}
 {"params": {"id": "tos"},  "method": "check"}
@@ -56,7 +58,10 @@ login_with_user_json = """{"method": "type", "params": {"id" : "loginDialogUsern
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}
-{"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": 40000}}"""
+{"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": 40000}}
+{"params": {"id": "newCollectionLink"}, "method": "click"}
+{"params": {"id": "getValueSubmit"}, "method": "click"}
+{"method": "waits.sleep", "params": {"milliseconds" : 3000}}"""
 
 from windmill.authoring import RunJsonFile
 import windmill

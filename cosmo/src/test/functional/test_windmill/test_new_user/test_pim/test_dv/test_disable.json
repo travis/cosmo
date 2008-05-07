@@ -1,4 +1,4 @@
-{"params": {"id": "viewToggle_button0"}, "method": "click"}
+{"params": {"id": "cosmoViewToggleListViewSelector"}, "method": "click"}
 {"params": {"timeout": 10000, "id": "listViewQuickItemEntry"}, "method": "waits.forElement"}
 {"params": {"id": "listViewQuickItemEntry"}, "method": "click"}
 {"params": {"text": "Test disabled state", "id": "listViewQuickItemEntry"}, "method": "type"}

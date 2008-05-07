@@ -4,7 +4,7 @@
 //ensuring that the events were created as expected
 //We then uncheck each of the collections and select the default collection
 
-{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.centerColumn.navBar.viewToggle.buttonNodes[1].id"}, "method": "click"}
+{"params": {"id": "cosmoViewToggleListViewSelector"}, "method": "click"}
 {"params": {"timeout": 40000, "id": "_month0_day28"}, "method": "waits.forElement"}
 {"params": {"id": "newCollectionLink"}, "method": "click"}
 {"params": {"text": "a", "id": "getValueInput"}, "method": "type"}

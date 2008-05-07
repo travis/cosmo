@@ -3,10 +3,10 @@ test_settings_setup_lab_json = """{"params": {"link": "Settings"}, "method": "cl
 {"params": {"jsid": "{$dialogTab1}"}, "method": "click"}
 {"params": {"id": "showAccountBrowser"}, "method": "check"}
 {"params": {"id": "showAccountBrowser"}, "method": "asserts.assertChecked"}
-{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"params": {"id": "settingsAdvancedSave"}, "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"link": "Account Browser"}, "method": "asserts.assertNode"}
-{"params": {"jsid": "{$calView}"},  "method": "click"}
+{"params": {"id": "cosmoViewToggleCalViewSelector"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"id": "hourDiv1-1000"},  "method": "doubleClick"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
@@ -22,10 +22,10 @@ test_settings_setup_snarf_json = """{"params": {"link": "Settings"}, "method": "
 {"params": {"jsid": "{$dialogTab1}"}, "method": "click"}
 {"params": {"id": "showAccountBrowser"}, "method": "check"}
 {"params": {"id": "showAccountBrowser"}, "method": "asserts.assertChecked"}
-{"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
+{"params": {"id": "settingsAdvancedSave"}, "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 {"params": {"link": "Account Browser"}, "method": "asserts.assertNode"}
-{"params": {"jsid": "{$calView}"},  "method": "click"}
+{"params": {"id": "cosmoViewToggleCalViewSelector"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"id": "hourDiv1-1000"},  "method": "doubleClick"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
@@ -41,7 +41,7 @@ test_settings_teardown_json = """{"params": {"url": "\/pim"},  "method": "open"}
 {"params": {"milliseconds": "2000"},  "method": "waits.sleep"}
 {"params": {"jsid": "{$dialogTab1}"},  "method": "click"}
 {"params": {"id": "showAccountBrowser"},  "method": "check"}
-{"params": {"jsid": " {$btnsRight0}"},  "method": "click"}
+{"params": {"id": "settingsAdvancedSave"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"method": "waits.sleep", "params": {"milliseconds" : 2000}}"""
 

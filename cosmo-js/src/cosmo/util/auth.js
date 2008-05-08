@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,71 +15,41 @@
  */
 
 dojo.provide("cosmo.util.auth");
+dojo.require("cosmo.auth.basic");
 
-dojo.require("dojo.cookie");
-dojo.require("cosmo.util.encoding");
+(function(){
+var am = cosmo.auth.basic;
+dojo.mixin(cosmo.util.auth, {
+    setCred: function (username, password){
+        am.setUsername(username);
+        am.setPassword(password);
+    },
 
-var COSMO_AUTH_COOKIE = "CosmoCred";
+    setPassword: function(password){
+        am.setPassword(password);
+    },
 
-cosmo.util.auth = new function() {
-    this.setCred = function (username, password){
-        dojo.cookie(COSMO_AUTH_COOKIE,
-            cosmo.util.encoding.toBase64(
-                username + ":" + password), {path:"/"});
-    }
+    setUsername: function(username){
+        am.setUsername(username);
+    },
 
-    this.getPassword = function(){
+    getUsername: function(){
+        return am.getUsername();
+    },
 
-        var cred = this.getCred();
+    clearAuth: function (){
+        am.clearAuth();
+    },
 
-        if (cred){
-            return cosmo.util.encoding.fromBase64(cred).split(":")[1];
-        } else {
-            return '';
-        }
-    }
+    currentlyAuthenticated: function(){
+        return am.currentlyAuthenticated();
+    },
 
-    this.getUsername = function(){
-
-        var cred = this.getCred();
-
-        if (cred){
-            return cosmo.util.encoding.fromBase64(cred).split(":")[0];
-        } else {
-            return '';
-        }
-    }
-
-    this.setPassword = function(pass){
-        this.setCred(this.getUsername(), pass);
-    }
-
-    this.setUsername = function(username){
-        this.setCred(username, this.getPassword());
-    }
-
-    this.clearAuth = function (){
-        dojo.cookie(COSMO_AUTH_COOKIE, null, {expires: -1, path: "/"});
-    }
-
-    this.getCred = function(){
-		return dojo.cookie(COSMO_AUTH_COOKIE);
-    }
-    
-    this.currentlyAuthenticated = function(){
-        return !!this.getCred();
-    }
-
-    this.getAuthorizedRequest = function(request, kwArgs){
+    getAuthorizedRequest: function(request, kwArgs){
         kwArgs = kwArgs || {};
-    	request = request || {};
-        request.headers = request.headers || {};
-        
-    	if (this.getCred() && !kwArgs.noAuth){
-    	   	request.headers.Authorization =  request.headers.Authorization || "Basic " + this.getCred();
-    	}
-    	return request;
+    	if (!kwArgs.noAuth){
+            return am.getAuthorizedRequest();
+    	} else return {headers: {}};
     }
-
-}
-
+});
+}());

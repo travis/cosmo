@@ -7,7 +7,7 @@ dojo.require("cosmo.util.sha1");
 	var hex='14e0cdf9ea14d22605002d5c7b8bb8e989a0d016';
 	var s='\x14\xe0\xcd\xf9\xea\x14\xd2&\x05\x00-\\{\x8b\xb8\xe9\x89\xa0\xd0\x16';
 	var cus = cosmo.util.sha1;
-	tests.register("dojox.encoding.tests.digests.SHA1", [
+	tests.register("cosmo.util.tests.sha1", [
 		function testBase64Compute(t){
 			t.assertEqual(base64, cus.b64(message));
 		},

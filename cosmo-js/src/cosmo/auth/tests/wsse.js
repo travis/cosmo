@@ -15,11 +15,22 @@
 */
 dojo.provide("cosmo.auth.tests.wsse");
 dojo.require("cosmo.auth.wsse");
-
+dojo.require("dojo.cookie");
 doh.register("cosmo.auth.tests.wsse",
 	[
         function testGenerateDigest(t){
             t.is("quR/EWLAV4xLf9Zqyw4pDmfV9OY=", cosmo.auth.wsse.generatePasswordDigest("d36e316282959a9ed4c89851497a717f", "2003-12-15T14:43:07Z", "taadtaadpstcsm"));
+        },
+
+        function testGenerateCredentials(t){
+            cosmo.auth.wsse.setUsername("bob");
+            cosmo.auth.wsse.setPassword("taadtaadpstcsm");
+            var cred = cosmo.auth.wsse.generateCredentials();
+            t.is('WSSE profile="UsernameToken"', cred['Authorization']);
+            t.t(!!cred['X-WSSE'].match(/Username="bob"/));
+            t.t(!!cred['X-WSSE'].match(/PasswordDigest=".*"/));
+            t.t(!!cred['X-WSSE'].match(/Nonce=".*"/));
+            t.t(!!cred['X-WSSE'].match(/Created=".*"/));
         }
 
     ]);

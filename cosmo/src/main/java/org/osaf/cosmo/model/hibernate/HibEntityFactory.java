@@ -47,6 +47,8 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.XmlAttribute;
+import org.w3c.dom.Element;
 
 /**
  * EntityFactory implementation that uses Hibernate 
@@ -110,6 +112,10 @@ public class HibEntityFactory implements EntityFactory {
 
     public IntegerAttribute createIntegerAttribute(QName qname, Long longVal) {
         return new HibIntegerAttribute(qname, longVal);
+    }
+
+    public XmlAttribute createXMLAttribute(QName qname, Element e) {
+        return new HibXmlAttribute(qname, e);
     }
 
     public MessageStamp createMessageStamp() {

@@ -47,6 +47,8 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.TicketType;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.User;
+import org.osaf.cosmo.model.XmlAttribute;
+import org.w3c.dom.Element;
 
 /**
  * EntityFactory implementation that uses mock objects.
@@ -89,6 +91,10 @@ public class MockEntityFactory implements EntityFactory {
 
     public DecimalAttribute createDecimalAttribute(QName qname, BigDecimal bd) {
         return new MockDecimalAttribute(qname, bd);
+    }
+    
+    public XmlAttribute createXMLAttribute(QName qname, Element e) {
+        return new MockXmlAttribute(qname, e);
     }
 
     public EventExceptionStamp createEventExceptionStamp(NoteItem note) {

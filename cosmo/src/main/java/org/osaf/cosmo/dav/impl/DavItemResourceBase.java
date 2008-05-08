@@ -79,6 +79,7 @@ import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.service.ContentService;
 import org.osaf.cosmo.util.PathUtil;
+import org.w3c.dom.Element;
 
 /**
  * <p>
@@ -657,7 +658,14 @@ public abstract class DavItemResourceBase extends DavResourceBase
             throw new UnprocessableEntityException("Property " + property.getName() + " requires a value");
         try {
             QName qname = propNameToQName(property.getName());
-            item.setAttribute(qname, property.getValue());
+            Element value = (Element) property.getValue();
+            Attribute attr = item.getAttribute(qname);
+            
+            // first check for existing attribute otherwise add
+            if(attr!=null)
+                attr.setValue(value);
+            else
+                item.addAttribute(entityFactory.createXMLAttribute(qname, value));
         } catch (DataSizeException e) {
             throw new ForbiddenException(e.getMessage());
         }

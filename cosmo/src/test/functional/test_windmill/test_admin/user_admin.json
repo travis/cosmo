@@ -2,11 +2,9 @@
 {"params": {"link": "Run Garbage Collector", "timeout": 40000}, "method": "waits.forElement"}
 {"params": {"link": "Users"}, "method": "click"}
 {"params": {"timeout": 40000, "id": "searchBox"}, "method": "waits.forElement"}
-{"params": {"id": "searchBox"}, "method": "click"}
 {"params": {"text": "foo", "id": "searchBox"}, "method": "type"}
 {"params": {"id": "searchButton"}, "method": "click"}
 {"params": {"id": "newUserButton"}, "method": "click"}
-{"params": {"id": "cosmoUserListUsername"}, "method": "click"}
 {"params": {"text": "{$random}", "id": "cosmoUserListUsername"}, "method": "type"}
 {"params": {"text": "{$random}", "id": "cosmoUserListFirstName"}, "method": "type"}
 {"params": {"text": "{$random}", "id": "cosmoUserListLastName"}, "method": "type"}
@@ -14,10 +12,13 @@
 {"params": {"text": "foobar", "id": "cosmoUserListPassword"}, "method": "type"}
 {"params": {"text": "foobar", "id": "cosmoUserListConfirm"}, "method": "type"}
 {"params": {"id": "cosmoUserListSubmit"}, "method": "click"}
-{"params": {"id": "searchBox"}, "method": "click"}
 {"params": {"text": "{$random}", "id": "searchBox"}, "method": "type"}
 {"params": {"id": "searchButton"}, "method": "click"}
 {"params": {"milliseconds": 1000}, "method": "waits.sleep"}
-{"params": {"xpath": "\/html\/body\/div\/div\/div\/div[2]\/div\/div\/div\/div\/div\/table\/tbody\/tr\/td[3]"}, "method": "doubleClick"}
+{"params": {"text": "", "id": "searchBox"}, "method": "type"}
+{"params": {"id": "searchButton"}, "method": "click"}
+{"params": {"milliseconds": 1000}, "method": "waits.sleep"}
+{"params": {"xpath": "\/html\/body\/div\/div\/div\/div[2]\/div\/div\/div\/div\/div\/table\/tbody\/tr\/td[2]"}, "method": "doubleClick"}
+{"params": {"milliseconds": 1000}, "method": "waits.sleep"}
 {"params": {"text": "bang bang", "id": "dijit_form_ValidationTextBox_0"}, "method": "type"}
 {"params": {"xpath": "\/html\/body\/div\/div\/div\/div[2]\/div\/div\/div\/div\/div\/table\/tbody\/tr\/td[6]"}, "method": "click"}

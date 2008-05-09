@@ -130,7 +130,12 @@ cosmo.account.create = new function () {
         var d = cosmo.app.modalDialog;
         var btnsCenter = [new cosmo.ui.widget.Button(
             { text:_('App.Button.Close'), width:74, id: "signupClose",
-            handleOnClick: function () { cosmo.app.hideDialog(); } })];
+            handleOnClick: function () {
+                if (self.subscription)
+                    location = cosmo.env.getBaseUrl() + '/login';
+                else
+                    cosmo.app.hideDialog();
+            }})];
 
         // Update dialog in place
         d.setPrompt(prompt);

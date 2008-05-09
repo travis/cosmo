@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.fortuna.ical4j.model.Calendar;
 
+import org.apache.abdera.util.EntityTag;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.calendar.EntityConverter;
@@ -113,6 +114,37 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
             return;
         }
 
+        EntityTag etag = new EntityTag(collection.getEntityTag());
+        
+        // set ETag
+        resp.setHeader("ETag", etag.toString());
+        
+        // check for If-None-Match
+        EntityTag[] requestEtags = getIfNoneMatch(req);
+        if (requestEtags!=null && requestEtags.length != 0) {
+            if (EntityTag.matchesAny(etag, requestEtags)) {
+                resp.setStatus(304);
+                return;
+            }
+        }
+        
+        // check for If-Modified-Since
+        long since = req.getDateHeader("If-Modified-Since");
+        
+        // If present and if collection's modified date not more recent,
+        // return 304 not modified
+        if (since != -1) {
+            long lastModified = collection.getModifiedDate().getTime() / 1000 * 1000;
+
+            if (lastModified <= since) {
+                resp.setStatus(304);
+                return;
+            }
+        }
+            
+        // set Last-Modified
+        resp.setDateHeader("Last-Modified", collection.getModifiedDate().getTime());
+        
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType(ICALENDAR_MEDIA_TYPE);
         resp.setCharacterEncoding("UTF-8");
@@ -136,6 +168,14 @@ public class WebcalServlet extends HttpServlet implements ICalendarConstants {
         ICalendarOutputter.output(calendar, resp.getOutputStream());
     }
 
+    protected EntityTag[] getIfNoneMatch(HttpServletRequest request) {
+        try {
+            return EntityTag.parseTags(request.getHeader("If-None-Match"));
+        } catch (RuntimeException e) {
+           return null;
+        }
+    }
+    
     // GenericServlet methods
 
     /**

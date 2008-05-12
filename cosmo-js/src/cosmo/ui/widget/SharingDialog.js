@@ -104,9 +104,9 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     },
 
     getReadOnlyTicket: function(){
-        if (this.readTicket){
+        if (this.readOnlyTicket){
             var d = new dojo.Deferred();
-            d.callback(this.readTicket);
+            d.callback(this.readOnlyTicket);
             return d;
         } else {
             return this.createTicket("read-only").addCallback(dojo.hitch(this, this.onTicket));
@@ -114,7 +114,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
     },
 
     getReadWriteTicket: function(){
-        if (this.readTicket){
+        if (this.readWriteTicket){
             var d = new dojo.Deferred();
             d.callback(this.readWriteTicket);
             return d;

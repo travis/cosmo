@@ -95,8 +95,9 @@ cosmo.account.create = new function () {
         else {
             var user = this.formToUserHash();
             // Hand off to CMP
-            var d = cosmo.cmp.signup(user, {error: handleCreateError});
+            var d = cosmo.cmp.signup(user);
             d.addCallback(handleCreateSuccess);
+            d.addErrback(handleCreateError);
             return d;
         }
     };
@@ -152,11 +153,10 @@ cosmo.account.create = new function () {
      * table with external client config on success.
      * @return Boolean, true on success, false on failure
      */
-    function handleCreateError(data, ioArgs) {
-        ioArgs = ioArgs || {};
+    function handleCreateError(error) {
         var err = '';
-        if (ioArgs.xhr && ioArgs.xhr.status && (ioArgs.xhr.status > 399)) {
-            switch (ioArgs.xhr.status) {
+        if (error || (error.status > 399)) {
+            switch (error.status) {
             case 403:
                 err = _('Signup.Error.AlreadyLoggedIn');
                 break;
@@ -168,15 +168,15 @@ cosmo.account.create = new function () {
                 break;
             default:
                 err = _('Signup.Error.Generic') + ' (error code ' +
-                    ioArgs.xhr.status + ')';
+                    error.status + ')';
                 break;
             }
         }
         else {
-            err = _('Signup.Error.Generic') + ' (' + data.message + ')';
+            err = _('Signup.Error.Generic') + ' (' + error.message + ')';
         }
         cosmo.app.modalDialog.setPrompt(err);
-        return false;
+        return error;
     }
     function handleCreateSuccess(user) {
             self.showResultsTable(user);

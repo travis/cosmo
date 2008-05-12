@@ -37,7 +37,6 @@
 </div>
 
 <script type="text/javascript">
-function reload(){location = location};
 dojo.require('dojo.parser');
 dojo.require("cosmo.ui.widget.TicketWidget");
 </script>

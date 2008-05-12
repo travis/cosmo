@@ -50,38 +50,37 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
         this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "TicketWidget");
     },
 
-    execute: function(form){
+    onSubmit: function(e){
         if (this.form.isValid()){
-		    var timeout = form.timeout;
-            
-		    timeout = timeout? "Second-" + timeout: "Infinite";
-            
-		    var content = ['<?xml version="1.0" encoding="utf-8" ?>',
-		        '<ticket:ticketinfo xmlns:D="DAV:" ',
-		        'xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">',
-   		        '<D:privilege>', this.privDict[form.privileges], '</D:privilege>',
-   		        '<ticket:timeout>', timeout, '</ticket:timeout>',
-		        '</ticket:ticketinfo>'].join("");
-		    var request = cosmo.util.auth.getAuthorizedRequest()
-		    dojo.mixin(request,
-		               {
+            var values = this.form.getValues();
+            var timeout = values.timeout;
+            timeout = timeout? "Second-" + timeout: "Infinite";
+            var content = ['<?xml version="1.0" encoding="utf-8" ?>',
+                '<ticket:ticketinfo xmlns:D="DAV:" ',
+                'xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">',
+                '<D:privilege>', this.privDict[values.privileges], '</D:privilege>',
+                '<ticket:timeout>', timeout, '</ticket:timeout>',
+                '</ticket:ticketinfo>'].join("");
+            var request = cosmo.util.auth.getAuthorizedRequest();
+            dojo.mixin(request,
+                       {
                            contentType: 'text/xml',
-			               postData: content,
+                           postData: content,
                            url: cosmo.env.getBaseUrl() + "/dav" + this.itemId
-        	           }
+                       }
                       );
             request.headers['X-Http-Method-Override'] =  "MKTICKET";
             var d = dojo.rawXhrPost(request);
-		    d.addCallback(dojo.hitch(this, this.createSuccess));
+            d.addCallback(dojo.hitch(this, this.createSuccess));
             d.addErrback(dojo.hitch(this, this.createFailure));
-            return d;
+            return false;
         }
     },
 
-   	createSuccess: function(data){
-   	},
+    createSuccess: function(data){
+    },
 
-   	createFailure: function(error){
-		alert("Ticket not created. Error: " + error.message);
-   	}
+    createFailure: function(error){
+        alert("Ticket not created. Error: " + error.message);
+    }
 });

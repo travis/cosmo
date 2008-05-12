@@ -440,11 +440,11 @@
 <c:if test="${eventstamp != null}">
 <div class="hd" style="margin-top: 12px;">
   Original iCalendar
+  
 </div>
 
 <pre>
-
-<c:out value="${eventstamp.calendar}"/>
+<c:out value="${eventstamp.eventCalendar}"/>
 </pre>
 
 </c:if>

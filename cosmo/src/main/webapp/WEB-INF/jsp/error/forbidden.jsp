@@ -32,8 +32,8 @@
   --%>
 
 <u:bind var="SecureContext"
-        type="org.acegisecurity.context.HttpSessionContextIntegrationFilter"
-        field="ACEGI_SECURITY_CONTEXT_KEY"/>
+        type="org.springframework.security.context.HttpSessionContextIntegrationFilter"
+        field="SPRING_SECURITY_CONTEXT_KEY"/>
 
 <c:if test="${not empty sessionScope[SecureContext] &&
               not empty sessionScope[SecureContext].authentication}">

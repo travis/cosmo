@@ -256,20 +256,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var selId = 'listView_item' + self.getSelectedItemId();
         var map = cosmo.view.list.triageStatusCodeMappings;
         var d = _createElem('div'); // Dummy div
-        // Proxy icon div for getting background image properties
-        var taskIcon = cosmo.ui.imagegrid.createImageIcon({ domNode: d,
-            iconState: 'listViewTaskIcon' });
-        var taskStyle = taskIcon.style;
-        var taskBgImg = taskStyle.backgroundImage;
-        // Safari 2 will render backgroundPosition, but doesn't preserve
-        // the actual value set, so reconstruct it from the X-/Y-specific
-        // values that it does set on the proxy div
-        // This is fixed in the Safari 3 Beta, which is why we're checking
-        // here for a specific version string
-        var taskBgPos = (navigator.userAgent.indexOf('Safari/41') > -1) ?
-            taskStyle.backgroundPositionX + ' ' + taskStyle.backgroundPositionY :
-            taskStyle.backgroundPosition;
-        var taskBgPos = taskStyle.backgroundPosition;
         var remainingWidth = this.width;
         // Icon/buttons living in the col headers (task, triage)
         var colHeaderIcons = {};
@@ -295,10 +281,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + '">';
             if (display.task) {
-                r += '<div style="margin: 3px 5px; width: ' + taskStyle.width +
-                    '; height: ' + taskStyle.height +
-                    '; font-size: 1px; background-image: ' + taskBgImg +
-                    '; background-position: ' + taskBgPos + ';">&nbsp;</div>';
+                r += '<div style="margin: 3px 5px; font-size: 1px;" class="cosmoListViewTaskIcon">&nbsp;</div>';
             }
             r += '</td>';
             r += '<td class="listViewDataCell' + selCss + '" title="' + title + '">' +
@@ -316,7 +299,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         var size = this.itemsPerPage;
         var st = (this.currPageNum * size) - size;
-        
+
         // Create an ordered list of the column objects, in order
         var order = cosmo.view.list.columnOrder;
         for (var i = 0; i < order.length; i++) {
@@ -450,7 +433,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         if (items % this.itemsPerPage > 0) {
             pages++;
         }
-        this.pageCount = pages; 
+        this.pageCount = pages;
     };
     this._updateSize = function () {
         if (this.parent) {
@@ -578,7 +561,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
         deferred = deferred || cosmo.util.deferred.getFiredDeferred()
         deferred.addCallback(updateEventsCallback);
-        deferred.addCallback(function (){ 
+        deferred.addCallback(function (){
             self._calcPageCount();
             self._doSortAndDisplay();
         });

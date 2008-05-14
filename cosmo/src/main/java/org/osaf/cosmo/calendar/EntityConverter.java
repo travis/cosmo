@@ -59,7 +59,6 @@ import net.fortuna.ical4j.model.property.Version;
 import org.apache.commons.lang.StringUtils;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
-import org.osaf.cosmo.calendar.util.TimeZoneUtils;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
@@ -435,16 +434,22 @@ public class EntityConverter {
         // check start/end date tz is included, and add if it isn't
         String tzid = getTzId(stamp.getStartDate());
         if(tzid!=null && !tzMap.containsKey(tzid)) {
-            VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, stamp.getStartDate().getTime());
-            masterCal.getComponents().add(0, vtz);
-            tzMap.put(tzid, vtz);
+            TimeZone tz = TIMEZONE_REGISTRY.getTimeZone(tzid);
+            if(tz!=null) {
+                VTimeZone vtz = tz.getVTimeZone();
+                masterCal.getComponents().add(0, vtz);
+                tzMap.put(tzid, vtz);
+            }
         }
         
         tzid = getTzId(stamp.getEndDate());
         if(tzid!=null && !tzMap.containsKey(tzid)) {
-            VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, stamp.getEndDate().getTime());
-            masterCal.getComponents().add(0, vtz);
-            tzMap.put(tzid, vtz);
+            TimeZone tz = TIMEZONE_REGISTRY.getTimeZone(tzid);
+            if(tz!=null) {
+                VTimeZone vtz = tz.getVTimeZone();
+                masterCal.getComponents().add(0, vtz);
+                tzMap.put(tzid, vtz);
+            }
         }
         
         // merge item properties to icalendar props
@@ -512,16 +517,22 @@ public class EntityConverter {
             // verify that timezones are present for exceptions, and add if not
             tzid = getTzId(exceptionStamp.getStartDate());
             if(tzid!=null && !tzMap.containsKey(tzid)) {
-                VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, exceptionStamp.getStartDate().getTime());
-                masterCal.getComponents().add(0, vtz);
-                tzMap.put(tzid, vtz);
+                TimeZone tz = TIMEZONE_REGISTRY.getTimeZone(tzid);
+                if(tz!=null) {
+                    VTimeZone vtz = tz.getVTimeZone();
+                    masterCal.getComponents().add(0, vtz);
+                    tzMap.put(tzid, vtz);
+                }
             }
             
             tzid = getTzId(exceptionStamp.getEndDate());
             if(tzid!=null && !tzMap.containsKey(tzid)) {
-                VTimeZone vtz = TimeZoneUtils.getSimpleVTimeZone(tzid, exceptionStamp.getEndDate().getTime());
-                masterCal.getComponents().add(0, vtz);
-                tzMap.put(tzid, vtz);
+                TimeZone tz = TIMEZONE_REGISTRY.getTimeZone(tzid);
+                if(tz!=null) {
+                    VTimeZone vtz = tz.getVTimeZone();
+                    masterCal.getComponents().add(0, vtz);
+                    tzMap.put(tzid, vtz);
+                }
             }
         }
         

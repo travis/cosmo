@@ -29,7 +29,7 @@ public class TimeZoneUtilsTest extends TestCase {
         VTimeZone vtz = TimeZoneUtils.getVTimeZone("America/Chicago");
         Assert.assertNotNull(vtz);
         Assert.assertEquals("America/Chicago", vtz.getTimeZoneId().getValue());
-        Assert.assertEquals(8, vtz.getObservances().size());
+        Assert.assertEquals(4, vtz.getObservances().size());
         
         vtz = TimeZoneUtils.getVTimeZone("blah");
         Assert.assertNull(vtz);

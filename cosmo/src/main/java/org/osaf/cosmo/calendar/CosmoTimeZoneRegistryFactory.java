@@ -20,7 +20,7 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 
 /**
  * Factory implementation for timezone registries.  Simply
- * creates and returns a CosmoTimeZoneRegistry instance.  This
+ * creates and returns a CosmoICUTimeZoneRegistry instance.  This
  * allows Cosmo to provide its own timezone registiry to plug
  * into ical4j.
  */

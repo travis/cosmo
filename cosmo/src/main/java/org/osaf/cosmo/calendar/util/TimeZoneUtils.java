@@ -17,12 +17,18 @@ package org.osaf.cosmo.calendar.util;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
-import com.ibm.icu.util.TimeZone;
-
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.Observance;
 import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.property.RRule;
+
+import com.ibm.icu.util.TimeZone;
 
 /**
  * Contains utility methods for working with ical4j TimeZone and
@@ -30,16 +36,19 @@ import net.fortuna.ical4j.model.component.VTimeZone;
  */
 public class TimeZoneUtils {
     
-    static HashSet<String> ALL_TIMEZONE_IDS = new HashSet<String>();
+    private static Set<String> ALL_TIMEZONE_IDS = new HashSet<String>();
+    public static final long ONE_DAY = 60*1000*60*24;
     
-    // represents 1990
-    static long TIMEZONE_START_DATE = 631237079*1000;
+    // represents 1998
+    static long TIMEZONE_START_DATE = 883612800000L;
     
     // index all timezone ids from icu registry
     static
     {
         for(String id: TimeZone.getAvailableIDs())
             ALL_TIMEZONE_IDS.add(id);
+        
+        ALL_TIMEZONE_IDS = Collections.unmodifiableSet(ALL_TIMEZONE_IDS);
     }
     
     /**
@@ -82,11 +91,32 @@ public class TimeZoneUtils {
             StringWriter sw = new StringWriter();
             icuvtz.write(sw, TIMEZONE_START_DATE);
             VTimeZone vtz = (VTimeZone) CalendarUtils.parseComponent(sw.toString()); 
+            fixIcuVTimeZone(vtz);
             return vtz;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+    
+    /**
+     * ICU4J generates VTIMEZONE RRULEs with floating UNTIL, which results
+     * in a bad VTIMEZONE because the UNTIL is converted to UTC, which will
+     * be different depending on the default timezone of the server.  So
+     * to fix this, always add a day to UNTIL to make sure the RRULE
+     * doesn't fall short.  This should work for most timezones as timezones
+     * don't usually change from day to day.  Hopefully this is fixed in
+     * an icu4j update.
+     * @param vtz
+     */
+    protected static void fixIcuVTimeZone(VTimeZone vtz) {
+        for(Iterator<Observance> obIt = vtz.getObservances().iterator();obIt.hasNext();)
+            for(Iterator<RRule> rrIt = obIt.next().getProperties(Property.RRULE).iterator();rrIt.hasNext();) {
+                Recur recur = rrIt.next().getRecur();
+                if(recur.getUntil()!=null)
+                    recur.getUntil().setTime(recur.getUntil().getTime() + ONE_DAY);
+            }
+    }
+    
     
     /**
      * Return simple ical4j VTimeZone instance (including only relevant

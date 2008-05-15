@@ -258,7 +258,7 @@ cosmo.env.getTimeoutMinutes = function (){
 }
 
 //initialize from dojo.config
-cosmo.env.setBaseUrl(dojo.config['serverBaseUrl']);
+cosmo.env.setBaseUrl(dojo.config['serverBaseUrl'] || dojo.moduleUrl("cosmo", "../.."));
 cosmo.env.setStaticBaseUrlTemplate(dojo.config['staticBaseUrlTemplate']);
 cosmo.env.setStaticBaseUrlRange(dojo.config['staticBaseUrlRange']);
 

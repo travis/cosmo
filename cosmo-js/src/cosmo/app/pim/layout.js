@@ -42,7 +42,7 @@ dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.detail");
 dojo.require("cosmo.ui.imagegrid");
-dojo.require("cosmo.ui.selector");
+dojo.require("cosmo.ui.widget.CollectionSelector");
 
 cosmo.app.pim.layout = new function () {
     this.baseLayout = null;
@@ -306,9 +306,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
 
     // Main logo graphic
     var logoDiv = _createElem('div');
-    logoDiv.id = 'mainLogoContainer';
-    logoDiv = cosmo.ui.imagegrid.createImageIcon({ domNode: logoDiv,
-        iconState: 'mainLogoGraphic' });
+    logoDiv.id = 'cosmoMainLogo';
     menuBar.domNode.appendChild(logoDiv);
 
     // Main menu of links at the top of the UI
@@ -376,7 +374,7 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     }
     // Logged-in view -- use the collection selector
     else {
-        var cB = new cosmo.ui.selector.CollectionSelector({ domNode: selectorDiv,
+        var cB = new cosmo.ui.widget.CollectionSelector({ domNode: selectorDiv,
             id: selectorDiv.id });
         leftSidebar.addChild(cB);
         leftSidebar.collectionSelector = cB;

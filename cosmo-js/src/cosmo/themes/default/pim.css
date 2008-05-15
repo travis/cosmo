@@ -18,6 +18,7 @@
  */
 @import url("../../../dijit/themes/dijit.css");
 @import url("SharingDialog.css");
+@import url("CollectionSelector.css");
 @import url("Dialog.css");
 @import url("imagegrid.css");
 
@@ -175,6 +176,7 @@
 #leftSidebar {
     position: absolute;
     background: #fff;
+    width: 168px;
 }
 /* Collection select box */
 #calSelectNav {
@@ -501,7 +503,10 @@
 }
 #collectionSelectorContainer {
     border-bottom: 1px solid #ccc;
-    overflow: auto; overflow-y: auto; overflow-x: hidden;
+    overflow: auto; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+    height: 160px;
 }
 #collectionLabelName {
     padding-top: 8px;
@@ -514,42 +519,6 @@
 #addCollectionPrompt {
     padding-top: 2px;
     padding-left: 4px;
-}
-#collectionSelectorTable {
-    table-layout: fixed;
-    width: 100%;
-}
-.collectionSelectorCheckbox {
-    width: 18px;
-    height: 16px;
-    padding-left: 3px;
-    text-align: center;
-}
-.collectionSelectorCollectionName {
-    padding-left: 5px;
-    padding-right: 3px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-}
-.collectionSelectorSel {
-    background-color: #659dd3;
-    color: #fff;
-    border-bottom: 1px solid white;
-}
-.collectionSelectorDetails {
-    width: 16px;
-    height: 15px;
-    border-bottom: 1px solid white;
-    cursor: pointer;
-}
-#collectionSelectorNoCollectionsPrompt {
-    color: #999;
-    padding: 4px;
-}
-#newCollectionDiv {
-    padding-top: 3px;
-    padding-left: 3px;
 }
 
 /* Minical styles
@@ -657,4 +626,12 @@
 .cosmoGraphicRadioButton {
     cursor: pointer;
     font-size: 1px;
+}
+.cosmoCollectionDetailsDefault{
+    margin = 'auto';
+}
+#cosmoMainLogo{
+    background: url(images/logo_en.png);
+    width: 216px;
+    height: 45px;
 }

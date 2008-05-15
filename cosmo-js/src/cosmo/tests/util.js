@@ -72,7 +72,6 @@ cosmo.tests.util = {
             dojo.hitch(this, function(serviceXml){
                 var collection = cosmo.atompub.getCollections(serviceXml.documentElement, "home")[0];
                 if (collection) {
-                    debugger
                     return collection;
                 } else {
                     var createD = this.createCollection(user);

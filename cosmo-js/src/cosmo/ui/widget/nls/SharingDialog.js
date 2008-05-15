@@ -69,8 +69,5 @@
 
      download: "Download",
 
-     deleteCollection: "Delete",
-     deleteFailed: "Attempt to delete ${collectionName} failed.",
-
      dismiss: "Done"
  })

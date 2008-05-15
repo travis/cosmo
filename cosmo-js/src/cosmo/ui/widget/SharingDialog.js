@@ -182,35 +182,8 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
         return d;
     },
 
-    deleteCollection: function(){
-        var displayName = this.store.getValue(this.collection, "displayName");
-        var confirmDeleteMessage = dojo.string.substitute(this.store.l10n.confirmDelete, {collectionName: displayName});
-        var d = cosmo.app.confirm(confirmDeleteMessage, {cancelDefault: true});
-        d.addCallback(dojo.hitch(this, function(confirmed){
-            if (confirmed){
-                this.store.deleteItem(this.collection);
-                var sd = this.store.save();
-                sd.addErrback(function(e){
-                    cosmo.app.showErr(
-                        dojo.string.substitute(this.l10n.deleteFailed,
-                                               {collectionName: displayName}),
-                        e.message, e);
-                    return e;
-                });
-                sd.addCallback(dojo.hitch(this, function(){this.onDeleteCollection(this.collection);}));
-                sd.addCallback(dojo.hitch(this, function(){this.destroy();}));
-                return sd;
-            } else return false;
-        }));
-        return d;
-    },
-
     // Extension points
     onDisplayNameChange: function(value){
-
-    },
-
-    onDeleteCollection: function(){
 
     },
 

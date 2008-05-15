@@ -24,6 +24,7 @@
  */
 
 dojo.provide("cosmo.env");
+(function(){
 cosmo.env.OVERLORD_USERNAME = "root";
 
 //private variable for storing environment information. Do not access directly,
@@ -258,8 +259,9 @@ cosmo.env.getTimeoutMinutes = function (){
 }
 
 //initialize from dojo.config
-cosmo.env.setBaseUrl(dojo.config['serverBaseUrl'] || dojo.moduleUrl("cosmo", "../.."));
+var baseUrlConfigValue = dojo.config['serverBaseUrl'];
+cosmo.env.setBaseUrl((typeof baseUrlConfigValue == "undefined")? dojo.moduleUrl("cosmo", "../..") : baseUrlConfigValue);
 cosmo.env.setStaticBaseUrlTemplate(dojo.config['staticBaseUrlTemplate']);
 cosmo.env.setStaticBaseUrlRange(dojo.config['staticBaseUrlRange']);
-
+})();
 

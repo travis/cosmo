@@ -21,7 +21,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;

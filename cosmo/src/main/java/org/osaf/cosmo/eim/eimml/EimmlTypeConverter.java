@@ -17,23 +17,23 @@ package org.osaf.cosmo.eim.eimml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Locale;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.util.DateUtil;
 
 /**
@@ -230,7 +230,8 @@ public class EimmlTypeConverter implements EimmlConstants {
                 pattern.append("#");
         }
 
-        return new DecimalFormat(pattern.toString()).format(value);
+        // make sure to always format with same symbols (US locale)
+        return new DecimalFormat(pattern.toString(), new DecimalFormatSymbols(Locale.US)).format(value);
     }
 
     private static byte[] decodeBase64String(String value)

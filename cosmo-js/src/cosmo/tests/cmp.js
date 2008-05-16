@@ -14,11 +14,12 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.cmp.test_cmp")
+dojo.provide("cosmo.tests.cmp");
 dojo.require("cosmo.cmp");
+dojo.require("cosmo.tests.jum");
 
-cosmotest.cmp.test_cmp = {
-    test_userXML: function(){
+doh.register("cosmo.test.cmp", [
+    function userXML(){
         var user1 = {
             username: "test1",
             password: "password1",
@@ -58,7 +59,7 @@ cosmotest.cmp.test_cmp = {
             '<firstName>test2</firstName>' +
             '<lastName>mctest2</lastName>' +
             '<email>test2@example.com</email>' +
-            '<subscription name="test subscription" ticket="09876">0123456789</subscription>' + 
+            '<subscription name="test subscription" ticket="09876">0123456789</subscription>' +
             '</user>';
 
         jum.assertEquals("user 2 wrong", user2XML, cosmo.cmp.userHashToXML(user2));
@@ -98,6 +99,6 @@ cosmotest.cmp.test_cmp = {
             jum.assertEquals("e3 ticket wrong", e3.ticket, "09876");
         }
     }
-}
+]);
 
 

@@ -14,11 +14,12 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.model.test_common")
+dojo.provide("cosmo.model.tests.common");
 dojo.require("cosmo.model.common");
+dojo.require("cosmo.tests.jum");
 
-cosmotest.model.test_common = {
-    test_duration: function (){
+doh.register("cosmo.model.tests.common", [
+    function test_duration(){
         var duration = new cosmo.model.Duration({day:1, month:2});
         jum.assertEquals(1, duration.getDay());
         jum.assertEquals(2, duration.getMonth());
@@ -29,7 +30,7 @@ cosmotest.model.test_common = {
         jum.assertEquals(5, duration.getMinute());
         jum.assertEquals(6, duration.getSecond());
         jum.assertEquals("PT4H5M6S", duration.toIso8601());
-        
+
         var date1 = new cosmo.datetime.Date(2000,0,1);
         var date2 = new cosmo.datetime.Date(2000,0,2);
         duration = new cosmo.model.Duration(date1, date2);
@@ -50,6 +51,6 @@ cosmotest.model.test_common = {
         jum.assertEquals(23, duration.getHour());
         jum.assertEquals("PT23H", duration.toIso8601());
     }
-}
+]);
 
 

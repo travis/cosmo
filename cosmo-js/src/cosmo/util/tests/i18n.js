@@ -14,12 +14,13 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.util.test_i18n");
+dojo.provide("cosmo.util.tests.i18n");
 
 dojo.require("cosmo.util.i18n");
+dojo.require("cosmo.tests.jum");
 
-cosmotest.util.test_i18n = {
-    test_getText: function (){
+doh.register("cosmo.util.tests.i18n", [
+    function getText(){
         cosmo.util.i18n._localtext = {
             "A": "nothing",
             "B": "zero {0}",
@@ -27,8 +28,8 @@ cosmotest.util.test_i18n = {
             "D": "one {1}",
             "E": "one {1} zero {0}",
             "F": "one {1} zero {0} one {1}"
-        }
-        
+        };
+
         jum.assertEquals("A", "nothing", cosmo.util.i18n.getText("A"));
         jum.assertEquals("B", "zero 0", cosmo.util.i18n.getText("B", 0));
         jum.assertEquals("C", "zero 0 one 1", cosmo.util.i18n.getText("C", 0, 1));
@@ -36,5 +37,4 @@ cosmotest.util.test_i18n = {
         jum.assertEquals("E", "one 1 zero 0", cosmo.util.i18n.getText("E", 0, 1));
         jum.assertEquals("F", "one 1 zero 0 one 1", cosmo.util.i18n.getText("F", 0, 1));
     }
-}
-  
+]);

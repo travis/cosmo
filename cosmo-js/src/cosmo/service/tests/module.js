@@ -13,9 +13,9 @@
  */
 dojo.provide("cosmo.service.tests.module");
 try{
-	dojo.require("cosmo.model.tests.transport.atom");
-	dojo.require("cosmo.model.tests.transport.rest");
-	dojo.require("cosmo.model.tests.trasnlators.eim");
+	dojo.require("cosmo.service.tests.transport.atom");
+	dojo.require("cosmo.service.tests.transport.rest");
+	dojo.require("cosmo.service.tests.translators.eim");
 
 }catch(e){
 	doh.debug(e);

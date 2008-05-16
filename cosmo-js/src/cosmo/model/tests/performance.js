@@ -14,28 +14,27 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.model.test_performance")
+dojo.provide("cosmo.model.tests.performance");
 dojo.require("cosmo.model.Item");
-
+(function(){
 function twoGets(item){
     item.getDisplayName();
-    item.getDisplayName();   
+    item.getDisplayName();
 }
 
 function saveInVar(item){
     var x = item.getDisplayName();
 }
 
-cosmotest.model.test_performance = {
+doh.register("cosmo.model.tests.performance", [
     /*
      * This test is meant to be run in the firebug profiler. It should
      * demonstrate which of the two functions above runs faster
      */
-    test_twoGetsVsSaveInVar: function (){
+    function twoGetsVsSaveInVar(){
         var item = new cosmo.model.Item({displayName: "foo"});
         twoGets(item);
         saveInVar(item);
     }
-}
-
-
+]);
+})();

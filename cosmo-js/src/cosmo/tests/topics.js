@@ -14,24 +14,27 @@
  * limitations under the License.
 */
 
+dojo.provide("cosmo.tests.topics");
 dojo.require("cosmo.topics");
 
-function test_publish(){
+doh.register("cosmo.tests.topics", [
+function test_publish(t){
    var success = false;
-   
+
    var myMessage = null;
    function f(/*cosmo.topics.CollectionUpdatedMessage*/ message){
        success = true;
        myMessage = message;
    }
-   
-   dojo.event.topic.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,null, f);
+
+   dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName,null, f);
    cosmo.topics.publish(cosmo.topics.CollectionUpdatedMessage, [{cid: "123456"}]);
-   
+
    while (success == false){
    }
-   
-   jum.assertEquals("123456", myMessage.collection.cid);
-   
-   
+
+   t.assertEqual("123456", myMessage.collection.cid);
+
+
 }
+]);

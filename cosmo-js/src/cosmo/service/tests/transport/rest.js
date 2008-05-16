@@ -14,15 +14,15 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.service.transport.test_Rest");
+dojo.provide("cosmo.service.tests.transport.rest");
 
 dojo.require("cosmo.service.transport.Rest");
 
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 
-cosmotest.service.transport.test_Rest = {
-    test_getDefaultRequest: function (){
+doh.register("cosmo.service.tests.transport.rest", [
+    function getDefaultRequest(){
         dojo.require("cosmo.util.auth");
 
         cosmo.util.auth.clearAuth();
@@ -32,17 +32,17 @@ cosmotest.service.transport.test_Rest = {
         jum.assertEquals("default content type", "text/xml", request.contentType);
         jum.assertEquals("default sync", false, request.sync);
         jum.assertEquals("default transport", "XMLHTTPTransport", request.transport);
-        var headers = request.headers
-        jum.assertEquals("default auth", undefined, headers["Authorization"])
-        
+        var headers = request.headers;
+        jum.assertEquals("default auth", undefined, headers["Authorization"]);
+
         cosmo.util.auth.setCred("foo", "bar");
         request = t.getDefaultRequest("", {});
-        headers = request.headers
+        headers = request.headers;
         jum.assertEquals("foo:bar auth", "Basic Zm9vOmJhcg==", headers["Authorization"]);
-        
-    },  
 
-    test_queryHashToString: function (){
+    },
+
+    function queryHashToString(){
         var t = new cosmo.service.transport.Rest();
         jum.assertEquals("hash1",
                          "?foo=bar&baz=bet",
@@ -126,4 +126,4 @@ cosmotest.service.transport.test_Rest = {
                          "?foo=%2B",
                          t.queryHashToString({"foo": "+"}));
     }
-}
+]);

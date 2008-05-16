@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Open Source Applications Foundation
+ * Copyright 2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.model.test_modelTriage");
+dojo.provide("cosmo.model.tests.modelTriage");
 dojo.require("cosmo.model.util");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
+dojo.require("cosmo.tests.jum");
 
-dojo.mixin(cosmotest.model.test_modelTriage,{
-    test_getSetTriage : function(){
+doh.register("cosmo.model.tests.modelTriage", [
+    function getSetTriage (){
         var note = new cosmo.model.Note();
         note.setTriageStatus(cosmo.model.TRIAGE_LATER);
         jum.assertEquals("Should be LATER", cosmo.model.TRIAGE_LATER, note.getTriageStatus());
@@ -33,29 +34,29 @@ dojo.mixin(cosmotest.model.test_modelTriage,{
 
         occurrence.setTriageStatus(cosmo.model.TRIAGE_DONE);
         jum.assertEquals("Should be DONE - set on the modification.", cosmo.model.TRIAGE_DONE, occurrence.getTriageStatus());
-        
+
         //sanity check - make sure master is still the same
         jum.assertEquals("Should be LATER", cosmo.model.TRIAGE_LATER, note.getTriageStatus());
-    }, 
-    
-    test_implicitTriageOfOccurrences: function(){
+    },
+
+    function implicitTriageOfOccurrences(){
         var note = new cosmo.model.Note();
         var eventStamp = note.getEventStamp(true);
         var duration = new cosmo.model.Duration({hour:1});
         eventStamp.setDuration(duration);
-        
+
         var now = (new Date()).getTime();
-        
+
         var startDate = new cosmo.datetime.Date();
 
         //let's make an occurrence that starts half an hour before now and lasts an hour.
-        var halfAnHourBeforeNow = now - (1000 * 60 * 30);  
+        var halfAnHourBeforeNow = now - (1000 * 60 * 30);
         startDate.updateFromUTC(halfAnHourBeforeNow);
         var nowOccurrence = note.getNoteOccurrence(startDate);
         jum.assertEquals("event is happening now", cosmo.model.TRIAGE_NOW, nowOccurrence.getTriageStatus());
 
         //let's make an occurrence that starts half an hour after now and lasts an hour.
-        var halfAnHourAfterNow = now + (1000 * 60 * 30);  
+        var halfAnHourAfterNow = now + (1000 * 60 * 30);
         startDate.updateFromUTC(halfAnHourAfterNow);
         var laterOccurrence = note.getNoteOccurrence(startDate);
         jum.assertEquals("event is happening later", cosmo.model.TRIAGE_LATER, laterOccurrence.getTriageStatus());
@@ -69,9 +70,9 @@ dojo.mixin(cosmotest.model.test_modelTriage,{
         //now let's assume Chandler synced and set lastPastOccurrence
         startDate.updateFromUTC(halfAnHourBeforeNow);
         eventStamp.setLastPastOccurrence(startDate);
-        jum.assertEquals("event is happening now, but Chandler marked done", 
+        jum.assertEquals("event is happening now, but Chandler marked done",
                          cosmo.model.TRIAGE_DONE, nowOccurrence.getTriageStatus());
-        
+
         startDate.updateFromUTC(halfAnHourAfterNow);
         eventStamp.setLastPastOccurrence(startDate);
         jum.assertEquals("event is happening later and Chandler synced", cosmo.model.TRIAGE_LATER, laterOccurrence.getTriageStatus());
@@ -80,16 +81,16 @@ dojo.mixin(cosmotest.model.test_modelTriage,{
         eventStamp.setLastPastOccurrence(startDate);
         jum.assertEquals("event happened and Chandler synced", cosmo.model.TRIAGE_DONE, doneOccurrence.getTriageStatus());
     },
-    
-    test_autotriage: function(){
+
+    function autotriage(){
         var now = (new Date()).getTime();
         var note = new cosmo.model.Note();
         var triaged = note.autoTriage();
         jum.assertEquals("note w/ no event stamp should not auto triage", false, triaged);
-        
+
         var eventStamp = note.getEventStamp(true);
         eventStamp.setDuration(new cosmo.model.Duration({hour:1}));
-        var startDate = new cosmo.datetime.Date(); 
+        var startDate = new cosmo.datetime.Date();
 
         var twoHoursBeforeNow = now - (1000 * 60 * 2 * 60);
         startDate.updateFromUTC(twoHoursBeforeNow);
@@ -98,4 +99,4 @@ dojo.mixin(cosmotest.model.test_modelTriage,{
         jum.assertEquals("note in the past should auto-triage to DONE", true, triaged);
         jum.assertEquals("note in the past should auto-triage to DONE", cosmo.model.TRIAGE_DONE, note.getTriageStatus());
     }
-});
+]);

@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-dojo.provide("cosmotest.account.test_preferences")
+dojo.provide("cosmo.account.tests.preferences");
 dojo.require("cosmo.account.preferences");
 
-cosmotest.account.test_preferences = {
-    test_cookiePreferences: function(){
+doh.register("cosmo.account.tests.preferences", [
+    function cookiePreferences(t){
         cosmo.account.preferences.setCookiePreference("foo", "bar");
-        jum.assertEquals("foo preference", "bar", cosmo.account.preferences.getCookiePreference("foo"));
-
-        jum.assertEquals("baz preference", null, cosmo.account.preferences.getCookiePreference("baz"));
-        
+        t.assertEqual("bar", cosmo.account.preferences.getCookiePreference("foo"));
+        t.assertEqual(null, cosmo.account.preferences.getCookiePreference("baz"));
     }
-}
+]);

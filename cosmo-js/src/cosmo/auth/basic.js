@@ -79,7 +79,9 @@ dojo.mixin(cosmo.auth.basic, {
         kwArgs = kwArgs || {};
     	request = request || {};
         request.headers = request.headers || {};
-        request.headers.Authorization = "Basic " + this.getCred();
+        var cred = this.getCred();
+        if (cred)
+            request.headers.Authorization = "Basic " + cred;
     	return request;
     }
 

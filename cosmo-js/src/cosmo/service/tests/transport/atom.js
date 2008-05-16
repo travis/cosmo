@@ -14,30 +14,30 @@
  * limitations under the License.
 */
 
-dojo.provide("cosmotest.service.transport.test_Atom");
+dojo.provide("cosmo.service.tests.transport.atom");
 
 dojo.require("cosmo.service.transport.Atom");
 dojo.require("cosmo.util.auth");
-
+dojo.require("cosmo.tests.jum");
 //Initialization.
 //TODO - once Dojo implements setUp() and tearDown() move this code there.
 
-cosmotest.service.transport.test_Atom = {
-    test_generateUri: function(){
+doh.register("cosmo.service.tests.transport.atom", [
+    function generateUri(){
         var at = new cosmo.service.transport.Atom();
-        var u = at.generateUri("a/b", "/c", {d:"e"})
-        jum.assertEquals("no query base uri generate unsuccessful", "a/b/c?d=e", u)
+        var u = at.generateUri("a/b", "/c", {d:"e"});
+        jum.assertEquals("no query base uri generate unsuccessful", "a/b/c?d=e", u);
 
-        u = at.generateUri("a/b?g=h", "/c", {d:"e"})
-        jum.assertEquals("query base uri generate unsuccessful", "a/b/c?d=e&g=h", u)
-        
+        u = at.generateUri("a/b?g=h", "/c", {d:"e"});
+        jum.assertEquals("query base uri generate unsuccessful", "a/b/c?d=e&g=h", u);
+
     },
-    test_getUsernameForURI: function(){
+    function getUsernameForURI(){
         var at = new cosmo.service.transport.Atom();
         cosmo.util.auth.setUsername("!@#$%^&*()\"';?/+=-_<>,.");
         jum.assertEquals("not escaping correctly",
                          "!%40%23%24%25%5E%26*()%22'%3B%3F%2F%2B%3D-_%3C%3E%2C.",
                          at._getUsernameForURI());
-                         
+
     }
-}
+]);

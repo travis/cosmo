@@ -17,9 +17,13 @@
 dojo.provide("cosmo.datetime.tests.serialize");
 
 dojo.require("cosmo.tests.jum");
+dojo.require("cosmo.env");
+dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
 dojo.require("cosmo.datetime.serialize");
 
 (function(){
+var registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry(cosmo.env.getBaseUrl() + "/js/olson-tzdata/");
+cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
 /* Makes sure properties specified in the expected match the actual.
  * Also, makes sure properties not specified in the expected
@@ -29,7 +33,7 @@ function assertDurationsEqual(id, d1, d2){
     if (d1.year) jum.assertEquals(id + ": year", d1.year, d2.year);
     else jum.assertFalse(id + ": year", !!d2.year);
     if (d1.month) jum.assertEquals(id + ": month", d1.month, d2.month);
-        else jum.assertFalse(id + ": month", !!d2.month);
+    else jum.assertFalse(id + ": month", !!d2.month);
     if (d1.day) jum.assertEquals(id + ": day", d1.day, d2.day);
     else jum.assertFalse(id + ": day", !!d2.day);
     if (d1.hour) jum.assertEquals(id + ": hour", d1.hour, d2.hour);
@@ -41,18 +45,24 @@ function assertDurationsEqual(id, d1, d2){
 }
 
 doh.register("cosmo.datetime.tests.serialize", [
+    function fromICalDate(t){
+        var f = cosmo.datetime.fromICalDate;
+        var d = f(";VALUE=DATE-TIME:20080515T100000")[0];
+        t.is(new Date(2008, 4, 15, 10, 0, 0).getTime(), d.getTime());
+        d = f(";VALUE=DATE-TIME;TZID=Pacific/Honolulu:20080515T100000")[0];
+        t.is(1210881600000, d.getTime());
+        d = f(";VALUE=DATE-TIME;TZID=America/Los_Angeles:20080515T100000")[0];
+        t.is(1210870800000, d.getTime());
+        d = f(";VALUE=DATE-TIME:20080515T200000Z")[0];
+        t.is(1210881600000, d.getTime());
+    },
+
     function fromIso8601(t){
         var fI8 = cosmo.datetime.fromIso8601;
-        doh.debug("gmt");
-        var d = fI8("20080515T200000Z");
+        var d = fI8("20080515T100000")[0];
+        t.is(new Date(2008, 4, 15, 10, 0, 0).getTime(), d.getTime());
+        d = fI8("20080515T200000Z");
         t.is(1210881600000, d.getTime());
-        doh.debug("honolulu");
-        d = fI8("20080515T100000", "Pacific/Honolulu");
-        t.is(1210881600000, d.getTime());
-        doh.debug("la");
-        d = fI8("20080515T100000", "America/Los_Angeles");
-        t.is(1210870800000, d.getTime());
-
     },
 
     function fromIso8601Date(){

@@ -490,7 +490,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     recurrenceIdToDate: function (/*String*/ rid, masterItemStartDate){
-         return cosmo.datetime.fromIso8601(rid, masterItemStartDate.tzId);
+        return cosmo.datetime.fromIso8601(rid).
+            createDateForTimezone(masterItemStartDate.tzId);
     },
 
     subscriptionToAtomEntry: function (subscription){
@@ -968,7 +969,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             if (record.fields.location) properties.location = record.fields.location[1];
             if (record.fields.rrule) properties.rrule = this.parseRRule(record.fields.rrule[1], properties.startDate);
             if (record.fields.exrule) properties.exrule = this.parseRRule(record.fields.exrule[1], properties.startDate);
-            if (record.fields.exdate) properties.exdates = this.parseExdate(record.fields.exdate[1]);
+            if (record.fields.exdate) properties.exdates = this.fromExdate(record.fields.exdate[1]);
             if (record.fields.status) properties.status = record.fields.status[1];
         }
         return properties;
@@ -1032,14 +1033,12 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     },
 
     fromEimDate: function (dateString){
-        var dateParts = dateString.split(":");
-        var dateParamList = dateParts[0].split(";");
-        var dateParams = {};
-        for (var i = 0; i < dateParamList.length; i++){
-            var keyValue = dateParamList[i].split("=");
-            dateParams[keyValue[0].toLowerCase()] = keyValue[1];
-        }
-        return cosmo.datetime.fromIso8601(dateParts[1], dateParams['tzid'] || null);
+        return cosmo.datetime.fromICalDate(dateString)[0];
+    },
+
+    fromExdate: function (exdate){
+        if (!exdate) return null;
+        return cosmo.datetime.fromICalDate(exdate);
     },
 
     addTriageStringToItemProps: function (triageString, props){
@@ -1133,14 +1132,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return null;
         }
         return this.rPropsToRRule(this.parseRRuleToHash(rule), startDate);
-    },
-
-    parseExdate: function (exdate){
-        if (!exdate) return null;
-        return dojo.map(
-                exdate.split(":")[1].split(","),
-                function (exdate, index) {return cosmo.datetime.fromIso8601(exdate);}
-         );
     },
 
     //Snagged from dojo.cal.iCalendar
@@ -1295,7 +1286,6 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             throw new cosmo.service.translators.
                ParseError("Could not find id element for entry " + entry);
         }
-        uuid = unescape(uuid.firstChild.nodeValue.substring(9));
-        return uuid;
+        return unescape(uuid.firstChild.nodeValue.substring(9));
     }
 });

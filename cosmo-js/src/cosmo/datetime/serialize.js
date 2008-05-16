@@ -16,6 +16,19 @@
 dojo.provide("cosmo.datetime.serialize");
 
 dojo.require("cosmo.datetime.util");
+dojo.require("dojo.date.stamp");
+(function(){
+function getDateParts(string){
+    var dateParts = string.split(":");
+    var dateParamList = dateParts[0].split(";");
+    var dateParams = {};
+    for (var i = 0; i < dateParamList.length; i++){
+        var keyValue = dateParamList[i].split("=");
+        dateParams[keyValue[0].toLowerCase()] = keyValue[1];
+    }
+    dateParts[0] = dateParams;
+    return dateParts;
+}
 //for iso8601 parsing
 cosmo.datetime._iso8601DateFormatString = "yyyyMMdd";
 cosmo.datetime._iso8601TimeFormatString = "HHmmss";
@@ -26,23 +39,39 @@ cosmo.datetime.toIso8601 = function (/*cosmo.datetime.Date*/ date){
     dojo.unimplemented();
 };
 
-cosmo.datetime.fromIso8601 = function(/*String*/formattedString, timezone){
-    var parts = cosmo.datetime.util.dateParts;
+cosmo.datetime.fromIso8601 = function(/*String*/dateString){
     var date = new cosmo.datetime.Date(2000,0,1);
-    if (timezone){
-        date.tzId = timezone;
-    }
-    else if (formattedString.substring(formattedString.length - 1).toLowerCase() == "z"){
-        date.utc = true;
-    }
-    var dateProps = cosmo.datetime.parseIso8601(formattedString);
-    date.setYear(dateProps[ parts.YEAR]);
-    date.setMonth(dateProps[parts.MONTH]);
-    date.setDate(dateProps[parts.DAY]);
-    date.setHours(dateProps[parts.HOUR]);
-    date.setMinutes(dateProps[parts.MINUTE]);
-    date.setSeconds(dateProps[parts.SECOND]);
+    date.utc = (dateString.substring(dateString.length - 1).toLowerCase() == "z");
+    dojo.date.stamp._isoRegExp = /^(?:(\d{4})(?:(\d{2})(?:(\d{2}))?)?)?(?:T(\d{2})(\d{2})(?:(\d{2})())?((?:[+-](\d{2})(\d{2}))|Z)?)?$/;
+    var d = dojo.date.stamp.fromISOString(dateString);
+    dojo.date.stamp._isoRegExp = null;
+    date.updateFromUTC(d.getTime());
     return date;
+};
+cosmo.datetime.fromICalDate = function(icalString){
+    var dateParts = getDateParts(icalString);
+    var timezone = dateParts[0].tzid;
+    var dateStrings = dateParts[1].split(",");
+    var dates = dojo.map(dateStrings, function(dateString){
+        var date = new cosmo.datetime.Date(2000, 0, 1);
+        var utc = (icalString.substring(icalString.length - 1).toLowerCase() == "z");
+        if (timezone && utc) throw new Error("Could not parse date " + icalString + ": found utc and timezone");
+        if (timezone){
+            date.tzId = timezone;
+        } else if (utc) {
+            date.utc = utc;
+        }
+        var dateProps = cosmo.datetime.parseIso8601(dateParts[1]);
+        var parts = cosmo.datetime.util.dateParts;
+        date.setYear(dateProps[parts.YEAR]);
+        date.setMonth(dateProps[parts.MONTH]);
+        date.setDate(dateProps[parts.DAY]);
+        date.setHours(dateProps[parts.HOUR]);
+        date.setMinutes(dateProps[parts.MINUTE]);
+        date.setSeconds(dateProps[parts.SECOND]);
+        return date;
+    });
+    return dates;
 };
 
 //summary: parses a date or datetime and returns an object set with the
@@ -158,3 +187,6 @@ function durationHashToIso8601(/*Object*/dur){
     }
     return ret;
 }
+
+
+})();

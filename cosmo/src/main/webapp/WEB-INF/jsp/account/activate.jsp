@@ -25,6 +25,7 @@
 <fmt:message key="Login.DownloadLink" var="downloadLink"/>
 <fmt:message key="Login.HomeLink" var="homeLink"/>
 <fmt:message key="Account.Activate.SetupLink" var="setupLink"/>
+<fmt:message key="Account.Activate.GetStartedLink" var="getStartedLink"/>
 
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
@@ -41,7 +42,7 @@
     </table>
 
     <div class="separateBig restrictWidth huge">
-      <a href="${setupLink}">
+      <a href="${getStartedLink}">
         <fmt:message key="Account.Activate.CenterPromoLine1"/><br/>
         <fmt:message key="Account.Activate.CenterPromoLine2"/>
       </a>
@@ -86,16 +87,13 @@
       <p class="close">
         <fmt:message key="Account.Activate.LoginLine1"/>
       </p>
-      <p class="separate">
-        <fmt:message key="Account.Activate.LoginLine2"/>
-      </p>
       <ol>
         <li><fmt:message key="Account.Activate.LoginList1"/></li>
         <li><fmt:message key="Account.Activate.LoginList2"/></li>
         <li><fmt:message key="Account.Activate.LoginList3"/></li>
       </ol>
       <p class="learn">
-        <a href="${setupLink}">
+        <a href="${getStartedLink}">
           <fmt:message key="Account.Activate.LearnHowClickHere"/>
         </a>
       </p>

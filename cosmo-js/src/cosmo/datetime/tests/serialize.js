@@ -59,7 +59,7 @@ doh.register("cosmo.datetime.tests.serialize", [
 
     function fromIso8601(t){
         var fI8 = cosmo.datetime.fromIso8601;
-        var d = fI8("20080515T100000")[0];
+        var d = fI8("20080515T100000");
         t.is(new Date(2008, 4, 15, 10, 0, 0).getTime(), d.getTime());
         d = fI8("20080515T200000Z");
         t.is(1210881600000, d.getTime());

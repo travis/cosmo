@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-dojo.provide("cosmo.tests.module");
+dojo.provide("cosmo.service.tests.module");
 try{
-	dojo.require("cosmo.tests.xml");
-    dojo.require("cosmo.tests.atompub");
-    dojo.require("cosmo.tests.cmp");
-    dojo.require("cosmo.tests.topics");
+	dojo.require("cosmo.model.tests.transport.atom");
+	dojo.require("cosmo.model.tests.transport.rest");
+	dojo.require("cosmo.model.tests.trasnlators.eim");
+
 }catch(e){
 	doh.debug(e);
 }

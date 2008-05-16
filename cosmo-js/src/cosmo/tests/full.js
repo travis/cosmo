@@ -16,7 +16,9 @@ try{
 	dojo.require("cosmo.tests.module");
 	dojo.require("cosmo.util.tests.module");
 	dojo.require("cosmo.auth.tests.module");
-
+	dojo.require("cosmo.account.tests.module");
+	dojo.require("cosmo.model.tests.module");
+	dojo.require("cosmo.service.tests.module");
 }catch(e){
 	doh.debug(e);
 }

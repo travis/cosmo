@@ -15,6 +15,9 @@ dojo.provide("cosmo.util.tests.module");
 try{
 	dojo.require("cosmo.util.tests.sha1");
 	dojo.require("cosmo.util.tests.auth");
+	dojo.require("cosmo.util.tests.i18n");
+	dojo.require("cosmo.util.tests.html");
+	dojo.require("cosmo.util.tests.base64");
 }catch(e){
 	doh.debug(e);
 }

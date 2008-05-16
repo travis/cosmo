@@ -831,6 +831,11 @@ public class EntityConverter {
             if (reminderTime != null)
                 note.setReminderTime(reminderTime);
         }
+
+        java.util.Date now =java.util.Calendar.getInstance().getTime();
+        boolean later = event.getStartDate().getDate().after(now);
+        int code = (later) ? TriageStatus.CODE_LATER : TriageStatus.CODE_DONE;
+        note.getTriageStatus().setCode(code);
     }
     
     private void setCalendarAttributes(NoteItem note, VToDo task) {

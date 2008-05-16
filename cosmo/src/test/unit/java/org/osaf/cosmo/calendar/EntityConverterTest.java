@@ -41,6 +41,7 @@ import net.fortuna.ical4j.model.property.Completed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
+import org.osaf.cosmo.calendar.util.TimeZoneUtils;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
@@ -108,6 +109,16 @@ public class EntityConverterTest extends TestCase {
         master = it.next();
         
         // check ical props
+        // DTSTART
+//      This fails, which is pretty strange
+//        EventStamp masterEvent = StampUtils.getEventStamp(master); 
+//        Assert.assertNotNull(masterEvent);
+//        DateTime testStart = new DateTime("20060102T140000", TimeZoneUtils.getTimeZone("US/Eastern_mod"));
+//        Assert.assertTrue(masterEvent.getStartDate().equals(testStart));
+        // Triage status
+        TriageStatus ts = master.getTriageStatus();
+        // the event is in the past, it should be DONE
+        Assert.assertTrue(TriageStatus.CODE_DONE==ts.getCode());
         // DTSTAMP
         Assert.assertEquals(master.getClientModifiedDate().getTime(), new DateTime("20051222T210507Z").getTime());
         // UID

@@ -7,7 +7,7 @@ E_OPTERROR=65
 
 if [ $# -eq "$NO_ARGS" ]  # Script invoked with no command-line args?
 then
-  echo "Usage: `basename $0` tagname"
+  echo "Usage: `basename $0` version_number"
   exit $E_OPTERROR        # Exit and explain usage, if no argument(s) given.
 fi
 

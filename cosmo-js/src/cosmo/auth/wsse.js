@@ -28,6 +28,7 @@ dojo.require("cosmo.util.sha1");
 
 dojo.require("dojo.date.stamp");
 dojo.require("dojo.cookie");
+dojo.require("dojox.encoding.digests.MD5");
 (function(){
 var COSMO_WSSE_PWDIGEST = "CosmoWssePasswordDigest";
 var COSMO_WSSE_NONCE = "CosmoWsseNonce";
@@ -51,9 +52,15 @@ dojo.mixin(cosmo.auth.wsse,
         return cosmo.util.sha1.b64(nonce + created + password);
     },
 
+    preProcessPassword: function(password){
+        // This is needed for cosmo because we don't store the actual password server side
+        return dojox.encoding.digests.MD5(password, dojox.encoding.digests.outputTypes.Hex);
+    },
+
     setPassword: function(/*String*/ password){
         var nonce = Math.floor(Math.random()*1000000);
         var created = dojo.date.stamp.toISOString(new Date());
+        password = this.preProcessPassword(password);
 
         dojo.cookie(COSMO_WSSE_PWDIGEST, this.generatePasswordDigest(nonce, created, password), {path:"/"});
         dojo.cookie(COSMO_WSSE_NONCE, nonce, {path:"/"});

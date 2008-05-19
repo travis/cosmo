@@ -19,6 +19,7 @@ dojo.require("dojo.cookie");
 doh.register("cosmo.auth.tests.wsse",
 	[
         function testGenerateDigest(t){
+            t.is("ae2b1fca515949e5d54fb22b8ed95575", cosmo.auth.wsse.preProcessPassword("testing"));
             t.is("quR/EWLAV4xLf9Zqyw4pDmfV9OY=", cosmo.auth.wsse.generatePasswordDigest("d36e316282959a9ed4c89851497a717f", "2003-12-15T14:43:07Z", "taadtaadpstcsm"));
         },
 

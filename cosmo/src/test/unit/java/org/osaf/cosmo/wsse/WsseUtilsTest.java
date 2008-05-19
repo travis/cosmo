@@ -34,4 +34,12 @@ public class WsseUtilsTest extends TestCase {
        Assert.assertNull(token);
     }
     
+    public void testCalculatePasswordDigest(){
+       String digest = WsseUtils.calculatePasswordDigest("taadtaadpstcsm", "d36e316282959a9ed4c89851497a717f", "2003-12-15T14:43:07Z");
+       // Taken from example here:
+       // http://www.xml.com/pub/a/2003/12/17/dive.html
+       // and javascript implementation.
+       Assert.assertEquals("quR/EWLAV4xLf9Zqyw4pDmfV9OY=", digest);
+    }
+    
 }           

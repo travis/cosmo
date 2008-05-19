@@ -15,10 +15,10 @@
  */
 
 dojo.provide("cosmo.util.auth");
-dojo.require("cosmo.auth.basic");
+dojo.require("cosmo.auth.wsse");
 
 (function(){
-var am = cosmo.auth.basic;
+var am = cosmo.auth.wsse;
 dojo.mixin(cosmo.util.auth, {
     setCred: function (username, password){
         am.setUsername(username);

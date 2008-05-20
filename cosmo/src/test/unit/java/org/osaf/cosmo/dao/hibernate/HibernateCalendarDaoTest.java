@@ -258,11 +258,9 @@ public class HibernateCalendarDaoTest extends AbstractHibernateDaoTestCase {
 
         // time range test
         eventFilter.setPropFilters(new ArrayList());
-        DateTime start = new DateTime("20050817T115000");
-        DateTime end = new DateTime("20050818T115000");
-        start.setUtc(true);
-        end.setUtc(true);
-
+        DateTime start = new DateTime("20050817T115000Z");
+        DateTime end = new DateTime("20050818T115000Z");
+        
         Period period = new Period(start, end);
         TimeRangeFilter timeRange = new TimeRangeFilter(period);
         eventFilter.setTimeRangeFilter(timeRange);

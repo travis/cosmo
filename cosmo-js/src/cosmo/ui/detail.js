@@ -90,21 +90,21 @@ cosmo.ui.detail = new function () {
         stampName = stampName.toLowerCase();
         return cosmo.app.pim.baseLayout.mainApp.rightSidebar
                    .detailViewForm[stampName +"Section"].formSection.formNode;
-    }
+    };
 
     this.getMainForm = function (){
         return cosmo.app.pim.baseLayout.mainApp.rightSidebar.detailViewForm.mainSection.formNode;
-    }
+    };
 
     this.isStampEnabled = function (stampName){
         //summary: returns whether or not a particular stamp section is enabled
         var checkBox = $("section"+ this._upperFirstChar(stampName) +"EnableToggle");
         return checkBox.checked;
-    }
+    };
 
     this._upperFirstChar = function (str){
         return str.charAt(0).toUpperCase() + str.substr(1,str.length -1 );
-    }
+    };
 
 };
 
@@ -164,8 +164,8 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     this.markupBar = c;
 
     // Main section
-    var d = _createElem('div');
-    var c = new cosmo.ui.detail.MainSection({ parent: this,
+    d = _createElem('div');
+    c = new cosmo.ui.detail.MainSection({ parent: this,
         domNode: d });
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
@@ -174,8 +174,8 @@ cosmo.ui.detail.DetailViewForm = function (p) {
     var stamps = this.stamps;
     for (var i = 0; i < stamps.length; i++) {
         var st = stamps[i];
-        var d = _createElem('div');
-        var c = new cosmo.ui.detail.StampSection({ parent: this,
+        d = _createElem('div');
+        c = new cosmo.ui.detail.StampSection({ parent: this,
             domNode: d,
             stampType: st.stampType,
             promptText: st.enablePrompt,
@@ -184,12 +184,12 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         this.domNode.appendChild(c.domNode);
         this[st.stampType.toLowerCase() + 'Section'] = c;
     }
-    var c = new cosmo.ui.detail.Byline();
+    c = new cosmo.ui.detail.Byline();
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.byline = c;
 
-    var c = new cosmo.ui.detail.ButtonSection({id: "detailButtonSection"});
+    c = new cosmo.ui.detail.ButtonSection({id: "detailButtonSection"});
     this.children.push(c);
     this.domNode.appendChild(c.domNode);
     this.buttonSection = c;
@@ -251,9 +251,9 @@ cosmo.ui.detail.DetailViewForm = function (p) {
         }
     }
 
-    dojo.subscribe('cosmo:calEventsDisplaySuccess', updateItems)
-    dojo.subscribe('cosmo:calNoItems', updateItems)
-    dojo.subscribe('cosmo:calSetSelected', updateItems)
+    dojo.subscribe('cosmo:calEventsDisplaySuccess', updateItems);
+    dojo.subscribe('cosmo:calNoItems', updateItems);
+    dojo.subscribe('cosmo:calSetSelected', updateItems);
     dojo.subscribe('cosmo:calClearSelected', updateItems);
     dojo.subscribe('cosmo:calSaveSuccess', function(cmd){
         var item = cmd.data;
@@ -342,7 +342,7 @@ cosmo.ui.detail.MarkupBar = function (p) {
     this.triageSection = null;
 
     // Override defaults with params passed in
-    for (var n in params) { this[n] = params[n] };
+    for (var n in params) { this[n] = params[n];}
 
     this.domNode.id = this.id;
 
@@ -445,8 +445,8 @@ cosmo.ui.detail.MarkupBar = function (p) {
             t.className = 'clearBoth';
             d.appendChild(t);
         }
-    }
-}
+    };
+};
 
 cosmo.ui.detail.MarkupBar.prototype =
     new cosmo.ui.ContentBox();
@@ -492,7 +492,7 @@ cosmo.ui.detail.TriageSection = function (p) {
               rolloverState: roll });
           d.appendChild(t);
 
-        }
+        };
         this.clearAll();
         createTriageButton('Now');
         createTriageButton('Later');
@@ -523,7 +523,7 @@ cosmo.ui.detail.StampSection = function (p) {
     this.promptNode = null; // Stamp enabling prompt
     this.bodyNode = null; // Body with form section
     this.enablerSwitch = null; // Checkbox for toggling disabled state
-    this.showHideSwitch = null // Show/hide link
+    this.showHideSwitch = null; // Show/hide link
     this.formSection = null; // Set of form elements for this stamp
     this.expanded = true; // Expanded/collapsed
     // IMPORTANT: initialize enabled to null, so the first
@@ -533,7 +533,7 @@ cosmo.ui.detail.StampSection = function (p) {
     this.bodyHeight = null;
 
     // Override defaults with params passed in
-    for (var n in params) { this[n] = params[n] };
+    for (var n in params) { this[n] = params[n]; }
 
     // Use the stamp type as a basis for the DOM node ids
     // e.g., 'mailSectionExpander', 'eventSectionBody', etc.
@@ -639,7 +639,7 @@ cosmo.ui.detail.StampSection = function (p) {
                 self, 'toggleExpando');
         }
     }
-}
+};
 
 cosmo.ui.detail.StampSection.prototype =
     new cosmo.ui.ContentBox();
@@ -651,9 +651,9 @@ cosmo.ui.detail.StampSection.prototype.toggleExpando = function (p, accordion) {
         return false;
     }
 
-    if (typeof p == 'boolean' ? p : !this.expanded) this.expand()
+    if (typeof p == 'boolean' ? p : !this.expanded) this.expand();
     else this.shrink();
-}
+};
 cosmo.ui.detail.StampSection.prototype.setShowHideText = function(str){
     if (dojo.isIE || dojo.isSafari) {
         this.showHideSwitch.innerText = str;
@@ -661,7 +661,7 @@ cosmo.ui.detail.StampSection.prototype.setShowHideText = function(str){
     else {
         this.showHideSwitch.textContent = str;
     }
-}
+};
 
 cosmo.ui.detail.StampSection.prototype.expand = function(){
     var dvForm = this.parent;
@@ -678,13 +678,13 @@ cosmo.ui.detail.StampSection.prototype.expand = function(){
     this.expanded = true;
     this.setShowHideText(_('Main.DetailForm.Hide'));
     dojo.fx.wipeIn({node: this.bodyNode, duration: 500}).play();
-}
+};
 
 cosmo.ui.detail.StampSection.prototype.shrink = function(){
     this.expanded = false;
     this.setShowHideText(_('Main.DetailForm.Show'));
     dojo.fx.wipeOut({node: this.bodyNode, duration: 500}).play();
-}
+};
 
 cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {
     var opts = o || {};
@@ -713,14 +713,14 @@ cosmo.ui.detail.StampSection.prototype.toggleEnabled = function (e, o) {
     if (this.hasBody) {
         this.formSection.toggleEnabled(this.enabled, opts);
     }
-}
+};
 
 cosmo.ui.detail.StampSection.prototype.updateFromStamp = function (stamp) {
     this.toggleEnabled(true, { disableStampFormElem: false, setUpDefaults: false });
     if (this.hasBody) {
         this.formSection.updateFromStamp(stamp);
     }
-}
+};
 
 cosmo.ui.detail.StampFormElements = function () {
     // Public members
@@ -757,7 +757,7 @@ cosmo.ui.detail.StampFormElements = function () {
         e.preventDefault();
         return false;
     });
-}
+};
 
 cosmo.ui.detail.StampFormElements.prototype =
     new cosmo.ui.ContentBox();
@@ -770,7 +770,7 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
         for (var i = 0; i < tags.length; i++) {
             dojo[key + 'Class'](tags[i], 'disabledText');
         }
-    }
+    };
     // If passed explicitly, reset the enabled prop
     if (typeof explicit == 'boolean') {
         this.enabled = explicit;
@@ -825,7 +825,7 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
 };
 
 cosmo.ui.detail.StampFormElements.prototype.setElemDefaultState =
-    function (elem, elemType, state) {
+function (elem, elemType, state) {
     if (!state) {
         cosmo.util.html.clearFormElem(elem, elemType);
     }
@@ -869,26 +869,26 @@ cosmo.ui.detail.MainSection = function () {
         value: '',
         className: 'inputText' });
     elem.style.width = '220px';
-    var t =  cosmo.ui.detail.createFormElemDiv(elem);
+    t =  cosmo.ui.detail.createFormElemDiv(elem);
     f.appendChild(t);
-    var t = cosmo.ui.detail.createLabelDiv(_(
+    t = cosmo.ui.detail.createLabelDiv(_(
         'Main.DetailForm.Description'));
     f.appendChild(t);
-    var elem = _createElem('textarea');
+    elem = _createElem('textarea');
     elem.className = 'inputText';
     elem.id = 'noteDescription';
     elem.name = 'noteDescription';
     elem.cols = '28';
     elem.rows = '4';
     elem.style.width = '220px';
-    var t = _createElem('div');
+    t = _createElem('div');
     t.appendChild(elem);
     f.appendChild(t);
 
     this.formNode = f;
     d.appendChild(f);
     this.domNode = d;
-}
+};
 
 cosmo.ui.detail.MainSection.prototype =
     new cosmo.ui.detail.StampFormElements();
@@ -928,7 +928,7 @@ cosmo.ui.detail.MailFormElements = function () {
             td.appendChild(elem);
             tr.appendChild(td);
             return tr;
-        }
+        };
         d.id = 'mailFormSection';
         d.style.padding = '8px';
         table.cellPadding = '0';
@@ -961,7 +961,7 @@ cosmo.ui.detail.MailFormElements = function () {
         f.mailTo.value = stamp.getToAddress() || '';
         f.mailCc.value = stamp.getCcAddress() || '';
         f.mailBcc.value = stamp.getBccAddress() || '';
-    }
+    };
 };
 cosmo.ui.detail.MailFormElements.prototype =
     new cosmo.ui.detail.StampFormElements();
@@ -1014,13 +1014,13 @@ cosmo.ui.detail.EventFormElements= function () {
                 maxlength: 10,
                 value: '',
                 className: 'inputText' }));
-        var t = cosmo.ui.detail.createFormElemDiv(elem);
+        t = cosmo.ui.detail.createFormElemDiv(elem);
         t.style.whiteSpace = 'nowrap';
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
             _('Main.DetailForm.At')));
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createInput({ type: 'text',
                 id: name + 'Time',
                 name:name + 'Time',
@@ -1030,7 +1030,7 @@ cosmo.ui.detail.EventFormElements= function () {
                 className: 'inputText' }));
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createInput({ type: 'radio',
                 id: name + 'MeridianAM',
                 name: name + 'Meridian',
@@ -1040,7 +1040,7 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(_createText(
             _('App.AM')));
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createInput({ type: 'radio',
                 id: name + 'MeridianPM',
                 name: name + 'Meridian',
@@ -1131,9 +1131,8 @@ cosmo.ui.detail.EventFormElements= function () {
         d.id = 'eventFormSection';
         d.style.padding = '8px';
         // Location
-        var t = cosmo.ui.detail.createLabelDiv(_(
-            'Main.DetailForm.Location'));
-        f.appendChild(t);
+        f.appendChild(cosmo.ui.detail.createLabelDiv(_(
+            'Main.DetailForm.Location')));
         var elem = addToHashAndReturn(
             _html.createInput({ type: 'text',
                 id: 'eventLocation',
@@ -1143,10 +1142,9 @@ cosmo.ui.detail.EventFormElements= function () {
                 value: '',
                 className: 'inputText' }));
         elem.style.width = '220px';
-        var t =  cosmo.ui.detail.createFormElemDiv(elem);
-        f.appendChild(t);
+        f.appendChild(cosmo.ui.detail.createFormElemDiv(elem));
         // All-day checkbox
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createInput({ type: 'checkbox',
                 id: 'eventAllDay',
                 name: 'eventAllDay',
@@ -1156,18 +1154,16 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(_createText('All day'));
         f.appendChild(t);
         // Event start
-        var t = createDateTimeInputs('startDate', 'start');
-        f.appendChild(t);
+        f.appendChild(createDateTimeInputs('startDate', 'start'));
         // Event end
-        var t = createDateTimeInputs('endDate', 'end');
-        f.appendChild(t);
+        f.appendChild(createDateTimeInputs('endDate', 'end'));
         // Timezone
-        var t = cosmo.ui.detail.createLabelDiv(_(
+        t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.Timezone'));
         t.style.whiteSpace = 'nowrap';
         t.className += ' formElem';
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createSelect({ id: 'tzRegion',
                 name: 'tzRegion',
                 multiple: false,
@@ -1176,7 +1172,7 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(_html.nbsp());
         t.appendChild(elem);
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createSelect({ id: 'tzId',
                 name: 'tzId',
                 multiple: false,
@@ -1186,11 +1182,11 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(elem);
         f.appendChild(t);
         // Event status
-        var t = cosmo.ui.detail.createLabelDiv(_(
+        t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.Status'));
         t.className += ' formElem';
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createSelect({ id: 'eventStatus',
                 name: 'eventStatus',
                 multi: false,
@@ -1200,11 +1196,11 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(elem);
         f.appendChild(t);
         // Recurrence
-        var t = cosmo.ui.detail.createLabelDiv(_(
+        t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.rrule'));
         t.className += ' formElem';
         t.style.whiteSpace = 'nowrap';
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createSelect({ id: 'recurrenceInterval',
                 name: 'recurrenceInterval',
                 multi: false,
@@ -1215,7 +1211,7 @@ cosmo.ui.detail.EventFormElements= function () {
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(_('Main.DetailForm.Ending')));
         t.appendChild(_html.nbsp());
-        var elem = addToHashAndReturn(
+        elem = addToHashAndReturn(
             _html.createInput({ type: 'text',
                 id: 'recurrenceEnd',
                 name: 'recurrenceEnd',
@@ -1250,7 +1246,7 @@ cosmo.ui.detail.EventFormElements= function () {
         // Clear out time inputs if All-day checkbox is checked
         // Unchecking does nothing -- this would create an anytime
         // event, adding a start/end time would create a timed event item
-        var func = function (e) {
+        func = function (e) {
             var allDay = e.target.checked;
             var handlerFunc;
             if (allDay) {
@@ -1271,7 +1267,7 @@ cosmo.ui.detail.EventFormElements= function () {
         // Recurrence -- disable 'ending' text box if event
         // does not recur
         var elem = formElements.recurrenceInterval;
-        var func = function () {
+        func = function () {
             var txtElem = formElements.recurrenceEnd;
             if (elem.selectedIndex == 0) {
                 cosmo.util.html.clearAndDisableFormElem(txtElem, 'text');
@@ -1281,13 +1277,13 @@ cosmo.ui.detail.EventFormElements= function () {
                     cosmo.util.html.setTextInput(txtElem, 'mm/dd/yyyy', true);
                 }
             }
-        }
+        };
         dojo.connect(elem, 'onchange', func);
 
         // Timezone selector -- selecting region should populate the
         // tz selector
-        var func = function (e) {
-            var r = e.target.value
+        func = function (e) {
+            var r = e.target.value;
             var tzIds = r ?
                 cosmo.datetime.timezone.getTzIdsForRegion(r).sort() : null;
             var options = [{
@@ -1336,9 +1332,9 @@ cosmo.ui.detail.EventFormElements= function () {
                 meridianElem[0].checked = false;
                 timeElem.value = '';
             }
-            meridianElem[1].disabled = allDay
+            meridianElem[1].disabled = allDay;
             meridianElem[0].disabled = allDay;
-            timeElem.disabled = allDay
+            timeElem.disabled = allDay;
         };
         var allDay = stamp.getAllDay();
         var anyTime = stamp.getAnyTime();
@@ -1432,7 +1428,7 @@ cosmo.ui.detail.EventFormElements.prototype.enableDisableEventStatus = function 
         }
 
         form["eventStatus"].disabled = !show;
-}
+};
 
 cosmo.ui.detail.Byline = function () {
     this.domNode = _createElem("div");
@@ -1464,7 +1460,7 @@ cosmo.ui.detail.Byline = function () {
             this.domNode.appendChild(d);
 
             // The responsible party
-            var d = _createElem('div');
+            d = _createElem('div');
             d.className = 'detailViewBylineEntry';
             var label = _('Main.DetailForm.Byline.Who');
             if (label && userId) {
@@ -1479,9 +1475,9 @@ cosmo.ui.detail.Byline = function () {
             dt.updateFromUTC(modby.getTimeStamp());
             // Desired date format, e.g., "11/26/07, at 6:00:58 PM"
             dt = dt.strftime(_("Main.DetailForm.Byline.DateFormat"));
-            var d = _createElem('div');
+            d = _createElem('div');
             d.className = 'detailViewBylineEntry';
-            var label = _('Main.DetailForm.Byline.When');
+            label = _('Main.DetailForm.Byline.When');
             if (label && userId) {
                 var str = label + ' ' + dt;
                 d.appendChild(_createText(str));

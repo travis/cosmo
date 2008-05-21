@@ -28,7 +28,8 @@
 <fmt:message key="Login.HomeLink" var="homeLink"/>
 <cosmo:threeColumnLayout prefix="Login." stylesheets="login" dojoLayers="login"
                          selfLink="${staticBaseUrl}/login">
-
+<c:set var="showSignup" value="${not properties['cosmo.service.account.disableSignups']}"/>
+${showSignup}
   <script type="text/javascript">
 
     dojo.require("cosmo.app");
@@ -40,15 +41,16 @@
     dojo.addOnLoad(init);
 
     function init() {
-    dojo.cookie('JSESSIONID', null, {expires: -1});
-    dojo.cookie('inputTimestamp', null, {expires: -1});
-    dojo.cookie('username', null, {expires: -1});
-    cosmo.util.auth.clearAuth();
-    cosmo.app.init();
-    if (dojo.queryToObject(location.search.substring(1))['signup']
-    == 'true'){
-    dojo.addOnLoad(function(){cosmo.account.create.showForm()});
-    }
+        dojo.cookie('JSESSIONID', null, {expires: -1});
+        dojo.cookie('inputTimestamp', null, {expires: -1});
+        dojo.cookie('username', null, {expires: -1});
+        cosmo.util.auth.clearAuth();
+        cosmo.app.init();
+        <c:if test="${showSignup}">
+        if (dojo.queryToObject(location.search.substring(1))['signup'] == 'true'){
+            dojo.addOnLoad(function(){cosmo.account.create.showForm()});
+        }
+        </c:if>
     
     }
   </script>
@@ -56,7 +58,7 @@
   <div id="center" class="column">
     <div dojoType="cosmo.ui.widget.LoginDialog" id="loginDialog">
     </div>
-    <c:if test="${properties['cosmo.service.account.disableSignups']}">
+    <c:if test="${showSignup}">
     <div class="bigger separate">
       <fmt:message key="Login.CreateAccount"/>
       <a class="biggest" id="signup" href="javascript:cosmo.account.create.showForm();">

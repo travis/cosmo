@@ -872,7 +872,7 @@ public class CmpServlet extends HttpServlet {
                                HttpServletResponse resp)
         throws ServletException, IOException {
         if (disableSignups){
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             try {
                 Document xmldoc = readXmlRequest(req);

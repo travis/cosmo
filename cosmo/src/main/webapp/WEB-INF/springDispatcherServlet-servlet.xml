@@ -99,11 +99,14 @@
  -->
  
  <bean id="collectionBookmarkController" class="org.osaf.cosmo.ui.pim.CollectionBookmarkController">
-     <property name="pimView"><value>pim</value></property>
+    <property name="pimView"><value>pim</value></property>
     <property name="contentService"><ref bean="contentService" /></property>
     <property name="securityManager"><ref bean="securityManager" /></property>
     <property name="serviceLocatorFactory">
       <ref bean="serviceLocatorFactory"/>
+    </property>
+    <property name="propertyPlaceholderConfigurer">
+      <ref bean="propertyPlaceholderConfigurer"/>
     </property>
  </bean>
 

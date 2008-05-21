@@ -10,7 +10,7 @@ dojo.require("cosmo.account.login");
 dojo.require("cosmo.convenience");
 
 dojo.declare(
-    "cosmo.ui.widget.LoginDialog", 
+    "cosmo.ui.widget.LoginDialog",
     [dijit._Widget, dijit._Templated],
     {
         stylesheet: "",
@@ -48,7 +48,7 @@ dojo.declare(
                 this.showErr(_('Login.Error.AuthFailed'));
                 this.passwordInput.value = '';
         },
-                         
+
         doLogin: function () {
             var self = this;
             var un = self.usernameInput.value;
@@ -65,10 +65,10 @@ dojo.declare(
             else {
                 self.showPrompt('normal', _('Login.Prompt.Processing'));
                 var d = cosmo.account.login.doLogin(
-                    un, pw 
+                    un, pw
                     );
                 d.addCallback(dojo.hitch(self, self.handleLoginSuccess));
-                d.addErrback(dojo.hitch(self, self.handleLoginError)); 
+                d.addErrback(dojo.hitch(self, self.handleLoginError));
 
             }
             return d;
@@ -79,12 +79,12 @@ dojo.declare(
         showPrompt: function (promptType, str) {
             var promptDiv = this.loginPromptContainer;
             if (promptType.toLowerCase() == 'error') {
-                dojo.removeClass(promptDiv, 'promptText')
-                dojo.addClass(promptDiv, 'promptTextError')
+                dojo.removeClass(promptDiv, 'promptText');
+                dojo.addClass(promptDiv, 'promptTextError');
             }
             else {
-                dojo.removeClass(promptDiv, 'promptTextError')
-                dojo.addClass(promptDiv, 'promptText')
+                dojo.removeClass(promptDiv, 'promptTextError');
+                dojo.addClass(promptDiv, 'promptText');
             }
             promptDiv.innerHTML = str;
         },
@@ -102,7 +102,7 @@ dojo.declare(
         },
         setFocus: function (e) {
             // Toggle values for _usernameFocus, _passwordFocus
-            t = e.target.id || '';
+            var t = e.target.id || '';
             if (t) {
                 var f = e.type == 'focus' ? true : false;
                 t = t.toLowerCase();
@@ -128,7 +128,7 @@ dojo.declare(
             dojo.connect(this.usernameInput, "onfocus", this, 'setFocus');
             dojo.connect(this.usernameInput, "onblur", this, 'setFocus');
             dojo.connect(this.submitButton, "handleOnClick", this, "doLogin");
-            dojo.addOnLoad(function(){self.usernameInput.focus()})
+            dojo.addOnLoad(function(){self.usernameInput.focus()});
         },
         constructor: function (){
             dojo.connect(document, "onkeyup", this, "keyUpHandler");

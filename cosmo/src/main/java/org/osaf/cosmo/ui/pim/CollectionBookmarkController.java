@@ -34,6 +34,7 @@ import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.service.ContentService;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+import org.osaf.cosmo.spring.CosmoPropertyPlaceholderConfigurer;
 
 
 /**
@@ -47,7 +48,7 @@ public class CollectionBookmarkController extends AbstractController {
     private ContentService contentService;
     private CosmoSecurityManager securityManager;
     private ServiceLocatorFactory serviceLocatorFactory;
-       
+    private CosmoPropertyPlaceholderConfigurer propertyPlaceholderConfigurer;
     /** 
      */
     public ModelAndView handleRequestInternal(HttpServletRequest request,
@@ -85,6 +86,7 @@ public class CollectionBookmarkController extends AbstractController {
                 .getCollectionUrls(collection);
         model.put("relationLinks", relationLinks);
         
+        model.put("properties", propertyPlaceholderConfigurer.getProperties());
 
         if (ticket != null) {
             model.put("ticketKey", ticket.getKey());
@@ -122,5 +124,10 @@ public class CollectionBookmarkController extends AbstractController {
 
     public void setServiceLocatorFactory(ServiceLocatorFactory serviceLocatorFactory) {
         this.serviceLocatorFactory = serviceLocatorFactory;
+    }
+
+    public void setPropertyPlaceholderConfigurer(
+            CosmoPropertyPlaceholderConfigurer propertyPlaceholderConfigurer) {
+        this.propertyPlaceholderConfigurer = propertyPlaceholderConfigurer;
     }
 }

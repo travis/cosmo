@@ -67,7 +67,7 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         MockHttpServletResponse response = new MockHttpServletResponse();
         servlet.service(request, response);
 
-        assertEquals("incorrect status", MockHttpServletResponse.SC_FORBIDDEN,
+        assertEquals("incorrect status", MockHttpServletResponse.SC_NOT_FOUND,
                      response.getStatus());
     }
 

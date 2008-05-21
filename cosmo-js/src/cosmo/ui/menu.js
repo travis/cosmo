@@ -55,7 +55,8 @@ cosmo.ui.menu = new function () {
                 if (this.itemShownInDisplayMode(item, this.calculateDisplayMode()) &&
                     this.userHasRequiredRolesForItem(item) &&
                     this.userHasRequiredPrefForItem(item) &&
-                    this.confForItem(item)) {
+                    this.confForItem(item) &&
+                    (item.displayFunc? item.displayFunc() : true)) {
 
                     this.items.addItem(item.id, new cosmo.ui.menu.MenuItem(item));
                 }
@@ -163,7 +164,8 @@ cosmo.ui.menu.allItems = [
         displayText: _('Main.SignUp'),
         onclickFunc: function () { cosmo.account.create.showForm() },
         displayMode: cosmo.ui.menu.displayModes.ANON,
-        requiredRoles: []
+        requiredRoles: [],
+        displayFunc: function(){return djConfig.cosmoDisableSignups != 'true'}
         },
     { id: 'loginMenuItem',
         displayText: _('Main.LogIn'),

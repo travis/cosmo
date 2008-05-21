@@ -28,7 +28,7 @@ dojo.require("cosmo.util.string");
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.auth");
 dojo.require("cosmo.util.lang");
-
+(function(){
 DEFAULT_PAGE_NUMBER = 1;
 DEFAULT_PAGE_SIZE = 25;
 DEFAULT_SORT_ORDER = "ascending";
@@ -36,9 +36,9 @@ DEFAULT_SORT_TYPE= "username";
 
 EL_ADMINISTRATOR = "administrator";
 
-cosmo.ROLE_ADMINISTRATOR = "administrator"
-cosmo.ROLE_ANONYMOUS = "anonymous"
-cosmo.ROLE_AUTHENTICATED = "authenticated"
+cosmo.ROLE_ADMINISTRATOR = "administrator";
+cosmo.ROLE_ANONYMOUS = "anonymous";
+cosmo.ROLE_AUTHENTICATED = "authenticated";
 
 
 dojo.declare("cosmo.cmp.Cmp", null,
@@ -54,7 +54,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          */
         getDefaultCMPRequest: function (/*Object*/ ioArgs){
             ioArgs = ioArgs || {};
-            var request = cosmo.util.auth.getAuthorizedRequest()
+            var request = cosmo.util.auth.getAuthorizedRequest();
             request.load = ioArgs.load;
             request.handle =  ioArgs.handle;
             request.error = ioArgs.error;
@@ -278,7 +278,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
          */
         headUser: function (/*String*/ username,
             /*Object*/ ioArgs){
-            var requestDict = this.getDefaultCMPRequest(ioArgs, true)
+            var requestDict = this.getDefaultCMPRequest(ioArgs, true);
             requestDict.url = this._baseUrl + "/user/" +
                 encodeURIComponent(username);
 
@@ -322,7 +322,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 ioArgs = this._wrap204Bandaid(ioArgs);
             }
 
-            var requestContent = this.userHashToXML(userHash)
+            var requestContent = this.userHashToXML(userHash);
 
             var requestDict = this.getDefaultCMPRequest(ioArgs);
             requestDict.url = this._baseUrl + "/account";
@@ -474,9 +474,9 @@ dojo.declare("cosmo.cmp.Cmp", null,
             if (handlerDict.load || !(handlerDict.load && handlerDict.handle)){
                 var old_load = handlerDict.load;
                 handlerDict.load = function(response, ioArgs){
-                    var parsedCMPXML = xmlParseFunc.apply(self, [ioArgs.xhr.responseXML])
+                    var parsedCMPXML = xmlParseFunc.apply(self, [ioArgs.xhr.responseXML]);
                     return old_load? old_load(parsedCMPXML, ioArgs) : parsedCMPXML;
-                }
+                };
             }
 			// Don't mess with "error". These responses shouldn't be XML.
 			// Don't mess with "handle". This is a "don't mess with my stuff" handler.
@@ -514,7 +514,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 } else {
                     originalFunc(response, ioArgs);
                 }
-            }
+            };
         },
 
         _changeCredCB: function (username, password){
@@ -526,7 +526,7 @@ dojo.declare("cosmo.cmp.Cmp", null,
                     cosmo.util.auth.setPassword(password);
                 }
                 return result;
-            }
+            };
         }
     }
 );
@@ -547,3 +547,4 @@ dojo.declare("cosmo.cmp.SubscriptionInfoMissingException", Error,  {
             "\nticket: " + this.ticket + "\nuuid: " + this.uuid;
     }
 });
+})();

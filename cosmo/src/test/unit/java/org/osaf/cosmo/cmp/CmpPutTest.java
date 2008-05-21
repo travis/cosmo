@@ -57,6 +57,20 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         assertFalse("User signed up as locked", u2.isLocked());
     }
 
+    public void testDisabledSignup() throws Exception {
+        this.servlet.setDisableSignups(true);
+        User u1 = testHelper.makeDummyUser();
+
+        MockHttpServletRequest request = createMockRequest("PUT", "/signup");
+        sendXmlRequest(request, new UserContent(u1));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("incorrect status", MockHttpServletResponse.SC_FORBIDDEN,
+                     response.getStatus());
+    }
+
     /**
      */
     public void testBadlyFormattedSignup() throws Exception {

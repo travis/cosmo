@@ -15,6 +15,9 @@
  */
 package org.osaf.cosmo.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +25,7 @@ import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.UserService;
+import org.osaf.cosmo.spring.CosmoPropertyPlaceholderConfigurer;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -32,11 +36,12 @@ public class ApplicationEntryController extends MultiActionController {
     private CosmoSecurityManager securityManager;
     private UserService userService;
     private String welcomePageUrl;
+    private CosmoPropertyPlaceholderConfigurer propertyPlaceholderConfigurer;
 
     public ModelAndView login(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         if (securityManager.getSecurityContext().getUser() == null){
-            return new ModelAndView(loginView);
+            return new ModelAndView(loginView, getDefaultModel());
         } else {
             return new ModelAndView("error_loggedin");
         }
@@ -46,7 +51,7 @@ public class ApplicationEntryController extends MultiActionController {
             HttpServletResponse response) throws Exception {
         request.getSession().invalidate();
 
-        return new ModelAndView(loginView);
+        return new ModelAndView(loginView, getDefaultModel());
     }
     
     public ModelAndView welcome(HttpServletRequest request,
@@ -55,7 +60,7 @@ public class ApplicationEntryController extends MultiActionController {
         User user = securityManager.getSecurityContext().getUser();
         
         if (user == null){
-            return new ModelAndView(loginView);
+            return new ModelAndView(loginView, getDefaultModel());
         } else {
             user =  userService.getUser(user.getUsername());
 
@@ -75,6 +80,12 @@ public class ApplicationEntryController extends MultiActionController {
 
     public void setSecurityManager(CosmoSecurityManager securityManager) {
         this.securityManager = securityManager;
+    }
+    
+    public Map getDefaultModel(){
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("properties", propertyPlaceholderConfigurer.getProperties());
+        return model;
     }
 
     public void setLoginView(String loginView) {
@@ -101,5 +112,12 @@ public class ApplicationEntryController extends MultiActionController {
         this.welcomePageUrl = welcomePageUrl;
     }
 
+    public CosmoPropertyPlaceholderConfigurer getPropertyPlaceholderConfigurer() {
+        return propertyPlaceholderConfigurer;
+    }
 
+    public void setPropertyPlaceholderConfigurer(
+            CosmoPropertyPlaceholderConfigurer propertyPlaceholderConfigurer) {
+        this.propertyPlaceholderConfigurer = propertyPlaceholderConfigurer;
+    }
 }

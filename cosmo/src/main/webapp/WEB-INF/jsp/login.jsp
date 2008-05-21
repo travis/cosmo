@@ -56,12 +56,14 @@
   <div id="center" class="column">
     <div dojoType="cosmo.ui.widget.LoginDialog" id="loginDialog">
     </div>
+    <c:if test="${properties['cosmo.service.account.disableSignups']}">
     <div class="bigger separate">
       <fmt:message key="Login.CreateAccount"/>
       <a class="biggest" id="signup" href="javascript:cosmo.account.create.showForm();">
         <fmt:message key="Login.CreateClickHere"/>
       </a>
     </div>
+    </c:if>
 
     <div class="lightText">
       <a href="${staticBaseUrl}/account/password/recover">

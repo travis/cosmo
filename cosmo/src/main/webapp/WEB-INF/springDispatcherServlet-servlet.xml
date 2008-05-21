@@ -164,6 +164,7 @@
     <property name="defaultLoggedInRedirect"><value>/pim</value></property>
     <property name="welcomePageUrl"><value>/welcome</value></property>
     <property name="userService"><ref bean="userService"/></property>
+    <property name="propertyPlaceholderConfigurer"><ref bean="propertyPlaceholderConfigurer"/></property>
 </bean> 
 
 <bean id="appEntryMethodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">

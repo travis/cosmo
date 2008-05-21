@@ -110,6 +110,7 @@ public class CmpServlet extends HttpServlet {
     private static final String BEAN_PROPERTIES = "propertyPlaceholderConfigurer";
 
     private static final String PROPERTY_CREATE_OOB_COLS = "cosmo.service.account.createOutOfBoxCollections";
+    private static final String PROPERTY_DISABLE_SIGNUPS = "cosmo.service.account.disableSignups";
     
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int DEFAULT_PAGE_SIZE = PageCriteria.VIEW_ALL;
@@ -127,6 +128,7 @@ public class CmpServlet extends HttpServlet {
     private AccountActivator accountActivator;
     private OutOfTheBoxHelper ootbHelper;
     private boolean createOutOfBoxCollections = false;
+    private boolean disableSignups = false;
 
     /**
      * Loads the servlet context's <code>WebApplicationContext</code>
@@ -177,6 +179,9 @@ public class CmpServlet extends HttpServlet {
                 String createOobCols = cppc.getProperties().getProperty(PROPERTY_CREATE_OOB_COLS);
                 if(createOobCols!=null && "true".equalsIgnoreCase(createOobCols))
                     createOutOfBoxCollections = true;
+                String disableSignupsProp = cppc.getProperties().getProperty(PROPERTY_DISABLE_SIGNUPS);
+                if(disableSignupsProp!=null && "true".equalsIgnoreCase(disableSignupsProp))
+                    disableSignups = true;
             }
         }
 
@@ -866,32 +871,36 @@ public class CmpServlet extends HttpServlet {
     private void processSignup(HttpServletRequest req,
                                HttpServletResponse resp)
         throws ServletException, IOException {
-        try {
-            Document xmldoc = readXmlRequest(req);
-            UserResource resource = new UserResource(getUrlBase(req), xmldoc, entityFactory);
-            User user = resource.getUser();
-            user.setAdmin(Boolean.FALSE);
-            user.setLocked(Boolean.FALSE);
-            user = userService.createUser(user, createSignupListeners(req));
-            
-            resource = new UserResource(user, getUrlBase(req));
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-            resp.setHeader("Content-Location", resource.getHomedirUrl());
-            resp.setHeader("ETag", resource.getEntityTag());
-            sendXmlResponse(resp, resource);
-        } catch (SAXException e) {
-            log.warn("error parsing request body: " + e.getMessage());
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                           "Error parsing request body: " + e.getMessage());
-            return;
-        } catch (CmpException e) {
-            log.warn("bad request for signup: " + e.getMessage());
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                           e.getMessage());
-        } catch (ModelValidationException e) {
-            handleModelValidationError(resp, e);
-        } catch (InvalidStateException ise) {
-            handleInvalidStateException(resp, ise);
+        if (disableSignups){
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        } else {
+            try {
+                Document xmldoc = readXmlRequest(req);
+                UserResource resource = new UserResource(getUrlBase(req), xmldoc, entityFactory);
+                User user = resource.getUser();
+                user.setAdmin(Boolean.FALSE);
+                user.setLocked(Boolean.FALSE);
+                user = userService.createUser(user, createSignupListeners(req));
+
+                resource = new UserResource(user, getUrlBase(req));
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.setHeader("Content-Location", resource.getHomedirUrl());
+                resp.setHeader("ETag", resource.getEntityTag());
+                sendXmlResponse(resp, resource);
+            } catch (SAXException e) {
+                log.warn("error parsing request body: " + e.getMessage());
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        "Error parsing request body: " + e.getMessage());
+                return;
+            } catch (CmpException e) {
+                log.warn("bad request for signup: " + e.getMessage());
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        e.getMessage());
+            } catch (ModelValidationException e) {
+                handleModelValidationError(resp, e);
+            } catch (InvalidStateException ise) {
+                handleInvalidStateException(resp, ise);
+            }
         }
     }
 
@@ -1339,5 +1348,13 @@ public class CmpServlet extends HttpServlet {
         context.setHostname(urlBase);
         
         return context;
+    }
+
+    public boolean isDisableSignups() {
+        return disableSignups;
+    }
+
+    public void setDisableSignups(boolean disableSignups) {
+        this.disableSignups = disableSignups;
     }
 }

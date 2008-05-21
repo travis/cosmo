@@ -360,7 +360,7 @@ cosmo.util.html.getFormElemNames = function (form) {
     for (var i = 0; i < elems.length; i++) {
         var elem = elems[i];
         var n = elem.name;
-        if (typeof names[n] == 'undefined') {
+        if (n && typeof names[n] == 'undefined') {
             names[n] = elem.type;
         }
     }

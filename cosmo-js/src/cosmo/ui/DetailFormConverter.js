@@ -198,7 +198,8 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
      },
 
     dateConverter: function(form, info, propertyName){
-        //this code adapted from mde's original cal_form code.
+        debugger
+        /*this code adapted from mde's original cal_form code.
         var dateFieldValue = this._getFormValue(form, info.dateField);
         dateFieldValue = dateFieldValue == "mm/dd/yyyy" ? null : dateFieldValue;
         var timeFieldValue = this._getFormValue(form, info.timeField);
@@ -258,7 +259,7 @@ dojo.declare("cosmo.ui.DetailFormConverter", null, {
             dt.updateFromUTC(jsDate.getTime());
         }
         dt.utc = false;
-        return [dt, null];
+        return [dt, null];*/
     },
 
     requiredValidator: function(value, propertyName){

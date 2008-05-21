@@ -37,6 +37,9 @@ dojo.require("cosmo.ui.DetailFormConverter");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.model.Item");
+dojo.require("dijit.form.DateTextBox");
+dojo.require("dijit.form.TimeTextBox");
+dojo.require("dojo.string");
 
 cosmo.ui.detail = new function () {
     this.item = null;
@@ -797,10 +800,10 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
     // ----------
     var elems = cosmo.util.html.getFormElemNames(this.formNode);
     if (this.enabled) {
-        for (var i in elems) {
-            var elem = this.formNode[i];
-            var state = this.elementDefaultStates[i];
-            var elemType = elems[i];
+        for (var name in elems) {
+            var elem = this.formNode[name];
+            var state = this.elementDefaultStates[name];
+            var elemType = elems[name];
             cosmo.util.html.enableFormElem(elem, elemType);
             if (opts.setUpDefaults != false) {
                 this.setElemDefaultState(elem, elemType, state);
@@ -811,9 +814,9 @@ cosmo.ui.detail.StampFormElements.prototype.toggleEnabled
         }
     }
     else {
-        for (var i in elems) {
-            var elem = this.formNode[i];
-            var elemType = elems[i];
+        for (var name in elems) {
+            var elem = this.formNode[name];
+            var elemType = elems[name];
             if (opts.disableStampFormElem) {
                 cosmo.util.html.clearAndDisableFormElem(elem, elemType);
             }
@@ -1002,25 +1005,29 @@ cosmo.ui.detail.EventFormElements= function () {
     // Private methods
     // -------
     function createDateTimeInputs(label, name) {
+
         var d = _createElem('div');
+//        d.innerHTML = dojo.string.substitute(
+//            "<span dojoType='dijit.form.DateTextBox' id='${name}Date' name='${name}Date' class='inputDate'></span>"
+//            + "<span dojoType='dijit.form.TimeTextBox' id='${name}Time' name='${name}Time' class='inputDate'></span>",
+//            {name: name, label: label});
+//        dojo.parser.parse(d);
+//        return d;
         var t = cosmo.ui.detail.createLabelDiv(_(
             'Main.DetailForm.' + label));
         d.appendChild(t);
-        var elem = addToHashAndReturn(
-            _html.createInput({ type: 'text',
-                id: name + 'Date',
-                name: name + 'Date',
-                size: 10,
-                maxlength: 10,
-                value: '',
-                className: 'inputText' }));
-        t = cosmo.ui.detail.createFormElemDiv(elem);
+        var datep = new dijit.form.DateTextBox({
+            id: name + 'Date',
+            name: name + 'Date'
+        });
+        var elem = addToHashAndReturn(datep.valueNode);
+        t = cosmo.ui.detail.createFormElemDiv(datep.textbox);
         t.style.whiteSpace = 'nowrap';
         t.appendChild(_html.nbsp());
         t.appendChild(_createText(
             _('Main.DetailForm.At')));
         t.appendChild(_html.nbsp());
-        elem = addToHashAndReturn(
+        var elem = addToHashAndReturn(
             _html.createInput({ type: 'text',
                 id: name + 'Time',
                 name:name + 'Time',
@@ -1255,10 +1262,10 @@ cosmo.ui.detail.EventFormElements= function () {
             else {
                 handlerFunc = cosmo.util.html.enableFormElem;
             }
-            handlerFunc(formElements.startTime, 'text');
-            handlerFunc(formElements.endTime, 'text');
-            handlerFunc(formElements.startMeridian, 'radio');
-            handlerFunc(formElements.endMeridian, 'radio');
+//            handlerFunc(formElements.startTime, 'text');
+//            handlerFunc(formElements.endTime, 'text');
+//            handlerFunc(formElements.startMeridian, 'radio');
+//            handlerFunc(formElements.endMeridian, 'radio');
             handlerFunc(formElements.tzRegion, 'select');
             handlerFunc(formElements.tzId, 'select');
         };
@@ -1307,7 +1314,8 @@ cosmo.ui.detail.EventFormElements= function () {
     // -------
     this.updateFromStamp = function (stamp) {
         var setTimeElem = function (form, name, dt, untimed, allDay) {
-            var timeElem = null;
+            debugger
+/*            var timeElem = null;
             var meridianElem = null;
             var str = '';
 
@@ -1334,7 +1342,7 @@ cosmo.ui.detail.EventFormElements= function () {
             }
             meridianElem[1].disabled = allDay;
             meridianElem[0].disabled = allDay;
-            timeElem.disabled = allDay;
+            timeElem.disabled = allDay;*/
         };
         var allDay = stamp.getAllDay();
         var anyTime = stamp.getAnyTime();
@@ -1342,11 +1350,11 @@ cosmo.ui.detail.EventFormElements= function () {
         f.eventAllDay.checked = allDay;
         _html.setTextInput(f.eventLocation, stamp.getLocation() || '');
         var start = stamp.getStartDate();
-        _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
-        setTimeElem(f, 'start', start, untimed, allDay);
+//        _html.setTextInput(f.startDate, start.strftime('%m/%d/%Y'));
+//        setTimeElem(f, 'start', start, untimed, allDay);
         var end = stamp.getEndDate();
-        _html.setTextInput(f.endDate, end.strftime('%m/%d/%Y'));
-        setTimeElem(f, 'end', end, untimed, allDay);
+//        _html.setTextInput(f.endDate, end.strftime('%m/%d/%Y'));
+//        setTimeElem(f, 'end', end, untimed, allDay);
         if (start.tzId){
             var tz = cosmo.datetime.timezone.getTimezone(start.tzId);
             if (!tz){

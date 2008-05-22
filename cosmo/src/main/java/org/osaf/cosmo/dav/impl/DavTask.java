@@ -28,8 +28,6 @@ import org.osaf.cosmo.dav.DavResourceLocator;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.StampUtils;
-import org.osaf.cosmo.model.TaskStamp;
 
 /**
  * Extends <code>DavCalendarResource</code> to adapt the Cosmo
@@ -49,7 +47,6 @@ public class DavTask extends DavCalendarResource {
                   EntityFactory entityFactory)
         throws DavException {
         this(entityFactory.createNote(), locator, factory, entityFactory);
-        getItem().addStamp(entityFactory.createTaskStamp());
     }
 
     /** */
@@ -76,10 +73,6 @@ public class DavTask extends DavCalendarResource {
      */
     public Calendar getCalendar() {
         return new EntityConverter(null).convertNote((NoteItem)getItem());
-    }
-    
-    public TaskStamp getTaskStamp() {
-        return StampUtils.getTaskStamp(getItem());
     }
 
     /**

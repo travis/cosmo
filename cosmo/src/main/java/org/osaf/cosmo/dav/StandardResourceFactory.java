@@ -27,7 +27,6 @@ import org.osaf.cosmo.dav.impl.DavEvent;
 import org.osaf.cosmo.dav.impl.DavFile;
 import org.osaf.cosmo.dav.impl.DavFreeBusy;
 import org.osaf.cosmo.dav.impl.DavHomeCollection;
-import org.osaf.cosmo.dav.impl.DavJournal;
 import org.osaf.cosmo.dav.impl.DavTask;
 import org.osaf.cosmo.icalendar.ICalendarClientFilterManager;
 import org.osaf.cosmo.model.AvailabilityItem;
@@ -40,7 +39,6 @@ import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
-import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.service.ContentService;
@@ -203,10 +201,8 @@ public class StandardResourceFactory
                 return null;
             else if (item.getStamp(EventStamp.class) != null)
                 return new DavEvent(note, locator, this, entityFactory);
-            else if (item.getStamp(TaskStamp.class) != null)
-                return new DavTask(note, locator, this, entityFactory);
             else 
-                return new DavJournal(note, locator, this, entityFactory);
+                return new DavTask(note, locator, this, entityFactory);
         }
         
         if(item instanceof FreeBusyItem)

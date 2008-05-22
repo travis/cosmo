@@ -93,6 +93,8 @@ public class EntityConverter {
 
     private EntityFactory entityFactory;
     
+    public static final String X_OSAF_STARRED = "X-OSAF-STARRED";
+    
     public EntityConverter(EntityFactory entityFactory) {
         this.entityFactory = entityFactory;
     }
@@ -197,8 +199,6 @@ public class EntityConverter {
      */
     public NoteItem convertJournalCalendar(NoteItem  note, Calendar calendar) {
         
-        note.setJournalCalendar(calendar);
-        
         VJournal vj = (VJournal) getMasterComponent(calendar.getComponents(Component.VJOURNAL));
         
         setCalendarAttributes(note, vj);
@@ -226,13 +226,7 @@ public class EntityConverter {
      */
     public NoteItem convertTaskCalendar(NoteItem  note, Calendar calendar) {
         
-        TaskStamp task = StampUtils.getTaskStamp(note);
-        if(task==null) {
-            task = entityFactory.createTaskStamp();
-            note.addStamp(task);
-        }
-        
-        task.setTaskCalendar(calendar);
+        note.setTaskCalendar(calendar);
         VToDo todo = (VToDo) getMasterComponent(calendar.getComponents(Component.VTODO));
         
         setCalendarAttributes(note, todo);
@@ -366,35 +360,12 @@ public class EntityConverter {
         if(event!=null)
             return getCalendarFromEventStamp(event);
 
-        TaskStamp task = StampUtils.getTaskStamp(note);
-        if(task!=null)
-            return getCalendarFromTaskStamp(task);
-
         return getCalendarFromNote(note);
     }
-    
    
-    protected Calendar getCalendarFromNote(NoteItem  note) {
+    protected Calendar getCalendarFromNote(NoteItem note) {
         // Start with existing calendar if present
-        Calendar calendar = note.getJournalCalendar();
-        
-        // otherwise, start with new calendar
-        if (calendar == null)
-            calendar = ICalendarUtils.createBaseCalendar(new VJournal());
-        else
-            // use copy when merging calendar with item properties
-            calendar = CalendarUtils.copyCalendar(calendar);
-        
-        // merge in displayName,body
-        VJournal journal = (VJournal) calendar.getComponent(Component.VJOURNAL);
-        mergeCalendarProperties(journal, note);
-        
-        return calendar;
-    }
-   
-    protected Calendar getCalendarFromTaskStamp(TaskStamp taskStamp) {
-        // Start with existing calendar if present
-        Calendar calendar = taskStamp.getTaskCalendar();
+        Calendar calendar = note.getTaskCalendar();
         
         // otherwise, start with new calendar
         if (calendar == null)
@@ -405,7 +376,7 @@ public class EntityConverter {
         
         // merge in displayName,body
         VToDo task = (VToDo) calendar.getComponent(Component.VTODO);
-        mergeCalendarProperties(task, (NoteItem) taskStamp.getItem());
+        mergeCalendarProperties(task, note);
         
         return calendar;
     }
@@ -577,6 +548,11 @@ public class EntityConverter {
             ICalendarUtils.setDtStamp(note.getClientModifiedDate(), event);
         else
             ICalendarUtils.setDtStamp(note.getModifiedDate(), event);
+        
+        if (StampUtils.getTaskStamp(note) != null)
+            ICalendarUtils.setXProperty(X_OSAF_STARRED, "TRUE", event);
+        else
+            ICalendarUtils.setXProperty(X_OSAF_STARRED, null, event);
     }
     
     private void mergeCalendarProperties(VToDo task, NoteItem note) {
@@ -607,6 +583,11 @@ public class EntityConverter {
         }
         
         ICalendarUtils.setCompleted(completeDate, task);
+        
+        if (StampUtils.getTaskStamp(note) != null)
+            ICalendarUtils.setXProperty(X_OSAF_STARRED, "TRUE", task);
+        else
+            ICalendarUtils.setXProperty(X_OSAF_STARRED, null, task);
     }
     
     private VAlarm getDisplayAlarm(VEvent event) {
@@ -664,7 +645,7 @@ public class EntityConverter {
         // Master calendar includes everything in the original calendar minus
         // any exception events (VEVENT with RECURRENCEID)
         eventStamp.setEventCalendar(masterCalendar);
-        compactTimezones(eventStamp);
+        compactTimezones(masterCalendar);
         
         VEvent event = eventStamp.getEvent();
        
@@ -674,16 +655,16 @@ public class EntityConverter {
         syncExceptions(exceptions, masterNote);
     }
 
-    private void compactTimezones(BaseEventStamp stamp) {
-        Calendar master = stamp.getEventCalendar();
-        if(master==null)
+    private void compactTimezones(Calendar calendar) {
+        
+        if(calendar==null)
             return;
 
         // Get list of timezones in master calendar and remove all timezone
         // definitions that are in the registry.  The idea is to not store
         // extra data.  Instead, the timezones will be added to the calendar
         // by the getCalendar() api.
-        ComponentList timezones = master.getComponents(Component.VTIMEZONE);
+        ComponentList timezones = calendar.getComponents(Component.VTIMEZONE);
         ArrayList toRemove = new ArrayList();
         for(Iterator it = timezones.iterator();it.hasNext();) {
             VTimeZone vtz = (VTimeZone) it.next();
@@ -697,7 +678,7 @@ public class EntityConverter {
         }
 
         // remove known timezones from master calendar
-        master.getComponents().removeAll(toRemove);
+        calendar.getComponents().removeAll(toRemove);
     }
 
     private void syncExceptions(Map<Date, VEvent> exceptions,
@@ -836,6 +817,13 @@ public class EntityConverter {
         boolean later = event.getStartDate().getDate().after(now);
         int code = (later) ? TriageStatus.CODE_LATER : TriageStatus.CODE_DONE;
         note.getTriageStatus().setCode(code);
+        
+        // check for X-OSAF-STARRED
+        if ("TRUE".equals(ICalendarUtils.getXProperty(X_OSAF_STARRED, event))) {
+            TaskStamp ts = StampUtils.getTaskStamp(note);
+            if (ts == null)
+                note.addStamp(entityFactory.createTaskStamp());
+        }
     }
     
     private void setCalendarAttributes(NoteItem note, VToDo task) {
@@ -885,7 +873,12 @@ public class EntityConverter {
                     TriageStatusUtil.getRank(completed.getDate().getTime()));
         }
         
-        // TODO: handle DUE
+        // check for X-OSAF-STARRED
+        if ("TRUE".equals(ICalendarUtils.getXProperty(X_OSAF_STARRED, task))) {
+            TaskStamp taskStamp = StampUtils.getTaskStamp(note);
+            if (taskStamp == null)
+                note.addStamp(entityFactory.createTaskStamp());
+        }
     }
     
     private void setCalendarAttributes(NoteItem note, VJournal journal) {

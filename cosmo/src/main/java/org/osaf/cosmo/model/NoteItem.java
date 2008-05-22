@@ -21,7 +21,7 @@ import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
 
-import org.osaf.cosmo.hibernate.validator.Journal;
+import org.osaf.cosmo.hibernate.validator.Task;
 
 /**
  * Extends {@link ICalendarItem} to represent a Note item.
@@ -41,19 +41,19 @@ public interface NoteItem extends ICalendarItem{
     public void setReminderTime(Date reminderTime);
 
     /**
-     * Return the Calendar object containing a VJOURNAL component.
+     * Return the Calendar object containing a VTODO component.
      * @return calendar
      */
-    @Journal
-    public Calendar getJournalCalendar();
+    @Task
+    public Calendar getTaskCalendar();
 
     /**
-     * Set the Calendar object containing a VJOURNAL component.  
+     * Set the Calendar object containing a VOTODO component.
      * This allows non-standard icalendar properties to be stored 
-     * with the note.
+     * with the task.
      * @param calendar
      */
-    public void setJournalCalendar(Calendar calendar);
+    public void setTaskCalendar(Calendar calendar);
 
     public Set<NoteItem> getModifications();
 

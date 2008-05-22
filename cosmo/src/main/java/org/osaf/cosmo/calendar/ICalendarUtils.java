@@ -50,6 +50,7 @@ import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.model.property.XProperty;
 
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.util.Dates;
@@ -120,6 +121,37 @@ public class ICalendarUtils {
             comp.getProperties().add(summary);
         }
         summary.setValue(text);
+    }
+    
+    /**
+     * Update the X property on a component.
+     * @param property the property to update
+     * @param value the value to set
+     * @param comp component to update
+     */
+    public static void setXProperty(String property, String value, Component comp) {
+        Property prop = comp.getProperties().getProperty(property);
+        if(prop!=null)
+            comp.getProperties().remove(prop);
+        
+        if (value != null) {
+            prop = new XProperty(property, value);
+            comp.getProperties().add(prop);
+        }
+    }
+    
+    /**
+     * Get X property value from component;
+     * @param property x property to get
+     * @param comp component
+     * @return value of xproperty, null if property does not exist
+     */
+    public static String getXProperty(String property, Component comp) {
+        Property prop = comp.getProperties().getProperty(property);
+        if(prop!=null)
+            return prop.getValue();
+        else
+            return null;
     }
     
     /**

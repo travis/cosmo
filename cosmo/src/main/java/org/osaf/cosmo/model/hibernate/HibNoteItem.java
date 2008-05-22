@@ -35,7 +35,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.osaf.cosmo.hibernate.validator.Journal;
+import org.osaf.cosmo.hibernate.validator.Task;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.QName;
@@ -70,6 +70,9 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     
     @Column(name= "hasmodifications")
     private boolean hasModifications = false;
+    
+    @Column(name = "originalvtodo")
+    private boolean originalVtodo = false;
     
     public HibNoteItem() {
     }
@@ -114,19 +117,16 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
         HibTimestampAttribute.setValue(this, ATTR_REMINDER_TIME, reminderTime);
     }
    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.NoteItem#getJournalCalendar()
-     */
-    @Journal
-    public Calendar getJournalCalendar() {
-        return getCalendar();
+    @Task
+    public Calendar getTaskCalendar() {
+        // calendar stored as ICalendarAttribute on Item
+        return HibICalendarAttribute.getValue(this, ATTR_ICALENDAR);
     }
-   
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.NoteItem#setJournalCalendar(net.fortuna.ical4j.model.Calendar)
-     */
-    public void setJournalCalendar(Calendar calendar) {
-        setCalendar(calendar);
+    
+    public void setTaskCalendar(Calendar calendar) {
+        // calendar stored as ICalendarAttribute on Item
+        HibICalendarAttribute.setValue(this, ATTR_ICALENDAR, calendar);
+        originalVtodo = (calendar!=null);
     }
    
     public Item copy() {

@@ -15,29 +15,10 @@
  */
 package org.osaf.cosmo.model;
 
-import net.fortuna.ical4j.model.Calendar;
-
-import org.osaf.cosmo.hibernate.validator.Task;
 
 /**
- * Represents a Task Stamp.  When added to a NoteItem, the note
- * becomes a task. Also represents VTODO.
+ * Represents a Task Stamp.
  */
 public interface TaskStamp extends Stamp{
-
-    /**
-     * Return the Calendar object containing a VTODO component.
-     * @return calendar
-     */
-    @Task
-    public Calendar getTaskCalendar();
-
-    /**
-     * Set the Calendar object containing a VOTODO component.
-     * This allows non-standard icalendar properties to be stored 
-     * with the task.
-     * @param calendar
-     */
-    public void setTaskCalendar(Calendar calendar);
 
 }

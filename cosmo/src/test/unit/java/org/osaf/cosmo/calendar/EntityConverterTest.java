@@ -41,7 +41,6 @@ import net.fortuna.ical4j.model.property.Completed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.eim.schema.EimValueConverter;
-import org.osaf.cosmo.calendar.util.TimeZoneUtils;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventExceptionStamp;
 import org.osaf.cosmo.model.EventStamp;
@@ -80,7 +79,6 @@ public class EntityConverterTest extends TestCase {
         
         NoteItem note = converter.convertTaskCalendar(calendar);
         
-        Assert.assertNotNull(StampUtils.getTaskStamp(note));
         Assert.assertTrue(TriageStatus.CODE_NOW==note.getTriageStatus().getCode());
         
         // add COMPLETED
@@ -225,8 +223,7 @@ public class EntityConverterTest extends TestCase {
         item = findItemByIcalUid(items, "19970901T130000Z-123404@host.com" );
         Assert.assertNotNull(item);
         Assert.assertTrue(item instanceof NoteItem);
-        Assert.assertNotNull(StampUtils.getTaskStamp(item));
-        
+       
         item = findItemByIcalUid(items, "19970901T130000Z-123405@host.com" );
         Assert.assertNotNull(item);
         Assert.assertTrue(item instanceof NoteItem);
@@ -247,6 +244,7 @@ public class EntityConverterTest extends TestCase {
         collection.addChild(note2);
         
         Calendar fullCal = converter.convertCollection(collection);
+        fullCal.validate();
         Assert.assertNotNull(fullCal);
         
         // VTIMEZONE, VTODO, VEVENT
@@ -264,11 +262,10 @@ public class EntityConverterTest extends TestCase {
         master.setBody("body");
         master.setIcalUid("icaluid");
         master.setClientModifiedDate(new DateTime("20070101T100000Z"));
-        TaskStamp taskStamp = new MockTaskStamp();
-        master.addStamp(taskStamp);
         master.setTriageStatus(TriageStatusUtil.initialize(new MockTriageStatus()));
         
         Calendar cal = converter.convertNote(master);
+        cal.validate();
         
         Assert.assertEquals(1, cal.getComponents().size());
         
@@ -277,11 +274,13 @@ public class EntityConverterTest extends TestCase {
         VToDo task = (VToDo) comps.get(0);
         
         Assert.assertNull(task.getDateCompleted());
+        Assert.assertNull(ICalendarUtils.getXProperty("X-OSAF-STARRED", task));
         
         DateTime completeDate = new DateTime("20080122T100000Z");
         
         master.getTriageStatus().setCode(TriageStatus.CODE_DONE);
         master.getTriageStatus().setRank(TriageStatusUtil.getRank(completeDate.getTime()));
+        master.addStamp(new MockTaskStamp());
         
         cal = converter.convertNote(master);
         task = (VToDo) cal.getComponents().get(0);
@@ -289,6 +288,8 @@ public class EntityConverterTest extends TestCase {
         Completed completed = task.getDateCompleted();
         Assert.assertNotNull(completed);
         Assert.assertEquals(completeDate.getTime(), completed.getDate().getTime());
+        Assert.assertEquals("TRUE", ICalendarUtils.getXProperty("X-OSAF-STARRED", task));
+        
     }
     
     public void testConvertEvent() throws Exception {
@@ -305,6 +306,7 @@ public class EntityConverterTest extends TestCase {
         master.addStamp(eventStamp);
         
         Calendar cal = converter.convertNote(master);
+        cal.validate();
         
         // date has no timezone, so there should be no timezones
         Assert.assertEquals(0, cal.getComponents(Component.VTIMEZONE).size());
@@ -312,6 +314,7 @@ public class EntityConverterTest extends TestCase {
         eventStamp.setStartDate(new DateTime("20070212T074500",TIMEZONE_REGISTRY.getTimeZone("America/Chicago")));
         
         cal = converter.convertNote(master);
+        cal.validate();
         
         // should be a single VEVENT
         ComponentList comps = cal.getComponents(Component.VEVENT);
@@ -333,6 +336,7 @@ public class EntityConverterTest extends TestCase {
         eventStamp.setEndDate(new DateTime("20070212T074500",TIMEZONE_REGISTRY.getTimeZone("America/Los_Angeles")));
         
         cal = converter.convertNote(master);
+        cal.validate();
         
         // dates have 2 different timezones, so there should be 2 timezones
         Assert.assertEquals(2, cal.getComponents(Component.VTIMEZONE).size());
@@ -342,6 +346,7 @@ public class EntityConverterTest extends TestCase {
         eventStamp.getEventCalendar().getComponents().add(registry.getTimeZone("America/Los_Angeles").getVTimeZone());
         
         cal = converter.convertNote(master);
+        cal.validate();
         Assert.assertEquals(2, cal.getComponents(Component.VTIMEZONE).size());
     }
     
@@ -356,7 +361,7 @@ public class EntityConverterTest extends TestCase {
         eventStamp.setRecurrenceDates(dates);
         master.addStamp(eventStamp);
         
-        eventStamp.getEventCalendar().validate(true);
+        eventStamp.getEventCalendar().validate();
        
         NoteItem mod = new MockNoteItem();
         mod.setDisplayName("modDisplayName");
@@ -399,9 +404,9 @@ public class EntityConverterTest extends TestCase {
         DateList dates = new ICalDate(";VALUE=DATE-TIME:20070212T074500,20070213T074500").getDateList();
         eventStamp.setRecurrenceDates(dates);
         
-        eventStamp.getEventCalendar().validate(true);
+        eventStamp.getEventCalendar().validate();
         eventStamp.setDisplayAlarmDescription(null);
-        eventStamp.getEventCalendar().validate(true);
+        eventStamp.getEventCalendar().validate();
         
         eventStamp.setDisplayAlarmDescription("alarm");
         master.addStamp(eventStamp);
@@ -449,6 +454,7 @@ public class EntityConverterTest extends TestCase {
         exceptionStamp.removeDisplayAlarm();
         
         cal = converter.convertNote(master);
+        cal.validate();
         comps = cal.getComponents(Component.VEVENT);
         Assert.assertEquals(2, comps.size());
         masterEvent = (VEvent) comps.get(0);
@@ -480,6 +486,7 @@ public class EntityConverterTest extends TestCase {
         mod.addStamp(exceptionStamp);
         
         Calendar cal = converter.convertNote(master);
+        cal.validate();
         ComponentList comps = cal.getComponents(Component.VEVENT);
         Assert.assertEquals(2, comps.size());
         VEvent masterEvent = (VEvent) comps.get(0);
@@ -497,6 +504,7 @@ public class EntityConverterTest extends TestCase {
         eventStamp.setAnyTime(false);
         
         cal = converter.convertNote(master);
+        cal.validate();
         comps = cal.getComponents(Component.VEVENT);
         Assert.assertEquals(2, comps.size());
         masterEvent = (VEvent) comps.get(0);
@@ -509,6 +517,7 @@ public class EntityConverterTest extends TestCase {
         exceptionStamp.setAnyTime(true);
         
         cal = converter.convertNote(master);
+        cal.validate();
         comps = cal.getComponents(Component.VEVENT);
         Assert.assertEquals(2, comps.size());
         masterEvent = (VEvent) comps.get(0);

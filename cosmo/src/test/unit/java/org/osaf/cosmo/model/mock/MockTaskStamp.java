@@ -15,8 +15,6 @@
  */
 package org.osaf.cosmo.model.mock;
 
-import net.fortuna.ical4j.model.Calendar;
-
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
@@ -46,22 +44,6 @@ public class MockTaskStamp extends MockStamp implements
      */
     public String getType() {
         return "task";
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTaskStamp#getTaskCalendar()
-     */
-    public Calendar getTaskCalendar() {
-        // calendar stored as ICalendarAttribute on Item
-        return MockICalendarAttribute.getValue(getItem(), ATTR_ICALENDAR);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceTaskStamp#setTaskCalendar(net.fortuna.ical4j.model.Calendar)
-     */
-    public void setTaskCalendar(Calendar calendar) {
-        // calendar stored as ICalendarAttribute on Item
-        MockICalendarAttribute.setValue(getItem(), ATTR_ICALENDAR, calendar);
     }
     
     /**

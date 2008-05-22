@@ -23,7 +23,6 @@ import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
 
-import org.osaf.cosmo.hibernate.validator.Journal;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.NoteItem;
@@ -95,19 +94,16 @@ public class MockNoteItem extends MockICalendarItem implements NoteItem {
         MockTimestampAttribute.setValue(this, ATTR_REMINDER_TIME, reminderTime);
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#getJournalCalendar()
-     */
-    @Journal
-    public Calendar getJournalCalendar() {
-        return getCalendar();
+  
+    public Calendar getTaskCalendar() {
+        // calendar stored as ICalendarAttribute on Item
+        return MockICalendarAttribute.getValue(this, ATTR_ICALENDAR);
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.copy.InterfaceNoteItem#setJournalCalendar(net.fortuna.ical4j.model.Calendar)
-     */
-    public void setJournalCalendar(Calendar calendar) {
-        setCalendar(calendar);
+   
+    public void setTaskCalendar(Calendar calendar) {
+        // calendar stored as ICalendarAttribute on Item
+        MockICalendarAttribute.setValue(this, ATTR_ICALENDAR, calendar);
     }
     
     

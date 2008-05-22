@@ -18,11 +18,8 @@ package org.osaf.cosmo.model.hibernate;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import net.fortuna.ical4j.model.Calendar;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.osaf.cosmo.hibernate.validator.Task;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.QName;
 import org.osaf.cosmo.model.Stamp;
@@ -55,23 +52,6 @@ public class HibTaskStamp extends HibStamp implements
      */
     public String getType() {
         return "task";
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.TaskStamp#getTaskCalendar()
-     */
-    @Task
-    public Calendar getTaskCalendar() {
-        // calendar stored as ICalendarAttribute on Item
-        return HibICalendarAttribute.getValue(getItem(), ATTR_ICALENDAR);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.TaskStamp#setTaskCalendar(net.fortuna.ical4j.model.Calendar)
-     */
-    public void setTaskCalendar(Calendar calendar) {
-        // calendar stored as ICalendarAttribute on Item
-        HibICalendarAttribute.setValue(getItem(), ATTR_ICALENDAR, calendar);
     }
     
     /**

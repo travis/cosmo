@@ -25,6 +25,7 @@ def json_to_css(filename):
     json = eval(json_file.read())
     
     output = license()
+    css = []
     for name, values in json.items():
         name = name[0].upper() + name[1:]
         height = values['height'] 
@@ -32,8 +33,11 @@ def json_to_css(filename):
         left = 0 - ((values['column'] - 1) * 45)
         top = 0 - ((values['row'] - 1) * 45)
         image_url = "images/image_grid.png"
-        output += ".cosmo%s{height: %dpx; width: %dpx; background-position: %dpx %dpx; background-image: url(%s);}\n" % (
-            name, height, width, left, top, image_url)
+        css.append(".cosmo%s{height: %dpx; width: %dpx; background-position: %dpx %dpx; background-image: url(%s);}\n" % (
+            name, height, width, left, top, image_url))
+    css.sort()
+    for clause in css:
+        output += clause
     print output
         
 

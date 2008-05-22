@@ -43,6 +43,7 @@
 
 "taskButtonDefault": { "row": 3, "column": 16, "width": 24, "height": 18 },
 "taskButtonRollover": { "row": 3, "column": 17, "width": 24, "height": 18 },
+"taskButtonSelected": { "row": 3, "column": 18, "width": 24, "height": 18 },
 
 "readOnlyIcon": { "row": 3, "column": 19, "width": 12, "height": 12 },
 

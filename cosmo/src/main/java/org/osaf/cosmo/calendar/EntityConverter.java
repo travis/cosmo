@@ -53,6 +53,7 @@ import net.fortuna.ical4j.model.property.DtStamp;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
@@ -575,11 +576,13 @@ public class EntityConverter {
         ICalendarUtils.setSummary(note.getDisplayName(), task);
         ICalendarUtils.setDescription(note.getBody(), task);
         
-        // Set COMPLETED if triagestatus is DONE
+        // Set COMPLETED/STATUS if triagestatus is DONE
         TriageStatus ts = note.getTriageStatus();
         DateTime completeDate = null;
-        if(ts!=null && ts.getCode()==TriageStatus.CODE_DONE && ts.getRank()!=null) {
-            completeDate =  new DateTime(TriageStatusUtil.getDateFromRank(ts.getRank())); 
+        if(ts!=null && ts.getCode()==TriageStatus.CODE_DONE) {
+            ICalendarUtils.setStatus(Status.VTODO_COMPLETED, task);
+            if(ts.getRank()!=null)
+                completeDate =  new DateTime(TriageStatusUtil.getDateFromRank(ts.getRank())); 
         }
         
         ICalendarUtils.setCompleted(completeDate, task);
@@ -853,12 +856,13 @@ public class EntityConverter {
                 note.setReminderTime(reminderTime);
         }
         
-        // look at COMPLETED
+        // look for COMPLETED or STATUS:COMPLETED
         Completed completed = task.getDateCompleted();
+        Status status = task.getStatus();
         TriageStatus ts = note.getTriageStatus();
         
         // Initialize TriageStatus if necessary
-        if(completed!=null) {
+        if(completed!=null || Status.VTODO_COMPLETED.equals(status)) {
             if (ts == null) {
                 ts = TriageStatusUtil.initialize(entityFactory
                         .createTriageStatus());
@@ -867,10 +871,15 @@ public class EntityConverter {
             
             // TriageStatus.code will be DONE
             note.getTriageStatus().setCode(TriageStatus.CODE_DONE);
-            // TriageStatus.rank will be the COMPLETED date
-            // in order to preserve it
-            note.getTriageStatus().setRank(
-                    TriageStatusUtil.getRank(completed.getDate().getTime()));
+            
+            // TriageStatus.rank will be the COMPLETED date if present
+            // or currentTime
+            if(completed!=null)
+                note.getTriageStatus().setRank(
+                        TriageStatusUtil.getRank(completed.getDate().getTime()));
+            else
+                note.getTriageStatus().setRank(
+                        TriageStatusUtil.getRank(System.currentTimeMillis()));
         }
         
         // check for X-OSAF-STARRED

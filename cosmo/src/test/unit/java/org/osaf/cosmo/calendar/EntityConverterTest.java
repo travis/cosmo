@@ -37,6 +37,7 @@ import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
+import net.fortuna.ical4j.model.property.Status;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,7 +49,6 @@ import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
-import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.TriageStatus;
 import org.osaf.cosmo.model.TriageStatusUtil;
 import org.osaf.cosmo.model.mock.MockCalendarCollectionStamp;
@@ -91,6 +91,21 @@ public class EntityConverterTest extends TestCase {
         TriageStatus ts = note.getTriageStatus();
         Assert.assertTrue(TriageStatus.CODE_DONE==ts.getCode());
         Assert.assertTrue(TriageStatusUtil.getDateFromRank(ts.getRank()).getTime()==completeDate.getTime());
+    
+        note.setTriageStatus(null);
+        ICalendarUtils.setCompleted(null, vtodo);
+        Assert.assertNull(vtodo.getDateCompleted());
+        ICalendarUtils.setStatus(Status.VTODO_COMPLETED, vtodo);
+        
+        // verify that TriageStatus.rank is set ot current time when 
+        // STATUS:COMPLETED is present and COMPLETED is not present
+        long begin = (System.currentTimeMillis() / 1000) * 1000;
+        note = converter.convertTaskCalendar(calendar);
+        long end = (System.currentTimeMillis() / 1000) * 1000;
+        ts = note.getTriageStatus();
+        Assert.assertTrue(TriageStatus.CODE_DONE==ts.getCode());
+        long rankTime = TriageStatusUtil.getDateFromRank(ts.getRank()).getTime();
+        Assert.assertTrue(rankTime<=end && rankTime>=begin);
     }
     
     public void testEntityConverterEvent() throws Exception {

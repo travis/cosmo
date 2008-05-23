@@ -18,12 +18,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:jee="http://www.springframework.org/schema/jee"
     xmlns:tx="http://www.springframework.org/schema/tx"
     xmlns:security="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd
     http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
   <bean id="messageSource"
@@ -35,16 +37,7 @@
 
   <!-- load the cosmo properties file and make the cosmo
        config properties available to other spring beans -->
-
-  <bean id="cosmoConfigPath"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>cosmo/config</value>
-    </property>
-    <property name="resourceRef">
-      <value>true</value>
-    </property>
-  </bean>
+  <jee:jndi-lookup id="cosmoConfigPath" jndi-name="java:comp/env/cosmo/config"/>
 
   <bean id="propertyPlaceholderConfigurer"
         class="org.osaf.cosmo.spring.CosmoPropertyPlaceholderConfigurer">
@@ -56,16 +49,7 @@
   </bean>
 
   <!-- resources needed to send mail -->
-
-  <bean id="mailSession"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName">
-      <value>mail/cosmo</value>
-    </property>
-    <property name="resourceRef">
-      <value>true</value>
-    </property>
-  </bean>
+  <jee:jndi-lookup id="mailSession" jndi-name="java:comp/env/mail/cosmo"/>
 
   <bean id="mailSender"
         class="org.springframework.mail.javamail.JavaMailSenderImpl">
@@ -75,11 +59,7 @@
   </bean>
 
   <!-- resources needed for database access -->
-
-  <bean id="jdbcDataSource"
-        class="org.springframework.jndi.JndiObjectFactoryBean">
-    <property name="jndiName" value="java:comp/env/jdbc/cosmo"/>
-  </bean>
+  <jee:jndi-lookup id="jdbcDataSource" jndi-name="java:comp/env/jdbc/cosmo"/>
 
   <bean id="defaultLobHandler"
         class="org.osaf.cosmo.hibernate.CosmoLobHandler">

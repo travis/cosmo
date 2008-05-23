@@ -19,6 +19,7 @@ try{
 	dojo.require("cosmo.model.tests.model");
 	dojo.require("cosmo.model.tests.modelTriage");
 	dojo.require("cosmo.model.tests.performance");
+	dojo.require("cosmo.model.tests.sort");
 	dojo.require("cosmo.model.tests.util");
 
 }catch(e){

@@ -26,6 +26,8 @@ doh.register("cosmo.model.tests.modelTriage", [
         note.setTriageStatus(cosmo.model.TRIAGE_LATER);
         jum.assertEquals("Should be LATER", cosmo.model.TRIAGE_LATER, note.getTriageStatus());
         jum.assertEquals("Should be TRUE - auto triage defaults to true", true, note.getAutoTriage());
+        jum.assertTrue("New Note should have non-zero rank",
+                       (1 < note.getRank() <= cosmo.model.NEW_RANK()));
         note.setAutoTriage(false);
 
         var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date());

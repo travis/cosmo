@@ -21,8 +21,8 @@ cosmo.util.hash.Hash = function () {
     var self = this;
 
     this.length = 0;
-    this.items = []; // Hash keys and their values
-    this.order = []; // Array of the order of hash keys
+    this.items = {}; // keys and their values
+    this.order = []; // Array of the order of keys
     this.cursorPos = 0; // Current cursor position in the hash
     for (var i = 0; i < arguments.length; i += 2) {
         if (typeof(arguments[i+1]) != 'undefined') {
@@ -215,8 +215,7 @@ cosmo.util.hash.Hash = function () {
         }
 
     };
-    this.sort = function (specialSort, desc) {
-        var sortFunc = getSort(specialSort, desc);
+    this.sort = function (sortFunc, direction) {
         var valSort = [];
         var keySort = [];
         for (var i = 0; i < this.order.length; i++) {
@@ -225,50 +224,20 @@ cosmo.util.hash.Hash = function () {
         // Sort values
         valSort.sort(sortFunc);
         for (var i = 0; i < valSort.length; i++) {
+            // we could avoid the nested loop if we knew the relationship
+            // between key and val, usually val.getUid()
             for (j in this.items) {
                 if (this.items[j] == valSort[i]) {
                     keySort[i] = j;
                     this.removeItem(j);
+                    break;
                 }
             }
         }
         for (var i = 0; i < valSort.length; i++) {
-            this.sort[i] = keySort[i];
             this.setItem(keySort[i], valSort[i]);
         }
+        if (direction == 'Desc') this.order.reverse();
     };
-    this.sortByKey = function (specialSort, desc) {
-        var sortFunc = getSort(specialSort, desc);
-        this.order.sort(sortFunc);
-    };
-    // Sorting and comparator functions
-    // ==============
-    function getSort(specialSort, desc) {
-        var sortFunc = null;
-        if (typeof specialSort == 'function') {
-            sortFunc = specialSort;
-        }
-        else {
-            if (specialSort == true) {
-                sortFunc = desc ? simpleDescNoCase : simpleAscNoCase;
-            }
-            else {
-                sortFunc = desc ? simpleDescCase : simpleAscCase;
-            }
-        }
-        return sortFunc;
-    };
-    function simpleAscCase(a, b) {
-        return (a >= b) ?  1 : -1;
-    };
-    function simpleDescCase(a, b) {
-        return (a < b) ?  1 : -1;
-    };
-    function simpleAscNoCase(a, b) {
-        return (a.toLowerCase() >= b.toLowerCase()) ? 1 : -1;
-    };
-    function simpleDescNoCase(a, b) {
-        return (a.toLowerCase() < b.toLowerCase()) ? 1 : -1;
-    };
-}
+};
 Hash = cosmo.util.hash.Hash;

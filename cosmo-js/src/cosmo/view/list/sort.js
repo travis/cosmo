@@ -16,39 +16,26 @@
 
 dojo.provide('cosmo.view.list.sort');
 
-dojo.require('cosmo.view.list.common');
-
-cosmo.view.list.sort.doSort = function (hash, col, dir) {
-    var currSortKey = col.substr(0, 1).toLowerCase() + col.substr(1);
-    // Sort based on the precalc'd values in item.sort
-    var currSort = function (a, b) {
-        var valA = a.sort[currSortKey];
-        var valB =  b.sort[currSortKey];
-        valA = (typeof valA == 'string') ? valA.toLowerCase() : valA;
-        valB = (typeof valB == 'string') ? valB.toLowerCase() : valB;
-        if (valA == valB) {
-            // If sort is already on title, secondary sort is uid
-            // (it could be anything; I just picked that out of the air)
-            var newKey = (currSortKey == 'title') ? 'uid' : 'title';
-            if (a.sort[newKey] > b.sort[newKey]) {
-                r = 1;
-            }
-            else {
-                r = -1;
-            }
-        }
-        else if (valA > valB) {
-            r = 1;
-        }
-        else {
-            r = -1;
-        }
-        // Reverse sort for Asc
-        r = dir == 'Desc' ? r : (0 - r);
-        return r;
-    };
-    // Sort the list
-    cosmo.view.list.itemRegistry.sort(currSort);
+cosmo.view.list.sort.doSort = function (hash, columnName, direction) {
+    var column = camelCase(columnName);
+    function compare(a, b){return compareOnSortColumn(a, b, column);}
+    hash.sort(compare, direction);
     return true;
 };
 
+function camelCase(s){
+    return s.charAt(0).toLowerCase() + s.substr(1);
+}
+
+function compareOnSortColumn(a, b, column) {
+    var valA = a.sort[column];
+    var valB = b.sort[column];
+    if (typeof valA == 'string') valA = valA.toLowerCase();
+    if (typeof valB == 'string') valB = valB.toLowerCase();
+    if (valA == valB){ // order of precedence column, title, uid
+        if (column == 'title')    return compareOnSortColumn(a, b, 'uid');
+        else if (column != 'uid') return compareOnSortColumn(a, b, 'title');
+        else return 0;
+    }
+    return (valA > valB) ? 1 : -1;
+}

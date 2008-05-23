@@ -48,10 +48,10 @@ cosmo.view.list.columnOrder = ['TASK', 'TITLE', 'WHO', 'START', 'TRIAGE'];
 // string, or as the key for the image icon in imagegrid.js
 cosmo.view.list.columns = {
     TASK: { name: 'task', width: '20px', display: 'taskColumn', isIcon: true, initSort: 'Asc' },
-    TITLE: { name: 'title', width: '50%', display: 'Title', isIcon: false, initSort: 'Desc' },
-    WHO: { name: 'who', width: '20%', display: 'UpdatedBy', isIcon: false, initSort: 'Desc' },
+    TITLE: { name: 'title', width: '50%', display: 'Title', isIcon: false, initSort: 'Asc' },
+    WHO: { name: 'who', width: '20%', display: 'UpdatedBy', isIcon: false, initSort: 'Asc' },
     START: { name: 'start', width: '30%', display: 'StartsOn', isIcon: false, initSort: 'Desc' },
-    TRIAGE: { name: 'triage', width: '36px', display: 'triageStatusColumn', isIcon: true, initSort: 'Desc' }
+    TRIAGE: { name: 'triage', width: '36px', display: 'triageStatusColumn', isIcon: true, initSort: 'Asc' }
 };
 
 cosmo.view.list.triageStatusCodeMappings = {
@@ -73,7 +73,7 @@ dojo.subscribe("cosmo:calLoadCollection", function(cmd){
     }
 });
 
-dojo.subscribe("cosmo:appKeyboardInput", 
+dojo.subscribe("cosmo:appKeyboardInput",
                dojo.hitch(cosmo.view.list, cosmo.view.list.handleKeyboardInput));
 
 cosmo.view.list.loadItems = function (o) {
@@ -198,11 +198,18 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     setVals(cols.START.name, sr, fm);
     // Triage
     var tr = data.getTriageStatus();
-    var rank = parseInt(data.getRank());
+    // use a very large number to separate triage-status sections
+    var largeNumber = 10000000000;
+    var rank = parseFloat(data.getRank());
     var fm = tr ? _('Dashboard.ListEntry.Triage' +
         this.triageStatusCodeMappings[tr]) : '(NONE)';
-    tr = (tr * 10000000000);
-    tr = tr + rank;
+    if (tr == cosmo.model.TRIAGE_LATER && dt){
+        // sort the LATER by date, if available
+        tr = (tr - 100) * largeNumber + sr/1000;
+    } else {
+        // otherwise, just sort by reverse rank
+        tr = tr * largeNumber - rank;
+    }
     setVals(cols.TRIAGE.name, tr, fm);
 
     // Use two separate keyword/val objs since

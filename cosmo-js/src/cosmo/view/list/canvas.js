@@ -50,8 +50,10 @@ cosmo.view.list.canvas.Canvas = function (p) {
     // itemRegistry, pull it from here to persist the
     // collection's selected object in the detail view
     this.selectedItemCache = {};
-    this.currSortCol = 'Triage';
-    this.currSortDir = 'Desc';
+    // Uppercase and lowercase vary confusingly, but camelCase appears to be
+    // appropriate for column names
+    this.currSortCol = 'triage';
+    this.currSortDir = 'Asc';
     this.itemsPerPage = 0;
     this.itemCount = 0;
     this.pageCount = 0;

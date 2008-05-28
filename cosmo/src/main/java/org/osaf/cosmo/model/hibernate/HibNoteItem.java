@@ -71,9 +71,6 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     @Column(name= "hasmodifications")
     private boolean hasModifications = false;
     
-    @Column(name = "originalvtodo")
-    private boolean originalVtodo = false;
-    
     public HibNoteItem() {
     }
 
@@ -126,7 +123,6 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     public void setTaskCalendar(Calendar calendar) {
         // calendar stored as ICalendarAttribute on Item
         HibICalendarAttribute.setValue(this, ATTR_ICALENDAR, calendar);
-        originalVtodo = (calendar!=null);
     }
    
     public Item copy() {

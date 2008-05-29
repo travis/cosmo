@@ -189,16 +189,18 @@ public class EventLogDaoImpl extends HibernateDaoSupport implements EventLogDao 
     
     private void updateDisplayName(HibEventLogEntry hibEntry, ItemEntry entry) {
         Item item = entry.getItem();
-        // store first 255 chars
-        hibEntry.setStrval1(StringUtils.substring(item.getDisplayName(), 0, 255));
-        
+        String displayName = item.getDisplayName();
+       
         // handle case of "missing" displayName
-        if(hibEntry.getStrval1()==null) {
+        if(displayName==null) {
             if(item instanceof NoteItem) {
                 NoteItem note = (NoteItem) item;
                 if(note.getModifies()!=null)
-                    hibEntry.setStrval1(note.getModifies().getDisplayName());
+                   displayName = note.getModifies().getDisplayName();
             }
         }
+        
+        // limit to 255 chars
+        hibEntry.setStrval1(StringUtils.substring(displayName, 0, 255));
     }
 }

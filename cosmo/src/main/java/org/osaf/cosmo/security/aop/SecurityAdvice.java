@@ -493,7 +493,7 @@ public class SecurityAdvice extends OrderedAdvice {
     public Object checkFindItems(ProceedingJoinPoint pjp,
             ItemFilter filter) throws Throwable {
         if(log.isDebugEnabled())
-            log.debug("in checkRemoveContent(content)");
+            log.debug("in checkFindItems(filter)");
         if (!enabled)
             return pjp.proceed();
         

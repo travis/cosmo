@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -188,7 +189,8 @@ public class EventLogDaoImpl extends HibernateDaoSupport implements EventLogDao 
     
     private void updateDisplayName(HibEventLogEntry hibEntry, ItemEntry entry) {
         Item item = entry.getItem();
-        hibEntry.setStrval1(item.getDisplayName());
+        // store first 255 chars
+        hibEntry.setStrval1(StringUtils.substring(item.getDisplayName(), 0, 255));
         
         // handle case of "missing" displayName
         if(hibEntry.getStrval1()==null) {

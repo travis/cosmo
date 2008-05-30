@@ -35,9 +35,6 @@
 #loginDialogInputsBox td {
     padding-bottom: 4px;
 }
-#loginDialogLoginPrompt {
-    padding-bottom: 0;
-}
 
 #loginDialogLogo {
     display: none;
@@ -45,29 +42,44 @@
     padding-bottom: 12px;
 }
 
-#loginDialogFormContainer { /* IE6 doesn't support max-width */
-    width: 330px;
-    margin-left: auto;
-    margin-right: auto;
+#loginDialogFormContainer {
     padding: 12px;
     border: 1px solid #CCCCCC;
     background: #FF6600;
-    margin-top: 10px;
+    margin-top: 5px;
+    width: 330px; /* IE6 doesn't support max-width */
 }
 
-#loginDialog > #loginDialogFormContainer {
+#loginDialogLoginPrompt {
+    display: none;
+    padding: 5px;
+    text-align: left;
+    background: #ffcc00;
+    border: 1px solid #ff6600;
+    color: black;
+    width: 344px; /* 330px + 2*(12-5)px padding, IE6 doesn't support max-width */
+}
+
+#loginDialogFormContainer, #loginDialogLoginPrompt { 
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#loginDialog > #loginDialogFormContainer{
     width: inherit;
     min-width: 210px;
     max-width: 330px;
 }
 
-#loginDialogFormContainer .labelTextHoriz {
-    color: white;
+#loginDialog > #loginDialogLoginPrompt {
+    width: inherit;
+    min-width: 224px;
+    max-width: 344px;
 }
 
-#loginDialogLoginPrompt {
-    display: block;
-    text-align: center;
+
+#loginDialogFormContainer .labelTextHoriz {
+    color: white;
 }
 
 #loginDialogInputsBox{

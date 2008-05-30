@@ -78,6 +78,7 @@ dojo.declare(
         },
         showPrompt: function (promptType, str) {
             var promptDiv = this.loginPromptContainer;
+            promptDiv.style.display = 'block';
             if (promptType.toLowerCase() == 'error') {
                 dojo.removeClass(promptDiv, 'promptText');
                 dojo.addClass(promptDiv, 'promptTextError');

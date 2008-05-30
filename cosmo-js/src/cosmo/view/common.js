@@ -64,8 +64,8 @@ cosmo.view.viewBase = new function () {
         var dateToBegin = dt ? new cosmo.datetime.Date(dt.getFullYear(),
             dt.getMonth(), dt.getDate(), 23, 59) : null;
         var filterFunc = function (id, item) {
-            if (!item) { 
-                throw new Error('item does not exist'); 
+            if (!item) {
+                throw new Error('item does not exist');
             }
             var keep = false;
             var masterUid = item.data.getUid();
@@ -110,7 +110,7 @@ cosmo.view.viewBase = new function () {
         return reg;
     };
 
-    
+
     /**
      * Handle events published on the '/app' channel -- app-wide
      * events
@@ -170,7 +170,7 @@ cosmo.view.viewBase = new function () {
             break;
         }
     };
-                                                       
+
 };
 
 cosmo.view.canvasBase = new function () {
@@ -218,11 +218,12 @@ cosmo.view.getCurrentView = function () {
 
 cosmo.view.handleUnsavedChanges = function (origSelection,
     discardFunc, cancelPreHook, savePreHook) {
-    var converter = new cosmo.ui.DetailFormConverter(
-        origSelection.data);
-    var deltaAndError;
+    // TODO: get rid of this global ref
+    var detailView = cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailView;
+
+    var delta;
     try {
-        deltaAndError = converter.createDelta();
+        delta = detailView.getDelta();
     } catch (e){
         // This will happen if there was a problem in the createDelta
         // function
@@ -232,15 +233,15 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
             // case, so just proceed with selecting the next item.
             return true;
         }
+        console.debug(e);
     }
 
     // This will be populated if there
     // was a validation error while creating
     // the delta.
-    var error = deltaAndError[1];
-    var delta = deltaAndError[0];
-    if (error || delta.hasChanges()) {
-        console.log(error || delta);
+    var errorList = detailView.validate();
+    if (!errorList.isEmpty() || delta.hasChanges()) {
+        console.log(errorList.toString() || delta);
         // Cancel button -- just hide the dialog, do nothing
         var cancel = function () {
             // Execute any pre-cancel code passed in
@@ -248,7 +249,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
                 cancelPreHook();
             }
             cosmo.app.hideDialog();
-        }
+        };
         // Throw out the changes and proceed to highlight the
         // new item
         var discard = function () {
@@ -267,7 +268,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
                     savePreHook();
                 }
                 dojo.publish('cosmo:calSaveFromForm', []);
-            }
+            };
             // Hide the dialog first, wait for return value to
             // avoid contention for the use of the dialog box
             if (cosmo.app.hideDialog()) {
@@ -300,11 +301,11 @@ cosmo.view.displayViewFromCollections = function (c) {
     }
     // Wrap in setTimeout so we don't lock up the UI
     // thread during the publish operation
-    var f = function () { 
+    var f = function () {
         dojo.publish('cosmo:calLoadCollection', [
             {opts: { loadType: 'changeCollection',
                      collection: newCollection }, data: {}
-            }]); 
+            }]);
     };
     // Make the timeout value greater than zero to
     // ensure that the 'loading' status message appears

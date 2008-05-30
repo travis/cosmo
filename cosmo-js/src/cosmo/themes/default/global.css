@@ -562,7 +562,7 @@ Link styles
     border-color: #555 #bbb #bbb #555;
     background-position: 0px -19px;
 }
-.btnElemDisabled {
+.dijitButtonDisabled .dijitButtonNode, .btnElemDisabled {
     color: #999;
     border-color: #ddd #888 #888 #ddd;
     cursor: default;

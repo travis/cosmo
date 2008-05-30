@@ -85,6 +85,7 @@ dojo.addOnLoad(function(){
             runTest: function (t){
                 dv.updateFromItem(testNote);
                 return getTimeoutDeferred(1000, function(){
+                    t.t(dv.validate().isEmpty());
                     var delta = dv.getDelta();
                     t.f(delta.hasChanges());
                     dv.titleInput.setValue("bar");

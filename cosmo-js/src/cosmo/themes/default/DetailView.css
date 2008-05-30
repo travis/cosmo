@@ -1,6 +1,6 @@
 @import url("Checkbox.css");
 #detailView{
-    width: 256px;
+    
 }
 .cosmoDetailView {
     position: absolute;
@@ -8,8 +8,8 @@
     left: 0;
     right: 0;
     bottom: 0;
+    background: white;
 }
-
 .cosmoDetailViewMarkupBar {
     height: 18px;
     border: 1px solid #999999;
@@ -45,6 +45,11 @@
     width: 229px;
 }
 
+.cosmoDetailViewNotesInput {
+    margin-top: 5px;
+    width: 229px;
+}
+
 .cosmoDetailViewEventSection {
     padding: 10px 20px 5px 7px;
 }
@@ -76,6 +81,22 @@
 
 .cosmoDetailViewLocationInput{
     display: block;
+    margin-bottom: 5px;
+}
+.cosmoDetailViewAllDaySection{
+    margin-bottom: 5px;
+}
+.cosmoDetailViewDateTimeSection{
+    margin-bottom: 5px;
+}
+.cosmoDetailViewTimezoneSection{
+    margin-bottom: 5px;
+}
+.cosmoDetailViewStatusSelector{
+    margin-bottom: 5px;
+}
+.cosmoDetailViewRecurrenceSection{
+    margin-bottom: 5px;
 }
 .cosmoDetailViewEventTitleBar{
     background: #ededed;
@@ -90,4 +111,12 @@
 .cosmoDetailViewFooter {
     background: #ededed;
     border-top: 1px solid #999999;
+}
+.cosmoDetailViewSaveButton {
+    float: left;
+    margin-left: 7px;
+}
+.cosmoDetailViewRemoveButton {
+    float: right;
+    margin-right: 7px;
 }

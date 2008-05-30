@@ -39,7 +39,6 @@ dojo.require("cosmo.view.cal.common");
 dojo.require('cosmo.view.cal.lozenge');
 dojo.require("cosmo.view.cal.conflict");
 dojo.require("cosmo.app.pim");
-dojo.require("cosmo.ui.DetailFormConverter");
 
 cosmo.view.cal.canvas = new function () {
 
@@ -332,7 +331,7 @@ cosmo.view.cal.canvas = new function () {
                 $(currDayIdPrefix + i + '30').className = 'hourDivBottom' + currDayClass;
             }
         }
-        
+
         // -----------
         // Do it!
         // -----------
@@ -356,7 +355,7 @@ cosmo.view.cal.canvas = new function () {
             dojo.connect(allDayColsNode, 'onmousedown', mouseDownHandler);
             dojo.connect(hoursNode, 'ondblclick', dblClickHandler);
             dojo.connect(allDayColsNode, 'ondblclick', dblClickHandler);
-            dojo.connect(hoursNode, 'oncontextmenu', self, '_handleContextForCanvasOnly') 
+            dojo.connect(hoursNode, 'oncontextmenu', self, '_handleContextForCanvasOnly')
             dojo.connect(allDayColsNode, 'oncontextmenu', self, '_handleContextForCanvasOnly');
             // Get a reference to the main scrolling area for timed events;
             this.timedCanvas = $('timedCanvas');

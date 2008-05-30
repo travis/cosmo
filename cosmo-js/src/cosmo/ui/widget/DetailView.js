@@ -64,21 +64,31 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     byline: null,
     removeButton: null,
     saveButton: null,
+    containerNode: null,
 
     //fields
     event: false,
+    eventSectionEnabled: false,
     item: null,
+    itemWrapper: null,
     triage: null,
     starred: null,
 
+    updateFromItemWrapper: function(itemWrapper){
+        this.itemWrapper = itemWrapper;
+        this.updateFromItem(itemWrapper.data);
+    },
+
     updateFromItem: function(item){
+        console.log("updating");
+        this.enable();
         this.titleInput.setValue(item.getDisplayName());
         this.notesInput.setValue(item.getBody());
         this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
-        this.clearEventFields();
+//        this.clearEventFields();
         if (eventStamp){
-            this.enableEvent();
+            if (!this.eventSectionEnabled) this.enableEvent();
             this.updateFromEventStamp(eventStamp);
         } else {
             this.disableEvent();
@@ -86,6 +96,35 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         if(item.getTaskStamp()) this.setStarred();
         else this.setUnstarred();
         this.item = item;
+    },
+
+    disable: function(){
+        this.titleInput.setAttribute("disabled", true);
+        this.notesInput.setAttribute("disabled", true);
+        this.saveButton.setAttribute("disabled", true);
+        this.removeButton.setAttribute("disabled", true);
+        this.disableEvent();
+    },
+
+    enable: function(){
+        this.titleInput.setAttribute("disabled", false);
+        this.notesInput.setAttribute("disabled", false);
+        this.saveButton.setAttribute("disabled", false);
+        this.removeButton.setAttribute("disabled", false);
+    },
+
+    clearSelected: function(){
+        this.item = null;
+        this.clearFields();
+        this.disable();
+    },
+
+    clearFields: function(){
+        this.clearEventFields();
+        this.clearTriage();
+        this.titleInput.setValue("");
+        this.notesInput.setValue("");
+        this.setUnstarred();
     },
 
     clearTriage: function(){
@@ -151,12 +190,13 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         var endDate = stamp.getEndDate();
         this.startDateInput.setValue(startDate);
         this.endDateInput.setValue(endDate);
-        if (stamp.getAllDay()){
-            this.startTimeInput.setAttribute("disabled", true);
-            this.endTimeInput.setAttribute("disabled", true);
-        } else {
+        this.updateAllDay(stamp.getAllDay());
+        if (!(stamp.getAnyTime() || stamp.getAllDay())){
             this.startTimeInput.setValue(startDate);
             this.endTimeInput.setValue(endDate);
+        } else {
+            this.startTimeInput.setValue(null);
+            this.endTimeInput.setValue(null);
         }
         if (startDate.tzId){
             this.updateFromTimezone(cosmo.datetime.timezone.getTimezone(startDate.tzId));
@@ -164,7 +204,6 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             this.clearTimezoneSelectors();
         }
 
-        this.updateAllDay(stamp.getAllDay());
         this.statusSelector.value = stamp.getStatus();
         this.updateFromRrule(stamp.getRrule());
     },
@@ -172,8 +211,11 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     updateAllDay: function(allDay){
         this.allDayInput.setValue(allDay);
         if (allDay){
+            this.clearTimezoneSelectors();
             this.timezoneRegionSelector.setAttribute("disabled", true);
             this.timezoneIdSelector.setAttribute("disabled", true);
+            this.startTimeInput.setValue(null);
+            this.endTimeInput.setValue(null);
             this.startTimeInput.setAttribute("disabled", true);
             this.endTimeInput.setAttribute("disabled", true);
         } else {
@@ -234,6 +276,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             var endDate = rrule.getEndDate();
             if (endDate) this.untilInput.setValue(endDate);
         } else {
+            this.untilInput.setValue(null);
             this.untilInput.setAttribute("disabled", true);
             this.recurrenceSelector.value = 'once';
         }
@@ -246,8 +289,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.startTimeInput.setValue("");
         this.endDateInput.setValue("");
         this.endTimeInput.setValue("");
-        this.timezoneRegionSelector.value = "";
-        this.timezoneIdSelector.value = "";
+        this.clearTimezoneSelectors();
         this.statusSelector.value = "";
         this.recurrenceSelector.value = "";
         this.untilInput.setValue("");
@@ -291,6 +333,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
         dojo.fx.wipeIn({node: this.eventSection}).play();
         this.enableEventFields();
+        this.eventSectionEnabled = true;
     },
 
     disableEvent: function(){
@@ -299,6 +342,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         dojo.removeClass(this.eventButton, "cosmoEventButtonSelected");
         dojo.fx.wipeOut({node: this.eventSection}).play();
         this.disableEventFields();
+        this.eventSectionEnabled = false;
     },
 
     // event handlers
@@ -384,6 +428,39 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     postCreate: function(){
         if (this.initItem) this.updateFromItem(this.initItem);
+
+        var updateItems = dojo.hitch(this, function(cmd){
+            var itemWrapper = cmd.data;
+            if (itemWrapper) {
+                var item = itemWrapper.data;
+                // Only update the values in the form if
+                // the item has actually changed -- note that
+                // in the cal, when navigating off the week
+                // where the selected item is displayed, the
+               // selected item will in the selectedItemCache
+                if (item != this.item) {
+                    this.updateFromItemWrapper(itemWrapper);
+                    // For brand-new items auto-focus the Title field
+                    // to allow people to change the placeholder
+                    // 'New Event' text quickly
+                    if (cmd.saveType == 'new') {
+                        this.titleInput.focus();
+                    }
+                }
+            }
+        });
+        dojo.subscribe('cosmo:calEventsDisplaySuccess', updateItems);
+        dojo.subscribe('cosmo:calNoItems', updateItems);
+        dojo.subscribe('cosmo:calSetSelected', updateItems);
+        dojo.subscribe('cosmo:calClearSelected', updateItems);
+        dojo.subscribe('cosmo:calSaveSuccess', dojo.hitch(this, function(cmd){
+            if (cmd.saveType != 'new') {
+                this.updateFromItemWrapper(cmd.data);
+            }
+        }));
+        dojo.subscribe('cosmo:calSaveFromForm', dojo.hitch(this, function(){
+            this.saveItem();
+        }));
     },
 
     // getters
@@ -451,7 +528,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             if (endDateFieldValue){
                 endDate = new cosmo.datetime.Date(endDateFieldValue.getFullYear(),
                 endDateFieldValue.getMonth(), endDateFieldValue.getDate());
-                var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
+                var tzIdFieldValue = this.timezoneIdSelector.value;
                 if (tzIdFieldValue){
                     endDate.tzId = tzIdFieldValue;
                 }
@@ -473,15 +550,52 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     // validation
 
     validate: function(dv){
-        var e = [];
-        if (dv.getTzRegion() && !dv.getTzId())
-            e.push(new cosmo.ui.Error(null, "App.Error.NoTzId"));
-        if (!dv.startTimeInput.getValue() && dv.endTimeInput())
-            e.push(new cosmo.ui.Error(null,"App.Error.NoEndTimeWithoutStartTime"));
-        if (!dv.startDateInput.getValue()) e.push(new cosmo.ui.Error(null, null, this.l10n.startDateRequired));
-        if (!dv.endDateInput.getValue()) e.push(new cosmo.ui.Error(null, null, this.l10n.endDateRequired));
+        var e = new cosmo.ui.ErrorList();
+        if (this.isEvent()){
+            if (this.timezoneRegionSelector.value && !this.timezoneIdSelector.value)
+                e.addError(new cosmo.ui.Error(null, "App.Error.NoTzId"));
+            if (!this.startTimeInput.getValue() && this.endTimeInput.getValue())
+                e.addError(new cosmo.ui.Error(null,"App.Error.NoEndTimeWithoutStartTime"));
+            if (!this.startDateInput.getValue()) e.addError(new cosmo.ui.Error(null, null, this.l10n.startDateRequired));
+            if (!this.endDateInput.getValue()) e.addError(new cosmo.ui.Error(null, null, this.l10n.endDateRequired));
+        }
         return e;
+    },
+
+    // CRUD
+    saveItem: function(){
+        var error = this.validate().toString();
+        var delta = this.getDelta();
+        if (error){
+            cosmo.app.showErr(_('Main.DetailForm.Error'), error);
+            return;
+        } else {
+            if (!delta.hasChanges()){
+                return;
+            }
+
+            this.itemWrapper.makeSnapshot();
+            dojo.publish('cosmo:calSaveConfirm', [{delta: delta, data: this.itemWrapper }]);
+        }
+    },
+
+    removeItem: function(){
+        dojo.publish('cosmo:calRemoveConfirm', [{data: this.itemWrapper }]);
+    },
+
+    // legacy
+    //TODO: deprecate
+
+    render: function(){
+        if (this.item)
+            this.updateFromItem(this.item);
+        else {
+            this.clearFields();
+            this.disable();
+        }
     }
+
+
 });
 
 

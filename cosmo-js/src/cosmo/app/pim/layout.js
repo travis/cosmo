@@ -40,7 +40,7 @@ dojo.require("cosmo.ui.widget.CollectionSubscriber");
 dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.navbar");
-dojo.require("cosmo.ui.detail");
+dojo.require("cosmo.ui.widget.DetailView");
 dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.ui.widget.CollectionSelector");
 
@@ -391,13 +391,11 @@ cosmo.app.pim.layout.populateBaseLayout = function () {
     cB.render();
 
     // Detail-view form
-    var detailDiv = _createElem('div');
-    detailDiv.id = 'detailViewForm';
-    var cB = new  cosmo.ui.detail.DetailViewForm({ domNode: detailDiv,
-        id: detailDiv.id, top: 0 });
-    rightSidebar.addChild(cB);
-    rightSidebar.detailViewForm = cB;
+    var dv = new  cosmo.ui.widget.DetailView({
+        id: 'detailView'});
+    rightSidebar.addChild(dv);
     // Not dependent on data loading -- just render
+    rightSidebar.detailView = dv;
     rightSidebar.render();
 
 };

@@ -29,14 +29,14 @@ dojo.declare("cosmo.ui.Error", null, {
         this.property = property;
         this.errorKey = errorKey;
         this.errorMessage = errorMessage;
-        this.params = params;
+        this.params = params || [];
     },
 
     //summary: this exists so that we can use the error objects as keys
     //         in a hash
     toString: function(){
         var s = this.property + ";" + this.errorKey + ";"+this.errorMessage+";";
-        dojo.map(params, function(param){s += param + ";"; });
+        dojo.map(this.params, function(param){s += param + ";"; });
         return s;
     }
 });
@@ -97,4 +97,4 @@ dojo.declare("cosmo.ui.ErrorList", null, {
     }
 
 
-})
+});

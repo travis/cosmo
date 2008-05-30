@@ -69,10 +69,16 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     //fields
     event: false,
     eventSectionEnabled: false,
+    eventSectionHidden: false,
     item: null,
     itemWrapper: null,
     triage: null,
     starred: null,
+    eventButtonDisabled: true,
+    starButtonDisabled: true,
+    mailButtonDisabled: true,
+    triageButtonsDisabled: true,
+    readOnly: false,
 
     updateFromItemWrapper: function(itemWrapper){
         this.itemWrapper = itemWrapper;
@@ -94,6 +100,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         if(item.getTaskStamp()) this.setStarred();
         else this.setUnstarred();
         this.item = item;
+        if (!cosmo.app.pim.getSelectedCollectionWriteable()) this.setReadOnly();
     },
 
     disable: function(){
@@ -101,7 +108,11 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.notesInput.setAttribute("disabled", true);
         this.saveButton.setAttribute("disabled", true);
         this.removeButton.setAttribute("disabled", true);
-        this.disableEvent();
+        this.eventButtonDisabled = true;
+        this.starButtonDisabled = true;
+        this.mailButtonDisabled = true;
+        this.triageButtonsDisabled = true;
+        this.disableEventFields();
     },
 
     enable: function(){
@@ -109,12 +120,17 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.notesInput.setAttribute("disabled", false);
         this.saveButton.setAttribute("disabled", false);
         this.removeButton.setAttribute("disabled", false);
+        this.eventButtonDisabled = false;
+        this.starButtonDisabled = false;
+        this.mailButtonDisabled = false;
+        this.triageButtonsDisabled = false;
     },
 
     clearSelected: function(){
         this.item = null;
         this.clearFields();
         this.disable();
+        this.hideEvent();
     },
 
     clearFields: function(){
@@ -331,6 +347,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         dojo.fx.wipeIn({node: this.eventSection}).play();
         this.enableEventFields();
         this.eventSectionEnabled = true;
+
     },
 
     disableEvent: function(){
@@ -340,6 +357,22 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         dojo.fx.wipeOut({node: this.eventSection}).play();
         this.disableEventFields();
         this.eventSectionEnabled = false;
+    },
+
+    setReadOnly: function(){
+        this.readOnly = true;
+        dojo.addClass(this.domNode, "cosmoDetailViewReadOnly");
+        this.disable();
+    },
+
+    setReadWrite: function(){
+        this.readOnly = false;
+        dojo.removeClass(this.domNode, "cosmoDetailViewReadOnly");
+        this.enable();
+    },
+
+    toggleReadOnly: function(){
+        this.readOnly? this.setReadWrite() : this.setReadOnly();
     },
 
     // event handlers
@@ -359,16 +392,40 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     },
 
     eventButtonOnClick: function(){
-        this.toggleEvent();
+        if (!this.eventButtonDisabled)
+            this.toggleEvent();
+    },
+
+    triageNowOnClick: function(){
+        if (!this.triageButtonsDisabled)
+            this.setTriageNow();
+    },
+
+    triageLaterOnClick: function(){
+        if (!this.triageButtonsDisabled)
+            this.setTriageLater();
+    },
+
+    triageDoneOnClick: function(){
+        if (!this.triageButtonsDisabled)
+            this.setTriageDone();
+    },
+
+    starButtonOnClick: function(){
+        if (!this.starButtonDisabled)
+            this.toggleStarred();
     },
 
     mailMouseDown: function(){
-        dojo.addClass(this.mailButton, "cosmoEmailButtonSelected");
-        this.itemToEmail(this.item);
+        if (!this.mailButtonDisabled){
+            dojo.addClass(this.mailButton, "cosmoEmailButtonSelected");
+            this.itemToEmail(this.item);
+        }
     },
 
     mailMouseUp: function(){
-        dojo.removeClass(this.mailButton, "cosmoEmailButtonSelected");
+        if (!this.mailButtonDisabled)
+            dojo.removeClass(this.mailButton, "cosmoEmailButtonSelected");
     },
 
     itemToEmail: function(item){
@@ -425,6 +482,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     postCreate: function(){
         if (this.initItem) this.updateFromItem(this.initItem);
+        if (this.readOnly) this.setReadOnly();
 
         var updateItems = dojo.hitch(this, function(cmd){
             var itemWrapper = cmd.data;
@@ -584,11 +642,12 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     //TODO: deprecate
 
     render: function(){
-        if (this.item)
+        if (this.item){
             this.updateFromItem(this.item);
-        else {
+        } else {
             this.clearFields();
             this.disable();
+            this.hideEvent();
         }
     }
 

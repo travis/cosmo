@@ -2,15 +2,16 @@
   <div class="cosmoDetailViewContainer" dojoAttachPoint="containerNode">
     <div class="cosmoDetailViewMarkupBar">
       <div id="${id}TriageButtons" dojoAttachPoint="triageButtons" class="cosmoDetailViewTriageButtons">
-        <span id="${id}NowButton" dojoAttachPoint="nowButton" dojoAttachEvent="onclick: setTriageNow"
+        <span id="${id}NowButton" dojoAttachPoint="nowButton" dojoAttachEvent="onclick: triageNowOnClick"
               class="cosmoDetailViewTriageButton cosmoDetailViewTriageNowButton cosmoTriageNowButtonDefault"></span>
-        <span id="${id}LaterButton" dojoAttachPoint="laterButton" dojoAttachEvent="onclick: setTriageLater"
+        <span id="${id}LaterButton" dojoAttachPoint="laterButton" dojoAttachEvent="onclick: triageLaterOnClick"
               class="cosmoDetailViewTriageButton cosmoDetailViewTriageLaterButton cosmoTriageLaterButtonDefault"></span>
-        <span id="${id}DoneButton" dojoAttachPoint="doneButton"  dojoAttachEvent="onclick: setTriageDone"
+        <span id="${id}DoneButton" dojoAttachPoint="doneButton"  dojoAttachEvent="onclick: triageDoneOnClick"
               class="cosmoDetailViewTriageButton cosmoDetailViewTriageDoneButton cosmoTriageDoneButtonDefault"></span>
       </div>
-      <span id="${id}StarButton" dojoAttachPoint="starButton"  dojoAttachEvent="onclick: toggleStarred"
+      <span id="${id}StarButton" dojoAttachPoint="starButton"  dojoAttachEvent="onclick: starButtonOnClick"
             class="cosmoDetailViewStarButton cosmoTaskButtonDefault"></span>
+      <span id="${id}ReadOnlyIcon" class="cosmoDetailViewReadOnlyIcon cosmoReadOnlyIcon"></span>
       <span id="${id}MailButton" dojoAttachPoint="mailButton" class="cosmoDetailViewMailButton cosmoEmailButtonDefault"
             dojoAttachEvent="onmousedown: mailMouseDown, onmouseup: mailMouseUp"></span>
     </div>

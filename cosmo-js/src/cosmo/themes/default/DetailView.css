@@ -120,3 +120,18 @@
     float: right;
     margin-right: 7px;
 }
+.cosmoDetailViewReadOnlyIcon{
+    position: absolute;
+    right: 48px;
+    margin: 3px;
+    display: none;
+}
+.cosmoDetailViewReadOnly .cosmoDetailViewReadOnlyIcon{
+    display: inline;
+}
+.cosmoDetailViewReadOnly .cosmoDetailViewSaveButton {
+    display: none;
+}
+.cosmoDetailViewReadOnly .cosmoDetailViewRemoveButton {
+    display: none;
+}

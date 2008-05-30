@@ -14,7 +14,7 @@
       <textarea id="${id}NotesInput" dojoAttachPoint="notesInput" dojoType="dijit.form.Textarea" class="cosmoDetailViewNotesInput"></textarea>
     </div>
     <div class="cosmoDetailViewEventTitleBar">
-      <span id="${id}Title" dojoAttachPoint="titleSpan" class="cosmoDetailViewEventTitle"></span>
+      <span id="${id}Title" dojoAttachPoint="titleSpan" class="cosmoDetailViewEventTitle">${l10n.eventTitle}</span>
       <span id="${id}EventButton" dojoAttachPoint="eventButton" class="cosmoDetailViewEventButton"></span>
     </div>
     <div class="cosmoDetailViewEventSection">
@@ -30,7 +30,17 @@
         <input id="${id}EndTimeInput" dojoAttachPoint="endTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewEndTimeInput"></input>
       </div>
       <div class="cosmoDetailViewTimezoneSection">
-        <select id="${id}TimezoneRegionSelector" dojoAttachPoint="timezoneRegionSelector" class="cosmoDetailViewTimezoneRegionSelector"></select>
+        <select id="${id}TimezoneRegionSelector" dojoAttachPoint="timezoneRegionSelector" class="cosmoDetailViewTimezoneRegionSelector">
+          <option value="Africa">${l10n.africa}</option>
+          <option value="America">${l10n.america}</option>
+          <option value="Asia">${l10n.asia}</option>
+          <option value="Antarctica">${l10n.antarctica}</option>
+          <option value="Atlantic">${l10n.atlantic}</option>
+          <option value="Australia">${l10n.australia}</option>
+          <option value="Europe">${l10n.europe}</option>
+          <option value="Indian">${l10n.indian}</option>
+          <option value="Pacific">${l10n.pacific}</option>
+        </select>
         <select id="${id}TimezoneCitySelector" dojoAttachPoint="timezoneCitySelector" class="cosmoDetailViewTimezoneCitySelector"></select>
       </div>
       <select id="${id}StatusSelector" dojoAttachPoint="statusSelector" class="cosmoDetailViewStatusSelector">

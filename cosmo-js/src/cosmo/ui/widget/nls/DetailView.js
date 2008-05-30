@@ -14,6 +14,7 @@
  * limitations under the License.
 */
 ({
+    eventTitle: "ADD TO CALENDAR",
     at: "at",
     custom: "Custom",
     once: "Once",
@@ -27,5 +28,14 @@
     until: "until",
     confirmed: "Confirmed",
     tentative: "Tentative",
-    fyi: "FYI"
+    fyi: "FYI",
+    africa: "Africa",
+    america: "America",
+    asia: "Asia",
+    antarctica: "Antarctica",
+    atlantic: "Atlantic",
+    australia: "Australia",
+    europe: "Europe",
+    indian: "Indian",
+    pacific: "Pacific"
 })

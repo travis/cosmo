@@ -21,6 +21,7 @@ dojo.require("dijit.form.DateTextBox");
 dojo.require("dijit.form.TimeTextBox");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.Button");
+dojo.require("cosmo.model.Item");
 
 dojo.requireLocalization("cosmo.ui.widget", "DetailView");
 
@@ -58,30 +59,115 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     //fields
     hasEvent: false,
+    item: null,
 
     updateFromItem: function(item){
         this.titleInput.setValue(item.getDisplayName());
         this.notesInput.setValue(item.getBody());
+        this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
         if (eventStamp){
             this.hasEvent = true;
             this.updateFromEventStamp(eventStamp);
         } else {
             this.hasEvent = false;
+            this.clearEventFields();
             this.disableEventFields();
         }
+        if(item.getTaskStamp()) this.setStarred();
+        else this.setUnstarred();
+        this.item = item;
     },
+
+    clearTriage: function(){
+        dojo.removeClass(this.nowButton, "cosmoTriageNowButtonSelected");
+        dojo.removeClass(this.laterButton, "cosmoTriageLaterButtonSelected");
+        dojo.removeClass(this.doneButton, "cosmoTriageDoneButtonSelected");
+    },
+
+    setTriageNow: function(){
+        this.clearTriage();
+        dojo.addClass(this.nowButton, "cosmoTriageNowButtonSelected");
+    },
+
+    setTriageLater: function(){
+        this.clearTriage();
+        dojo.addClass(this.laterButton, "cosmoTriageLaterButtonSelected");
+    },
+
+    setTriageDone: function(){
+        this.clearTriage();
+        dojo.addClass(this.doneButton, "cosmoTriageDoneButtonSelected");
+    },
+
+    setTriageStatus: function(status){
+        switch(status){
+            case cosmo.model.TRIAGE_NOW:
+                this.setTriageNow();
+                break;
+            case cosmo.model.TRIAGE_LATER:
+                this.setTriageLater();
+                break;
+            case cosmo.model.TRIAGE_DONE:
+                this.setTriageDone();
+                break;
+            default:
+                throw new Error("Triage must be now later or done.");
+        }
+    },
+
+    setStarred: function(){
+        dojo.addClass(this.starButton, "cosmoTaskButtonSelected");
+    },
+
+    setUnstarred: function(){
+        dojo.removeClass(this.starButton, "cosmoTaskButtonSelected");
+    },
+
+    /* Event Stamp functions */
 
     updateFromEventStamp: function(stamp){
         this.locationInput.setValue(stamp.getLocation());
         this.allDayInput.setValue(stamp.getAllDay());
         var startDate = stamp.getStartDate();
-        this.startDateInput.setValue(startDate);
-        this.startTimeInput.setValue(startDate);
         var endDate = stamp.getEndDate();
+        this.startDateInput.setValue(startDate);
         this.endDateInput.setValue(endDate);
-        this.endTimeInput.setValue(endDate);
+        if (stamp.getAllDay()){
+            this.startTimeInput.setAttribute("disabled", true);
+            this.endTimeInput.setAttribute("disabled", true);
+        } else {
+            this.startTimeInput.setValue(startDate);
+            this.endTimeInput.setValue(endDate);
+        }
         this.statusSelector.value = stamp.getStatus();
+        this.setRecurrence(stamp.getRrule());
+    },
+
+    setRecurrence: function(rrule){
+        if (rrule){
+            if (rrule.isSupported()){
+                this.recurrenceSelector.value = rrule.getFrequency();
+            } else {
+                this.recurrenceSelector.value = 'custom';
+            }
+            var endDate = rrule.getEndDate();
+            if (endDate) this.untilInput.setValue(endDate);
+        } else this.recurrenceSelector.value = 'once';
+    },
+
+    clearEventFields: function(){
+        this.locationInput.setValue("");
+        this.allDayInput.setValue("");
+        this.startDateInput.setValue("");
+        this.startTimeInput.setValue("");
+        this.endDateInput.setValue("");
+        this.endTimeInput.setValue("");
+        this.timezoneRegionSelector.value = "";
+        this.timezoneCitySelector.value = "";
+        this.statusSelector.value = "";
+        this.recurrenceSelector.value = "";
+        this.untilInput.setValue("");
     },
 
     disableEventFields: function(){
@@ -91,10 +177,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.startTimeInput.setAttribute("disabled", true);
         this.endDateInput.setAttribute("disabled", true);
         this.endTimeInput.setAttribute("disabled", true);
-        this.timezoneRegionSelector.disabled = true;
-        this.timezoneCitySelector.disabled = true;
-        this.statusSelector.disabled = true;
-        this.recurrenceSelector.disabled = true;
+        this.timezoneRegionSelector.setAttribute("disabled", true);
+        this.timezoneCitySelector.setAttribute("disabled", true);
+        this.statusSelector.setAttribute("disabled", true);
+        this.recurrenceSelector.setAttribute("disabled", true);
         this.untilInput.setAttribute("disabled", true);
     },
 

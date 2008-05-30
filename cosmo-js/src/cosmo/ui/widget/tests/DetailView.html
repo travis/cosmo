@@ -12,25 +12,52 @@
         @import "../../../../cosmo/themes/default/imagegrid.css";
     </style>
 	<script type="text/javascript">
-        dojo.require("cosmo.ui.widget.DetailView");
-        dojo.require("cosmo.model.Item");
-        dojo.require("cosmo.model.EventStamp");
-        dojo.require("cosmo.model.common");
-        dojo.require("cosmo.datetime.Date");
-        initItem = new cosmo.model.Note({displayName: "foo", body: "barbazbuck"});
-        initEvent = new cosmo.model.Note({displayName: "an event", body: "event notes"});
-        initEvent.getEventStamp(
-            true, 
-            {startDate: new cosmo.datetime.Date(),
-             duration: new cosmo.model.Duration({hour: 1}),
-             location: "wherever",
-             status: "TENTATIVE"
-             
-            });
+
+dojo.require("cosmo.ui.widget.DetailView");
+dojo.require("cosmo.model.Item");
+dojo.require("cosmo.model.EventStamp");
+dojo.require("cosmo.model.common");
+dojo.require("cosmo.datetime.Date");
+testItem = new cosmo.model.Note({displayName: "foo", body: "barbazbuck", triageStatus: cosmo.model.TRIAGE_LATER});
+testEvent = new cosmo.model.Note({displayName: "an event", body: "event notes", triageStatus: cosmo.model.TRIAGE_LATER});
+testEvent.getEventStamp(
+    true, 
+    {startDate: new cosmo.datetime.Date(),
+     duration: new cosmo.model.Duration({hour: 1}),
+     location: "wherever",
+     status: "TENTATIVE"
+     
+    });
+
+testTask = new cosmo.model.Note({displayName: "a task", body: "task notes", triageStatus: cosmo.model.TRIAGE_DONE});
+testTask.getTaskStamp(true);
+
+testAllDayEvent = testEvent.clone();
+testAllDayEvent.getEventStamp().setStartDate(new cosmo.datetime.Date(2008, 5, 1));
+testAllDayEvent.getEventStamp().setDuration(null);
+testAllDayEvent.getEventStamp().setAllDay(true);
+
+testAnyTimeEvent = testAllDayEvent.clone();
+testAnyTimeEvent.getEventStamp().setAnyTime(true);
+
+testDailyEvent = testEvent.clone();
+testDailyEvent.getEventStamp().setRrule(
+    new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY}
+                                  ));
+
+testDailyEndDateEvent = testEvent.clone();
+endDate = new cosmo.datetime.Date();
+endDate.addDuration(new cosmo.model.Duration({year: 1}));
+testDailyEndDateEvent.getEventStamp().setRrule(
+    new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY,
+                                    endDate: endDate
+                                   }
+                                  ));
+
     </script>
 </head>
 <body class="cosmo">
-	<div id="detailView" dojoType="cosmo.ui.widget.DetailView" initItem="initEvent">
+	<div id="detailView" dojoType="cosmo.ui.widget.DetailView" initItem="testAllDayEvent">
 	</div>
 </body>
 </html>

@@ -4,9 +4,11 @@ if [ ! -d dojo-src ]; then
     svn co http://svn.dojotoolkit.org/src/tags/$DOJO_VERSION dojo-src
 fi
 
+cssBuild=""
 case "$1" in
     "release")
         profile=cosmo
+        cssBuild="cssOptimize=comments"
          ;;
     "widgets")
         profile=cosmo-widgets
@@ -18,7 +20,7 @@ esac
 
 ##### build dojo files #####
 cd dojo-src/util/buildscripts
-./build.sh profile=../../../../$profile action=clean,release
+./build.sh profile=../../../../$profile action=clean,release $cssBuild
 
 cd ../../../
 

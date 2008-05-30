@@ -31,5 +31,6 @@ dependencies.layers = [
 dependencies.prefixes = [
     ["dijit", "../dijit" ],
     ["dojox", "../dojox" ],
-    ["cosmo", "../../src/cosmo"]
+    ["cosmo", "../../src/cosmo"],
+    ["css", "../../src/cosmo/themes/default"]
 ];

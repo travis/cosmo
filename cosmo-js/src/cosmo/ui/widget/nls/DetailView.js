@@ -15,6 +15,7 @@
 */
 ({
     eventTitle: "ADD TO CALENDAR",
+    allDay: "All day",
     at: "at",
     custom: "Custom",
     once: "Once",
@@ -37,5 +38,7 @@
     australia: "Australia",
     europe: "Europe",
     indian: "Indian",
-    pacific: "Pacific"
+    pacific: "Pacific",
+    noTzRegion: "None",
+    noTzCity: "None"
 })

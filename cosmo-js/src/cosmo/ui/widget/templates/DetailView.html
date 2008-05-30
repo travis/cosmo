@@ -19,8 +19,8 @@
     </div>
     <div class="cosmoDetailViewEventSection">
       <input id="${id}LocationInput" dojoAttachPoint="locationInput" dojoType="dijit.form.TextBox" type="text" class="cosmoDetailViewLocationInput"></input>
-      <input id="${id}AllDayInput" dojoAttachPoint="allDayInput" dojotype="dijit.form.CheckBox"
-           name="allDay" type="checkbox" /></input>
+      <div class="cosmoDetailViewAllDaySection"><input id="${id}AllDayInput" dojoAttachPoint="allDayInput" dojotype="dijit.form.CheckBox"
+           name="allDay" type="checkbox" dojoAttachEvent="onChange: allDayOnChange"></input> ${l10n.allDay}</div>
       <div class="cosmoDetailViewStartSection">
         <input id="${id}StartDateInput" selector="date" dojoAttachPoint="startDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewStartDateInput"></input> ${l10n.at}
         <input id="${id}StartTimeInput" selector="time" dojoAttachPoint="startTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewStartTimeInput"></input>
@@ -30,7 +30,9 @@
         <input id="${id}EndTimeInput" dojoAttachPoint="endTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewEndTimeInput"></input>
       </div>
       <div class="cosmoDetailViewTimezoneSection">
-        <select id="${id}TimezoneRegionSelector" dojoAttachPoint="timezoneRegionSelector" class="cosmoDetailViewTimezoneRegionSelector">
+        <select id="${id}TimezoneRegionSelector" dojoAttachPoint="timezoneRegionSelector" class="cosmoDetailViewTimezoneRegionSelector"
+                dojoAttachEvent="onchange: tzRegionOnChange">
+          <option value="">${l10n.noTzRegion}</option>
           <option value="Africa">${l10n.africa}</option>
           <option value="America">${l10n.america}</option>
           <option value="Asia">${l10n.asia}</option>
@@ -49,14 +51,15 @@
         <option value="FYI">${l10n.fyi}</option>
       </select>
       <div class="cosmoDetailViewRecurrenceSection">
-        <select id="${id}RecurrenceSelector" dojoAttachPoint="recurrenceSelector" class="cosmoDetailViewRecurrenceSelector">
-          <option value="custom">${l10n.custom}</option>
+        <select id="${id}RecurrenceSelector" dojoAttachPoint="recurrenceSelector" class="cosmoDetailViewRecurrenceSelector"
+                dojoAttachEvent="onchange: rruleOnChange">
           <option value="once">${l10n.once}</option>
           <option value="daily">${l10n.daily}</option>
           <option value="weekly">${l10n.weekly}</option>
           <option value="biweekly">${l10n.biweekly}</option>
           <option value="monthly">${l10n.monthly}</option>
           <option value="yearly">${l10n.yearly}</option>
+          <option value="custom">${l10n.custom}</option>
         </select> ${l10n.until}
         <input id="${id}UntilInput" dojoAttachPoint="untilInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewUntilInput"></input>
       </div>

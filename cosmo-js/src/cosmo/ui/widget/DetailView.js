@@ -22,6 +22,8 @@ dojo.require("dijit.form.TimeTextBox");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.Button");
 dojo.require("cosmo.model.Item");
+dojo.require("cosmo.datetime.timezone");
+dojo.require("cosmo.util.html");
 
 dojo.requireLocalization("cosmo.ui.widget", "DetailView");
 
@@ -128,7 +130,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     updateFromEventStamp: function(stamp){
         this.locationInput.setValue(stamp.getLocation());
-        this.allDayInput.setValue(stamp.getAllDay());
+
         var startDate = stamp.getStartDate();
         var endDate = stamp.getEndDate();
         this.startDateInput.setValue(startDate);
@@ -140,20 +142,85 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             this.startTimeInput.setValue(startDate);
             this.endTimeInput.setValue(endDate);
         }
+        if (startDate.tzId){
+            this.updateFromTimezone(cosmo.datetime.timezone.getTimezone(startDate.tzId));
+        } else {
+            this.clearTimezoneSelectors();
+        }
+
+        this.updateAllDay(stamp.getAllDay());
         this.statusSelector.value = stamp.getStatus();
-        this.setRecurrence(stamp.getRrule());
+        this.updateFromRrule(stamp.getRrule());
     },
 
-    setRecurrence: function(rrule){
+    updateAllDay: function(allDay){
+        this.allDayInput.setValue(allDay);
+        if (allDay){
+            this.timezoneRegionSelector.setAttribute("disabled", true);
+            this.timezoneCitySelector.setAttribute("disabled", true);
+            this.startTimeInput.setAttribute("disabled", true);
+            this.endTimeInput.setAttribute("disabled", true);
+        } else {
+            this.timezoneRegionSelector.disabled = false;
+            this.startTimeInput.setAttribute("disabled", false);
+            this.endTimeInput.setAttribute("disabled", false);
+        }
+    },
+
+    updateFromTimezone: function(tz){
+        if (tz){
+            var tzId = tz.tzId;
+            var region = tzId.split("/")[0];
+            this.updateFromTimezoneRegion(region);
+            cosmo.util.html.setSelect(this.timezoneCitySelector, tzId);
+        } else {
+            this.clearTimezoneSelectors();
+        }
+    },
+
+    updateFromTimezoneRegion: function(region){
+        if (region){
+            cosmo.util.html.setSelect(this.timezoneRegionSelector, region);
+            cosmo.util.html.setSelectOptions(this.timezoneCitySelector, this.getTimezoneIdOptions(region));
+            this.timezoneCitySelector.disabled = false;
+        } else {
+            this.clearTimezoneSelectors();
+        }
+    },
+
+    clearTimezoneSelectors: function(){
+        this.timezoneRegionSelector.value = "";
+        this.timezoneCitySelector.value = "";
+        this.timezoneCitySelector.setAttribute("disabled", true);
+    },
+
+    getTimezoneIdOptions: function(region){
+        return [{text: this.l10n.noTzCity,
+                 value: "" }
+               ].concat(dojo.map(cosmo.datetime.timezone.getTzIdsForRegion(region),
+                   function(id){
+                       return {
+                           text: id.substr(
+                               id.indexOf("/") + 1).replace(/_/g," "),
+                               value: id
+                       };
+                   }));
+    },
+
+    updateFromRrule: function(rrule){
         if (rrule){
             if (rrule.isSupported()){
                 this.recurrenceSelector.value = rrule.getFrequency();
             } else {
                 this.recurrenceSelector.value = 'custom';
             }
+            this.untilInput.setAttribute("disabled", false);
             var endDate = rrule.getEndDate();
             if (endDate) this.untilInput.setValue(endDate);
-        } else this.recurrenceSelector.value = 'once';
+        } else {
+            this.untilInput.setAttribute("disabled", true);
+            this.recurrenceSelector.value = 'once';
+        }
     },
 
     clearEventFields: function(){
@@ -184,13 +251,30 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.untilInput.setAttribute("disabled", true);
     },
 
+    // event handlers
+    tzRegionOnChange: function(e){
+        this.updateFromTimezoneRegion(e.target.value);
+    },
+
+    rruleOnChange: function(e){
+        var frequency = e.target.value;
+        if (frequency == "once") this.updateFromRecurrenceRule(null);
+        else if (frequency == "custom") {/*TODO??*/}
+        else this.updateFromRrule(new cosmo.model.RecurrenceRule({frequency: frequency}));
+
+    },
+
+    allDayOnChange: function(value){
+        this.updateAllDay(value);
+    },
+
+    // lifecycle functions
     constructor: function(){
         this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "DetailView");
 
     },
 
     postCreate: function(){
-        // set up timezone selector
         if (this.initItem) this.updateFromItem(this.initItem);
     }
 });

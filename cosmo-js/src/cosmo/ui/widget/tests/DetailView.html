@@ -3,7 +3,7 @@
 <html>
 <head>
 	<title>Detail View</title>
-	<script type="text/javascript" src="../../../../dojo/dojo.js" djConfig="isDebug: true, parseOnLoad: true, serverBaseUrl: '../../'"></script>
+	<script type="text/javascript" src="../../../../dojo/dojo.js" djConfig="isDebug: true, parseOnLoad: true, serverBaseUrl: '../../../../'"></script>
 	<script type="text/javascript" src="../../../cosmo.js"></script>
     <style type="text/css">
         @import "../../../../dijit/themes/dijit.css";
@@ -18,6 +18,11 @@ dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
 dojo.require("cosmo.model.common");
 dojo.require("cosmo.datetime.Date");
+
+dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
+registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("../../../../olson-tzdata");
+cosmo.datetime.timezone.setTimezoneRegistry(registry);
+
 testItem = new cosmo.model.Note({displayName: "foo", body: "barbazbuck", triageStatus: cosmo.model.TRIAGE_LATER});
 testEvent = new cosmo.model.Note({displayName: "an event", body: "event notes", triageStatus: cosmo.model.TRIAGE_LATER});
 testEvent.getEventStamp(
@@ -31,6 +36,9 @@ testEvent.getEventStamp(
 
 testTask = new cosmo.model.Note({displayName: "a task", body: "task notes", triageStatus: cosmo.model.TRIAGE_DONE});
 testTask.getTaskStamp(true);
+
+testLAEvent = testEvent.clone();
+testLAEvent.getEventStamp().setStartDate(new cosmo.datetime.Date(2008, 5, 1, 12, 0, 0, 0, "America/Los_Angeles"));
 
 testAllDayEvent = testEvent.clone();
 testAllDayEvent.getEventStamp().setStartDate(new cosmo.datetime.Date(2008, 5, 1));

@@ -1,3 +1,4 @@
+@import url("Checkbox.css");
 #detailView{
     width: 256px;
 }
@@ -65,4 +66,8 @@
 }
 .cosmoDetailViewUntilInput{
     width: 115px;
+}
+
+.cosmoDetailViewLocationInput{
+    display: block;
 }

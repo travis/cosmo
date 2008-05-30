@@ -1,0 +1,48 @@
+/* copied from tundra css */
+.cosmo .dijitToggleButton .dijitCheckBoxIcon {
+	background-image: url('images/checkmarkNoBorder.gif');
+}
+
+.cosmo .dijitCheckBox,
+.cosmo .dijitCheckBoxIcon		/* inside a toggle button */	{
+	background-image: url('images/checkmark.gif'); /* checkbox sprite image */
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+}
+
+.cosmo .dijitCheckBox,
+.cosmo .dijitToggleButton .dijitCheckBoxIcon {
+	/* unchecked */
+	background-position: -16px;
+}
+
+.cosmo .dijitCheckBoxChecked,
+.cosmo .dijitToggleButtonChecked .dijitCheckBoxIcon {
+	/* checked */
+	background-position: 0px;
+}
+
+.cosmo .dijitCheckBoxDisabled {
+	/* disabled */
+	background-position: -48px;
+}
+
+.cosmo .dijitCheckBoxCheckedDisabled {
+	/* disabled but checked */
+	background-position: -32px;
+}
+
+.cosmo .dijitCheckBoxHover,
+.cosmo .dijitCheckBoxFocused {
+	/* hovering over an unchecked enabled checkbox */
+	background-position: -80px;
+}
+
+.cosmo .dijitCheckBoxCheckedHover,
+.cosmo .dijitCheckBoxCheckedFocused {
+	/* hovering over a checked enabled checkbox */
+	background-position: -64px;
+}

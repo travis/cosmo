@@ -69,7 +69,6 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     //fields
     event: false,
     eventSectionEnabled: false,
-    eventSectionHidden: false,
     item: null,
     itemWrapper: null,
     triage: null,
@@ -343,20 +342,28 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     enableEvent: function(){
         this.event = true;
         this.eventTitleSpan.innerHTML = this.l10n.removeFromCalendar;
-        dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
-        dojo.fx.wipeIn({node: this.eventSection}).play();
+        if (!dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.showEvent();
         this.enableEventFields();
         this.eventSectionEnabled = true;
 
     },
 
+    showEvent: function(){
+            dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
+            dojo.fx.wipeIn({node: this.eventSection}).play();
+    },
+
     disableEvent: function(){
         this.event = false;
         this.eventTitleSpan.innerHTML = this.l10n.addToCalendar;
-        dojo.removeClass(this.eventButton, "cosmoEventButtonSelected");
-        dojo.fx.wipeOut({node: this.eventSection}).play();
+        if (dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.hideEvent();
         this.disableEventFields();
         this.eventSectionEnabled = false;
+    },
+
+    hideEvent: function(){
+        dojo.removeClass(this.eventButton, "cosmoEventButtonSelected");
+        dojo.fx.wipeOut({node: this.eventSection}).play();
     },
 
     setReadOnly: function(){
@@ -481,6 +488,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     },
 
     postCreate: function(){
+        this.hideEvent();
         if (this.initItem) this.updateFromItem(this.initItem);
         if (this.readOnly) this.setReadOnly();
 

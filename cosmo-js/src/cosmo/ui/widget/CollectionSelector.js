@@ -22,7 +22,7 @@ dojo.require("cosmo.topics");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.data.CollectionStore");
 dojo.require("cosmo.data.SubscriptionStore");
-dojo.require("cosmo.data.SharingDialog");
+dojo.require("cosmo.ui.widget.SharingDialog");
 dojo.require("cosmo.app.pim");
 
 dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");

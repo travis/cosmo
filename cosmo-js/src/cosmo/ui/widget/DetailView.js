@@ -14,6 +14,8 @@
  * limitations under the License.
 */
 dojo.provide("cosmo.ui.widget.DetailView");
+dojo.require("dojo.fx");
+
 dojo.require("dijit._Templated");
 dojo.require("dijit.form.TextBox");
 dojo.require("dijit.form.Textarea");
@@ -21,6 +23,7 @@ dojo.require("dijit.form.DateTextBox");
 dojo.require("dijit.form.TimeTextBox");
 dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.Button");
+
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.html");
@@ -42,8 +45,9 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     mailButton: null,
     titleInput: null,
     notesInput: null,
-    titleSpan: null,
+    eventTitleSpan: null,
     eventButton: null,
+    eventSection: null,
     locationInput: null,
     allDayInput: null,
     startDateInput: null,
@@ -62,19 +66,20 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     //fields
     hasEvent: false,
     item: null,
+    triage: null,
+    starred: null,
 
     updateFromItem: function(item){
         this.titleInput.setValue(item.getDisplayName());
         this.notesInput.setValue(item.getBody());
         this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
+        this.clearEventFields();
         if (eventStamp){
-            this.hasEvent = true;
+            this.enableEvent();
             this.updateFromEventStamp(eventStamp);
         } else {
-            this.hasEvent = false;
-            this.clearEventFields();
-            this.disableEventFields();
+            this.disableEvent();
         }
         if(item.getTaskStamp()) this.setStarred();
         else this.setUnstarred();
@@ -89,16 +94,19 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     setTriageNow: function(){
         this.clearTriage();
+        this.triage = cosmo.model.TRIAGE_NOW;
         dojo.addClass(this.nowButton, "cosmoTriageNowButtonSelected");
     },
 
     setTriageLater: function(){
         this.clearTriage();
+        this.triage = cosmo.model.TRIAGE_LATER;
         dojo.addClass(this.laterButton, "cosmoTriageLaterButtonSelected");
     },
 
     setTriageDone: function(){
         this.clearTriage();
+        this.triage = cosmo.model.TRIAGE_DONE;
         dojo.addClass(this.doneButton, "cosmoTriageDoneButtonSelected");
     },
 
@@ -118,11 +126,17 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         }
     },
 
+    toggleStarred: function(){
+        this.starred? this.setUnstarred() : this.setStarred();
+    },
+
     setStarred: function(){
+        this.starred = true;
         dojo.addClass(this.starButton, "cosmoTaskButtonSelected");
     },
 
     setUnstarred: function(){
+        this.starred = false;
         dojo.removeClass(this.starButton, "cosmoTaskButtonSelected");
     },
 
@@ -251,6 +265,40 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.untilInput.setAttribute("disabled", true);
     },
 
+    enableEventFields: function(){
+        this.locationInput.setAttribute("disabled", false);
+        this.allDayInput.setAttribute("disabled", false);
+        this.startDateInput.setAttribute("disabled", false);
+        this.startTimeInput.setAttribute("disabled", false);
+        this.endDateInput.setAttribute("disabled", false);
+        this.endTimeInput.setAttribute("disabled", false);
+        this.timezoneRegionSelector.disabled = false;
+        this.timezoneCitySelector.disabled = false;
+        this.statusSelector.disabled = false;
+        this.recurrenceSelector.disabled = false;
+        this.untilInput.setAttribute("disabled", false);
+    },
+
+    toggleEvent: function(){
+        this.hasEvent? this.disableEvent() : this.enableEvent();
+    },
+
+    enableEvent: function(){
+        this.hasEvent = true;
+        this.eventTitleSpan.innerHTML = this.l10n.removeFromCalendar;
+        dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
+        dojo.fx.wipeIn({node: this.eventSection}).play();
+        this.enableEventFields();
+    },
+
+    disableEvent: function(){
+        this.hasEvent = false;
+        this.eventTitleSpan.innerHTML = this.l10n.addToCalendar;
+        dojo.removeClass(this.eventButton, "cosmoEventButtonSelected");
+        dojo.fx.wipeOut({node: this.eventSection}).play();
+        this.disableEventFields();
+    },
+
     // event handlers
     tzRegionOnChange: function(e){
         this.updateFromTimezoneRegion(e.target.value);
@@ -261,11 +309,65 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         if (frequency == "once") this.updateFromRecurrenceRule(null);
         else if (frequency == "custom") {/*TODO??*/}
         else this.updateFromRrule(new cosmo.model.RecurrenceRule({frequency: frequency}));
-
     },
 
     allDayOnChange: function(value){
         this.updateAllDay(value);
+    },
+
+    eventButtonOnClick: function(){
+        this.toggleEvent();
+    },
+
+    mailMouseDown: function(){
+        dojo.addClass(this.mailButton, "cosmoEmailButtonSelected");
+        this.itemToEmail(this.item);
+    },
+
+    mailMouseUp: function(){
+        dojo.removeClass(this.mailButton, "cosmoEmailButtonSelected");
+    },
+
+    itemToEmail: function(item){
+        var timeFormat = this.l10n.emailTimeFormat;
+        var subject = item.getDisplayName();
+        var body = [this.l10n.emailTitle , item.getDisplayName() , "%0d%0a"];
+        var eventStamp = item.getEventStamp();
+        if (eventStamp){
+            var startDate = eventStamp.getStartDate();
+            var endDate = eventStamp.getEndDate();
+
+            if (startDate.tzId) {
+                body = body.concat([
+                    this.l10n.emailTimezone, startDate.tzId , "%0d%0a"]);
+            }
+            body = body.concat([
+                       this.l10n.emailStarts , dojox.date.posix.strftime(startDate, timeFormat) , "%0d%0a" ,
+                       this.l10n.emailEnds , dojox.date.posix.strftime(endDate, timeFormat) , "%0d%0a"]);
+            if (eventStamp.getAllDay()) {
+                body.push(this.l10n.emailAllDay + "%0d%0a");
+            }
+
+            if (eventStamp.getRrule()) {
+                var rrule = eventStamp.getRrule();
+                body = body.concat([this.l10n.emailRecurs ,
+                rrule.getFrequency()]);
+                if (rrule.getEndDate()) {
+                    body = body.concat([this.l10n.emailEndingOn ,
+                    dojox.date.posix.strftime(rrule.getEndDate(), timeFormat)]);
+                }
+                body.push(".%0d%0a");
+            }
+            if (eventStamp.getStatus()) {
+                body.concat([this.l10n.emailStatus , eventStamp.getStatus() , "%0d%0a"]);
+            }
+        }
+        if (item.getBody()) {
+            body = body.concat([ ,
+                        this.l10n.emailDescription , item.getBody(), "%0d%0a"]);
+        }
+        var s = "mailto:?subject=" + subject + "&body=" + body.join("");
+        location = s;
     },
 
     // lifecycle functions

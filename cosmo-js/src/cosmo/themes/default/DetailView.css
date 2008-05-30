@@ -36,7 +36,7 @@
 }
 
 .cosmoDetailViewNoteSection {
-    margin: 10px 20px 5px 7px;
+    padding: 10px 20px 5px 7px;
 }
 
 .cosmoDetailViewTitleInput {
@@ -46,10 +46,16 @@
 }
 
 .cosmoDetailViewEventSection {
-    margin: 10px 20px 5px 7px;
+    padding: 10px 20px 5px 7px;
 }
 .cosmoDetailViewEventTitleBar{
     height: 18px;
+    padding-left: 7px;
+}
+.cosmoDetailViewEventTitle{
+    font-weight: bold;
+    line-height: 18px;
+    font-size: 0.9em;
 }
 
 .cosmoDetailViewStartDateInput{
@@ -70,4 +76,18 @@
 
 .cosmoDetailViewLocationInput{
     display: block;
+}
+.cosmoDetailViewEventTitleBar{
+    background: #ededed;
+    border-top: 1px solid #999999;
+    border-bottom: 1px solid #999999;
+
+}
+.cosmoDetailViewEventButton {
+    position: absolute;
+    right: 0;
+}
+.cosmoDetailViewFooter {
+    background: #ededed;
+    border-top: 1px solid #999999;
 }

@@ -2,22 +2,28 @@
   <div class="cosmoDetailViewContainer">
     <div class="cosmoDetailViewMarkupBar">
       <div id="${id}TriageButtons" dojoAttachPoint="triageButtons" class="cosmoDetailViewTriageButtons">
-        <span id="${id}NowButton" dojoAttachPoint="nowButton" class="cosmoDetailViewTriageButton cosmoDetailViewTriageNowButton cosmoTriageNowButtonDefault"></span>
-        <span id="${id}LaterButton" dojoAttachPoint="laterButton" class="cosmoDetailViewTriageButton cosmoDetailViewTriageLaterButton cosmoTriageLaterButtonDefault"></span>
-        <span id="${id}DoneButton" dojoAttachPoint="doneButton" class="cosmoDetailViewTriageButton cosmoDetailViewTriageDoneButton cosmoTriageDoneButtonDefault"></span>
+        <span id="${id}NowButton" dojoAttachPoint="nowButton" dojoAttachEvent="onclick: setTriageNow"
+              class="cosmoDetailViewTriageButton cosmoDetailViewTriageNowButton cosmoTriageNowButtonDefault"></span>
+        <span id="${id}LaterButton" dojoAttachPoint="laterButton" dojoAttachEvent="onclick: setTriageLater"
+              class="cosmoDetailViewTriageButton cosmoDetailViewTriageLaterButton cosmoTriageLaterButtonDefault"></span>
+        <span id="${id}DoneButton" dojoAttachPoint="doneButton"  dojoAttachEvent="onclick: setTriageDone"
+              class="cosmoDetailViewTriageButton cosmoDetailViewTriageDoneButton cosmoTriageDoneButtonDefault"></span>
       </div>
-      <span id="${id}StarButton" dojoAttachPoint="starButton" class="cosmoDetailViewStarButton cosmoTaskButtonDefault"></span>
-      <span id="${id}MailButton" dojoAttachPoint="mailButton" class="cosmoDetailViewMailButton cosmoEmailButtonDefault"></span>
+      <span id="${id}StarButton" dojoAttachPoint="starButton"  dojoAttachEvent="onclick: toggleStarred"
+            class="cosmoDetailViewStarButton cosmoTaskButtonDefault"></span>
+      <span id="${id}MailButton" dojoAttachPoint="mailButton" class="cosmoDetailViewMailButton cosmoEmailButtonDefault"
+            dojoAttachEvent="onmousedown: mailMouseDown, onmouseup: mailMouseUp"></span>
     </div>
     <div class="cosmoDetailViewNoteSection">
       <div id="${id}titleInput" dojoAttachPoint="titleInput" dojoType="dijit.form.TextBox" class="cosmoDetailViewTitleInput"></div>
       <textarea id="${id}NotesInput" dojoAttachPoint="notesInput" dojoType="dijit.form.Textarea" class="cosmoDetailViewNotesInput"></textarea>
     </div>
     <div class="cosmoDetailViewEventTitleBar">
-      <span id="${id}Title" dojoAttachPoint="titleSpan" class="cosmoDetailViewEventTitle">${l10n.eventTitle}</span>
-      <span id="${id}EventButton" dojoAttachPoint="eventButton" class="cosmoDetailViewEventButton"></span>
+      <span id="${id}EventTitle" dojoAttachPoint="eventTitleSpan" class="cosmoDetailViewEventTitle"></span>
+      <span id="${id}EventButton" dojoAttachPoint="eventButton" class="cosmoDetailViewEventButton cosmoEventButtonDefault"
+            dojoAttachEvent="onclick: eventButtonOnClick"></span>
     </div>
-    <div class="cosmoDetailViewEventSection">
+    <div class="cosmoDetailViewEventSection" dojoAttachPoint="eventSection">
       <input id="${id}LocationInput" dojoAttachPoint="locationInput" dojoType="dijit.form.TextBox" type="text" class="cosmoDetailViewLocationInput"></input>
       <div class="cosmoDetailViewAllDaySection"><input id="${id}AllDayInput" dojoAttachPoint="allDayInput" dojotype="dijit.form.CheckBox"
            name="allDay" type="checkbox" dojoAttachEvent="onChange: allDayOnChange"></input> ${l10n.allDay}</div>
@@ -65,10 +71,10 @@
       </div>
     </div>
     <div class="cosmoDetailViewFooter">
-    <div class="cosmoDetailViewBylineSection" dojoAttachPoint="byline">
-    </div>
-    <button dojoType="dijit.form.Button" dojoAttachPoint="removeButton">${l10n.remove}</button>
-    <button dojoType="dijit.form.Button" dojoAttachPoint="saveButton">${l10n.save}</button>
+      <div class="cosmoDetailViewBylineSection" dojoAttachPoint="byline">
+      </div>
+      <button dojoType="dijit.form.Button" dojoAttachPoint="removeButton">${l10n.remove}</button>
+      <button dojoType="dijit.form.Button" dojoAttachPoint="saveButton">${l10n.save}</button>
     </div>
   </div>
 </div>

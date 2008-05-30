@@ -68,7 +68,6 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     //fields
     event: false,
-    eventSectionEnabled: false,
     item: null,
     itemWrapper: null,
     triage: null,
@@ -91,7 +90,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
         if (eventStamp){
-            if (!this.eventSectionEnabled) this.enableEvent();
+            this.enableEvent();
             this.updateFromEventStamp(eventStamp);
         } else {
             this.disableEvent();
@@ -344,13 +343,12 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.eventTitleSpan.innerHTML = this.l10n.removeFromCalendar;
         if (!dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.showEvent();
         this.enableEventFields();
-        this.eventSectionEnabled = true;
 
     },
 
     showEvent: function(){
-            dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
-            dojo.fx.wipeIn({node: this.eventSection}).play();
+        dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
+        dojo.fx.wipeIn({node: this.eventSection}).play();
     },
 
     disableEvent: function(){
@@ -358,7 +356,6 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.eventTitleSpan.innerHTML = this.l10n.addToCalendar;
         if (dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.hideEvent();
         this.disableEventFields();
-        this.eventSectionEnabled = false;
     },
 
     hideEvent: function(){
@@ -513,9 +510,9 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             }
         });
         dojo.subscribe('cosmo:calEventsDisplaySuccess', updateItems);
-        dojo.subscribe('cosmo:calNoItems', updateItems);
+        dojo.subscribe('cosmo:calNoItems', dojo.hitch(this, function(){this.clearSelected();}));
         dojo.subscribe('cosmo:calSetSelected', updateItems);
-        dojo.subscribe('cosmo:calClearSelected', updateItems);
+        dojo.subscribe('cosmo:calClearSelected', dojo.hitch(this, function(){this.clearSelected();}));
         dojo.subscribe('cosmo:calSaveSuccess', dojo.hitch(this, function(cmd){
             if (cmd.saveType != 'new') {
                 this.updateFromItemWrapper(cmd.data);
@@ -585,7 +582,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         var endDateFieldValue = this.untilInput.getValue();
         if (frequencyFieldValue == "once") return null;
         else if (frequencyFieldValue == "custom"){
-            return this.item.getRrule();
+            return this.item.getEventStamp().getRrule();
         } else {
             var endDate;
             if (endDateFieldValue){

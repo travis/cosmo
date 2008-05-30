@@ -60,7 +60,7 @@ cosmo.ui.navbar.Bar = function (p) {
     // Handle published messages -- in this case just a poke
     // to let the NavBar know to re-render
 
-    var r = function(){self.render()};
+    var r = function(){self.render();};
     dojo.subscribe('cosmo:calEventsLoadSuccess', r);
     dojo.subscribe('cosmo:calNavigateLoadedCollection', r);
     dojo.subscribe('cosmo:calSaveSuccess', r);

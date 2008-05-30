@@ -35,7 +35,7 @@ dojo.mixin(cosmo.view.cal, cosmo.view.viewBase);
 cosmo.view.cal.init = function(){
     cosmo.view.viewBase.init.apply(this);
     cosmo.view.cal.setQuerySpan(cosmo.app.pim.currDate);
-}
+};
 
 cosmo.view.cal.hasBeenInitialized = false;
 
@@ -64,7 +64,7 @@ dojo.subscribe("cosmo:calLoadCollection", function(cmd){
     var opts = cmd.opts || {};
     cosmo.view.cal.loadItems(opts);
 });
-dojo.subscribe("cosmo:appKeyboardInput", 
+dojo.subscribe("cosmo:appKeyboardInput",
                dojo.hitch(cosmo.view.cal, cosmo.view.cal.handleKeyboardInput));
 
 
@@ -114,7 +114,7 @@ cosmo.view.cal.loadItems = function (p) {
         viewStart: _cal.viewStart,
         viewEnd: _cal.viewEnd,
         currDate: cosmo.app.pim.currDate
-    }
+    };
     for (var n in params) { opts[n] = params[n]; }
 
     // Default to the app's selectedCollection if one isn't passed
@@ -138,30 +138,28 @@ cosmo.view.cal.loadItems = function (p) {
             cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
             return reloadDeferred;
         };
-        if (coll.isDisplayed != coll.doDisplay) {
-            if (coll.doDisplay) {
-                loadDeferred = cosmo.app.pim.serv.getItems(coll,
-                    { start: start, end: end });
-                loadDeferred.addErrback(handleErr);
-                loadDeferred.addCallback(function (eventLoadList){
-                    var h = _this.createEventRegistry(eventLoadList, collId);
-                    collectionReg[collId] = h;
-                });
-            }
-            else {
-                collectionReg[collId] = new cosmo.util.hash.Hash();
-            }
-            coll.isDisplayed = coll.doDisplay;
+        if (coll.doDisplay) {
+            loadDeferred = cosmo.app.pim.serv.getItems(coll,
+                { start: start, end: end });
+            loadDeferred.addErrback(handleErr);
+            loadDeferred.addCallback(function (eventLoadList){
+                var h = _this.createEventRegistry(eventLoadList, collId);
+                collectionReg[collId] = h;
+            });
         }
+        else {
+            collectionReg[collId] = new cosmo.util.hash.Hash();
+        }
+        coll.isDisplayed = coll.doDisplay;
         return loadDeferred || cosmo.util.deferred.getFiredDeferred();
-    }
+    };
     var l = cosmo.app.pim.collections.each(loadEach);
     var loadDeferred = new dojo.DeferredList(l);
     cosmo.util.deferred.addStdDLCallback(loadDeferred);
     loadDeferred.addCallback(function(){
         var itemRegistry = cosmo.view.cal.createItemRegistryFromCollections();
         dojo.publish('cosmo:calEventsLoadSuccess', [{data: itemRegistry, opts: opts }]);
-    });        
+    });
     return loadDeferred;
 };
 /**
@@ -275,9 +273,9 @@ cosmo.view.cal.removeRecurrenceGroupFromCollectionRegistry =
  */
 cosmo.view.cal.setQuerySpan = function (dt) {
     this.viewStart = cosmo.datetime.util.getWeekStart(dt);
-    console.log("viewStart: " + this.viewStart)
+    console.log("viewStart: " + this.viewStart);
     this.viewEnd = cosmo.datetime.util.getWeekEnd(dt);
-    console.log("viewEnd: " + this.viewEnd)
+    console.log("viewEnd: " + this.viewEnd);
     return true;
 };
 /**

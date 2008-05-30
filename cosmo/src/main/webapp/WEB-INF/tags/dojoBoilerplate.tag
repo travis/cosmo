@@ -20,15 +20,15 @@
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <cosmo:baseurl var="baseUrl"/>
+<cosmo:jsurl var="jsUrl"/>
+<u:bind var="PRODUCT_VERSION"
+        type="org.osaf.cosmo.CosmoConstants"
+        field="PRODUCT_VERSION"/>
 
 <%@ attribute name="timezones"        %>
 <%@ attribute name="parseWidgets"        %>
 <%@ attribute name="dojoLayers"        %>
 
-<u:bind var="PRODUCT_VERSION"
-        type="org.osaf.cosmo.CosmoConstants"
-        field="PRODUCT_VERSION"/>
-        
 <fmt:setBundle basename="PimMessageResources"/>
 <fmt:message key="App.TemplateName" var="templateName"/>
         
@@ -60,7 +60,7 @@
                     cosmoDisableSignups: "${disableSignups}"}
 </script>
 
-<c:set var="dojoPath" value="${baseUrl}/js-${PRODUCT_VERSION}/dojo"/>
+<c:set var="dojoPath" value="${jsUrl}/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <c:forEach var="layerName" items="${dojoLayers}">
 <script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>

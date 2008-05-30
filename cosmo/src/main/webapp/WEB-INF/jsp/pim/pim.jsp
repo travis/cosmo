@@ -22,6 +22,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <cosmo:baseurl var="baseUrl"/>
+<cosmo:jsurl var="jsUrl"/>
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <c:set var="ticketedView" value="${not empty ticketKey }"/>
 <cosmoui:user var="user"/>
@@ -41,11 +42,8 @@
 <head>
 
 <title><fmt:message key="App.Welcome"/></title>
-<style type="text/css">
-    @import "${baseUrl}/js/dojo/resources/dojo.css";
-    @import "${baseUrl}/js/cosmo/themes/default/pim.css";
-</style>
-<cosmo:stylesheets stylesheets=""/>
+<link rel="stylesheet" type="text/css" href="${jsUrl}/cosmo/themes/default/pim.css"/>
+
 <!--[if IE]>
 <style type="text/css">
   html, body { overflow: hidden; }

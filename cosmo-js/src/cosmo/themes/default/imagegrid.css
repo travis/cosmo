@@ -19,9 +19,13 @@
 .cosmoCollectionDetails{height: 7px; width: 10px; background-position: -720px -45px; background-image: url(images/image_grid.png);}
 .cosmoEmailButtonDefault{height: 18px; width: 24px; background-position: -540px -90px; background-image: url(images/image_grid.png);}
 .cosmoEmailButtonRollover{height: 18px; width: 24px; background-position: -585px -90px; background-image: url(images/image_grid.png);}
+.cosmoEmailButtonSelected{height: 18px; width: 24px; background-position: -630px -90px; background-image: url(images/image_grid.png);}
 .cosmoEnterDefault{height: 19px; width: 19px; background-position: -270px -45px; background-image: url(images/image_grid.png);}
 .cosmoEnterRollover{height: 19px; width: 19px; background-position: -315px -45px; background-image: url(images/image_grid.png);}
 .cosmoEnterSelected{height: 19px; width: 19px; background-position: -360px -45px; background-image: url(images/image_grid.png);}
+.cosmoEventButtonDefault{height: 18px; width: 23px; background-position: -405px -135px; background-image: url(images/image_grid.png);}
+.cosmoEventButtonRollover{height: 18px; width: 23px; background-position: -450px -135px; background-image: url(images/image_grid.png);}
+.cosmoEventButtonSelected{height: 18px; width: 23px; background-position: -495px -135px; background-image: url(images/image_grid.png);}
 .cosmoListViewDefault{height: 35px; width: 24px; background-position: -225px 0px; background-image: url(images/image_grid.png);}
 .cosmoListViewRollover{height: 35px; width: 24px; background-position: -270px 0px; background-image: url(images/image_grid.png);}
 .cosmoListViewSelected{height: 35px; width: 24px; background-position: -360px 0px; background-image: url(images/image_grid.png);}

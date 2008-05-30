@@ -28,11 +28,11 @@
       <div class="cosmoDetailViewAllDaySection"><input id="${id}AllDayInput" dojoAttachPoint="allDayInput" dojotype="dijit.form.CheckBox"
            name="allDay" type="checkbox" dojoAttachEvent="onChange: allDayOnChange"></input> ${l10n.allDay}</div>
       <div class="cosmoDetailViewStartSection">
-        <input id="${id}StartDateInput" selector="date" dojoAttachPoint="startDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewStartDateInput"></input> ${l10n.at}
+        <input id="${id}StartDateInput" selector="date" dojoAttachPoint="startDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewStartDateInput" required="true"></input> ${l10n.at}
         <input id="${id}StartTimeInput" selector="time" dojoAttachPoint="startTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewStartTimeInput"></input>
       </div>
       <div class="cosmoDetailViewEndSection">
-        <input id="${id}EndDateInput" dojoAttachPoint="endDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewEndDateInput"></input> ${l10n.at}
+        <input id="${id}EndDateInput" dojoAttachPoint="endDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewEndDateInput" required="true"></input> ${l10n.at}
         <input id="${id}EndTimeInput" dojoAttachPoint="endTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewEndTimeInput"></input>
       </div>
       <div class="cosmoDetailViewTimezoneSection">
@@ -49,7 +49,7 @@
           <option value="Indian">${l10n.indian}</option>
           <option value="Pacific">${l10n.pacific}</option>
         </select>
-        <select id="${id}TimezoneCitySelector" dojoAttachPoint="timezoneCitySelector" class="cosmoDetailViewTimezoneCitySelector"></select>
+        <select id="${id}TimezoneIdSelector" dojoAttachPoint="timezoneIdSelector" class="cosmoDetailViewTimezoneIdSelector"></select>
       </div>
       <select id="${id}StatusSelector" dojoAttachPoint="statusSelector" class="cosmoDetailViewStatusSelector">
         <option value="CONFIRMED">${l10n.confirmed}</option>

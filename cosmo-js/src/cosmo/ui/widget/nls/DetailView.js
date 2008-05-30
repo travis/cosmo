@@ -41,7 +41,7 @@
      indian: "Indian",
      pacific: "Pacific",
      noTzRegion: "None",
-     noTzCity: "None",
+     noTzId: "None",
      emailTitle: "Title:",
      emailTimeFormat: "%m/%d/%Y at %I:%M %p",
      emailTimezone: "Time zone:",
@@ -51,5 +51,7 @@
      emailRecurs: "This item recurs",
      emailEndingOn: "\ ends on",
      emailStatus: "Status:",
-     emailDescription: "Notes:"
+     emailDescription: "Notes:",
+     startDateRequired: "You must choose a start date.",
+     endDateRequired: "You must choose an end date."
 })

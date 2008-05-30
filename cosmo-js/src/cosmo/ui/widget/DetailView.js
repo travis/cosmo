@@ -25,11 +25,13 @@ dojo.require("dijit.form.CheckBox");
 dojo.require("dijit.form.Button");
 
 dojo.require("cosmo.model.Item");
+dojo.require("cosmo.model.Delta");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.html");
+dojo.require("cosmo.ui.Error");
 
 dojo.requireLocalization("cosmo.ui.widget", "DetailView");
-
+(function(){
 dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     templatePath: dojo.moduleUrl("cosmo", "ui/widget/templates/DetailView.html"),
     widgetsInTemplate: true,
@@ -55,7 +57,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     endDateInput: null,
     endTimeInput: null,
     timezoneRegionSelector: null,
-    timezoneCitySelector: null,
+    timezoneIdSelector: null,
     statusSelector: null,
     recurrenceSelector: null,
     untilInput: null,
@@ -64,7 +66,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     saveButton: null,
 
     //fields
-    hasEvent: false,
+    event: false,
     item: null,
     triage: null,
     starred: null,
@@ -171,7 +173,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.allDayInput.setValue(allDay);
         if (allDay){
             this.timezoneRegionSelector.setAttribute("disabled", true);
-            this.timezoneCitySelector.setAttribute("disabled", true);
+            this.timezoneIdSelector.setAttribute("disabled", true);
             this.startTimeInput.setAttribute("disabled", true);
             this.endTimeInput.setAttribute("disabled", true);
         } else {
@@ -186,7 +188,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             var tzId = tz.tzId;
             var region = tzId.split("/")[0];
             this.updateFromTimezoneRegion(region);
-            cosmo.util.html.setSelect(this.timezoneCitySelector, tzId);
+            cosmo.util.html.setSelect(this.timezoneIdSelector, tzId);
         } else {
             this.clearTimezoneSelectors();
         }
@@ -195,8 +197,8 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     updateFromTimezoneRegion: function(region){
         if (region){
             cosmo.util.html.setSelect(this.timezoneRegionSelector, region);
-            cosmo.util.html.setSelectOptions(this.timezoneCitySelector, this.getTimezoneIdOptions(region));
-            this.timezoneCitySelector.disabled = false;
+            cosmo.util.html.setSelectOptions(this.timezoneIdSelector, this.getTimezoneIdOptions(region));
+            this.timezoneIdSelector.disabled = false;
         } else {
             this.clearTimezoneSelectors();
         }
@@ -204,12 +206,12 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     clearTimezoneSelectors: function(){
         this.timezoneRegionSelector.value = "";
-        this.timezoneCitySelector.value = "";
-        this.timezoneCitySelector.setAttribute("disabled", true);
+        this.timezoneIdSelector.value = "";
+        this.timezoneIdSelector.setAttribute("disabled", true);
     },
 
     getTimezoneIdOptions: function(region){
-        return [{text: this.l10n.noTzCity,
+        return [{text: this.l10n.noTzId,
                  value: "" }
                ].concat(dojo.map(cosmo.datetime.timezone.getTzIdsForRegion(region),
                    function(id){
@@ -245,7 +247,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.endDateInput.setValue("");
         this.endTimeInput.setValue("");
         this.timezoneRegionSelector.value = "";
-        this.timezoneCitySelector.value = "";
+        this.timezoneIdSelector.value = "";
         this.statusSelector.value = "";
         this.recurrenceSelector.value = "";
         this.untilInput.setValue("");
@@ -259,7 +261,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.endDateInput.setAttribute("disabled", true);
         this.endTimeInput.setAttribute("disabled", true);
         this.timezoneRegionSelector.setAttribute("disabled", true);
-        this.timezoneCitySelector.setAttribute("disabled", true);
+        this.timezoneIdSelector.setAttribute("disabled", true);
         this.statusSelector.setAttribute("disabled", true);
         this.recurrenceSelector.setAttribute("disabled", true);
         this.untilInput.setAttribute("disabled", true);
@@ -273,18 +275,18 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.endDateInput.setAttribute("disabled", false);
         this.endTimeInput.setAttribute("disabled", false);
         this.timezoneRegionSelector.disabled = false;
-        this.timezoneCitySelector.disabled = false;
+        this.timezoneIdSelector.disabled = false;
         this.statusSelector.disabled = false;
         this.recurrenceSelector.disabled = false;
         this.untilInput.setAttribute("disabled", false);
     },
 
     toggleEvent: function(){
-        this.hasEvent? this.disableEvent() : this.enableEvent();
+        this.event? this.disableEvent() : this.enableEvent();
     },
 
     enableEvent: function(){
-        this.hasEvent = true;
+        this.event = true;
         this.eventTitleSpan.innerHTML = this.l10n.removeFromCalendar;
         dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
         dojo.fx.wipeIn({node: this.eventSection}).play();
@@ -292,7 +294,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     },
 
     disableEvent: function(){
-        this.hasEvent = false;
+        this.event = false;
         this.eventTitleSpan.innerHTML = this.l10n.addToCalendar;
         dojo.removeClass(this.eventButton, "cosmoEventButtonSelected");
         dojo.fx.wipeOut({node: this.eventSection}).play();
@@ -370,6 +372,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         location = s;
     },
 
+    getDelta: function(){
+        return getDetailViewDelta(this);
+    },
+
     // lifecycle functions
     constructor: function(){
         this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "DetailView");
@@ -378,5 +384,167 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     postCreate: function(){
         if (this.initItem) this.updateFromItem(this.initItem);
+    },
+
+    // getters
+    getTriage: function(){
+        return this.triage;
+    },
+
+    getBody: function(){
+        return this.notesInput.getValue();
+    },
+
+    getDisplayName: function(){
+        return this.titleInput.getValue();
+    },
+
+    getDateTime: function(dateField, timeField){
+        var dateFieldValue = dateField.getValue();
+        if (!dateFieldValue) return null;
+        var timeFieldValue = timeField.getValue();
+        if (timeFieldValue){
+            dateFieldValue.setHours(timeFieldValue.getHours(), timeFieldValue.getMinutes());
+        }
+        var tzIdFieldValue = this.timezoneIdSelector.value;
+        var dt = new cosmo.datetime.Date();
+        if (tzIdFieldValue && timeFieldValue){
+            dt.tzId = tzIdFieldValue;
+            dt.utc = false;
+            dt.updateFromLocalDate(dateFieldValue);
+        } else {
+            dt.tzId = null;
+            dt.utc = false;
+            dt.updateFromUTC(dateFieldValue.getTime());
+        }
+        return dt;
+    },
+
+    getStartDateTime: function(){
+        return this.getDateTime(this.startDateInput, this.startTimeInput);
+    },
+
+    getEndDateTime: function(){
+        return this.getDateTime(this.endDateInput, this.endTimeInput);
+    },
+
+    getLocation: function(){
+        return this.locationInput.getValue();
+    },
+
+    getStatus: function(){
+        return this.statusSelector.value;
+    },
+
+    getAllDay: function(){
+        return this.allDayInput.checked;
+    },
+
+    getRrule: function(){
+        var frequencyFieldValue = this.recurrenceSelector.value;
+        var endDateFieldValue = this.untilInput.getValue();
+        if (frequencyFieldValue == "once") return null;
+        else if (frequencyFieldValue == "custom"){
+            return this.item.getRrule();
+        } else {
+            var endDate;
+            if (endDateFieldValue){
+                endDate = new cosmo.datetime.Date(endDateFieldValue.getFullYear(),
+                endDateFieldValue.getMonth(), endDateFieldValue.getDate());
+                var tzIdFieldValue = this._getFormValue(form, info.tzIdField);
+                if (tzIdFieldValue){
+                    endDate.tzId = tzIdFieldValue;
+                }
+            }
+            return new cosmo.model.RecurrenceRule({
+                frequency: frequencyFieldValue,
+                endDate: endDate});
+        }
+    },
+
+    isEvent: function(){
+        return this.event;
+    },
+
+    isStarred: function(){
+        return this.starred;
+    },
+
+    // validation
+
+    validate: function(dv){
+        var e = [];
+        if (dv.getTzRegion() && !dv.getTzId())
+            e.push(new cosmo.ui.Error(null, "App.Error.NoTzId"));
+        if (!dv.startTimeInput.getValue() && dv.endTimeInput())
+            e.push(new cosmo.ui.Error(null,"App.Error.NoEndTimeWithoutStartTime"));
+        if (!dv.startDateInput.getValue()) e.push(new cosmo.ui.Error(null, null, this.l10n.startDateRequired));
+        if (!dv.endDateInput.getValue()) e.push(new cosmo.ui.Error(null, null, this.l10n.endDateRequired));
+        return e;
     }
 });
+
+
+// To delta functions
+function getDetailViewDelta(detailView){
+    var delta = new cosmo.model.Delta(detailView.item);
+
+    populateDeltaTriage(detailView, delta);
+    populateDeltaNoteFields(detailView, delta);
+
+    if (detailView.isEvent()){
+        delta.addAddedStamp("event");
+        populateDeltaEventFields(detailView, delta);
+    } else {
+        delta.addDeletedStamp("event");
+    }
+
+    if (detailView.isStarred()){
+        delta.addAddedStamp("task");
+    } else {
+        delta.addDeletedStamp("task");
+    }
+    delta.deltafy(true);
+    return delta;
+}
+
+function populateDeltaNoteFields(dv, delta){
+    delta.addProperty("displayName", dv.getDisplayName());
+    delta.addProperty("body", dv.getBody());
+}
+
+function populateDeltaEventFields(dv, delta){
+    delta.addStampProperty("event", "startDate", dv.getStartDateTime());
+    delta.addStampProperty("event", "endDate", dv.getEndDateTime());
+    delta.addStampProperty("event", "location", dv.getLocation());
+    delta.addStampProperty("event", "status", dv.getStatus());
+    delta.addStampProperty("event", "allDay", dv.getAllDay());
+    var rrule = dv.getRrule();
+    if (!rrule || (rrule && rrule.isSupported())) delta.addStampProperty("event", "rrule", rrule);
+    populateDeltaAnytimeAtTime(dv, delta);
+}
+
+function populateDeltaAnytimeAtTime(dv, delta){
+    if (dv.getAllDay()){
+        delta.addStampProperty("event", "anyTime", false);
+    } else if (!dv.startTimeInput.getValue() && !dv.endTimeInput.getValue()){
+        delta.addStampProperty("event", "anyTime", true);
+        delta.addStampProperty("event", "status", null);
+    } else if (!dv.endTimeInput.getValue() || dv.getStartDateTime().equals(dv.getEndDateTime())){
+        //this is attime, so kill duration, end time
+        delta.removeStampProperty("event", "endDate");
+        delta.addStampProperty("event", "duration", new cosmo.model.Duration(cosmo.model.ZERO_DURATION));
+        delta.addStampProperty("event", "anyTime", false); //just in case.
+        delta.addStampProperty("event", "status", null);
+    }
+}
+
+function populateDeltaTriage(dv, delta){
+    var triageStatus = dv.getTriage();
+    if (triageStatus != dv.item.getTriageStatus()){
+        delta.addProperty("triageStatus", triageStatus);
+        delta.addProperty("autoTriage", false);
+    }
+}
+})();
+

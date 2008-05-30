@@ -13,6 +13,7 @@
     </style>
 	<script type="text/javascript">
 
+dojo.require("doh.runner");
 dojo.require("cosmo.ui.widget.DetailView");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.EventStamp");
@@ -23,11 +24,11 @@ dojo.require("cosmo.datetime.timezone.LazyCachingTimezoneRegistry");
 registry = new cosmo.datetime.timezone.LazyCachingTimezoneRegistry("../../../../olson-tzdata");
 cosmo.datetime.timezone.setTimezoneRegistry(registry);
 
-testItem = new cosmo.model.Note({displayName: "foo", body: "barbazbuck", triageStatus: cosmo.model.TRIAGE_LATER});
+testNote = new cosmo.model.Note({displayName: "foo", body: "barbazbuck", triageStatus: cosmo.model.TRIAGE_LATER});
 testEvent = new cosmo.model.Note({displayName: "an event", body: "event notes", triageStatus: cosmo.model.TRIAGE_LATER});
 testEvent.getEventStamp(
     true, 
-    {startDate: new cosmo.datetime.Date(),
+    {startDate: new cosmo.datetime.Date(2008, 5, 1, 12, 0, 0, 0),
      duration: new cosmo.model.Duration({hour: 1}),
      location: "wherever",
      status: "TENTATIVE"
@@ -62,11 +63,74 @@ testDailyEndDateEvent.getEventStamp().setRrule(
                                    }
                                   ));
 
+function getTimeoutDeferred(time, f){
+    var dohDeferred = new doh.Deferred();
+    setTimeout(function(){
+        try {
+            f();
+            dohDeferred.callback(true);
+        } catch (e) {
+            dohDeferred.errback(e);
+        }
+    }, time);
+    return dohDeferred;
+}
+
+dojo.addOnLoad(function(){
+    var dv = dijit.byId("detailView");
+    doh.register(["cosmo.ui.widget.DetailView"], [
+        {
+            name: "testNote",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testNote);
+                return getTimeoutDeferred(1000, function(){
+                    var delta = dv.getDelta();
+                    t.f(delta.hasChanges());
+                    dv.titleInput.setValue("bar");
+                    delta = dv.getDelta();
+                    t.t(delta.hasChanges());
+                });
+            }
+        }, 
+
+        {
+            name: "testEvent",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testEvent);
+                return getTimeoutDeferred(1000, function(){
+                    t.is("once", dv.recurrenceSelector.value);
+                });
+            }
+        }
+    ]);
+    dv.updateFromItem(testNote);
+});
+
+function showDelta(){
+    dojo.byId("deltaDisplay").innerHTML = dijit.byId("detailView").getDelta().toString();
+}
     </script>
 </head>
 <body class="cosmo">
-	<div id="detailView" dojoType="cosmo.ui.widget.DetailView" initItem="testItem">
+	<div id="detailView" dojoType="cosmo.ui.widget.DetailView" initItem="testNote">
 	</div>
+
+    <select onchange="dijit.byId('detailView').updateFromItem(dojo.global[this.value]);" style="position: absolute; right: 0; top: 0;">
+      <option value="testNote">testNote</option>
+      <option value="testEvent">testEvent</option>
+      <option value="testTask">testTask</option>
+      <option value="testLAEvent">testLAEvent</option>
+      <option value="testAllDayEvent">testAllDayEvent</option>
+      <option value="testAnyTimeEvent">testAnyTimeEvent</option>
+      <option value="testDailyEvent">testDailyEvent</option>
+      <option value="testDailyEndDateEvent">testDailyEndDateEvent</option>
+    </select>
+    <button onclick="doh.run()" style="position: absolute; right: 0; top: 30px;">Run Tests</button>
+    <button onclick="showDelta()" style="position: absolute; right: 0; top: 60px;">Show Delta</button>
+    <div id="deltaDisplay" style="position: absolute; left: 300px; right: 0; top: 90px;"></div>
+
 </body>
 </html>
 

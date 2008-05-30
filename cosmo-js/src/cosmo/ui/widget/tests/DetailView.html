@@ -10,6 +10,7 @@
         @import "../../../../dojo/resources/dojo.css";
         @import "../../../../cosmo/themes/default/DetailView.css";
         @import "../../../../cosmo/themes/default/imagegrid.css";
+#detailView{width: 300px};
     </style>
 	<script type="text/javascript">
 
@@ -43,10 +44,11 @@ testLAEvent.getEventStamp().setStartDate(new cosmo.datetime.Date(2008, 5, 1, 12,
 
 testAllDayEvent = testEvent.clone();
 testAllDayEvent.getEventStamp().setStartDate(new cosmo.datetime.Date(2008, 5, 1));
-testAllDayEvent.getEventStamp().setDuration(null);
+testAllDayEvent.getEventStamp().setDuration(new cosmo.model.Duration({day: 1}));
 testAllDayEvent.getEventStamp().setAllDay(true);
 
 testAnyTimeEvent = testAllDayEvent.clone();
+testAnyTimeEvent.getEventStamp().setAllDay(false);
 testAnyTimeEvent.getEventStamp().setAnyTime(true);
 
 testDailyEvent = testEvent.clone();
@@ -55,7 +57,12 @@ testDailyEvent.getEventStamp().setRrule(
                                   ));
 
 testDailyEndDateEvent = testEvent.clone();
-endDate = new cosmo.datetime.Date();
+startDate = testDailyEndDateEvent.getEventStamp().getStartDate();
+endDate = startDate.clone();
+endDate.setHours(0);
+endDate.setMinutes(0);
+endDate.setSeconds(0);
+endDate.setMilliseconds(0);
 endDate.addDuration(new cosmo.model.Duration({year: 1}));
 testDailyEndDateEvent.getEventStamp().setRrule(
     new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY,
@@ -75,6 +82,30 @@ function getTimeoutDeferred(time, f){
     }, time);
     return dohDeferred;
 }
+function initTest(dv, t){
+    t.t(dv.validate().isEmpty());
+    var delta = dv.getDelta();
+    if (delta.hasChanges()){
+        console.log(delta.toString());
+    }
+    t.f(delta.hasChanges());
+}
+
+function titleTest(dv, t){
+    var title = "new title abcdefg";
+    dv.titleInput.setValue(title);
+    var delta = dv.getDelta();
+    t.t(delta.hasChanges());
+    t.is(title, delta.getProperty("displayName"));
+}
+
+function notesTest(dv, t){
+    var notes = "big old body";
+    dv.notesInput.setValue(notes);
+    var delta = dv.getDelta();
+    t.t(delta.hasChanges());
+    t.is(notes, delta.getProperty("body"));
+}
 
 dojo.addOnLoad(function(){
     var dv = dijit.byId("detailView");
@@ -85,12 +116,9 @@ dojo.addOnLoad(function(){
             runTest: function (t){
                 dv.updateFromItem(testNote);
                 return getTimeoutDeferred(1000, function(){
-                    t.t(dv.validate().isEmpty());
-                    var delta = dv.getDelta();
-                    t.f(delta.hasChanges());
-                    dv.titleInput.setValue("bar");
-                    delta = dv.getDelta();
-                    t.t(delta.hasChanges());
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
                 });
             }
         }, 
@@ -101,7 +129,82 @@ dojo.addOnLoad(function(){
             runTest: function (t){
                 dv.updateFromItem(testEvent);
                 return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
                     t.is("once", dv.recurrenceSelector.value);
+                });
+            }
+        },
+        {
+            name: "testTask",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testTask);
+                return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
+                });
+            }
+        },
+        {
+            name: "testLAEvent",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testLAEvent);
+                return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
+                });
+            }
+        },
+        {
+            name: "testAllDayEvent",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testAllDayEvent);
+                return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
+                });
+            }
+        },
+        {
+            name: "testAnyTimeEvent",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testAnyTimeEvent);
+                return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
+                });
+            }
+        },
+        {
+            name: "testDailyEvent",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testDailyEvent);
+                return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
+                });
+            }
+        },
+        {
+            name: "testDailyEndDateEvent",
+            timeout: 4000,
+            runTest: function (t){
+                dv.updateFromItem(testDailyEndDateEvent);
+                return getTimeoutDeferred(1000, function(){
+                    initTest(dv, t);
+                    titleTest(dv, t);
+                    notesTest(dv, t);
                 });
             }
         }

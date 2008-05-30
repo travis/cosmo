@@ -80,13 +80,11 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     },
 
     updateFromItem: function(item){
-        console.log("updating");
         this.enable();
         this.titleInput.setValue(item.getDisplayName());
         this.notesInput.setValue(item.getBody());
         this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
-//        this.clearEventFields();
         if (eventStamp){
             if (!this.eventSectionEnabled) this.enableEvent();
             this.updateFromEventStamp(eventStamp);
@@ -273,8 +271,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
                 this.recurrenceSelector.value = 'custom';
             }
             this.untilInput.setAttribute("disabled", false);
-            var endDate = rrule.getEndDate();
-            if (endDate) this.untilInput.setValue(endDate);
+            this.untilInput.setValue(rrule.getEndDate());
         } else {
             this.untilInput.setValue(null);
             this.untilInput.setAttribute("disabled", true);
@@ -631,7 +628,6 @@ function populateDeltaEventFields(dv, delta){
     delta.addStampProperty("event", "startDate", dv.getStartDateTime());
     delta.addStampProperty("event", "endDate", dv.getEndDateTime());
     delta.addStampProperty("event", "location", dv.getLocation());
-    delta.addStampProperty("event", "status", dv.getStatus());
     delta.addStampProperty("event", "allDay", dv.getAllDay());
     var rrule = dv.getRrule();
     if (!rrule || (rrule && rrule.isSupported())) delta.addStampProperty("event", "rrule", rrule);
@@ -643,13 +639,11 @@ function populateDeltaAnytimeAtTime(dv, delta){
         delta.addStampProperty("event", "anyTime", false);
     } else if (!dv.startTimeInput.getValue() && !dv.endTimeInput.getValue()){
         delta.addStampProperty("event", "anyTime", true);
-        delta.addStampProperty("event", "status", null);
     } else if (!dv.endTimeInput.getValue() || dv.getStartDateTime().equals(dv.getEndDateTime())){
         //this is attime, so kill duration, end time
         delta.removeStampProperty("event", "endDate");
         delta.addStampProperty("event", "duration", new cosmo.model.Duration(cosmo.model.ZERO_DURATION));
         delta.addStampProperty("event", "anyTime", false); //just in case.
-        delta.addStampProperty("event", "status", null);
     }
 }
 

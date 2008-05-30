@@ -29,7 +29,6 @@
 <cosmo:threeColumnLayout prefix="Login." stylesheets="login" dojoLayers="login"
                          selfLink="${staticBaseUrl}/login">
 <c:set var="showSignup" value="${not properties['cosmo.service.account.disableSignups']}"/>
-${showSignup}
   <script type="text/javascript">
 
     dojo.require("cosmo.app");

@@ -12,12 +12,25 @@
         @import "../../../../cosmo/themes/default/imagegrid.css";
     </style>
 	<script type="text/javascript">
-        dojo.require("doh.runner");
         dojo.require("cosmo.ui.widget.DetailView");
+        dojo.require("cosmo.model.Item");
+        dojo.require("cosmo.model.EventStamp");
+        dojo.require("cosmo.model.common");
+        dojo.require("cosmo.datetime.Date");
+        initItem = new cosmo.model.Note({displayName: "foo", body: "barbazbuck"});
+        initEvent = new cosmo.model.Note({displayName: "an event", body: "event notes"});
+        initEvent.getEventStamp(
+            true, 
+            {startDate: new cosmo.datetime.Date(),
+             duration: new cosmo.model.Duration({hour: 1}),
+             location: "wherever",
+             status: "TENTATIVE"
+             
+            });
     </script>
 </head>
 <body class="cosmo">
-	<div id="detailView" dojoType="cosmo.ui.widget.DetailView">
+	<div id="detailView" dojoType="cosmo.ui.widget.DetailView" initItem="initEvent">
 	</div>
 </body>
 </html>

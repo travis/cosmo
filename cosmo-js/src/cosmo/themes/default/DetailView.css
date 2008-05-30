@@ -1,0 +1,68 @@
+#detailView{
+    width: 256px;
+}
+.cosmoDetailView {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.cosmoDetailViewMarkupBar {
+    height: 18px;
+    border: 1px solid #999999;
+}
+.cosmoDetailViewTriageButton {
+    position: absolute;
+}
+.cosmoDetailViewTriageLaterButton {
+    left: 43px;
+}
+.cosmoDetailViewTriageDoneButton {
+    left: 86px;
+}
+.cosmoDetailViewTriageButtons {
+    position: absolute;
+}
+.cosmoDetailViewStarButton {
+    position: absolute;
+    left: 150px;
+}
+.cosmoDetailViewMailButton {
+    position: absolute;
+    right: 0px;
+}
+
+.cosmoDetailViewNoteSection {
+    margin: 10px 20px 5px 7px;
+}
+
+.cosmoDetailViewTitleInput {
+    font-size: 15pt;
+    font-weight: bold;
+    width: 229px;
+}
+
+.cosmoDetailViewEventSection {
+    margin: 10px 20px 5px 7px;
+}
+.cosmoDetailViewEventTitleBar{
+    height: 18px;
+}
+
+.cosmoDetailViewStartDateInput{
+    width: 130px;
+}
+.cosmoDetailViewStartTimeInput{
+    width: 75px;
+}
+.cosmoDetailViewEndDateInput{
+    width: 130px;
+}
+.cosmoDetailViewEndTimeInput{
+    width: 75px;
+}
+.cosmoDetailViewUntilInput{
+    width: 115px;
+}

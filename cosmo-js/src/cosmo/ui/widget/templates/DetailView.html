@@ -1,0 +1,61 @@
+<div class="cosmoDetailView">
+  <div class="cosmoDetailViewContainer">
+    <div class="cosmoDetailViewMarkupBar">
+      <div id="${id}TriageButtons" dojoAttachPoint="triageButtons" class="cosmoDetailViewTriageButtons">
+        <span id="${id}NowButton" dojoAttachPoint="nowButton" class="cosmoDetailViewTriageButton cosmoDetailViewTriageNowButton cosmoTriageNowButtonDefault"></span>
+        <span id="${id}LaterButton" dojoAttachPoint="laterButton" class="cosmoDetailViewTriageButton cosmoDetailViewTriageLaterButton cosmoTriageLaterButtonDefault"></span>
+        <span id="${id}DoneButton" dojoAttachPoint="doneButton" class="cosmoDetailViewTriageButton cosmoDetailViewTriageDoneButton cosmoTriageDoneButtonDefault"></span>
+      </div>
+      <span id="${id}StarButton" dojoAttachPoint="starButton" class="cosmoDetailViewStarButton cosmoTaskButtonDefault"></span>
+      <span id="${id}MailButton" dojoAttachPoint="mailButton" class="cosmoDetailViewMailButton cosmoEmailButtonDefault"></span>
+    </div>
+    <div class="cosmoDetailViewNoteSection">
+      <div id="${id}titleInput" dojoAttachPoint="titleInput" dojoType="dijit.form.TextBox" class="cosmoDetailViewTitleInput"></div>
+      <textarea id="${id}NotesInput" dojoAttachPoint="notesInput" dojoType="dijit.form.Textarea" class="cosmoDetailViewNotesInput"></textarea>
+    </div>
+    <div class="cosmoDetailViewEventTitleBar">
+      <span id="${id}Title" dojoAttachPoint="titleSpan" class="cosmoDetailViewEventTitle"></span>
+      <span id="${id}EventButton" dojoAttachPoint="eventButton" class="cosmoDetailViewEventButton"></span>
+    </div>
+    <div class="cosmoDetailViewEventSection">
+      <input id="${id}LocationInput" dojoAttachPoint="locationInput" dojoType="dijit.form.TextBox" type="text" class="cosmoDetailViewLocationInput"></input>
+      <input id="${id}AllDayInput" dojoAttachPoint="allDayInput" dojotype="dijit.form.CheckBox"
+           name="allDay" type="checkbox" /></input>
+      <div class="cosmoDetailViewStartSection">
+        <input id="${id}StartDateInput" selector="date" dojoAttachPoint="startDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewStartDateInput"></input> ${l10n.at}
+        <input id="${id}StartTimeInput" selector="time" dojoAttachPoint="startTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewStartTimeInput"></input>
+      </div>
+      <div class="cosmoDetailViewEndSection">
+        <input id="${id}EndDateInput" dojoAttachPoint="endDateInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewEndDateInput"></input> ${l10n.at}
+        <input id="${id}EndTimeInput" dojoAttachPoint="endTimeInput" dojoType="dijit.form.TimeTextBox" type="text" class="cosmoDetailViewEndTimeInput"></input>
+      </div>
+      <div class="cosmoDetailViewTimezoneSection">
+        <select id="${id}TimezoneRegionSelector" dojoAttachPoint="timezoneRegionSelector" class="cosmoDetailViewTimezoneRegionSelector"></select>
+        <select id="${id}TimezoneCitySelector" dojoAttachPoint="timezoneCitySelector" class="cosmoDetailViewTimezoneCitySelector"></select>
+      </div>
+      <select id="${id}StatusSelector" dojoAttachPoint="statusSelector" class="cosmoDetailViewStatusSelector">
+        <option value="CONFIRMED">${l10n.confirmed}</option>
+        <option value="TENTATIVE">${l10n.tentative}</option>
+        <option value="FYI">${l10n.fyi}</option>
+      </select>
+      <div class="cosmoDetailViewRecurrenceSection">
+        <select id="${id}RecurrenceSelector" dojoAttachPoint="recurrenceSelector" class="cosmoDetailViewRecurrenceSelector">
+          <option value="custom">${l10n.custom}</option>
+          <option value="once">${l10n.once}</option>
+          <option value="daily">${l10n.daily}</option>
+          <option value="weekly">${l10n.weekly}</option>
+          <option value="biweekly">${l10n.biweekly}</option>
+          <option value="monthly">${l10n.monthly}</option>
+          <option value="yearly">${l10n.yearly}</option>
+        </select> ${l10n.until}
+        <input id="${id}UntilInput" dojoAttachPoint="untilInput" dojoType="dijit.form.DateTextBox" type="text" class="cosmoDetailViewUntilInput"></input>
+      </div>
+    </div>
+    <div class="cosmoDetailViewFooter">
+    <div class="cosmoDetailViewBylineSection" dojoAttachPoint="byline">
+    </div>
+    <button dojoType="dijit.form.Button" dojoAttachPoint="removeButton">${l10n.remove}</button>
+    <button dojoType="dijit.form.Button" dojoAttachPoint="saveButton">${l10n.save}</button>
+    </div>
+  </div>
+</div>

@@ -1094,7 +1094,7 @@ dojo.declare("cosmo.service.translators.Eim", null, {
             return recurrenceRuleList.join("");
         }
         else {
-            return rrulePropsToICal(rrule.getUnsupportedRule());
+            return this.rrulePropsToICal(rrule.getUnsupportedRule());
         }
     },
 
@@ -1107,11 +1107,11 @@ dojo.declare("cosmo.service.translators.Eim", null, {
         return dojox.date.posix.strftime(date, "%Y%m%dT%H%M%SZ");
     },
 
-    rrlePropsToICal: function (rProps, startDate){
+    rrulePropsToICal: function (rProps, startDate){
         var iCalProps = [];
         for (var key in rProps){
-            iCalProps.push(key);
-            iCalProps.push("=")
+            iCalProps.push(key.toUpperCase());
+            iCalProps.push("=");
             if (dojo.isArray(rProps[key])){
                 iCalProps.push(rProps[key].join());
             }
@@ -1123,8 +1123,8 @@ dojo.declare("cosmo.service.translators.Eim", null, {
                 iCalProps.push(rProps[key]);
             }
             iCalProps.push(";");
-            return iCalProps.join("");
         }
+        return iCalProps.join("");
     },
 
     parseRRule: function (rule, startDate){

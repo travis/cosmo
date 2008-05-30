@@ -40,6 +40,7 @@
 
 "emailButtonDefault": { "row": 3, "column": 13, "width": 24, "height": 18 },
 "emailButtonRollover": { "row": 3, "column": 14, "width": 24, "height": 18 },
+"emailButtonSelected": { "row": 3, "column": 15, "width": 24, "height": 18 },
 
 "taskButtonDefault": { "row": 3, "column": 16, "width": 24, "height": 18 },
 "taskButtonRollover": { "row": 3, "column": 17, "width": 24, "height": 18 },

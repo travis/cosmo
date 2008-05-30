@@ -18,6 +18,11 @@ dojo.provide("cosmo.ui.widget.CollectionSelector");
 dojo.require("dojox.color");
 dojo.require("dijit._Templated");
 dojo.require("cosmo.ui.ContentBox"); // legacy, deprecate soon
+dojo.require("cosmo.topics");
+dojo.require("cosmo.model.Item");
+dojo.require("cosmo.data.CollectionStore");
+dojo.require("cosmo.data.SubscriptionStore");
+dojo.require("cosmo.data.SharingDialog");
 dojo.require("cosmo.app.pim");
 
 dojo.requireLocalization("cosmo.ui.widget", "CollectionSelector");

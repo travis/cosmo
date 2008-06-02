@@ -265,7 +265,9 @@ td.dataDisplayLabel {
  * --------------------- */
 /* Main box for fake popup */
 #modalDialog {
-    position: absolute;
+    /* Work around Mozilla bug, https://bugzilla.mozilla.org/show_bug.cgi?id=167801 */
+    position:fixed;
+    position:expression("absolute");
     /* background: #fff;
     background: #fff;
     border: 1px solid #999; */

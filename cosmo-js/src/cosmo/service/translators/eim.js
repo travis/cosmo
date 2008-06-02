@@ -850,9 +850,14 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     modifiedOccurrenceToEventRecord: function(modifiedOccurrence){
         var modification = modifiedOccurrence.getMaster().getModification(modifiedOccurrence.recurrenceId);
         var props = modification.getModifiedStamps().event || {};
+        var modifiedEventStamp = modifiedOccurrence.getEventStamp();
         if (props.allDay || props.anyTime) props.startDate =
-            modifiedOccurrence.getEventStamp().getStartDate();
+            modifiedEventStamp.getStartDate();
         props.uuid = modifiedOccurrence.getUid();
+        if (props.startDate) {
+            props.allDay = modifiedEventStamp.getAllDay();
+            props.anyTime = modifiedEventStamp.getAnyTime();
+        }
         var record = this.propsToEventRecord(props);
         var missingFields = [];
         if (record.fields.dtstart == undefined) missingFields.push("dtstart");

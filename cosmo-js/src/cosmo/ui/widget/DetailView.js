@@ -655,8 +655,6 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             this.hideEvent();
         }
     }
-
-
 });
 
 

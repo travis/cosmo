@@ -135,82 +135,89 @@ cosmo.ui.menu.urls = {
 // based on display mode, user permissions, and user prefs
 cosmo.ui.menu.allItems = [
     { id: 'welcomeMenuItem',
-        displayText: _('Main.Welcome', [cosmo.app.currentUsername]),
-        displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
-        },
+      displayText: _('Main.Welcome', [cosmo.app.currentUsername]),
+      displayMode: cosmo.ui.menu.displayModes.AUTH,
+      requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
+    },
     { id: 'adminConsoleMenuItem',
-        displayText: _('Main.Console'),
-        urlString: cosmo.ui.menu.urls.ADMIN_CONSOLE,
-        displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.ROOT]
-        },
+      displayText: _('Main.Console'),
+      urlString: cosmo.ui.menu.urls.ADMIN_CONSOLE,
+      displayMode: cosmo.ui.menu.displayModes.AUTH,
+      requiredRoles: [cosmo.ui.menu.requiredRoles.ROOT]
+    },
     { id: 'settingsMenuItem',
-        displayText: _('Main.Settings'),
-        onclickFunc: function () { cosmo.account.settings.showDialog(); },
-        displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
-        },
+      displayText: _('Main.Settings'),
+      onclickFunc: function () { cosmo.account.settings.showDialog(); },
+      displayMode: cosmo.ui.menu.displayModes.AUTH,
+      requiredRoles: [cosmo.ui.menu.requiredRoles.USER]
+    },
     { id: 'accountBrowserMenuItem',
-        displayText: _('Main.AccountBrowser'),
-        onclickFunc: function (e) {
-            window.open(cosmo.ui.menu.urls.ACCOUNT_BROWSER); e.preventDefault(); },
-        urlString: cosmo.ui.menu.urls.ACCOUNT_BROWSER,
-        displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.USER],
-        requiredPref: cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK
-        },
+      displayText: _('Main.AccountBrowser'),
+      onclickFunc: function (e) {
+          window.open(cosmo.ui.menu.urls.ACCOUNT_BROWSER); e.preventDefault(); },
+      urlString: cosmo.ui.menu.urls.ACCOUNT_BROWSER,
+      displayMode: cosmo.ui.menu.displayModes.AUTH,
+      requiredRoles: [cosmo.ui.menu.requiredRoles.USER],
+      requiredPref: cosmo.account.preferences.SHOW_ACCOUNT_BROWSER_LINK
+    },
+    { id: 'whatIsMenuItem',
+      displayText: ['<a id="whatIsChandlerLink" href="http://chandlerproject.org" target="_blank">',
+                    _('Main.WhatIsChandler'), '</a>'].join(""),
+      displayMode: cosmo.ui.menu.displayModes.ANON,
+      requiredRoles: [],
+      dividerText: "\u00A0\u00A0"
+    },
     { id: 'signupMenuItem',
-        displayText: _('Main.SignUp'),
-        onclickFunc: function () { cosmo.account.create.showForm() },
-        displayMode: cosmo.ui.menu.displayModes.ANON,
-        requiredRoles: [],
-        displayFunc: function(){return djConfig.cosmoDisableSignups != 'true'}
-        },
+      displayText: _('Main.SignUp'),
+      onclickFunc: function () { cosmo.account.create.showForm() },
+      displayMode: cosmo.ui.menu.displayModes.ANON,
+      requiredRoles: [],
+      displayFunc: function(){return djConfig.cosmoDisableSignups != 'true'}
+    },
     { id: 'loginMenuItem',
-        displayText: _('Main.LogIn'),
-        onclickFunc: function(){location = cosmo.env.getLoginRedirect()},
-        displayMode: cosmo.ui.menu.displayModes.ANON,
-        requiredRoles: [],
-        dividerText: "\u00A0\u00A0"
-        },
+      displayText: _('Main.LogIn'),
+      onclickFunc: function(){location = cosmo.env.getLoginRedirect()},
+      displayMode: cosmo.ui.menu.displayModes.ANON,
+      requiredRoles: [],
+      dividerText: "\u00A0\u00A0"
+    },
     { id: 'logoutMenuItem',
-        displayText: _('Main.LogOut'),
-        urlString: cosmo.env.getRedirectUrl(),
-        displayMode: cosmo.ui.menu.displayModes.AUTH,
-        requiredRoles: [cosmo.ui.menu.requiredRoles.USER],
-        dividerText: "\u00A0\u00A0"
-        },
+      displayText: _('Main.LogOut'),
+      urlString: cosmo.env.getRedirectUrl(),
+      displayMode: cosmo.ui.menu.displayModes.AUTH,
+      requiredRoles: [cosmo.ui.menu.requiredRoles.USER],
+      dividerText: "\u00A0\u00A0"
+    },
     { id: 'aboutMenuItem',
-        displayText: _('Main.About'),
-        onclickFunc: function () {cosmo.util.popup.open(cosmo.env.getFullUrl("About"), 360, 280)},
-        displayMode: cosmo.ui.menu.displayModes.ANON,
-        requiredRoles: []
-        },
+      displayText: _('Main.About'),
+      onclickFunc: function () {cosmo.util.popup.open(cosmo.env.getFullUrl("About"), 360, 280)},
+      displayMode: cosmo.ui.menu.displayModes.ANON,
+      requiredRoles: []
+    },
     { id: 'tosMenuItem',
-        displayText: _('Main.TermsOfService'),
-        onclickFunc: function (e) {
-            cosmo.util.popup.open(cosmo.env.getFullUrl("TermsOfService"), _("TermsOfService.Width"), _("TermsOfService.Height"), true); },
-        displayMode: cosmo.ui.menu.displayModes.ANY,
-        requiredRoles: [],
-        requiredConf: ["tosRequired"]
-        },
+      displayText: _('Main.TermsOfService'),
+      onclickFunc: function (e) {
+          cosmo.util.popup.open(cosmo.env.getFullUrl("TermsOfService"), _("TermsOfService.Width"), _("TermsOfService.Height"), true); },
+      displayMode: cosmo.ui.menu.displayModes.ANY,
+      requiredRoles: [],
+      requiredConf: ["tosRequired"]
+    },
     { id: 'privacyMenuItem',
-        displayText: _('Main.PrivacyPolicy'),
-        onclickFunc: function (e) {
-            cosmo.util.popup.open(cosmo.env.getFullUrl("PrivacyPolicy"), _("PrivacyPolicy.Width"), _("PrivacyPolicy.Height"), true); },
-        displayMode: cosmo.ui.menu.displayModes.ANY,
-        requiredRoles: [],
-        requiredConf: ["tosRequired"]
-        },
+      displayText: _('Main.PrivacyPolicy'),
+      onclickFunc: function (e) {
+          cosmo.util.popup.open(cosmo.env.getFullUrl("PrivacyPolicy"), _("PrivacyPolicy.Width"), _("PrivacyPolicy.Height"), true); },
+      displayMode: cosmo.ui.menu.displayModes.ANY,
+      requiredRoles: [],
+      requiredConf: ["tosRequired"]
+    },
     { id: 'helpMenuItem',
-        displayText: _('Main.Help'),
-        onclickFunc: function (e) {
-            window.open(cosmo.ui.menu.urls.HELP); e.preventDefault(); },
-        urlString: cosmo.ui.menu.urls.HELP,
-        displayMode: cosmo.ui.menu.displayModes.ANY,
-        requiredRoles: []
-        }
+      displayText: _('Main.Help'),
+      onclickFunc: function (e) {
+          window.open(cosmo.ui.menu.urls.HELP); e.preventDefault(); },
+      urlString: cosmo.ui.menu.urls.HELP,
+      displayMode: cosmo.ui.menu.displayModes.ANY,
+      requiredRoles: []
+    }
 ];
 
 cosmo.ui.menu.MenuItem = function (p) {

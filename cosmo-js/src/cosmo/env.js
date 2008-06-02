@@ -69,7 +69,7 @@ cosmo.env._getCachePropGetterPopulator = function(propName, calculatorFunction )
 
    return prop;
    };
-}
+};
 
 /**
  * Returns the path to the widgets template directory , relative to the document NOT dojo.
@@ -93,7 +93,7 @@ cosmo.env.getBaseUrl = function(){
         throw new Error("You must setBaseUrl before calling this function");
     }
     return result;
-}
+};
 
 /**
  * Sets the base url of the application. Provided by the server and set during bootstrap.
@@ -101,7 +101,7 @@ cosmo.env.getBaseUrl = function(){
  */
 cosmo.env.setBaseUrl = function(baseUrl){
     cosmo.env._cosmoConfig["baseUrl"] = baseUrl;
-}
+};
 
 /**
  * Sets the base url for static resources. Provided by the server and set during bootstrap.
@@ -109,11 +109,11 @@ cosmo.env.setBaseUrl = function(baseUrl){
  */
 cosmo.env.setStaticBaseUrlTemplate = function(staticBaseUrl){
     cosmo.env._cosmoConfig["staticBaseUrlTemplate"] = staticBaseUrl;
-}
+};
 
 cosmo.env.getStaticBaseUrlTemplate = function(){
     return cosmo.env._cosmoConfig["staticBaseUrlTemplate"];
-}
+};
 
 cosmo.env.setStaticBaseUrlRange = function(staticBaseUrlRange){
     if (staticBaseUrlRange){
@@ -121,19 +121,19 @@ cosmo.env.setStaticBaseUrlRange = function(staticBaseUrlRange){
         this._cosmoConfig.rangeLow = parsedRange[0];
         this._cosmoConfig.rangeHigh = parsedRange[1];
     }
-}
+};
 
 cosmo.env.getStaticBaseUrlRangeLow = function(){
     return cosmo.env._cosmoConfig["rangeLow"];
-}
+};
 
 cosmo.env.getStaticBaseUrlRangeHigh = function(){
     return cosmo.env._cosmoConfig["rangeHigh"];
-}
+};
 
 cosmo.env._doesHaveRange = function(){
     return !!cosmo.env._cosmoConfig["rangeLow"];
-}
+};
 
 cosmo.env._getNextSuffix = function(){
     var current = this._currentSuffix;
@@ -147,7 +147,7 @@ cosmo.env._getNextSuffix = function(){
     }
     this._currentSuffix = current;
     return current;
-}
+};
 
 /**
  * Returns the url for a static resource. Uses a round-robin algorithm to
@@ -172,7 +172,7 @@ cosmo.env.getStaticUrl = function(resourcePath){
     url += resourcePath;
     this._staticUrlPathCache[resourcePath] = url;
     return url;
-}
+};
 
 /**
  * Sets the number of seconds for server-side timeout. Provided
@@ -188,11 +188,11 @@ cosmo.env.setTimeoutSeconds = function(timeoutSeconds) {
     else {
         cosmo.env._cosmoConfig["timeoutSeconds"] = s;
     }
-}
+};
 
 cosmo.env.getImageUrl = function(image){
     return dojo.moduleUrl("cosmo", "themes/default/images/" + image);
-}
+};
 
 cosmo.env.urls = {
     "Login": "/login",
@@ -201,7 +201,7 @@ cosmo.env.urls = {
     "Logout": "/logout",
     "Redirect": "/logout",
     "Auth": "/security_check",
-    "Notices": function(){return _("About.NoticesUrl")},
+    "Notices": function(){return _("About.NoticesUrl");},
     "Browse": "/browse",
     "UserList": '/admin/users',
     "TermsOfService": "/help/tos",
@@ -209,35 +209,36 @@ cosmo.env.urls = {
     "About": "/help/about",
     "Dav": "/dav",
     "Cmp": "/cmp"
-}
+};
 
 cosmo.env.getFullUrl = function (urlKey) {
     var url = this.urls[urlKey];
     if (typeof url == "function") url = url();
     return this.getBaseUrl() + url;
-}
+};
 
 cosmo.env.getRedirectUrl = function(){
     dojo.deprecated("cosmo.env.getRedirectUrl", "please use cosmo.env.getFullUrl instead", "0.8");
-    return cosmo.env.getBaseUrl() + '/logout';}
+    return cosmo.env.getBaseUrl() + '/logout';
+};
 
 cosmo.env.getLoginRedirect = function(){
     dojo.deprecated("cosmo.env.getLoginRedirect", "please use cosmo.env.getFullUrl instead", "0.8");
     return cosmo.env.getBaseUrl() + "/login";
-}
+};
 
 cosmo.env.getAuthProc = function(){
     dojo.deprecated("cosmo.env.getAuthProc", "please use cosmo.env.getFullUrl instead", "0.8");
     return cosmo.env.getBaseUrl() + "/security_check";
-}
+};
 
 cosmo.env.getVersion = function(){
     return this._version;
-}
+};
 
 cosmo.env.setVersion = function(version){
     this._version = version;
-}
+};
 
 /**
  * Returns the number of seconds for the server-side timeout
@@ -245,7 +246,7 @@ cosmo.env.setVersion = function(version){
  */
 cosmo.env.getTimeoutSeconds = function (){
     return cosmo.env._cosmoConfig["timeoutSeconds"];
-}
+};
 
 /**
  * Convenience method to return the number of minutes
@@ -256,7 +257,7 @@ cosmo.env.getTimeoutMinutes = function (){
     var s = cosmo.env._cosmoConfig["timeoutSeconds"];
     var ret = s == -1 ? -1 : s/60;
     return ret;
-}
+};
 
 //initialize from dojo.config
 var baseUrlConfigValue = dojo.config['serverBaseUrl'];

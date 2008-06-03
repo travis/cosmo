@@ -236,7 +236,7 @@ cosmo.account.create = new function () {
         var td = null;
 
         // Outer div
-        var dO = _createElem('div');
+        var d0 = _createElem('div');
 
         if (user.unactivated) {
             p = _createElem('div');
@@ -244,12 +244,12 @@ cosmo.account.create = new function () {
             p.style.textAlign = 'center';
             p.className = 'activationPrompt';
             p.innerHTML = _('Signup.Prompt.AccountActivation');
-            dO.appendChild(p);
+            d0.appendChild(p);
         }
 
         p = _createElem('div');
         p.appendChild(_createText(_('Signup.Prompt.AccountSetup')));
-        dO.appendChild(p);
+        d0.appendChild(p);
 
         // Create the table, append rows for each config value
         var table = _createElem('table');
@@ -277,7 +277,7 @@ cosmo.account.create = new function () {
             body.appendChild(tr)
         }
         table.appendChild(body);
-        dO.appendChild(table);
+        d0.appendChild(table);
 
         /*
         ***** Leave this out until we can actually do auto-login *****
@@ -290,11 +290,11 @@ cosmo.account.create = new function () {
             a.href = 'javascript:cosmo.app.modalDialog.hide();';
             a.appendChild(_createText(_('Signup.Links.LogInToCosmo')));
             p.appendChild(a);
-            dO.appendChild(p);
+            d0.appendChild(p);
         }
         */
 
         // Return the div containing the content
-        return dO;
+        return d0;
     }
 }

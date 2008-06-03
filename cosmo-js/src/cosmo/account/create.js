@@ -245,6 +245,7 @@ cosmo.account.create = new function () {
             p.className = 'activationPrompt';
             p.innerHTML = _('Signup.Prompt.AccountActivation');
             d0.appendChild(p);
+            return d0;
         }
 
         p = _createElem('div');

@@ -613,11 +613,13 @@ Link styles
 }
 
 .activationPrompt {
-	border: 1px solid #ff6600;
-	background: #ffffcc;
-	font-size: 12px;
-	padding: 8px;
-	font-weight: bold;
+    border: 1px solid #CCCCCC;
+    background: #ff6600;
+    color: white;
+    font-size: 1.1em;
+    line-height: 1.1em;
+    padding: 5px;
+    font-weight: bold;
 }
 
 

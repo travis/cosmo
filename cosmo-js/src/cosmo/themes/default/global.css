@@ -17,6 +17,9 @@
 /* Styles that will likely be needed app-wide (pim, admin, etc..) */
 
 
+@import url("../../../dojo/resources/dojo.css");
+@import url("../../../dijit/themes/dijit.css");
+@import url("../../../dijit/themes/dijit.css");
 /* Main styles, element types
  * ==================================== */
 /* All elements -- don't set the default font size here

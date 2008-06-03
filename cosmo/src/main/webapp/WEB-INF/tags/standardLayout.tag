@@ -67,21 +67,7 @@
 	</c:otherwise>
     </c:choose>
 
-    <cosmo:stylesheets stylesheets="${stylesheets}"/>
-    
-    
-    <c:if test="${not empty selfLink}">
-    <link rel="self" type="text/html" href="${selfLink }"/>
-    </c:if>
-
-    <cosmo:dojoBoilerplate parseWidgets="${parseWidgets}" dojoLayers="${dojoLayers}"/>
     <style type="text/css">
-      /* tundraGrid.css matches Dijit Tundra style.  Others forthcoming.
-      Use Grid.css on the same path for a more color-neutral theme */
-      @import "${staticBaseUrl}/js/dojox/grid/_grid/tundraGrid.css";
-      @import "${staticBaseUrl}/js/dijit/themes/tundra/tundra.css";
-      @import "${staticBaseUrl}/js/dojo/resources/dojo.css";
-
 #head {
 position: absolute;
 width: 100%;
@@ -131,8 +117,16 @@ img#logo {
 }
 
     </style>
+    <cosmo:stylesheets stylesheets="${stylesheets}"/>
+    
+    
+    <c:if test="${not empty selfLink}">
+    <link rel="self" type="text/html" href="${selfLink }"/>
+    </c:if>
+
+    <cosmo:dojoBoilerplate parseWidgets="${parseWidgets}" dojoLayers="${dojoLayers}"/>
   </head>
-  <body class="tundra">
+  <body class="cosmo tundra">
     <div id="head">
       <span id="mainLogoContainer">
         <a href="<c:url value="/account/view"/>">

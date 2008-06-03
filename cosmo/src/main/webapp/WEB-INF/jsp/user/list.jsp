@@ -24,7 +24,9 @@
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 
 <cosmo:standardLayout prefix="User.List." contentWrapperClass="foo" dojoLayers="userlist">
-
+<style type="text/css">
+      @import "${staticBaseUrl}/js/dojox/grid/_grid/Grid.css";
+</style>
 <script language="JavaScript">
 dojo.require("cosmo.ui.widget.UserList");
 </script>

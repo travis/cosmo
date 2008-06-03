@@ -16,10 +16,8 @@
 /* Styles for the PIM ui.
  *
  */
-@import url("../../../dojo/resources/dojo.css");
-@import url("../../../dijit/themes/dijit.css");
-@import url("../../../dijit/themes/tundra/Calendar.css");
 @import url("global.css");
+@import url("../../../dijit/themes/tundra/Calendar.css");
 @import url("SharingDialog.css");
 @import url("CollectionSelector.css");
 @import url("Dialog.css");

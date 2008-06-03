@@ -21,18 +21,11 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp"  %>
 <%@ include file="/WEB-INF/jsp/tagfiles.jsp" %>
 <fmt:setBundle basename="MessageResources"/>
-<cosmo:standardLayout prefix="Account.PasswordReset." showNav="false">
+<cosmo:standardLayout prefix="Account.PasswordReset." showNav="false" stylesheets="PasswordResetter">
 <cosmo:staticbaseurl var="staticBaseUrl"/>
 <script type="text/javascript">
 dojo.require("cosmo.ui.widget.PasswordResetter");
-
 </script>
-<style type="text/css">
-#passwordResetter{
-margin-left: auto;
-margin-right: auto;
-}
-</style>
 
 <div dojoType="cosmo.ui.widget.PasswordResetter" displayDefaultInfo="true" recoveryKey="${param.key}" id="passwordResetter"/>
 

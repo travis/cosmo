@@ -27,13 +27,15 @@ dojo.provide("cosmo.ui.widget.PasswordResetter");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.cmp");
-dojo.require("cosmo.util.i18n");
-dojo.require("cosmo.convenience");
-dojo.require("cosmo.ui.widget.Button");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
+dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dijit.form.Button");
+dojo.require("dojo.string");
 
-dojo.declare("cosmo.ui.widget.PasswordResetter", 
+dojo.requireLocalization("cosmo.ui.widget", "PasswordResetter");
+
+dojo.declare("cosmo.ui.widget.PasswordResetter",
              [dijit._Widget, dijit._Templated],
     {
 
@@ -42,7 +44,6 @@ dojo.declare("cosmo.ui.widget.PasswordResetter",
 
         widgetsInTemplate: true,
         displayDefaultInfo: false,
-        i18nPrefix: "Account.PasswordReset",
 
         recoveryKey: "",
 
@@ -66,34 +67,33 @@ dojo.declare("cosmo.ui.widget.PasswordResetter",
         },
 
         resetPassword: function(){
-            var self = this;
-            self.setError("");
-            if (this.passwordInput.value == this.confirmInput.value){
+            this.setError("");
+            if (this.validate()){
                 var d = cosmo.cmp.resetPassword(this.recoveryKey, this.passwordInput.value);
-                d.addCallback(function(data){
-                    self.setInfo(_(self.i18nPrefix + ".Success",
-                                   cosmo.env.getLoginRedirect()));
-                });
-                d.addErrback(function(error){
+                d.addCallback(dojo.hitch(this, function(data){
+                    this.setInfo(dojo.string.substitute(this.l10n.success,
+                                   [cosmo.env.getLoginRedirect()]));
+                }));
+                d.addErrback(dojo.hitch(this, function(error){
                     if (d.ioArgs.xhr.status == "404"){
-                        self.setError(_(self.i18nPrefix + ".Error.404", self.recoveryKey));
+                        this.setError(dojo.string.substitute(this.l10n.error404, [this.recoveryKey]));
                     } else {
-                        self.setError(error.message);
+                        this.setError(error.message);
                     }
-                });
-            } else {
-                this.setError(_(this.i18nPrefix + ".Error.PasswordMatch"));
+                }));
             }
         },
 
-        postCreate: function(){
-           if (this.displayDefaultInfo){
-               this.setInfo(_(this.i18nPrefix + ".InitialInfo"));
-           }
+        validate: function(){
+            if (this.passwordInput.value != this.confirmInput.value){
+                this.setError(this.l10n.errorPasswordMatch);
+            } else if (this.passwordInput.validate() &&
+                       this.confirmInput.validate()) return true;
+            return false;
+         },
 
-           this.passwordLabel.innerHTML = _(this.i18nPrefix + ".Password");
-           this.confirmLabel.innerHTML = _(this.i18nPrefix + ".Confirm");
+        constructor: function(){
+            this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "PasswordResetter");
         }
-
     }
 );

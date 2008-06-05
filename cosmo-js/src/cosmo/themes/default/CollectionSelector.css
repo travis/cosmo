@@ -52,14 +52,13 @@
     height: 18px;
     line-height: 18px;
     padding-left: 5px;
+    float: left;
 }
 .cosmoAddCollectionButton {
-    position: absolute;
-    right: 18px;
+    float: right;
     cursor: pointer;
 }
 .cosmoRemoveCollectionButton {
-    position: absolute;
-    right: 0px;
+    float: right;
     cursor: pointer;
 }

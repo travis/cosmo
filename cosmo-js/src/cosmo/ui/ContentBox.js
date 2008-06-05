@@ -97,6 +97,8 @@ cosmo.ui.ContentBox.prototype.update = function (p) {
     for (var n in params) { this[n] = params[n]; }
 };
 cosmo.ui.ContentBox.prototype.render = function () {
+    console.log("content box render deprecated:");
+    console.log(this.domNode);
     var renderDeferred;
     if (typeof this.renderSelf == 'function') {
         renderDeferred = this.renderSelf();

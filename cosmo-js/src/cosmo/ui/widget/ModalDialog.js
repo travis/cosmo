@@ -215,6 +215,7 @@ dojo.declare(
             return true;
         },
         render: function () {
+            console.log("modal dialog render deprecated");
             this.setTitle();
             this.setPrompt();
             this.setContent();

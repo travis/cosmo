@@ -100,6 +100,7 @@ cosmo.view.cal.canvas = new function () {
      * @param cD Date, the current date on the client
      */
     this.render = function (vS, vE, cD) {
+        console.log("calendar canvas render deprecated");
         var viewStart = vS;
         var viewEnd = vE;
         var currDate = cD;

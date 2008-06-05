@@ -647,6 +647,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     //TODO: deprecate
 
     render: function(){
+        console.log("detail view render deprecated");
         if (this.item){
             this.updateFromItem(this.item);
         } else {

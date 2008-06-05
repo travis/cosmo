@@ -49,7 +49,7 @@
 <script type="text/javascript">
 
     // Set isDebug to true to get nice dojo debugging messages
-    var djConfig = {isDebug: false, 
+    var djConfig = {isDebug: true, 
                     staticBaseUrlTemplate: "${cosmoui:getStaticHostUrlTemplate()}",
                     staticBaseUrlRange: "${cosmoui:getStaticHostUrlRange()}",
                     i18nLocation: "${baseUrl}/i18n.js",

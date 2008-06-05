@@ -711,8 +711,9 @@ dojo.declare("cosmo.service.translators.Eim", null, {
     // Make sure triage rank ends in two decimals
     fixTriageRank: function(rank){
         rank = rank || "0";
-        if (rank.toString().match(/d*\.\d\d/)) return rank;
-        else return rank + ".00";
+        if (rank.toString().match(/^\d*$/)) return rank + ".00";
+        else if (rank.toString().match(/^\d*\.\d$/)) return rank + "0";
+        else return rank;
     },
 
     noteToNoteRecord: function(note){

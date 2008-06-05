@@ -418,7 +418,7 @@ cosmo.view.service = new function () {
         // Display the correct confirmation dialog based on
         // whether or not the item recurs
         if (item.data.hasRecurrence()) {
-            if (item.collectionIds.length > 1) {
+            if (item.collectionIds && item.collectionIds.length > 1) {
                 confirmType = 'removeRecurConfirmAllEventsOnly';
             }
             else {

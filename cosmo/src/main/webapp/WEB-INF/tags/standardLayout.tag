@@ -57,68 +57,7 @@
       </fmt:message>
     </title>
     
-    <!-- Stylesheets -->
-    <c:choose>
-    <c:when  test="${not empty stylesheets}">
-    	<c:set var="stylesheets" value="${stylesheets}"/>
-	</c:when>
-	<c:otherwise>
-		<c:set var="stylesheets" value=""/>
-	</c:otherwise>
-    </c:choose>
-
-    <style type="text/css">
-#head {
-position: absolute;
-width: 100%;
-top: 0;
-height: 6em;
-border: 0;
-margin: 0;
-}
-
-#main {
-position: absolute;
-width: 100%;
-top: 6em;
-bottom: 2em;
-border: 0;
-margin: 0;
-}
-
-#foot {
-position: absolute;
-text-align: center;      
-height: 2em;
-bottom: 0;
-width: 100%;
-border: 0;
-margin: 0;
-}
-
-html, body{
-height: 100%;
-width: 100%;
-margin: 0;
-padding: 0;
-}
-
-#menuNavItems {
-	position: absolute;
-	display: inline;
-	width: auto;
-	right: 0;
-	padding: 5px;
-}
-
-img#logo {
-	height: 45px;
-	width: 216px;
-}
-
-    </style>
     <cosmo:stylesheets stylesheets="${stylesheets}"/>
-    
     
     <c:if test="${not empty selfLink}">
     <link rel="self" type="text/html" href="${selfLink }"/>

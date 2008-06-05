@@ -32,17 +32,19 @@ function getRGB(h, s, v){
     return 'rgb(' + rgb.join() + ')';
 }
 
-var collectionNameTd = "<td id='collectionSelectorItemSel_${uid}' dojoAttachPoint='nameCell' dojoAttachEvent='onmouseover: handleNameMouseOver, onmouseout: handleNameMouseOut, onclick: handleSelectionClick' class='collectionSelectorCollectionName'>${displayName}</td>";
-var collectionDropdownTd = "<td dojoAttachEvent='onclick: handleDropdownClick, onmouseover: handleDropdownMouseOver, onmouseout: handleDropdownMouseOut' id='collectionSelectorItemDetails_${uid}' class='collectionSelectorDetails' style='background-color: ${defaultHueString}'><div class='cosmoPulldown'></div></td>";
+var collectionNameMarkup = "<div id='collectionSelectorItemSel_${uid}' dojoAttachPoint='nameCell' dojoAttachEvent='onmouseover: handleNameMouseOver, onmouseout: handleNameMouseOut, onclick: handleSelectionClick' class='collectionSelectorCollectionName'>${displayName}</div>";
+var collectionDropdownMarkup = "<div dojoAttachPoint='dropdown' dojoAttachEvent='onclick: handleDropdownClick, onmouseover: handleDropdownMouseOver, onmouseout: handleDropdownMouseOut' id='collectionSelectorItemDetails_${uid}' class='collectionSelectorDetails' style='background-color: ${defaultHueString}'><div class='cosmoCollectionDetails'></div></div>";
 dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
 {
-    templateString: "<tr>" + collectionNameTd + collectionDropdownTd + "</tr>",
+    templateString: "<div class='cosmoCollectionSelectorSection'>" + collectionNameMarkup + collectionDropdownMarkup + "</div>",
     hue: null,
     collection: null,
     store: null,
 
     selectionSubscription: null,
     nameCell: null,
+    dropdown: null,
+
     constructor: function(){
         this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "CollectionSelector");
     },
@@ -84,11 +86,11 @@ dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
     },
 
     handleDropdownMouseOver: function(e){
-        e.target.style.backgroundColor = getRGB(this.hue, 50, 100);
+        this.dropdown.style.backgroundColor = getRGB(this.hue, 50, 100);
     },
 
     handleDropdownMouseOut: function(e){
-        e.target.style.backgroundColor = this.defaultHueString;
+        this.dropdown.style.backgroundColor = this.defaultHueString;
     },
 
     handleNameMouseOver: function(e){
@@ -116,10 +118,11 @@ dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
     }
 });
 
-var collectionCheckboxTd = "<td class='collectionSelectorCheckbox'><input type='checkbox' id='collectionSelectorItemCheck_${uid}' ${checkedAttribute} dojoAttachEvent='onclick: handleCheckboxClick'/></td>";
+var collectionCheckboxMarkup = "<div class='collectionSelectorCheckbox'><input type='checkbox' id='collectionSelectorItemCheck_${uid}' ${checkedAttribute} dojoAttachEvent='onclick: handleCheckboxClick'/></div>";
+
 dojo.declare("cosmo.ui.widget._CalViewSelector", cosmo.ui.widget._BaseSelector,
 {
-    templateString: "<tr>" + collectionCheckboxTd + collectionNameTd + collectionDropdownTd + "</tr>",
+    templateString: "<div class='cosmoCollectionSelectorSection cosmoCollectionSelectorCalSelect'>" + collectionCheckboxMarkup + collectionNameMarkup + collectionDropdownMarkup + "</div>",
     postMixInProperties: function(){
         this.inherited("postMixInProperties", arguments);
         this.checkedAttribute = this.collection.isOverlaid? "checked='checked'" : "";
@@ -145,7 +148,7 @@ dojo.declare("cosmo.ui.widget._CalViewSelector", cosmo.ui.widget._BaseSelector,
 
 dojo.declare("cosmo.ui.widget._ListViewSelector", cosmo.ui.widget._BaseSelector,
 {
-
+    templateString: "<div class='cosmoCollectionSelectorSection cosmoCollectionSelectorListSelect'>" + collectionNameMarkup + collectionDropdownMarkup + "</div>"
 });
 
 dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templated, cosmo.ui.ContentBox],

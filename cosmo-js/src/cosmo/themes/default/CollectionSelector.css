@@ -1,47 +1,52 @@
-#collectionSelectorTable {
-    table-layout: fixed;
-    width: 100%;
+#collectionSelectorContainer {
+    height: 176px;
+    overflow: auto;
 }
 .collectionSelectorCheckbox {
     width: 18px;
     height: 16px;
     padding-left: 3px;
     text-align: center;
-}
-#collectionSelectorContainer {
-    height: 176px;
-    overflow: auto;
+    display: inline;
+    float: left;
 }
 .collectionSelectorCollectionName {
     padding-left: 5px;
     cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
+    float: left;
+}
+.cosmoCollectionSelectorCalSelect .collectionSelectorCollectionName {
+    width: 128px;
+}
+.cosmoCollectionSelectorListSelect .collectionSelectorCollectionName {
+    width: 149px;
+}
+.cosmoCollectionSelectorSection {
+    clear: both;
 }
 .collectionSelectorSel {
     background-color: #659dd3;
     color: #fff;
-    border-bottom: 1px solid white;
 }
 .collectionSelectorDetails {
-    width: 11px;
-    padding: 0px 1px 0px 3px;
-    height: 15px;
-    border-bottom: 1px solid white;
+    width: 14px;
+    height: 14px;
     cursor: pointer;
+    float: right;
+    border-bottom: 1px white solid;
 }
-.dj_safari .collectionSelectorDetails{
-    width: 15px;
+.cosmoCollectionDetails {
+    margin: 4px 2px 0px 2px;
 }
 #collectionSelectorNoCollectionsPrompt {
     color: #999;
     padding: 4px;
 }
-.cosmoAddRemoveCollectionContainer{
+.cosmoAddRemoveCollectionContainer {
     height: 18px;
     border-bottom: 1px solid #DDDDDD;
 }
-.cosmoAddRemoveCollectionLabel{
+.cosmoAddRemoveCollectionLabel {
     font-weight: bold;
     color: #7f7f7f;
     height: 18px;

@@ -206,7 +206,7 @@ public class ServiceLocatorFactory {
                 append("://").
                 append(request.getServerName());
             if ((request.isSecure() && request.getServerPort() != 443) ||
-                    (request.getServerPort() != 80)) {
+                ((!request.isSecure() && request.getServerPort() != 80))) {
                 buf.append(":").append(request.getServerPort());
             }
         }

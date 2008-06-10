@@ -233,7 +233,7 @@ cosmo.view.handleUnsavedChanges = function (origSelection,
             // case, so just proceed with selecting the next item.
             return true;
         }
-        console.debug(e);
+        console.log(e);
     }
 
     // This will be populated if there

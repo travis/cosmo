@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.mock.MockCollectionSubscription;
 /**
  * Test class for {@link SubscriptionProvider#updateEntry()} tests.
  */
-public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
+public class UpdateSubscriptionTest extends BaseSubscriptionCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(UpdateSubscriptionTest.class);
 
@@ -36,7 +36,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         MockCollectionSubscription newsub = (MockCollectionSubscription) newSubscription();
         RequestContext req = createRequestContext(sub, newsub);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -66,7 +66,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         RequestContext req = createRequestContext(sub, newsub);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -78,7 +78,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         newsub.setDisplayName(sub2.getDisplayName());
         RequestContext req = createRequestContext(sub1, newsub);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
@@ -90,7 +90,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         newsub.setCollectionUid("deadbeef");
         RequestContext req = createRequestContext(sub, newsub);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -102,7 +102,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
         newsub.setTicketKey("deadbeef");
         RequestContext req = createRequestContext(sub, newsub);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -119,7 +119,7 @@ public class UpdateSubscriptionTest extends BaseSubscriptionProviderTestCase {
                                                 CollectionSubscription newsub)
         throws Exception {
         MockSubscriptionRequestContext rc =
-            new MockSubscriptionRequestContext(helper.getServiceContext(),
+            new MockSubscriptionRequestContext(provider,
                                                helper.getUser(), sub, "PUT");
         rc.setXhtmlContentAsEntry(serialize(newsub));
         return rc;

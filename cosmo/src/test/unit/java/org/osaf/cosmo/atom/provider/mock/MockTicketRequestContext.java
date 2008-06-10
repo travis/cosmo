@@ -15,14 +15,13 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import org.apache.abdera.protocol.server.ServiceContext;
-
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.TicketTarget;
-import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Ticket;
 
 /**
  * Mock implementation of {@link RequestContext} representing requests
@@ -32,13 +31,13 @@ public class MockTicketRequestContext extends BaseMockRequestContext {
     private static final Log log =
         LogFactory.getLog(MockTicketRequestContext.class);
 
-    public MockTicketRequestContext(ServiceContext context,
+    public MockTicketRequestContext(Provider provider,
             CollectionItem collection,
             Ticket ticket) {
-        this(context, collection, ticket, "GET");
+        this(provider, collection, ticket, "GET");
     }
 
-    public MockTicketRequestContext(ServiceContext context,
+    public MockTicketRequestContext(Provider context,
             CollectionItem collection,
             Ticket ticket,
             String method) {

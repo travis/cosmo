@@ -17,19 +17,16 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.mock.MockServiceRequestContext;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.User;
 
 /**
  * Test class for {@link ItemProvider#createCollection()} tests.
  */
-public class CreateCollectionTest extends BaseItemProviderTestCase
+public class CreateCollectionTest extends BaseItemCollectionAdapterTestCase
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(CreateCollectionTest.class);
@@ -40,7 +37,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -63,7 +60,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -84,7 +81,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -96,7 +93,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -108,7 +105,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -124,7 +121,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -138,7 +135,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.createCollection(req);
+        ResponseContext res = adapter.postCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
@@ -146,7 +143,7 @@ public class CreateCollectionTest extends BaseItemProviderTestCase
     public RequestContext createRequestContext(CollectionItem collection)
         throws Exception {
         MockServiceRequestContext rc =
-            new MockServiceRequestContext(helper.getServiceContext(),
+            new MockServiceRequestContext(provider,
                                           helper.getUser(),
                                           helper.getHomeCollection());
         if (collection != null)

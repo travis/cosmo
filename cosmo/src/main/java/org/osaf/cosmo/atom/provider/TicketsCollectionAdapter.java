@@ -21,12 +21,11 @@ import java.text.ParseException;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorException;
 import org.osaf.cosmo.atom.generator.TicketsFeedGenerator;
@@ -38,9 +37,9 @@ import org.osaf.cosmo.security.CosmoSecurityManager;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
-public class TicketsProvider extends BaseProvider
+public class TicketsCollectionAdapter extends BaseCollectionAdapter
     implements AtomConstants {
-    private static final Log log = LogFactory.getLog(TicketsProvider.class);
+    private static final Log log = LogFactory.getLog(TicketsCollectionAdapter.class);
     private static final String[] ALLOWED_COLL_METHODS =
         new String[] { "GET", "HEAD", "POST", "OPTIONS" };
     private static final String[] ALLOWED_ENTRY_METHODS =
@@ -51,7 +50,7 @@ public class TicketsProvider extends BaseProvider
 
     // Provider methods
 
-    public ResponseContext createEntry(RequestContext request) {
+    public ResponseContext postEntry(RequestContext request) {
         TicketsTarget target = (TicketsTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
 
@@ -63,7 +62,7 @@ public class TicketsProvider extends BaseProvider
             Ticket ticket = readTicket(request);
             ticket.setOwner(securityManager.getSecurityContext().getUser());
             if (contentService.getTicket(collection, ticket.getKey()) != null)
-                return conflict(getAbdera(), request, "Ticket exists on " + 
+                return ProviderHelper.conflict(request, "Ticket exists on " + 
                                 collection.getDisplayName());
 
             if (log.isDebugEnabled())
@@ -79,20 +78,20 @@ public class TicketsProvider extends BaseProvider
                 createTicketsFeedGenerator(locator);
             Entry entry = generator.generateEntry(collection, ticket);
             
-            return created(entry, ticket, locator);
+            return created(request, entry, ticket, locator);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (ValidationException e) {
             String msg = "Invalid entry: " + e.getMessage();
             if (e.getCause() != null)
                 msg += e.getCause().getMessage();
-            return badrequest(getAbdera(), request, msg);
+            return ProviderHelper.badrequest(request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
 
@@ -113,11 +112,7 @@ public class TicketsProvider extends BaseProvider
         throw new UnsupportedOperationException();
     }
 
-    public ResponseContext updateEntry(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-  
-    public ResponseContext updateMedia(RequestContext request) {
+    public ResponseContext putEntry(RequestContext request) {
         throw new UnsupportedOperationException();
     }
   
@@ -138,11 +133,11 @@ public class TicketsProvider extends BaseProvider
                 createTicketsFeedGenerator(locator);
             Feed feed = generator.generateFeed(collection);
 
-            return ok(feed);
+            return ok(request, feed);
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
 
@@ -160,11 +155,11 @@ public class TicketsProvider extends BaseProvider
                 createTicketsFeedGenerator(locator);
             Entry entry = generator.generateEntry(collection, ticket);
 
-            return ok(entry, ticket);
+            return ok(request, entry, ticket);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
   
@@ -176,26 +171,19 @@ public class TicketsProvider extends BaseProvider
         throw new UnsupportedOperationException();
     }
   
-    public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-  
-    public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-
+    
     // ExtendedProvider methods
 
-    public ResponseContext createCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    public ResponseContext putCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
-    public ResponseContext updateCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    public ResponseContext postCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext deleteCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
     // our methods

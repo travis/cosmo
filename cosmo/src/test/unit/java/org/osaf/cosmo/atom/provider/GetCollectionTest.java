@@ -27,14 +27,14 @@ import org.osaf.cosmo.model.CollectionItem;
 /**
  * Test class for {@link ItemProvider#getFeed()} tests.
  */
-public class GetCollectionTest extends BaseItemProviderTestCase {
+public class GetCollectionTest extends BaseItemCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetCollectionTest.class);
 
     public void testGetFeed() throws Exception {
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -46,7 +46,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(collection);
         helper.forgetProjections();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -56,7 +56,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(collection);
         helper.forgetFormats();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -66,7 +66,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(collection);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -79,7 +79,7 @@ public class GetCollectionTest extends BaseItemProviderTestCase {
     }
 
     public RequestContext createRequestContext(CollectionItem collection) {
-        return new MockCollectionRequestContext(helper.getServiceContext(),
+        return new MockCollectionRequestContext(provider,
                                                 collection, "GET", "yyz",
                                                 "eff");
     }

@@ -16,11 +16,11 @@
 package org.osaf.cosmo.atom.provider;
 
 
-import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.CollectionAdapter;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 
-public interface ExtendedProvider extends Provider {
+public interface ExtendedCollectionAdapter extends CollectionAdapter {
 
     /**
      * <p>
@@ -30,7 +30,7 @@ public interface ExtendedProvider extends Provider {
      * Returns <code>201 OK</code> on success.
      * </p>
      */
-    public ResponseContext createCollection(RequestContext request);
+    public ResponseContext putCollection(RequestContext request);
 
     /**
      * <p>
@@ -40,7 +40,7 @@ public interface ExtendedProvider extends Provider {
      * Returns <code>204 No Content</code> on success.
      * </p>
      */
-    public ResponseContext updateCollection(RequestContext request);
+    public ResponseContext postCollection(RequestContext request);
 
     /**
      * Deletes the targeted collection.

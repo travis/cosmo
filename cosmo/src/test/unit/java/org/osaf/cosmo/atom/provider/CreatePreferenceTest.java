@@ -28,7 +28,7 @@ import org.osaf.cosmo.model.hibernate.HibPreference;
 /**
  * Test class for {@link PreferenceProvider#createEntry()} tests.
  */
-public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
+public class CreatePreferenceTest extends BasePreferencesCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(CreatePreferenceTest.class);
 
@@ -36,7 +36,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         Preference pref = helper.makeDummyPreference();
         RequestContext req = createRequestContext(pref);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -59,7 +59,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         RequestContext req = createRequestContext(pref);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -68,7 +68,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         Preference pref = helper.makeAndStoreDummyPreference();
         RequestContext req = createRequestContext(pref);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
@@ -77,7 +77,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         Preference pref = new HibPreference("new key", null);
         RequestContext req = createRequestContext(pref);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
     }
@@ -86,7 +86,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
         Preference pref = new HibPreference(null, "new value");
         RequestContext req = createRequestContext(pref);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -94,7 +94,7 @@ public class CreatePreferenceTest extends BasePreferencesProviderTestCase {
     private RequestContext createRequestContext(Preference pref)
         throws Exception {
         MockPreferencesRequestContext rc =
-            new MockPreferencesRequestContext(helper.getServiceContext(),
+            new MockPreferencesRequestContext(provider,
                                               helper.getUser(), "POST");
         rc.setXhtmlContentAsEntry(serialize(pref));
         return rc;

@@ -15,55 +15,48 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.GeneratorException;
+import org.osaf.cosmo.atom.generator.ItemFeedGenerator;
 import org.osaf.cosmo.atom.generator.UnsupportedFormatException;
 import org.osaf.cosmo.atom.generator.UnsupportedProjectionException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.server.ServiceLocator;
 
-public class ExpandedItemProvider extends ItemProvider {
+public class ExpandedItemCollectionAdapter extends ItemCollectionAdapter {
     private static final Log log =
-        LogFactory.getLog(ExpandedItemProvider.class);
+        LogFactory.getLog(ExpandedItemCollectionAdapter.class);
     private static final String[] ALLOWED_COLL_METHODS =
         new String[] { "GET", "HEAD", "OPTIONS" };
     private static final String[] ALLOWED_ENTRY_METHODS =
         new String[] { "OPTIONS" };
 
     // Provider methods
-
-    public ResponseContext createEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    @Override
+    public ResponseContext putEntry(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
+    @Override
     public ResponseContext deleteEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-  
-    public ResponseContext deleteMedia(RequestContext request) {
-        throw new UnsupportedOperationException();
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
-    public ResponseContext updateEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+    @Override
+    public ResponseContext postEntry(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
-    public ResponseContext updateMedia(RequestContext request) {
-        throw new UnsupportedOperationException();
+    @Override
+    public ResponseContext putMedia(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
-    public ResponseContext getService(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-
     public ResponseContext getFeed(RequestContext request) {
         ExpandedItemTarget target = (ExpandedItemTarget) request.getTarget();
         NoteItem item = target.getItem();
@@ -78,24 +71,24 @@ public class ExpandedItemProvider extends ItemProvider {
 
             Feed feed = generator.generateFeed(item);
 
-            return ok(feed, item);
+            return ok(request, feed, item);
         } catch (InvalidQueryException e) {
-            return badrequest(getAbdera(), request, e.getMessage());
+            return ProviderHelper.badrequest(request, e.getMessage());
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (UnsupportedFormatException e) {
             String reason = "Format " + target.getFormat() + " not supported";
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext getMedia(RequestContext request) {
@@ -107,16 +100,16 @@ public class ExpandedItemProvider extends ItemProvider {
     }
   
     public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
-    // ExtendedProvider methods
-
-    public ResponseContext updateCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    // ExtendedCollectionAdapter methods
+    @Override
+    public ResponseContext postCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 }

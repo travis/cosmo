@@ -32,14 +32,16 @@ import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.util.Dates;
 
+import org.apache.abdera.model.AtomDate;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
+import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.AbstractResponseContext;
+import org.apache.abdera.protocol.server.context.AbstractResponseContext;
+import org.apache.abdera.protocol.server.context.EmptyResponseContext;
 import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
 import org.apache.abdera.util.MimeTypeHelper;
@@ -83,8 +85,9 @@ import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.ContentService;
 
-public class ItemProvider extends BaseProvider implements AtomConstants {
-    private static final Log log = LogFactory.getLog(ItemProvider.class);
+public class ItemCollectionAdapter extends BaseCollectionAdapter implements AtomConstants {
+   
+    private static final Log log = LogFactory.getLog(ItemCollectionAdapter.class);
 
     private ProcessorFactory processorFactory;
     private ContentService contentService;
@@ -95,30 +98,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     private static final String[] ALLOWED_ENTRY_METHODS =
         new String[] { "GET", "HEAD", "PUT", "OPTIONS" };
 
-    /**
-     * Supports additional API methods:
-     * <ul>
-     * <li> POST to a collection - if the content type is
-     * <code>application/x-www-form-urlencoded</code>, the request is
-     * delegated to the method {@link #addItemToCollection(RequestContext)}.
-     * </li>
-     * </ul>
-     */
-    public ResponseContext request(RequestContext request) {
-        String method = request.getMethod();
-        TargetType type = request.getTarget().getType();
-
-        if (method.equals("POST")) {
-            if (type == TargetType.TYPE_COLLECTION) {
-                if (isAddItemToCollectionRequest(request))
-                    return addItemToCollection(request);
-            }
-        }
-
-        return super.request(request);
-    }
-
-    public ResponseContext createEntry(RequestContext request) {
+    public ResponseContext postEntry(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
@@ -145,7 +125,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 try {
                     processor = createContentProcessor(mediaType);
                 } catch (UnsupportedContentTypeException e) {
-                    return notsupported(getAbdera(), request, "Content-type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
+                    return ProviderHelper.notsupported(request, "Content-type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
                 }
                 item = processor.processCreation(request.getReader(), collection);
             }
@@ -162,49 +142,49 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                     createItemFeedGenerator(itemTarget, locator);
                 entry = generator.generateEntry(item);
 
-                return created(entry, item, locator);
+                return created(request, entry, item, locator);
             } else {
                 return created(item, locator);
             }
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (UnsupportedContentTypeException e) {
-            return badrequest(getAbdera(), request, "Entry content type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
+            return ProviderHelper.badrequest(request, "Entry content type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
         } catch (ParseException e) {
             String reason = "Unparseable content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (UidInUseException e) {
-            return conflict(getAbdera(), request, "Uid already in use");
+            return ProviderHelper.conflict(request, "Uid already in use");
         } catch (IcalUidInUseException e) {
             return conflict(request, new UidConflictException(e));
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
 
@@ -214,7 +194,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
         // handle case where item is an occurrence, return unknown
         if(item instanceof NoteOccurrence)
-            return this.unknown(getAbdera(), request, "Item not found");
+            return ProviderHelper.notfound(request, "Item not found");
         
         if (log.isDebugEnabled())
             log.debug("deleting entry for item " + item.getUid());
@@ -224,9 +204,9 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             if (! StringUtils.isBlank(uuid)) {
                 Item collection = contentService.findItemByUid(uuid);
                 if (collection == null)
-                    return conflict(getAbdera(), request, "Collection not found");
+                    return ProviderHelper.conflict(request, "Collection not found");
                 if (! (collection instanceof CollectionItem))
-                    return conflict(getAbdera(), request, "Uuid does not specify a collection");
+                    return ProviderHelper.conflict(request, "Uuid does not specify a collection");
                 contentService.
                     removeItemFromCollection(item, (CollectionItem)collection);
             } else {
@@ -235,20 +215,16 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             return deleted();
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
   
-    public ResponseContext deleteMedia(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-
-    public ResponseContext updateEntry(RequestContext request) {
+    public ResponseContext putEntry(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
@@ -271,48 +247,49 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 createItemFeedGenerator(target, locator);
             entry = generator.generateEntry(item);
 
-            return updated(entry, item, locator, false);
+            return updated(request, entry, item, locator, false);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (UnsupportedContentTypeException e) {
-            return badrequest(getAbdera(), request, "Entry content type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
+            return ProviderHelper.badrequest(request, "Entry content type must be one of " + StringUtils.join(processorFactory.getSupportedContentTypes(), ", "));
         } catch (ParseException e) {
             String reason = "Unparseable content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (IcalUidInUseException e) {
             return conflict(request, new UidConflictException(e));
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
   
-    public ResponseContext updateMedia(RequestContext request) {
+    @Override
+    public ResponseContext putMedia(RequestContext request) {
         ItemTarget target = (ItemTarget) request.getTarget();
         NoteItem item = target.getItem();
         if (log.isDebugEnabled())
@@ -332,32 +309,37 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (UnsupportedContentTypeException e) {
-            return notsupported(getAbdera(), request, "Unsupported media type " + e.getContentType());
+            return ProviderHelper.notsupported(request, "Unsupported media type " + e.getContentType());
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
-  
-    public ResponseContext getService(RequestContext request) {
-        throw new UnsupportedOperationException();
+    
+    
+    @Override
+    public ResponseContext postMedia(RequestContext request) {
+        if(isAddItemToCollectionRequest(request))
+            return addItemToCollection(request);
+            
+        return super.postMedia(request);
     }
 
     public ResponseContext getFeed(RequestContext request) {
@@ -374,19 +356,19 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             Feed feed = generator.generateFeed(collection);
 
-            return ok(feed, collection);
+            return ok(request, feed, collection);
         } catch (InvalidQueryException e) {
-            return badrequest(getAbdera(), request, e.getMessage());
+            return ProviderHelper.badrequest(request, e.getMessage());
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (UnsupportedFormatException e) {
             String reason = "Format " + target.getFormat() + " not supported";
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
 
@@ -401,40 +383,24 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
             ItemFeedGenerator generator =
                 createItemFeedGenerator(target, locator);
             Entry entry = generator.generateEntry(item);
-
-            return ok(entry, item);
+            
+            return ok(request, entry, item);
         } catch (UnsupportedProjectionException e) {
             String reason = "Projection " + target.getProjection() + " not supported";
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (UnsupportedFormatException e) {
             String reason = "Format " + target.getFormat() + " not supported";
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
-  
-    public ResponseContext getMedia(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-  
-    public ResponseContext getCategories(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-  
-    public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-  
-    public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
 
-    // ExtendedProvider methods
+    // ExtendedCollectionAdapter methods
   
-    public ResponseContext createCollection(RequestContext request) {
+    public ResponseContext postCollection(RequestContext request) {
         NewCollectionTarget target = (NewCollectionTarget) request.getTarget();
         User user = target.getUser();
         HomeCollectionItem home = target.getHomeCollection();
@@ -451,7 +417,6 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             CollectionItem collection = getEntityFactory().createCollection();
             collection.setUid(content.getUid());
-            String name = content.getDisplayName().replaceAll("[\\/\\?\\#\\=\\;]", "_");
             collection.setName(collection.getUid());
             collection.setDisplayName(content.getDisplayName());
             collection.setOwner(user);
@@ -471,30 +436,45 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (ValidationException e) {
             String msg = "Invalid request content: " + e.getMessage();
             if (e.getCause() != null)
                 msg += ": " + e.getCause().getMessage();
-            return badrequest(getAbdera(), request, msg);
+            return ProviderHelper.badrequest(request, msg);
         } catch (UidInUseException e) {
-            return conflict(getAbdera(), request, "Uid already in use");
+            return ProviderHelper.conflict(request, "Uid already in use");
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
 
-    public ResponseContext updateCollection(RequestContext request) {
+    @Override
+    public ResponseContext extensionRequest(RequestContext request) {
+        // PUT to a CollecitonTarget
+        if(isUpdateCollectionRequest(request))
+            return putCollection(request);
+        // POST to a NewCollectionTarget
+        else if(isCreateCollectionRequest(request))
+            return postCollection(request);
+        // POST to a CollectionTarget with media type application/x-www-form-urlencoded
+        else if(isAddItemToCollectionRequest(request))
+            return addItemToCollection(request);
+        else
+            return super.extensionRequest(request);
+    }
+
+    public ResponseContext putCollection(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
 
         if (collection instanceof HomeCollectionItem)
-            return unauthorized(getAbdera(), request, "Home collection is not modifiable");
+            return ProviderHelper.unauthorized(request, "Home collection is not modifiable");
 
         if (log.isDebugEnabled())
             log.debug("updating details for collection " + collection.getUid());
@@ -518,19 +498,19 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (ValidationException e) {
             String msg = "Invalid request content: " + e.getMessage();
             if (e.getCause() != null)
                 msg += ": " + e.getCause().getMessage();
-            return badrequest(getAbdera(), request, msg);
+            return ProviderHelper.badrequest(request, msg);
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
 
@@ -539,7 +519,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         CollectionItem collection = target.getCollection();
 
         if (collection instanceof HomeCollectionItem)
-            return unauthorized(getAbdera(), request, "Home collection is not deleteable");
+            return ProviderHelper.unauthorized(request, "Home collection is not deleteable");
 
         if (log.isDebugEnabled())
             log.debug("deleting collection " + collection.getUid());
@@ -549,18 +529,27 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
             return deleted();
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return this.forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
-
+    
     // our methods
+    @Override
+    public ResponseContext headEntry(RequestContext request) {
+        ItemTarget target = (ItemTarget) request.getTarget();
+        NoteItem note = target.getItem();
+        EmptyResponseContext rc = new EmptyResponseContext(200);
+        rc.setEntityTag(new EntityTag(note.getEntityTag()));
+        rc.setLastModified(note.getModifiedDate());
+        return rc;
+    }
 
-    public ResponseContext addItemToCollection(RequestContext request) {
+    protected ResponseContext addItemToCollection(RequestContext request) {
         CollectionTarget target = (CollectionTarget) request.getTarget();
         CollectionItem collection = target.getCollection();
         if (log.isDebugEnabled())
@@ -573,13 +562,13 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         try {
             String uuid = readUuid(request);
             if (uuid == null)
-                return badrequest(getAbdera(), request, "Uuid must be provided");
+                return ProviderHelper.badrequest(request, "Uuid must be provided");
 
             Item item = contentService.findItemByUid(uuid);
             if (item == null)
-                return badrequest(getAbdera(), request, "Item with uuid " + uuid + " not found");
+                return ProviderHelper.badrequest(request, "Item with uuid " + uuid + " not found");
             if (! (item instanceof NoteItem))
-                return badrequest(getAbdera(), request, "Item with uuid " + uuid + " is not a note");
+                return ProviderHelper.badrequest(request, "Item with uuid " + uuid + " is not a note");
 
             //
             // FIXME
@@ -592,7 +581,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
                 contentService.addItemToCollection(item, collection);
             else {
                 // return forbidden
-                return forbidden(getAbdera(), request, "unauthorized for item "
+                return ProviderHelper.forbidden(request, "unauthorized for item "
                         + item.getUid());
             }
                
@@ -600,17 +589,18 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
-
+    
+   
     public ProcessorFactory getProcessorFactory() {
         return processorFactory;
     }
@@ -712,7 +702,24 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
         return itemFilter;
     }
 
+    private boolean isUpdateCollectionRequest(RequestContext request) {
+        if(!(request.getTarget() instanceof CollectionTarget))
+            return false;
+        
+        return request.getMethod().equalsIgnoreCase("PUT");
+    }
+    
+    private boolean isCreateCollectionRequest(RequestContext request) {
+        if(!(request.getTarget() instanceof NewCollectionTarget))
+            return false;
+        
+        return request.getMethod().equalsIgnoreCase("POST");
+    }
+    
     private boolean isAddItemToCollectionRequest(RequestContext request) {
+        if(!(request.getTarget() instanceof CollectionTarget))
+            return false;
+        
         MimeType ct = request.getContentType();
         if (ct == null)
             return false;
@@ -722,7 +729,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
     private ResponseContext checkAddItemToCollectionPreconditions(RequestContext request) {
         int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
         if (contentLength <= 0)
-            return lengthrequired(getAbdera(), request);
+            return lengthrequired(request);
 
         return null;
     }
@@ -894,7 +901,7 @@ public class ItemProvider extends BaseProvider implements AtomConstants {
 
     private ResponseContext created(NoteItem item,
                                     ServiceLocator locator) {
-        AbstractResponseContext rc = createResponseContext(201, "Created");
+        org.apache.abdera.protocol.server.context.AbstractResponseContext rc = createResponseContext(201, "Created");
 
         rc.setEntityTag(new EntityTag(item.getEntityTag()));
         rc.setLastModified(item.getModifiedDate());

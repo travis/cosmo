@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.parser.ParseException;
+import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 
@@ -43,9 +44,9 @@ import org.osaf.cosmo.model.util.ThisAndFutureHelper;
 import org.osaf.cosmo.security.CosmoSecurityException;
 import org.osaf.cosmo.server.ServiceLocator;
 
-public class DetachedItemProvider extends ItemProvider {
+public class DetachedItemCollectionAdapter extends ItemCollectionAdapter {
     private static final Log log =
-        LogFactory.getLog(DetachedItemProvider.class);
+        LogFactory.getLog(DetachedItemCollectionAdapter.class);
     private static final String[] ALLOWED_COLL_METHODS =
         new String[] { "OPTIONS" };
     private static final String[] ALLOWED_ENTRY_METHODS =
@@ -53,7 +54,8 @@ public class DetachedItemProvider extends ItemProvider {
 
     // Provider methods
 
-    public ResponseContext createEntry(RequestContext request) {
+    @Override
+    public ResponseContext postEntry(RequestContext request) {
         DetachedItemTarget target = (DetachedItemTarget) request.getTarget();
         NoteItem master = target.getMaster();
         NoteItem occurrence = target.getOccurrence();
@@ -82,73 +84,67 @@ public class DetachedItemProvider extends ItemProvider {
                 createItemFeedGenerator(itemTarget, locator);
             entry = generator.generateEntry(detached);
 
-            return created(entry, detached, locator);
+            return created(request, entry, detached, locator);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (UnsupportedContentTypeException e) {
-            return badrequest(getAbdera(), request, "Entry content type must be one of " + StringUtils.join(getProcessorFactory().getSupportedContentTypes(), ", "));
+            return ProviderHelper.badrequest(request, "Entry content type must be one of " + StringUtils.join(getProcessorFactory().getSupportedContentTypes(), ", "));
         } catch (ParseException e) {
             String reason = "Unparseable content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (ValidationException e) {
             String reason = "Invalid content: ";
             if (e.getCause() != null)
                 reason = reason + e.getCause().getMessage();
             else
                 reason = reason + e.getMessage();
-            return badrequest(getAbdera(), request, reason);
+            return ProviderHelper.badrequest(request, reason);
         } catch (UidInUseException e) {
-            return conflict(getAbdera(), request, "Uid already in use");
+            return ProviderHelper.conflict(request, "Uid already in use");
         } catch (ProcessorException e) {
             String reason = "Unknown content processing error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CollectionLockedException e) {
-            return locked(getAbdera(), request);
+            return locked(request);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (CosmoSecurityException e) {
             if(e instanceof ItemSecurityException)
                 return insufficientPrivileges(request, new InsufficientPrivilegesException((ItemSecurityException) e));
             else
-                return forbidden(getAbdera(), request, e.getMessage());
+                return ProviderHelper.forbidden(request, e.getMessage());
         }
     }
 
+    @Override
     public ResponseContext deleteEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
-    public ResponseContext deleteMedia(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-
-    public ResponseContext updateEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+    @Override
+    public ResponseContext putEntry(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
-    public ResponseContext updateMedia(RequestContext request) {
+    public ResponseContext putMedia(RequestContext request) {
         throw new UnsupportedOperationException();
     }
   
-    public ResponseContext getService(RequestContext request) {
-        throw new UnsupportedOperationException();
-    }
-
     public ResponseContext getFeed(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext getMedia(RequestContext request) {
@@ -159,22 +155,19 @@ public class DetachedItemProvider extends ItemProvider {
         throw new UnsupportedOperationException();
     }
   
-    public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-  
-    public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
+    @Override
+    public ResponseContext postMedia(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedProvider methods
 
-    public ResponseContext createCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    public ResponseContext postCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
-    public ResponseContext updateCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    public ResponseContext putCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
     // our methods

@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.osaf.cosmo.atom.provider.mock;
+package org.osaf.cosmo.atom.provider;
 
-import org.apache.abdera.protocol.server.Provider;
-import org.apache.abdera.protocol.server.impl.AbstractSingletonProviderManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class MockProviderManager extends AbstractSingletonProviderManager {
+/**
+ * Base class for for {@link UserProvider} tests.
+ */
+public abstract class BaseUserCollectionAdapterTestCase extends BaseCollectionAdapterTestCase {
+    private static final Log log =
+        LogFactory.getLog(BaseUserCollectionAdapterTestCase.class);
 
-    protected Provider initProvider() {
-        return new MockProvider();
+    protected BaseCollectionAdapter createAdapter() {
+        UserCollectionAdapter adapter = new UserCollectionAdapter();
+        return adapter;
     }
 }

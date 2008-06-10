@@ -15,13 +15,10 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import java.net.URLEncoder;
-
-import org.apache.abdera.protocol.server.ServiceContext;
-
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.SubscriptionTarget;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
@@ -34,17 +31,17 @@ public class MockSubscriptionRequestContext extends BaseMockRequestContext {
     private static final Log log =
         LogFactory.getLog(MockSubscriptionRequestContext.class);
 
-    public MockSubscriptionRequestContext(ServiceContext context,
+    public MockSubscriptionRequestContext(Provider provider,
                                           User user,
                                           CollectionSubscription sub) {
-        this(context, user, sub, "GET");
+        this(provider, user, sub, "GET");
     }
 
-    public MockSubscriptionRequestContext(ServiceContext context,
+    public MockSubscriptionRequestContext(Provider provider,
                                           User user,
                                           CollectionSubscription sub,
                                           String method) {
-        super(context, method, toRequestUri(user, sub));
+        super(provider, method, toRequestUri(user, sub));
         this.target = new SubscriptionTarget(this, user, sub);
     }
 

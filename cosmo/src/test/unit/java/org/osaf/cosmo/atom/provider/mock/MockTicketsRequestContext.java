@@ -15,11 +15,10 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import org.apache.abdera.protocol.server.ServiceContext;
-
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.TicketsTarget;
 import org.osaf.cosmo.model.CollectionItem;
 
@@ -31,15 +30,15 @@ public class MockTicketsRequestContext extends BaseMockRequestContext {
     private static final Log log =
         LogFactory.getLog(MockTicketsRequestContext.class);
 
-    public MockTicketsRequestContext(ServiceContext context,
+    public MockTicketsRequestContext(Provider provider,
                                         CollectionItem collection) {
-        this(context, collection, "GET");
+        this(provider, collection, "GET");
     }
 
-    public MockTicketsRequestContext(ServiceContext context,
+    public MockTicketsRequestContext(Provider provider,
                                         CollectionItem collection,
                                         String method) {
-        super(context, method, toRequestUri(collection));
+        super(provider, method, toRequestUri(collection));
         this.target = new TicketsTarget(this, collection);
     }
 

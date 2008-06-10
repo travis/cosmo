@@ -27,7 +27,7 @@ import org.osaf.cosmo.model.Preference;
 /**
  * Test class for {@link PreferencesProvider#deleteEntry()} tests.
  */
-public class DeletePreferenceTest extends BasePreferencesProviderTestCase {
+public class DeletePreferenceTest extends BasePreferencesCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(DeletePreferenceTest.class);
 
@@ -35,7 +35,7 @@ public class DeletePreferenceTest extends BasePreferencesProviderTestCase {
         Preference pref = helper.makeAndStoreDummyPreference();
         RequestContext req = createRequestContext(pref);
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Preference not removed",
@@ -43,8 +43,8 @@ public class DeletePreferenceTest extends BasePreferencesProviderTestCase {
     }
 
     private RequestContext createRequestContext(Preference pref) {
-        return new MockPreferenceRequestContext(helper.getServiceContext(),
+        return new MockPreferenceRequestContext(provider,
                                                 helper.getUser(), pref,
-                                                "DELETE");
+                                               "DELETE");
     }
 }

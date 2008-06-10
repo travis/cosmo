@@ -514,24 +514,33 @@
 
   <bean id="abdera" class="org.apache.abdera.Abdera"/>
 
-  <bean id="atomBaseProvider" class="org.osaf.cosmo.atom.provider.BaseProvider"
-        init-method="init" abstract="true">
-    <property name="abdera"><ref local="abdera"/></property>
-    <property name="generatorFactory">
-      <bean class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory"
+  <bean id="atomGeneratorFactory" class="org.osaf.cosmo.atom.generator.StandardGeneratorFactory"
             init-method="init">
-        <property name="abdera"><ref local="abdera"/></property>
-        <property name="contentFactory">
-          <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>
-        </property>
-        <property name="contentService">
-          <ref local="contentService"/>
-        </property>
-        <property name="securityManager">
-          <ref local="securityManager"/>
-        </property>
-      </bean>
+    <property name="abdera"><ref local="abdera"/></property>
+    <property name="contentFactory">
+      <bean class="org.osaf.cosmo.atom.generator.ContentFactory"/>
     </property>
+    <property name="contentService">
+      <ref local="contentService"/>
+    </property>
+    <property name="securityManager">
+      <ref local="securityManager"/>
+    </property>
+  </bean>
+	
+  <bean id="atomTargetResolver" class="org.osaf.cosmo.atom.provider.StandardTargetResolver"
+            init-method="init">
+    <property name="contentService">
+      <ref local="contentService"/>
+    </property>
+    <property name="userService">
+      <ref local="userService"/>
+    </property>
+  </bean>
+	
+  <bean id="atomBaseAdapter" class="org.osaf.cosmo.atom.provider.BaseCollectionAdapter"
+        init-method="init" abstract="true">
+    <property name="generatorFactory"><ref local="atomGeneratorFactory"/></property>
     <property name="serviceLocatorFactory">
       <ref local="serviceLocatorFactory"/>
     </property>
@@ -543,9 +552,9 @@
     <property name="entityFactory" ref="cosmoEntityFactory"/>
   </bean>
 
-  <bean id="atomItemProvider"
-        class="org.osaf.cosmo.atom.provider.ItemProvider"
-        init-method="init" parent="atomBaseProvider">
+  <bean id="atomItemAdapter"
+        class="org.osaf.cosmo.atom.provider.ItemCollectionAdapter"
+        init-method="init" parent="atomBaseAdapter">
     <property name="processorFactory">
       <ref local="atomStandardProcessorFactory"/>
     </property>
@@ -554,33 +563,33 @@
     </property>
   </bean>
   
-  <bean id="atomDetachedItemProvider"
-        class="org.osaf.cosmo.atom.provider.DetachedItemProvider"
-        init-method="init" parent="atomItemProvider"/>
+  <bean id="atomDetachedItemAdapter"
+        class="org.osaf.cosmo.atom.provider.DetachedItemCollectionAdapter"
+        init-method="init" parent="atomItemAdapter"/>
 
-  <bean id="atomExpandedItemProvider"
-        class="org.osaf.cosmo.atom.provider.ExpandedItemProvider"
-        init-method="init" parent="atomItemProvider"/>
+  <bean id="atomExpandedItemAdapter"
+        class="org.osaf.cosmo.atom.provider.ExpandedItemCollectionAdapter"
+        init-method="init" parent="atomItemAdapter"/>
 
-  <bean id="atomSubscriptionProvider"
-        class="org.osaf.cosmo.atom.provider.SubscriptionProvider"
-        init-method="init" parent="atomBaseProvider">
+  <bean id="atomSubscriptionAdapter"
+        class="org.osaf.cosmo.atom.provider.SubscriptionCollectionAdapter"
+        init-method="init" parent="atomBaseAdapter">
     <property name="userService">
       <ref local="userService"/>
     </property>
   </bean>
 
-  <bean id="atomPreferencesProvider"
-        class="org.osaf.cosmo.atom.provider.PreferencesProvider"
-        init-method="init" parent="atomBaseProvider">
+  <bean id="atomPreferencesAdapter"
+        class="org.osaf.cosmo.atom.provider.PreferencesCollectionAdapter"
+        init-method="init" parent="atomBaseAdapter">
     <property name="userService">
       <ref local="userService"/>
     </property>
   </bean>
 
-  <bean id="atomTicketsProvider"
-        class="org.osaf.cosmo.atom.provider.TicketsProvider"
-        init-method="init" parent="atomBaseProvider">
+  <bean id="atomTicketsAdapter"
+        class="org.osaf.cosmo.atom.provider.TicketsCollectionAdapter"
+        init-method="init" parent="atomBaseAdapter">
     <property name="contentService">
       <ref local="contentService"/>
     </property>
@@ -589,56 +598,43 @@
     </property>
   </bean>
 
-  <bean id="atomUserProvider" class="org.osaf.cosmo.atom.provider.UserProvider"
-        init-method="init" parent="atomBaseProvider"/>
+  <bean id="atomUserAdapter" class="org.osaf.cosmo.atom.provider.UserCollectionAdapter"
+        init-method="init" parent="atomBaseAdapter"/>
 
-  <bean id="atomServiceContext"
-        class="org.osaf.cosmo.atom.StandardServiceContext">
+  <bean id="atomWorkspaceManager" class="org.osaf.cosmo.atom.provider.StandardWorkspaceManager">
+	 <property name="itemAdapter">
+       <ref local="atomItemAdapter"/>
+     </property>
+     <property name="detachedItemAdapter">
+       <ref local="atomDetachedItemAdapter"/>
+     </property>
+     <property name="expandedItemAdapter">
+       <ref local="atomExpandedItemAdapter"/>
+     </property>
+     <property name="subscriptionAdapter">
+       <ref local="atomSubscriptionAdapter"/>
+     </property>
+     <property name="preferencesAdapter">
+        <ref local="atomPreferencesAdapter"/>
+     </property>
+     <property name="ticketsAdapter">
+       <ref local="atomTicketsAdapter"/>
+     </property>
+     <property name="userAdapter">
+       <ref local="atomUserAdapter"/>
+     </property>
+  </bean>
+	
+  <bean id="atomProvider"
+        class="org.osaf.cosmo.atom.provider.StandardProvider">
     <property name="abdera"><ref local="abdera"/></property>
-    <property name="providerManager">
-      <bean class="org.osaf.cosmo.atom.provider.StandardProviderManager"
-            init-method="init">
-        <property name="itemProvider">
-          <ref local="atomItemProvider"/>
-        </property>
-        <property name="detachedItemProvider">
-          <ref local="atomDetachedItemProvider"/>
-        </property>
-        <property name="expandedItemProvider">
-          <ref local="atomExpandedItemProvider"/>
-        </property>
-        <property name="subscriptionProvider">
-          <ref local="atomSubscriptionProvider"/>
-        </property>
-        <property name="preferencesProvider">
-          <ref local="atomPreferencesProvider"/>
-        </property>
-        <property name="ticketsProvider">
-          <ref local="atomTicketsProvider"/>
-        </property>
-        <property name="userProvider">
-          <ref local="atomUserProvider"/>
-        </property>
-      </bean>
-    </property>
-    <property name="handlerManager">
-      <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager"
-            init-method="init">
-        <property name="requestHandler">
-          <bean class="org.osaf.cosmo.atom.servlet.StandardRequestHandler"/>
-        </property>
-      </bean>
+    <property name="workspaceManager"><ref local="atomWorkspaceManager"/></property>
+    <property name="generatorFactory"><ref local="atomGeneratorFactory"/></property>
+    <property name="serviceLocatorFactory">
+      <ref local="serviceLocatorFactory"/>
     </property>
     <property name="targetResolver">
-      <bean class="org.osaf.cosmo.atom.provider.StandardTargetResolver"
-            init-method="init">
-        <property name="contentService">
-          <ref local="contentService"/>
-        </property>
-        <property name="userService">
-          <ref local="userService"/>
-        </property>
-      </bean>
+      <ref local="atomTargetResolver"/>
     </property>
   </bean>
 

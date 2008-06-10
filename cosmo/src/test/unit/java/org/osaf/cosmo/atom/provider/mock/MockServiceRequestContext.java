@@ -15,14 +15,12 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import org.apache.abdera.protocol.server.ServiceContext;
-
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.NewCollectionTarget;
 import org.osaf.cosmo.atom.provider.UserTarget;
-
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.User;
 
@@ -33,16 +31,16 @@ public class MockServiceRequestContext extends BaseMockRequestContext {
     private static final Log log =
         LogFactory.getLog(MockServiceRequestContext.class);
 
-    public MockServiceRequestContext(ServiceContext context,
+    public MockServiceRequestContext(Provider provider,
                                      User user) {
-        super(context, "GET", toRequestUri(user));
+        super(provider, "GET", toRequestUri(user));
         this.target = new UserTarget(this, user);
     }    
 
-    public MockServiceRequestContext(ServiceContext context,
+    public MockServiceRequestContext(Provider provider,
                                      User user,
                                      HomeCollectionItem home) {
-        super(context, "POST", toRequestUri(user));
+        super(provider, "POST", toRequestUri(user));
         this.target = new NewCollectionTarget(this, user, home);
     }
 

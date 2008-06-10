@@ -28,7 +28,7 @@ import org.osaf.cosmo.model.CollectionSubscription;
  * Test class for {@link SubscriptionProvider#deleteEntry()} tests.
  */
 public class DeleteSubscriptionTest
-    extends BaseSubscriptionProviderTestCase {
+    extends BaseSubscriptionCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(DeleteSubscriptionTest.class);
 
@@ -36,7 +36,7 @@ public class DeleteSubscriptionTest
         CollectionSubscription sub = helper.makeAndStoreDummySubscription();
         RequestContext req = createRequestContext(sub);
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Subscription not removed",
@@ -44,7 +44,7 @@ public class DeleteSubscriptionTest
     }
 
     private RequestContext createRequestContext(CollectionSubscription sub) {
-        return new MockSubscriptionRequestContext(helper.getServiceContext(),
+        return new MockSubscriptionRequestContext(provider,
                                                   helper.getUser(), sub,
                                                   "DELETE");
     }

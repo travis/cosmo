@@ -21,18 +21,16 @@ import java.util.Set;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
-
+import org.apache.abdera.protocol.server.context.EmptyResponseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.CollectionTarget;
-import org.osaf.cosmo.atom.provider.ExtendedProvider;
+import org.osaf.cosmo.atom.provider.ExtendedCollectionAdapter;
 import org.osaf.cosmo.atom.provider.ItemTarget;
 import org.osaf.cosmo.model.CollectionItem;
 
-public class MockProvider implements ExtendedProvider {
-    private static final Log log = LogFactory.getLog(MockProvider.class);
+public class MockCollectionAdapter implements ExtendedCollectionAdapter {
+    private static final Log log = LogFactory.getLog(MockCollectionAdapter.class);
 
     private Set<String> collections = new HashSet<String>();
     private Set<String> items = new HashSet<String>();
@@ -41,7 +39,7 @@ public class MockProvider implements ExtendedProvider {
 
     // Provider methods
 
-    public ResponseContext createEntry(RequestContext request) {
+    public ResponseContext postEntry(RequestContext request) {
         if (failureMode)
             throw new RuntimeException("failure mode engaged");
 
@@ -56,7 +54,7 @@ public class MockProvider implements ExtendedProvider {
         return null;
     }
 
-    public ResponseContext updateEntry(RequestContext request) {
+    public ResponseContext putEntry(RequestContext request) {
         if (failureMode)
             throw new RuntimeException("failure mode engaged");
 
@@ -70,7 +68,7 @@ public class MockProvider implements ExtendedProvider {
         return new EmptyResponseContext(204);
     }
   
-    public ResponseContext updateMedia(RequestContext request) {
+    public ResponseContext putMedia(RequestContext request) {
         return null;
     }
   
@@ -113,11 +111,7 @@ public class MockProvider implements ExtendedProvider {
         return null;
     }
   
-    public ResponseContext entryPost(RequestContext request) {
-        return null;
-    }
-  
-    public ResponseContext mediaPost(RequestContext request) {
+    public ResponseContext postMedia(RequestContext request) {
         return null;
     }
 
@@ -131,11 +125,32 @@ public class MockProvider implements ExtendedProvider {
 
     // ExtendedProvider methods
 
-    public ResponseContext createCollection(RequestContext request) {
+    public ResponseContext extensionRequest(RequestContext arg0) {
+        if (failureMode)
+            throw new RuntimeException("failure mode engaged");
+
+        return new EmptyResponseContext(201);
+    }
+
+    public ResponseContext headEntry(RequestContext arg0) {
+        if (failureMode)
+            throw new RuntimeException("failure mode engaged");
+
+        return new EmptyResponseContext(201);
+    }
+
+    public ResponseContext optionsEntry(RequestContext arg0) {
+        if (failureMode)
+            throw new RuntimeException("failure mode engaged");
+
+        return new EmptyResponseContext(201);
+    }
+
+    public ResponseContext postCollection(RequestContext request) {
         return null;
     }
 
-    public ResponseContext updateCollection(RequestContext request) {
+    public ResponseContext putCollection(RequestContext request) {
         if (! (request.getTarget() instanceof CollectionTarget))
             return new EmptyResponseContext(404);
 

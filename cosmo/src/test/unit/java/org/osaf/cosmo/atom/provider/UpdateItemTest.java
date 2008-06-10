@@ -20,13 +20,10 @@ import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Recur;
 
 import org.apache.abdera.model.Content;
-import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.provider.mock.MockItemRequestContext;
 import org.osaf.cosmo.model.EventExceptionStamp;
@@ -39,7 +36,7 @@ import org.osaf.cosmo.model.hibernate.HibEventStamp;
 /**
  * Test class for {@link ItemProvider#updateEntry()} tests.
  */
-public class UpdateItemTest extends BaseItemProviderTestCase
+public class UpdateItemTest extends BaseItemCollectionAdapterTestCase
     implements AtomConstants {
     private static final Log log = LogFactory.getLog(UpdateItemTest.class);
 
@@ -50,7 +47,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         copy.setDisplayName("this is a new name");
         RequestContext req = createRequestContext(item, copy);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -65,7 +62,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(item, copy);
         helper.forgetContentTypes();
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -78,7 +75,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorValidationError();
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -91,7 +88,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorFailure();
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -106,7 +103,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
             updateRecurringEventStartDate(master, "20070601T140000");
         RequestContext req = createRequestContext(master, copy);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -136,7 +133,7 @@ public class UpdateItemTest extends BaseItemProviderTestCase
                                                 NoteItem update)
         throws Exception {
         MockItemRequestContext rc =
-            new MockItemRequestContext(helper.getServiceContext(), original,
+            new MockItemRequestContext(provider, original,
                                        "PUT");
         rc.setPropertiesAsEntry(serialize(update));
         return rc;

@@ -21,7 +21,8 @@ import org.apache.abdera.protocol.Request;
 import org.apache.abdera.protocol.Resolver;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.Target;
-import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
+import org.apache.abdera.protocol.server.servlet.ServletRequestContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.atom.AtomConstants;
@@ -67,8 +68,8 @@ public class StandardTargetResolver
      * @return the target of the request, or <code>null</code>
      */
     public Target resolve(Request request) {
-        HttpServletRequestContext context =
-            (HttpServletRequestContext) request;
+        ServletRequestContext context =
+            (ServletRequestContext) request;
         String uri = context.getRequest().getPathInfo();
         if (log.isDebugEnabled())
             log.debug("resolving URI " + uri);

@@ -29,7 +29,7 @@ import org.osaf.cosmo.model.NoteItem;
 /**
  * Test class for {@link ItemProvider#addItemToCollection()} tests.
  */
-public class AddItemToCollectionTest extends BaseItemProviderTestCase
+public class AddItemToCollectionTest extends BaseItemCollectionAdapterTestCase
     implements AtomConstants {
     private static final Log log = LogFactory.getLog(AddItemToCollectionTest.class);
 
@@ -39,7 +39,7 @@ public class AddItemToCollectionTest extends BaseItemProviderTestCase
         NoteItem item = helper.makeAndStoreDummyItem(collection1);
         RequestContext req = createRequestContext(collection2, item.getUid());
 
-        ResponseContext res = ((ItemProvider)provider).addItemToCollection(req);
+        ResponseContext res = ((ItemCollectionAdapter)adapter).addItemToCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertTrue("item not in collection 1", collection1.getChildren().contains(item));
@@ -50,7 +50,7 @@ public class AddItemToCollectionTest extends BaseItemProviderTestCase
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection, null);
 
-        ResponseContext res = ((ItemProvider)provider).addItemToCollection(req);
+        ResponseContext res = ((ItemCollectionAdapter)adapter).addItemToCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 411, res.getStatus());
     }
@@ -59,7 +59,7 @@ public class AddItemToCollectionTest extends BaseItemProviderTestCase
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection, "garbage");
 
-        ResponseContext res = ((ItemProvider)provider).addItemToCollection(req);
+        ResponseContext res = ((ItemCollectionAdapter)adapter).addItemToCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -68,7 +68,7 @@ public class AddItemToCollectionTest extends BaseItemProviderTestCase
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection, collection.getUid());
 
-        ResponseContext res = ((ItemProvider)provider).addItemToCollection(req);
+        ResponseContext res = ((ItemCollectionAdapter)adapter).addItemToCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -82,7 +82,7 @@ public class AddItemToCollectionTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(collection2, item.getUid());
         helper.lockCollection(collection2);
 
-        ResponseContext res = ((ItemProvider)provider).addItemToCollection(req);
+        ResponseContext res = ((ItemCollectionAdapter)adapter).addItemToCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 423, res.getStatus());
     }
@@ -97,7 +97,7 @@ public class AddItemToCollectionTest extends BaseItemProviderTestCase
                                                 String uid)
         throws Exception {
         MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(helper.getServiceContext(),
+            new MockCollectionRequestContext(provider,
                                              collection, "POST");
         if (uid != null)
             rc.setContent("uuid=" + uid, MEDIA_TYPE_URLENCODED);

@@ -28,7 +28,7 @@ import org.osaf.cosmo.atom.provider.mock.MockTicketRequestContext;
 /**
  * Test class for {@link TicketProvider#getEntry()} tests.
  */
-public class GetTicketTest extends BaseTicketsProviderTestCase {
+public class GetTicketTest extends BaseTicketsCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetTicketTest.class);
 
     public void testGetTicketEntry() throws Exception {
@@ -36,7 +36,7 @@ public class GetTicketTest extends BaseTicketsProviderTestCase {
         Ticket ticket = helper.makeAndStoreDummyTicket(collection);
         RequestContext req = newRequestContext(collection, ticket);
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -49,13 +49,13 @@ public class GetTicketTest extends BaseTicketsProviderTestCase {
         RequestContext req = newRequestContext(collection, ticket);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     private RequestContext newRequestContext(CollectionItem collection, Ticket ticket) {
-        return new MockTicketRequestContext(helper.getServiceContext(),
+        return new MockTicketRequestContext(provider,
                                                 collection, ticket);
     }
 }

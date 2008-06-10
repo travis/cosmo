@@ -19,31 +19,31 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;
-import org.apache.abdera.protocol.server.ServiceContext;
-import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
+import org.apache.abdera.protocol.server.ServiceManager;
+import org.apache.abdera.protocol.server.servlet.ServletRequestContext;
 import org.apache.abdera.util.Constants;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
-
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 
 /**
  * Mock implementation of {@link RequestContext}.
  */
-public class BaseMockRequestContext extends HttpServletRequestContext
+public class BaseMockRequestContext extends ServletRequestContext
     implements AtomConstants, Constants {
     private static final Log log =
         LogFactory.getLog(BaseMockRequestContext.class);
 
-    public BaseMockRequestContext(ServiceContext context,
+    public BaseMockRequestContext(Provider provider,
                                   String method,
                                   String uri) {
-        super(context, createRequest(method, uri));
+        super(provider, createRequest(method, uri));
     }
 
     private static MockHttpServletRequest createRequest(String method,
@@ -70,7 +70,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext
 
     public void setContent(Entry entry)
         throws IOException {
-        String xml = context.getAbdera().getWriter().write(entry).toString();
+        String xml = getAbdera().getWriter().write(entry).toString();
         setContent(xml, ATOM_MEDIA_TYPE);
     }
 
@@ -81,7 +81,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext
 
     public void setContentAsEntry(String content)
         throws IOException {
-        Entry entry = context.getAbdera().getFactory().newEntry();
+        Entry entry = getAbdera().getFactory().newEntry();
         entry.setContent(content);
         setContent(entry);
     }
@@ -93,7 +93,7 @@ public class BaseMockRequestContext extends HttpServletRequestContext
 
     public void setXhtmlContentAsEntry(String content)
         throws IOException {
-        Entry entry = context.getAbdera().getFactory().newEntry();
+        Entry entry = getAbdera().getFactory().newEntry();
         entry.setContentAsXhtml(content);
         setContent(entry);
     }
@@ -113,10 +113,14 @@ public class BaseMockRequestContext extends HttpServletRequestContext
 
     public void setPropertiesAsEntry(Properties props)
         throws IOException {
-        Entry entry = context.getAbdera().getFactory().newEntry();
+        Entry entry = getAbdera().getFactory().newEntry();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         props.store(out, null);
         entry.setContent(out.toString());
         setContent(entry);
     }
+    
+    public Abdera getAbdera() {
+        return ServiceManager.getAbdera();
+     }
 }

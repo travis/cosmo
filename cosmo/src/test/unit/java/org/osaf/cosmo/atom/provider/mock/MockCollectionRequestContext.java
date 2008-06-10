@@ -15,15 +15,11 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import java.io.IOException;
-
-import org.apache.abdera.model.Entry;
-import org.apache.abdera.protocol.server.ServiceContext;
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.util.Constants;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.CollectionTarget;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.hibernate.HibCollectionItem;
@@ -36,34 +32,34 @@ public class MockCollectionRequestContext extends BaseMockRequestContext
     private static final Log log =
         LogFactory.getLog(MockCollectionRequestContext.class);
 
-    public MockCollectionRequestContext(ServiceContext context,
+    public MockCollectionRequestContext(Provider provider,
                                         CollectionItem collection,
                                         String method) {
-        this(context, collection, method, null, null);
+        this(provider, collection, method, null, null);
     }
 
-    public MockCollectionRequestContext(ServiceContext context,
+    public MockCollectionRequestContext(Provider provider,
                                         CollectionItem collection,
                                         String method,
                                         String projection,
                                         String format) {
-        super(context, method, toRequestUri(collection, projection, format));
+        super(provider, method, toRequestUri(collection, projection, format));
         this.target = new CollectionTarget(this, collection, projection,
                                            format);
     }
 
-    public MockCollectionRequestContext(ServiceContext context,
+    public MockCollectionRequestContext(Provider provider,
                                         String uid,
                                         String method) {
-        this(context, uid, method, null, null);
+        this(provider, uid, method, null, null);
     }
 
-    public MockCollectionRequestContext(ServiceContext context,
+    public MockCollectionRequestContext(Provider provider,
                                         String uid,
                                         String method,
                                         String projection,
                                         String format) {
-        this(context, newCollection(uid), method, projection, format);
+        this(provider, newCollection(uid), method, projection, format);
     }
 
     private static String toRequestUri(CollectionItem collection,

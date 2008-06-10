@@ -30,7 +30,7 @@ import org.osaf.cosmo.model.hibernate.HibTicket;
 /**
  * Test class for {@link TicketProvider#createEntry()} tests.
  */
-public class CreateTicketTest extends BaseTicketsProviderTestCase {
+public class CreateTicketTest extends BaseTicketsCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(CreateTicketTest.class);
 
@@ -41,7 +41,7 @@ public class CreateTicketTest extends BaseTicketsProviderTestCase {
         
         RequestContext req = createRequestContext(collection, ticket);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -66,7 +66,7 @@ public class CreateTicketTest extends BaseTicketsProviderTestCase {
         RequestContext req = createRequestContext(collection, ticket);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -76,7 +76,7 @@ public class CreateTicketTest extends BaseTicketsProviderTestCase {
         Ticket ticket = helper.makeAndStoreDummyTicket(collection);
         RequestContext req = createRequestContext(collection, ticket);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
@@ -86,7 +86,7 @@ public class CreateTicketTest extends BaseTicketsProviderTestCase {
         Ticket ticket = new HibTicket(TicketType.READ_ONLY);
         RequestContext req = createRequestContext(collection, ticket);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -98,7 +98,7 @@ public class CreateTicketTest extends BaseTicketsProviderTestCase {
         ticket.setKey("foo");
         RequestContext req = createRequestContext(collection, ticket);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -106,7 +106,7 @@ public class CreateTicketTest extends BaseTicketsProviderTestCase {
     private RequestContext createRequestContext(CollectionItem collection, Ticket ticket)
         throws Exception {
         MockTicketsRequestContext rc =
-            new MockTicketsRequestContext(helper.getServiceContext(),
+            new MockTicketsRequestContext(provider,
                     collection, "POST");
         rc.setXhtmlContentAsEntry(serialize(ticket));
         return rc;

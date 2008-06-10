@@ -26,7 +26,7 @@ import org.osaf.cosmo.model.mock.MockPreference;
 /**
  * Test class for {@link PreferencesProvider#updateEntry()} tests.
  */
-public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
+public class UpdatePreferenceTest extends BasePreferencesCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(UpdatePreferenceTest.class);
 
@@ -36,7 +36,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         MockPreference newpref = (MockPreference) newPreference();
         RequestContext req = createRequestContext(pref, newpref);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -62,7 +62,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         RequestContext req = createRequestContext(pref, newpref);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -74,7 +74,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         newpref.setKey(pref2.getKey());
         RequestContext req = createRequestContext(pref1, newpref);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
@@ -84,7 +84,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         Preference newpref = new MockPreference("new key", null);
         RequestContext req = createRequestContext(pref, newpref);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -94,7 +94,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
         Preference newpref = new MockPreference(null, "new value");
         RequestContext req = createRequestContext(pref, newpref);
 
-        ResponseContext res = provider.updateEntry(req);
+        ResponseContext res = adapter.putEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -110,7 +110,7 @@ public class UpdatePreferenceTest extends BasePreferencesProviderTestCase {
                                                 Preference newpref)
         throws Exception {
         MockPreferenceRequestContext rc =
-            new MockPreferenceRequestContext(helper.getServiceContext(),
+            new MockPreferenceRequestContext(provider,
                                              helper.getUser(), pref, "POST");
         rc.setXhtmlContentAsEntry(serialize(newpref));
         return rc;

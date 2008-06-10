@@ -15,11 +15,9 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import org.apache.abdera.protocol.server.ServiceContext;
-
+import org.apache.abdera.protocol.server.Provider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.ExpandedItemTarget;
 import org.osaf.cosmo.model.NoteItem;
 
@@ -27,30 +25,30 @@ public class MockExpandedRequestContext extends BaseMockRequestContext {
     private static final Log log =
         LogFactory.getLog(MockExpandedRequestContext.class);
 
-    public MockExpandedRequestContext(ServiceContext context,
+    public MockExpandedRequestContext(Provider provider,
                                       NoteItem item) {
-        this(context, item, "GET");
+        this(provider, item, "GET");
     }
 
-    public MockExpandedRequestContext(ServiceContext context,
+    public MockExpandedRequestContext(Provider provider,
                                       NoteItem item,
                                       String projection,
                                       String format) {
-        this(context, item, "GET", projection, format);
+        this(provider, item, "GET", projection, format);
     }
 
-    public MockExpandedRequestContext(ServiceContext context,
+    public MockExpandedRequestContext(Provider provider,
                                       NoteItem item,
                                       String method) {
-        this(context, item, method, null, null);
+        this(provider, item, method, null, null);
     }
 
-    public MockExpandedRequestContext(ServiceContext context,
+    public MockExpandedRequestContext(Provider provider,
                                       NoteItem item,
                                       String method,
                                       String projection,
                                       String format) {
-        super(context, method, toRequestUri(item, projection, format));
+        super(provider, method, toRequestUri(item, projection, format));
         this.target = new ExpandedItemTarget(this, item, projection, format);
     }
 

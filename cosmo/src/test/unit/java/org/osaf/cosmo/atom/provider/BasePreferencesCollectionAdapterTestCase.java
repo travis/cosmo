@@ -18,15 +18,26 @@ package org.osaf.cosmo.atom.provider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Base class for for {@link UserProvider} tests.
- */
-public abstract class BaseUserProviderTestCase extends BaseProviderTestCase {
-    private static final Log log =
-        LogFactory.getLog(BaseUserProviderTestCase.class);
+import org.osaf.cosmo.atom.AtomConstants;
+import org.osaf.cosmo.model.Preference;
+import org.osaf.cosmo.model.text.XhtmlPreferenceFormat;
 
-    protected BaseProvider createProvider() {
-        UserProvider provider = new UserProvider();
-        return provider;
+/**
+ * Base class for for {@link PreferencesProvider} tests.
+ */
+public abstract class BasePreferencesCollectionAdapterTestCase
+    extends BaseCollectionAdapterTestCase implements AtomConstants {
+    private static final Log log =
+        LogFactory.getLog(BasePreferencesCollectionAdapterTestCase.class);
+
+    protected BaseCollectionAdapter createAdapter() {
+        PreferencesCollectionAdapter adapter = new PreferencesCollectionAdapter();
+        adapter.setUserService(helper.getUserService());
+        return adapter;
+    }
+
+    protected String serialize(Preference pref) {
+        XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
+        return formatter.format(pref);
     }
 }

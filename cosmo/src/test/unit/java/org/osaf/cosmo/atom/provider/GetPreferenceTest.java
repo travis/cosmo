@@ -27,14 +27,14 @@ import org.osaf.cosmo.atom.provider.mock.MockPreferenceRequestContext;
 /**
  * Test class for {@link PreferenceProvider#getEntry()} tests.
  */
-public class GetPreferenceTest extends BasePreferencesProviderTestCase {
+public class GetPreferenceTest extends BasePreferencesCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetPreferenceTest.class);
 
     public void testGetPreferenceEntry() throws Exception {
         Preference pref = helper.makeAndStoreDummyPreference();
         RequestContext req = newRequestContext(pref);
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -46,13 +46,13 @@ public class GetPreferenceTest extends BasePreferencesProviderTestCase {
         RequestContext req = newRequestContext(pref);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     private RequestContext newRequestContext(Preference pref) {
-        return new MockPreferenceRequestContext(helper.getServiceContext(),
+        return new MockPreferenceRequestContext(provider,
                                                 helper.getUser(), pref);
     }
 }

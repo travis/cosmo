@@ -27,14 +27,14 @@ import org.osaf.cosmo.model.CollectionSubscription;
 /**
  * Test class for {@link SubscriptionProvider#getEntry()} tests.
  */
-public class GetSubscriptionTest extends BaseSubscriptionProviderTestCase {
+public class GetSubscriptionTest extends BaseSubscriptionCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetSubscriptionTest.class);
 
     public void testGetSubscriptionEntry() throws Exception {
         CollectionSubscription sub = helper.makeAndStoreDummySubscription();
         RequestContext req = createRequestContext(sub);
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -46,13 +46,13 @@ public class GetSubscriptionTest extends BaseSubscriptionProviderTestCase {
         RequestContext req = createRequestContext(sub);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     private RequestContext createRequestContext(CollectionSubscription sub) {
-        return new MockSubscriptionRequestContext(helper.getServiceContext(),
+        return new MockSubscriptionRequestContext(provider,
                                                   helper.getUser(), sub);
     }
 }

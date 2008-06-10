@@ -21,15 +21,15 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Base class for for {@link ExpandedItemProvider} tests.
  */
-public abstract class BaseExpandedItemProviderTestCase
-    extends BaseProviderTestCase {
+public abstract class BaseExpandedItemCollectionAdapterTestCase
+    extends BaseCollectionAdapterTestCase {
     private static final Log log =
-        LogFactory.getLog(BaseExpandedItemProviderTestCase.class);
+        LogFactory.getLog(BaseExpandedItemCollectionAdapterTestCase.class);
 
-    protected BaseProvider createProvider() {
-        ExpandedItemProvider provider = new ExpandedItemProvider();
-        provider.setProcessorFactory(helper.getProcessorFactory());
-        provider.setContentService(helper.getContentService());
-        return provider;
+    protected BaseCollectionAdapter createAdapter() {
+        ExpandedItemCollectionAdapter adapter = new ExpandedItemCollectionAdapter();
+        adapter.setProcessorFactory(helper.getProcessorFactory());
+        adapter.setContentService(helper.getContentService());
+        return adapter;
     }
 }

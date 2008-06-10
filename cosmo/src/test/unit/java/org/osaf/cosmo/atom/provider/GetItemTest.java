@@ -27,14 +27,14 @@ import org.osaf.cosmo.model.NoteItem;
 /**
  * Test class for {@link ItemProvider#getEntry()} tests.
  */
-public class GetItemTest extends BaseItemProviderTestCase {
+public class GetItemTest extends BaseItemCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetItemTest.class);
 
     public void testGetEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = createRequestContext(item);
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -46,7 +46,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item);
         helper.forgetProjections();
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -56,7 +56,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item);
         helper.forgetFormats();
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -66,7 +66,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getEntry(req);
+        ResponseContext res = adapter.getEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -79,7 +79,7 @@ public class GetItemTest extends BaseItemProviderTestCase {
     }
 
     private RequestContext createRequestContext(NoteItem item) {
-        return new MockItemRequestContext(helper.getServiceContext(), item,
+        return new MockItemRequestContext(provider, item,
                                           "GET", "yyz", "eff");
     }
 }

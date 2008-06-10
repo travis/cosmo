@@ -26,7 +26,7 @@ import org.osaf.cosmo.atom.provider.mock.MockServiceRequestContext;
 /**
  * Test class for {@link ProviderProxy#getService()} tests.
  */
-public class GetUserServiceTest extends BaseUserProviderTestCase {
+public class GetUserServiceTest extends BaseUserCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetUserServiceTest.class);
 
     public void testGetService() throws Exception {
@@ -35,7 +35,7 @@ public class GetUserServiceTest extends BaseUserProviderTestCase {
         helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext();
 
-        ResponseContext res = provider.getService(req);
+        ResponseContext res = provider.getServiceDocument(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
     }
@@ -45,13 +45,13 @@ public class GetUserServiceTest extends BaseUserProviderTestCase {
         RequestContext req = createRequestContext();
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getService(req);
+        ResponseContext res = provider.getServiceDocument(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     private RequestContext createRequestContext() {
-        return new MockServiceRequestContext(helper.getServiceContext(),
+        return new MockServiceRequestContext(provider,
                                              helper.getUser());
     }
 }

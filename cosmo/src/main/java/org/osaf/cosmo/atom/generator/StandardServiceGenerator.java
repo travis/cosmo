@@ -19,13 +19,10 @@ import org.apache.abdera.i18n.iri.IRISyntaxException;
 import org.apache.abdera.model.Collection;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Workspace;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.CollectionItem;
-import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.User;

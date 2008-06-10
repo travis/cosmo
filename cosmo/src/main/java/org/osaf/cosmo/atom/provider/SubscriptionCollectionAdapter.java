@@ -21,25 +21,25 @@ import java.text.ParseException;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.generator.GeneratorException;
-import org.osaf.cosmo.atom.generator.PreferencesFeedGenerator;
+import org.osaf.cosmo.atom.generator.SubscriptionFeedGenerator;
 import org.osaf.cosmo.atom.processor.ValidationException;
+import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.User;
-import org.osaf.cosmo.model.Preference;
-import org.osaf.cosmo.model.text.XhtmlPreferenceFormat;
+import org.osaf.cosmo.model.text.XhtmlSubscriptionFormat;
 import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.service.UserService;
 
-public class PreferencesProvider extends BaseProvider
+public class SubscriptionCollectionAdapter extends BaseCollectionAdapter
     implements AtomConstants {
-    private static final Log log = LogFactory.getLog(PreferencesProvider.class);
+    private static final Log log =
+        LogFactory.getLog(SubscriptionCollectionAdapter.class);
     private static final String[] ALLOWED_COLL_METHODS =
         new String[] { "GET", "HEAD", "POST", "OPTIONS" };
     private static final String[] ALLOWED_ENTRY_METHODS =
@@ -49,8 +49,8 @@ public class PreferencesProvider extends BaseProvider
 
     // Provider methods
 
-    public ResponseContext createEntry(RequestContext request) {
-        PreferencesTarget target = (PreferencesTarget) request.getTarget();
+    public ResponseContext postEntry(RequestContext request) {
+        SubscriptionsTarget target = (SubscriptionsTarget) request.getTarget();
         User user = target.getUser();
 
         ResponseContext frc = checkEntryWritePreconditions(request);
@@ -58,49 +58,50 @@ public class PreferencesProvider extends BaseProvider
             return frc;
 
         try {
-            Preference pref = readPreference(request);
+            CollectionSubscription sub = readSubscription(request);
 
-            if (user.getPreference(pref.getKey()) != null)
-                return conflict(getAbdera(), request, "Preference exists");
+            if (user.getSubscription(sub.getDisplayName()) != null)
+                return ProviderHelper.conflict(request,
+                                "Named subscription exists");
 
             if (log.isDebugEnabled())
-                log.debug("creating preference " + pref.getKey() +
+                log.debug("creating subscription " + sub.getDisplayName() +
                           " for user " + user.getUsername());
 
-            user.addPreference(pref);
+            user.addSubscription(sub);
             user = userService.updateUser(user);
 
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Entry entry = generator.generateEntry(pref);
-            
-            return created(entry, pref, locator);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(locator);
+            Entry entry = generator.generateEntry(sub);
+
+            return created(request, entry, sub, locator);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (ValidationException e) {
             String msg = "Invalid entry: " + e.getMessage();
             if (e.getCause() != null)
-                msg += e.getCause().getMessage();
-            return badrequest(getAbdera(), request, msg);
+                msg += ": " + e.getCause().getMessage();
+            return ProviderHelper.badrequest(request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
 
     public ResponseContext deleteEntry(RequestContext request) {
-        PreferenceTarget target = (PreferenceTarget) request.getTarget();
+        SubscriptionTarget target = (SubscriptionTarget) request.getTarget();
         User user = target.getUser();
-        Preference pref = target.getPreference();
+        CollectionSubscription sub = target.getSubscription();
         if (log.isDebugEnabled())
-            log.debug("deleting entry for preference " + pref.getKey() +
-                      " for user " + user.getUsername());
+            log.debug("deleting entry for subscription " +
+                      sub.getDisplayName() + " for user " + user.getUsername());
 
-        user.removePreference(pref);
+        user.removeSubscription(sub);
         userService.updateUser(user);
 
         return deleted();
@@ -110,55 +111,57 @@ public class PreferencesProvider extends BaseProvider
         throw new UnsupportedOperationException();
     }
 
-    public ResponseContext updateEntry(RequestContext request) {
-        PreferenceTarget target = (PreferenceTarget) request.getTarget();
+    public ResponseContext putEntry(RequestContext request) {
+        SubscriptionTarget target = (SubscriptionTarget) request.getTarget();
         User user = target.getUser();
-        Preference pref = target.getPreference();
+        CollectionSubscription sub = target.getSubscription();
         if (log.isDebugEnabled())
-            log.debug("upudating preference " + pref.getKey() + " for user " +
-                      user.getUsername());
+            log.debug("upudating subscription " + sub.getDisplayName() +
+                      " for user " + user.getUsername());
 
         ResponseContext frc = checkEntryWritePreconditions(request);
         if (frc != null)
             return frc;
 
         try {
-            Preference newpref = readPreference(request);
+            CollectionSubscription newsub = readSubscription(request);
 
-            if (user.getPreference(newpref.getKey()) != null &&
-                ! user.getPreference(newpref.getKey()).equals(pref))
-                return conflict(getAbdera(), request, "Preference exists");
+            if (user.getSubscription(newsub.getDisplayName()) != null &&
+                ! user.getSubscription(newsub.getDisplayName()).equals(sub))
+                return ProviderHelper.conflict(request,
+                                "Named subscription exists");
 
-            String oldKey = pref.getKey();
-            pref.setKey(newpref.getKey());
-            pref.setValue(newpref.getValue());
+            String oldName = sub.getDisplayName();
+            sub.setDisplayName(newsub.getDisplayName());
+            sub.setCollectionUid(newsub.getCollectionUid());
+            sub.setTicketKey(newsub.getTicketKey());
 
             user = userService.updateUser(user);
 
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Entry entry = generator.generateEntry(pref);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(locator);
+            Entry entry = generator.generateEntry(sub);
 
-            boolean locationChanged = ! oldKey.equals(pref.getKey());
-            return updated(entry, pref, locator, locationChanged);
+            boolean locationChanged = ! oldName.equals(sub.getDisplayName());
+            return updated(request, entry, sub, locator, locationChanged);
         } catch (IOException e) {
             String reason = "Unable to read request content: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         } catch (ValidationException e) {
             String msg = "Invalid entry: " + e.getMessage();
             if (e.getCause() != null)
-                msg += e.getCause().getMessage();
-            return badrequest(getAbdera(), request, msg);
+                log.error(msg, e.getCause());
+            return ProviderHelper.badrequest(request, msg);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
   
-    public ResponseContext updateMedia(RequestContext request) {
+    public ResponseContext putMedia(RequestContext request) {
         throw new UnsupportedOperationException();
     }
   
@@ -167,45 +170,45 @@ public class PreferencesProvider extends BaseProvider
     }
 
     public ResponseContext getFeed(RequestContext request) {
-        PreferencesTarget target = (PreferencesTarget) request.getTarget();
+        SubscriptionsTarget target = (SubscriptionsTarget) request.getTarget();
         User user = target.getUser();
         if (log.isDebugEnabled())
-            log.debug("getting preferences feed for user " +
+            log.debug("getting subscriptions feed for user " +
                       user.getUsername());
 
         try {
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(locator);
             Feed feed = generator.generateFeed(user);
 
-            return ok(feed);
+            return ok(request, feed);
         } catch (GeneratorException e) {
             String reason = "Unknown feed generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        PreferenceTarget target = (PreferenceTarget) request.getTarget();
+        SubscriptionTarget target = (SubscriptionTarget) request.getTarget();
         User user = target.getUser();
-        Preference pref = target.getPreference();
+        CollectionSubscription sub = target.getSubscription();
         if (log.isDebugEnabled())
-            log.debug("getting entry for preference " +
-                      pref.getKey() + " for user " + user.getUsername());
+            log.debug("getting entry for subscription " +
+                      sub.getDisplayName() + " for user " + user.getUsername());
 
         try {
             ServiceLocator locator = createServiceLocator(request);
-            PreferencesFeedGenerator generator =
-                createPreferencesFeedGenerator(locator);
-            Entry entry = generator.generateEntry(pref);
+            SubscriptionFeedGenerator generator =
+                createSubscriptionFeedGenerator(locator);
+            Entry entry = generator.generateEntry(sub);
 
-            return ok(entry, pref);
+            return ok(request, entry, sub);
         } catch (GeneratorException e) {
             String reason = "Unknown entry generation error: " + e.getMessage();
             log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e);
+            return ProviderHelper.servererror(request, reason, e);
         }
     }
   
@@ -217,26 +220,18 @@ public class PreferencesProvider extends BaseProvider
         throw new UnsupportedOperationException();
     }
   
-    public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-  
-    public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_ENTRY_METHODS);
-    }
-
     // ExtendedProvider methods
 
-    public ResponseContext createCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    public ResponseContext putCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
-    public ResponseContext updateCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+    public ResponseContext postCollection(RequestContext request) {
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext deleteCollection(RequestContext request) {
-        return methodnotallowed(getAbdera(), request, ALLOWED_COLL_METHODS);
+        return methodnotallowed(request, ALLOWED_COLL_METHODS);
     }
 
     // our methods
@@ -255,13 +250,13 @@ public class PreferencesProvider extends BaseProvider
             throw new IllegalStateException("userService is required");
     }
 
-    protected PreferencesFeedGenerator
-        createPreferencesFeedGenerator(ServiceLocator locator) {
+    protected SubscriptionFeedGenerator
+        createSubscriptionFeedGenerator(ServiceLocator locator) {
         return getGeneratorFactory().
-            createPreferencesFeedGenerator(locator);
+            createSubscriptionFeedGenerator(locator);
     }
 
-    private Preference readPreference(RequestContext request)
+    private CollectionSubscription readSubscription(RequestContext request)
         throws IOException, ValidationException {
         Entry entry = (Entry) request.getDocument().getRoot();
         if (entry.getContentType() == null ||
@@ -269,13 +264,15 @@ public class PreferencesProvider extends BaseProvider
             throw new ValidationException("Content must be XHTML");
 
         try {
-            XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
-            Preference pref = formatter.parse(entry.getContent(), getEntityFactory());
-            if (pref.getKey() == null)
-                throw new ValidationException("Preference requires a key");
-            if (pref.getValue() == null)
-                pref.setValue("");
-            return pref;
+            XhtmlSubscriptionFormat formatter = new XhtmlSubscriptionFormat();
+            CollectionSubscription sub = formatter.parse(entry.getContent(), getEntityFactory());
+            if (sub.getDisplayName() == null)
+                throw new ValidationException("Subscription requires a display name");
+            if (sub.getCollectionUid() == null)
+                throw new ValidationException("Subscription requires a collection uuid");
+            if (sub.getTicketKey() == null)
+                throw new ValidationException("Subscription requires a ticket key");
+            return sub;
         } catch (ParseException e) {
             throw new ValidationException("Error parsing XHTML content", e);
         }

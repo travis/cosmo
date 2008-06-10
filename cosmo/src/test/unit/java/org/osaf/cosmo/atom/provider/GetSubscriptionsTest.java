@@ -27,14 +27,14 @@ import org.osaf.cosmo.model.CollectionSubscription;
 /**
  * Test class for {@link SubscriptionProvider#getFeed()} tests.
  */
-public class GetSubscriptionsTest extends BaseSubscriptionProviderTestCase {
+public class GetSubscriptionsTest extends BaseSubscriptionCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(GetSubscriptionsTest.class);
 
     public void testGetSubscriptionFeed() throws Exception {
         RequestContext req = createRequestContext();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         // subscribed feeds have no etag or last modified
@@ -46,13 +46,13 @@ public class GetSubscriptionsTest extends BaseSubscriptionProviderTestCase {
         RequestContext req = createRequestContext();
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     public RequestContext createRequestContext() {
-        return new MockSubscriptionsRequestContext(helper.getServiceContext(),
+        return new MockSubscriptionsRequestContext(provider,
                                                    helper.getUser());
     }
 }

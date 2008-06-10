@@ -15,8 +15,8 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
+import org.apache.abdera.protocol.server.Provider;
 import org.apache.abdera.protocol.server.RequestContext;
-import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.abdera.util.Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,33 +32,33 @@ public class MockItemRequestContext extends BaseMockRequestContext
     private static final Log log =
         LogFactory.getLog(MockItemRequestContext.class);
 
-    public MockItemRequestContext(ServiceContext context,
+    public MockItemRequestContext(Provider provider,
                                   NoteItem item,
                                   String method) {
-        this(context, item, method, null, null);
+        this(provider, item, method, null, null);
     }
 
-    public MockItemRequestContext(ServiceContext context,
+    public MockItemRequestContext(Provider provider,
                                   NoteItem item,
                                   String method,
                                   String projection,
                                   String format) {
-        super(context, method, toRequestUri(item, projection, format));
+        super(provider, method, toRequestUri(item, projection, format));
         this.target = new ItemTarget(this, item, projection, format);
     }
 
-    public MockItemRequestContext(ServiceContext context,
+    public MockItemRequestContext(Provider provider,
                                   String uid,
                                   String method) {
-        this(context, newItem(uid), method);
+        this(provider, newItem(uid), method);
     }
 
-    public MockItemRequestContext(ServiceContext context,
+    public MockItemRequestContext(Provider provider,
                                   String uid,
                                   String method,
                                   String projection,
                                   String format) {
-        this(context, newItem(uid), method, projection, format);
+        this(provider, newItem(uid), method, projection, format);
     }
 
     private static String toRequestUri(NoteItem item,

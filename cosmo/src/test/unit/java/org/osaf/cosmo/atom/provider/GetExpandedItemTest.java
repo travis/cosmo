@@ -17,25 +17,22 @@ package org.osaf.cosmo.atom.provider;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.osaf.cosmo.atom.provider.ItemProvider;
 import org.osaf.cosmo.atom.provider.mock.MockExpandedRequestContext;
 import org.osaf.cosmo.model.NoteItem;
 
 /**
  * Test class for {@link ExpandedItemProvider#getFeed()} tests.
  */
-public class GetExpandedItemTest extends BaseExpandedItemProviderTestCase {
+public class GetExpandedItemTest extends BaseExpandedItemCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetExpandedItemTest.class);
 
     public void testGetFeed() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = createRequestContext(item, "yyz", "eff");
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -47,7 +44,7 @@ public class GetExpandedItemTest extends BaseExpandedItemProviderTestCase {
         RequestContext req = createRequestContext(item, "yyz", "eff");
         helper.forgetProjections();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -57,7 +54,7 @@ public class GetExpandedItemTest extends BaseExpandedItemProviderTestCase {
         RequestContext req = createRequestContext(item, "yyz", "eff");
         helper.forgetFormats();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -67,7 +64,7 @@ public class GetExpandedItemTest extends BaseExpandedItemProviderTestCase {
         RequestContext req = createRequestContext(item, "yyz", "eff");
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -90,7 +87,7 @@ public class GetExpandedItemTest extends BaseExpandedItemProviderTestCase {
                                                 String format,
                                                 boolean withQueryParams) {
         MockExpandedRequestContext rc =
-            new MockExpandedRequestContext(helper.getServiceContext(), item,
+            new MockExpandedRequestContext(provider, item,
                                            projection, format);
         if (withQueryParams) {
             helper.addParameter(rc, "start", "2007-01-01T00:00:00Z");

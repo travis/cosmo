@@ -28,7 +28,7 @@ import org.osaf.cosmo.model.Ticket;
 /**
  * Test class for {@link TicketProvider#deleteEntry()} tests.
  */
-public class DeleteTicketTest extends BaseTicketsProviderTestCase {
+public class DeleteTicketTest extends BaseTicketsCollectionAdapterTestCase {
     private static final Log log =
         LogFactory.getLog(DeleteTicketTest.class);
 
@@ -37,7 +37,7 @@ public class DeleteTicketTest extends BaseTicketsProviderTestCase {
         Ticket ticket = helper.makeAndStoreDummyTicket(collection);
         RequestContext req = createRequestContext(collection, ticket);
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Ticket not removed",
@@ -45,7 +45,7 @@ public class DeleteTicketTest extends BaseTicketsProviderTestCase {
     }
 
     private RequestContext createRequestContext(CollectionItem collection, Ticket ticket) {
-        return new MockTicketRequestContext(helper.getServiceContext(),
+        return new MockTicketRequestContext(provider,
                                                 collection, ticket,
                                                 "DELETE");
     }

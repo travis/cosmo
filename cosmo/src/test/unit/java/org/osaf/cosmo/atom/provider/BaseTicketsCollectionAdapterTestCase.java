@@ -19,25 +19,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
-import org.osaf.cosmo.model.CollectionSubscription;
-import org.osaf.cosmo.model.text.XhtmlSubscriptionFormat;
+import org.osaf.cosmo.model.Ticket;
+import org.osaf.cosmo.model.text.XhtmlTicketFormat;
 
 /**
- * Base class for for {@link SubscriptionProvider} tests.
+ * Base class for for {@link TicketsProvider} tests.
  */
-public abstract class BaseSubscriptionProviderTestCase
-    extends BaseProviderTestCase implements AtomConstants {
+public abstract class BaseTicketsCollectionAdapterTestCase
+    extends BaseCollectionAdapterTestCase implements AtomConstants {
     private static final Log log =
-        LogFactory.getLog(BaseSubscriptionProviderTestCase.class);
+        LogFactory.getLog(BaseTicketsCollectionAdapterTestCase.class);
 
-    protected BaseProvider createProvider() {
-        SubscriptionProvider provider = new SubscriptionProvider();
-        provider.setUserService(helper.getUserService());
-        return provider;
+    protected BaseCollectionAdapter createAdapter() {
+        TicketsCollectionAdapter adapter = new TicketsCollectionAdapter();
+        adapter.setContentService(helper.getContentService());
+        adapter.setSecurityManager(helper.getSecurityManager());
+        return adapter;
     }
 
-    protected String serialize(CollectionSubscription sub) {
-        XhtmlSubscriptionFormat formatter = new XhtmlSubscriptionFormat();
-        return formatter.format(sub);
+    protected String serialize(Ticket ticket) {
+        XhtmlTicketFormat formatter = new XhtmlTicketFormat();
+        return formatter.format(ticket);
     }
 }

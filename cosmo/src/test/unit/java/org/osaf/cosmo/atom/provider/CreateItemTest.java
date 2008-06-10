@@ -30,7 +30,7 @@ import org.osaf.cosmo.model.NoteItem;
 /**
  * Test class for {@link ItemProvider#createEntry()} tests.
  */
-public class CreateItemTest extends BaseItemProviderTestCase
+public class CreateItemTest extends BaseItemCollectionAdapterTestCase
     implements AtomConstants {
     private static final Log log = LogFactory.getLog(CreateItemTest.class);
 
@@ -39,7 +39,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         NoteItem item = helper.makeDummyItem(collection.getOwner());
         RequestContext req = createRequestContext(collection, item);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -58,7 +58,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         VEvent event = helper.makeDummyEvent();
         RequestContext req = createRequestContext(collection, event);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         log.error(helper.getContent(res));
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 201, res.getStatus());
@@ -73,7 +73,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(collection, item);
         helper.forgetContentTypes();
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -84,7 +84,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(collection, item);
         helper.enableProcessorValidationError();
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -96,7 +96,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         item2.setUid(item1.getUid());
         RequestContext req = createRequestContext(collection, item2);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
     }
@@ -107,7 +107,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(collection, item);
         helper.enableProcessorFailure();
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -120,7 +120,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(collection, item);
         helper.lockCollection(collection);
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 423, res.getStatus());
     }
@@ -131,7 +131,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
         RequestContext req = createRequestContext(collection, item);
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.createEntry(req);
+        ResponseContext res = adapter.postEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -147,7 +147,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
                                                 NoteItem item)
         throws Exception {
         MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(helper.getServiceContext(),
+            new MockCollectionRequestContext(provider,
                                              collection, "POST");
         rc.setPropertiesAsEntry(serialize(item));
         return rc;
@@ -157,7 +157,7 @@ public class CreateItemTest extends BaseItemProviderTestCase
                                                 VEvent event)
         throws Exception {
         MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(helper.getServiceContext(),
+            new MockCollectionRequestContext(provider,
                                              collection, "POST");
         rc.setProperties(serialize(event), MEDIA_TYPE_XHTML);
         return rc;

@@ -15,9 +15,6 @@
  */
 package org.osaf.cosmo.atom.generator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.server.ServiceLocator;
 
 /**

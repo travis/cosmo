@@ -28,7 +28,7 @@ import org.osaf.cosmo.model.CollectionItem;
 /**
  * Test class for {@link ItemProvider#deleteCollection()} tests.
  */
-public class DeleteCollectionTest extends BaseItemProviderTestCase
+public class DeleteCollectionTest extends BaseItemCollectionAdapterTestCase
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(DeleteCollectionTest.class);
@@ -37,7 +37,7 @@ public class DeleteCollectionTest extends BaseItemProviderTestCase
         CollectionItem collection = helper.makeAndStoreDummyCollection();
         RequestContext req = createRequestContext(collection);
 
-        ResponseContext res = provider.deleteCollection(req);
+        ResponseContext res = adapter.deleteCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Collection not deleted", helper.findCollection(collection.getUid()));
@@ -46,7 +46,7 @@ public class DeleteCollectionTest extends BaseItemProviderTestCase
     public RequestContext createRequestContext(CollectionItem collection)
         throws Exception {
         MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(helper.getServiceContext(),
+            new MockCollectionRequestContext(provider,
                                              collection, "DELETE");
         return rc;
     }

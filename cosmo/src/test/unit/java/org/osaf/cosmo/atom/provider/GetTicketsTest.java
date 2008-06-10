@@ -26,13 +26,13 @@ import org.osaf.cosmo.atom.provider.mock.MockTicketsRequestContext;
 /**
  * Test class for {@link TicketsProvider#getFeed()} tests.
  */
-public class GetTicketsTest extends BaseTicketsProviderTestCase {
+public class GetTicketsTest extends BaseTicketsCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetTicketsTest.class);
 
     public void testGetSubscriptionFeed() throws Exception {
         RequestContext req = newRequestContext();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         // tickets feeds have no etag or last modified
@@ -44,13 +44,13 @@ public class GetTicketsTest extends BaseTicketsProviderTestCase {
         RequestContext req = newRequestContext();
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     private RequestContext newRequestContext() throws Exception {
-        return new MockTicketsRequestContext(helper.getServiceContext(),
+        return new MockTicketsRequestContext(provider,
                                                  helper.makeAndStoreDummyCollection());
     }
 }

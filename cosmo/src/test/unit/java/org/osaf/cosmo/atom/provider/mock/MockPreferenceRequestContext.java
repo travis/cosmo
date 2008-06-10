@@ -15,13 +15,10 @@
  */
 package org.osaf.cosmo.atom.provider.mock;
 
-import java.net.URLEncoder;
-
-import org.apache.abdera.protocol.server.ServiceContext;
-
+import org.apache.abdera.protocol.server.Provider;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.provider.PreferenceTarget;
 import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
@@ -34,13 +31,13 @@ public class MockPreferenceRequestContext extends BaseMockRequestContext {
     private static final Log log =
         LogFactory.getLog(MockPreferenceRequestContext.class);
 
-    public MockPreferenceRequestContext(ServiceContext context,
+    public MockPreferenceRequestContext(Provider provider,
                                         User user,
                                         Preference pref) {
-        this(context, user, pref, "GET");
+        this(provider, user, pref, "GET");
     }
 
-    public MockPreferenceRequestContext(ServiceContext context,
+    public MockPreferenceRequestContext(Provider context,
                                         User user,
                                         Preference pref,
                                         String method) {

@@ -26,13 +26,13 @@ import org.osaf.cosmo.atom.provider.mock.MockPreferencesRequestContext;
 /**
  * Test class for {@link PreferencesProvider#getFeed()} tests.
  */
-public class GetPreferencesTest extends BasePreferencesProviderTestCase {
+public class GetPreferencesTest extends BasePreferencesCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(GetPreferencesTest.class);
 
     public void testGetSubscriptionFeed() throws Exception {
         RequestContext req = newRequestContext();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 200, res.getStatus());
         // preferences feeds have no etag or last modified
@@ -44,13 +44,13 @@ public class GetPreferencesTest extends BasePreferencesProviderTestCase {
         RequestContext req = newRequestContext();
         helper.enableGeneratorFailure();
 
-        ResponseContext res = provider.getFeed(req);
+        ResponseContext res = adapter.getFeed(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
 
     private RequestContext newRequestContext() {
-        return new MockPreferencesRequestContext(helper.getServiceContext(),
+        return new MockPreferencesRequestContext(provider,
                                                  helper.getUser());
     }
 }

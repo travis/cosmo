@@ -19,25 +19,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.osaf.cosmo.atom.AtomConstants;
-import org.osaf.cosmo.model.Preference;
-import org.osaf.cosmo.model.text.XhtmlPreferenceFormat;
+import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.text.XhtmlSubscriptionFormat;
 
 /**
- * Base class for for {@link PreferencesProvider} tests.
+ * Base class for for {@link SubscriptionProvider} tests.
  */
-public abstract class BasePreferencesProviderTestCase
-    extends BaseProviderTestCase implements AtomConstants {
+public abstract class BaseSubscriptionCollectionAdapterTestCase
+    extends BaseCollectionAdapterTestCase implements AtomConstants {
     private static final Log log =
-        LogFactory.getLog(BasePreferencesProviderTestCase.class);
+        LogFactory.getLog(BaseSubscriptionCollectionAdapterTestCase.class);
 
-    protected BaseProvider createProvider() {
-        PreferencesProvider provider = new PreferencesProvider();
-        provider.setUserService(helper.getUserService());
-        return provider;
+    protected BaseCollectionAdapter createAdapter() {
+        SubscriptionCollectionAdapter adapter = new SubscriptionCollectionAdapter();
+        adapter.setUserService(helper.getUserService());
+        return adapter;
     }
 
-    protected String serialize(Preference pref) {
-        XhtmlPreferenceFormat formatter = new XhtmlPreferenceFormat();
-        return formatter.format(pref);
+    protected String serialize(CollectionSubscription sub) {
+        XhtmlSubscriptionFormat formatter = new XhtmlSubscriptionFormat();
+        return formatter.format(sub);
     }
 }

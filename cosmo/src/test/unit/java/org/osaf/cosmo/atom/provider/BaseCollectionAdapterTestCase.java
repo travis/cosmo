@@ -17,31 +17,37 @@ package org.osaf.cosmo.atom.provider;
 
 import junit.framework.TestCase;
 
+import org.apache.abdera.Abdera;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomHelper;
 
 /**
  * Base class for for provider tests.
  */
-public abstract class BaseProviderTestCase extends TestCase {
+public abstract class BaseCollectionAdapterTestCase extends TestCase {
     private static final Log log =
-        LogFactory.getLog(BaseProviderTestCase.class);
+        LogFactory.getLog(BaseCollectionAdapterTestCase.class);
 
-    protected BaseProvider provider;
+    protected BaseCollectionAdapter adapter;
+    protected StandardProvider provider;
     protected AtomHelper helper;
 
     protected void setUp() throws Exception {
         helper = new AtomHelper();
         helper.setUp();
 
-        provider = createProvider();
-        provider.setAbdera(helper.getAbdera());
+        provider = new StandardProvider();
+        provider.setWorkspaceManager(new StandardWorkspaceManager());
         provider.setGeneratorFactory(helper.getGeneratorFactory());
         provider.setServiceLocatorFactory(helper.getServiceLocatorFactory());
-        provider.setEntityFactory(helper.getEntityFactory());
-        provider.init();
+        provider.init(new Abdera(), null);
+        
+        adapter = createAdapter();
+        adapter.setGeneratorFactory(helper.getGeneratorFactory());
+        adapter.setServiceLocatorFactory(helper.getServiceLocatorFactory());
+        adapter.setEntityFactory(helper.getEntityFactory());
+        adapter.init();
 
         helper.logIn();
     }
@@ -49,5 +55,5 @@ public abstract class BaseProviderTestCase extends TestCase {
     protected void tearDown() throws Exception {
     }
 
-    protected abstract BaseProvider createProvider();
+    protected abstract BaseCollectionAdapter createAdapter();
 }

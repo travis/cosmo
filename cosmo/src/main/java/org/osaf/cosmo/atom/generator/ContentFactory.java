@@ -21,7 +21,6 @@ import java.util.HashSet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.EimRecordSet;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
@@ -31,7 +30,6 @@ import org.osaf.cosmo.eim.json.JsonConstants;
 import org.osaf.cosmo.eim.json.JsonStreamException;
 import org.osaf.cosmo.eim.json.JsonStreamWriter;
 import org.osaf.cosmo.eim.schema.ItemTranslator;
-import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.NoteItem;
 
 /**

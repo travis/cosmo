@@ -27,7 +27,7 @@ import org.osaf.cosmo.model.NoteItem;
 /**
  * Test class for {@link ItemProvider#updateMedia()} tests.
  */
-public class UpdateItemMediaTest extends BaseItemProviderTestCase {
+public class UpdateItemMediaTest extends BaseItemCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(UpdateItemMediaTest.class);
 
     public void testUpdateMedia() throws Exception {
@@ -37,7 +37,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, copy);
         log.error("content-type: " + req.getContentType());
 
-        ResponseContext res = provider.updateMedia(req);
+        ResponseContext res = adapter.putMedia(req);
         log.error(helper.getContent(res));
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
@@ -52,7 +52,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, copy);
         helper.forgetContentTypes();
 
-        ResponseContext res = provider.updateMedia(req);
+        ResponseContext res = adapter.putMedia(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 415, res.getStatus());
     }
@@ -64,7 +64,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorValidationError();
 
-        ResponseContext res = provider.updateMedia(req);
+        ResponseContext res = adapter.putMedia(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -76,7 +76,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item, copy);
         helper.enableProcessorFailure();
 
-        ResponseContext res = provider.updateMedia(req);
+        ResponseContext res = adapter.putMedia(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 500, res.getStatus());
     }
@@ -91,7 +91,7 @@ public class UpdateItemMediaTest extends BaseItemProviderTestCase {
                                                 NoteItem update)
         throws Exception {
         MockItemRequestContext rc =
-            new MockItemRequestContext(helper.getServiceContext(), original,
+            new MockItemRequestContext(provider, original,
                                        "PUT");
         rc.setPropertiesAsText(serialize(update));
         return rc;

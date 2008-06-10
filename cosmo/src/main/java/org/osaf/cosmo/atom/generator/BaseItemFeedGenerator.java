@@ -24,11 +24,8 @@ import java.util.TreeSet;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
-import org.apache.abdera.util.Constants;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.eim.eimml.EimmlConstants;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
@@ -39,7 +36,6 @@ import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
 import org.osaf.cosmo.model.Ticket;
-import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;
 import org.osaf.cosmo.server.ServiceLocator;
 

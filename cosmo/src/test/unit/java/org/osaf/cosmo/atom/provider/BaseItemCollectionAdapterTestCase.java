@@ -29,17 +29,17 @@ import org.osaf.cosmo.model.StampUtils;
 import org.osaf.cosmo.model.text.XhtmlCollectionFormat;
 
 /**
- * Base class for for {@link ItemProvider} tests.
+ * Base class for for {@link ItemCollectionAdapter} tests.
  */
-public abstract class BaseItemProviderTestCase extends BaseProviderTestCase {
+public abstract class BaseItemCollectionAdapterTestCase extends BaseCollectionAdapterTestCase {
     private static final Log log =
-        LogFactory.getLog(BaseItemProviderTestCase.class);
+        LogFactory.getLog(BaseItemCollectionAdapterTestCase.class);
 
-    protected BaseProvider createProvider() {
-        ItemProvider provider = new ItemProvider();
-        provider.setProcessorFactory(helper.getProcessorFactory());
-        provider.setContentService(helper.getContentService());
-        return provider;
+    protected BaseCollectionAdapter createAdapter() {
+        ItemCollectionAdapter adapter = new ItemCollectionAdapter();
+        adapter.setProcessorFactory(helper.getProcessorFactory());
+        adapter.setContentService(helper.getContentService());
+        return adapter;
     }
 
     protected Properties serialize(NoteItem item) {

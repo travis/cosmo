@@ -19,18 +19,17 @@ import java.util.Date;
 
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.DefaultTarget;
+import org.apache.abdera.protocol.server.impl.SimpleTarget;
 import org.apache.abdera.util.EntityTag;
-
-import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.CollectionItem;
+import org.osaf.cosmo.model.Ticket;
 
 /**
  * <p>
  * A target that identifies a particular user preference.
  * </p>
  */
-public class TicketTarget extends DefaultTarget implements AuditableTarget{
+public class TicketTarget extends SimpleTarget implements AuditableTarget{
 
     private Ticket ticket;
     private CollectionItem collection;

@@ -15,10 +15,6 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
@@ -26,28 +22,31 @@ import java.util.Date;
 import javax.activation.MimeType;
 import javax.servlet.http.HttpServletRequest;
 
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Base;
 import org.apache.abdera.model.Document;
-import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-import org.apache.abdera.protocol.server.TargetType;
-import org.apache.abdera.protocol.server.impl.AbstractProvider;
-import org.apache.abdera.protocol.server.impl.AbstractResponseContext;
-import org.apache.abdera.protocol.server.impl.BaseResponseContext;
-import org.apache.abdera.protocol.server.impl.EmptyResponseContext;
-import org.apache.abdera.protocol.server.impl.HttpServletRequestContext;
+import org.apache.abdera.protocol.server.context.AbstractResponseContext;
+import org.apache.abdera.protocol.server.context.BaseResponseContext;
+import org.apache.abdera.protocol.server.context.EmptyResponseContext;
+import org.apache.abdera.protocol.server.context.ResponseContextException;
+import org.apache.abdera.protocol.server.impl.AbstractCollectionAdapter;
+import org.apache.abdera.protocol.server.servlet.ServletRequestContext;
 import org.apache.abdera.util.Constants;
 import org.apache.abdera.util.EntityTag;
 import org.apache.abdera.util.MimeTypeHelper;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.atom.AtomException;
 import org.osaf.cosmo.atom.generator.GeneratorFactory;
@@ -58,73 +57,29 @@ import org.osaf.cosmo.server.ServiceLocator;
 import org.osaf.cosmo.server.ServiceLocatorFactory;
 import org.osaf.cosmo.util.DateUtil;
 
-public abstract class BaseProvider extends AbstractProvider
-    implements ExtendedProvider, AtomConstants, ServerConstants {
-    private static final Log log = LogFactory.getLog(BaseProvider.class);
+public abstract class BaseCollectionAdapter extends AbstractCollectionAdapter
+    implements ExtendedCollectionAdapter, AtomConstants, ServerConstants {
+    private static final Log log = LogFactory.getLog(BaseCollectionAdapter.class);
     private static final TimeZoneRegistry TIMEZONE_REGISTRY =
         TimeZoneRegistryFactory.getInstance().createRegistry();
 
-    private Abdera abdera;
     private GeneratorFactory generatorFactory;
     private ServiceLocatorFactory serviceLocatorFactory;
     private EntityFactory entityFactory;
-
+   
     // AbstractProvider methods
-
+    
     protected int getDefaultPageSize() {
         // XXX
         return 25;
     }
     
-    /**
-     * <p>
-     * Extends the superclass method to implement the following APP
-     * extensions:
-     * </p>
-     * <ul>
-     * <li> When <code>PUT</code>ing to a collection, the request is
-     * interpreted as an update of the collection itself.
-     * </ul>
-     */
-    public ResponseContext request(RequestContext request) {
-        String method = request.getMethod();
-        TargetType type = request.getTarget().getType();
-
-        if (log.isDebugEnabled())
-            log.debug("servicing request for method " + method + " against target type " + type.name());
-
-        try {
-            if (method.equals("POST")) {
-                if (type == TargetType.TYPE_SERVICE)
-                    return createCollection(request);
-            } else if (method.equals("PUT")) {
-                if (type == TargetType.TYPE_COLLECTION)
-                    return updateCollection(request);
-            } else if (method.equals("DELETE")) {
-                if (type == TargetType.TYPE_COLLECTION)
-                    return deleteCollection(request);
-            }
-
-            return super.request(request);
-        } catch (RuntimeException e) {
-            // the request handler swallows the exception when it sends its
-            // 500 response, so stuff the exception into a request attribute
-            // to let the servlet and filters examine the exception if they
-            // wish
-            request.setAttribute(RequestContext.Scope.REQUEST,
-                                 ATTR_SERVICE_EXCEPTION, e);
-            throw e;
-        }
+    protected ServiceLocator createServiceLocator(RequestContext context) {
+        HttpServletRequest request =
+            ((ServletRequestContext)context).getRequest();
+        return serviceLocatorFactory.createServiceLocator(request);
     }
-
-    public String[] getAllowedMethods(TargetType type) {
-        if (type != null && type == TargetType.TYPE_COLLECTION)
-            return new String[] {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS" };
-        if (type != null && type == TargetType.TYPE_SERVICE)
-            return new String[] { "GET", "POST", "HEAD", "OPTIONS" };
-        return super.getAllowedMethods(type);
-    }
-
+    
     // our methods
 
     /**
@@ -172,13 +127,30 @@ public abstract class BaseProvider extends AbstractProvider
             throw new IllegalArgumentException("Unregistered timezone " + value);
         return tz;
     }
-
-    public Abdera getAbdera() {
-        return abdera;
+    
+    @Override
+    public void compensate(RequestContext request, Throwable t) {
+        // keep track of unexpected exception by storing in the request
+        ((ServletRequestContext) request).getRequest().setAttribute(
+                ServerConstants.ATTR_SERVICE_EXCEPTION, t);
+    }
+    
+    @Override
+    public String getAuthor(RequestContext context)
+            throws ResponseContextException {
+        // required by AbstractCollectionAdapter but not used
+        return null;
     }
 
-    public void setAbdera(Abdera abdera) {
-        this.abdera = abdera;
+    @Override
+    public String getId(RequestContext context) {
+        // required by AbstractCollectionAdapter but not used
+        return null;
+    }
+    
+    public String getTitle(RequestContext arg0) {
+        // required by CollectionInfo but not used
+        return null;
     }
 
     public GeneratorFactory getGeneratorFactory() {
@@ -208,8 +180,6 @@ public abstract class BaseProvider extends AbstractProvider
 
 
     public void init() {
-        if (abdera == null)
-            throw new IllegalStateException("abdera is required");
         if (generatorFactory == null)
             throw new IllegalStateException("generatorFactory is required");
         if (serviceLocatorFactory == null)
@@ -218,74 +188,15 @@ public abstract class BaseProvider extends AbstractProvider
             throw new IllegalStateException("entityFactory is required");
     }
 
-    protected ResponseContext
-        checkCollectionWritePreconditions(RequestContext request) {
-        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
-        if (contentLength <= 0)
-            return lengthrequired(getAbdera(), request);
-
-        MimeType ct = request.getContentType();
-        if (ct == null ||
-            ! MimeTypeHelper.isMatch(MEDIA_TYPE_XHTML, ct.toString()))
-            return notsupported(getAbdera(), request, "Content-Type must be " + MEDIA_TYPE_XHTML);
-
-        return null;
+    protected ResponseContext ok(RequestContext context, Feed feed) {
+        return ok(context, feed, null);
     }
 
-    protected ResponseContext checkEntryWritePreconditions(RequestContext request) {
-        return checkEntryWritePreconditions(request, true);
-    }
-
-    protected ResponseContext checkEntryWritePreconditions(RequestContext request,
-                                                           boolean requireAtomContent) {
-        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
-        if (contentLength <= 0)
-            return lengthrequired(getAbdera(), request);
-
-        MimeType ct = request.getContentType();
-        if (ct == null)
-            return badrequest(getAbdera(), request, "Content-Type required");
-
-        if (! requireAtomContent)
-            return null;
-
-        if (! MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, ct.toString()))
-            return notsupported(getAbdera(), request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
-
-        try {
-            if (! (request.getDocument().getRoot() instanceof Entry))
-                return badrequest(getAbdera(), request, "Entity-body must be an Atom entry");
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return servererror(getAbdera(), request, reason, e); 
-        }
-
-        return null;
-    }
-
-    protected ResponseContext checkMediaWritePreconditions(RequestContext request) {
-        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
-        if (contentLength <= 0)
-            return lengthrequired(getAbdera(), request);
-
-        return null;
-    }
-
-    protected ServiceLocator createServiceLocator(RequestContext context) {
-        HttpServletRequest request =
-            ((HttpServletRequestContext)context).getRequest();
-        return serviceLocatorFactory.createServiceLocator(request);
-    }
-
-    protected ResponseContext ok(Feed feed) {
-        return ok(feed, null);
-    }
-
-    protected ResponseContext ok(Feed feed,
+    protected ResponseContext ok(RequestContext context,
+                                 Feed feed,
                                  AuditableObject auditable) {
         AbstractResponseContext rc =
-            createResponseContext(feed.getDocument());
+            createResponseContext(context, feed.getDocument());
 
         if (auditable != null) {
             rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
@@ -295,10 +206,11 @@ public abstract class BaseProvider extends AbstractProvider
         return rc;
     }
 
-    protected ResponseContext ok(Entry entry,
+    protected ResponseContext ok(RequestContext context,
+                                 Entry entry,
                                  AuditableObject auditable) {
          AbstractResponseContext rc =
-             createResponseContext(entry.getDocument());
+             createResponseContext(context, entry.getDocument());
 
          if (auditable != null) {
              rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
@@ -308,11 +220,12 @@ public abstract class BaseProvider extends AbstractProvider
          return rc;
     }
 
-    protected ResponseContext created(Entry entry,
+    protected ResponseContext created(RequestContext context,
+                                      Entry entry,
                                       AuditableObject auditable,
                                       ServiceLocator locator) {
         AbstractResponseContext rc =
-            createResponseContext(entry.getDocument(), 201, "Created");
+            createResponseContext(context, entry.getDocument(), 201, "Created");
 
         if (auditable != null) {
             rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
@@ -342,12 +255,13 @@ public abstract class BaseProvider extends AbstractProvider
         return rc;
     }
 
-    protected ResponseContext updated(Entry entry,
+    protected ResponseContext updated(RequestContext context,
+                                      Entry entry,
                                       AuditableObject auditable,
                                       ServiceLocator locator,
                                       boolean locationChanged) {
         AbstractResponseContext rc =
-            createResponseContext(entry.getDocument());
+            createResponseContext(context, entry.getDocument());
 
         if (auditable != null) {
             rc.setEntityTag(new EntityTag(auditable.getEntityTag()));
@@ -371,44 +285,28 @@ public abstract class BaseProvider extends AbstractProvider
     protected ResponseContext deleted() {
         return createResponseContext(204);
     }
+    
+    protected ResponseContext conflict(RequestContext request, AtomException e) {
+        return returnBase(e.createDocument(request.getAbdera()), e.getCode(), null, request.getAbdera());
+    }
+    
+    protected ResponseContext lengthrequired(RequestContext request) {
+        return ProviderHelper.createErrorResponse(request.getAbdera(), 411, "Length Required",null);
+    }
 
-    protected ResponseContext conflict(RequestContext request,
-                                       AtomException e) {
-        return returnBase(e.createDocument(abdera), e.getCode(), null);
+    protected ResponseContext locked(RequestContext request) {
+        return ProviderHelper.createErrorResponse(request.getAbdera(), 423, "Collection Locked",null);
     }
     
     protected ResponseContext insufficientPrivileges(RequestContext request, AtomException e) {
-        return returnBase(e.createDocument(abdera), e.getCode(), null);
+        return returnBase(e.createDocument(request.getAbdera()), e.getCode(), null, request.getAbdera());
     }
 
-    protected ResponseContext preconditionfailed(Abdera abdera,
-                                                 RequestContext request,
-                                                 String reason) {
-        return returnBase(createErrorDocument(abdera, 412, reason, null),
-                          412, null);
-    }
-
-    protected ResponseContext lengthrequired(Abdera abdera,
-                                             RequestContext request) {
-        return returnBase(createErrorDocument(abdera, 411, "Length Required",
-                                              null),
-                          411, null);
-    }
-
-    protected ResponseContext locked(Abdera abdera,
-                                     RequestContext request) {
-        return returnBase(createErrorDocument(abdera, 423, "Collection Locked",
-                                              null),
-                          423, null);
-    }
-
-    protected ResponseContext methodnotallowed(Abdera abdera, 
-                                               RequestContext request,
+    protected ResponseContext methodnotallowed(RequestContext request,
                                                String[] methods) {
-        BaseResponseContext resp = (BaseResponseContext)
-            returnBase(createErrorDocument(abdera, 405, "Method Not Allowed",
-                                           null),
-                       405, null);
+        BaseResponseContext<Base> resp = (BaseResponseContext)
+            ProviderHelper.createErrorResponse(request.getAbdera(), 405, "Method Not Allowed",null);
+                       
         resp.setAllow(methods);
         return resp;
     }
@@ -430,18 +328,19 @@ public abstract class BaseProvider extends AbstractProvider
     }
 
     protected AbstractResponseContext
-        createResponseContext(Document<Element> doc) {
-        return createResponseContext(doc, -1, null);
+        createResponseContext(RequestContext context, Document<Element> doc) {
+        return createResponseContext(context, doc, -1, null);
     }
 
     protected AbstractResponseContext
-        createResponseContext(Document<Element> doc,
+        createResponseContext(RequestContext context,
+                              Document<Element> doc,
                               int status,
                               String reason) {
         AbstractResponseContext rc =
             new BaseResponseContext<Document<Element>>(doc);
 
-        rc.setWriter(abdera.getWriterFactory().getWriter("PrettyXML"));
+        rc.setWriter(context.getAbdera().getWriterFactory().getWriter("PrettyXML"));
 
         if (status > 0)
             rc.setStatus(status);
@@ -459,9 +358,67 @@ public abstract class BaseProvider extends AbstractProvider
 
     protected ResponseContext returnBase(Base base, 
                                          int status,
-                                         Date lastModified) {
-        ResponseContext rc = super.returnBase(base, status, lastModified);
+                                         Date lastModified,
+                                         Abdera abdera) {
+        ResponseContext rc = ProviderHelper.returnBase(base, status, lastModified);
         rc.setWriter(abdera.getWriterFactory().getWriter("PrettyXML"));
         return rc;
     }
+    
+    protected ResponseContext checkCollectionWritePreconditions(
+            RequestContext request) {
+        int contentLength = Integer.valueOf(request.getProperty(
+                RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(request);
+
+        MimeType ct = request.getContentType();
+        if (ct == null
+                || !MimeTypeHelper.isMatch(MEDIA_TYPE_XHTML, ct.toString()))
+            return ProviderHelper.notsupported(request, "Content-Type must be "
+                    + MEDIA_TYPE_XHTML);
+
+        return null;
+    }
+    
+    protected ResponseContext checkEntryWritePreconditions(RequestContext request) {
+        return checkEntryWritePreconditions(request, true);
+    }
+
+    protected ResponseContext checkEntryWritePreconditions(RequestContext request,
+                                                           boolean requireAtomContent) {
+        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(request);
+
+        MimeType ct = request.getContentType();
+        if (ct == null)
+            return ProviderHelper.badrequest(request, "Content-Type required");
+
+        if (! requireAtomContent)
+            return null;
+
+        if (! MimeTypeHelper.isMatch(Constants.ATOM_MEDIA_TYPE, ct.toString()))
+            return ProviderHelper.notsupported(request, "Content-Type must be " + Constants.ATOM_MEDIA_TYPE);
+
+        try {
+            if (! (request.getDocument().getRoot() instanceof Entry))
+                return ProviderHelper.badrequest(request, "Entity-body must be an Atom entry");
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return ProviderHelper.servererror(request, reason, e); 
+        }
+
+        return null;
+    }
+    
+    protected ResponseContext checkMediaWritePreconditions(RequestContext request) {
+        int contentLength = Integer.valueOf(request.getProperty(RequestContext.Property.CONTENTLENGTH).toString());
+        if (contentLength <= 0)
+            return lengthrequired(request);
+
+        return null;
+    }
+    
 }

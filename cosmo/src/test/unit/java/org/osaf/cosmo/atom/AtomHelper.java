@@ -22,7 +22,6 @@ import java.util.Date;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
-import org.apache.abdera.protocol.server.ServiceContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osaf.cosmo.MockHelper;
@@ -30,11 +29,8 @@ import org.osaf.cosmo.atom.generator.GeneratorFactory;
 import org.osaf.cosmo.atom.generator.mock.MockGeneratorFactory;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.mock.MockProcessorFactory;
-import org.osaf.cosmo.atom.provider.StandardTargetResolver;
 import org.osaf.cosmo.atom.provider.mock.BaseMockRequestContext;
-import org.osaf.cosmo.atom.provider.mock.MockProvider;
-import org.osaf.cosmo.atom.provider.mock.MockProviderManager;
-import org.osaf.cosmo.atom.servlet.StandardRequestHandlerManager;
+import org.osaf.cosmo.atom.provider.mock.MockCollectionAdapter;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.mock.MockEntityFactory;
@@ -52,25 +48,19 @@ public class AtomHelper extends MockHelper {
     private Abdera abdera;
     private MockGeneratorFactory generatorFactory;
     private MockProcessorFactory processorFactory;
-    private StandardServiceContext serviceContext;
+    private MockCollectionAdapter collectionAdapter;
     private EntityFactory entityFactory;
 
     public AtomHelper() {
         super();
 
         abdera = new Abdera();
-
+        collectionAdapter = new MockCollectionAdapter();
         generatorFactory = new MockGeneratorFactory(abdera);
         processorFactory = new MockProcessorFactory();
         entityFactory = new MockEntityFactory();
 
-        serviceContext = new StandardServiceContext();
-        serviceContext.setAbdera(abdera);
-        serviceContext.setProviderManager(new MockProviderManager());
-        // XXX mock these up
-        serviceContext.setHandlerManager(new StandardRequestHandlerManager());
-        serviceContext.setTargetResolver(new StandardTargetResolver());
-        serviceContext.init();
+        
     }
 
     public Abdera getAbdera() {
@@ -89,13 +79,8 @@ public class AtomHelper extends MockHelper {
         return processorFactory;
     }
 
-    public ServiceContext getServiceContext() {
-        return serviceContext;
-    }
-
-    public MockProvider getProvider(RequestContext request) {
-        return (MockProvider)
-            serviceContext.getProviderManager().get(request);
+    public MockCollectionAdapter getCollectionAdapter(RequestContext request) {
+        return collectionAdapter;
     }
 
     public void setIfMatch(RequestContext context,

@@ -28,7 +28,7 @@ import org.osaf.cosmo.model.CollectionItem;
 /**
  * Test class for {@link ItemProvider#updateCollection()} tests.
  */
-public class UpdateCollectionTest extends BaseItemProviderTestCase
+public class UpdateCollectionTest extends BaseItemCollectionAdapterTestCase
     implements AtomConstants {
     private static final Log log =
         LogFactory.getLog(UpdateCollectionTest.class);
@@ -41,7 +41,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection, copy);
 
-        ResponseContext res = provider.updateCollection(req);
+        ResponseContext res = adapter.putCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Null etag", res.getEntityTag());
@@ -57,7 +57,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection, copy);
 
-        ResponseContext res = provider.updateCollection(req);
+        ResponseContext res = adapter.putCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -69,7 +69,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
 
         RequestContext req = createRequestContext(collection, copy);
 
-        ResponseContext res = provider.updateCollection(req);
+        ResponseContext res = adapter.putCollection(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 400, res.getStatus());
     }
@@ -78,7 +78,7 @@ public class UpdateCollectionTest extends BaseItemProviderTestCase
                                                CollectionItem update)
         throws Exception {
         MockCollectionRequestContext rc =
-            new MockCollectionRequestContext(helper.getServiceContext(),
+            new MockCollectionRequestContext(provider,
                                              collection, "PUT");
         if (update != null)
             rc.setContentAsXhtml(serialize(update));

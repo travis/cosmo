@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.atom;
 
-import javax.activation.MimeType;
 import javax.xml.namespace.QName;
 
 import org.osaf.cosmo.util.UriTemplate;

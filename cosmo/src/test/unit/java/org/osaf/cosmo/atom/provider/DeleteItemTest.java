@@ -29,14 +29,14 @@ import org.osaf.cosmo.model.mock.MockCollectionItem;
 /**
  * Test class for {@link ItemProvider#deleteEntry()} tests.
  */
-public class DeleteItemTest extends BaseItemProviderTestCase {
+public class DeleteItemTest extends BaseItemCollectionAdapterTestCase {
     private static final Log log = LogFactory.getLog(DeleteItemTest.class);
 
     public void testDeleteEntry() throws Exception {
         NoteItem item = helper.makeAndStoreDummyItem();
         RequestContext req = createRequestContext(item);
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNull("Item not deleted", helper.findItem(item.getUid()));
@@ -54,7 +54,7 @@ public class DeleteItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item);
         helper.addParameter(req, "uuid", collection2.getUid());
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 204, res.getStatus());
         assertNotNull("Item incorrectly removed",
@@ -71,7 +71,7 @@ public class DeleteItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item);
         helper.addParameter(req, "uuid", "deadbeef");
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
         assertNotNull("Item incorrectly removed",
@@ -85,7 +85,7 @@ public class DeleteItemTest extends BaseItemProviderTestCase {
         RequestContext req = createRequestContext(item1);
         helper.addParameter(req, "uuid", item2.getUid());
 
-        ResponseContext res = provider.deleteEntry(req);
+        ResponseContext res = adapter.deleteEntry(req);
         assertNotNull("Null response context", res);
         assertEquals("Incorrect response status", 409, res.getStatus());
         assertNotNull("Item incorrectly removed",
@@ -93,7 +93,7 @@ public class DeleteItemTest extends BaseItemProviderTestCase {
     }
 
     public RequestContext createRequestContext(NoteItem item) {
-        return new MockItemRequestContext(helper.getServiceContext(), item,
+        return new MockItemRequestContext(provider, item,
                                           "DELETE");
     }
 }

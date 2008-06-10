@@ -225,7 +225,7 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
     vp.setMinSize([
         constr.MIN_WIDTH,
         constr.MIN_HEIGHT,
-        (LEFT_SIDEBAR_WIDTH + 1),
+        (LEFT_SIDEBAR_WIDTH),
         0,
         (constr.MIN_WIDTH - RIGHT_SIDEBAR_WIDTH),
         (constr.MIN_HEIGHT - TOP_MENU_HEIGHT)
@@ -233,7 +233,7 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
     vp.setMaxSize([
         constr.MAX_WIDTH,
         constr.MAX_HEIGHT,
-        (LEFT_SIDEBAR_WIDTH + 1),
+        (LEFT_SIDEBAR_WIDTH),
         0,
         (constr.MAX_WIDTH - RIGHT_SIDEBAR_WIDTH),
         (constr.MAX_HEIGHT - TOP_MENU_HEIGHT)

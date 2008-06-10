@@ -16,10 +16,10 @@
     float: left;
 }
 .cosmoCollectionSelectorCalSelect .collectionSelectorCollectionName {
-    width: 128px;
+    width: 127px;
 }
 .cosmoCollectionSelectorListSelect .collectionSelectorCollectionName {
-    width: 149px;
+    width: 148px;
 }
 .cosmoCollectionSelectorSection {
     clear: both;
@@ -34,6 +34,7 @@
     cursor: pointer;
     float: right;
     border-bottom: 1px white solid;
+    border-right: 1px white solid;
 }
 .cosmoCollectionDetails {
     margin: 4px 2px 0px 2px;

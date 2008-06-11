@@ -58,13 +58,24 @@ public class StandardResourceLocatorFactory
                               uri.getPath());
 
                 // make sure that absolute URLs use the same scheme and
-                // authority
+                // authority (host:port)
                 if (url.getProtocol() != null &&
                     ! url.getProtocol().equals(context.getProtocol()))
-                    throw new BadGatewayException(uri + " does not specify same scheme as " + context.toString());
-                if (url.getAuthority() != null &&
-                    ! url.getAuthority().equals(context.getAuthority()))
-                    throw new BadGatewayException(uri + " does not specify same authority as " + context.toString());
+                    throw new BadRequestException("target " + uri + " does not specify same scheme as context " + context.toString());
+                
+                // look at host
+                if(url.getHost() !=null &&
+                    ! url.getHost().equals(context.getHost()))
+                    throw new BadRequestException("target " + uri + " does not specify same host as context " + context.toString());
+                
+                // look at ports
+                // take default ports 80 and 443 into account so that
+                // https://server is the same as https://server:443
+                int port1 = translatePort(context.getProtocol(), context.getPort());
+                int port2 = translatePort(url.getProtocol(), url.getPort());
+                
+                if(port1!=port2)
+                    throw new BadRequestException("target " +  uri + " does not specify same port as context " + context.toString());
             }
 
             if (! url.getPath().startsWith(context.getPath()))
@@ -93,5 +104,13 @@ public class StandardResourceLocatorFactory
         throws DavException {
         String path = TEMPLATE_USER.bind(user.getUsername());
         return new StandardResourceLocator(context, path, this);
+    }
+    
+    private int translatePort(String protocol, int port) {
+        if (port == -1 || (port == 80 && "http".equals(protocol))
+                || (port == 443 && "https".equals(protocol)))
+            return -1;
+        else
+            return port;
     }
 }

@@ -1,0 +1,32 @@
+<div class="cosmoSharingDialog">
+  <div class="cosmoSharingDialogForm">
+  <div class="cosmoSharingTopDiv"><span class="cosmoSharingDisplayName" id="${id}DisplayName" title="${l10n.displayNameTitle}" dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" dojoAttachPoint="displayName">${displayName}</span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
+  <h2 class="cosmoSharingSectionHead">${l10n.subscribeHead}</h2>
+  <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span>
+
+  <a href="${urls.webcal.uri}" dojoAttachEvent="onclick: iCalOnClick"><span class="cosmoSubscribeButton cosmoICalSubscribeButton" title="${l10n.iCalSubscribeTitle}">${l10n.iCal}</span></a>
+
+  <span dojoAttachEvent="onclick: atomOnClick" class="cosmoSubscribeButton cosmoAtomSubscribeButton" title="${l10n.atomSubscribeTitle}">${l10n.atom}</span>
+
+  <a href="${urls.dav.uri}" dojoAttachEvent="onclick: davOnClick"><span class="cosmoSubscribeButton cosmoDavSubscribeButton" title="${l10n.davSubscribeTitle}">${l10n.dav}</span></a>
+
+  <div dojoType="dijit.form.Button" id="${id}Invite" dojoAttachEvent="onClick: invite" class="cosmoInviteButton" dojoAttachPoint="inviteButton">
+    ${l10n.invite}
+  </div>
+
+  <div dojoAttachPoint="inviteSection" class="cosmoInviteSection" id="${id}InviteSection">
+    <div class="cosmoInviteInstructions">${l10n.inviteInstructions}</div>
+    <a href="" id="${id}ReadOnlyInviteLink" class="cosmoReadOnlyInviteLink" dojoAttachPoint="readOnlyInviteLink">${l10n.inviteReadOnly}</a>
+    <a href="" id="${id}ReadWriteInviteLink" class="cosmoReadWriteInviteLink" dojoAttachPoint="readWriteInviteLink">${l10n.inviteReadWrite}</a>
+  </div>
+      
+  <a href="${urls.webcal.uri}" target="_blank" class="cosmoSharingDownloadLink">
+    <div dojoType="dijit.form.Button" id="${id}Download" class="cosmoSharingDownloadButton">
+      ${l10n.download}
+    </div>
+  </a>
+
+ <span id="${id}Dismiss" dojoAttachEvent="onClick: destroy" dojoType="dijit.form.Button" 
+       class="cosmoSharingDoneButton" dojoAttachPoint="destroyButton">${l10n.dismiss}</span>
+ </div>
+</div>

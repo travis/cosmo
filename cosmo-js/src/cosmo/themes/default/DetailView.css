@@ -13,39 +13,71 @@
 .cosmoDetailHidden {
     visibility: hidden;
 }
-.cosmoDetailViewMarkupBar {
-    height: 18px;
-    border: 1px solid #999999;
-}
-.cosmoDetailViewTriageButton {
-    position: absolute;
-}
-.cosmoDetailViewTriageLaterButton {
-    left: 43px;
-}
-.cosmoDetailViewTriageDoneButton {
-    left: 86px;
-}
-.cosmoDetailViewTriageButtons {
-    position: absolute;
-}
-.cosmoDetailViewStarButton {
-    position: absolute;
-    left: 150px;
-}
-.cosmoDetailViewMailButton {
-    position: absolute;
-    right: 0px;
+
+.cosmoDetailViewControlButtons {
+    display: table;
+    width: 100%;
 }
 
-.cosmoDetailViewNoteSection {
+.paddingWrapper {
+    padding: 5px;
+    height: 25px;
+}
+
+.cosmoDetailViewControlButtons .dijitButtonNode {
+    background: none;
+    height: 25px; /* 35px - 2 * 5px */
+    width: 100%;
+    line-height: 11px;
+    color: #0066FF;
+    border-left-width: 0px;
+    border-color: #B6B6B6;
+}
+
+.cosmoDetailViewSaveButton {
+    background: #EDEDED;
+}
+
+.cosmoDetailViewRemoveButton {
+    background: #F7F7F7;
+}
+
+.cosmoDetailViewControlButtons > .dijitButton:first-child .dijitButtonNode {
+    border-left-width: 1px;
+}
+
+.cosmoDetailViewControlButtons .dijitButton {
+    margin: 0;
+    display: table-cell;
+    width: 50%;
+}
+
+.cosmoDetailViewMarkupBar {
+    height: 18px;
+    border-top: 1px solid #DDDDDD;
+    border-bottom: 1px solid #DDDDDD;
+    clear: both;
+}
+
+.cosmoDetailViewTriageButton {
+    float:left;
+}
+
+.cosmoDetailViewStarButton, .cosmoDetailViewMailButton {
+    float: left;
+    margin-left: 15px;
+}
+
+.textPadContainer {
     padding: 10px 20px 5px 7px;
 }
 
 .cosmoDetailViewTitleInput {
-    font-size: 15pt;
+    border-color: #AAAAAA;
+    padding-left: 3px;
+    font-size: 15px;
     font-weight: bold;
-    width: 229px;
+    width: 226px; /* 229 - 3px left padding */
 }
 
 .cosmoDetailViewNotesInput {
@@ -104,8 +136,6 @@
 .cosmoDetailViewEventTitleBar{
     background: #ededed;
     border-top: 1px solid #999999;
-    border-bottom: 1px solid #999999;
-
 }
 .cosmoDetailViewEventButton {
     position: absolute;
@@ -113,20 +143,12 @@
 }
 .cosmoDetailViewFooter {
     background: #ededed;
-    border-top: 1px solid #999999;
 }
-.cosmoDetailViewSaveButton {
-    float: left;
-    margin-left: 7px;
-}
-.cosmoDetailViewRemoveButton {
-    float: right;
-    margin-right: 7px;
-}
+
 .cosmoDetailViewReadOnlyIcon{
-    position: absolute;
-    right: 48px;
-    margin: 3px;
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
     display: none;
 }
 .cosmoDetailViewReadOnly .cosmoDetailViewReadOnlyIcon{

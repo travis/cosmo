@@ -1,5 +1,11 @@
 <div class="cosmoDetailView">
   <div class="cosmoDetailViewContainer" dojoAttachPoint="containerNode">
+    <div class="paddingWrapper">
+      <div class="cosmoDetailViewControlButtons">
+        <button dojoType="dijit.form.Button" dojoAttachPoint="removeButton" dojoAttachEvent="onClick: removeItem" class="cosmoDetailViewRemoveButton">${l10n.remove}</button>
+        <button dojoType="dijit.form.Button" dojoAttachPoint="saveButton" dojoAttachEvent="onClick: saveItem" class="cosmoDetailViewSaveButton">${l10n.save}</button>
+      </div>
+    </div>
     <div class="cosmoDetailViewMarkupBar">
       <div id="${id}TriageButtons" dojoAttachPoint="triageButtons" class="cosmoDetailViewTriageButtons">
         <span id="${id}NowButton" dojoAttachPoint="nowButton" dojoAttachEvent="onclick: triageNowOnClick"
@@ -15,10 +21,15 @@
       <span id="${id}MailButton" dojoAttachPoint="mailButton" class="cosmoDetailViewMailButton cosmoEmailButtonDefault"
             dojoAttachEvent="onmousedown: mailMouseDown, onmouseup: mailMouseUp"></span>
     </div>
-    <div class="cosmoDetailViewNoteSection">
-      <div id="${id}titleInput" dojoAttachPoint="titleInput" dojoType="dijit.form.TextBox" class="cosmoDetailViewTitleInput"></div>
-      <textarea id="${id}NotesInput" dojoAttachPoint="notesInput" dojoType="dijit.form.Textarea" class="cosmoDetailViewNotesInput"></textarea>
+
+    <div class="cosmoDetailViewBylineSection" dojoAttachPoint="byline">
     </div>
+
+    <div class="textPadContainer">
+      <div id="${id}titleInput" dojoAttachPoint="titleInput" dojoType="dijit.form.TextBox" class="cosmoDetailViewTitleInput"></div>
+    </div>
+
+
     <div class="cosmoDetailViewEventTitleBar">
       <span id="${id}EventTitle" dojoAttachPoint="eventTitleSpan" class="cosmoDetailViewEventTitle"></span>
       <span id="${id}EventButton" dojoAttachPoint="eventButton" class="cosmoDetailViewEventButton cosmoEventButtonDefault"
@@ -72,10 +83,9 @@
       </div>
     </div>
     <div class="cosmoDetailViewFooter">
-      <div class="cosmoDetailViewBylineSection" dojoAttachPoint="byline">
-      </div>
-      <button dojoType="dijit.form.Button" dojoAttachPoint="removeButton" dojoAttachEvent="onClick: removeItem" class="cosmoDetailViewSaveButton">${l10n.remove}</button>
-      <button dojoType="dijit.form.Button" dojoAttachPoint="saveButton" dojoAttachEvent="onClick: saveItem" class="cosmoDetailViewRemoveButton">${l10n.save}</button>
+    <div class="textPadContainer">
+      <textarea id="${id}NotesInput" dojoAttachPoint="notesInput" dojoType="dijit.form.Textarea" class="cosmoDetailViewNotesInput"></textarea>
+    </div>
     </div>
   </div>
 </div>

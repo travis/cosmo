@@ -88,5 +88,9 @@
     }
     dojo.require('cosmo.ui.conf');
 })();
+// Work around dojo/safari bug (http://trac.dojotoolkit.org/ticket/6849)
+dojo.addOnLoad(function(){
+    if (!console.debug) console.debug = console.log;
+});
 </script>
 

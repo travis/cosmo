@@ -15,7 +15,6 @@
 }
 
 .cosmoDetailViewControlButtons {
-    display: table;
     width: 100%;
 }
 
@@ -37,10 +36,10 @@
 .cosmoDetailViewControlButtons .dijitButton {
     background: #EDEDED;
 }
-.cosmoDetailViewControlButtons > .dijitButtonHover {
+.cosmoDetailViewControlButtons .dijitButtonHover {
     background: #F7F7F7;
 }
-.cosmoDetailViewControlButtons > .dijitButtonActive {
+.cosmoDetailViewControlButtons .dijitButtonActive {
     background: #E0E0E0;
 }
 
@@ -50,8 +49,8 @@
 
 .cosmoDetailViewControlButtons .dijitButton {
     margin: 0;
-    display: table-cell;
-    width: 50%;
+    float: left;
+    width: 123px;
 }
 
 .cosmoDetailViewMarkupBar {

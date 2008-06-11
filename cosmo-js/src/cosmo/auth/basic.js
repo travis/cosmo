@@ -23,14 +23,15 @@ dojo.provide("cosmo.auth.basic");
 dojo.require("cosmo.auth._base");
 dojo.require("cosmo.util.encoding");
 
-dojo.require("dojo.cookie");
+dojo.require("dojox.storage");
+
 (function(){
 var COSMO_BASIC_AUTH_CRED="CosmoBasicCred";
 dojo.mixin(cosmo.auth.basic, {
     setCred: function (username, password){
-        dojo.cookie(COSMO_BASIC_AUTH_CRED,
+        dojox.storage.put(COSMO_BASIC_AUTH_CRED,
             cosmo.util.encoding.toBase64(
-                username + ":" + password), {path:"/"});
+                username + ":" + password));
     },
 
     getPassword: function(){
@@ -64,11 +65,12 @@ dojo.mixin(cosmo.auth.basic, {
     },
 
     clearAuth: function (){
-        dojo.cookie(COSMO_BASIC_AUTH_CRED, null, {expires: -1, path: "/"});
+        dojox.storage.remove(COSMO_BASIC_AUTH_CRED);
     },
 
     getCred: function(){
-		return dojo.cookie(COSMO_BASIC_AUTH_CRED);
+        debugger
+		return dojox.storage.get(COSMO_BASIC_AUTH_CRED);
     },
 
     currentlyAuthenticated: function(){

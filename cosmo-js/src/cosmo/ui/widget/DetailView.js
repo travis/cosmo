@@ -730,3 +730,15 @@ function populateDeltaTriage(dv, delta){
 }
 })();
 
+
+dojo.declare("cosmo.ui.widget.DetailView.StyledTextArea", [dijit.form.Textarea], {
+    postCreate: function() {
+        if (dojo.isFF){
+            this.inherited('postCreate', arguments);
+            var w = this.iframe.contentWindow;
+            if (!w || !w.document) return;
+            w.document.body.style.fontFamily = '"Lucida Grande", "Verdana", "Arial", sans-serif';
+            w.document.body.style.fontSize   = '11px';
+        }
+    }
+});

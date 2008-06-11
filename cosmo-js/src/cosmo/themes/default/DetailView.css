@@ -1,6 +1,6 @@
 @import url("Checkbox.css");
 #detailView{
-    
+    overflow-x: hidden;
 }
 .cosmoDetailView {
     position: absolute;
@@ -71,26 +71,36 @@
 }
 
 .cosmoDetailViewTitleInput {
-    font-size: 15px;
+    font-size: 15px !important;
     font-weight: bold;
     margin-left: 5px !important;
 }
 
 .cosmoDetailViewWideBox {
-    border-color: #AAAAAA;
     padding-left: 3px;
     padding-right: 1px;
-    margin: 5px 5px 5px 0px;
+    margin: 5px 0px 5px 0px;
     width: 224px;
 }
 
 .cosmoDetailViewNotesInput {
-    margin-top: 5px;
-    width: 229px;
+    margin: 5px;
+    width: 224px;
+    min-height: 150px;
+    padding: 2px;
+}
+
+.cosmoDetailViewNotesInput #detailViewNotesInput {
+    min-height: 150px;
+    padding: 2px;
+}
+
+.cosmo .cosmoDetailView .dijitTextArea {
+    background: white !important;
 }
 
 .cosmoDetailViewEventSection {
-    padding: 0px 20px 5px 5px;
+    padding: 0px 20px 0px 5px;
 }
 .cosmoDetailViewEventTitleBar{
     height: 18px;
@@ -126,29 +136,28 @@
     margin-bottom: 5px;
 }
 
+.cosmoDetailViewEventSection {
+    vertical-align: top;
+}
+
 .cosmoDetailViewEventSection input {
     padding: 2px;
 } 
 
-.cosmoDetailViewEventSection .dijitTextBox, .cosmoDetailViewEventSection select {
+.cosmoDetailViewEventSection .dijitTextBox, .cosmoDetailViewEventSection select, .cosmoDetailViewWideBox, .cosmoDetailViewNotesInput .dijitTextArea {
     border: 1px solid #AAAAAA;
 } 
 
-.cosmoDetailViewAllDaySection{
+.cosmoDetailViewEventSection select {
+    height: 17px;
+    font-size: 11px;
+    font-family: "Lucida Grande", "Verdana", "Arial", sans-serif;
+}
+
+.cosmoDetailViewStatusSelector, .cosmoDetailViewAllDaySection, .cosmoDetailViewDateTimeSection, .cosmoDetailViewTimezoneSection {
     margin-bottom: 5px;
 }
-.cosmoDetailViewDateTimeSection{
-    margin-bottom: 5px;
-}
-.cosmoDetailViewTimezoneSection{
-    margin-bottom: 5px;
-}
-.cosmoDetailViewStatusSelector{
-    margin-bottom: 5px;
-}
-.cosmoDetailViewRecurrenceSection{
-    margin-bottom: 5px;
-}
+
 .cosmoDetailViewEventTitleBar{
     background: #ededed;
     border-top: 1px solid #CCCCCC;
@@ -157,9 +166,6 @@
 .cosmoDetailViewEventButton {
     position: absolute;
     right: 0;
-}
-.cosmoDetailViewFooter {
-    background: #ededed;
 }
 
 .cosmoDetailViewReadOnlyIcon{
@@ -176,4 +182,8 @@
 }
 .cosmoDetailViewReadOnly .cosmoDetailViewRemoveButton {
     display: none;
+}
+
+.cosmoDetailViewRecurrenceSection {
+    verical-align: middle;
 }

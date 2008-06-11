@@ -325,9 +325,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (col.isIcon) {
                 var iconPrefix = isSelected ? 'Selected' : 'Default';
                 var iconDiv = _createElem('div');
-                var mouseOver = function (e) { self.handleMouseOver(e); };
-                var mouseOut = function (e) { self.handleMouseOut(e); };
-                var click = function (e) { self.handleClick(e); };
+                var mouseOver = function (e) { self.handleMouseOver(e); }
+                var mouseOut = function (e) { self.handleMouseOut(e); }
+                var click = function (e) { self.handleClick(e); }
                 var colIcon = cosmo.ui.imagegrid.createImageButton({ domNode: iconDiv,
                     defaultState: col.display + iconPrefix,
                     rolloverState: col.display + iconPrefix + 'Rollover',
@@ -350,7 +350,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<td id="listView_' + col.name +
                 'Header" class="listViewHeaderCell';
             if (isSelected) {
-                r += ' listViewHeaderCellSel';
+              r += ' listViewHeaderCellSel'
             }
             r += '"';
             if (colStyle) {

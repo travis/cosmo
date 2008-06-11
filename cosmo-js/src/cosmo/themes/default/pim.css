@@ -274,6 +274,9 @@
     white-space: nowrap;
     overflow: hidden;
 }
+tr > .listViewHeaderCell:last-child {
+    border-right: 0px;
+}
 .listViewHeaderCellLit {
     background-position: 0px -20px;
 }

@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: white;
+    background: #F7F7F7;
 }
 .cosmoDetailHidden {
     visibility: hidden;
@@ -34,12 +34,14 @@
     border-color: #B6B6B6;
 }
 
-.cosmoDetailViewSaveButton {
+.cosmoDetailViewControlButtons .dijitButton {
     background: #EDEDED;
 }
-
-.cosmoDetailViewRemoveButton {
+.cosmoDetailViewControlButtons > .dijitButtonHover {
     background: #F7F7F7;
+}
+.cosmoDetailViewControlButtons > .dijitButtonActive {
+    background: #E0E0E0;
 }
 
 .cosmoDetailViewControlButtons > .dijitButton:first-child .dijitButtonNode {
@@ -68,16 +70,18 @@
     margin-left: 15px;
 }
 
-.textPadContainer {
-    padding: 10px 20px 5px 7px;
-}
-
 .cosmoDetailViewTitleInput {
-    border-color: #AAAAAA;
-    padding-left: 3px;
     font-size: 15px;
     font-weight: bold;
-    width: 226px; /* 229 - 3px left padding */
+    margin-left: 5px !important;
+}
+
+.cosmoDetailViewWideBox {
+    border-color: #AAAAAA;
+    padding-left: 3px;
+    padding-right: 1px;
+    margin: 5px 5px 5px 0px;
+    width: 224px;
 }
 
 .cosmoDetailViewNotesInput {
@@ -86,38 +90,50 @@
 }
 
 .cosmoDetailViewEventSection {
-    padding: 10px 20px 5px 7px;
+    padding: 0px 20px 5px 5px;
 }
 .cosmoDetailViewEventTitleBar{
     height: 18px;
-    padding-left: 7px;
+    padding-left: 5px;
+    margin-top: 5px;
 }
 .cosmoDetailViewEventTitle{
     font-weight: bold;
     line-height: 18px;
-    font-size: 0.9em;
+    font-size: 10px;
+    vertical-align: middle;
 }
 
-.cosmoDetailViewStartDateInput{
-    width: 130px;
+.cosmoDetailViewStartDateInput, .cosmoDetailViewEndDateInput{
+    width: 85px;
 }
-.cosmoDetailViewStartTimeInput{
-    width: 75px;
+.cosmoDetailViewStartTimeInput, .cosmoDetailViewEndTimeInput, .cosmoDetailViewUntilInput{
+    width: 85px;
+    margin-left: 5px;
 }
-.cosmoDetailViewEndDateInput{
-    width: 130px;
+
+.cosmoDetailViewTimezoneRegionSelector, .cosmoDetailViewStatusSelector, .cosmoDetailViewRecurrenceSelector{
+    width: 87px; /* 85px + 2*1px border */
 }
-.cosmoDetailViewEndTimeInput{
-    width: 75px;
-}
-.cosmoDetailViewUntilInput{
-    width: 115px;
+
+.cosmoDetailViewTimezoneIdSelector {
+    margin-left: 5px;
+    width: 135px;
 }
 
 .cosmoDetailViewLocationInput{
     display: block;
     margin-bottom: 5px;
 }
+
+.cosmoDetailViewEventSection input {
+    padding: 2px;
+} 
+
+.cosmoDetailViewEventSection .dijitTextBox, .cosmoDetailViewEventSection select {
+    border: 1px solid #AAAAAA;
+} 
+
 .cosmoDetailViewAllDaySection{
     margin-bottom: 5px;
 }
@@ -135,7 +151,8 @@
 }
 .cosmoDetailViewEventTitleBar{
     background: #ededed;
-    border-top: 1px solid #999999;
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;    
 }
 .cosmoDetailViewEventButton {
     position: absolute;

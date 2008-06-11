@@ -35,7 +35,7 @@ cosmo.account.settings = new function () {
     this.advancedForm = null;
     // The field that has focus
     this.focusedField = null;
-    
+
     // Localized strings
     var strings = {
         title: _('AccountSettings.Title'),
@@ -46,8 +46,8 @@ cosmo.account.settings = new function () {
         advanced: _('AccountSettings.Advanced'),
         about: _('AccountSettings.About'),
         advancedAccountBrowser: _('AccountSettings.Advanced.AccountBrowser')
-    }
-    
+    };
+
     dojo.mixin(this, cosmo.account.accountBase);
 
     // Public memebers
@@ -129,7 +129,7 @@ cosmo.account.settings = new function () {
         d = _createElem('div');
         d.className = 'promptText floatLeft';
         d.style.width = '59%';
-        d.style.paddingLeft = '4px'
+        d.style.paddingLeft = '4px';
         d.appendChild(_createText(strings['passwordBlank']));
         passCell.appendChild(d);
         d = _createElem('div');
@@ -152,7 +152,7 @@ cosmo.account.settings = new function () {
             this.advancedForm = advancedForm;
             tabContent.appendChild(this.advancedForm);
             tabs.push({ label: tabLabel, content: tabContent });
-    
+
             // About Cosmo tab
             // -------
             tabLabel = strings.about;
@@ -160,37 +160,37 @@ cosmo.account.settings = new function () {
             tabContent = about;
             originalAboutBox = about;
             tabs.push({ label: tabLabel, content: tabContent });
-    
+
             var self = this; // For callback scope
             // Submit button and default Enter-key action
             var f = function () { self.submitSave.apply(self); };
-    
+
             var b = null; // For dialog buttons
             var c = null; // For dialog content area
             c = new cosmo.ui.widget.TabContainer({tabs: tabs});
             o.content = c;
-            b = new cosmo.ui.widget.Button({ 
+            b = new cosmo.ui.widget.Button({
                 text:_('App.Button.Close'),
-                id: "settingsAdvancedClose",                             
+                id: "settingsAdvancedClose",
                 width:60, small: true, handleOnClick: function () {
                     cosmo.app.hideDialog(); } });
             o.btnsLeft = [b];
-            b = new cosmo.ui.widget.Button({ 
+            b = new cosmo.ui.widget.Button({
                 text:_('App.Button.Save'),
-                id: "settingsAdvancedSave",                             
+                id: "settingsAdvancedSave",
                 width:60, small: true, handleOnClick: f });
             o.btnsRight = [b];
             o.defaultAction = f;
-    
+
             cosmo.app.showDialog(o);
         }));
         return advancedFormDeferred;
-    }
+    };
     /**
      * Validate the form input and submit via XHR
      */
     this.submitSave = function () {
-        
+
         // Don't submit from keyboard input if focus is on a text field
         // Otherwise saved form field values selected by Enter key
         // will give you spurious submissions
@@ -209,7 +209,7 @@ cosmo.account.settings = new function () {
         }
         // Start preferences setting
         setPreferencesDeferred = new dojo.DeferredList(prefDeferreds);
-        
+
         setPreferencesDeferred.addCallback(dojo.hitch(this, function () {
             // Validate the form input using each field's
             // attached validators
@@ -217,7 +217,7 @@ cosmo.account.settings = new function () {
             // Validate fields with the attached validators
             // and display any inline err messages
             var err = cosmo.account.validateForm(this.detailsForm, fieldList, false);
-    
+
             // No error -- submit updated account info via CMP
             if (!err) {
                 var self = this;
@@ -239,7 +239,7 @@ cosmo.account.settings = new function () {
                 return d;
             }
         }));
-        
+
         cosmo.util.deferred.addStdErrback(setPreferencesDeferred, _("Error.SaveSettings"), "");
     };
 
@@ -267,19 +267,19 @@ cosmo.account.settings = new function () {
             var check = cosmo.util.html.createInput({ type: 'checkbox',
                 id: 'showAccountBrowser', name: 'showAccountBrowser',
                 value: '', checked: checkedDefault });
-    
+
             div.appendChild(check);
             div.appendChild(nbsp());
             div.appendChild(nbsp());
             div.appendChild(_createText(strings.advancedAccountBrowser));
             form.appendChild(div);
-    
+
             // BANDAID: Hack to get the checkbox into Safari's
             // form elements collection
             if (navigator.userAgent.indexOf('Safari') > -1) {
                 cosmo.util.html.addInputsToForm([check], form);
             }
-    
+
             return form;
         });
         return prefsDeferred;

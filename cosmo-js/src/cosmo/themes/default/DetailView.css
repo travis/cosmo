@@ -10,6 +10,9 @@
     bottom: 0;
     background: white;
 }
+.cosmoDetailHidden {
+    visibility: hidden;
+}
 .cosmoDetailViewMarkupBar {
     height: 18px;
     border: 1px solid #999999;

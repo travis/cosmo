@@ -196,7 +196,7 @@
 /* Right sidebar main */
 #rightSidebar {
     position: absolute;
-    background: #ededed;
+    background: white;
     overflow: auto;
     bottom: 0;
 }

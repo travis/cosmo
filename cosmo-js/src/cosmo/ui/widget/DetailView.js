@@ -129,6 +129,15 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.clearFields();
         this.disable();
         this.hideEvent();
+        this.hideDetailView();
+    },
+
+    hideDetailView: function(){
+        dojo.addClass(this.domNode, "cosmoDetailHidden");
+    },
+
+    showDetailView: function(){
+        dojo.removeClass(this.domNode, "cosmoDetailHidden");
     },
 
     clearFields: function(){
@@ -487,12 +496,15 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     postCreate: function(){
         this.hideEvent();
         if (this.initItem) this.updateFromItem(this.initItem);
+        else this.hideDetailView();
+
         if (this.readOnly) this.setReadOnly();
 
         var updateItems = dojo.hitch(this, function(cmd){
             var itemWrapper = cmd.data;
             if (itemWrapper) {
                 var item = itemWrapper.data;
+                if (item) this.showDetailView();
                 // Only update the values in the form if
                 // the item has actually changed -- note that
                 // in the cal, when navigating off the week

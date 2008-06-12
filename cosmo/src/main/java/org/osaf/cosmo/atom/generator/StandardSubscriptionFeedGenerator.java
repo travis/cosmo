@@ -29,6 +29,7 @@ import org.osaf.cosmo.atom.AtomConstants;
 import org.osaf.cosmo.model.AuditableComparator;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.ItemSecurityException;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.text.XhtmlSubscriptionFormat;
@@ -161,9 +162,17 @@ public class StandardSubscriptionFeedGenerator
         String uid = sub.getOwner().getUsername() + "-" + sub.getDisplayName();
         Entry entry = newEntry(uid, isDocument);
 
-        CollectionItem collection = (CollectionItem)
-            getFactory().getContentService().
-            findItemByUid(sub.getCollectionUid());
+        CollectionItem collection = null;
+        
+        try {
+            collection = (CollectionItem) getFactory().getContentService()
+                    .findItemByUid(sub.getCollectionUid());
+        } catch (ItemSecurityException e) {
+            // user no longer has access to collection, so treat as non
+            // existing collection
+            collection = null;
+        }
+        
         Ticket ticket = collection != null ?
             getFactory().getContentService()
             .getTicket(collection, sub.getTicketKey()) : null;

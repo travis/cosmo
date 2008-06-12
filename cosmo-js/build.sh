@@ -2,6 +2,7 @@
 DOJO_VERSION="release-1.1.1"
 if [ ! -d dojo-src ]; then
     svn co http://svn.dojotoolkit.org/src/tags/$DOJO_VERSION dojo-src
+    patch -d dojo-src/dojox -p0 < dojo_storage_whatwg.diff
 fi
 
 cssBuild=""

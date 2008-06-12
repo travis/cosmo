@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core-tiger</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-taglibs</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>

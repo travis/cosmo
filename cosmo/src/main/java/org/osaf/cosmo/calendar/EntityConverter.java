@@ -54,6 +54,7 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RecurrenceId;
 import net.fortuna.ical4j.model.property.Status;
+import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
@@ -71,6 +72,7 @@ import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.FreeBusyItem;
 import org.osaf.cosmo.model.ICalendarItem;
 import org.osaf.cosmo.model.Item;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
@@ -651,7 +653,11 @@ public class EntityConverter {
         compactTimezones(masterCalendar);
         
         VEvent event = eventStamp.getEvent();
-       
+        
+        // verify master event exists
+        if(event==null)
+            throw new ModelValidationException("no master calednar component found");
+        
         setCalendarAttributes(masterNote, event);
         
         // synchronize exceptions with master NoteItem modifications
@@ -807,11 +813,11 @@ public class EntityConverter {
         if(event.getDateStamp()!=null)
             note.setClientModifiedDate(event.getDateStamp().getDate());
         
-        // look for VALARM
+        // look for absolute VALARM
         VAlarm va = ICalendarUtils.getDisplayAlarm(event);
-        if (va != null) {
-            Date reminderTime = ICalendarUtils.getTriggerDate(va.getTrigger(),
-                    event);
+        if (va != null && va.getTrigger()!=null) {
+            Trigger trigger = va.getTrigger();
+            Date reminderTime = trigger.getDateTime();
             if (reminderTime != null)
                 note.setReminderTime(reminderTime);
         }
@@ -847,11 +853,11 @@ public class EntityConverter {
         if (task.getDateStamp() != null)
             note.setClientModifiedDate(task.getDateStamp().getDate());
 
-        // look for VALARM
+        // look for absolute VALARM
         VAlarm va = ICalendarUtils.getDisplayAlarm(task);
-        if (va != null) {
-            Date reminderTime = ICalendarUtils.getTriggerDate(va.getTrigger(),
-                    task);
+        if (va != null && va.getTrigger()!=null) {
+            Trigger trigger = va.getTrigger();
+            Date reminderTime = trigger.getDateTime();
             if (reminderTime != null)
                 note.setReminderTime(reminderTime);
         }

@@ -44,6 +44,7 @@ import org.osaf.cosmo.dav.ProtectedPropertyModificationException;
 import org.osaf.cosmo.dav.UnprocessableEntityException;
 import org.osaf.cosmo.dav.caldav.CaldavConstants;
 import org.osaf.cosmo.dav.caldav.InvalidCalendarLocationException;
+import org.osaf.cosmo.dav.caldav.InvalidCalendarResourceException;
 import org.osaf.cosmo.dav.caldav.MaxResourceSizeException;
 import org.osaf.cosmo.dav.caldav.TimeZoneExtractor;
 import org.osaf.cosmo.dav.caldav.UidConflictException;
@@ -63,6 +64,7 @@ import org.osaf.cosmo.model.DataSizeException;
 import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.EventStamp;
 import org.osaf.cosmo.model.IcalUidInUseException;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.StampUtils;
 
@@ -347,6 +349,8 @@ public class DavCalendarCollection extends DavCollectionBase
                 throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
                 throw new LockedException();
+            } catch (ModelValidationException e) {
+                throw new InvalidCalendarResourceException(e.getMessage());
             }
         } else {
             if (log.isDebugEnabled())
@@ -359,6 +363,8 @@ public class DavCalendarCollection extends DavCollectionBase
                 throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
                 throw new LockedException();
+            } catch (ModelValidationException e) {
+                throw new InvalidCalendarResourceException(e.getMessage());
             }
         }
 

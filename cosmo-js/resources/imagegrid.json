@@ -48,15 +48,15 @@
 
 "readOnlyIcon": { "row": 3, "column": 19, "width": 12, "height": 12 },
 
-"triageStatusColumnDefault": { "row": 4, "column": 1, "width": 36, "height": 15 },
-"triageStatusColumnSelected": { "row": 4, "column": 4, "width": 36, "height": 15 },
+"triageStatusColumnDefault": { "row": 4, "column": 1, "width": 36, "height": 18 },
+"triageStatusColumnSelected": { "row": 4, "column": 4, "width": 36, "height": 18 },
 
-"taskColumnDefault": { "row": 4, "column": 5, "width": 20, "height": 15 },
-"taskColumnSelected": { "row": 4, "column": 8, "width": 20, "height": 15 },
+"taskColumnDefault": { "row": 4, "column": 5, "width": 20, "height": 18 },
+"taskColumnSelected": { "row": 4, "column": 8, "width": 20, "height": 18 },
 
 "listViewTaskIcon": { "row": 4, "column": 9, "width": 12, "height": 11 },
 
 "eventButtonDefault": { "row": 4, "column": 10, "width": 23, "height": 18 },
 "eventButtonRollover": { "row": 4, "column": 11, "width": 23, "height": 18 },
 "eventButtonSelected": { "row": 4, "column": 12, "width": 23, "height": 18 },
-}
+}}

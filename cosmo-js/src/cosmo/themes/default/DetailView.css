@@ -16,6 +16,7 @@
 
 .cosmoDetailViewControlButtons {
     width: 100%;
+    min-width: 247px;
 }
 
 .paddingWrapper {
@@ -155,6 +156,10 @@
 
 .cosmoDetailViewStatusSelector, .cosmoDetailViewAllDaySection, .cosmoDetailViewDateTimeSection, .cosmoDetailViewTimezoneSection {
     margin-bottom: 5px;
+}
+
+.cosmoDetailViewTimezoneSection {
+    min-width: 232px;
 }
 
 .cosmoDetailViewEventTitleBar{

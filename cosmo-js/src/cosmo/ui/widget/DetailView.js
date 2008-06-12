@@ -734,7 +734,7 @@ function populateDeltaTriage(dv, delta){
 dojo.declare("cosmo.ui.widget.DetailView.StyledTextArea", [dijit.form.Textarea], {
     postCreate: function() {
         this.inherited('postCreate', arguments);
-        if (dojo.isFF){
+        if (dojo.isFF && dojo.isFF < 3){
             var w = this.iframe.contentWindow;
             if (!w || !w.document) return;
             w.document.body.style.fontFamily = '"Lucida Grande", "Verdana", "Arial", sans-serif';

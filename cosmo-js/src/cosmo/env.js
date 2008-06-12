@@ -203,7 +203,6 @@ cosmo.env.urls = {
     "Auth": "/security_check",
     "Notices": function(){return _("About.NoticesUrl");},
     "Browse": "/browse",
-    "UserList": '/admin/users',
     "TermsOfService": "/help/tos",
     "PrivacyPolicy": "/help/privacy",
     "About": "/help/about",

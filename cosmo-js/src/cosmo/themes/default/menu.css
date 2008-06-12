@@ -1,0 +1,62 @@
+/*
+ * Copyright 2008 Open Source Applications Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+
+/* Top menubar
+ * --------------------- */
+/* Menubar main */
+#menuBar {
+    position: absolute;
+    border: 1px solid #dddddd;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 46px;
+    visibility: visible;
+}
+#cosmoMainLogo{
+    background: url(images/logo_en.png);
+    width: 216px;
+    height: 45px;
+    float: left;
+}
+#menuNavItems {
+    margin-right: 4px;
+    margin-top: 4px;
+    color: #333333;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: right;
+    float: right;
+}
+/* Menu links should look clickable whether
+ * they have an href prop or not */
+#menuNavItems a.menuBarLink {
+    cursor: pointer;
+}
+/* The pipe character between links */
+#menuNavItems span.menuBarDivider {
+    font-weight: normal;
+    color: #999;
+}
+
+/* Cosmo logo up on menubar */
+#smallLogoDiv {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 129px;
+    height: 28px;
+    background-repeat: no-repeat;
+}

@@ -41,7 +41,6 @@ cosmo.app = new function () {
     // List of any queued-up error messages
     this.errorList = [];
     // Quick access to the currently logged-in user
-    this.currentUsername =  cosmo.util.auth.getUsername();
     //select boxes to show/hide when displaying modal dialog box
     this._selectBoxIds = {};
 

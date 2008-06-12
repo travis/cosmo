@@ -38,7 +38,6 @@ dojo.require("cosmo.data.CollectionStore");
 dojo.require("cosmo.ui.widget.CollectionSubscriber");
 // --
 dojo.require("cosmo.ui.minical");
-dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.widget.DetailView");
 dojo.require("cosmo.ui.imagegrid");
@@ -71,14 +70,13 @@ cosmo.app.pim.layout = new function () {
 
 cosmo.app.pim.layout.BaseLayout = function (p) {
     var params = p || {};
-    this.top = 0;
+    this.top = TOP_MENU_HEIGHT;
     this.left = 0;
     this.width = 0;
     this.height = 0;
     this.domNode = params.domNode;
-    this.menuBar = new cosmo.app.pim.layout.MenuBar({ parent: this });
     this.mainApp = new cosmo.app.pim.layout.MainApp({ parent: this });
-    this.children = [this.menuBar, this.mainApp];
+    this.children = [this.mainApp];
     this.renderSelf = function () {
         var viewport = dijit.getViewport();
         var w = viewport.w;
@@ -89,40 +87,15 @@ cosmo.app.pim.layout.BaseLayout = function (p) {
         h -= 2;
         this.width = w;
         this.height = h;
-        this.menuBar.update({
-            top: 0, left: 0,
-            width: this.width, height: (TOP_MENU_HEIGHT - 1) });
         this.mainApp.update({
-            top: TOP_MENU_HEIGHT, left: 0,
-            width: this.width, height: (this.height - TOP_MENU_HEIGHT) });
+            top: 0, left: 0,
+            width: this.width, height: (this.height) });
         this.setPosition();
         this.setSize();
         cosmo.ui.resize.Viewports.resize();
     }
 };
 cosmo.app.pim.layout.BaseLayout.prototype =
-    new cosmo.ui.ContentBox();
-
-cosmo.app.pim.layout.MenuBar = function (p) {
-    var params = p || {};
-    for (var n in params) { this[n] = params[n]; }
-
-    var d = _createElem('div');
-    d.id = 'menuBar';
-    this.parent.domNode.appendChild(d);
-
-    this.domNode = d;
-    this.children = [];
-    this.renderSelf = function () {
-        this.setPosition();
-        this.setSize();
-        if (!this.hasBeenRendered) {
-            this.parent.domNode.appendChild(this.domNode);
-            this.hasBeenRendered = true;
-        }
-    }
-};
-cosmo.app.pim.layout.MenuBar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.MainApp = function (p) {
@@ -183,7 +156,7 @@ cosmo.app.pim.layout.LeftSidebar = function (p) {
         0,
         0,
         LEFT_SIDEBAR_WIDTH,
-        (constr.MIN_HEIGHT - TOP_MENU_HEIGHT)
+        (constr.MIN_HEIGHT)
     ]);
     vp.setMaxSize([
         constr.MAX_WIDTH,
@@ -191,7 +164,7 @@ cosmo.app.pim.layout.LeftSidebar = function (p) {
         0,
         0,
         LEFT_SIDEBAR_WIDTH,
-        (constr.MAX_HEIGHT - TOP_MENU_HEIGHT)
+        (constr.MAX_HEIGHT)
     ]);
     vp.addResize("renderSelf",this.renderSelf);
     /*
@@ -228,7 +201,7 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
         (LEFT_SIDEBAR_WIDTH),
         0,
         (constr.MIN_WIDTH - RIGHT_SIDEBAR_WIDTH),
-        (constr.MIN_HEIGHT - TOP_MENU_HEIGHT)
+        (constr.MIN_HEIGHT)
     ]);
     vp.setMaxSize([
         constr.MAX_WIDTH,
@@ -236,7 +209,7 @@ cosmo.app.pim.layout.CenterColumn = function (p) {
         (LEFT_SIDEBAR_WIDTH),
         0,
         (constr.MAX_WIDTH - RIGHT_SIDEBAR_WIDTH),
-        (constr.MAX_HEIGHT - TOP_MENU_HEIGHT)
+        (constr.MAX_HEIGHT)
     ]);
     vp.addResize("renderSelf",this.renderSelf)    ;
 };
@@ -299,23 +272,9 @@ cosmo.app.pim.layout.RightSidebar.prototype =
     new cosmo.ui.ContentBox();
 
 cosmo.app.pim.layout.populateBaseLayout = function () {
-    var menuBar = this.baseLayout.menuBar;
     var centerColumn = this.baseLayout.mainApp.centerColumn;
     var leftSidebar = this.baseLayout.mainApp.leftSidebar;
     var rightSidebar = this.baseLayout.mainApp.rightSidebar;
-
-    // Main logo graphic
-    var logoDiv = _createElem('div');
-    logoDiv.id = 'cosmoMainLogo';
-    menuBar.domNode.appendChild(logoDiv);
-
-    // Main menu of links at the top of the UI
-    var menuDiv = _createElem('div');
-    menuDiv.id = 'menuNavItems';
-    var cB = new cosmo.ui.menu.MainMenu({ domNode: menuDiv, id: menuDiv.id, top: 4});
-    menuBar.addChild(cB);
-    menuBar.mainMenu = cB;
-    cB.render(); // Go ahead and render the menubar -- no waiting for data
 
     // List view canvas
     var listDiv = _createElem('div');

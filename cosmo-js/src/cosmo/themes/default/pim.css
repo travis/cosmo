@@ -539,11 +539,6 @@ tr > .listViewHeaderCell:last-child {
 .cosmoCollectionDetailsDefault{
     margin = 'auto';
 }
-#cosmoMainLogo{
-    background: url(images/logo_en.png);
-    width: 216px;
-    height: 45px;
-}
 .cosmo .dijitTextArea{
 	background:#fff url("../../../dijit/themes/tundra/images/validationInputBg.png") repeat-x top left;
 	#background:#fff url('../../../dijit/themes/tundra/images/validationInputBg.gif') repeat-x top left;

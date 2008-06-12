@@ -41,11 +41,6 @@
   <c:set var="parseWidgets" value="true"/>
 </c:if>
 
-<c:if test="${not empty properties}">
-  <c:set var="disableSignups" value="${properties['cosmo.service.account.disableSignups']}"/>
-</c:if>
-
-
 <script type="text/javascript">
 
     // Set isDebug to true to get nice dojo debugging messages
@@ -56,8 +51,7 @@
                     confLocation: "${baseUrl}/webui.conf",
                     templateName: "${templateName}",
                     parseOnLoad: ${parseWidgets},
-                    serverBaseUrl: "${baseUrl}",
-                    cosmoDisableSignups: "${disableSignups}"}
+                    serverBaseUrl: "${baseUrl}"}
 </script>
 
 <c:set var="dojoPath" value="${jsUrl}/dojo"/>

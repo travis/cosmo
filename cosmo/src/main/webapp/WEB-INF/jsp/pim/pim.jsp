@@ -103,6 +103,7 @@ cosmo.ui.event.listeners.hookUpListeners();
 </head>
 
 <body id="body" class="cosmo tundra">
+    <cosmo:menu/>
     <div id="baseLayout" style="position: absolute;"></div>
     <div id="maskDiv">
       <div id="appLoadingMessage">

@@ -11,15 +11,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-dojo.provide("cosmo.tests.full");
-try{
-	dojo.require("cosmo.tests.module");
-	dojo.require("cosmo.util.tests.module");
-	dojo.require("cosmo.auth.tests.module");
-	dojo.require("cosmo.account.tests.module");
-	dojo.require("cosmo.model.tests.module");
-	dojo.require("cosmo.service.tests.module");
-	dojo.require("cosmo.storage.tests.module");
-}catch(e){
-	doh.debug(e);
-}
+
+ /**
+ * summary:
+ *      This module provides CRUD methods based on DOM storage:
+ *      http://developer.mozilla.org/en/docs/DOM:Storage
+ * description:
+ *      TODO: fill this in
+ */
+
+dojo.provide("cosmo.storage.Cookie");
+
+dojo.declare("cosmo.storage.Cookie", null, {
+    get: function(key){
+        return dojo.cookie(key);
+    },
+
+    put: function(key, value){
+        dojo.cookie(key, value, {path:"/"});
+    },
+
+    remove: function(key){
+        dojo.cookie(key, null, {expires: -1, path: "/"});
+    },
+
+    isAvailable: function(){
+        return true;
+    }
+});

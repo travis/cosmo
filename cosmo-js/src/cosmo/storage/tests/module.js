@@ -11,15 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-dojo.provide("cosmo.tests.full");
+dojo.provide("cosmo.storage.tests.module");
 try{
-	dojo.require("cosmo.tests.module");
-	dojo.require("cosmo.util.tests.module");
-	dojo.require("cosmo.auth.tests.module");
-	dojo.require("cosmo.account.tests.module");
-	dojo.require("cosmo.model.tests.module");
-	dojo.require("cosmo.service.tests.module");
-	dojo.require("cosmo.storage.tests.module");
+	dojo.require("cosmo.storage.tests.providers");
 }catch(e){
 	doh.debug(e);
 }

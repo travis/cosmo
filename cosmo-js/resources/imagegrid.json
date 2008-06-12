@@ -59,4 +59,4 @@
 "eventButtonDefault": { "row": 4, "column": 10, "width": 23, "height": 18 },
 "eventButtonRollover": { "row": 4, "column": 11, "width": 23, "height": 18 },
 "eventButtonSelected": { "row": 4, "column": 12, "width": 23, "height": 18 },
-}}
+}

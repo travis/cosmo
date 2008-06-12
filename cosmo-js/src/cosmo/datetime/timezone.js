@@ -271,7 +271,7 @@ cosmo.datetime.timezone.RuleSet.prototype._getRulesForYear = function(year){
 
 cosmo.datetime.timezone.RuleSet.prototype._getLastOccurringRule = function(){
     //sumamry: returns the rule with the latest possible date. In other words
-    //if the date was an infinite amount of years from now, this would be 
+    //if the date was an infinite amount of years from now, this would be
     //the last rule that occurred.
 
     if (this.rules == null || this.rules.length == 0){
@@ -296,7 +296,7 @@ cosmo.datetime.timezone.RuleSet.prototype._getLastOccurringRule = function(){
 
         return 1;
     });
-    
+
     return rules[0];
 }
 

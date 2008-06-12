@@ -20,6 +20,7 @@ try{
 	dojo.require("cosmo.model.tests.module");
 	dojo.require("cosmo.service.tests.module");
 	dojo.require("cosmo.storage.tests.module");
+	dojo.require("cosmo.datetime.tests.module");
 }catch(e){
 	doh.debug(e);
 }

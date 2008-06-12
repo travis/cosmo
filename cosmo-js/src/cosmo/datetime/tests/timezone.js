@@ -206,19 +206,19 @@ doh.register("cosmo.datetime.test.timezone", [
                      var date;
                      var offset;
 
-                     date = new Date(2006, 1, 1);
+                     date = new cosmo.datetime.Date(2006, 1, 1, 0, 0, 0, 0, "America/Los_Angeles");
                      offset = timezone.getOffsetInMinutes(date);
                      jum.assertEquals(-300, offset);
 
-                     date = new Date(2006, 3, 1);
+                     date = new cosmo.datetime.Date(2006, 3, 1, 0, 0, 0, 0, "America/Los_Angeles");
                      offset = timezone.getOffsetInMinutes(date);
                      jum.assertEquals(-300, offset);
 
-                     date = new Date(2006, 3, 2, 1, 59, 69);
+                     date = new cosmo.datetime.Date(2006, 3, 2, 1, 59, 59, 0, "America/Los_Angeles");
                      offset = timezone.getOffsetInMinutes(date);
                      jum.assertEquals(-300, offset);
 
-                     date = new Date(2006, 3, 2, 3, 0, 0);
+                     date = new cosmo.datetime.Date(2006, 3, 2, 3, 0, 0, 0, "America/Los_Angeles");
                      offset = timezone.getOffsetInMinutes(date);
                      jum.assertEquals(-240, offset);
                  },

@@ -287,6 +287,7 @@ dojo.declare("cosmo.data.UserStore", null, {
         var oldValue = item[attribute];
         if (attribute == "unactivated" && oldValue && !value){
             item["doActivate"] = true;
+            this._modifiedItems[item.username] = item;
         }
         else if (value != oldValue) {
             item[attribute] = value;

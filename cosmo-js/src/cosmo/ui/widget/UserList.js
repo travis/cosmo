@@ -44,7 +44,7 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
 
     userListSearch: function(){
         var query = document.getElementById("searchBox").value;
-        var newModel = new dojox.grid.data.DojoData(null,null,{rowsPerPage: 20, 
+        var newModel = new dojox.grid.data.DojoData(null,null,{rowsPerPage: 20,
             store: this.store, query: {q: query}});
         this.userList.setModel(newModel);
     },
@@ -58,7 +58,6 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
             this.store.newItem(form);
             this.store.save({
                 onComplete: dojo.hitch(this, function(){
-                    this.model.insert(form);
                     this.newUserForm.setValues({username: "",
                                                firstName: "",
                                                lastName: "",
@@ -69,6 +68,7 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
                     this.newUserDialog.hide();
                 })
             });
+
         } else {
             cosmo.util.notify.showMessage(this.l10n.invalidUser);
         }
@@ -77,37 +77,38 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
     deleteUser: function(event){
         var selection = this.userList.selection.getSelected();
         var usernames = [];
+        var itemsToDelete = [];
         for (var i in selection){
-            var username = this.userList.model.getRow(selection[i]).username;
+            var rowIndex = selection[i];
+            var username = this.userList.model.getRow(rowIndex).username;
             if (username == this.USERNAME_OVERLORD){
                 cosmo.util.notify.showMessage(this.l10n.deleteRoot);
             } else {
                 usernames.push(username);
+                itemsToDelete.push(this.userList.model.getRow(rowIndex).__dojo_data_item);
             }
         }
         if (usernames.length > 0){
             if (confirm(dojo.string.substitute(this.l10n.confirmDelete, {usernames: usernames.join()}))){
-                for (var i in selection){
-                    var rowIndex = selection[i];
-                    this.store.deleteItem(this.userList.model.getRow(rowIndex).__dojo_data_item);
+                for (var j in itemsToDelete){
+                    this.store.deleteItem(itemsToDelete[j]);
                 }
                 this.store.save({
                     onComplete: dojo.hitch(this.userList, function(){
-                        this.model.remove(selection);
                         this.selection.clear();
                     })
                 });
             }
         }
-        
+
     },
 
     constructor: function(){
         var DEFAULT_PASSWORD_VALUE = this.DEFAULT_PASSWORD_VALUE;
         var l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "UserList");
         this.l10n = l10n;
-        this.validation = 
-            {username: {regExp:".{3,32}", required: true, 
+        this.validation =
+            {username: {regExp:".{3,32}", required: true,
                         invalidMessage: l10n.usernameValid
                        },
              firstName: {regExp:".{1,128}", required: true,
@@ -119,12 +120,12 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
              email: {regExp:dojox.regexp.emailAddress({allowLocal: true}), required: true,
                      invalidMessage: l10n.emailValid
                },
-             password: {regExp:".{5,16}", 
+             password: {regExp:".{5,16}",
                         invalidMessage: l10n.passwordValid,
                         required: true
                        }
             };
-             
+
         this.userListLayout = [{
             cells: [[
                 {name: l10n.username, field: "username",
@@ -150,11 +151,11 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
                  editorClass: "dijit.form.ValidationTextBox",
                  editorProps: this.validation.email
                 },
-                {name: l10n.password, field: "password", 
+                {name: l10n.password, field: "password",
                  styles: "text-align: center;", value: this.DEFAULT_PASSWORD_VALUE,
                  editor: dojox.grid.editors.Dijit,
                  editorClass: "dijit.form.ValidationTextBox",
-                 applyEdit: 
+                 applyEdit:
                  function(inValue, inRowIndex){
                      if (inValue == DEFAULT_PASSWORD_VALUE) this.cancelEdit(inRowIndex);
                      else if (window.prompt(l10n.passwordConfirm) == inValue) this.inherited("applyEdit", arguments);
@@ -191,12 +192,12 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
             // make sure value has changed and, if password, value is not default
             if (oldVal != newVal){
                 console.log("About to change "+attr+" from "+oldVal+" to "+newVal);
-                
+
                 this.save({
                     onComplete: function(){
                         cosmo.util.notify.showMessage(dojo.string.substitute(
-                            l10n.attributeUpdate, 
-                            {attr: l10n[attr], 
+                            l10n.attributeUpdate,
+                            {attr: l10n[attr],
                              newVal: newVal}));
                     },
                     onError: function(e){
@@ -206,7 +207,7 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
                 });
             }
         });
-        
+
         var model = new dojox.grid.data.DojoData(null, null, {rowsPerPage: 20, store: userStore, query: {}});
         this.model = model;
     },
@@ -229,5 +230,5 @@ dojo.declare("cosmo.ui.widget.UserList", [dijit._Widget, dijit._Templated], {
         this.userList.setStructure(this.userListLayout);
         this.userList.setModel(model);
     }
-} 
+}
 );

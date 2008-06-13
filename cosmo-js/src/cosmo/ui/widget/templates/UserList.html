@@ -39,7 +39,8 @@ if (!(rowData.username == "root" &&
 </div>
     
 <div dojoType="dijit.Dialog" id="newUserDialog" title="Create new user" dojoAttachPoint="newUserDialog">
-  <form dojoType="dijit.form.Form" dojoAttachEvent="execute:createNewUser" dojoAttachPoint="newUserForm">
+  <form dojoType="dijit.form.Form" dojoAttachEvent="execute:createNewUser" dojoAttachPoint="newUserForm"
+        action="" method="" onsubmit="return false;">
       <table>
         <tr>
           <td><label for="loc">${l10n.username}: </label></td>

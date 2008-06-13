@@ -90,7 +90,7 @@ public class StandardTriageStatusQueryProcessorTest extends TestCase {
         noteMod.getTriageStatus().setCode(TriageStatus.CODE_NOW);
         noteMod = (NoteItem) contentDao.createContent(calendar, noteMod);
         
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= 4; i++) {
             ContentItem event = generateEvent("test" + i + ".ics", "eventwithtimezone"
                     + i + ".ics", user);
             event.setUid("calendar2_" + i);
@@ -102,16 +102,21 @@ public class StandardTriageStatusQueryProcessorTest extends TestCase {
         CollectionItem calendar = (CollectionItem) contentDao.findItemByUid(CALENDAR_UID);
         TriageStatusQueryContext context =
             new TriageStatusQueryContext(null, new DateTime("20070601T000000Z"), null);
-        Set<NoteItem> done = queryProcessor.processTriageStatusQuery(calendar, context);
-        Assert.assertEquals(10, done.size());
-        verifyItemInSet(done,NOTE_UID + "later");
-        verifyItemInSet(done,NOTE_UID + "done");
-        verifyItemInSet(done,NOTE_UID + "mod");
-        verifyItemInSet(done,"calendar2_1:20070529T101500Z");
-        verifyItemInSet(done,"calendar2_3:20070531T081500Z");
-        verifyItemInSet(done,"calendar2_1");
-        verifyItemInSet(done,"calendar2_2");
-        verifyItemInSet(done,"calendar2_3");
+        Set<NoteItem> all = queryProcessor.processTriageStatusQuery(calendar, context);
+        Assert.assertEquals(12, all.size());
+        
+        verifyItemInSet(all,NOTE_UID + "later");
+        verifyItemInSet(all,NOTE_UID + "done");
+        verifyItemInSet(all,NOTE_UID + "mod");
+        verifyItemInSet(all,"calendar2_1:20070529T101500Z");
+        verifyItemInSet(all,"calendar2_1:20070605T101500Z");
+        verifyItemInSet(all,"calendar2_3:20070531T081500Z");
+        verifyItemInSet(all,"calendar2_3:20070601T081500Z");
+        verifyItemInSet(all,"calendar2_4:20080508T081500Z");
+        verifyItemInSet(all,"calendar2_1");
+        verifyItemInSet(all,"calendar2_2");
+        verifyItemInSet(all,"calendar2_3");
+        verifyItemInSet(all,"calendar2_4");
     }
 
     public void testGetDoneCollection() throws Exception {
@@ -143,12 +148,14 @@ public class StandardTriageStatusQueryProcessorTest extends TestCase {
         TriageStatusQueryContext context =
             new TriageStatusQueryContext(TriageStatus.LABEL_LATER, new DateTime("20070601T000000Z"), null);
         Set<NoteItem> later = queryProcessor.processTriageStatusQuery(calendar, context);
-        Assert.assertEquals(5, later.size());
+        Assert.assertEquals(7, later.size());
         verifyItemInSet(later,NOTE_UID + "later");
         verifyItemInSet(later,"calendar2_1:20070605T101500Z");
         verifyItemInSet(later,"calendar2_3:20070601T081500Z");
+        verifyItemInSet(later,"calendar2_4:20080508T081500Z");
         verifyItemInSet(later,"calendar2_1");
         verifyItemInSet(later,"calendar2_3");
+        verifyItemInSet(later,"calendar2_4");
     }
     
     public void testGetLaterItem() throws Exception {

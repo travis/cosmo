@@ -21,12 +21,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 
 import org.apache.commons.logging.Log;
@@ -67,10 +69,19 @@ public class StandardTriageStatusQueryProcessor implements
     private static final Comparator<NoteItem> COMPARE_ASC = new NoteItemTriageStatusComparator(false);
     private static final Comparator<NoteItem> COMPARE_DESC = new NoteItemTriageStatusComparator(true);
     
-    // Duration to search forward/backward for recurring events
-    // is set to 30 days by default
-    private Dur laterDur = new Dur("P30D");
-    private Dur doneDur = new Dur("-P30D");
+    // Durations used to search forward/backward for recurring events
+    // and used to determine time periods that events will be expanded
+    // to determine the previous/next occurrence
+    
+    // 31 days (1 month)
+    private Dur monthLaterDur = new Dur("P31D");
+    private Dur monthDoneDur = new Dur("-P31D");
+    
+    // 366 days (1 year)
+    private Dur yearLaterDur = new Dur("P366D");
+    private Dur yearDoneDur = new Dur("-P366D");
+    
+    // number of DONE items to return
     private int maxDone = 25;
     
     /* (non-Javadoc)
@@ -264,10 +275,12 @@ public class StandardTriageStatusQueryProcessor implements
         NoteItemFilter laterFilter =
             getTriageStatusFilter(collection, TriageStatus.CODE_LATER);
        
-        // recurring event filter
+        // Recurring event filter 
+        // Search for recurring events that have occurrences up to a
+        // year from point in time
         NoteItemFilter eventFilter =
             getRecurringEventFilter(collection, context.getPointInTime(),
-                                    laterDur.getTime(context.getPointInTime()),
+                                    yearLaterDur.getTime(context.getPointInTime()),
                                     context.getTimeZone());
 
         // Add all items that are have an explicit LATER triage
@@ -345,7 +358,8 @@ public class StandardTriageStatusQueryProcessor implements
                                   TriageStatusQueryContext context) {
         EventStamp eventStamp = StampUtils.getEventStamp(note);
         Date currentDate = context.getPointInTime();
-        Date futureDate = laterDur.getTime(currentDate);
+        Date futureDate = getDurToUseForExpanding(eventStamp, true).getTime(
+                currentDate);
 
         // calculate the next occurrence or LATER modification
         NoteItem first = getFirstInstanceOrModification(eventStamp,
@@ -378,10 +392,12 @@ public class StandardTriageStatusQueryProcessor implements
         doneFilter.setMaxResults(maxDone);
         doneFilter.addOrderBy(ContentItemFilter.ORDER_BY_TRIAGE_STATUS_RANK_ASC);
         
-        // filter for recurring events
+        // Recurring event filter 
+        // Search for recurring events that had occurrences up to a
+        // year from point in time
         NoteItemFilter eventFilter =
             getRecurringEventFilter(collection,
-                                    doneDur.getTime(context.getPointInTime()),
+                                    yearDoneDur.getTime(context.getPointInTime()),
                                     context.getPointInTime(),
                                     context.getTimeZone());
 
@@ -456,8 +472,9 @@ public class StandardTriageStatusQueryProcessor implements
                                  TriageStatusQueryContext context) {
         EventStamp eventStamp = StampUtils.getEventStamp(note);
         Date currentDate = context.getPointInTime();
-        Date pastDate = doneDur.getTime(currentDate);
-       
+        Date pastDate = getDurToUseForExpanding(eventStamp, false).getTime(
+                currentDate);
+
         // calculate the previous occurrence or modification
         NoteItem latest = getLatestInstanceOrModification(eventStamp, pastDate,
                 currentDate, context.getTimeZone());
@@ -594,17 +611,28 @@ public class StandardTriageStatusQueryProcessor implements
         eventNoteFilter.getStampFilters().add(eventFilter);
         return eventNoteFilter;
     }
+    
+    private Dur getDurToUseForExpanding(EventStamp es, boolean later) {
+        List<Recur> rules = es.getRecurrenceRules();
+        
+        // No rules, assume RDATEs so expand a year
+        if(rules.size()==0)
+            return later ? yearLaterDur : yearDoneDur;
+        
+        // Look at first rule only
+        Recur recur = rules.get(0);
+        
+        // If rule is yearly or monthly then expand a year,
+        // otherwise only expand a month
+        if(Recur.YEARLY.equals(recur.getFrequency()) ||
+           Recur.MONTHLY.equals(recur.getFrequency()))
+            return later ? yearLaterDur : yearDoneDur;
+        else
+            return later ? monthLaterDur : monthDoneDur;
+    }
 
     public void setContentDao(ContentDao contentDao) {
         this.contentDao = contentDao;
-    }
-
-    public void setDoneDuration(String doneDuration) {
-        doneDur = new Dur(doneDuration);
-    }
-
-    public void setLaterDuration(String laterDuration) {
-        laterDur = new Dur(laterDuration);
     }
 
     public void setMaxDone(int maxDone) {

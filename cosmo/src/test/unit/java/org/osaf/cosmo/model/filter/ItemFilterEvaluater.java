@@ -209,7 +209,7 @@ public class ItemFilterEvaluater {
         else if(s==null )
             return false;
         
-        if(s instanceof EventStampFilter)
+        if(sf instanceof EventStampFilter)
             if(!handleEventStampFilter(s, (EventStampFilter) sf))
                 return false;
         
@@ -220,6 +220,14 @@ public class ItemFilterEvaluater {
         
         BaseEventStamp es = (BaseEventStamp) s;
      
+        // check recurring
+        if(esf.getIsRecurring()!=null) {
+            if(esf.getIsRecurring().booleanValue() && !es.isRecurring())
+                return false;
+            else if(!esf.getIsRecurring().booleanValue() && es.isRecurring())
+                return false;
+        }   
+        
         Calendar cal = new EntityConverter(null).convertNote((NoteItem) s.getItem());
         CalendarFilter cf = getCalendarFilter(esf);
         CalendarFilterEvaluater cfe = new CalendarFilterEvaluater();

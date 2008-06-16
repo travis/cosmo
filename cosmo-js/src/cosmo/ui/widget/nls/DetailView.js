@@ -40,8 +40,8 @@
      europe: "Europe",
      indian: "Indian",
      pacific: "Pacific",
-     noTzRegion: "None",
-     noTzId: "None",
+     noTzRegion: "Region",
+     noTzId: "Time zone",
      emailTitle: "Title:",
      emailTimeFormat: "%m/%d/%Y at %I:%M %p",
      emailTimezone: "Time zone:",
@@ -53,5 +53,7 @@
      emailStatus: "Status:",
      emailDescription: "Notes:",
      startDateRequired: "You must choose a start date.",
-     endDateRequired: "You must choose an end date."
+     endDateRequired: "You must choose an end date.",
+     location: "Location",
+     title: "Title"
 })

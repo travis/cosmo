@@ -1,4 +1,6 @@
 @import url("Checkbox.css");
+@import url("HintText.css");
+
 #detailView{
     overflow-x: hidden;
 }
@@ -11,7 +13,7 @@
     background: #F7F7F7;
 }
 .cosmoDetailHidden {
-    visibility: hidden;
+    display: none;
 }
 
 .cosmoDetailViewControlButtons {
@@ -71,9 +73,12 @@
 }
 
 .cosmoDetailViewTitleInput {
+    margin-left: 5px !important;
+}
+
+.cosmoDetailViewTitleInput input {
     font-size: 15px !important;
     font-weight: bold;
-    margin-left: 5px !important;
 }
 
 .cosmoDetailViewWideBox {

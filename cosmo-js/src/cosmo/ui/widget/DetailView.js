@@ -29,6 +29,7 @@ dojo.require("cosmo.model.Delta");
 dojo.require("cosmo.datetime.timezone");
 dojo.require("cosmo.util.html");
 dojo.require("cosmo.ui.Error");
+dojo.require("cosmo.ui.widget.HintBox");
 
 dojo.requireLocalization("cosmo.ui.widget", "DetailView");
 (function(){

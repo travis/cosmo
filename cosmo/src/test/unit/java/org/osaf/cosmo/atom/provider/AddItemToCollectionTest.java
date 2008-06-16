@@ -101,6 +101,9 @@ public class AddItemToCollectionTest extends BaseItemCollectionAdapterTestCase
                                              collection, "POST");
         if (uid != null)
             rc.setContent("uuid=" + uid, MEDIA_TYPE_URLENCODED);
+        
+        rc.setParameter("uuid", uid);
+        
         return rc;
     }
 }

@@ -656,7 +656,7 @@ public class EntityConverter {
         
         // verify master event exists
         if(event==null)
-            throw new ModelValidationException("no master calednar component found");
+            throw new ModelValidationException("no master calendar component found");
         
         setCalendarAttributes(masterNote, event);
         
@@ -797,8 +797,8 @@ public class EntityConverter {
     private void setCalendarAttributes(NoteItem note,
                                        VEvent event) {
         
-        // UID
-        if(event.getUid()!=null)
+        // UID (only set if master)
+        if(event.getUid()!=null && note.getModifies()==null)
             note.setIcalUid(event.getUid().getValue());
         
         // for now displayName is limited to 1024 chars

@@ -15,24 +15,24 @@
  */
 package org.osaf.cosmo.atom.provider;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.activation.MimeType;
 
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.util.Dates;
 
-import org.apache.abdera.model.AtomDate;
 import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -61,6 +61,8 @@ import org.osaf.cosmo.atom.processor.ProcessorException;
 import org.osaf.cosmo.atom.processor.ProcessorFactory;
 import org.osaf.cosmo.atom.processor.UnsupportedContentTypeException;
 import org.osaf.cosmo.atom.processor.ValidationException;
+import org.osaf.cosmo.calendar.EntityConverter;
+import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.model.BaseEventStamp;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
@@ -72,6 +74,7 @@ import org.osaf.cosmo.model.HomeCollectionItem;
 import org.osaf.cosmo.model.IcalUidInUseException;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.ItemSecurityException;
+import org.osaf.cosmo.model.ModelValidationException;
 import org.osaf.cosmo.model.ModificationUid;
 import org.osaf.cosmo.model.NoteItem;
 import org.osaf.cosmo.model.NoteOccurrence;
@@ -401,6 +404,91 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
     // ExtendedCollectionAdapter methods
   
     public ResponseContext postCollection(RequestContext request) {
+        // This adapter supports POSTing an XHTML representation (
+        // of a collection (no child items), or POSTing an icalendar
+        // representation of a collection (where child items will be
+        // imported as well)
+        
+        MimeType ct = request.getContentType();
+        if (ct == null)
+            return ProviderHelper.notsupported(request, "Content-Type is required");
+        
+        String mimeType = ct.toString();
+        
+        if(MimeTypeHelper.isMatch(MEDIA_TYPE_XHTML, mimeType))
+            return createCollectionXHTML(request);
+        else if(MimeTypeHelper.isMatch(MEDIA_TYPE_CALENDAR, mimeType))
+            return createCollectionICS(request);
+        else
+            return ProviderHelper.notsupported(request, "unsupported Content-Type");
+    }
+    
+    protected ResponseContext createCollectionICS(RequestContext request) {
+        
+        NewCollectionTarget target = (NewCollectionTarget) request.getTarget();
+        User user = target.getUser();
+        HomeCollectionItem home = target.getHomeCollection();
+
+        if (log.isDebugEnabled())
+            log.debug("creating collection from icalendar in home collection of user '" + user.getUsername() + "'");
+
+        try {
+            String displayName = target.getDisplayName();
+           
+            if(displayName==null)
+                return ProviderHelper.badrequest(request, "displayName must be provided");
+            
+            // parse and validate icalendar
+            Calendar calendar = CalendarUtils.parseCalendar(request.getReader());
+            if(calendar==null)
+                return ProviderHelper.badrequest(request, "invalid icalendar");
+            
+            calendar.validate(true);
+            
+            // create new collection
+            CollectionItem collection = getEntityFactory().createCollection();
+            collection.setDisplayName(displayName);
+            collection.setOwner(user);
+            CalendarCollectionStamp stamp = getEntityFactory()
+                    .createCalendarCollectionStamp(collection);
+
+            stamp.setDescription(collection.getDisplayName());
+            // XXX set the calendar language from Content-Language
+            collection.addStamp(stamp);
+            
+            // add child items by converting icalendar calendar
+            Set<Item> children = new HashSet<Item>();
+            
+            for (Item child : new EntityConverter(getEntityFactory())
+                    .convertCalendar(calendar)) {
+                child.setOwner(user);
+                children.add(child);
+            }
+            
+            // use api that creates collection and children
+            collection = getContentService().createCollection(home, collection,
+                    children);
+
+            ServiceLocator locator = createServiceLocator(request);
+
+            return created(collection, locator);
+            
+        } catch(UnsupportedEncodingException e) {
+            return ProviderHelper.badrequest(request, "displayName and icalendar must be provided");
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return ProviderHelper.servererror(request, reason, e);
+        } catch(ParserException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        } catch(net.fortuna.ical4j.model.ValidationException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        } catch(ModelValidationException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        }
+    }
+    
+    protected ResponseContext createCollectionXHTML(RequestContext request) {
         NewCollectionTarget target = (NewCollectionTarget) request.getTarget();
         User user = target.getUser();
         HomeCollectionItem home = target.getHomeCollection();
@@ -560,7 +648,7 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
             return frc;
 
         try {
-            String uuid = readUuid(request);
+            String uuid = getNonEmptyParameter(request, "uuid");
             if (uuid == null)
                 return ProviderHelper.badrequest(request, "Uuid must be provided");
 
@@ -586,10 +674,6 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
             }
                
             return createResponseContext(204);
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return ProviderHelper.servererror(request, reason, e);
         } catch (CollectionLockedException e) {
             return locked(request);
         } catch (CosmoSecurityException e) {
@@ -731,20 +815,6 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
         if (contentLength <= 0)
             return lengthrequired(request);
 
-        return null;
-    }
-
-    private String readUuid(RequestContext request)
-        throws IOException {
-        BufferedReader in = (BufferedReader) request.getReader();
-        try {
-            for (String pair : in.readLine().split("\\&")) {
-                String[] fields = pair.split("=");
-                String name = URLDecoder.decode(fields[0], "UTF-8");
-                if (name.equals("uuid"))
-                    return URLDecoder.decode(fields[1], "UTF-8");
-            }
-        } catch (UnsupportedEncodingException e) {}
         return null;
     }
 

@@ -34,10 +34,11 @@ public interface AtomConstants {
     public static final String MEDIA_TYPE_XML = "text/xml";
     /** */
     public static final String MEDIA_TYPE_TEXT = "text/plain";
+    public static final String MEDIA_TYPE_CALENDAR = "text/calendar";
     public static final String MEDIA_TYPE_XHTML = "application/xhtml+xml";
     public static final String MEDIA_TYPE_URLENCODED =
         "application/x-www-form-urlencoded";
-
+   
     // link relation constants
 
     /** */
@@ -129,4 +130,6 @@ public interface AtomConstants {
         new UriTemplate("/user/{username}/preference/{name}");
     public static final UriTemplate TEMPLATE_SERVICE =
         new UriTemplate("/user/{username}");
+    public static final UriTemplate TEMPLATE_IMPORT_COLLECTION =
+        new UriTemplate("/user/{username}/import/{displayName}");
 }

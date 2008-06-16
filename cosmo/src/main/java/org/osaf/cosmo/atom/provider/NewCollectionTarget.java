@@ -27,6 +27,7 @@ import org.osaf.cosmo.model.User;
  */
 public class NewCollectionTarget extends SimpleTarget {
 
+    private String displayName = null;
     private User user;
     private HomeCollectionItem home;
 
@@ -37,16 +38,23 @@ public class NewCollectionTarget extends SimpleTarget {
     public NewCollectionTarget(RequestContext request,
                                User user,
                                HomeCollectionItem home) {
-        this(TargetType.TYPE_SERVICE, request, user, home);
+        this(TargetType.TYPE_SERVICE, request, user, home, null);
+    }
+    
+    public NewCollectionTarget(RequestContext request, User user,
+            HomeCollectionItem home, String displayName) {
+        this(TargetType.TYPE_SERVICE, request, user, home, displayName);
     }
 
     public NewCollectionTarget(TargetType type,
                                RequestContext request,
                                User user,
-                               HomeCollectionItem home) {
+                               HomeCollectionItem home,
+                               String displayName) {
         super(type, request);
         this.user = user;
         this.home = home;
+        this.displayName = displayName;
     }
 
     public User getUser() {
@@ -55,5 +63,9 @@ public class NewCollectionTarget extends SimpleTarget {
 
     public HomeCollectionItem getHomeCollection() {
         return home;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }

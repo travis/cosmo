@@ -17,6 +17,9 @@ package org.osaf.cosmo.atom.provider.mock;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.abdera.Abdera;
@@ -37,9 +40,12 @@ import org.springframework.mock.web.MockServletContext;
  */
 public class BaseMockRequestContext extends ServletRequestContext
     implements AtomConstants, Constants {
+    
     private static final Log log =
         LogFactory.getLog(BaseMockRequestContext.class);
 
+    private HashMap<String, String> params = new HashMap<String, String>();
+    
     public BaseMockRequestContext(Provider provider,
                                   String method,
                                   String uri) {
@@ -54,6 +60,35 @@ public class BaseMockRequestContext extends ServletRequestContext
 
     public MockHttpServletRequest getMockRequest() {
         return (MockHttpServletRequest) getRequest();
+    }
+
+    public void setParameter(String name, String value) {
+        params.put(name, value);
+    }
+    
+    @Override
+    public String getParameter(String name) {
+        String val = params.get(name);
+        if(val!=null)
+            return val;
+        else
+            return super.getParameter(name);
+    }
+
+    @Override
+    public String[] getParameterNames() {
+        HashSet<String> names = new HashSet<String>();
+        names.addAll(params.keySet());
+        for(String name: super.getParameterNames())
+            names.add(name);
+        
+        return names.toArray(new String[0]);
+    }
+
+    @Override
+    public List<String> getParameters(String name) {
+        // TODO override, but for now ignore
+        return super.getParameters(name);
     }
 
     public void setContent(String content,
@@ -89,6 +124,14 @@ public class BaseMockRequestContext extends ServletRequestContext
     public void setContentAsXhtml(String content)
         throws IOException {
         setContent(content, "application/xhtml+xml");
+    }
+    
+    public void setContentAsFormEncoded(String content) throws IOException {
+        setContent(content, "application/x-www-form-urlencoded");
+    }
+    
+    public void setContentAsCalendar(String content) throws IOException {
+        setContent(content, "text/calendar");
     }
 
     public void setXhtmlContentAsEntry(String content)

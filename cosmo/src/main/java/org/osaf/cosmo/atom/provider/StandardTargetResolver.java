@@ -122,6 +122,10 @@ public class StandardTargetResolver
                 return createNewCollectionTarget(context, match);
             return createServiceTarget(context, match);
         }
+        
+        match = TEMPLATE_IMPORT_COLLECTION.match(uri);
+        if (match != null)
+            return createNewCollectionTarget(context, match);
 
         return null;
     }
@@ -294,7 +298,8 @@ public class StandardTargetResolver
         if (user == null)
             return null;
         HomeCollectionItem home = contentService.getRootItem(user);
-        return new NewCollectionTarget(context, user, home);
+        String displayName = match.get("displayName");
+        return new NewCollectionTarget(context, user, home, displayName);
     }
 
     /**

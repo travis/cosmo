@@ -27,14 +27,7 @@ dojo.declare(
             this.textbox.value = this.hintMessage;
             dojo.addClass(this.textbox, "hintText");
             this._hintShown = true;
-        }
-    }
-);
-
-dojo.declare(
-    "cosmo.ui.widget.HintBox",
-    [dijit.form.ValidationTextBox, cosmo.ui.widget._HintMixin],
-    {
+        },
         validate: function(isFocused) {
             this.updateHint(isFocused);
             return this.inherited(arguments);
@@ -49,3 +42,15 @@ dojo.declare(
         }
     }
 );
+
+dojo.declare(
+    "cosmo.ui.widget.HintBox",
+    [dijit.form.ValidationTextBox, cosmo.ui.widget._HintMixin]);
+
+dojo.declare(
+    "cosmo.ui.widget.DateHintBox",
+    [dijit.form.DateTextBox, cosmo.ui.widget._HintMixin]);
+
+dojo.declare(
+    "cosmo.ui.widget.TimeHintBox",
+    [dijit.form.TimeTextBox, cosmo.ui.widget._HintMixin]);

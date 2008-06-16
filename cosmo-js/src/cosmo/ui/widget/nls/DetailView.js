@@ -55,5 +55,10 @@
      startDateRequired: "You must choose a start date.",
      endDateRequired: "You must choose an end date.",
      location: "Location",
-     title: "Title"
+     title: "Title",
+     recurrenceEnds: "Ends",
+     startDate: "Start date",
+     endDate: "End date",
+     startTime: "Start time",
+     endTime: "End time"
 })

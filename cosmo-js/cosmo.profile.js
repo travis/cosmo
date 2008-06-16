@@ -2,29 +2,22 @@ dependencies = {};
 
 dependencies.layers = [
     {
-        name: "../cosmo/login.js",
+        name: "../cosmo/layers/login.js",
         dependencies: [
-            "cosmo.app",
-            "cosmo.account.create",
-            "cosmo.convenience",
-            "cosmo.ui.widget.LoginDialog",
-            "cosmo.ui.widget.ModalDialog",
-            "dojo.cookie"
+            "cosmo.layers.login"
         ]
     },
     {
-        name: "../cosmo/pim.js",
+        name: "../cosmo/layers/pim.js",
         layerDependencies:["../cosmo/login.js"],
         dependencies: [
-            "cosmo.app.pim",
-            "cosmo.datetime.timezone.LazyCachingTimezoneRegistry",
-            "cosmo.ui.event.listeners"
+            "cosmo.layers.pim"
         ]
     },
     {
-        name: "../cosmo/userlist.js",
+        name: "../cosmo/layers/userlist.js",
         dependencies: [
-            "cosmo.ui.widget.UserList"
+            "cosmo.layers.userlist"
         ]
     }
 ];

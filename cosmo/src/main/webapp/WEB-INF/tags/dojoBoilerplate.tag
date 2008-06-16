@@ -63,7 +63,7 @@
 <c:set var="dojoPath" value="${jsUrl}/dojo"/>
 <script type="text/javascript" src="${dojoPath}/dojo.js"></script>
 <c:forEach var="layerName" items="${dojoLayers}">
-<script type="text/javascript" src="${dojoPath}/../cosmo/${layerName}.js"></script>
+<script type="text/javascript" src="${dojoPath}/../cosmo/layers/${layerName}.js"></script>
 </c:forEach>
 
 <script type="text/javascript">

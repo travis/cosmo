@@ -33,9 +33,9 @@ fi
 mv dojo-src/release/dojo/* release
 
 files="release/dojo/dojo.js\
-       release/cosmo/pim.js\
-       release/cosmo/login.js\
-       release/cosmo/userlist.js"
+       release/cosmo/layers/pim.js\
+       release/cosmo/layers/login.js\
+       release/cosmo/layers/userlist.js"
 
 ##### move widgets layer, if appropriate #####
 if [ "$1" == "widgets" -a "$WIDGETS_HOME" ]; then

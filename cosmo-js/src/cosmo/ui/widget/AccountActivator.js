@@ -54,7 +54,7 @@ dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
         activateButtonContainer: null,
 
         postCreate: function (){
-            var button = new cosmo.ui.widget.Button,
+            var button = new cosmo.ui.widget.Button(
                 {text: _("Activation.Activate"),
                  id: "accountActivateButton"});
 
@@ -81,11 +81,11 @@ dojo.declare("cosmo.ui.widget.AccountActivator", [dijit._Templated],
                 if (d.ioArgs.xhr.status == 403){
                     alert(_("Account.Activate.UserNotFound"));
                 } else {
-                    alert(_("Account.Activate.UserNotFound") + ": " + 
+                    alert(_("Account.Activate.UserNotFound") + ": " +
                           evt.status);
                 }
             });
-            
+
 
 
         },

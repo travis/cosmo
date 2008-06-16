@@ -10,7 +10,6 @@ dojo.declare(
         hintMessage: "Hint",
         _hintShown: false,
 		updateHint: function(isFocused){
-            // can't use setValue, or this will recurse
             if (isFocused && this._hintShown){
                 this.hideHint();
             }
@@ -19,6 +18,7 @@ dojo.declare(
             }
         },
         hideHint: function(){
+            // can't use setValue, or this will recurse
             this.textbox.value = '';
             dojo.removeClass(this.textbox, "hintText");
             this._hintShown = false;

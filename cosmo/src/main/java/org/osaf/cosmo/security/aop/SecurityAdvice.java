@@ -266,7 +266,7 @@ public class SecurityAdvice extends OrderedAdvice {
     public Object checkCreateCollection(ProceedingJoinPoint pjp,
             CollectionItem parent, CollectionItem collection, Set<Item> children) throws Throwable {
         if(log.isDebugEnabled())
-            log.debug("in checkCreateCollection(parent, collection)");
+            log.debug("in checkCreateCollection(parent, collection, children)");
         if (!enabled)
             return pjp.proceed();
         

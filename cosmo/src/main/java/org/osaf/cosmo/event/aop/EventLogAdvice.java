@@ -128,7 +128,7 @@ public class EventLogAdvice extends OrderedAdvice {
     public Object createCollection(ProceedingJoinPoint pjp,
             CollectionItem parent, CollectionItem collection, Set<Item> children) throws Throwable {
         if(log.isDebugEnabled())
-            log.debug("in createCollection(parent, collection)");
+            log.debug("in createCollection(parent, collection, children)");
         if (!enabled)
             return pjp.proceed();
         

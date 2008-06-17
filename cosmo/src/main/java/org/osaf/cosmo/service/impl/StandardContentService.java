@@ -354,7 +354,7 @@ public class StandardContentService implements ContentService {
         // Obtain locks to all collections involved.  A collection is involved
         // if it is the parent of one of the children.  If all children are new
         // items, then no locks are obtained.
-        Set<CollectionItem> locks = acquireLocks(collection, children);
+        Set<CollectionItem> locks = acquireLocks(children);
         
         try {
             // Create the new collection
@@ -896,7 +896,7 @@ public class StandardContentService implements ContentService {
     /**
      * Given a set of items, aquire a lock on all parents
      */
-    private Set<CollectionItem> acquireLocks(Set<ContentItem> children) {
+    private Set<CollectionItem> acquireLocks(Set<? extends Item> children) {
         
         HashSet<CollectionItem> locks = new HashSet<CollectionItem>();
         

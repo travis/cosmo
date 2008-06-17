@@ -41,7 +41,6 @@ dojo.require("cosmo.ui.minical");
 dojo.require("cosmo.ui.menu");
 dojo.require("cosmo.ui.navbar");
 dojo.require("cosmo.ui.widget.DetailView");
-dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.ui.widget.CollectionSelector");
 
 cosmo.app.pim.layout = new function () {

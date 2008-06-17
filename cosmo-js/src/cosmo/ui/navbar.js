@@ -29,7 +29,6 @@ dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.widget.NavButtonSet");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.ui.widget.Button");
-dojo.require("cosmo.ui.imagegrid");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.account.preferences");

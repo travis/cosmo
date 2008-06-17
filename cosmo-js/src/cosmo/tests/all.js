@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-dojo.provide("cosmo.tests.full");
+dojo.provide("cosmo.tests.all");
 try{
 	dojo.require("cosmo.tests.module");
 	dojo.require("cosmo.util.tests.module");

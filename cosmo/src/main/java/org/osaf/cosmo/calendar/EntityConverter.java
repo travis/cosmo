@@ -62,7 +62,7 @@ import org.apache.commons.lang.StringUtils;
 import org.osaf.cosmo.CosmoConstants;
 import org.osaf.cosmo.calendar.util.CalendarUtils;
 import org.osaf.cosmo.icalendar.ICalendarConstants;
-import org.osaf.cosmo.model.BaseEventStamp;
+import org.osaf.cosmo.model.AvailabilityItem;
 import org.osaf.cosmo.model.CalendarCollectionStamp;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.ContentItem;
@@ -338,8 +338,10 @@ public class EntityConverter {
 
         if(item instanceof NoteItem)
             return convertNote((NoteItem) item);
-        else if(item instanceof ICalendarItem)
-            return ((ICalendarItem) item).getFullCalendar();
+        else if(item instanceof FreeBusyItem)
+            return convertFreeBusyItem((FreeBusyItem) item);
+        else if(item instanceof AvailabilityItem)
+            return convertAvailability((AvailabilityItem) item);
 
         return null;
     }
@@ -364,6 +366,14 @@ public class EntityConverter {
             return getCalendarFromEventStamp(event);
 
         return getCalendarFromNote(note);
+    }
+    
+    public Calendar convertFreeBusyItem(FreeBusyItem freeBusyItem) {
+        return freeBusyItem.getFreeBusyCalendar();
+    }
+    
+    public Calendar convertAvailability(AvailabilityItem availability) {
+        return availability.getAvailabilityCalendar();
     }
    
     protected Calendar getCalendarFromNote(NoteItem note) {

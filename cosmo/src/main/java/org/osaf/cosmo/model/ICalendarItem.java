@@ -15,7 +15,6 @@
  */
 package org.osaf.cosmo.model;
 
-import net.fortuna.ical4j.model.Calendar;
 
 /**
  * Extends {@link Item} to represent an abstract
@@ -32,12 +31,4 @@ public interface ICalendarItem extends ContentItem{
      * @param icalUid
      */
     public void setIcalUid(String icalUid);
-
-    /**
-     * Return the full icalendar representation of the item.  
-     * Subclasses can override this to manipulate the calendar
-     * object before returning.
-     */
-    public Calendar getFullCalendar();
-
 }

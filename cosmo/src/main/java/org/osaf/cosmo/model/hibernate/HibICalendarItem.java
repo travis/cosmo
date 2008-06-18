@@ -56,13 +56,6 @@ public abstract class HibICalendarItem extends HibContentItem implements ICalend
         this.icalUid = icalUid;
     }
     
-    /* (non-Javadoc)
-     * @see org.osaf.cosmo.model.ICalendarItem#getFullCalendar()
-     */
-    public Calendar getFullCalendar() {
-        return getCalendar();
-    }
-    
     /**
      * Return the Calendar object containing a calendar component.
      * Used by sublcasses to store specific components.

@@ -117,12 +117,11 @@ public class HibNoteItem extends HibICalendarItem implements NoteItem {
     @Task
     public Calendar getTaskCalendar() {
         // calendar stored as ICalendarAttribute on Item
-        return HibICalendarAttribute.getValue(this, ATTR_ICALENDAR);
+        return getCalendar();
     }
     
     public void setTaskCalendar(Calendar calendar) {
-        // calendar stored as ICalendarAttribute on Item
-        HibICalendarAttribute.setValue(this, ATTR_ICALENDAR, calendar);
+        setCalendar(calendar);
     }
    
     public Item copy() {

@@ -28,6 +28,8 @@ dojo.require("cosmo.util.hash");
 dojo.require("cosmo.convenience");
 dojo.require("cosmo.service.exception");
 
+dojo.require("dojo.string");
+
 dojo.mixin(cosmo.view.list, cosmo.view.viewBase);
 
 cosmo.view.list.hasBeenInitialized = false;
@@ -164,6 +166,20 @@ cosmo.view.list.createItemRegistry = function (arrParam) {
     return h;
 };
 
+function stripEmail(email){
+    if (!email) return '';
+    var match = email;
+    var nameEnd = email.indexOf("<");
+    if (nameEnd > 0)
+        match = email.substring(0, nameEnd);
+    else {
+        var atSign = email.indexOf("@");
+        if (atSign > 0)
+            match = email.substring(0, atSign);
+    }
+    return dojo.string.trim(match);
+}
+
 // Getting an appropriate value to display and to sort on
 // require a lot of the same calculations -- don't do them
 // twice
@@ -175,7 +191,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     var setVals = function (key, s, d) {
         sort[key] = s; // Precalc'd values used in the sort
         display[key] = d; // Precalc'd values used in the table display
-    }
+    };
     // Uid
     var uid = data.getItemUid();
     setVals('uid', uid, uid);
@@ -187,9 +203,8 @@ cosmo.view.list.setSortAndDisplay = function (item) {
     var t = data.getDisplayName();
     setVals(cols.TITLE.name, t, t);
     // Who
-    var m = data.getModifiedBy();
-    m = m ? m.getUserId() : '';
-    setVals(cols.WHO.name, m, m);
+    var modifiedBy = stripEmail(data.getModifiedBy().getUserId());
+    setVals(cols.WHO.name, modifiedBy, modifiedBy);
     // Start
     var st = data.getEventStamp();
     var dt = st ? st.getStartDate() : null;

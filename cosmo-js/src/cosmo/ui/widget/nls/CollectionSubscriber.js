@@ -22,7 +22,7 @@
     successPrompt: 'Logging into Chandler Server...',
     confirmAddPre: "Are you sure you want to add ",
     confirmAddPost: " to your account?",
-    addPrompt: "Add to my account...",
+    addPrompt: "ADD TO MY ACCOUNT",
     redirectPrompt: "Redirecting to your collections...",
     enterNamePrompt: "Please enter a new name.",
     subscribed: "You are already subscribed to this collection.",

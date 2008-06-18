@@ -16,7 +16,7 @@
 ({
      displayNameTitle: "Double click to change display name",
 
-     subscribeHead: "Subscribe with...",
+     subscribeHead: "Subscribe with:",
 
      atom: "Feed Reader",
      iCal: "Apple iCal",

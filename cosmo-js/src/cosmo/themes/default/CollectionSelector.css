@@ -1,6 +1,7 @@
 #collectionSelectorContainer {
     height: 176px;
     overflow: auto;
+    border-top: 1px solid white;
 }
 .collectionSelectorCheckbox {
     width: 18px;
@@ -18,7 +19,7 @@
     padding-left: 5px;
     cursor: pointer;
     float: left;
-    height: 14px;
+    height: 15px;
 }
 .cosmoCollectionSelectorCalSelect .collectionSelectorCollectionName {
     width: 127px;
@@ -33,9 +34,14 @@
     background-color: #808080;
     color: #fff;
 }
+
+.cosmoCollectionSelectorSection .mouseoverItem {
+    background-color: #e0e0e0 !important;
+}
+
 .collectionSelectorDetails {
     width: 14px;
-    height: 14px;
+    height: 15px;
     cursor: pointer;
     float: right;
     border-bottom: 1px white solid;

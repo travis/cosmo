@@ -15,9 +15,9 @@
 .cosmoSharingTopDiv {
     position: absolute;
     top: 0px;
-    right: -2px;
+    right: 0px;
     left: 0px;
-    border: 1px solid #999999;
+    border-bottom: 1px solid #999999;
     padding: 2px 5px;
     background: white;
 }
@@ -31,7 +31,8 @@
     float: right;
 }
 h2.cosmoSharingSectionHead {
-    margin-top: 30px;
+    margin-top: 15px;
+    margin-bottom: 3px;
     font-size: 1em;
 }
 .cosmoSubscribeButton{
@@ -117,7 +118,7 @@ h2.cosmoSharingSectionHead {
     display: block;
     position: absolute;
     left: -2px;
-    right: -4px;
+    right: -3px;
 }
 .cosmoSharingDoneButton .dijitButtonNode{
     width: 100%

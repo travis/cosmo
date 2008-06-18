@@ -15,5 +15,6 @@
 */
 ({
      collectionsLabel: "COLLECTIONS",
-     deleteFailed: "Attempt to delete ${collectionName} failed."
+     deleteFailed: "Attempt to delete ${collectionName} failed.",
+     noCollectionsPrompt: "To get started, click [+] to create a new collection."
 })

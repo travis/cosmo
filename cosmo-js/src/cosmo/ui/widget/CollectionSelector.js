@@ -154,6 +154,7 @@ dojo.declare("cosmo.ui.widget._ListViewSelector", cosmo.ui.widget._BaseSelector,
 dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templated, cosmo.ui.ContentBox],
 {
     containerNode: null,
+    noCollectionsPrompt: null,
     view: null,
     //cosmo.ui.widget._BaseSelector
     selection: null,
@@ -187,13 +188,25 @@ dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templa
         this.populateChildrenFromCollections(cosmo.app.pim.collections);
     },
 
+    showPrompt: function(){
+        this.noCollectionsPrompt.style.display = "block";
+    },
+
+    hidePrompt: function(){
+        this.noCollectionsPrompt.style.display = "none";
+    },
+
     populateChildrenFromCollections: function(collections){
-        collections.each(dojo.hitch(this, this.addCollection));
+        if (collections.length > 0) {
+            collections.each(dojo.hitch(this, this.addCollection));
+            this.hidePrompt();
+        } else this.showPrompt();
     },
 
     addCollection: function(collectionKey, collection){
         var selector = new this.selectors[this.view]({collection: collection});
         this.containerNode.appendChild(selector.domNode);
+        this.hidePrompt();
     },
     handleNewCollection: function(){
         var collections = cosmo.app.pim.collections;

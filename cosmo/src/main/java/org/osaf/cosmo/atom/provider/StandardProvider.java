@@ -9,11 +9,15 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.protocol.Resolver;
+import org.apache.abdera.protocol.server.CollectionAdapter;
+import org.apache.abdera.protocol.server.MediaCollectionAdapter;
 import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.protocol.server.Target;
 import org.apache.abdera.protocol.server.TargetBuilder;
+import org.apache.abdera.protocol.server.TargetType;
+import org.apache.abdera.protocol.server.Transactional;
 import org.apache.abdera.protocol.server.WorkspaceManager;
 import org.apache.abdera.protocol.server.context.AbstractResponseContext;
 import org.apache.abdera.protocol.server.context.BaseResponseContext;
@@ -39,12 +43,111 @@ public class StandardProvider extends AbstractProvider {
     private static final Log log = LogFactory.getLog(StandardProvider.class);
     
     @Override
+    // Have to override because the base class method doesn't support
+    // DELETE or PUT to a collection target, which we use.
     public ResponseContext process(RequestContext request) {
         ResponseContext response = preconditions(request);
         if(response!=null)
             return response;
         
-        return super.process(request);
+        // resolve target
+        Target target = request.getTarget();
+        
+        // ensure target was resolved
+        if (target == null || target.getType() == TargetType.TYPE_NOT_FOUND)
+            return ProviderHelper.notfound(request);
+        
+        String method = request.getMethod();
+        TargetType type = target.getType();
+        
+        // Handle service document GET
+        if (type == TargetType.TYPE_SERVICE && method.equalsIgnoreCase("GET")) {
+            return getServiceDocument(request);
+        }
+        
+        WorkspaceManager wm = getWorkspaceManager(request);
+
+        // Lookup CollectionAdapter to handle request
+        CollectionAdapter adapter = wm.getCollectionAdapter(request);
+        if (adapter == null) {
+            return ProviderHelper.notfound(request);
+        }
+
+        Transactional transaction = adapter instanceof Transactional ? (Transactional) adapter
+                : null;
+       
+        try {
+            if (transaction != null)
+                transaction.start(request);
+            if (type == TargetType.TYPE_CATEGORIES) {
+                if (method.equalsIgnoreCase("GET"))
+                    response = adapter.getCategories(request);
+            } else if (type == TargetType.TYPE_COLLECTION) {
+                if (method.equalsIgnoreCase("GET"))
+                    response = adapter.getFeed(request);
+                else if (method.equalsIgnoreCase("POST")) {
+                    response = ProviderHelper.isAtom(request) ? adapter
+                            .postEntry(request)
+                            : adapter instanceof MediaCollectionAdapter ? ((MediaCollectionAdapter) adapter)
+                                    .postMedia(request)
+                                    : ProviderHelper.notsupported(request);
+                } else if (method.equalsIgnoreCase("DELETE")) {
+                    if (adapter instanceof ExtendedCollectionAdapter)
+                        response = ((ExtendedCollectionAdapter) adapter)
+                                .deleteCollection(request);
+                } else if (method.equalsIgnoreCase("PUT")) {
+                    if (adapter instanceof ExtendedCollectionAdapter)
+                        response = ((ExtendedCollectionAdapter) adapter)
+                                .putCollection(request);
+                }
+
+            } else if (type == TargetType.TYPE_ENTRY) {
+                if (method.equalsIgnoreCase("GET"))
+                    response = adapter.getEntry(request);
+                else if (method.equalsIgnoreCase("PUT"))
+                    response = adapter.putEntry(request);
+                else if (method.equalsIgnoreCase("DELETE"))
+                    response = adapter.deleteEntry(request);
+                else if (method.equalsIgnoreCase("HEAD"))
+                    response = adapter.headEntry(request);
+                else if (method.equalsIgnoreCase("OPTIONS"))
+                    response = adapter.optionsEntry(request);
+            } else if (type == TargetType.TYPE_MEDIA) {
+                if (adapter instanceof MediaCollectionAdapter) {
+                    MediaCollectionAdapter mcadapter = (MediaCollectionAdapter) adapter;
+                    if (method.equalsIgnoreCase("GET"))
+                        response = mcadapter.getMedia(request);
+                    else if (method.equalsIgnoreCase("PUT"))
+                        response = mcadapter.putMedia(request);
+                    else if (method.equalsIgnoreCase("DELETE"))
+                        response = mcadapter.deleteMedia(request);
+                    else if (method.equalsIgnoreCase("HEAD"))
+                        response = mcadapter.headMedia(request);
+                    else if (method.equalsIgnoreCase("OPTIONS"))
+                        response = mcadapter.optionsMedia(request);
+                } else {
+                    response = ProviderHelper.notsupported(request);
+                }
+            } else if (type == TargetType.TYPE_NOT_FOUND) {
+                response = ProviderHelper.notfound(request);
+            }
+            
+            // Forward all other requests to extensionRequest()
+            if (response == null)
+                response = adapter.extensionRequest(request);
+            
+            return response;
+        } catch (Throwable e) {
+            log.error(e);
+            if (transaction != null)
+                transaction.compensate(request, e);
+            response = ProviderHelper.servererror(request, e);
+            return response;
+        } finally {
+            if (transaction != null)
+                transaction.end(request, response);
+        }
+              
     }
     
     protected ServiceLocator createServiceLocator(RequestContext context) {
@@ -54,17 +157,17 @@ public class StandardProvider extends AbstractProvider {
     }
 
     @Override
-    protected TargetBuilder getTargetBuilder(RequestContext arg0) {
+    protected TargetBuilder getTargetBuilder(RequestContext request) {
         return null;
     }
 
     @Override
-    protected Resolver<Target> getTargetResolver(RequestContext arg0) {
+    protected Resolver<Target> getTargetResolver(RequestContext request) {
         return resolver;
     }
 
     @Override
-    protected WorkspaceManager getWorkspaceManager(RequestContext arg0) {
+    protected WorkspaceManager getWorkspaceManager(RequestContext request) {
         return workspaceManager;
     }
 

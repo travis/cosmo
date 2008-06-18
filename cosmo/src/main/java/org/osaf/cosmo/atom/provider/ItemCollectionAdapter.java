@@ -544,11 +544,8 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
 
     @Override
     public ResponseContext extensionRequest(RequestContext request) {
-        // PUT to a CollecitonTarget
-        if(isUpdateCollectionRequest(request))
-            return putCollection(request);
         // POST to a NewCollectionTarget
-        else if(isCreateCollectionRequest(request))
+        if(isCreateCollectionRequest(request))
             return postCollection(request);
         // POST to a CollectionTarget with media type application/x-www-form-urlencoded
         else if(isAddItemToCollectionRequest(request))
@@ -784,13 +781,6 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
         itemFilter.getStampFilters().add(eventFilter);
 
         return itemFilter;
-    }
-
-    private boolean isUpdateCollectionRequest(RequestContext request) {
-        if(!(request.getTarget() instanceof CollectionTarget))
-            return false;
-        
-        return request.getMethod().equalsIgnoreCase("PUT");
     }
     
     private boolean isCreateCollectionRequest(RequestContext request) {

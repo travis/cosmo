@@ -4,6 +4,10 @@
 }
 .collectionSelectorCheckbox {
     width: 18px;
+/* This height makes calendar view sidebar layout have an extra 1px gap 
+   which is jarring during transitions, but without it on Safari the
+   checkboxes are cramped.
+*/
     height: 16px;
     padding-left: 3px;
     text-align: center;
@@ -14,6 +18,7 @@
     padding-left: 5px;
     cursor: pointer;
     float: left;
+    height: 14px;
 }
 .cosmoCollectionSelectorCalSelect .collectionSelectorCollectionName {
     width: 127px;
@@ -25,7 +30,7 @@
     clear: both;
 }
 .collectionSelectorSel {
-    background-color: #659dd3;
+    background-color: #808080;
     color: #fff;
 }
 .collectionSelectorDetails {

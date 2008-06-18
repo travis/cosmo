@@ -23,6 +23,7 @@
 @import url("Dialog.css");
 @import url("DetailView.css");
 @import url("imagegrid.css");
+@import url("ListView.css");
 
 /* Calendar-specific styles, classes
  * ==================================== */
@@ -249,67 +250,6 @@
     background: #fff;
     line-height: 34px;
     vertical-align: middle;
-}
-/* List view */
-#listViewContainer {
-    position: absolute;
-    display: none;
-    border-left: 1px solid #999;
-    border-right: 1px solid #999;
-    overflow: hidden;
-}
-#listViewTable {
-    table-layout: fixed;
-    width: 100%;
-}
-.listViewHeaderCell {
-    color: #000;
-    font-weight: bold;
-    height: 15px;
-    line-height: 15px;
-    border-right: 1px solid #ddd;
-    background-image: url(images/tiling_horizontal.png);
-    background-position: 0px 0px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-}
-tr > .listViewHeaderCell:last-child {
-    border-right: 0px;
-}
-.listViewHeaderCellLit {
-    background-position: 0px -20px;
-}
-.listViewHeaderCellSel {
-    background-position: 0px -40px;
-}
-.listViewHeaderCellSelLit {
-    background-position: 0px -60px;
-}
-.listViewDataCell {
-    height: 20px;
-    line-height: 20px;
-    overflow: hidden;
-    white-space: nowrap;
-    cursor: pointer;
-    vertical-align: top;
-    border-bottom: 1px solid #ddd;
-}
-.listViewTriageCell {
-    text-align: center;
-    font-size: 10px;
-}
-.listViewTriageNow {
-    color: #fff;
-    background-color: #3c0;
-}
-.listViewTriageLater {
-    color: #fff;
-    background-color: #fc0;
-}
-.listViewTriageDone {
-    color: #fff;
-    background-color: #545454;
 }
 /* Calendar canvas */
 /* List of day/dates -- e.g., 'Sun 11 | Mon 12 | Tue 12' */

@@ -286,11 +286,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 r += '<div style="margin: 3px 5px; font-size: 1px;" class="cosmoListViewTaskIcon">&nbsp;</div>';
             }
             r += '</td>';
-            r += '<td class="listViewDataCell' + selCss + '" title="' + title + '">' +
+            r += '<td class="listViewDataCell listViewGutter ellipsis' + selCss + '" title="' + title + '">' +
               title + '</td>';
-            r += '<td class="listViewDataCell' + selCss + '" title="' + who + '">' +
+            r += '<td class="listViewDataCell listViewGutter ellipsis' + selCss + '" title="' + who + '">' +
               who + '</td>';
-            r += '<td class="listViewDataCell' + selCss +
+            r += '<td class="listViewDataCell listViewGutter' + selCss +
               '" style="white-space: nowrap;" title="' + start + '">' + start + '</td>';
             r += '<td class="listViewDataCell' +
                 ' listViewTriageCell listViewTriage' +

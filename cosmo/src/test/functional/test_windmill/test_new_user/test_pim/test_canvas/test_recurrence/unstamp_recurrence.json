@@ -12,10 +12,10 @@
 {"method": "waits.sleep", "params": {"milliseconds" : 1100}}
 
 //make it recurring, daily
-{"params": {"option": "Daily", "id": "recurrenceInterval"},  "method": "select"}
+{"params": {"option": "Daily", "id": "detailViewRecurrenceSelector"},  "method": "select"}
 
 //save it
-{"params": {"id": "detailSaveButton"},  "method": "click"}
+{"params": {"id": "detailViewSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
 
 //go to list view
@@ -26,10 +26,10 @@
 {"params": {"jsid": "'listView_item' + windmill.testWindow.cosmo.view.list.itemRegistry.getLast().id"}, "method": "click"}
 
 //unstamp event
-{"params": {"id": "sectionEventEnableToggle"}, "method": "check"}
+{"params": {"id": "detailViewEventButton"}, "method": "click"}
 
 //save it!
-{"params": {"id": "detailSaveButton"},  "method": "click"}
+{"params": {"id": "detailViewSaveButton"},  "method": "click"}
 
 {"method": "waits.sleep", "params": {"milliseconds" : 1100}}
 {"params": {"id": "allButtonDialog"}, "method": "click"}

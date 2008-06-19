@@ -4,7 +4,6 @@
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.leftSidebar.minical.goToButton.domNode.id"},  "method": "click"}
 {"params": {"id": "hourDiv1-1100"},  "method": "doubleClick"}
 {"params": {"id": "viewNavCenterRight"},  "method": "click"}
-{"params": {"id": "startDate"},  "method": "click"}
-{"params": {"text": "8\/5\/2007", "id": "startDate"},  "method": "type"}
-{"params": {"text": "8\/5\/2007", "id": "endDate"},  "method": "type"}
-{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"},  "method": "click"}
+{"params": {"text": "8\/5\/2007", "id": "detailViewStartDateInput"},  "method": "type"}
+{"params": {"text": "8\/5\/2007", "id": "detailViewEndDateInput"},  "method": "type"}
+{"params": {"id": "detailViewSaveButton"},  "method": "click"}

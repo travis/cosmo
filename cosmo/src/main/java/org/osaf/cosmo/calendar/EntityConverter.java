@@ -179,7 +179,10 @@ public class EntityConverter {
      * master and exception items.
      */
     public Set<NoteItem> convertEventCalendar(Calendar calendar) {
-        return convertEventCalendar(entityFactory.createNote(), calendar);
+        NoteItem note = entityFactory.createNote();
+        note.setUid(entityFactory.generateUid());
+        setBaseContentAttributes(note);
+        return convertEventCalendar(note, calendar);
     }
     
     /**
@@ -203,9 +206,7 @@ public class EntityConverter {
     public NoteItem convertJournalCalendar(NoteItem  note, Calendar calendar) {
         
         VJournal vj = (VJournal) getMasterComponent(calendar.getComponents(Component.VJOURNAL));
-        
         setCalendarAttributes(note, vj);
-        
         return note;
     }
     

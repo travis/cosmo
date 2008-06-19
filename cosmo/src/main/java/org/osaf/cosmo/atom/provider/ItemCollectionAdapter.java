@@ -459,9 +459,10 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
             // add child items by converting icalendar calendar
             Set<Item> children = new HashSet<Item>();
             
-            for (Item child : new EntityConverter(getEntityFactory())
+            for (ContentItem child : new EntityConverter(getEntityFactory())
                     .convertCalendar(calendar)) {
                 child.setOwner(user);
+                child.setLastModifiedBy(user.getEmail());
                 children.add(child);
             }
             

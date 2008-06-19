@@ -164,8 +164,7 @@ cosmo.ui.menu.allItems = [
       displayText: ['<a id="whatIsChandlerLink" href="http://chandlerproject.org" target="_blank">',
                     _('Main.WhatIsChandler'), '</a>'].join(""),
       displayMode: cosmo.ui.menu.displayModes.ANON,
-      requiredRoles: [],
-      dividerText: "\u00A0\u00A0"
+      requiredRoles: []
     },
     { id: 'signupMenuItem',
       displayText: _('Main.SignUp'),

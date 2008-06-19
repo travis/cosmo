@@ -310,7 +310,7 @@ cosmo.ui.minical.MiniCal = function (p) {
             // the collection display in ticket view, and the collection
             // selector when logged in
             c = cosmo.app.pim.ticketKey ? COLLECTION_SUBSCRIBER_HEIGHT : COLLECTION_SELECTOR_HEIGHT;
-            c += 8; // A bit of spacing
+            c += 45; // A bit of spacing
             var h = self.navPanel.offsetHeight;
             h += self.goToDateNode.offsetHeight;
             for (var i = 0; i < self.months.length; i++) {

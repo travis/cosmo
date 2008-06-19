@@ -76,3 +76,14 @@ td.label {
 .learn {
     text-align: center;
 }
+
+.orange {
+    width: 350px;
+    padding: 5px;
+    background: #ffcc00;
+    border: 1px solid #ff6600;
+    color: black;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 14px;
+}

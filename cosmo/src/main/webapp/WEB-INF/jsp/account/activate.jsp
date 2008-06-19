@@ -31,16 +31,16 @@
 
 <cosmo:threeColumnLayout prefix="Account.Activate." stylesheets="activation">
   <div id="center" class="column">
-
-    <span id="congratulations"><fmt:message key="Account.Activate.Congrats"/></span>
-    <span id="activatedMessage"><fmt:message key="Account.Activate.ActivatedMessage"/></span>
-    <table id="user">
-      <tbody>
-        <tr><td class="label"><fmt:message key="Account.Activate.Username"/></td><td><c:out value="${user.username}"/></td></tr>
-        <tr><td class="label"><fmt:message key="Account.Activate.Email"/></td><td><c:out value="${user.email}"/></td></tr>
-      </tbody>
-    </table>
-
+    <div class="orange">
+      <span id="congratulations"><fmt:message key="Account.Activate.Congrats"/></span>
+      <span id="activatedMessage"><fmt:message key="Account.Activate.ActivatedMessage"/></span>
+      <table id="user">
+        <tbody>
+          <tr><td class="label"><fmt:message key="Account.Activate.Username"/></td><td><c:out value="${user.username}"/></td></tr>
+          <tr><td class="label"><fmt:message key="Account.Activate.Email"/></td><td><c:out value="${user.email}"/></td></tr>
+        </tbody>
+      </table>
+    </div>
     <div class="separateBig restrictWidth huge">
       <a href="${getStartedLink}">
         <fmt:message key="Account.Activate.CenterPromoLine1"/><br/>

@@ -69,7 +69,7 @@ public class UserPathAccessDecisionManager
                     "Unrecognized authentication token");
         
         // Only check user paths for now
-        UserPath up = UserPath.parse(request.getPathInfo());
+        UserPath up = UserPath.parse(request.getPathInfo(), true);
         if(up!=null) {
             // Must be user
             if(! (authentication instanceof UsernamePasswordAuthenticationToken) &&

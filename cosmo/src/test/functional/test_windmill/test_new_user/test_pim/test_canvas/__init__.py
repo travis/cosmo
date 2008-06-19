@@ -1,6 +1,6 @@
 
-cal_cavas_setup_json = """{"method": "waits.sleep", "params": {"milliseconds" : 1000}}
-{"method": "click", "params": {"id": "cosmoViewToggleCalViewSelector"}}"""
+cal_cavas_setup_json = """{"params": {"timeout": 40000, "id": "cosmoViewToggleCalViewSelector"}, "method": "waits.forElement"}
+{"params": {"id": "cosmoViewToggleCalViewSelector"}, "method": "click"}"""
 
 from windmill.authoring import RunJsonFile
 

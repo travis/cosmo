@@ -5,10 +5,6 @@
 }
 .collectionSelectorCheckbox {
     width: 18px;
-/* This height makes calendar view sidebar layout have an extra 1px gap 
-   which is jarring during transitions, but without it on Safari the
-   checkboxes are cramped.
-*/
     height: 16px;
     padding-left: 3px;
     text-align: center;

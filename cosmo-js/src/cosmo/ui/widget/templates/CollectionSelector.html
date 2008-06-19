@@ -1,8 +1,8 @@
 <form>
   <div class='cosmoAddRemoveCollectionContainer'>
     <span class='cosmoAddRemoveCollectionLabel'> ${l10n.collectionsLabel}</span>
-    <span class='cosmoAddCollectionButton cosmoNewCollectionDefault' dojoAttachEvent='onclick: handleNewCollection'></span>
-    <span class='cosmoRemoveCollectionButton cosmoRemoveCollectionDefault' dojoAttachEvent='onclick: handleDeleteCollection'></span>
+    <span id="${id}AddCollectionButton" class='cosmoAddCollectionButton cosmoNewCollectionDefault' dojoAttachEvent='onclick: handleNewCollection'></span>
+    <span id="${id}AddCollectionButton" class='cosmoRemoveCollectionButton cosmoRemoveCollectionDefault' dojoAttachEvent='onclick: handleDeleteCollection'></span>
   </div>
   <div id='collectionSelectorNoCollectionsPrompt' dojoAttachPoint="noCollectionsPrompt">
     ${l10n.noCollectionsPrompt}

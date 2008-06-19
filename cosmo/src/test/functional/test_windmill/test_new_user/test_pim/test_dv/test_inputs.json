@@ -1,0 +1,11 @@
+{"params": {"timeout": 40000, "id": "cosmoViewToggleCalViewSelector"}, "method": "waits.forElement"}
+{"params": {"id": "cosmoViewToggleCalViewSelector"}, "method": "click"}
+{"params": {"validator": "className|cosmoDetailHidden", "id": "detailView"}, "method": "asserts.assertProperty"}
+{"params": {"id": "hourDiv3-1200"}, "method": "doubleClick"}
+{"params": {"validator": "className|cosmoDetailHidden", "id": "detailView"}, "method": "asserts.assertNotProperty"}
+{"params": {"text": "foobar", "id": "detailViewTitleInput"}, "method": "type"}
+{"params": {"validator": "foobar", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
+{"params": {"text": "foobar", "id": "detailViewLocationInput"}, "method": "type"}
+{"params": {"validator": "foobar", "id": "detailViewLocationInput"}, "method": "asserts.assertValue"}
+{"params": {"text": "foobar", "id": "detailViewNotesInput"}, "method": "type"}
+{"params": {"validator": "foobar", "id": "detailViewNotesInput"}, "method": "asserts.assertValue"}

@@ -20,6 +20,8 @@
 /* Home Dir Browser styles
  * -------------------*/
 
+@import url("../../../dijit/themes/tundra/form/RadioButton.css");
+
 .smTableColHead {
     font-size: 11px;
     color: #666666;

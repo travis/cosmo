@@ -24,8 +24,8 @@ module Cosmo
     MEAN_COL_SIZE = 50
     SECONDS_IN_WEEK = 60*60*24*7
     
-    OPERATIONS = [:rangeQuery, :fullFeed, :createEvent, :updateEvent, :dashBoardQuery, :createCollection, :deleteEvent, :deleteCollection]
-    PROBS = [0.5925, 0.045, 0.15, 0.05, 0.15, 0.005, 0.005, 0.0025]
+    OPERATIONS = [:rangeQuery, :fullFeed, :createEvent, :updateEvent, :dashBoardQuery, :createCollection, :deleteEvent, :deleteCollection, :updateCollection]
+    PROBS = [0.59, 0.045, 0.15, 0.05, 0.15, 0.005, 0.005, 0.0025, 0.0025]
     
     class CollectionHolder
       def initialize(uid, itemUids)
@@ -53,6 +53,7 @@ module Cosmo
     def registerStats
       @stats.registerStatMap(:atomCreateCollection, "atom create collection")
       @stats.registerStatMap(:atomDeleteCollection, "atom delete collection")
+      @stats.registerStatMap(:atomUpdateCollection, "atom update collection")
       @stats.registerStatMap(:atomRangeQuery, "atom range query")
       @stats.registerStatMap(:atomFullFeed, "atom full feed")
       @stats.registerStatMap(:atomCreateEntry, "atom create entry")
@@ -117,6 +118,9 @@ module Cosmo
               collection = @collections[rand(@collections.size)]
               deleted = deleteCollection(collection)
               @collections.delete(collection) if deleted==true
+            when :updateCollection
+              collection = @collections[rand(@collections.size)]
+              updateCollection(collection)
           end
         end
     end
@@ -204,6 +208,16 @@ module Cosmo
       end
     end
     
+    def updateCollection(collection)
+      colXml = generateUpdateCollectionXml(random_string(64))
+      resp = @atomClient.updateCollection(collection.uid,colXml)
+      if(resp.code==204)
+        @stats.reportStat(:atomUpdateCollection, true, resp.time, colXml.length, nil, 204)
+      else
+        @stats.reportStat(:atomUpdateCollection, false, nil, nil, nil, resp.code)
+      end
+    end
+    
     def deleteCollection(collection)
       resp = @atomClient.deleteCollection(collection.uid)
       if(resp.code==204)
@@ -219,6 +233,15 @@ module Cosmo
       <div class="collection">
         <span class="name">#{name}</span>
         <span class="uuid">#{uid}</span>
+      </div>
+EOF
+      return xml
+    end
+  
+    def generateUpdateCollectionXml(name)
+      xml =<<EOF
+      <div class="collection">
+        <span class="name">#{name}</span>
       </div>
 EOF
       return xml

@@ -101,6 +101,26 @@ module Cosmo
       end
     end
     
+    def updateCollection(collection, body)
+      @@log.debug "put to collection #{collection} begin"
+      @http.start do |http|
+        
+        strRequest = "#{@context}#{COL_PATH}collection/#{collection}"
+        
+        req = Net::HTTP::Put.new(strRequest)
+        init_req(req)
+        http.read_timeout=600
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        req['Content-Type'] = 'application/xhtml+xml'
+        resp, data = time_block { http.request(req, body) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "put to collection #{collection} end (#{@reqTime}ms)"
+        return AtomResponse.new(resp, data, @reqTime)
+      end
+    end
+    
     def deleteCollection(collection)
       @@log.debug "delete collection #{collection} begin"
       @http.start do |http|

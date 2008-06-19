@@ -115,6 +115,23 @@ module Cosmo
       end
     end
     
+    def propfind(path, body, depth="0")
+      @@log.debug "propfind #{path} begin"
+      @http.start do |http|
+        req = Net::HTTP::Propfind.new("#{@context}#{DAV_PATH}#{path}")
+        http.read_timeout=600
+        # we make an HTTP basic auth by passing the
+        # username and password
+        req.basic_auth @user, @pass
+        req['Content-Type'] = 'application/xml'
+        req['Depth'] = depth
+        resp, data = time_block { http.request(req, body) }
+        @@log.debug "received code #{resp.code}"
+        @@log.debug "propfind #{path} end (#{@reqTime}ms)"
+        return CalDAVResponse.new(resp, data, @reqTime)
+      end
+    end
+    
      def makeCalendar(path, calendarBody)
       @@log.debug "mkcalendar #{path} begin"
       @http.start do |http|

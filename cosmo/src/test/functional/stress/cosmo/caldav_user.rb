@@ -20,8 +20,8 @@ module Cosmo
   class CalDAVUser < CosmoUser
   
     SECONDS_IN_WEEK = 60*60*24*7
-    OPERATIONS = [:makeCalendar, :putEvent, :deleteEvent, :rangeQuery, :getEvent]
-    PROBS = [0.005, 0.25, 0.005, 0.69, 0.05]
+    OPERATIONS = [:makeCalendar, :putItem, :deleteItem, :rangeQuery, :getItem, :deleteCollection, :propfindCollection]
+    PROBS = [0.005, 0.25, 0.005, 0.6375, 0.05, 0.0025, 0.05]
     
     class CollectionHolder
       def initialize(uid)
@@ -48,8 +48,10 @@ module Cosmo
       @stats.registerStatMap(:calDavMkCalendar, "CalDAV MKCALENDAR")
       @stats.registerStatMap(:calDavPut, "CalDAV PUT")
       @stats.registerStatMap(:calDavGet, "CalDAV GET")
-      @stats.registerStatMap(:calDavDeleteEvent, "CalDAV DELETE Event")
+      @stats.registerStatMap(:calDavDeleteItem, "CalDAV DELETE Resource")
+      @stats.registerStatMap(:calDavDeleteCollection, "CalDAV DELETE Collection")
       @stats.registerStatMap(:calDavRangeQuery, "CalDAV time-range REPORT")
+      @stats.registerStatMap(:calDavPropfindCollection, "CalDAV propfind collection")
     end
     
     def preRun
@@ -76,18 +78,25 @@ module Cosmo
               if(!collection.nil?)
                 @collections[collection.uid] = collection
               end
-            when :putEvent
+            when :putItem
               collection = @collections.to_a[rand(@collections.size)][1]
-              putEvent(collection)
-            when :deleteEvent
+              putItem(collection)
+            when :deleteItem
               collection = @collections.to_a[rand(@collections.size)][1]
-              deleteEvent(collection)
-            when :getEvent
+              deleteItem(collection)
+            when :getItem
               collection = @collections.to_a[rand(@collections.size)][1]
-              get_event(collection)
+              getItem(collection)
             when :rangeQuery
               collection = @collections.to_a[rand(@collections.size)][1]
               rangeQueryCalendar(collection)
+            when :deleteCollection
+              collection = @collections.to_a[rand(@collections.size)][1]
+              deleted = deleteCollection(collection)
+              @collections.delete(collection.uid) if deleted==true
+            when :propfindCollection
+              collection = @collections.to_a[rand(@collections.size)][1]
+              propfindCollection(collection)
           end
         end
     end
@@ -112,40 +121,62 @@ module Cosmo
       end
     end
     
-    def putEvent(collection)
+    def propfindCollection(collection)
+      xml = getPropFindXml
+      resp = @calDavClient.propfind("#{@user}/#{collection.uid}", xml, "1")
+      if(resp.code==207)
+        @stats.reportStat(:calDavPropfindCollection, true, resp.time, xml.length, resp.data.length, 207)
+      else
+        @stats.reportStat(:calDavPropfindCollection, false, nil, nil, nil, resp.code)
+      end
+    end
+    
+    def deleteCollection(collection)
+      resp = @calDavClient.delete("#{@user}/#{collection.uid}")
+      if(resp.code==204)
+        @stats.reportStat(:calDavDeleteCollection, true, resp.time, nil, nil, 204)
+      else
+        @stats.reportStat(:calDavDeleteCollection, false, nil, nil, nil, resp.code)
+      end
+      return (resp.code==204)
+    end
+    
+    
+    
+    def putItem(collection)
       
-      eventUid = random_string(40)
-      ics = generateEventIcs(eventUid)
+      itemUid = random_string(40)
+      ics = rand < 0.90 ?  generateEventIcs(itemUid) :  generateTaskIcs(itemUid)
       
-      resp = @calDavClient.put("#{@user}/#{collection.uid}/#{eventUid}.ics", ics)
+      resp = @calDavClient.put("#{@user}/#{collection.uid}/#{itemUid}.ics", ics)
       
       if(resp.code==201)
         @stats.reportStat(:calDavPut, true, resp.time, ics.length, nil, 201)
-        collection.itemUids << eventUid
+        collection.itemUids << itemUid
       else
         @stats.reportStat(:calDavPut, false, nil, nil, nil, resp.code)
       end
     end
     
-    def deleteEvent(collection)
+    def deleteItem(collection)
       return if(collection.itemUids.size==0)
-      eventUid = collection.randomItemUid
+      itemUid = collection.randomItemUid
       
-      resp = @calDavClient.delete("#{@user}/#{collection.uid}/#{eventUid}.ics")
+      resp = @calDavClient.delete("#{@user}/#{collection.uid}/#{itemUid}.ics")
       
       if(resp.code==204)
-        @stats.reportStat(:calDavDeleteEvent, true, resp.time, nil, nil, 204)
-        collection.itemUids.delete(eventUid)
+        @stats.reportStat(:calDavDeleteItem, true, resp.time, nil, nil, 204)
+        collection.itemUids.delete(itemUid)
       else
-        @stats.reportStat(:calDavDeleteEvent, false, nil, nil, nil, resp.code)
+        @stats.reportStat(:calDavDeleteItem, false, nil, nil, nil, resp.code)
       end
     end
     
-    def get_event(collection)
+    def getItem(collection)
       return if(collection.itemUids.size==0)
-      eventUid = collection.randomItemUid
+      itemUid = collection.randomItemUid
       
-      resp = @calDavClient.get("#{@user}/#{collection.uid}/#{eventUid}.ics")
+      resp = @calDavClient.get("#{@user}/#{collection.uid}/#{itemUid}.ics")
       
       if(resp.code==200)
         @stats.reportStat(:calDavGet, true, resp.time, resp.data.length, nil, 200)
@@ -202,6 +233,19 @@ END:VCALENDAR]]></C:calendar-timezone>
      </C:mkcalendar>
 EOF
       return xml
+    end
+    
+    def getPropFindXml
+       xml =<<EOF
+<D:propfind xmlns:D="DAV:">
+<D:prop>
+<D:getcontentlength/>
+<D:getcontenttype/>
+<D:resourcetype/>
+<D:getetag/>
+</D:prop>
+</D:propfind>
+EOF
     end
     
     def generateQueryXml
@@ -263,7 +307,25 @@ DTSTART:#{random_date}
 DURATION:#{random_duration}
 RRULE:FREQ=WEEKLY
 SUMMARY:#{random_string(50)}
+DESCRIPTION:#{random_string(100)}
 END:VEVENT
+END:VCALENDAR
+EOF
+      return ics
+    end
+     
+    def generateTaskIcs(uid)
+      ics = <<EOF
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Example Corp.//CalDAV Client//EN
+BEGIN:VTODO
+UID:#{uid}
+DTSTAMP:19970901T130000Z
+SUMMARY:#{random_string(50)}
+DESCRIPTION:#{random_string(100)}
+STATUS:NEEDS-ACTION
+END:VTODO
 END:VCALENDAR
 EOF
       return ics

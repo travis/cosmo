@@ -24,7 +24,7 @@ module Cosmo
     DELETE_PROB = 0.333
     
     OPERATIONS = [:publish, :sync, :update, :subscribe, :delete, :serviceDoc]
-    PROBS = [0.005, 0.765, 0.15, 0.075, 0.0025, 0.0025]
+    PROBS = [0.005, 0.765, 0.15, 0.07, 0.0025, 0.0075]
              
     class CollectionHolder
       def initialize(uid, itemUids, sync_token)

@@ -529,7 +529,6 @@ Link styles
  * matter the order the class is added
  */
 .selectedItem {
-    background-color: #659dd3 !important;
     color: #fff !important;
 }
 .mouseoverItem {

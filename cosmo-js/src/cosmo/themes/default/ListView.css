@@ -10,6 +10,9 @@
     table-layout: fixed;
     width: 100%;
 }
+#listViewTable .selectedItem {
+    background-color: #2873db;
+}
 .listViewHeaderCell {
     color: #000;
     font-weight: bold;
@@ -49,15 +52,15 @@ tr > .listViewHeaderCell:last-child {
 }
 .listViewTriageNow {
     color: #fff;
-    background-color: #3c0;
+    background-color: #3c0 !important;
 }
 .listViewTriageLater {
     color: #fff;
-    background-color: #fc0;
+    background-color: #fc0 !important;
 }
 .listViewTriageDone {
     color: #fff;
-    background-color: #545454;
+    background-color: #545454 !important;
 }
 .listViewGutter {
     padding-right: 5px;

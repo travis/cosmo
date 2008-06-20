@@ -40,6 +40,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     initItem: null,
     initializing: false,
     recursionCount: 0,
+    preserveEventFields: false,
 
     // Attach points
     triageButtons: null,
@@ -95,8 +96,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         var eventStamp = item.getEventStamp();
         if (eventStamp){
             this.updateFromEventStamp(eventStamp);
+            this.preserveEventFields = true;
             this.enableEvent();
         } else {
+            this.preserveEventFields = false;
             this.disableEvent();
         }
         if(item.getTaskStamp()) this.setStarred();
@@ -308,7 +311,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     clearEventFields: function(){
         this.locationInput.setValue("");
-        this.allDayInput.setValue("");
+        this.allDayInput.setValue(false);
         this.startDateInput.setValue("");
         this.startTimeInput.setValue("");
         this.endDateInput.setValue("");
@@ -356,7 +359,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.eventTitleSpan.innerHTML = this.l10n.removeFromCalendar;
         if (!dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.showEvent(fast);
         this.enableEventFields();
-
+        if (!this.preserveEventFields)
+            // zero out event fields if they weren't set recently for this item
+            this.clearEventFields();
+        this.preserveEventFields = true;
     },
 
     showEvent: function(fast){
@@ -410,8 +416,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     },
 
     eventButtonOnClick: function(){
-        if (!this.eventButtonDisabled)
+        if (!this.eventButtonDisabled){
             this.toggleEvent();
+            this.updateVisibility();
+        }
     },
 
     triageNowOnClick: function(){
@@ -634,7 +642,8 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
                 dict.time = true;
                 if (!this.getAnyTime()) {
                     dict.timezone = true;
-                    if (!this.getStartDateTime().equals(this.getEndDateTime()))
+                    var start = this.getStartDateTime();
+                    if (!start || !start.equals(this.getEndDateTime()))
                         dict.status = true;
                 }
             }

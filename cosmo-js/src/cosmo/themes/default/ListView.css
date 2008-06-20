@@ -62,9 +62,6 @@ tr > .listViewHeaderCell:last-child {
     color: #fff;
     background-color: #545454 !important;
 }
-.listViewGutter {
-    padding-right: 5px;
-}
 
 .ellipsis {
     /* doesn't work with mozilla, but does with others */

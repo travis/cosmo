@@ -263,6 +263,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         var colHeaderIcons = {};
         var t = '';
         var r = '';
+        var gutterWidth = 5;
         var cols = [];
         var colCount = 0; // Used to generated the 'processing' row
         var fillCell = function (s) {
@@ -279,26 +280,27 @@ cosmo.view.list.canvas.Canvas = function (p) {
             var title = fillCell(display.title);
             var who = fillCell(display.who);
             var start = fillCell(display.start);
-            r = '';
+            var spacer = '<td class="listViewDataCell ' + selCss + '">&nbsp;</td>';
+            var r = '';
             r += '<tr id="listView_item' + display.uid + '">';
             r += '<td class="listViewDataCell' + selCss + '">';
             if (display.task) {
                 r += '<div style="margin: 3px 5px; font-size: 1px;" class="cosmoListViewTaskIcon">&nbsp;</div>';
             }
             r += '</td>';
-            r += '<td class="listViewDataCell listViewGutter ellipsis' + selCss + '" title="' + title + '">' +
-              title + '</td>';
-            r += '<td class="listViewDataCell listViewGutter ellipsis' + selCss + '" title="' + who + '">' +
-              who + '</td>';
-            r += '<td class="listViewDataCell listViewGutter' + selCss +
-              '" style="white-space: nowrap;" title="' + start + '">' + start + '</td>';
+            r += '<td class="listViewDataCell ellipsis ' + selCss + '" title="' + title + '">' +
+              title + '</td>' + spacer;
+            r += '<td class="listViewDataCell ellipsis ' + selCss + '" title="' + who + '">' +
+              who + '</td>' + spacer;
+            r += '<td class="listViewDataCell ' + selCss +
+              '" style="white-space: nowrap;" title="' + start + '">' + start + '</td>' + spacer;
             r += '<td class="listViewDataCell' +
                 ' listViewTriageCell listViewTriage' +
                 _tMap[item.data.getTriageStatus()] + selCss + '">' +
                 fillCell(display.triage) + '</td>';
             r += '</tr>\n';
             t += r;
-        }
+        };
         var size = this.itemsPerPage;
         var st = (this.currPageNum * size) - size;
 
@@ -309,7 +311,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
 
         t = '<table id="listViewTable" cellpadding="0" cellspacing="0" style="width: ' + this.width + 'px;">\n';
-        // Header row
+        // Invisible header row
+        var hr = '<tr height="0px">';
+        // Visible header row
         r += '<tr>';
         // Subtract static width cols from the total
         for (var i = 0; i < cols.length; i++) {
@@ -325,9 +329,9 @@ cosmo.view.list.canvas.Canvas = function (p) {
             if (col.isIcon) {
                 var iconPrefix = isSelected ? 'Selected' : 'Default';
                 var iconDiv = _createElem('div');
-                var mouseOver = function (e) { self.handleMouseOver(e); }
-                var mouseOut = function (e) { self.handleMouseOut(e); }
-                var click = function (e) { self.handleClick(e); }
+                var mouseOver = function (e) { self.handleMouseOver(e); };
+                var mouseOut = function (e) { self.handleMouseOut(e); };
+                var click = function (e) { self.handleClick(e); };
                 var colIcon = cosmo.ui.imagegrid.createImageButton({ domNode: iconDiv,
                     defaultState: col.display + iconPrefix,
                     rolloverState: col.display + iconPrefix + 'Rollover',
@@ -345,16 +349,24 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 var w = parseInt(col.width) / 100;
                 w = parseInt(remainingWidth * w) - 1;
             }
-            colStyle += ' width: ' + w + 'px;';
+            if (col.gutter){
+                hr += '<td style="width: ' + (w - gutterWidth) + 'px"></td>'
+                    + '<td style="width: ' + gutterWidth + 'px;"></td>';
+            }
+            else
+                hr += '<td style="width: ' + w + 'px"></td>';
 
             r += '<td id="listView_' + col.name +
                 'Header" class="listViewHeaderCell';
             if (isSelected) {
-              r += ' listViewHeaderCellSel'
+                r += ' listViewHeaderCellSel';
             }
             r += '"';
             if (colStyle) {
               r += ' style="' + colStyle + '"';
+            }
+            if (col.gutter){
+                r += 'colspan="2"';
             }
             r += '>';
             if (!col.isIcon) {
@@ -363,9 +375,13 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 '"><nobr>' + displ + '</nobr></div>';
             }
             r += '</td>';
+
             colCount++;
         }
         r += '</tr>\n';
+        hr += '</tr>\n';
+
+        t += hr;
         t += r;
 
         hash.each(createContentRow, { start: st, items: size });

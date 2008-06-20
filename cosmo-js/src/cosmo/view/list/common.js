@@ -50,9 +50,9 @@ cosmo.view.list.columnOrder = ['TASK', 'TITLE', 'WHO', 'START', 'TRIAGE'];
 // string, or as the key for the image icon in imagegrid.js
 cosmo.view.list.columns = {
     TASK: { name: 'task', width: '20px', display: 'taskColumn', isIcon: true, initSort: 'Asc' },
-    TITLE: { name: 'title', width: '50%', display: 'Title', isIcon: false, initSort: 'Asc' },
-    WHO: { name: 'who', width: '20%', display: 'UpdatedBy', isIcon: false, initSort: 'Asc' },
-    START: { name: 'start', width: '30%', display: 'StartsOn', isIcon: false, initSort: 'Desc' },
+    TITLE: { name: 'title', width: '50%', display: 'Title', isIcon: false, initSort: 'Asc', gutter: true },
+    WHO: { name: 'who', width: '20%', display: 'UpdatedBy', isIcon: false, initSort: 'Asc', gutter: true },
+    START: { name: 'start', width: '30%', display: 'StartsOn', isIcon: false, initSort: 'Desc', gutter: true },
     TRIAGE: { name: 'triage', width: '36px', display: 'triageStatusColumn', isIcon: true, initSort: 'Asc' }
 };
 

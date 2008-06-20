@@ -76,8 +76,13 @@ dojo.declare("cosmo.ui.widget.Button", [dijit._Widget, dijit._Templated], {
             this.domNode.style.width = parseInt(width) + "px";
         }
     },
+    getSuffix: function(){
+        /* Don't use small buttons. */
+        return ''; /*this.small ? 'Sm' : '';*/
+    },
     setEnabled: function(enabled) {
-        var suf = this.small ? 'Sm' : '';
+        /* Don't use small buttons. */
+        var suf = this.getSuffix();
         this.enabled = enabled;
         if (this.enabled) {
             if (this.handleOnClickOrig) {
@@ -104,7 +109,7 @@ dojo.declare("cosmo.ui.widget.Button", [dijit._Widget, dijit._Templated], {
     _morphButton: function(e) {
         if (this.enabled) {
             var s = e.type;
-            var suf = this.small ? 'Sm' : '';
+            var suf = this.getSuffix();
             var states = {
                 mouseover: 'btnElemBase' + suf + ' btnElemMouseover' + suf,
                 mouseout: 'btnElemBase' + suf,

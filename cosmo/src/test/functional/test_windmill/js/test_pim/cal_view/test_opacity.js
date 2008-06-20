@@ -18,7 +18,7 @@ pimTest.calView.test_opacity= new function () {
     // Select the first event
     function () { doLozengeClickByRegistryIndex(0); },
     // Click the Remove button
-    { method: "click", params: { id: "detailRemoveButton" } },
+    { method: "click", params: { id: "detailViewRemoveButton" } },
     { method: "waits.forElement", params: { id: "removeConfirmRemoveButton", "timeout": 40000} },
     // Check the opacity of the UI mask
     function () {
@@ -43,7 +43,7 @@ pimTest.calView.test_opacity= new function () {
     // Check the opacity of the detail view buttons
     // Nothing should be selected, so buttons should be disabled
     function () {
-      var rem = $('detailRemoveButton');
+      var rem = $('detailViewRemoveButton');
       if (document.all) {
         if (rem.style.filter != 'alpha(opacity=70)') {
           return false;

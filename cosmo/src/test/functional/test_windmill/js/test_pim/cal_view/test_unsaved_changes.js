@@ -124,7 +124,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Select the second event
     function () { doLozengeClickByRegistryIndex(1); },
     // Click the Remove button
-    { method: "click", params: { id: "detailRemoveButton" } },
+    { method: "click", params: { id: "detailViewRemoveButton" } },
     { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Click Remove button on the confirmation dialog
     { method: "click", params: { id: "removeConfirmRemoveButton" } },
@@ -132,7 +132,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Select the first event
     function () { doLozengeClickByRegistryIndex(0); },
     // Click the Remove button
-    { method: "click", params: { id: "detailRemoveButton" } },
+    { method: "click", params: { id: "detailViewRemoveButton" } },
     { method: "waits.sleep", params: { milliseconds: 4000 } },
     // Click Remove button on the confirmation dialog
     { method: "click", params: { id: "removeConfirmRemoveButton" } },

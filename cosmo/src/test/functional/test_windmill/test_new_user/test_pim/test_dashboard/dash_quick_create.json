@@ -5,8 +5,8 @@
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"jsid": "{$quickCreateButton}"},  "method": "click"}
-{"params": {"id": "noteDescription"},  "method": "click"}
-{"params": {"text": "We will be eating great food.", "id": "noteDescription"},  "method": "type"}
+{"params": {"id": "detailViewTitleInput"},  "method": "click"}
+{"params": {"text": "We will be eating great food.", "id": "detailViewTitleInput"},  "method": "type"}
 {"params": {"id": "sectionEventEnableToggle"},  "method": "check"}
 {"params": {"milliseconds": "5000"},  "method": "waits.sleep"}
 {"params": {"id": "detailViewLocationInput"},  "method": "click"}
@@ -23,4 +23,4 @@
 {"params": {"option": "Tentative", "id": "eventStatus"},  "method": "select"}
 {"params": {"id": "sectionTaskEnableToggle"},  "method": "check"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "detailSaveButton"},  "method": "click"}
+{"params": {"id": "detailViewSaveButton"},  "method": "click"}

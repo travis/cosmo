@@ -735,7 +735,8 @@ function populateDeltaEventFields(dv, delta){
     delta.addStampProperty("event", "startDate", dv.getStartDateTime());
     delta.addStampProperty("event", "endDate", dv.getEndDateTime());
     delta.addStampProperty("event", "location", dv.getLocation());
-    delta.addStampProperty("event", "status", dv.getStatus());
+    var status = dv.getEventVisibility().status ? dv.getStatus() : null;
+    delta.addStampProperty("event", "status", status);
     delta.addStampProperty("event", "allDay", dv.getAllDay());
     var rrule = dv.getRrule();
     if (!rrule || (rrule && rrule.isSupported())) delta.addStampProperty("event", "rrule", rrule);

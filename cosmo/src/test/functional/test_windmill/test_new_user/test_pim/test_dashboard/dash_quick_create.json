@@ -9,8 +9,8 @@
 {"params": {"text": "We will be eating great food.", "id": "noteDescription"},  "method": "type"}
 {"params": {"id": "sectionEventEnableToggle"},  "method": "check"}
 {"params": {"milliseconds": "5000"},  "method": "waits.sleep"}
-{"params": {"id": "eventLocation"},  "method": "click"}
-{"params": {"text": "Adams house", "id": "eventLocation"},  "method": "type"}
+{"params": {"id": "detailViewLocationInput"},  "method": "click"}
+{"params": {"text": "Adams house", "id": "detailViewLocationInput"},  "method": "type"}
 {"params": {"text": "08\/06\/2007", "id": "startDate"},  "method": "type"}
 {"params": {"text": "12:00", "id": "startTime"},  "method": "type"}
 {"params": {"id": "startMeridianAM"},  "method": "radio"}

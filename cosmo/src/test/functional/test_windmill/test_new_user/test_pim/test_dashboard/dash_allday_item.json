@@ -3,8 +3,8 @@
 {"params": {"id": "listViewQuickItemEntry"},  "method": "click"}
 {"params": {"text": "Testing All Day", "id": "listViewQuickItemEntry"},  "method": "type"}
 {"params": {"jsid": "{$quickCreateButton}"},  "method": "click"}
-{"params": {"id": "noteDescription"},  "method": "click"}
-{"params": {"text": "My All day test of event details in the dashboard.", "id": "noteDescription"},  "method": "type"}
+{"params": {"id": "detailViewTitleInput"},  "method": "click"}
+{"params": {"text": "My All day test of event details in the dashboard.", "id": "detailViewTitleInput"},  "method": "type"}
 {"params": {"id": "sectionEventEnableToggle"},  "method": "check"}
 {"params": {"id": "eventAllDay"},  "method": "click"}
 {"params": {"text": "8\/06\/2007", "id": "startDate"},  "method": "type"}

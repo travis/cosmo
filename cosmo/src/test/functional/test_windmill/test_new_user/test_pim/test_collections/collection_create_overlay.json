@@ -15,9 +15,9 @@
 {"params": {"id": "hourDiv2-1230"}, "method": "doubleClick"}
 {"params": {"milliseconds": 1000}, "method": "waits.sleep"}
 {"params": {"text": "Calendar A", "id": "detailViewTitleInput"}, "method": "type"}
-{"params": {"id": "noteDescription"}, "method": "click"}
-{"params": {"text": "Testing overalys, first calendar", "id": "noteDescription"}, "method": "type"}
-{"params": {"id": "eventLocation"}, "method": "click"}
+{"params": {"id": "detailViewTitleInput"}, "method": "click"}
+{"params": {"text": "Testing overalys, first calendar", "id": "detailViewTitleInput"}, "method": "type"}
+{"params": {"id": "detailViewLocationInput"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getFirst().getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
@@ -30,9 +30,9 @@
 {"params": {"id": "hourDiv3-1230"}, "method": "doubleClick"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
 {"params": {"text": "Calendar B", "id": "detailViewTitleInput"}, "method": "type"}
-{"params": {"id": "noteDescription"}, "method": "click"}
-{"params": {"text": "Testing overalys, first calendar", "id": "noteDescription"}, "method": "type"}
-{"params": {"id": "eventLocation"}, "method": "click"}
+{"params": {"id": "detailViewTitleInput"}, "method": "click"}
+{"params": {"text": "Testing overalys, first calendar", "id": "detailViewTitleInput"}, "method": "type"}
+{"params": {"id": "detailViewLocationInput"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(1).getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 2500}, "method": "waits.sleep"}
@@ -45,9 +45,9 @@
 {"params": {"id": "hourDiv4-1230"}, "method": "doubleClick"}
 {"params": {"milliseconds": 1000}, "method": "waits.sleep"}
 {"params": {"text": "Calendar C", "id": "detailViewTitleInput"}, "method": "type"}
-{"params": {"id": "noteDescription"}, "method": "click"}
-{"params": {"text": "Testing overalys, first calendar", "id": "noteDescription"}, "method": "type"}
-{"params": {"id": "eventLocation"}, "method": "click"}
+{"params": {"id": "detailViewTitleInput"}, "method": "click"}
+{"params": {"text": "Testing overalys, first calendar", "id": "detailViewTitleInput"}, "method": "type"}
+{"params": {"id": "detailViewLocationInput"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(2).getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}

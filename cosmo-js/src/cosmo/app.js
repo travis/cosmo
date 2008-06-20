@@ -258,6 +258,8 @@ cosmo.app = new function () {
             "defaultAction": submitFunc
         };
         this.showDialog(dialogProps);
+        var getValueInput = dojo.query("#getValueInput")[0];
+        if (getValueInput) getValueInput.focus();
         if (!kwArgs.noAutoClose) deferred.addCallback(function(arg){cosmo.app.hideDialog(); return arg;});
         return deferred;
     };

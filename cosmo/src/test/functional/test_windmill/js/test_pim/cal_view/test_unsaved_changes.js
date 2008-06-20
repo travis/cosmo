@@ -23,7 +23,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Select the second event
     function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
-    { method: "type", params: { id: "noteTitle", text: "Unsaved: Click Lozenge" } },
+    { method: "type", params: { id: "detailViewTitleInput", text: "Unsaved: Click Lozenge" } },
     // Click back to the first event
     function () { doLozengeClickByRegistryIndex(0); },
     // Verify that the Unsaved Changes dialog appears
@@ -35,7 +35,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the event title didn't change
     function () {
-      var summaryText = $('noteTitle').value;
+      var summaryText = $('detailViewTitleInput').value;
       jum.assertNotEquals(summaryText, 'Unsaved: Click Lozenge');
     }
   ];
@@ -45,7 +45,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Select the second event
     function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
-    { method: "type", params: { id: "noteTitle", text: "Unsaved: Click Lozenge" } },
+    { method: "type", params: { id: "detailViewTitleInput", text: "Unsaved: Click Lozenge" } },
     // Click back to the first event
     function () { doLozengeClickByRegistryIndex(0); },
     // Verify that the Unsaved Changes dialog appears
@@ -57,7 +57,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the event title changed
     function () {
-      var summaryText = $('noteTitle').value;
+      var summaryText = $('detailViewTitleInput').value;
       jum.assertEquals(summaryText, 'Unsaved: Click Lozenge');
     }
   ];
@@ -67,7 +67,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Select the second event
     function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
-    { method: "type", params: { id: "noteTitle", text: "Unsaved: Change View" } },
+    { method: "type", params: { id: "detailViewTitleInput", text: "Unsaved: Change View" } },
     // Change to list view
     { method: "click", params: { id: "cosmoViewToggleListViewSelector" } },
     // Verify that the Unsaved Changes dialog appears
@@ -93,7 +93,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     function () { doLozengeClickByRegistryIndex(1); },
     // Verify the event title didn't change
     function () {
-      var summaryText = $('noteTitle').value;
+      var summaryText = $('detailViewTitleInput').value;
       jum.assertNotEquals(summaryText, 'Unsaved: Change View');
     }
   ];
@@ -103,7 +103,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     // Select the second event
     function () { doLozengeClickByRegistryIndex(1); },
     // Change the title
-    { method: "type", params: { id: "noteTitle", text: "Unsaved: Change View" } },
+    { method: "type", params: { id: "detailViewTitleInput", text: "Unsaved: Change View" } },
     // Change to list view
     { method: "click", params: { id: "cosmoViewToggleListViewSelector" } },
     // Verify that the Unsaved Changes dialog appears
@@ -115,7 +115,7 @@ pimTest.calView.test_unsavedChanges = new function () {
     { method: "waits.forNotElement", params: { id: "modalDialogContent" } },
     // Verify the event title changed
     function () {
-      var summaryText = $('noteTitle').value;
+      var summaryText = $('detailViewTitleInput').value;
       jum.assertEquals(summaryText, 'Unsaved: Change View');
     }
   ];

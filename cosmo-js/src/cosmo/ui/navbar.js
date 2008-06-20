@@ -381,6 +381,21 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
     this.createTextBox = null;
     this.createButton = null;
 
+    this.getValue = dojo.hitch(this, function() {
+        return this.formNode.listViewQuickItemEntry.value;
+    });
+
+    this.setValue = dojo.hitch(this, function(value) {
+        this.formNode.listViewQuickItemEntry.value = value;
+    });
+
+    this.hintText =  _('Main.NavBar.QuickItemEntryHint');
+
+    this.updateHint = dojo.hitch(this, function() {
+        if (!this.getValue() || !dojo.trim(this.getValue()))
+            cosmo.util.html.setTextInput(this.createTextBox, this.hintText, true);
+    });
+
     this.renderSelf = function () {
         // Resest processing lock on render
         isProcessing = false;
@@ -395,12 +410,10 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
             // Only create one item at a time
             if (isProcessing) { return false; }
             isProcessing = true;
-            var form = self.formNode;
-            var title = form.listViewQuickItemEntry.value;
+            var title = self.getValue();
             disableButton();
-            form.listViewQuickItemEntry.value = _('App.Status.Processing');
-            dojo.addClass(form.listViewQuickItemEntry,
-                'listViewSelectedCell');
+            self.setValue(_('App.Status.Processing'));
+            dojo.addClass(self.formNode.listViewQuickItemEntry, 'listViewSelectedCell');
             cosmo.view.list.createNoteItem(title);
         };
 
@@ -426,19 +439,19 @@ cosmo.ui.navbar.QuickItemEntry = function (p) {
         };
         var text = cosmo.util.html.createInput(o);
         // Dynamically size the quick-entry text so the
-        // page nav can fit -- max it out at 220px wide
+        // page nav can fit -- max it out at 350px wide
         var w = this.parent.width - 300;
-        w = w > 220 ? 220 : w;
+        w = w > 350 ? 350 : w;
         text.style.width = w + 'px';
         this.createTextBox = text;
-        if (writeable) {
-            var func = cosmo.util.html.handleTextInputFocus;
-            cosmo.util.html.setTextInput(text,
-                _('Main.NavBar.QuickItemEntryHint'), true);
-            dojo.connect(text, 'onfocus', func);
-        }
         form.appendChild(text);
         form.appendChild(cosmo.util.html.nbsp());
+
+        if (writeable) {
+            this.updateHint();
+            dojo.connect(text, 'onfocus', cosmo.util.html.handleTextInputFocus);
+            dojo.connect(text, 'onblur', this, 'updateHint');
+        }
 
         dojo.connect(text, 'onkeyup', function (e) {
             if (writeable && e.keyCode == 13) {

@@ -76,3 +76,6 @@
     background: #659dd3;
     color: #fff;
 }
+#goToDateButton {
+    display: none;
+}

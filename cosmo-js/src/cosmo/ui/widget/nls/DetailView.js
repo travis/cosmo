@@ -40,7 +40,7 @@
      europe: "Europe",
      indian: "Indian",
      pacific: "Pacific",
-     noTzRegion: "Region",
+     noTzRegion: "No timezone",
      noTzId: "Time zone",
      emailTitle: "Title:",
      emailTimeFormat: "%m/%d/%Y at %I:%M %p",

@@ -44,7 +44,7 @@
         <input id="${id}EndDateInput" dojoAttachPoint="endDateInput" dojoType="cosmo.ui.widget.DateHintBox" type="text" class="cosmoDetailViewEndDateInput" required="true" hintMessage="${l10n.endDate}" dojoAttachEvent="onChange: updateVisibility"></input>
         <input id="${id}EndTimeInput" dojoAttachPoint="endTimeInput" dojoType="cosmo.ui.widget.TimeHintBox" type="text" class="cosmoDetailViewEndTimeInput" hintMessage="${l10n.endTime}" dojoAttachEvent="onChange: updateVisibility"></input>
       </div>
-      <div class="cosmoDetailViewTimezoneSection">
+      <div class="cosmoDetailViewTimezoneSection" dojoAttachPoint="timezoneContainer">
         <select id="${id}TimezoneRegionSelector" dojoAttachPoint="timezoneRegionSelector" class="cosmoDetailViewTimezoneRegionSelector"
                 dojoAttachEvent="onchange: tzRegionOnChange">
           <option value="">${l10n.noTzRegion}</option>

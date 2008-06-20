@@ -254,16 +254,27 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         if (region){
             cosmo.util.html.setSelect(this.timezoneRegionSelector, region);
             cosmo.util.html.setSelectOptions(this.timezoneIdSelector, this.getTimezoneIdOptions(region));
-            this.timezoneIdSelector.disabled = false;
-        } else {
-            this.clearTimezoneSelectors();
         }
+        this.setTimezoneSelectorVisibility();
+    },
+
+    setTimezoneSelectorVisibility: function(){
+        if (this.timezoneRegionSelector.value)
+            this.showTimezoneSelectors();
+        else
+            this.clearTimezoneSelectors();
+    },
+
+    showTimezoneSelectors: function(){
+        dojo.removeClass(this.timezoneIdSelector, "cosmoDetailHidden");
+        dojo.removeClass(this.timezoneRegionSelector, "expandWidth");
     },
 
     clearTimezoneSelectors: function(){
         this.timezoneRegionSelector.value = "";
         this.timezoneIdSelector.value = "";
-        this.timezoneIdSelector.setAttribute("disabled", true);
+        dojo.addClass(this.timezoneIdSelector, "cosmoDetailHidden");
+        dojo.addClass(this.timezoneRegionSelector, "expandWidth");
     },
 
     getTimezoneIdOptions: function(region){
@@ -545,7 +556,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     getDateTime: function(dateField, timeField){
         var dateFieldValue = dateField.getValue();
         if (!dateFieldValue) return null;
-        var timeFieldValue = timeField.getValue();
+        var timeFieldValue = this.getAllDay() ? null : timeField.getValue();
         if (timeFieldValue){
             dateFieldValue.setHours(timeFieldValue.getHours(), timeFieldValue.getMinutes());
         }
@@ -639,10 +650,11 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             apply(node, "cosmoDetailHidden");
         }
         var dict = this.getEventVisibility();
+        this.setTimezoneSelectorVisibility();
+
+        setVisible(this.timezoneContainer,   dict.timezone);
         setVisible(this.startTimeInput.domNode,   dict.time);
         setVisible(this.endTimeInput.domNode,     dict.time);
-        setVisible(this.timezoneRegionSelector,   dict.timezone);
-        setVisible(this.timezoneIdSelector,       dict.timezone);
         setVisible(this.untilInput.domNode,       dict.until);
         setVisible(this.statusSelector,           dict.status);
         this.recursionCount -= 1;
@@ -697,7 +709,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     render: function(){
         if (this.item){
-            this.updateFromItem(this.item);
+//             It's actively counterproductive to update, it causes
+//             data to be lost if there have been edits.  This doesn't seem
+//             necessary, so don't do it
+//             this.updateFromItem(this.item);
         } else {
             this.clearFields();
             this.disable();
@@ -756,7 +771,9 @@ function populateDeltaAnytimeAtTime(dv, delta){
         //this is attime, so kill duration, end time
         delta.removeStampProperty("event", "endDate");
         delta.addStampProperty("event", "duration", new cosmo.model.Duration(cosmo.model.ZERO_DURATION));
-        delta.addStampProperty("event", "anyTime", false); //just in case.
+        delta.addStampProperty("event", "anyTime", false);
+    } else {
+        delta.addStampProperty("event", "anyTime", false);
     }
 }
 

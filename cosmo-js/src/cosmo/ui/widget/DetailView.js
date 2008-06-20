@@ -94,8 +94,8 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
         if (eventStamp){
-            this.enableEvent();
             this.updateFromEventStamp(eventStamp);
+            this.enableEvent();
         } else {
             this.disableEvent();
         }
@@ -340,29 +340,33 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.event? this.disableEvent() : this.enableEvent();
     },
 
-    enableEvent: function(){
+    enableEvent: function(fast){
         this.event = true;
         this.eventTitleSpan.innerHTML = this.l10n.removeFromCalendar;
-        if (!dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.showEvent();
+        if (!dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.showEvent(fast);
         this.enableEventFields();
 
     },
 
-    showEvent: function(){
+    showEvent: function(fast){
         dojo.addClass(this.eventButton, "cosmoEventButtonSelected");
-        dojo.fx.wipeIn({node: this.eventSection}).play();
+        if (!fast)
+            dojo.fx.wipeIn({node: this.eventSection}).play();
+        else this.eventSection.style.display="block";
     },
 
-    disableEvent: function(){
+    disableEvent: function(fast){
         this.event = false;
         this.eventTitleSpan.innerHTML = this.l10n.addToCalendar;
-        if (dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.hideEvent();
+        if (dojo.hasClass(this.eventButton, "cosmoEventButtonSelected")) this.hideEvent(fast);
         this.disableEventFields();
     },
 
-    hideEvent: function(){
+    hideEvent: function(fast){
         dojo.removeClass(this.eventButton, "cosmoEventButtonSelected");
-        dojo.fx.wipeOut({node: this.eventSection}).play();
+        if (!fast)
+            dojo.fx.wipeOut({node: this.eventSection}).play();
+        else this.eventSection.style.display="none";
     },
 
     setReadOnly: function(){

@@ -204,5 +204,5 @@
 }
 
 .cosmoDetailViewRecurrenceSection {
-    verical-align: middle;
+    height: 20px; /* Explicitly set to prevent FF3 from giving an extra few pixels */
 }

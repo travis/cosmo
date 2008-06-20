@@ -645,18 +645,31 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     updateVisibility: function(){
         if (this.recursionCount > 0 || this.initializing) return;
         this.recursionCount += 1;
-        function setVisible(node, visible){
-            var apply = (visible) ? dojo.removeClass : dojo.addClass;
-            apply(node, "cosmoDetailHidden");
+        function fade(node, visible){
+            function setClass(){
+                var apply = (visible) ? dojo.removeClass : dojo.addClass;
+                apply(node, "cosmoDetailHidden");
+            }
+            if (visible){
+                setClass();
+                return dojo.fadeIn({node:node});
+            } else {
+                return dojo.fadeOut({node:node, onEnd: setClass});
+            }
+            // return a dummy animation to keep dojo.fx.combine happy
+            return new dojo._Animation;
         }
+
+
         var dict = this.getEventVisibility();
         this.setTimezoneSelectorVisibility();
-
-        setVisible(this.timezoneContainer,   dict.timezone);
-        setVisible(this.startTimeInput.domNode,   dict.time);
-        setVisible(this.endTimeInput.domNode,     dict.time);
-        setVisible(this.untilInput.domNode,       dict.until);
-        setVisible(this.statusSelector,           dict.status);
+        dojo.fx.combine([
+            fade(this.timezoneContainer,        dict.timezone),
+            fade(this.startTimeInput.domNode,   dict.time),
+            fade(this.endTimeInput.domNode,     dict.time),
+            fade(this.untilInput.domNode,       dict.until),
+            fade(this.statusSelector,           dict.status)
+        ]).play();
         this.recursionCount -= 1;
     },
 

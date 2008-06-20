@@ -226,8 +226,8 @@
     width:120px;
     margin-top: -20px;
     margin-left: -60px;
-    color: #339;
-    border: 1px solid #339;
+    color: #0066FF;
+    border: 1px solid #0066FF;
     line-height: 38px;
     text-align: center;
 }
@@ -237,9 +237,9 @@
     text-align: center;
     vertical-align: middle;
     background-color: #fff;
-    border: 1px solid #339;
+    border: 1px solid #0066FF;
     position: absolute;
-    color: #339;
+    color: #0066FF;
 }
 
 #calTopNavDiv, #dayListDiv, #allDayResizeMainDiv, #timedCanvas {

@@ -219,7 +219,7 @@ td.dataDisplayLabel {
     margin-top: 24px;
 }
 .tabSelected {
-    color: #339;
+    color: #0066FF;
     border-left: 1px solid #aaa;
     border-top: 1px solid #aaa;
     border-right: 1px solid #aaa;
@@ -232,7 +232,7 @@ td.dataDisplayLabel {
     cursor: pointer;
 }
 .tabUnselected {
-    color: #339;
+    color: #0066FF;
     border-left: 1px solid #aaa;
     border-top: 1px solid #aaa;
     border-right: 1px solid #aaa;
@@ -546,19 +546,19 @@ Link styles
     margin: auto;
     text-align: center;
     font-size: 11px;
-    color: #155ecc;
+    color: black;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
-    height: 19px;
-    padding: 0 0 2px 0;
+    height: 20px;
+    padding: 0 0 3px 0;
     cursor: pointer;
     background-image: url(images/button_bgs.png);
     background-repeat: repeat-x;
     background-position: 0px 0px;
 }
-.btnElemMouseover {
-    color: #104698;
+
+.btnElemMouseover, .dijitButtonHover .dijitButtonNode {
     background-position: 0px -19px;
 }
 .btnElemMousedown {
@@ -576,19 +576,18 @@ Link styles
     margin: auto;
     text-align: center;
     font-size: 9px;
-    color: #339;
+    color: black;
     border-style: solid;
     border-color: #ccc #777 #777 #ccc;
     border-width: 1px;
-    height: 16px;
+    height: 18px;
     padding: 0 0 1px 0;
     cursor: pointer;
     background-image: url(images/button_bgs.png);
     background-repeat: repeat-x;
     background-position: 0px -2px;
 }
-.btnElemMouseoverSm {
-    color: #3333aa;
+.btnElemMouseoverSm{
     background-position: 0px -21px;
 }
 .btnElemMousedownSm {
@@ -658,7 +657,7 @@ div.authBoxRecoverPassword {
 #menuNavItems {
 position: absolute;
     width: 100%;
-    color: #333333;
+    color: black;
     font-size: 11px;
     font-weight: bold;
     text-align: right;

@@ -49,7 +49,7 @@ cosmo.view.loading.StatusMessage = function (p) {
         dojo.fadeIn({node: this.domNode, duration: 1}).play();
     };
     this.hide = function (duration) {
-        dojo.fadeOut({node: this.domNode, 
+        dojo.fadeOut({node: this.domNode,
                       duration: duration || 500,
                       onEnd: dojo.hitch(this, function () {
                           cosmo.view.loading.statusProcessing = false;
@@ -58,7 +58,7 @@ cosmo.view.loading.StatusMessage = function (p) {
                      }).play();
     };
 
-    dojo.subscribe('cosmo:calEventsLoadSuccess', 
+    dojo.subscribe('cosmo:calEventsLoadSuccess',
                    dojo.hitch(this, function(){this.hide()}));
 };
 

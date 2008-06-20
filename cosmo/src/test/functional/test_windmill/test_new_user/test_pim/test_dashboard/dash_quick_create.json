@@ -17,7 +17,7 @@
 {"params": {"text": "08\/06\/2007", "id": "detailViewEndDateInput"},  "method": "type"}
 {"params": {"text": "5:00 PM", "id": "detailViewEndTimeInput"},  "method": "type"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"option": "Tentative", "id": "eventStatus"},  "method": "select"}
+{"params": {"option": "Tentative", "id": "detailViewStatusSelector"},  "method": "select"}
 {"params": {"id": "detailViewStarButton"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}

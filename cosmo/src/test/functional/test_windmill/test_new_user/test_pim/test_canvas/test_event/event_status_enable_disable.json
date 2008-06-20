@@ -9,7 +9,7 @@
 {"params": {"text": "9:00 AM", "id": "detailViewEndTimeInput"},  "method": "type"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}
 
-//ensure that eventStatus is disabled (as it should be for @time)
+//ensure that detailViewStatusSelector is disabled (as it should be for @time)
 {"params": {"validator": "disabled|true", "id": "detailViewStatusSelector"},  "method": "asserts.assertProperty"}
 
 //make the event all day

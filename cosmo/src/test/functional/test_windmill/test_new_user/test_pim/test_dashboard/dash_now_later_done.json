@@ -4,9 +4,9 @@
 {"params": {"text": "another test", "id": "listViewQuickItemEntry"},  "method": "type"}
 {"params": {"jsid": "{$quickCreateButton}"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "triageButtonLater"},  "method": "click"}
+{"params": {"id": "detailViewLaterButton"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "triageButtonDone"},  "method": "click"}
+{"params": {"id": "detailViewDoneButton"},  "method": "click"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"id": "detailViewStarButton"},  "method": "click"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}

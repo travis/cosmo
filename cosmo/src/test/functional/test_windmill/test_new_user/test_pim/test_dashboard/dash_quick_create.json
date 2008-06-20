@@ -11,16 +11,13 @@
 {"params": {"milliseconds": "5000"},  "method": "waits.sleep"}
 {"params": {"id": "detailViewLocationInput"},  "method": "click"}
 {"params": {"text": "Adams house", "id": "detailViewLocationInput"},  "method": "type"}
-{"params": {"text": "08\/06\/2007", "id": "startDate"},  "method": "type"}
-{"params": {"text": "12:00", "id": "startTime"},  "method": "type"}
-{"params": {"id": "startMeridianAM"},  "method": "radio"}
+{"params": {"text": "08\/06\/2007", "id": "detailViewStartDateInput"},  "method": "type"}
+{"params": {"text": "12:00 AM", "id": "detailViewStartTimeInput"},  "method": "type"}
 {"params": {"milliseconds": "5000"},  "method": "waits.sleep"}
-{"params": {"text": "08\/06\/2007", "id": "endDate"},  "method": "type"}
-{"params": {"text": "5:00", "id": "endTime"},  "method": "type"}
-{"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
-{"params": {"id": "endMeridianPM"},  "method": "radio"}
+{"params": {"text": "08\/06\/2007", "id": "detailViewEndDateInput"},  "method": "type"}
+{"params": {"text": "5:00 PM", "id": "detailViewEndTimeInput"},  "method": "type"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"option": "Tentative", "id": "eventStatus"},  "method": "select"}
-{"params": {"id": "sectionTaskEnableToggle"},  "method": "check"}
+{"params": {"id": "detailViewStarbutton"},  "method": "check"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}

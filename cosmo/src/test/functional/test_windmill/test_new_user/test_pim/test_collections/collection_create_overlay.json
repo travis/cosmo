@@ -6,7 +6,7 @@
 
 {"params": {"id": "cosmoViewToggleCalViewSelector"}, "method": "click"}
 {"params": {"timeout": 40000, "id": "_month0_day28"}, "method": "waits.forElement"}
-{"params": {"id": "newCollectionLink"}, "method": "click"}
+{"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
 {"params": {"text": "a", "id": "getValueInput"}, "method": "type"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"milliseconds": 5000}, "method": "waits.sleep"}
@@ -21,7 +21,7 @@
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getFirst().getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
-{"params": {"id": "newCollectionLink"}, "method": "click"}
+{"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
 {"params": {"text": "b", "id": "getValueInput"}, "method": "type"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"milliseconds": 2500}, "method": "waits.sleep"}
@@ -36,7 +36,7 @@
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(1).getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 2500}, "method": "waits.sleep"}
-{"params": {"id": "newCollectionLink"}, "method": "click"}
+{"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
 {"params": {"text": "c", "id": "getValueInput"}, "method": "type"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}
 {"params": {"milliseconds": 5000}, "method": "waits.sleep"}

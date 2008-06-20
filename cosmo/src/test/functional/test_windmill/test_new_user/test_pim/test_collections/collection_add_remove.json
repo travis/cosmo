@@ -1,4 +1,4 @@
-{"params": {"id": "newCollectionLink"}, "method": "click"}
+{"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
 {"params": {"id": "getValueInput"}, "method": "click"}
 {"params": {"text": "zeus", "id": "getValueInput"}, "method": "type"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}

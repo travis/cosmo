@@ -5,8 +5,8 @@
 {"params": {"jsid": "{$quickCreateButton}"},  "method": "click"}
 {"params": {"id": "detailViewTitleInput"},  "method": "click"}
 {"params": {"text": "My All day test of event details in the dashboard.", "id": "detailViewTitleInput"},  "method": "type"}
-{"params": {"id": "sectionEventEnableToggle"},  "method": "check"}
-{"params": {"id": "eventAllDay"},  "method": "click"}
+{"params": {"id": "detailViewEventButton"},  "method": "click"}
+{"params": {"id": "detailViewAllDayInput"},  "method": "click"}
 {"params": {"text": "8\/06\/2007", "id": "detailViewStartDateInput"},  "method": "type"}
 {"params": {"text": "8\/06\/2007", "id": "detailViewEndDateInput"},  "method": "type"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}

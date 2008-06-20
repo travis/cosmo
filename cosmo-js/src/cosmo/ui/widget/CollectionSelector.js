@@ -32,17 +32,18 @@ function getRGB(h, s, v){
     return 'rgb(' + rgb.join() + ')';
 }
 
-var collectionNameMarkup = "<div id='collectionSelectorItemSel_${uid}' dojoAttachPoint='nameCell' dojoAttachEvent='onmouseover: handleNameMouseOver, onmouseout: handleNameMouseOut, onclick: handleSelectionClick' class='collectionSelectorCollectionName'>${displayName}</div>";
+var collectionNameMarkup = "<div id='collectionSelectorItemSel_${uid}' dojoAttachPoint='nameCell' class='collectionSelectorCollectionName'>${displayName}</div>";
 var collectionDropdownMarkup = "<div dojoAttachPoint='dropdown' dojoAttachEvent='onclick: handleDropdownClick, onmouseover: handleDropdownMouseOver, onmouseout: handleDropdownMouseOut' id='collectionSelectorItemDetails_${uid}' class='collectionSelectorDetails' style='background-color: ${defaultHueString}'><div class='cosmoCollectionDetails'></div></div>";
+var selectorAttachEvents = " dojoAttachEvent='onmouseover: handleNameMouseOver, onmouseout: handleNameMouseOut, onclick: handleSelectionClick' ";
 dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
 {
-    templateString: "<div class='cosmoCollectionSelectorSection'>" + collectionNameMarkup + collectionDropdownMarkup + "</div>",
+    templateString: "<div class='cosmoCollectionSelectorSection' " + selectorAttachEvents + ">" + collectionNameMarkup + collectionDropdownMarkup + "</div>",
     hue: null,
     collection: null,
     store: null,
 
-    selectionSubscription: null,
     nameCell: null,
+    selectionSubscription: null,
     dropdown: null,
 
     constructor: function(){
@@ -78,10 +79,10 @@ dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
     handleSelectionChanged: function(selection){
         if (selection != this.collection){
             this.collection.doDisplay = false;
-            dojo.removeClass(this.nameCell, "collectionSelectorSel");
+            dojo.removeClass(this.domNode, "collectionSelectorSel");
         } else {
             this.collection.doDisplay = true;
-            dojo.addClass(this.nameCell, "collectionSelectorSel");
+            dojo.addClass(this.domNode, "collectionSelectorSel");
         }
     },
 
@@ -94,11 +95,11 @@ dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
     },
 
     handleNameMouseOver: function(e){
-        dojo.addClass(e.target, "mouseoverItem");
+        dojo.addClass(this.domNode, "mouseoverItem");
     },
 
     handleNameMouseOut: function(e){
-        dojo.removeClass(e.target, "mouseoverItem");
+        dojo.removeClass(this.domNode, "mouseoverItem");
     },
 
     handleSelectionClick: function(){
@@ -122,19 +123,19 @@ var collectionCheckboxMarkup = "<div class='collectionSelectorCheckbox'><input t
 
 dojo.declare("cosmo.ui.widget._CalViewSelector", cosmo.ui.widget._BaseSelector,
 {
-    templateString: "<div class='cosmoCollectionSelectorSection cosmoCollectionSelectorCalSelect'>" + collectionCheckboxMarkup + collectionNameMarkup + collectionDropdownMarkup + "</div>",
+    templateString: "<div class='cosmoCollectionSelectorSection cosmoCollectionSelectorCalSelect' " + selectorAttachEvents + ">" + collectionCheckboxMarkup + collectionNameMarkup + collectionDropdownMarkup + "</div>",
     postMixInProperties: function(){
         this.inherited("postMixInProperties", arguments);
         this.checkedAttribute = this.collection.isOverlaid? "checked='checked'" : "";
     },
     handleSelectionChanged: function(selection, store){
         if (selection != this.collection){
-            dojo.removeClass(this.nameCell, "collectionSelectorSel");
+            dojo.removeClass(this.domNode, "collectionSelectorSel");
             if (!this.collection.isOverlaid)
                 this.collection.doDisplay = false;
         } else {
             this.collection.doDisplay = true;
-            dojo.addClass(this.nameCell, "collectionSelectorSel");
+            dojo.addClass(this.domNode, "collectionSelectorSel");
         }
 
     },
@@ -148,7 +149,7 @@ dojo.declare("cosmo.ui.widget._CalViewSelector", cosmo.ui.widget._BaseSelector,
 
 dojo.declare("cosmo.ui.widget._ListViewSelector", cosmo.ui.widget._BaseSelector,
 {
-    templateString: "<div class='cosmoCollectionSelectorSection cosmoCollectionSelectorListSelect'>" + collectionNameMarkup + collectionDropdownMarkup + "</div>"
+    templateString: "<div class='cosmoCollectionSelectorSection cosmoCollectionSelectorListSelect'  " + selectorAttachEvents + ">" + collectionNameMarkup + collectionDropdownMarkup + "</div>"
 });
 
 dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templated, cosmo.ui.ContentBox],

@@ -27,10 +27,10 @@
 
       <div id="${id}TitleInput" dojoAttachPoint="titleInput" dojoType="cosmo.ui.widget.HintBox" class="cosmoDetailViewTitleInput cosmoDetailViewWideBox" hintMessage="${l10n.title}"></div>
 
-    <div class="cosmoDetailViewEventTitleBar">
+    <div class="cosmoDetailViewEventTitleBar" dojoAttachEvent="onclick: eventButtonOnClick">
       <span id="${id}EventTitle" dojoAttachPoint="eventTitleSpan" class="cosmoDetailViewEventTitle"></span>
       <span id="${id}EventButton" dojoAttachPoint="eventButton" class="cosmoDetailViewEventButton cosmoEventButtonDefault"
-            dojoAttachEvent="onclick: eventButtonOnClick"></span>
+></span>
     </div>
     <div class="cosmoDetailViewEventSection" dojoAttachPoint="eventSection">
       <input id="${id}LocationInput" dojoAttachPoint="locationInput" dojoType="cosmo.ui.widget.HintBox" type="text" class="cosmoDetailViewLocationInput cosmoDetailViewWideBox" hintMessage="${l10n.location}"></input>

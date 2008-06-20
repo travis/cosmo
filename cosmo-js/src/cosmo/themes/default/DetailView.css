@@ -112,11 +112,15 @@
     padding-left: 5px;
     margin-top: 5px;
 }
+.cosmoDetailViewEventTitleBar, #detailViewTriageButtons, #detailViewStarButton, #detailViewMailButton{
+    cursor: pointer;
+}
 .cosmoDetailViewEventTitle{
     font-weight: bold;
     line-height: 18px;
     font-size: 10px;
     vertical-align: middle;
+    color: #0066FF !important;
 }
 
 .cosmoDetailViewStartDateInput, .cosmoDetailViewEndDateInput{

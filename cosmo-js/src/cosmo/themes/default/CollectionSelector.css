@@ -34,8 +34,9 @@
     color: #fff;
 }
 
-.cosmoCollectionSelectorSection .mouseoverItem {
+#collectionSelectorContainer .mouseoverItem {
     background-color: #e0e0e0 !important;
+    color: black;
 }
 
 .collectionSelectorDetails {

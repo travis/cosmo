@@ -38,6 +38,8 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     widgetsInTemplate: true,
 
     initItem: null,
+    initializing: false,
+    recursionCount: 0,
 
     // Attach points
     triageButtons: null,
@@ -85,6 +87,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
     },
 
     updateFromItem: function(item){
+        this.initializing = true;
         this.enable();
         this.titleInput.setValue(item.getDisplayName());
         this.notesInput.setValue(item.getBody());
@@ -100,6 +103,8 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         else this.setUnstarred();
         this.item = item;
         if (!cosmo.app.pim.getSelectedCollectionWriteable()) this.setReadOnly();
+        this.initializing = false;
+        this.updateVisibility();
     },
 
     disable: function(){
@@ -232,19 +237,6 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
 
     updateAllDay: function(allDay){
         this.allDayInput.setValue(allDay);
-        if (allDay){
-            this.clearTimezoneSelectors();
-            this.timezoneRegionSelector.setAttribute("disabled", true);
-            this.timezoneIdSelector.setAttribute("disabled", true);
-            this.startTimeInput.setValue(null);
-            this.endTimeInput.setValue(null);
-            this.startTimeInput.setAttribute("disabled", true);
-            this.endTimeInput.setAttribute("disabled", true);
-        } else {
-            this.timezoneRegionSelector.disabled = false;
-            this.startTimeInput.setAttribute("disabled", false);
-            this.endTimeInput.setAttribute("disabled", false);
-        }
     },
 
     updateFromTimezone: function(tz){
@@ -399,10 +391,7 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         if (frequency == "once") this.updateFromRecurrenceRule(null);
         else if (frequency == "custom") {/*TODO??*/}
         else this.updateFromRrule(new cosmo.model.RecurrenceRule({frequency: frequency}));
-    },
-
-    allDayOnChange: function(value){
-        this.updateAllDay(value);
+        this.updateVisibility();
     },
 
     eventButtonOnClick: function(){
@@ -590,6 +579,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         return this.allDayInput.checked;
     },
 
+    getAnyTime: function(){
+        return !this.getAllDay() && !this.startTimeInput.getValue() && !this.endTimeInput.getValue();
+    },
+
     getRrule: function(){
         var frequencyFieldValue = this.recurrenceSelector.value;
         var endDateFieldValue = this.untilInput.getValue();
@@ -610,6 +603,45 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
                 frequency: frequencyFieldValue,
                 endDate: endDate});
         }
+    },
+
+    getEventVisibility: function(){
+        /* Return a dictionary, keys are event related fields, values are
+         * true if the field should be visible/set in deltas.
+         */
+        var dict = {timezone: false, status: false, until: false, time: false};
+        if (this.isEvent()){
+            if (this.recurrenceSelector.value != 'once')
+                dict.until = true;
+            if (this.getAllDay())
+                dict.status = true;
+            else {
+                dict.time = true;
+                if (!this.getAnyTime()) {
+                    dict.timezone = true;
+                    if (!this.getStartDateTime().equals(this.getEndDateTime()))
+                        dict.status = true;
+                }
+            }
+        }
+        return dict;
+    },
+
+    updateVisibility: function(){
+        if (this.recursionCount > 0 || this.initializing) return;
+        this.recursionCount += 1;
+        function setVisible(node, visible){
+            var apply = (visible) ? dojo.removeClass : dojo.addClass;
+            apply(node, "cosmoDetailHidden");
+        }
+        var dict = this.getEventVisibility();
+        setVisible(this.startTimeInput.domNode,   dict.time);
+        setVisible(this.endTimeInput.domNode,     dict.time);
+        setVisible(this.timezoneRegionSelector,   dict.timezone);
+        setVisible(this.timezoneIdSelector,       dict.timezone);
+        setVisible(this.untilInput.domNode,       dict.until);
+        setVisible(this.statusSelector,           dict.status);
+        this.recursionCount -= 1;
     },
 
     isEvent: function(){
@@ -713,7 +745,7 @@ function populateDeltaEventFields(dv, delta){
 function populateDeltaAnytimeAtTime(dv, delta){
     if (dv.getAllDay()){
         delta.addStampProperty("event", "anyTime", false);
-    } else if (!dv.startTimeInput.getValue() && !dv.endTimeInput.getValue()){
+    } else if (dv.getAnyTime()){
         delta.addStampProperty("event", "anyTime", true);
     } else if (!dv.endTimeInput.getValue() || dv.getStartDateTime().equals(dv.getEndDateTime())){
         //this is attime, so kill duration, end time

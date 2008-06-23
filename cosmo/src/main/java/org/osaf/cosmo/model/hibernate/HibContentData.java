@@ -85,14 +85,5 @@ public class HibContentData extends BaseModelObject {
             return content.getLength();
         else
             return -1;
-    }
-
-    private BufferedContent getContent() {
-        return content;
-    }
-
-    private void setContent(BufferedContent content) {
-        this.content = content;
-    }
-    
+    } 
 }

@@ -51,12 +51,12 @@ dojo.declare(
             return err;
         },
 
-        _handleError: function(msg){
-            this._showErr(msg);
+        _handleError: function(err){
+            this._showErr(err.message);
             if (!this.noRetry){
                 this.passwordInput.value = '';
             } else {
-                this.deferred.errback(msg);
+                this.deferred.errback(err);
             }
         },
 

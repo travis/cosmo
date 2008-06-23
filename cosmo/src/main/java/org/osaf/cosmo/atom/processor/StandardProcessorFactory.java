@@ -75,8 +75,6 @@ public class StandardProcessorFactory
                 return new EimmlProcessor(entityFactory);
             if (type.equals(MEDIA_TYPE_XHTML))
                 return new HCalendarProcessor(entityFactory);
-            if (type.equals(MEDIA_TYPE_XHTML))
-                return new HCalendarProcessor(entityFactory);
         }
         throw new UnsupportedContentTypeException(type);
     }

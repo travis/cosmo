@@ -11,7 +11,7 @@ dojo.require("cosmo.convenience");
 dojo.require("cosmo.account.login");
 
 dojo.declare(
-    "cosmo.ui.widget.AuthBox", 
+    "cosmo.ui.widget.AuthBox",
     [dijit._Widget, dijit._Templated],
     {
         templateString: '<span></span>',
@@ -22,7 +22,7 @@ dojo.declare(
         passwordLabel: _("Login.Password"),
         // Clients can pass a subscription
         // that will be passed to the signup
-        // dialog if users decide to create a new 
+        // dialog if users decide to create a new
         // account instead of log in.
         subscription: null,
 
@@ -142,7 +142,7 @@ dojo.declare(
             var recoverPasswordDiv = _createElem("div");
             recoverPasswordDiv.className = "authBoxRecoverPassword";
             this.domNode.appendChild(recoverPasswordDiv);
-            recoverPasswordDiv.innerHTML = [_("Login.Forgot"), "<a href=", cosmo.env.getFullUrl("ForgotPassword"), 
+            recoverPasswordDiv.innerHTML = [_("Login.Forgot"), "<a href=", cosmo.env.getFullUrl("ForgotPassword"),
                                             " target=\"_blank\"> ", _("Login.ClickHere"), "</a>"].join("");
 
             // Sign up link
@@ -152,7 +152,7 @@ dojo.declare(
 
             var signupLink = _createElem("a");
             signupLink.appendChild(_createText(_("AuthBox.CreateClickHere")));
-            dojo.connect(signupLink, "onclick",  
+            dojo.connect(signupLink, "onclick",
                                dojo.hitch(this, function(){
                                    cosmo.account.create.showForm(this.subscription);
                                    return false;
@@ -161,7 +161,7 @@ dojo.declare(
             signupLinkDiv.appendChild(signupLink);
             this.domNode.appendChild(signupLinkDiv);
         },
-        
+
         constructor: function(){
             this.deferred = new dojo.Deferred();
         }
@@ -170,22 +170,22 @@ dojo.declare(
 
 
 cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) {
-    var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init')
+    var initPrompt = authAction.authInitPrompt || _('Login.Prompt.Init');
 
     var c = new cosmo.ui.widget.AuthBox({
-        'authAction': authAction, 
-        'subscription': authAction.subscription })
+        'authAction': authAction,
+        'subscription': authAction.subscription});
 
-    var cancelButton = new cosmo.ui.widget.Button({
-        text: _("App.Button.Cancel"),
+    var cancelButton = new dijit.form.Button({
+        label: _("App.Button.Cancel"),
         width: '60px',
-        handleOnClick: cosmo.app.hideDialog,
+        onClick: cosmo.app.hideDialog,
         small: true });
 
-    var submitButton = new cosmo.ui.widget.Button({
-        text: _("App.Button.Submit"),
+    var submitButton = new dijit.form.Button({
+        label: _("App.Button.Submit"),
         width: '60px',
-        handleOnClick: function () { c.doAuth.apply(c) },
+        onClick: function () { c.doAuth.apply(c); },
         small: true });
 
     return {prompt: initPrompt,
@@ -195,5 +195,5 @@ cosmo.ui.widget.AuthBox.getInitProperties = function ( /* Object */ authAction) 
             btnsLeft: [cancelButton],
             btnsRight: [submitButton],
             deferred: c.deferred,
-            defaultAction: function () { c.doAuth.apply(c) } };
+            defaultAction: function () { c.doAuth.apply(c); } };
 };

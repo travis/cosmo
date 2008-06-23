@@ -49,7 +49,7 @@ cosmo.view.list.columnOrder = ['TASK', 'TITLE', 'WHO', 'START', 'TRIAGE'];
 // Note: the 'display' prop is used either as the key for the localized
 // string, or as the key for the image icon in imagegrid.js
 cosmo.view.list.columns = {
-    TASK: { name: 'task', width: '20px', display: 'taskColumn', isIcon: true, initSort: 'Asc' },
+    TASK: { name: 'task', width: '22px', display: 'taskColumn', isIcon: true, initSort: 'Asc' },
     TITLE: { name: 'title', width: '50%', display: 'Title', isIcon: false, initSort: 'Asc', gutter: true },
     WHO: { name: 'who', width: '20%', display: 'UpdatedBy', isIcon: false, initSort: 'Asc', gutter: true },
     START: { name: 'start', width: '30%', display: 'StartsOn', isIcon: false, initSort: 'Desc', gutter: true },

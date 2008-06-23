@@ -36,6 +36,7 @@ tr > .listViewHeaderCell:last-child {
 }
 .listViewHeaderCellSelLit {
     background-position: 0px -60px;
+    color: white;
 }
 .listViewDataCell {
     height: 20px;

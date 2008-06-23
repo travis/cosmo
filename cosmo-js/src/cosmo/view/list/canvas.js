@@ -100,7 +100,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
         this.itemsPerPage = parseInt((this.height - 15) / 21);
         this.initListProps();
         this.displayListViewTable();
-    }
+    };
     this.handleMouseOver = function (e) {
         // Avoid DOM-event/DOM-node contention problems in Safari
         // Just forego the purty rollovers
@@ -114,13 +114,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
             while (!targ.id) { targ = targ.parentNode; }
             if (targ.id == 'body') { return false; }
             if (targ.id.indexOf('Header') > -1) {
-                if (targ.className.indexOf('Sel') > -1) {
-                    dojo.removeClass(targ, 'listViewHeaderCellSelLit');
-                    dojo.addClass(targ, 'listViewHeaderCellSel');
-                }
-                else {
-                    dojo.addClass(targ, 'listViewHeaderCellLit');
-                }
             }
             else {
                 if (targ.id ==  'listView_item' +
@@ -143,13 +136,6 @@ cosmo.view.list.canvas.Canvas = function (p) {
             while (!targ.id) { targ = targ.parentNode; }
             if (targ.id == 'body') { return false; }
             if (targ.id.indexOf('Header') > -1) {
-                if (targ.className.indexOf('Sel') > -1) {
-                    dojo.removeClass(targ, 'listViewHeaderCellSel');
-                    dojo.addClass(targ, 'listViewHeaderCellSelLit');
-                }
-                else {
-                  dojo.removeClass(targ, 'listViewHeaderCellLit');
-                }
             }
             else {
                 var ch = targ.childNodes;
@@ -359,7 +345,7 @@ cosmo.view.list.canvas.Canvas = function (p) {
             r += '<td id="listView_' + col.name +
                 'Header" class="listViewHeaderCell';
             if (isSelected) {
-                r += ' listViewHeaderCellSel';
+                r += ' listViewHeaderCellSelLit';
             }
             r += '"';
             if (colStyle) {

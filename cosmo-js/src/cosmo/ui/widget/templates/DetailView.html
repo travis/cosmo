@@ -37,8 +37,8 @@
       <div class="cosmoDetailViewAllDaySection"><input id="${id}AllDayInput" dojoAttachPoint="allDayInput" dojotype="dijit.form.CheckBox"
            name="allDay" type="checkbox" dojoAttachEvent="onChange: updateVisibility"></input> ${l10n.allDay}</div>
       <div class="cosmoDetailViewStartSection cosmoDetailViewDateTimeSection">
-        <input id="${id}StartDateInput" selector="date" dojoAttachPoint="startDateInput" dojoType="cosmo.ui.widget.DateHintBox" type="text" class="cosmoDetailViewStartDateInput" required="true" hintMessage="${l10n.startDate}" dojoAttachEvent="onChange: updateVisibility"></input>
-        <input id="${id}StartTimeInput" selector="time" dojoAttachPoint="startTimeInput" dojoType="cosmo.ui.widget.TimeHintBox" type="text" class="cosmoDetailViewStartTimeInput" hintMessage="${l10n.startTime}" dojoAttachEvent="onChange: updateVisibility"></input>
+        <input id="${id}StartDateInput" selector="date" dojoAttachPoint="startDateInput" dojoType="cosmo.ui.widget.DateHintBox" type="text" class="cosmoDetailViewStartDateInput" required="true" hintMessage="${l10n.startDate}" dojoAttachEvent="onChange: updateStartDate"></input>
+        <input id="${id}StartTimeInput" selector="time" dojoAttachPoint="startTimeInput" dojoType="cosmo.ui.widget.TimeHintBox" type="text" class="cosmoDetailViewStartTimeInput" hintMessage="${l10n.startTime}" dojoAttachEvent="onChange: updateStartTime"></input>
       </div>
       <div class="cosmoDetailViewEndSection cosmoDetailViewDateTimeSection">
         <input id="${id}EndDateInput" dojoAttachPoint="endDateInput" dojoType="cosmo.ui.widget.DateHintBox" type="text" class="cosmoDetailViewEndDateInput" required="true" hintMessage="${l10n.endDate}" dojoAttachEvent="onChange: updateVisibility"></input>

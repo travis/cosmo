@@ -682,6 +682,18 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.recursionCount -= 1;
     },
 
+    updateStartDate: function(){
+        if (!this.endDateInput.getValue())
+            this.endDateInput.setValue(this.startDateInput.getValue());
+        this.updateVisibility();
+    },
+
+    updateStartTime: function(){
+        if (!this.endTimeInput.getValue())
+            this.endTimeInput.setValue(this.startTimeInput.getValue());
+        this.updateVisibility();
+    },
+
     isEvent: function(){
         return this.event;
     },

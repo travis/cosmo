@@ -125,6 +125,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
     },
 
     getDashboardItems: function(item, kwArgs){
+        kwArgs = kwArgs || {};
         var transportFunc = "";
         if (item instanceof cosmo.model.Collection ||
             item instanceof cosmo.model.Subscription){
@@ -137,7 +138,7 @@ dojo.declare("cosmo.service.conduits.Conduit", null, {
         } else {
             throw new Error("Can not get dashboard items for " + item);
         }
-        var deferred = this._transport[transportFunc](item, {projection: "/dashboard/eim-json"}, kwArgs);
+        var deferred = this._transport[transportFunc](item, dojo.mixin({projection: "/dashboard/eim-json"}, kwArgs.searchCrit), kwArgs);
         this._addTranslation(deferred, "translateGetItems");
 
         return deferred;

@@ -98,7 +98,7 @@ cosmo.view.list.loadItems = function (o) {
     // the entire collection
     //
     if (cosmo.app.pim.getSelectedCollection()) {
-        deferred = cosmo.app.pim.serv.getDashboardItems(note || collection);
+        deferred = cosmo.app.pim.serv.getDashboardItems(note || collection, opts);
     }
     // User has no collections
     // Create a dummy Deferred with an empty item list

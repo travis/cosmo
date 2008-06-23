@@ -296,14 +296,16 @@ dojo.declare("cosmo.service.transport.Atom", cosmo.service.transport.Rest, {
     },
 
     _generateSearchQuery: function(/*Object*/searchCrit){
-        var ret = {};
+        var ret = dojo.clone(searchCrit) || {};
         if (!searchCrit) return ret;
+        if (searchCrit.projection) delete ret.projection;
         if (searchCrit.start) {
             ret["start"] = dojo.date.stamp.toISOString(searchCrit.start);
         }
         if (searchCrit.end) {
             ret["end"] = dojo.date.stamp.toISOString(searchCrit.end);
         }
+
         return ret;
     }
 });

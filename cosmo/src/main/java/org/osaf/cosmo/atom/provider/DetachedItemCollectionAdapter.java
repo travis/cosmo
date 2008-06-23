@@ -127,12 +127,12 @@ public class DetachedItemCollectionAdapter extends ItemCollectionAdapter {
 
     @Override
     public ResponseContext deleteEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     @Override
     public ResponseContext putEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext putMedia(RequestContext request) {
@@ -140,11 +140,11 @@ public class DetachedItemCollectionAdapter extends ItemCollectionAdapter {
     }
   
     public ResponseContext getFeed(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext getMedia(RequestContext request) {
@@ -157,17 +157,17 @@ public class DetachedItemCollectionAdapter extends ItemCollectionAdapter {
   
     @Override
     public ResponseContext postMedia(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedProvider methods
 
     public ResponseContext postCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext putCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     // our methods

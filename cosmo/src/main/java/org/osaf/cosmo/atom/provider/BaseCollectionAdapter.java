@@ -301,15 +301,6 @@ public abstract class BaseCollectionAdapter extends AbstractCollectionAdapter
     protected ResponseContext insufficientPrivileges(RequestContext request, AtomException e) {
         return returnBase(e.createDocument(request.getAbdera()), e.getCode(), null, request.getAbdera());
     }
-
-    protected ResponseContext methodnotallowed(RequestContext request,
-                                               String[] methods) {
-        BaseResponseContext<Base> resp = (BaseResponseContext)
-            ProviderHelper.createErrorResponse(request.getAbdera(), 405, "Method Not Allowed",null);
-                       
-        resp.setAllow(methods);
-        return resp;
-    }
   
     protected AbstractResponseContext
         createResponseContext(int status) {

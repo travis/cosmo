@@ -175,15 +175,15 @@ public class TicketsCollectionAdapter extends BaseCollectionAdapter
     // ExtendedProvider methods
 
     public ResponseContext putCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext postCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext deleteCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     // our methods

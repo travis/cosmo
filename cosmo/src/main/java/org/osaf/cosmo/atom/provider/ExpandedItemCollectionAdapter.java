@@ -39,22 +39,22 @@ public class ExpandedItemCollectionAdapter extends ItemCollectionAdapter {
     // Provider methods
     @Override
     public ResponseContext putEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     @Override
     public ResponseContext deleteEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
     @Override
     public ResponseContext postEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     @Override
     public ResponseContext putMedia(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext getFeed(RequestContext request) {
@@ -88,7 +88,7 @@ public class ExpandedItemCollectionAdapter extends ItemCollectionAdapter {
     }
 
     public ResponseContext getEntry(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext getMedia(RequestContext request) {
@@ -100,16 +100,16 @@ public class ExpandedItemCollectionAdapter extends ItemCollectionAdapter {
     }
   
     public ResponseContext entryPost(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
   
     public ResponseContext mediaPost(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedCollectionAdapter methods
     @Override
     public ResponseContext postCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 }

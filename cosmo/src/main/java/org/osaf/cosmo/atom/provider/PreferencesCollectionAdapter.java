@@ -213,21 +213,21 @@ public class PreferencesCollectionAdapter extends BaseCollectionAdapter
     }
   
     public ResponseContext postMedia(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_ENTRY_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_ENTRY_METHODS);
     }
 
     // ExtendedCollectionAdapter methods
 
     public ResponseContext putCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext postCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     public ResponseContext deleteCollection(RequestContext request) {
-        return methodnotallowed(request, ALLOWED_COLL_METHODS);
+        return ProviderHelper.notallowed(request, ALLOWED_COLL_METHODS);
     }
 
     // our methods

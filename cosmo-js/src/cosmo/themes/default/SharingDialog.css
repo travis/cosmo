@@ -35,10 +35,15 @@
     font-size: 1.1em;
     font-weight: bold;
     float: left;
+    width: 128px;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .cosmoSharingHtmlLink{
     text-decoration: none;
     float: right;
+    width: 25px;
 }
 h2.cosmoSharingSectionHead {
     margin-top: 15px;

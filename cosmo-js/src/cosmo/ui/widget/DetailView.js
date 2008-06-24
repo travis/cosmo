@@ -106,7 +106,11 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         if(item.getTaskStamp()) this.setStarred();
         else this.setUnstarred();
         this.item = item;
-        if (!cosmo.app.pim.getSelectedCollectionWriteable()) this.setReadOnly();
+        if (cosmo.app.pim.getSelectedCollectionWriteable())
+            this.setReadWrite();
+        else
+            this.setReadOnly();
+
         this.initializing = false;
         this.updateVisibility();
     },

@@ -423,3 +423,9 @@
 #quickEntryCreate {
     display: none;
 }
+
+.dijitDialogUnderlay {
+    opacity: 0.2;
+    filter: alpha(opacity=20);
+    background: black;
+}

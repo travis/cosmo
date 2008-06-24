@@ -1,6 +1,11 @@
-<div class="cosmoSharingDialog">
+<div class="cosmoSharingDialog ${baseClass}">
   <div class="cosmoSharingDialogForm">
-  <div class="cosmoSharingTopDiv"><span class="cosmoSharingDisplayName" id="${id}DisplayName" title="${l10n.displayNameTitle}" dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" dojoAttachPoint="displayName">${displayName}</span><a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
+  <div class="cosmoSharingTopDiv">
+    <span class="cosmoSharingDisplayName" id="${id}DisplayName" title="${l10n.displayNameTitle}" 
+          dojoType="dijit.InlineEditBox" dojoAttachEvent="onChange: changeDisplayName" 
+          dojoAttachPoint="displayName">${displayName}</span>
+    <a href="${urls.html.uri}" class="cosmoSharingHtmlLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a>
+  </div>
   <h2 class="cosmoSharingSectionHead">${l10n.subscribeHead}</h2>
   <span class="cosmoSubscribeButton cosmoChandlerSubscribeButton" title="${l10n.chandlerSubscribeTitle}" dojoAttachEvent="onclick: chandlerOnClick">${l10n.chandler}</span>
 
@@ -20,6 +25,8 @@
     <a href="" id="${id}ReadWriteInviteLink" class="cosmoReadWriteInviteLink" dojoAttachPoint="readWriteInviteLink">${l10n.inviteReadWrite}</a>
   </div>
       
+    <div class="cosmoSubscriptionInviteSection">${l10n.subscriptionInviteInstructions}<a href="${urls.html.uri}" class="cosmoSubscriptionInviteLink" title="${l10n.htmlLinkTitle}">${l10n.html}</a></div>
+
   <a href="${urls.webcal.uri}" target="_blank" class="cosmoSharingDownloadLink">
     <div dojoType="dijit.form.Button" id="${id}Download" class="cosmoSharingDownloadButton">
       ${l10n.download}

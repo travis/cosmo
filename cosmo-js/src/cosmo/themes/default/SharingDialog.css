@@ -95,6 +95,9 @@ h2.cosmoSharingSectionHead {
     margin: 30px 0 0 0;
     display: block;
 }
+.cosmoSubscriptionCollectionDialog .cosmoInviteButton{
+    display: none;
+}
 .cosmoInviteSection{
     display: none;
 }
@@ -107,6 +110,12 @@ h2.cosmoSharingSectionHead {
 }
 .cosmoReadWriteInviteLink {
     display: block;
+}
+.cosmoOwnedCollectionDialog .cosmoSubscriptionInviteSection{
+    display: none;
+}
+.cosmoSubscriptionInviteLink{
+    float: left;
 }
 .cosmoSharingDownloadLink {
     color: black;

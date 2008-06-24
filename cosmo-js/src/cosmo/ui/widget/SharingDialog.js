@@ -28,6 +28,7 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
 {
     widgetsInTemplate: true,
     templatePath: dojo.moduleUrl("cosmo", 'ui/widget/templates/SharingDialog.html'),
+    baseClass: "",
 
     // init params
     store: null,
@@ -207,9 +208,11 @@ dojo.declare("cosmo.ui.widget.SharingDialog", [dijit._Widget, dijit._Templated],
                 }));
             }
         }
+        if (this.ticketStore) this.baseClass = "cosmoOwnedCollectionDialog";
+        else this.baseClass = "cosmoSubscriptionCollectionDialog";
     },
+
     postCreate: function(){
-        if (this.inviteButton && !this.ticketStore) this.inviteButton.destroy();
     }
 });
 

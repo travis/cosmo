@@ -29,6 +29,7 @@ dojo.require("cosmo.ui.ContentBox");
 dojo.require("cosmo.ui.widget.NavButtonSet");
 dojo.require("cosmo.ui.widget.GraphicRadioButtonSet");
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.widget.AwesomeBox");
 dojo.require("cosmo.view.cal.common");
 dojo.require("cosmo.view.list.common");
 dojo.require("cosmo.account.preferences");
@@ -47,7 +48,7 @@ cosmo.ui.navbar.Bar = function (p) {
     this.listViewPageNum = null;
     this.defaultViewHasBeenInitialized = false;
     this.calViewNav = new cosmo.ui.navbar.CalViewNav({ parent: this });
-    this.quickItemEntry = new cosmo.ui.navbar.QuickItemEntry({ parent: this });
+    this.quickItemEntry = new cosmo.ui.widget.AwesomeBox({ parent: this, id: "awesomeBox"});
     this.listViewPager = new cosmo.ui.navbar.ListPager({ parent: this,
                                                          listCanvas: p.listCanvas
                                                        });
@@ -369,110 +370,6 @@ cosmo.ui.navbar.CalViewNav = function (p) {
 
 cosmo.ui.navbar.CalViewNav.prototype = new cosmo.ui.ContentBox();
 
-cosmo.ui.navbar.QuickItemEntry = function (p) {
-    var self = this;
-    var params = p || {};
-    // Processing lock to avoid duplicate items created
-    var isProcessing = false;
-
-    this.parent = params.parent;
-    this.domNode = _createElem('div');
-    this.formNode = null;
-    this.createTextBox = null;
-    this.createButton = null;
-
-    this.getValue = dojo.hitch(this, function() {
-        return this.formNode.listViewQuickItemEntry.value;
-    });
-
-    this.setValue = dojo.hitch(this, function(value) {
-        this.formNode.listViewQuickItemEntry.value = value;
-    });
-
-    this.hintText =  _('Main.NavBar.QuickItemEntryHint');
-
-    this.updateHint = dojo.hitch(this, function() {
-        if (!this.getValue() || !dojo.trim(this.getValue()))
-            cosmo.util.html.setTextInput(this.createTextBox, this.hintText, true);
-    });
-
-    this.renderSelf = function () {
-        // Resest processing lock on render
-        isProcessing = false;
-
-        // If the collection isn't writeable, disable everything
-        var writeable = cosmo.app.pim.getSelectedCollectionWriteable();
-
-        var disableButton = function () {
-            self.createButton.setEnabled(false);
-        };
-        var createItem = function () {
-            // Only create one item at a time
-            if (isProcessing) { return false; }
-            isProcessing = true;
-            var title = self.getValue();
-            disableButton();
-            self.setValue(_('App.Status.Processing'));
-            dojo.addClass(self.formNode.listViewQuickItemEntry, 'listViewSelectedCell');
-            cosmo.view.list.createNoteItem(title);
-        };
-
-        var t = this.domNode;
-        t.className = 'floatLeft';
-        t.style.paddingLeft = '12px';
-
-        // Cleanup
-        if (this.createButton) { this.createButton.destroy() };
-        this.clearAll();
-
-        this.formNode = _createElem('form');
-        var form = this.formNode;
-        form.onsubmit = function () { return false; };
-        t.appendChild(form);
-        var o = { type: 'text',
-            id: 'listViewQuickItemEntry',
-            name: 'listViewQuickItemEntry',
-            size: 24,
-            className: 'inputText',
-            value: '',
-            disabled: writeable ? false : true
-        };
-        var text = cosmo.util.html.createInput(o);
-        // Dynamically size the quick-entry text so the
-        // page nav can fit -- max it out at 350px wide
-        var w = this.parent.width - 300;
-        w = w > 350 ? 350 : w;
-        text.style.width = w + 'px';
-        this.createTextBox = text;
-        form.appendChild(text);
-        form.appendChild(cosmo.util.html.nbsp());
-
-        if (writeable) {
-            this.updateHint();
-            dojo.connect(text, 'onfocus', cosmo.util.html.handleTextInputFocus);
-            dojo.connect(text, 'onblur', this, 'updateHint');
-        }
-
-        dojo.connect(text, 'onkeyup', function (e) {
-            if (writeable && e.keyCode == 13) {
-                createItem();
-                e.stopPropagation();
-            }
-        });
-
-        this.createButton = new cosmo.ui.widget.Button({
-            text: _('App.Button.Create'),
-            handleOnClick: createItem,
-            small: true,
-            width: 52,
-            enabled: writeable,
-            id: "quickEntryCreate"})
-
-        this.formNode.appendChild(this.createButton.domNode);
-    };
-};
-
-cosmo.ui.navbar.QuickItemEntry.prototype = new cosmo.ui.ContentBox();
 
 cosmo.ui.navbar.ListPager = function (p) {
     var self = this;

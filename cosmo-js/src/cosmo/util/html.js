@@ -246,8 +246,9 @@ cosmo.util.html.addInputsToForm = function(inputs, form){
 
 cosmo.util.html.handleTextInputFocus = function (e) {
     var t = e.target;
-    if (t.className == 'inputTextDim') {
-        t.className = 'inputText';
+    if (dojo.hasClass(t, 'inputTextDim')) {
+        dojo.addClass(t, 'inputText');
+        dojo.removeClass(t, 'inputTextDim');
         t.value = '';
     }
     else {
@@ -286,7 +287,13 @@ cosmo.util.html.getElementsByTagName = function(parent, namespace, tagName, kwAr
  */
 cosmo.util.html.setTextInput = function (textbox, textValue, isDefaultText,
     disabled) {
-    textbox.className = isDefaultText ? 'inputTextDim' : 'inputText';
+    if (isDefaultText){
+        dojo.removeClass(textbox, 'inputText');
+        dojo.addClass(textbox, 'inputTextDim');
+    } else {
+        dojo.removeClass(textbox, 'inputTextDim');
+        dojo.addClass(textbox, 'inputText');
+    }
     textbox.value = textValue;
     if (typeof disabled == 'boolean') {
         textbox.disabled = disabled;

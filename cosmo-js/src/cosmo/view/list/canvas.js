@@ -317,13 +317,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
                 var iconDiv = _createElem('div');
                 var mouseOver = function (e) { self.handleMouseOver(e); };
                 var mouseOut = function (e) { self.handleMouseOut(e); };
-                var click = function (e) { self.handleClick(e); };
                 var colIcon = cosmo.ui.imagegrid.createImageButton({ domNode: iconDiv,
                     defaultState: col.display + iconPrefix,
                     rolloverState: col.display + iconPrefix + 'Rollover',
                     handleMouseOver: mouseOver,
-                    handleMouseOut: mouseOut,
-                    handleClick: click });
+                    handleMouseOut: mouseOut});
                 iconDiv.style.margin = 'auto';
                 colHeaderIcons[col.name] = iconDiv;
                 colStyle += ' text-align: center;';

@@ -317,8 +317,9 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.endDateInput.setValue("");
         this.endTimeInput.setValue("");
         this.clearTimezoneSelectors();
-        this.statusSelector.value = "";
-        this.recurrenceSelector.value = "";
+        // Use real default values for selectors, empty isn't a valid value
+        this.statusSelector.value = "CONFIRMED";
+        this.recurrenceSelector.value = "once";
         this.untilInput.setValue("");
     },
 

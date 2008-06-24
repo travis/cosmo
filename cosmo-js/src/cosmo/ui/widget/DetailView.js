@@ -91,7 +91,8 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         this.initializing = true;
         this.enable();
         this.titleInput.setValue(item.getDisplayName());
-        this.notesInput.setValue(item.getBody());
+        // setValue(null) won't work, make it a string
+        this.notesInput.setValue(item.getBody() || "");
         this.setTriageStatus(item.getTriageStatus());
         var eventStamp = item.getEventStamp();
         if (eventStamp){

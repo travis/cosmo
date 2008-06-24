@@ -71,6 +71,11 @@ cosmo.view.list.canvas.Canvas = function (p) {
         }
     }));
 
+    dojo.subscribe('cosmo:calSaveFailed', dojo.hitch(this, function(cmd){
+        if (cosmo.view.list.isCurrentView())
+            this._doSortAndDisplay();
+    }));
+
     var update = dojo.hitch(this, function(cmd){
         if (!cosmo.view.list.isCurrentView()) { return false; }
         if (cmd.saveType != "new") {

@@ -161,6 +161,8 @@ dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templa
 {
     containerNode: null,
     noCollectionsPrompt: null,
+    maskDiv: null,
+    addRemoveContainer: null,
     view: null,
     //cosmo.ui.widget._BaseSelector
     selection: null,
@@ -181,6 +183,7 @@ dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templa
         dojo.subscribe(cosmo.topics.CollectionUpdatedMessage.topicName, r);
         dojo.subscribe(cosmo.topics.SubscriptionUpdatedMessage.topicName, r);
         dojo.subscribe('cosmo:selectionChanged', this, "handleSelectionChanged");
+        this.initMask();
     },
 
     handleSelectionChanged: function(selection, store){
@@ -194,12 +197,24 @@ dojo.declare("cosmo.ui.widget.CollectionSelector", [dijit._Widget, dijit._Templa
         this.populateChildrenFromCollections(cosmo.app.pim.collections);
     },
 
+    initMask: function(){
+        if (!this.maskDiv){
+            this.maskDiv = document.createElement('div');
+            dojo.addClass(this.maskDiv, "greyedout");
+            dojo.body().appendChild(this.maskDiv);
+        }
+    },
+
     showPrompt: function(){
-        this.noCollectionsPrompt.style.display = "block";
+        dojo.addClass(this.noCollectionsPrompt,   "showme");
+        dojo.addClass(this.maskDiv,               "showme");
+        dojo.addClass(this.addRemoveContainer, "highlight");
     },
 
     hidePrompt: function(){
-        this.noCollectionsPrompt.style.display = "none";
+        dojo.removeClass(this.noCollectionsPrompt,   "showme");
+        dojo.removeClass(this.maskDiv,               "showme");
+        dojo.removeClass(this.addRemoveContainer, "highlight");
     },
 
     populateChildrenFromCollections: function(collections){

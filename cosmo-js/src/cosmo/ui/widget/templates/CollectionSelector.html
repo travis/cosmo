@@ -1,11 +1,13 @@
 <form>
-  <div class='cosmoAddRemoveCollectionContainer'>
+  <div class='cosmoAddRemoveCollectionContainer' dojoAttachPoint='addRemoveContainer'>
     <span class='cosmoAddRemoveCollectionLabel'> ${l10n.collectionsLabel}</span>
     <span id="${id}AddCollectionButton" class='cosmoAddCollectionButton cosmoNewCollectionDefault' dojoAttachEvent='onclick: handleNewCollection'></span>
     <span id="${id}AddCollectionButton" class='cosmoRemoveCollectionButton cosmoRemoveCollectionDefault' dojoAttachEvent='onclick: handleDeleteCollection'></span>
   </div>
   <div id='collectionSelectorNoCollectionsPrompt' dojoAttachPoint="noCollectionsPrompt">
-    ${l10n.noCollectionsPrompt}
+    <p>${l10n.noCollectionsPrompt}</p>
+    <p>${l10n.or}</p>
+    <p><a href="http://chandlerproject.org/Projects/SetupDesktop">${l10n.linkMessage}</a></p>
   </div>
   <div id='collectionSelectorContainer' dojoAttachPoint="containerNode">
   </div>

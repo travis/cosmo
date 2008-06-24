@@ -51,11 +51,46 @@
     margin: 4px 2px 0px 2px;
 }
 #collectionSelectorNoCollectionsPrompt {
-    color: #a8a8a8;
+    top: 18px;
+    background: #ffcc00;
+    border: 1px solid #ff6600;
+    color: black;
     font-size: 11px;
-    padding: 5px;
+    padding: 2px 5px;
+    margin: 3px;
+    display: none;
 }
+
+#collectionSelectorNoCollectionsPrompt, #collectionDisplay .highlight {
+    position: absolute; /* necessary to allow the prompt's z-index to beat .greyedout */
+    z-index: 15;
+}
+
+#collectionSelectorNoCollectionsPrompt p {
+    line-height: 14px;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.greyedout {
+    position: absolute;
+    top: 48px;
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+	opacity: .2;
+	filter: alpha(opacity=20);
+    background: black;
+    z-index: 10;
+    display: none;
+}
+
+.showme {
+    display: block !important;
+}
+
 .cosmoAddRemoveCollectionContainer {
+    width: 100%;
     height: 18px;
     border-bottom: 1px solid #DDDDDD;
 }

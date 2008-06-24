@@ -85,6 +85,10 @@
     display: none;
 }
 
+.dj_ie .greyedout {
+    left: 168px;
+}
+
 .showme {
     display: block !important;
 }

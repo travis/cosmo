@@ -334,9 +334,13 @@ public class DavCalendarCollection extends DavCollectionBase
         EntityConverter converter = new EntityConverter(getEntityFactory());
         Set<ContentItem> toUpdate = new LinkedHashSet<ContentItem>();
         
-        // convert icalendar representation to cosmo data model
-        toUpdate.addAll(converter.convertEventCalendar(
-                (NoteItem) content, event.getEventCalendar()));
+        try {
+            // convert icalendar representation to cosmo data model
+            toUpdate.addAll(converter.convertEventCalendar(
+                    (NoteItem) content, event.getEventCalendar()));
+        } catch (ModelValidationException e) {
+            throw new InvalidCalendarResourceException(e.getMessage());
+        }
         
         if (event.getCreationDate()!=null) {
             if (log.isDebugEnabled())
@@ -349,9 +353,7 @@ public class DavCalendarCollection extends DavCollectionBase
                 throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
                 throw new LockedException();
-            } catch (ModelValidationException e) {
-                throw new InvalidCalendarResourceException(e.getMessage());
-            }
+            } 
         } else {
             if (log.isDebugEnabled())
                 log.debug("creating event " + member.getResourcePath());
@@ -363,8 +365,6 @@ public class DavCalendarCollection extends DavCollectionBase
                 throw new UidConflictException(e);
             } catch (CollectionLockedException e) {
                 throw new LockedException();
-            } catch (ModelValidationException e) {
-                throw new InvalidCalendarResourceException(e.getMessage());
             }
         }
 

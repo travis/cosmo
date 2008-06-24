@@ -54,6 +54,7 @@
      emailDescription: "Notes:",
      startDateRequired: "You must choose a start date.",
      endDateRequired: "You must choose an end date.",
+     mismatchedDates: "End cannot be before start.",
      location: "Location",
      title: "Title",
      recurrenceEnds: "Ends",

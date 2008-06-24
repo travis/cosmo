@@ -712,8 +712,12 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
                 e.addError(new cosmo.ui.Error(null, "App.Error.NoTzId"));
             if (!this.startTimeInput.getValue() && this.endTimeInput.getValue())
                 e.addError(new cosmo.ui.Error(null,"App.Error.NoEndTimeWithoutStartTime"));
-            if (!this.startDateInput.getValue()) e.addError(new cosmo.ui.Error(null, null, this.l10n.startDateRequired));
-            if (!this.endDateInput.getValue()) e.addError(new cosmo.ui.Error(null, null, this.l10n.endDateRequired));
+            if (!this.startDateInput.getValue())
+                e.addError(new cosmo.ui.Error(null, null, this.l10n.startDateRequired));
+            if (!this.endDateInput.getValue())
+                e.addError(new cosmo.ui.Error(null, null, this.l10n.endDateRequired));
+            if (this.getStartDateTime().after(this.getEndDateTime()))
+                e.addError(new cosmo.ui.Error(null, null, this.l10n.mismatchedDates));
         }
         return e;
     },

@@ -216,7 +216,7 @@ td.dataDisplayLabel {
 }
 .tabContent {
     position: relative;
-    margin-top: 24px;
+    margin-top: 20px;
 }
 .tabSelected {
     color: #0066FF;
@@ -414,7 +414,20 @@ td.dataDisplayLabel {
 }
 
 .notices{
-	margin-top: 1em;
+    margin-top: 20px;
+    margin-left: 10px;
+    text-align: left;
+}
+
+.notices p{
+    font-size: 10px;
+    line-height: 14px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+.notices ul{
+    margin-left: 10px;
 }
 
 /*

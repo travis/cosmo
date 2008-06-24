@@ -131,13 +131,9 @@ public class CalendarFilterConverterTest extends TestCase {
         NoteItemFilter noteFilter = (NoteItemFilter) itemFilter;
       
         Assert.assertFalse(noteFilter.getIsModification().booleanValue());
-        Assert.assertEquals(2, noteFilter.getStampFilters().size());
+        Assert.assertEquals(1, noteFilter.getStampFilters().size());
         
         StampFilter sf = noteFilter.getStampFilters().get(0);
-        Assert.assertEquals(TaskStamp.class, sf.getStampClass());
-        Assert.assertEquals(false, sf.isMissing());
-        
-        sf = noteFilter.getStampFilters().get(1);
         Assert.assertEquals(EventStamp.class, sf.getStampClass());
         Assert.assertEquals(true, sf.isMissing());
     }

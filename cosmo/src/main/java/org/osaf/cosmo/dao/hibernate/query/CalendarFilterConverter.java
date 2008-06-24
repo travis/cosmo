@@ -105,7 +105,6 @@ public class CalendarFilterConverter {
         NoteItemFilter filter = new NoteItemFilter();
         filter.setParent(collection);
         filter.setIsModification(false);
-        filter.getStampFilters().add(new StampFilter(TaskStamp.class, false));
         filter.getStampFilters().add(new StampFilter(EventStamp.class, true));
         return filter;
     }

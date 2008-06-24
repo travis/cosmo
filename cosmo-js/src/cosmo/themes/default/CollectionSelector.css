@@ -22,8 +22,9 @@
     width: 142px;
     white-space: nowrap;
 }
-.cosmoCollectionSelectorCalSelect .collectionSelectorCollectionName {
 
+.cosmoCollectionSelectorCalSelect .collectionSelectorCollectionName {
+    width: 124px;
 }
 .cosmoCollectionSelectorListSelect .collectionSelectorCollectionName {
 

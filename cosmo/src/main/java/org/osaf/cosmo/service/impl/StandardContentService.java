@@ -190,6 +190,10 @@ public class StandardContentService implements ContentService {
     public void copyItem(Item item, CollectionItem targetParent, 
             String path, boolean deepCopy) {
 
+        // prevent HomeCollection from being copied
+        if(item instanceof HomeCollectionItem)
+            throw new IllegalArgumentException("cannot copy home collection");
+        
         Item toItem = findItemByPath(path);
         if(toItem!=null)
             throw new DuplicateItemNameException(null, path + " exists");
@@ -236,6 +240,10 @@ public class StandardContentService implements ContentService {
      */
     public void moveItem(Item item, CollectionItem oldParent, CollectionItem newParent) {
         
+        // prevent HomeCollection from being moved
+        if(item instanceof HomeCollectionItem)
+            throw new IllegalArgumentException("cannot move home collection");
+        
         // Only need locking for ContentItem for now
         if(item instanceof ContentItem) {
             Set<CollectionItem> locks = acquireLocks(newParent, item);
@@ -277,6 +285,8 @@ public class StandardContentService implements ContentService {
         // Let service handle ContentItems (for sync purposes)
         if(item instanceof ContentItem)
             removeContent((ContentItem) item);
+        else if(item instanceof CollectionItem)
+            removeCollection((CollectionItem) item);
         else
             contentDao.removeItem(item);
     }
@@ -415,6 +425,10 @@ public class StandardContentService implements ContentService {
      */
     public CollectionItem updateCollection(CollectionItem collection) {
 
+        // prevent HomeCollection from being updated
+        if(collection instanceof HomeCollectionItem)
+            throw new IllegalArgumentException("cannot update home collection");
+        
         if (! lockManager.lockCollection(collection, lockTimeout))
             throw new CollectionLockedException("unable to obtain collection lock");
         
@@ -514,6 +528,11 @@ public class StandardContentService implements ContentService {
         if (log.isDebugEnabled())
             log.debug("removing collection " + collection.getUid());
 
+        // prevent HomeCollection from being removed (should only be removed
+        // when user is removed)
+        if(collection instanceof HomeCollectionItem)
+            throw new IllegalArgumentException("cannot remove home collection");
+        
         contentDao.removeCollection(collection);
     }
 

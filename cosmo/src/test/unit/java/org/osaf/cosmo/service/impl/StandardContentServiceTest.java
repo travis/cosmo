@@ -130,13 +130,20 @@ public class StandardContentServiceTest extends TestCase {
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
 
-        contentDao.removeItem(dummyContent);
+        service.removeItem(dummyContent);
 
         String path = "/" + user.getUsername() + "/" + dummyContent.getName();
         Item item = service.findItemByPath(path);
 
         // XXX service should throw exception rather than return null
         assertNull(item);
+        
+        // cannot remove HomeCollection
+        try {
+            service.removeItem(rootCollection);
+            Assert.fail("able to remove root!");
+        } catch (IllegalArgumentException e) {
+        }
     }
 
     /** */
@@ -147,13 +154,11 @@ public class StandardContentServiceTest extends TestCase {
         ContentItem content = new MockNoteItem();
         content.setName("foo");
         content.setOwner(user);
-        content = contentDao.createContent(rootCollection, content);
+        content = service.createContent(rootCollection, content);
 
         assertNotNull(content);
         assertEquals("foo", content.getName());
         assertEquals(user, content.getOwner());
-
-        contentDao.removeContent(content);
     }
 
     /** */
@@ -165,7 +170,7 @@ public class StandardContentServiceTest extends TestCase {
         dummyContent.setOwner(user);
         dummyContent = contentDao.createContent(rootCollection, dummyContent);
 
-        contentDao.removeContent(dummyContent);
+        service.removeContent(dummyContent);
 
         String path = "/" + user.getUsername() + "/" + dummyContent.getName();
         Item item = service.findItemByPath(path);

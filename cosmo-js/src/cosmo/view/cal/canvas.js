@@ -611,9 +611,6 @@ cosmo.view.cal.canvas = new function () {
             // collection object
             var currColl = cosmo.app.pim.getSelectedCollection();
             var ch = $('collectionSelectorItemCheck_' + currColl.getUid());
-            if (!ch || (ch && !ch.checked)) {
-                currColl.doDisplay = false;
-            }
             // Re-render the view, with the newly selected collection
             var collId = sel.primaryCollectionId ?
                 sel.primaryCollectionId : sel.collectionIds[0];

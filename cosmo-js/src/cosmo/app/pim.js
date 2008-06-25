@@ -173,8 +173,8 @@ cosmo.app.pim = dojo.mixin(new function () {
         // ============
         keys = cosmo.datetime.fullMonth;
         newArr = [];
-        for (var i = 0; i < keys.length; i++) {
-            newArr.push(_('App.' + keys[i]));
+        for (var j = 0; j < keys.length; j++) {
+            newArr.push(_('App.' + keys[j]));
         }
         cosmo.datetime.fullMonth = newArr;
         // AM/PM
@@ -320,7 +320,6 @@ cosmo.app.pim = dojo.mixin(new function () {
                 var coll = c[i];
                 coll.isDisplayed = false;
                 coll.isOverlaid = false;
-                coll.doDisplay = false;
                 index = i % hues.length;
                 var hue = hues[index];
                 coll.hue = hue;
@@ -339,9 +338,6 @@ cosmo.app.pim = dojo.mixin(new function () {
         }
         else {
             this._selectedCollection = this.collections.getAtPos(0);
-        }
-        if (this._selectedCollection) {
-            this._selectedCollection.doDisplay = true;
         }
     };
     this.setSelectedCollection = function (collection) {
@@ -391,7 +387,8 @@ cosmo.app.pim = dojo.mixin(new function () {
                 state[id] = {
                     isDisplayed: coll.isDisplayed,
                     isOverlaid: coll.isOverlaid,
-                    doDisplay: coll.doDisplay };
+                    doDisplay: cosmo.view[cosmo.pim.currentView].doDisplay(coll)
+                };
             };
             // Preserve selected/overlaid state
             this.collections.each(saveState);
@@ -426,7 +423,6 @@ cosmo.app.pim = dojo.mixin(new function () {
                     }
                     if (newSel) {
                         this._selectedCollection = newSel;
-                        newSel.doDisplay = true;
                     }
                     // Default new selection is the first collection
                     // in the list
@@ -441,7 +437,6 @@ cosmo.app.pim = dojo.mixin(new function () {
                 else {
                     if (newSel) {
                         this._selectedCollection = newSel;
-                        newSel.doDisplay = true;
                     }
                 }
 

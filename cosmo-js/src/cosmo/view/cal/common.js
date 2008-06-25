@@ -81,7 +81,7 @@ cosmo.view.cal.loadItems = function (p) {
     var evData = null;
     var id = '';
     var ev = null;
-    var collectionReg = cosmo.view.cal.collectionItemRegistries;
+    var collectionReg = cosmo.view.cal.collectionItemRegistries = {};
     var queryDate = null;
     // Changing dates
     // FIXME: There is similar logic is dup'd in ...
@@ -94,7 +94,6 @@ cosmo.view.cal.loadItems = function (p) {
     // --------
     if (params.goTo) {
         goToNav = params.goTo;
-        console.log("goto");
         // param is 'back' or 'next'
         if (typeof goToNav == 'string') {
             var key = goToNav.toLowerCase();
@@ -122,7 +121,6 @@ cosmo.view.cal.loadItems = function (p) {
 
     start = opts.viewStart;
     end = opts.viewEnd;
-
     var _this = this;
     var loadEach = function (collId, coll) {
         var loadDeferred = null;
@@ -138,7 +136,7 @@ cosmo.view.cal.loadItems = function (p) {
             cosmo.app.showErr(_('Main.Error.LoadItemsFailed'),"", e);
             return reloadDeferred;
         };
-        if (coll.doDisplay) {
+        if (_this.doDisplay(coll)) {
             loadDeferred = cosmo.app.pim.serv.getItems(coll,
                 { start: start, end: end });
             loadDeferred.addErrback(handleErr);
@@ -150,7 +148,7 @@ cosmo.view.cal.loadItems = function (p) {
         else {
             collectionReg[collId] = new cosmo.util.hash.Hash();
         }
-        coll.isDisplayed = coll.doDisplay;
+        coll.isDisplayed = _this.doDisplay(coll);
         return loadDeferred || cosmo.util.deferred.getFiredDeferred();
     };
     var l = cosmo.app.pim.collections.each(loadEach);
@@ -161,6 +159,9 @@ cosmo.view.cal.loadItems = function (p) {
         dojo.publish('cosmo:calEventsLoadSuccess', [{data: itemRegistry, opts: opts }]);
     });
     return loadDeferred;
+};
+cosmo.view.cal.doDisplay = function(collection){
+    return (collection.isOverlaid || (collection == cosmo.app.pim._selectedCollection));
 };
 /**
  * Create a Hash of CalItem objects with data property of stamped

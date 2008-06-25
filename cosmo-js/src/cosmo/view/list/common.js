@@ -130,6 +130,10 @@ cosmo.view.list.loadItems = function (o) {
     return deferred;
 };
 
+cosmo.view.list.doDisplay = function(collection){
+    return (collection == cosmo.app.pim._selectedCollection);
+};
+
 cosmo.view.list.createItemRegistry = function (arrParam) {
     var h = new cosmo.util.hash.Hash();
     var arr = [];

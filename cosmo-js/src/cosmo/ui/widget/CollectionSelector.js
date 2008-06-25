@@ -78,10 +78,8 @@ dojo.declare("cosmo.ui.widget._BaseSelector", [dijit._Widget, dijit._Templated],
 
     handleSelectionChanged: function(selection){
         if (selection != this.collection){
-            this.collection.doDisplay = false;
             dojo.removeClass(this.domNode, "collectionSelectorSel");
         } else {
-            this.collection.doDisplay = true;
             dojo.addClass(this.domNode, "collectionSelectorSel");
         }
     },
@@ -131,22 +129,9 @@ dojo.declare("cosmo.ui.widget._CalViewSelector", cosmo.ui.widget._BaseSelector,
         this.checkedAttribute = this.collection.isOverlaid? "checked='checked'" : "";
     },
 
-    handleSelectionChanged: function(selection, store){
-        if (selection != this.collection){
-            dojo.removeClass(this.domNode, "collectionSelectorSel");
-            if (!this.collection.isOverlaid)
-                this.collection.doDisplay = false;
-        } else {
-            this.collection.doDisplay = true;
-            dojo.addClass(this.domNode, "collectionSelectorSel");
-        }
-
-    },
-
     handleCheckboxClick: function(e){
         dojo.stopEvent(e);
         var checked = e.target.checked;
-        this.collection.doDisplay = checked;
         this.collection.isOverlaid = checked;
         if (cosmo.app.pim.getSelectedCollection() != this.collection) cosmo.view.displayViewFromCollections();
     }

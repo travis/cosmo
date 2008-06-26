@@ -303,6 +303,10 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
             if (rrule.isSupported()){
                 this.recurrenceSelector.value = rrule.getFrequency();
             } else {
+                var customOption = document.createElement("option");
+                customOption.value = 'custom';
+                customOption.appendChild(document.createTextNode(this.l10n.custom));
+                this.recurrenceSelector.appendChild(customOption);
                 this.recurrenceSelector.value = 'custom';
             }
             this.untilInput.setAttribute("disabled", false);

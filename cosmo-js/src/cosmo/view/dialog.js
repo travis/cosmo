@@ -26,7 +26,7 @@ cosmo.view.dialog = new function () {
     // ********************
     this._item = null;
 
-    dojo.subscribe('cosmo:calSetSelected', 
+    dojo.subscribe('cosmo:calSetSelected',
                    dojo.hitch(this, function(cmd){this._item = cmd.data}));
     // Public methods
     // ********************
@@ -86,7 +86,7 @@ cosmo.view.dialog.RecurrenceDialog = function () {
         'removeFutureEvents': function () {
             console.log("create removeFutureEvents button called.");
             return new cosmo.ui.widget.Button(
-                {id: 'allFutureButtonDialog', 
+                {id: 'allFutureButtonDialog',
                  width: btnWiderWidth,
                  handleOnClick: function () { self.doPublishRemove(
                 cosmo.view.service.recurringEventOptions.ALL_FUTURE_EVENTS); },
@@ -157,11 +157,11 @@ cosmo.view.dialog.RecurrenceDialog = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new cosmo.ui.widget.Button(
-                {id: 'removeConfirmCancelButton', width: 74, 
+                {id: 'removeConfirmCancelButton', width: 74,
                  handleOnClick: cosmo.app.hideDialog,
                  text: _('App.Button.Cancel'), small: true})],
             'btnsRight': [new cosmo.ui.widget.Button(
-                {id: 'removeConfirmRemoveButton', width: 74, 
+                {id: 'removeConfirmRemoveButton', width: 74,
                  handleOnClick: function () { self.doPublishRemove(); },
                  text: _('App.Button.Remove'), small: true})],
             'defaultAction': function () { self.doPublishRemove(); },
@@ -173,8 +173,8 @@ cosmo.view.dialog.RecurrenceDialog = function () {
         return {
             'type': cosmo.app.modalDialog.CONFIRM,
             'btnsLeft': [new cosmo.ui.widget.Button(
-                {id: 'removeRecurrenceCancelButton', width: 74, 
-                 handleOnClick: cosmo.app.hideDialog, text: _('App.Button.Cancel'), 
+                {id: 'removeRecurrenceCancelButton', width: 74,
+                 handleOnClick: cosmo.app.hideDialog, text: _('App.Button.Cancel'),
                  small: true})],
             'btnsRight': [],
             'defaultAction': function () {},
@@ -251,7 +251,7 @@ cosmo.view.dialog.RecurrenceDialog = function () {
                 break;
             case 'saveRecurConfirmAllEventsOnly':
                 var delta = opts.delta;
-                var saveItem = opts.saveItem  
+                var saveItem = opts.saveItem
                 // Button should say 'Save' instead of 'All Events'
                 p.btnsRight = [buttons.saveAllEvents(saveItem, delta, true)];
                 break;
@@ -296,21 +296,21 @@ cosmo.view.dialog.UnsavedChangesDialog = function () {
             'btnsLeft': [
                 new cosmo.ui.widget.Button({
                     id: "unsavedChangesDialogCancelButton",
-                    text: strings.cancelButtonText, 
+                    text: strings.cancelButtonText,
                     width: btnWidth,
-                    handleOnClick: opts.cancelFunc, 
+                    handleOnClick: opts.cancelFunc,
                     small: true,
                     enabled: true })
             ],
             'btnsRight': [
-                new cosmo.ui.widget.Button({ 
+                new cosmo.ui.widget.Button({
                     id: "unsavedChangesDialogDiscardButton",
                     text: strings.discardButtonText,
                     width: btnWidthWide,
                     handleOnClick: opts.discardFunc,
                     small: true,
                     enabled: true }),
-                new cosmo.ui.widget.Button({ 
+                new cosmo.ui.widget.Button({
                     id: "unsavedChangesDialogSaveButton",
                     text: strings.saveButtonText,
                     width: btnWidthWide,

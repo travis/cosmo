@@ -545,8 +545,12 @@ dojo.declare("cosmo.ui.widget.DetailView", [dijit._Widget, dijit._Templated], {
         dojo.subscribe('cosmo:calSetSelected', updateItems);
         dojo.subscribe('cosmo:calClearSelected', dojo.hitch(this, function(){this.clearSelected();}));
         dojo.subscribe('cosmo:calSaveSuccess', dojo.hitch(this, function(cmd){
-            if (cmd.saveType != 'new') {
-                this.updateFromItemWrapper(cmd.data);
+            var itemWrapper = cmd.data;
+            var item = itemWrapper.data;
+            if (item.isMaster() && item.hasRecurrence()){
+                this.clearSelected();
+            } else if (cmd.saveType != 'new') {
+                this.updateFromItemWrapper(itemWrapper);
             }
         }));
         dojo.subscribe('cosmo:calSaveFromForm', dojo.hitch(this, function(){

@@ -400,11 +400,11 @@ public class StandardContentService implements ContentService {
             collection = contentDao.updateCollection(collection, childrenToUpdate);
             
             // update timestamps on all collections involved
-            for(CollectionItem lockedCollection : locks) {
-                lockedCollection = contentDao.updateCollectionTimestamp(lockedCollection);
-                if(lockedCollection.getUid().equals(collection.getUid()))
-                    collection = lockedCollection;
-            }
+            for(CollectionItem lockedCollection : locks)
+               contentDao.updateCollectionTimestamp(lockedCollection);
+            
+            // update timestamp on new collection
+            collection = contentDao.updateCollectionTimestamp(collection);
             
             // get latest timestamp
             return collection;

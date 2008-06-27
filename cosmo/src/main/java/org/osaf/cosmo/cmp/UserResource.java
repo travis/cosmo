@@ -18,17 +18,14 @@ package org.osaf.cosmo.cmp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.ElementIterator;
-
-import org.osaf.cosmo.atom.processor.ValidationException;
 import org.osaf.cosmo.model.CollectionSubscription;
 import org.osaf.cosmo.model.EntityFactory;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.util.DateUtil;
 import org.osaf.cosmo.util.UriTemplate;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -86,6 +83,15 @@ public class UserResource implements CmpResource, OutputsXml {
     /**
      */
     public static final String ATTR_SUBSCRIPTION_NAME = "name";
+    /**
+     */
+    public static final String EL_PREFERENCE = "preference";
+    /**
+     */
+    public static final String ATTR_PREFERENCE_KEY = "key";
+    /**
+     */
+    public static final String ATTR_PREFERENCE_VALUE = "value";
 
     private User user;
     private String urlBase;
@@ -210,6 +216,13 @@ public class UserResource implements CmpResource, OutputsXml {
             DomUtil.setText(hurl, homedirUrl);
             e.appendChild(hurl);
         }
+        
+        for(Preference pref: user.getPreferences()) {
+            Element elPref = DomUtil.createElement(doc, EL_PREFERENCE, NS_CMP);
+            elPref.setAttribute(ATTR_PREFERENCE_KEY, pref.getKey());
+            elPref.setAttribute(ATTR_PREFERENCE_VALUE, pref.getValue());
+            e.appendChild(elPref);
+        }
 
         return e;
     }
@@ -326,6 +339,20 @@ public class UserResource implements CmpResource, OutputsXml {
                 subscription.setCollectionUid(uuid);
                 subscription.setTicketKey(ticketKey);
                 user.addSubscription(subscription);
+            }
+            else if (DomUtil.matches(e, EL_PREFERENCE, NS_CMP)){
+                String prefKey = e.getAttribute(ATTR_PREFERENCE_KEY);
+                String prefValue = e.getAttribute(ATTR_PREFERENCE_VALUE);
+                if (prefKey == null)
+                    throw new CmpException("Preference requires a key");
+                if (prefValue == null)
+                    throw new CmpException("Preference requires a value");
+                if (user.getPreference(prefKey) != null)
+                    throw new CmpException("Preference with this key already exists");
+                Preference preference = 
+                    factory.createPreference(prefKey, prefValue);
+                
+                user.addPreference(preference);
             }
             else {
                 throw new CmpException("unknown user attribute element " +

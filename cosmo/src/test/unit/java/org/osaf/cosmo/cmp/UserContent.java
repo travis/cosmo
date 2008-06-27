@@ -22,6 +22,7 @@ import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.apache.jackrabbit.webdav.xml.XmlSerializable;
 
 import org.osaf.cosmo.cmp.UserResource;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.User;
 import org.osaf.cosmo.model.CollectionSubscription;
 
@@ -38,6 +39,7 @@ public class UserContent implements XmlSerializable {
 
     private User user;
     private CollectionSubscription subscription;
+    private Preference preference;
 
     /**
      */
@@ -49,6 +51,12 @@ public class UserContent implements XmlSerializable {
         this.user = user;
         this.subscription = sub;
     }
+    
+    public UserContent(User user, Preference pref) {
+        this.user = user;
+        this.preference = pref;
+    }
+    
 
     /**
      */
@@ -125,6 +133,18 @@ public class UserContent implements XmlSerializable {
             e.appendChild(sub);
         }
 
+        if (preference != null){
+            Element sub = 
+                DomUtil.createElement(doc, 
+                        UserResource.EL_PREFERENCE,
+                        UserResource.NS_CMP);
+            sub.setAttribute(UserResource.ATTR_PREFERENCE_KEY, 
+                    preference.getKey());
+            sub.setAttribute(UserResource.ATTR_PREFERENCE_VALUE,
+                    preference.getValue());
+            e.appendChild(sub);
+        }
+        
         return e;
     }
 }

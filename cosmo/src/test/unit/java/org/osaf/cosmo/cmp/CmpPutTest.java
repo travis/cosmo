@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.xml.DomUtil;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.CollectionSubscription;
+import org.osaf.cosmo.model.Preference;
 import org.osaf.cosmo.model.Ticket;
 import org.osaf.cosmo.model.User;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -209,6 +210,28 @@ public class CmpPutTest extends BaseCmpServletTestCase {
         Ticket t2 = contentService.getTicket(collection, s2.getTicketKey());
         assertTrue("ticket missing from collection",  t2 != null);
         assertEquals("ticket wrong", t1, t2);
+    }
+    
+    /**
+     */
+    public void testSignupWithPreference() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        Preference p1 = testHelper.getEntityFactory().createPreference("key", "value");
+       
+        MockHttpServletRequest request = createMockRequest("PUT", "/signup");
+        sendXmlRequest(request, new UserContent(u1, p1));
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertEquals("incorrect status", MockHttpServletResponse.SC_CREATED,
+                     response.getStatus());
+
+        User u3 = userService.getUser(u1.getUsername());
+        Preference p2 = u3.getPreference(p1.getKey());
+        assertTrue("preference missing",  p2 != null);
+        assertEquals("preference value wrong", 
+                p1.getValue(), p2.getValue());
     }
 
     /**

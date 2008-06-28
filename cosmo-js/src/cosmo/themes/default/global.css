@@ -639,16 +639,16 @@ Link styles
 /* 
  * Account signup related styles
  */
-#tosLinkLabel {
+.createUserCheckboxLabel{
 	padding-left: 1em;
 }
-
-#tosElemCell {
+.createUserCheckboxElem{
 	width: 100%;
-	text-align: center;
+    padding-left: 7em;
+}
+#tosElemCell {
 	margin-top: 1em;
 }
-
 /*
  * AuthBox styles
  */

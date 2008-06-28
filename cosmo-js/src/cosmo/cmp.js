@@ -377,7 +377,18 @@ dojo.declare("cosmo.cmp.Cmp", null,
                 (userHash.subscription? this._subscriptionToXML(userHash.subscription) : "") +
                 (userHash.administrator && !isRoot? '<' + EL_ADMINISTRATOR + ' >true</' + EL_ADMINISTRATOR + '>' : "") +
                 (userHash.locked?'<locked>true</locked>' : "") +
+                (userHash.preferences? this._preferencesToXML(userHash.preferences) : "") +
                 '</user>';
+        },
+
+        _preferencesToXML: function(/*Object*/ preferences){
+            var preferenceXML = "";
+            for (var key in preferences){
+                preferenceXML += '<preference key="' + cosmo.util.string.escapeXml(key)
+                    + '" value="' + cosmo.util.string.escapeXml(preferences[key])
+                    + '"/>';
+            }
+            return preferenceXML;
         },
 
         _subscriptionToXML: function (/*Object*/ subscription){

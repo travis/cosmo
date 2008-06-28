@@ -108,15 +108,18 @@ cosmo.account.create = new function () {
             firstName: form.firstName.value,
             lastName: form.lastName.value,
             email: form.email.value,
-            password: form.password.value
+            password: form.password.value,
+            preferences: {}
         };
         if (form.subscriptionName || form.subscriptionTicket || form.subscriptionUuid){
             user.subscription = {
                 name: form.subscriptionName.value,
                 ticket: form.subscriptionTicket.value,
                 uuid: form.subscriptionUuid.value
-            }
+            };
         }
+        if (form.contactPreference)
+            user.preferences["Contact"] = form.contactPreference.checked.toString();
         return user;
     };
     /**

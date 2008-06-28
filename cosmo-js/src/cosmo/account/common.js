@@ -141,6 +141,19 @@ cosmo.account.getFieldList = function (accountInfo, subscription) {
         list.push(f);
     }
 
+    if (!accountInfo && cosmo.ui.conf.getBooleanValue("getContactPreference")){
+        f = { label: _('Signup.Form.ContactPref'),
+            elemName: 'contactPreference',
+            elemType: 'checkbox'
+        };
+        // no validation
+        f.validators = function (elem) {
+            return null;
+        };
+        f.value = a[f.elemName];
+       list.push(f);
+    }
+
     if (subscription){
         f = {label: _('Signup.Form.Subscription.Name'),
              elemName: 'subscriptionName',
@@ -215,7 +228,9 @@ cosmo.account.getFormTable = function (fieldList, callingContext) {
     for (var i = 0; i < fieldList.length; i++) {
         var f = fieldList[i];
         if (f.elemName == 'tos') {
-            form.appendChild(cosmo.account.createTosInput(f));
+            form.appendChild(cosmo.account.createCheckbox(f, "tosElemCell", "tosLinkLabel"));
+        } else if (f.elemName == 'contactPreference') {
+            form.appendChild(cosmo.account.createCheckbox(f, "contactPreferenceElemCell", "contactPreferenceLabel"));
         } else {
             var type = f.elemType;
 
@@ -272,19 +287,21 @@ cosmo.account.fieldToElement = function (field){
     return elem;
 };
 
-cosmo.account.createTosInput = function (tosField){
-    var tosDiv = _createElem('div');
-    tosDiv.id = "tosElemCell"
+cosmo.account.createCheckbox = function (field, elemId, labelId){
+    var div = _createElem('div');
+    div.id = elemId;
+    div.className = 'createUserCheckboxElem';
 
     var lab = _createElem('span');
-    lab.id = "tosLinkLabel";
-    lab.innerHTML = tosField.label;
+    lab.id = labelId;
+    lab.innerHTML = field.label;
+    lab.className = 'createUserCheckboxLabel';
 
-    var input = cosmo.account.fieldToElement(tosField)
+    var input = cosmo.account.fieldToElement(field);
 
-    tosDiv.appendChild(input);
-    tosDiv.appendChild(lab);
-    return tosDiv;
+    div.appendChild(input);
+    div.appendChild(lab);
+    return div;
 };
 
 /**

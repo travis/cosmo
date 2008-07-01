@@ -387,7 +387,7 @@ cosmo.app.pim = dojo.mixin(new function () {
                 state[id] = {
                     isDisplayed: coll.isDisplayed,
                     isOverlaid: coll.isOverlaid,
-                    doDisplay: cosmo.view[cosmo.pim.currentView].doDisplay(coll)
+                    doDisplay: cosmo.view[cosmo.app.pim.currentView].doDisplay(coll)
                 };
             };
             // Preserve selected/overlaid state

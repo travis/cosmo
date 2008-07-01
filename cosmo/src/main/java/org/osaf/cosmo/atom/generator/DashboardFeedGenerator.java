@@ -101,10 +101,13 @@ public class DashboardFeedGenerator extends FullFeedGenerator {
             null : TriageStatusUtil.label(triageStatus);
         Date now = Calendar.getInstance().getTime();
         TimeZone tz = null;
+        
+        // Look for timezone in EventStampFilter if present
         if (getFilter() != null) {
             EventStampFilter esf = (EventStampFilter)
                 getFilter().getStampFilter(EventStampFilter.class);
-            tz = esf.getTimezone();
+            if(esf!=null)
+                tz = esf.getTimezone();
         }
 
         TriageStatusQueryContext context =

@@ -381,7 +381,7 @@
   <env-entry>
     <env-entry-name>cosmo/config</env-entry-name>
     <env-entry-type>java.lang.String</env-entry-type>
-    <env-entry-value>file:etc/cosmo.properties</env-entry-value>
+    <env-entry-value>classpath:cosmo.properties</env-entry-value>
   </env-entry>
   <resource-ref>
     <res-ref-name>jdbc/cosmo</res-ref-name>

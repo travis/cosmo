@@ -896,6 +896,25 @@
     <constructor-arg type="java.lang.String" value="${cosmo.log.HttpLoggingFilter.format}"/>
   </bean>
    
+  <!--  Retry Filter -->
+  <bean id="retryFilter" class="org.osaf.cosmo.filters.RetryFilter">
+    <property name="maxRetries" value="10"/>
+    <property name="methods">
+      <list>
+        <value>POST</value>
+        <value>PUT</value>
+        <value>DELETE</value>
+        <value>MKCALENDAR</value>
+      </list>
+    </property>
+    <property name="exceptions">
+      <list>
+        <value>org.springframework.dao.ConcurrencyFailureException</value>
+        <value>org.springframework.dao.DataIntegrityViolationException</value>
+      </list>
+    </property>
+  </bean>
+   
   <!-- give JSP tag functions access to config properties -->
   <bean id="jspConfigProps" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
     <property name="targetClass" value="org.osaf.cosmo.ui.TagFunctions"/>

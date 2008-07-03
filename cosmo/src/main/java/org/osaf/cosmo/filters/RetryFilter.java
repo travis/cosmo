@@ -48,15 +48,10 @@ public class RetryFilter implements Filter, ServerConstants {
     private int maxRetries = 10;
     private int maxMemoryBuffer = 1024*256;
     private Class[] exceptions = new Class[] {};
-    private String[] methods = new String[] {"PUT", "POST", "DELETE", "MKCALENDAR" };
-    
-    private static final String PARAM_RETRIES = "retries";
-    private static final String PARAM_METHODS = "methods";
-    private static final String PARAM_EXCEPTIONS = "exceptions";
-    private static final String PARAM_MAX_MEM_BUFFER = "maxMemoryBuffer";
-
+    private String[] methods = new String[] {"PUT", "POST", "DELETE"};
 
     public void destroy() {
+        // nothing to do
     }
 
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -146,7 +141,7 @@ public class RetryFilter implements Filter, ServerConstants {
     private boolean isFilterException(Exception e) {
         for(Class exception: exceptions)
             if(exception.isInstance(e))
-            return true;
+                return true;
 
         return false;
     }
@@ -177,35 +172,23 @@ public class RetryFilter implements Filter, ServerConstants {
     }
 
     public void init(FilterConfig config) throws ServletException {
-        try {
-            // initialize maxRetries from config parameter
-            String param = config.getInitParameter(PARAM_RETRIES);
-            if(param!=null)
-                maxRetries = Integer.parseInt(param);
+       // nothing to do
+    }
+    
+    public void setMaxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+    }
 
-            // initialize methods to filter
-            param = config.getInitParameter(PARAM_METHODS);
-            if(param!=null) {
-                methods = param.split(",");
-            }
+    public void setMaxMemoryBuffer(int maxMemoryBuffer) {
+        this.maxMemoryBuffer = maxMemoryBuffer;
+    }
 
-            // initialize memory buffer size
-            param = config.getInitParameter(PARAM_MAX_MEM_BUFFER);
-            if(param!=null)
-                maxMemoryBuffer = Integer.parseInt(param);
-            
-            // initialize exceptions to catch and retry
-            param = config.getInitParameter(PARAM_EXCEPTIONS);
-            if(param!=null) {
-                String[] classes = param.split(","); 
-                exceptions = new Class[classes.length];
-                for(int i=0;i<classes.length;i++)
-                    exceptions[i] = Class.forName(classes[i]);
-            }
-        } catch (Exception e) {
-            log.error("error configuring filter", e);
-            throw new ServletException(e);
-        }
+    public void setExceptions(Class[] exceptions) {
+        this.exceptions = exceptions;
+    }
+
+    public void setMethods(String[] methods) {
+        this.methods = methods;
     }
 
 }

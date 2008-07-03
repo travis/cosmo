@@ -165,22 +165,14 @@
   </filter>
   <filter>
     <filter-name>retry-filter</filter-name>
-    <filter-class>org.osaf.cosmo.filters.RetryFilter</filter-class>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
-      <param-name>retries</param-name>
-      <param-value>10</param-value>
-      <param-name>methods</param-name>
-      <param-value>POST,PUT,DELETE,MKCALENDAR</param-value>
-      <param-name>exceptions</param-name>
-      <param-value>org.springframework.dao.ConcurrencyFailureException,org.springframework.dao.DataIntegrityViolationException</param-value>
+      <param-name>targetBeanName</param-name>
+      <param-value>retryFilter</param-value>
     </init-param>
   </filter>
   <filter-mapping>
     <filter-name>http-override</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>version-header</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>

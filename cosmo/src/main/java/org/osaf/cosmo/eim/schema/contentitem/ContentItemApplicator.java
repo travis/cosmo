@@ -27,7 +27,6 @@ import org.osaf.cosmo.eim.schema.EimSchemaException;
 import org.osaf.cosmo.eim.schema.EimValidationException;
 import org.osaf.cosmo.eim.schema.text.TriageStatusFormat;
 import org.osaf.cosmo.model.ContentItem;
-import org.osaf.cosmo.model.EntityFactory;
 import org.osaf.cosmo.model.Item;
 import org.osaf.cosmo.model.TriageStatus;
 

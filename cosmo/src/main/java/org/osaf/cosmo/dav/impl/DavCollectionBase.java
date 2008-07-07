@@ -367,11 +367,16 @@ public class DavCollectionBase extends DavItemResourceBase
                                                    "utf8"));
 
         writer.write("<html>\n<head><title>");
-        writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
+        String colName = getDisplayName() != null ? getDisplayName() : "no name";
+        writer.write(StringEscapeUtils.escapeHtml(colName));
+      
+        
         writer.write("</title></head>\n");
         writer.write("<body>\n");
         writer.write("<h1>");
-        writer.write(StringEscapeUtils.escapeHtml(getDisplayName()));
+        
+        writer.write(StringEscapeUtils.escapeHtml(colName));
+      
         writer.write("</h1>\n");
         
         DavResource parent = getParent();
@@ -379,7 +384,10 @@ public class DavCollectionBase extends DavItemResourceBase
             writer.write("Parent: <a href=\"");
             writer.write(parent.getResourceLocator().getHref(true));
             writer.write("\">");
-            writer.write(StringEscapeUtils.escapeHtml(parent.getDisplayName()));
+            if(parent.getDisplayName()!=null)
+                writer.write(StringEscapeUtils.escapeHtml(parent.getDisplayName()));
+            else
+                writer.write("no name");
             writer.write("</a></li>\n");
         }
 
@@ -390,7 +398,10 @@ public class DavCollectionBase extends DavItemResourceBase
             writer.write("<li><a href=\"");
             writer.write(child.getResourceLocator().getHref(child.isCollection()));
             writer.write("\">");
-            writer.write(StringEscapeUtils.escapeHtml(child.getDisplayName()));
+            if(child.getDisplayName()!=null)
+                writer.write(StringEscapeUtils.escapeHtml(child.getDisplayName()));
+            else
+                writer.write("no name");
             writer.write("</a></li>\n");
         }
         writer.write("</ul>\n");

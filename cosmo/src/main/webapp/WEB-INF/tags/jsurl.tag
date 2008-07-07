@@ -29,3 +29,7 @@
 
 <c:set var="result"
        value="${baseUrl}/js-${PRODUCT_VERSION}"/>
+<c:if test="${properties['cosmo.debug.jsDev']}">
+<c:set var="result"
+       value="${baseUrl}/js-dev"/>
+</c:if>

@@ -20,7 +20,7 @@ esac
 
 ##### build dojo files #####
 cd dojo-src/util/buildscripts
-./build.sh profile=../../../../$profile action=clean,release $cssBuild optimize="shrinksafe" copyTests=false
+./build.sh profile=../../../../$profile action=clean,release $cssBuild optimize="shrinksafe"
 
 cd ../../../
 

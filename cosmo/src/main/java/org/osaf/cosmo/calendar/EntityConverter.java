@@ -833,10 +833,21 @@ public class EntityConverter {
                 note.setReminderTime(reminderTime);
         }
 
+        // calculate triage status based on start date
         java.util.Date now =java.util.Calendar.getInstance().getTime();
         boolean later = event.getStartDate().getDate().after(now);
         int code = (later) ? TriageStatus.CODE_LATER : TriageStatus.CODE_DONE;
-        note.getTriageStatus().setCode(code);
+        
+        TriageStatus triageStatus = note.getTriageStatus();
+        
+        // initialize TriageStatus if not present
+        if (triageStatus == null) {
+            triageStatus = TriageStatusUtil.initialize(entityFactory
+                    .createTriageStatus());
+            note.setTriageStatus(triageStatus);
+        }
+
+        triageStatus.setCode(code);
         
         // check for X-OSAF-STARRED
         if ("TRUE".equals(ICalendarUtils.getXProperty(X_OSAF_STARRED, event))) {

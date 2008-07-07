@@ -138,7 +138,7 @@ public class StandardProvider extends AbstractProvider {
             
             return response;
         } catch (Throwable e) {
-            log.error(e);
+            log.error("Unexpected processing error", e);
             if (transaction != null)
                 transaction.compensate(request, e);
             response = ProviderHelper.servererror(request, e);

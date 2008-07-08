@@ -29,7 +29,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
       ["status", String, {}],
       ["lastPastOccurrence", cosmo.datetime.Date, {}]
     ],
-    //mixins for master item stamps		 
+    //mixins for master item stamps
     {
         constructor: function(kwArgs){
             this.initializeProperties(kwArgs);
@@ -40,11 +40,11 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
             if (duration == null){
                 return this.getStartDate();
             }
-            
+
             if (this.getStartDate() == null){
                 return null;
             }
-            
+
             var endDate = this.getStartDate().clone();
             endDate.addDuration(duration);
             if (this.getAnyTime() || this.getAllDay()){
@@ -52,7 +52,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
             }
             return endDate;
         },
-        
+
         getStatus: function(){
             if (this.getAnyTime() || this.getAtTime()){
                 return null;
@@ -69,20 +69,22 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
             var duration = new cosmo.model.Duration(this.getStartDate(), endDate);
             this.setDuration(duration);
         },
-    
+
+        // setStartDate will automatically move recurrences and modifications appropriately,
+        // unless noMove is passed
         setStartDate: function (/*cosmo.datetime.Date*/ newStartDate){
            var oldDate = this.getStartDate();
            this.__setProperty("startDate", newStartDate);
 
-           //if this event stamp is attached to an item, and already has a 
+           //if this event stamp is attached to an item, and already has a
            //previous start date we may have some updating to do
            if (this.item && oldDate){
-               var diff = dojo.date.difference(oldDate, 
+               var diff = dojo.date.difference(oldDate,
                    newStartDate, cosmo.datetime.util.dateParts.SECOND);
-               
+
                //if there are modifications, we need to move the recurrenceid's for all of them
                if (!cosmo.util.lang.isEmpty(this.item._modifications)){
-               
+
                    //first copy the modifications into a new hash
                    var mods = this.item._modifications;
                    var oldMods = {};
@@ -90,15 +92,15 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                    for (var x in mods){
                        delete mods[x];
                    }
-                   for (var x in oldMods){
-                       var mod = oldMods[x];
+                   for (var y in oldMods){
+                       var mod = oldMods[y];
                        var rId = mod.getRecurrenceId().clone();
                        rId.add(cosmo.datetime.util.dateParts.SECOND, diff);
                        mod.setRecurrenceId(rId);
                        this.item.addModification(mod);
                    }
                }
-               
+
                //also, if there are exdates, we need to move the recurrenceid's for all of them too
                if (this._exdates && this._exdates.length > 0){
                    var oldExdates = this._exdates;
@@ -106,12 +108,12 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                    for (var x = 0; x < oldExdates.length; x++){
                        var exdate = oldExdates[x];
                        exdate.add(cosmo.datetime.util.dateParts.SECOND, diff);
-                       newExdates.push(exdate);                   
+                       newExdates.push(exdate);
                    }
-                   this._exates = newExdates;
+                   this._exdates = newExdates;
                }
            }
-           
+
         },
 
         // get rid of occurrences before newStartDate
@@ -130,19 +132,19 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
         getAtTime: function(){
             return !this.getDuration() || this.getDuration().isZero();
         },
-        
-       applyChange: function(propertyName, changeValue, type){
-            //this handles the case of setting the master start date or end date 
+
+        applyChange: function(propertyName, changeValue, type){
+            //this handles the case of setting the master start date or end date
             // from an occurrence
-            if ( (propertyName == "startDate" || propertyName =="endDate") 
-                    && type == "master" 
+            if ( (propertyName == "startDate" || propertyName =="endDate")
+                    && type == "master"
                     && this.isOccurrenceStamp()){
                 var getterAndSetter = cosmo.model.util.getGetterAndSetterName(propertyName);
                 var getterName = getterAndSetter[0];
                 var setterName = getterAndSetter[1];
-                
-                var diff =  dojo.date.difference(this[getterName](), 
-                            changeValue, 
+
+                var diff =  dojo.date.difference(this[getterName](),
+                            changeValue,
                             cosmo.datetime.util.dateParts.SECOND);
 
                 var masterDate = this.getMaster().getEventStamp()[getterName]();
@@ -154,7 +156,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                 if (propertyName == "startDate"){
                     this.item.recurrenceId.add(cosmo.datetime.util.dateParts.SECOND,diff);
                 }
-                return;  
+                return;
             }
             this.inherited("applyChange", arguments);
         }
@@ -167,7 +169,7 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
                return this.recurrenceId;
             }
         },
-        
+
         //we don't want to inherit from the one from the master....
         setStartDate: function (newStartDate){
            this.__setProperty("startDate", newStartDate);

@@ -18,12 +18,12 @@ package org.osaf.cosmo.migrate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osaf.cosmo.migrate.mock.MockDataSource;
-import org.osaf.cosmo.migrate.mock.MockMigration;
-import org.osaf.cosmo.migrate.mock.MockMigrationManager;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import org.osaf.cosmo.migrate.mock.MockMigration;
+import org.osaf.cosmo.migrate.mock.MockMigrationManager;
+import org.osaf.cosmo.migrate.mock.MockJdbcUtil;
 
 /**
  * Test MigrationManager
@@ -40,7 +40,7 @@ public class MigrationManagerTest extends TestCase {
     protected void setUp() throws Exception {
         manager = new MockMigrationManager();
         ((MockMigrationManager) manager).setCurrentVersion("1");
-        manager.setDatasource(new MockDataSource());
+        manager.setDatasource(MockJdbcUtil.getMockDataSource());
        
         mig1 = new MockMigration();
         mig2 = new MockMigration();

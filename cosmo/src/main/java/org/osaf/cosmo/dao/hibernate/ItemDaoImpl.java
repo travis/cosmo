@@ -94,7 +94,7 @@ public abstract class ItemDaoImpl extends HibernateDaoSupport implements ItemDao
         try {
             Item parent = findItemByUid(parentUid);
             if(parent==null)
-                throw new ItemNotFoundException("parent with uid " + parentUid + " not found");
+                return null;
             Item item = itemPathTranslator.findItemByPath(path, (CollectionItem) parent);
             return item;
         } catch (HibernateException e) {

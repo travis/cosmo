@@ -113,7 +113,20 @@ cosmo.model.declareStamp("cosmo.model.EventStamp", "event", "http://osafoundatio
            }
            
         },
-        
+
+        // get rid of occurrences before newStartDate
+        discardBefore: function (/*cosmo.datetime.Date*/ newStartDate){
+            var mods = this.item._modifications;
+            for (var key in mods){
+                if (newStartDate.after(mods[key].getRecurrenceId()))
+                    delete mods[key];
+            }
+            if (this._exdates) this._exdates = dojo.filter(this._exdates,
+                function(exdate){return newStartDate.before(exdate);});
+
+            this.__setProperty("startDate", newStartDate);
+        },
+
         getAtTime: function(){
             return !this.getDuration() || this.getDuration().isZero();
         },

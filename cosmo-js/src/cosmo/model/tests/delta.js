@@ -15,6 +15,7 @@
 */
 dojo.provide("cosmo.model.tests.delta");
 dojo.require("cosmo.model.util");
+dojo.require("cosmo.model.common");
 dojo.require("cosmo.model.Item");
 dojo.require("cosmo.model.Delta");
 dojo.require("cosmo.model.EventStamp");
@@ -313,6 +314,25 @@ function makeItemAllDay(){
         delta.deltafy();
         var changes = delta.getApplicableChangeTypes();
         jum.assertTrue("Master only for series only stamp", setEquals(changes, {master:true}));
+    },
+
+    // bugzilla bug 12206
+    function thisAndFutureWithExdate(){
+
+        // Set up recurrenc
+        var note = new cosmo.model.Note();
+        note.getEventStamp(true, {
+            startDate: new cosmo.datetime.Date(2000, 0, 1),
+            rrule: new cosmo.model.RecurrenceRule({frequency: cosmo.model.RRULE_FREQUENCIES.FREQUENCY_DAILY}),
+            exdates: [new cosmo.datetime.Date(2000, 0, 2)]
+        });
+
+        var occurrence = note.getNoteOccurrence(new cosmo.datetime.Date(2000, 0, 3));
+        var delta = new cosmo.model.Delta(occurrence);
+        delta.addStampProperty("event","startDate", new cosmo.datetime.Date(2000, 0, 3, 3));
+
+        var newItem  = delta.applyToOccurrenceAndFuture();
+        jum.assertEquals(0, newItem.getEventStamp().getExdates().length);
     }
 ]);
 })();

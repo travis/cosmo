@@ -44,7 +44,7 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
 
     privDict: {'ro': '<D:read/>',
             'rw': '<D:read/><D:write/>',
-            'fb': '<D:freebusy/>'},
+            'fb': '<C:read-free-busy/>'},
 
     constructor: function(){
         this.l10n = dojo.i18n.getLocalization("cosmo.ui.widget", "TicketWidget");
@@ -56,7 +56,8 @@ dojo.declare("cosmo.ui.widget.TicketWidget", [dijit._Widget, dijit._Templated], 
             var timeout = values.timeout;
             timeout = timeout? "Second-" + timeout: "Infinite";
             var content = ['<?xml version="1.0" encoding="utf-8" ?>',
-                '<ticket:ticketinfo xmlns:D="DAV:" ',
+                '<ticket:ticketinfo xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" ',
+
                 'xmlns:ticket="http://www.xythos.com/namespaces/StorageServer">',
                 '<D:privilege>', this.privDict[values.privileges], '</D:privilege>',
                 '<ticket:timeout>', timeout, '</ticket:timeout>',

@@ -109,7 +109,7 @@ public class DisplayAlarmGeneratorTest extends BaseGeneratorTestCase
         assertEquals("unexpected number of fields", 4, fields.size());
 
         EimRecordField descriptionField = fields.get(0);
-        checkTextField(descriptionField, FIELD_DESCRIPTION, null);
+        checkTextField(descriptionField, FIELD_DESCRIPTION, "Event Reminder");
 
         EimRecordField triggerField = fields.get(1);
         DateTime dt = new DateTime(true);

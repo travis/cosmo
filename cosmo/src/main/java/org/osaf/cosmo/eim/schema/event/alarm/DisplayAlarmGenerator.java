@@ -44,8 +44,10 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
     implements DisplayAlarmConstants {
     private static final Log log =
         LogFactory.getLog(DisplayAlarmGenerator.class);
-
+    
     private static final HashSet<String> STAMP_TYPES = new HashSet<String>(2);
+    
+    public static final String DEFAULT_DESCRIPTION = "Event Reminder";
     
     static {
         STAMP_TYPES.add("event");
@@ -139,11 +141,15 @@ public class DisplayAlarmGenerator extends BaseStampGenerator
     
     private void addFieldsNonEvent(EimRecord record) {
         NoteItem noteItem = (NoteItem) getItem();
+        boolean hasAlarm = noteItem.getReminderTime()!=null;
         
-        record.addField(new TextField(FIELD_DESCRIPTION, null));
+        if(hasAlarm)
+            record.addField(new TextField(FIELD_DESCRIPTION, DEFAULT_DESCRIPTION));
+        else
+            record.addField(new TextField(FIELD_DESCRIPTION, null));
         
         // TODO: fix to generate isMissing
-        if(noteItem.getReminderTime()==null) {
+        if(!hasAlarm) {
             record.addField(new TextField(FIELD_TRIGGER, null));
         }
         else {

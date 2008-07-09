@@ -180,6 +180,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         queryItem.setClientModifiedDate(new Date());
         es.setEventCalendar(helper.getCalendar("cal2.ics"));
         Calendar newCal = es.getEventCalendar();
+        Thread.sleep(10);
         
         contentDao.updateContent(queryItem);
         
@@ -191,6 +192,7 @@ public class HibernateContentDaoStampingTest extends AbstractHibernateDaoTestCas
         es = (EventStamp) stamp;
        
         Assert.assertTrue(stamp.getModifiedDate().after(stamp.getCreationDate()));
+        
         if(!es.getEventCalendar().toString().equals(newCal.toString())) {
             log.error(es.getEventCalendar().toString());
             log.error(newCal.toString());

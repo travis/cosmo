@@ -46,7 +46,8 @@ public interface CalendarDao {
     
 
     /**
-     * Find calendar items by filter.
+     * Find calendar items by calendar filter.  Calendar filter is
+     * based on the CalDAV filter element.
      *
      * @param collection
      *            collection to search

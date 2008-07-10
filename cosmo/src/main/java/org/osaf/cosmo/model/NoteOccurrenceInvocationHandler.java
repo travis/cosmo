@@ -17,6 +17,9 @@ package org.osaf.cosmo.model;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Date;
 
@@ -44,6 +47,8 @@ public class NoteOccurrenceInvocationHandler implements InvocationHandler {
     private Date occurrenceDate = null;
     private NoteItem masterNote = null;
     private ModificationUid modUid = null;
+    private static final Set<NoteItem> EMPTY_MODS = Collections
+            .unmodifiableSet(new HashSet<NoteItem>(0));
     
     public NoteOccurrenceInvocationHandler(Date occurrenceDate,
                                            NoteItem masterNote) {
@@ -73,6 +78,9 @@ public class NoteOccurrenceInvocationHandler implements InvocationHandler {
         // support getOccurrenceDate()
         else if(name.equals("getOccurrenceDate"))
             return occurrenceDate;
+        // no modifications
+        else if(name.equals("getModifications"))
+            return EMPTY_MODS;
         // equals() and hashCode() are based on modUid, so override
         else if(name.equals("equals"))
             return equalsOverride(args[0]);

@@ -98,14 +98,16 @@ public class FullFeedGenerator extends BaseItemFeedGenerator {
             entry.addLink(newModificationLink(modification));
 
         EventStamp stamp = StampUtils.getEventStamp(item);
-        if (stamp != null && stamp.isRecurring())
+        // Add expanded link only for master events
+        if (!(item instanceof NoteOccurrence) && stamp != null
+                && stamp.isRecurring())
             entry.addLink(newExpandedLink(item));
 
         if (item instanceof NoteOccurrence)
             entry.addLink(newMasterLink((NoteOccurrence)item));
         else
             entry.addLink(newEditLink(item));
-
+        
         if (item.getModifies() != null || item instanceof NoteOccurrence)
             entry.addLink(newDetachedLink(item));
 

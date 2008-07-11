@@ -44,9 +44,9 @@
 .cosmoRemoveCollectionDefault{height: 18px; width: 18px; background-position: -135px -45px; background-image: url(images/image_grid.png);}
 .cosmoRemoveCollectionRollover{height: 18px; width: 18px; background-position: -180px -45px; background-image: url(images/image_grid.png);}
 .cosmoRemoveCollectionSelected{height: 18px; width: 18px; background-position: -225px -45px; background-image: url(images/image_grid.png);}
-.cosmoTaskButtonDefault{height: 18px; width: 21px; background-position: -675px -90px; background-image: url(images/image_grid.png);}
-.cosmoTaskButtonRollover{height: 18px; width: 21px; background-position: -720px -90px; background-image: url(images/image_grid.png);}
-.cosmoTaskButtonSelected{height: 18px; width: 21px; background-position: -765px -90px; background-image: url(images/image_grid.png);}
+.cosmoTaskButtonDefault{height: 18px; width: 24px; background-position: -675px -90px; background-image: url(images/image_grid.png);}
+.cosmoTaskButtonRollover{height: 18px; width: 24px; background-position: -720px -90px; background-image: url(images/image_grid.png);}
+.cosmoTaskButtonSelected{height: 18px; width: 24px; background-position: -765px -90px; background-image: url(images/image_grid.png);}
 .cosmoTaskColumnDefault{height: 18px; width: 21px; background-position: -180px -134px; background-image: url(images/image_grid.png);}
 .cosmoTaskColumnSelected{height: 18px; width: 21px; background-position: -315px -134px; background-image: url(images/image_grid.png);}
 .cosmoTriageDoneButtonDefault{height: 18px; width: 43px; background-position: -360px -90px; background-image: url(images/image_grid.png);}

@@ -896,6 +896,60 @@ public class InstanceListTest extends TestCase {
         Assert.assertEquals("20070104T111500", instance.getEnd().toString());
     }
     
+    public void testRecurrenceExpanderByDay() throws Exception {
+       
+        Calendar calendar = getCalendar("recurring_by_day.ics");
+
+        InstanceList instances = new InstanceList();
+        
+        DateTime start = new DateTime("20080720T170000Z");
+        DateTime end = new DateTime("20080726T200000Z");
+        
+        addToInstanceList(calendar, instances, start, end);
+        
+        Assert.assertEquals(5, instances.size());
+        
+        Iterator<String> keys = instances.keySet().iterator();
+        
+        String key = null;
+        Instance instance = null;
+            
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20080721T180000Z", key);
+        Assert.assertEquals("20080721T110000", instance.getStart().toString());
+        Assert.assertEquals("20080721T113000", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20080722T180000Z", key);
+        Assert.assertEquals("20080722T110000", instance.getStart().toString());
+        Assert.assertEquals("20080722T113000", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20080723T180000Z", key);
+        Assert.assertEquals("20080723T110000", instance.getStart().toString());
+        Assert.assertEquals("20080723T113000", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20080724T180000Z", key);
+        Assert.assertEquals("20080724T110000", instance.getStart().toString());
+        Assert.assertEquals("20080724T113000", instance.getEnd().toString());
+        
+        key = keys.next();
+        instance = (Instance) instances.get(key);
+        
+        Assert.assertEquals("20080725T180000Z", key);
+        Assert.assertEquals("20080725T110000", instance.getStart().toString());
+        Assert.assertEquals("20080725T113000", instance.getEnd().toString());
+    }
+    
     private static void addToInstanceList(Calendar calendar,
             InstanceList instances, Date start, Date end) {
         ComponentList comps = calendar.getComponents();

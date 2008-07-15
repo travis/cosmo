@@ -15,24 +15,21 @@
  */
 package org.osaf.cosmo.dav.provider;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.apache.jackrabbit.webdav.io.OutputContextImpl;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.version.report.ReportInfo;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.osaf.cosmo.dav.BadRequestException;
 import org.osaf.cosmo.dav.ConflictException;
 import org.osaf.cosmo.dav.ContentLengthRequiredException;
@@ -57,8 +54,8 @@ import org.osaf.cosmo.dav.acl.UserAclEvaluator;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipal;
 import org.osaf.cosmo.dav.acl.resource.DavUserPrincipalCollection;
 import org.osaf.cosmo.dav.caldav.report.FreeBusyReport;
-import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.impl.DavFile;
+import org.osaf.cosmo.dav.impl.DavItemResource;
 import org.osaf.cosmo.dav.io.DavInputContext;
 import org.osaf.cosmo.dav.ticket.TicketConstants;
 import org.osaf.cosmo.model.EntityFactory;

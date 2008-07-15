@@ -28,6 +28,7 @@ import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VTimeZone;
 
@@ -64,6 +65,8 @@ public class CalendarUtils implements ICalendarConstants {
         if (calendar == null)
             return null;
         CalendarBuilder builder = CalendarBuilderDispenser.getCalendarBuilder();
+        clearTZRegistry(builder);
+        
         StringReader sr = new StringReader(calendar);
         return builder.build(sr);
     }
@@ -96,6 +99,7 @@ public class CalendarUtils implements ICalendarConstants {
         if (reader == null)
             return null;
         CalendarBuilder builder = CalendarBuilderDispenser.getCalendarBuilder();
+        clearTZRegistry(builder);
         return builder.build(reader);
     }
 
@@ -107,9 +111,9 @@ public class CalendarUtils implements ICalendarConstants {
      */
     public static Calendar parseCalendar(byte[] content) 
         throws ParserException, IOException {
-        Calendar calendar = CalendarBuilderDispenser.getCalendarBuilder()
-                .build(new ByteArrayInputStream(content));
-        return calendar;
+        CalendarBuilder builder = CalendarBuilderDispenser.getCalendarBuilder();
+        clearTZRegistry(builder);
+        return builder.build(new ByteArrayInputStream(content));
     }
 
     /**
@@ -120,9 +124,9 @@ public class CalendarUtils implements ICalendarConstants {
      */
     public static Calendar parseCalendar(InputStream is) 
         throws ParserException, IOException {
-        Calendar calendar = CalendarBuilderDispenser.getCalendarBuilder()
-                .build(is);
-        return calendar;
+        CalendarBuilder builder = CalendarBuilderDispenser.getCalendarBuilder();
+        clearTZRegistry(builder);
+        return builder.build(is);
     }
     
     public static Calendar copyCalendar(Calendar calendar) {
@@ -179,5 +183,12 @@ public class CalendarUtils implements ICalendarConstants {
                  return true;
          }
          return false;
+    }
+    
+    private static void clearTZRegistry(CalendarBuilder cb) {
+        // clear timezone registry if present
+        TimeZoneRegistry tzr = cb.getRegistry();
+        if(tzr!=null)
+            tzr.clear();
     }
 }

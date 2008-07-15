@@ -27,7 +27,6 @@ import org.osaf.cosmo.calendar.query.TextMatchFilter;
 import org.osaf.cosmo.calendar.query.TimeRangeFilter;
 import org.osaf.cosmo.model.CollectionItem;
 import org.osaf.cosmo.model.EventStamp;
-import org.osaf.cosmo.model.TaskStamp;
 import org.osaf.cosmo.model.filter.EventStampFilter;
 import org.osaf.cosmo.model.filter.ItemFilter;
 import org.osaf.cosmo.model.filter.NoteItemFilter;

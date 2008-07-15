@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+  Copyright 2008 Open Source Applications Foundation
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+      http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+</head>
+<body bgcolor="white">
+
+Implements a &quot;WSSE-based&quot; authentication. By
+including a WSSSE token a Cosmo request, the request can be
+authenticated without sending the password in clear text,
+as basic auth does.
+
+<h2>Authentication Details</h2>
+The algorithm works like this:
+<ol>
+   <li>Start with 2 pieces of information: username and password.</li>
+   <li>Create a nonce, which is a cryptographically random string</li>
+   <li>Create a "creation timestamp" of the current time, in W3DTF format</li>
+   <li>Create a password digest:<br/>
+
+      <code>PasswordDigest = Base64 \ (SHA1 (Nonce + CreationTimestamp + Password))</code>
+   </li>
+</ol>
+
+This requires the server to have access to the clear text password.  Because
+Cosmo only stores the MD5 hash, the MD5 hash can be thought of as the password
+equivalent and all references to <code>Password</code> really mean the MD5 hash
+of the user's password.
+
+The server verifies the token by re-calculating the hash given the username, nonce, creation timestamp,
+and the password equivalent stored in the database.  The server will reject any token
+that does not match or that contains an out-of-date creation timestamp (to prevent replay attacks).
+In future implementations, the nonce should be cached and tokens should also be rejected
+if the nonce has been used before, but cosmo currently does not do this.
+
+So an example on how to authenticate usssing a WSSE UserToken:
+<ol>
+<li> User Joe has username "joeschmoe" has a password "abcd" (assume MD5 hash is 5f4dcc3b5aa765d61d8327deb882cf99)
+<li> Joe creates a nonce, "d36e316282959a9ed4c89851497a717f"</li>
+<li> Joe created this nonce at "2003-12-15T14:43:07Z", so that's the creation timestamp.</li>
+<li> Joe's password digest is <code>Base64(SHA1 ("d36e316282959a9ed4c89851497a717f" + "2003-12-15T14:43:07Z" + "5f4dcc3b5aa765d61d8327deb882cf99"))</code>, which is "quR/EWLAV4xLf9Zqyw4pDmfV90Y=". 
+<li> Joe request includes the following header:<br/>
+     <code>X-WSSE: UsernameToken Username="bob", PasswordDigest="quR/EWLAV4xLf9Zqyw4pDmfV9OY=", Nonce="d36e316282959a9ed4c89851497a717f", Created="2003-12-15T14:43:07Z"</code>
+     </li>
+<h2>Related Documentation</h2>
+
+<ul>
+<li><a
+href="http://www.oasis-open.org/committees/wss/documents/WSS-Username-02-0223-merged.pdf">WSSE Username Token</a></li>
+<li><a
+href="http://www.w3.org/TR/NOTE-datetime">W3DTF format</a></li>
+<li><a
+href="http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a></li>
+</ul>
+
+</body>
+</html>

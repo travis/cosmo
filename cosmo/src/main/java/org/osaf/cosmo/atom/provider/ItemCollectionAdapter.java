@@ -18,6 +18,8 @@ package org.osaf.cosmo.atom.provider;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -405,9 +407,10 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
   
     public ResponseContext postCollection(RequestContext request) {
         // This adapter supports POSTing an XHTML representation (
-        // of a collection (no child items), or POSTing an icalendar
+        // of a collection (no child items), POSTing an icalendar
         // representation of a collection (where child items will be
-        // imported as well)
+        // imported as well), or POSTing a URL that points to
+        // an icalendar representation of a collection
         
         MimeType ct = request.getContentType();
         if (ct == null)
@@ -418,12 +421,68 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
         if(MimeTypeHelper.isMatch(MEDIA_TYPE_XHTML, mimeType))
             return createCollectionXHTML(request);
         else if(MimeTypeHelper.isMatch(MEDIA_TYPE_CALENDAR, mimeType))
-            return createCollectionICS(request);
+            return createCollectionICSFromData(request);
+        else if(MimeTypeHelper.isMatch(MEDIA_TYPE_URLENCODED, mimeType))
+            return createCollectionICSFromURL(request);
         else
             return ProviderHelper.notsupported(request, "unsupported Content-Type");
     }
     
-    protected ResponseContext createCollectionICS(RequestContext request) {
+    protected ResponseContext createCollectionICSFromURL(RequestContext request) {
+
+        try {
+            String url = getNonEmptyParameter(request, "url");
+            if (url == null)
+                return ProviderHelper.badrequest(request, "url must be provided");
+            URL calUrl = new URL(url);
+            
+            Calendar calendar = CalendarUtils.parseCalendar(calUrl.openConnection().getInputStream());
+            if(calendar==null)
+                return ProviderHelper.badrequest(request, "invalid icalendar");
+            
+            calendar.validate(true);
+            
+            return createCollectionICSCommon(request, calendar);
+            
+        } catch(MalformedURLException e) {
+            return ProviderHelper.badrequest(request, "invalid URL");
+        } catch(UnsupportedEncodingException e) {
+            return ProviderHelper.badrequest(request, "displayName and icalendar must be provided");
+        } catch (IOException e) {
+            String reason = "Unable to read URL content: " + e.getMessage();
+            return ProviderHelper.badrequest(request, reason);
+        } catch(ParserException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        } catch(net.fortuna.ical4j.model.ValidationException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        }
+    }
+    
+    protected ResponseContext createCollectionICSFromData(RequestContext request) {
+
+        try {
+            // parse and validate icalendar
+            Calendar calendar = CalendarUtils.parseCalendar(request.getReader());
+            if(calendar==null)
+                return ProviderHelper.badrequest(request, "invalid icalendar");
+            
+            calendar.validate(true);
+            return createCollectionICSCommon(request, calendar);
+            
+        } catch(UnsupportedEncodingException e) {
+            return ProviderHelper.badrequest(request, "displayName and icalendar must be provided");
+        } catch (IOException e) {
+            String reason = "Unable to read request content: " + e.getMessage();
+            log.error(reason, e);
+            return ProviderHelper.servererror(request, reason, e);
+        } catch(ParserException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        } catch(net.fortuna.ical4j.model.ValidationException e) {
+            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
+        }
+    }
+    
+    protected ResponseContext createCollectionICSCommon(RequestContext request, Calendar calendar) {
         
         NewCollectionTarget target = (NewCollectionTarget) request.getTarget();
         User user = target.getUser();
@@ -437,13 +496,6 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
            
             if(displayName==null)
                 return ProviderHelper.badrequest(request, "displayName must be provided");
-            
-            // parse and validate icalendar
-            Calendar calendar = CalendarUtils.parseCalendar(request.getReader());
-            if(calendar==null)
-                return ProviderHelper.badrequest(request, "invalid icalendar");
-            
-            calendar.validate(true);
             
             // create new collection
             CollectionItem collection = getEntityFactory().createCollection();
@@ -474,16 +526,6 @@ public class ItemCollectionAdapter extends BaseCollectionAdapter implements Atom
 
             return created(collection, locator);
             
-        } catch(UnsupportedEncodingException e) {
-            return ProviderHelper.badrequest(request, "displayName and icalendar must be provided");
-        } catch (IOException e) {
-            String reason = "Unable to read request content: " + e.getMessage();
-            log.error(reason, e);
-            return ProviderHelper.servererror(request, reason, e);
-        } catch(ParserException e) {
-            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
-        } catch(net.fortuna.ical4j.model.ValidationException e) {
-            return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
         } catch(ModelValidationException e) {
             return ProviderHelper.badrequest(request, "invalid icalendar: " + e.getMessage());
         }

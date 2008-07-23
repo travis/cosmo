@@ -58,7 +58,7 @@ login_with_user_json = """{"method": "type", "params": {"id" : "loginDialogUsern
 {"method": "type", "params": {"id" : "loginDialogPasswordInput", "text": "tester"}}
 {"method": "click", "params": {"id" : "loginSubmitButton"}}
 {"method":"reWriteAlert", "params":{}}
-{"method": "waits.forElement", "params": {"id": "_month2_day28", "timeout": 40000}}
+{"method": "waits.forElement", "params": {"id": "collectionDisplayAddCollectionButton", "timeout": 40000}}
 {"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
 {"params": {"text": "tester tester", "id": "getValueInput"}, "method": "type"}
 {"params": {"id": "getValueSubmit"}, "method": "click"}

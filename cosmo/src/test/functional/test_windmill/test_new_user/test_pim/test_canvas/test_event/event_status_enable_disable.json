@@ -10,7 +10,7 @@
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}
 
 //ensure that detailViewStatusSelector is disabled (as it should be for @time)
-{"params": {"validator": "disabled|true", "id": "detailViewStatusSelector"},  "method": "asserts.assertProperty"}
+{"params": {"validator": "style.display|", "id": "detailViewStatusSelector"},  "method": "asserts.assertProperty"}
 
 //make the event all day
 {"params": {"id": "detailViewAllDayInput"},  "method": "check"}
@@ -26,4 +26,4 @@
 {"params": {"milliseconds": 3000},  "method": "waits.sleep"}
 
 //event status should be disabled for any time events
-{"params": {"validator": "disabled|true", "id": "detailViewStatusSelector"},  "method": "asserts.assertProperty"}
+{"params": {"validator": "style.display|", "id": "detailViewStatusSelector"},  "method": "asserts.assertProperty"}

@@ -51,13 +51,13 @@
 {"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(2).getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getFirst().id"}, "method": "extensions.clickLozenge"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getFirst().lozenge.domNode.id"}, "method": "click"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}
 {"params": {"validator": "Calendar A", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getAtPos(1).id"}, "method": "extensions.clickLozenge"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getAtPos(1).lozenge.domNode.id"}, "method": "click"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}
 {"params": {"validator": "Calendar B", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getAtPos(2).id"}, "method": "extensions.clickLozenge"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getAtPos(2).lozenge.domNode.id"}, "method": "click"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}
 {"params": {"validator": "Calendar C", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
 {"params": {"milliseconds": 2000}, "method": "waits.sleep"}

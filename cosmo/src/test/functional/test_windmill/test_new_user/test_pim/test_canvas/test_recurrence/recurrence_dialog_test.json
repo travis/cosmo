@@ -15,19 +15,19 @@
 {"params": {"option": "Daily", "id": "detailViewRecurrenceSelector"},  "method": "select"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getCurrent().id"},  "method": "extensions.clickLozenge"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getCurrent().lozenge.domNode.id"},  "method": "click"}
 {"method": "select", "params": {"id" : "detailViewTimezoneRegionSelector", "option": "America"}}
 {"params": {"option": "Mazatlan", "id": "detailViewTimezoneIdSelector"},  "method": "select"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}
 {"params": {"jsid": "{$btnsRight0}"}, "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().lozenge.domNode.id"},  "method": "click"}
 {"method": "select", "params": {"id" : "detailViewTimezoneRegionSelector", "option": "America"}}
 {"params": {"option": "Barbados", "id": "detailViewTimezoneIdSelector"},  "method": "select"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}
 {"method": "waits.sleep", "params": {"milliseconds" : 3000}}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().id"},  "method": "extensions.clickLozenge"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().lozenge.domNode.id"},  "method": "click"}
+{"params": {"jsid": "cosmo.view.cal.itemRegistry.getNext().lozenge.domNode.id"},  "method": "click"}
 {"method": "select", "params": {"id" : "detailViewTimezoneRegionSelector", "option": "America"}}
 {"params": {"option": "Miquelon", "id": "detailViewTimezoneIdSelector"},  "method": "select"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}

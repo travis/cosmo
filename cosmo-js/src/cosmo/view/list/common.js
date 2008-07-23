@@ -224,7 +224,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
         this.triageStatusCodeMappings[tr]) : '(NONE)';
     if (tr == cosmo.model.TRIAGE_LATER && dt){
         // sort the LATER by date, if available
-        tr = (tr - 100) * largeNumber + sr/1000;
+        tr = (tr - 50) * largeNumber + sr/1000;
     } else {
         // otherwise, just sort by reverse rank
         tr = tr * largeNumber - rank;

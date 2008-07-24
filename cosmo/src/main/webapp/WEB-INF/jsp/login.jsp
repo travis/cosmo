@@ -76,6 +76,8 @@
           <fmt:message key="Login.LostActivation"/>
         </a>
       </c:if>
+      |
+      <a href="<fmt:message key='Help.LoginUrl'/>"><fmt:message key='Main.Help'/></a>
     </div>
 
     <div id="gallery"></div>

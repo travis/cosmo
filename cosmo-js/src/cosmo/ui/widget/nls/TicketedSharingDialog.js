@@ -14,10 +14,17 @@
  * limitations under the License.
 */
 ({
+     iCal: "Apple iCal, Google",
+     iCalLabel: "Apple iCal, Google",
+     iCalSubscribeTitle: "Apple iCal, Google",
      iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>"
          +"<p>Click on the above link to subscribe <b>view-only</b> to this collection with Apple iCal. "
          + "If that fails, from Apple iCal, <br/> go to <b>Calendar>>Subscribe...</b> and paste this link "
-         + "into the <b>URL:</b> field.</p>",
+         + "into the <b>URL:</b> field.</p>"
+         + "<b>Google Calendar</b>"
+         + "<ol style='margin: 1em 0em 0em 2em'><li>Copy the above link.</li>"
+         + "<li> In Google Calendar, select \"<b>Add by URL</b>\" from the <b>[Add]</b> pulldown.</li>"
+         + "<li>Paste the URL and click <b>[Add]</b></li>",
 
      davInstructions: "<a href='${dav}' onclick='return false'>${dav}</a>"
          + "<p>Paste the above link into a CalDAV client that supports individual collection subscriptions.</p>"

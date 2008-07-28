@@ -4,6 +4,7 @@
 {"params": {"id": "hourDiv1-1200"}, "method": "doubleClick"}
 {"params": {"text": "Properties Test", "id": "detailViewTitleInput"}, "method": "type"}
 {"params": {"text": "9:00 AM", "id": "detailViewStartTimeInput"}, "method": "type"}
+{"params": {"id": "detailView"}, "method": "click"}
 {"params": {"text": "4:00 PM", "id": "detailViewEndTimeInput"}, "method": "type"}
 {"params": {"option": "Tentative", "id": "detailViewStatusSelector"}, "method": "select"}
 {"params": {"id": "detailViewSaveButton"}, "method": "click"}

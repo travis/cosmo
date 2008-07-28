@@ -23,7 +23,7 @@
 {"method": "waits.forElement", "params": {"id": "listViewQuickItemEntry", "timeout": "40000"}}
 
 //select it
-{"params": {"jsid": "'listView_item' + windmill.testWindow.cosmo.view.list.itemRegistry.getLast().id"}, "method": "click"}
+{"params": {"jsid": "'listView_item' + windmill.testWindow.cosmo.view.list.itemRegistry.getNext().id"}, "method": "click"}
 
 //unstamp event
 {"params": {"id": "detailViewEventButton"}, "method": "click"}

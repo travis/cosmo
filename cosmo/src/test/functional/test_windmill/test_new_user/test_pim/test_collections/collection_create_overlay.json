@@ -18,7 +18,7 @@
 {"params": {"id": "detailViewTitleInput"}, "method": "click"}
 {"params": {"text": "Testing overalys, first calendar", "id": "detailViewTitleInput"}, "method": "type"}
 {"params": {"id": "detailViewLocationInput"}, "method": "click"}
-{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
+{"params": {"id": "detailViewSaveButton"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getFirst().getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 3000}, "method": "waits.sleep"}
 {"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
@@ -33,7 +33,7 @@
 {"params": {"id": "detailViewTitleInput"}, "method": "click"}
 {"params": {"text": "Testing overalys, first calendar", "id": "detailViewTitleInput"}, "method": "type"}
 {"params": {"id": "detailViewLocationInput"}, "method": "click"}
-{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
+{"params": {"id": "detailViewSaveButton"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(1).getUid()"}, "method": "extensions.checkCollection"}
 {"params": {"milliseconds": 2500}, "method": "waits.sleep"}
 {"params": {"id": "collectionDisplayAddCollectionButton"}, "method": "click"}
@@ -48,23 +48,5 @@
 {"params": {"id": "detailViewTitleInput"}, "method": "click"}
 {"params": {"text": "Testing overalys, first calendar", "id": "detailViewTitleInput"}, "method": "type"}
 {"params": {"id": "detailViewLocationInput"}, "method": "click"}
-{"params": {"jsid": "cosmo.app.pim.layout.baseLayout.mainApp.rightSidebar.detailViewForm.buttonSection.saveButton.domNode.id"}, "method": "click"}
+{"params": {"id": "detailViewSaveButton"}, "method": "click"}
 {"params": {"jsid": "cosmo.app.pim.collections.getAtPos(2).getUid()"}, "method": "extensions.checkCollection"}
-{"params": {"milliseconds": 3000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getFirst().lozenge.domNode.id"}, "method": "click"}
-{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
-{"params": {"validator": "Calendar A", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getAtPos(1).lozenge.domNode.id"}, "method": "click"}
-{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
-{"params": {"validator": "Calendar B", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
-{"params": {"jsid": "cosmo.view.cal.itemRegistry.getAtPos(2).lozenge.domNode.id"}, "method": "click"}
-{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
-{"params": {"validator": "Calendar C", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
-{"params": {"milliseconds": 2000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.app.pim.collections.getAtPos(0).getUid()"}, "method": "extensions.checkCollection"}
-{"params": {"milliseconds": 1000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.app.pim.collections.getAtPos(1).getUid()"}, "method": "extensions.checkCollection"}
-{"params": {"milliseconds": 1000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.app.pim.collections.getAtPos(2).getUid()"}, "method": "extensions.checkCollection"}
-{"params": {"milliseconds": 1000}, "method": "waits.sleep"}
-{"params": {"jsid": "cosmo.app.pim.collections.getLast().getUid()"}, "method": "extensions.clickCollection"}

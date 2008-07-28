@@ -1,3 +1,0 @@
-{"params": {"timeout": 20000, "id": "listViewGoToPage"}, "method": "waits.forElement"}
-{"params": {"validator": "1", "id": "listViewGoToPage"}, "method": "asserts.assertValue"}
-{"params": {"id": "listViewPageNum"}, "method": "asserts.assertNode"}

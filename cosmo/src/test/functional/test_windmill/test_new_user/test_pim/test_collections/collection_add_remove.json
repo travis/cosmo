@@ -11,7 +11,7 @@
 {"params": {"timeout": 2000, "id": "collectionSharingDialogReadOnlyInviteLink"}, "method": "waits.forElement"}
 {"params": {"timeout": 2000, "id": "collectionSharingDialogReadWriteInviteLink"}, "method": "waits.forElement"}
 {"params": {"validator": "zeus", "id": "collectionSharingDialogDisplayName"}, "method": "asserts.assertText"}
-{"params": {"id": "collectionSharingDialogDelete"}, "method": "click"}
-{"params": {"timeout": 2000, "id": "cosmoModalConfirmYes"}, "method": "waits.forElement"}
+{"params": {"id": "collectionSharingDialogDismiss"}, "method": "click"}
+{"params": {"id": "collectionDisplayRemoveCollectionButton"}, "method": "click"}
+{"params": {"timeout": "2000", "id": "cosmoModalConfirmYes"}, "method": "waits.forElement"}
 {"params": {"id": "cosmoModalConfirmYes"}, "method": "click"}
-

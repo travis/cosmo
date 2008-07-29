@@ -19,9 +19,7 @@ login_with_root_snarf_json = """{"method": "click", "params": {"link" : "Log in 
 
 logout = """{"method": "click", "params": {"link" : "Log out"}}
 {"params": {"url": "\/"}, "method": "open"}
-{"method": "waits.forElement", "params": {"link" : "Log in to Chandler Server"}}
-{"params": {"milliseconds": 1000}, "method": "waits.sleep"}
-"""
+{"params": {"milliseconds": 1000}, "method": "waits.sleep"}"""
 
 from windmill.authoring import RunJsonFile
 import windmill
@@ -30,16 +28,13 @@ lab_urls = ['http://lab.osaf.us', 'http://next.osaf.us', 'http://d10test.osaf.us
 
 def setup_module(module):
     if windmill.settings['TEST_URL'] in lab_urls:
-        json = ""
+        json = login_with_root_lab_json
     else:
         json = login_with_root_snarf_json
     RunJsonFile('login_with_root_user.json', lines=json.splitlines())()
     
 def teardown_module(module):
-  if windmill.settings['TEST_URL'] in lab_urls:
-        json = ""
-  else:
-        RunJsonFile('log_out.json', lines=logout.splitlines())()
+    RunJsonFile('log_out.json', lines=logout.splitlines())()
 
     
     

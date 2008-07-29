@@ -64,7 +64,7 @@ function getEimRecordset(/*Object*/ props){
 function generateAtom(/*Object*/ content){
     var uuid = content.uuid;
     return dojox.data.dom.createDocument('<?xml version=\'1.0\' encoding=\'UTF-8\'?>' +
-    '<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:base="http://localhost:8080/cosmo/atom/">' +
+    '<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://localhost:8080/cosmo/atom/">' +
     '<id>urn:uuid:56599b95-6676-4823-8c88-1eec17058f48</id>' +
     '<title type="text">Cosmo</title>' +
     '<generator uri="http://cosmo.osafoundation.org/" version="0.7.0-SNAPSHOT">Cosmo Sharing Server</generator>' +

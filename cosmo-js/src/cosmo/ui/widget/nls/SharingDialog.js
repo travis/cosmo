@@ -66,7 +66,8 @@
      inviteInstructions: "Give out the URLs below to invite others to subscribe.",
      inviteReadOnly: "View-only",
      inviteReadWrite: "View and Edit",
-     subscriptionInviteInstructions: "Give out the URL below to invite others to subscribe.",
+     subscriptionInviteInstructions: "<b>Invite</b>: <br/>Give out the URL below to invite others to subscribe.",
+     subscriptionInviteLink: "Invitation Link",
 
      download: "Download",
 

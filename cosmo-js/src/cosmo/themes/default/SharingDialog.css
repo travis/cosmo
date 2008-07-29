@@ -116,6 +116,9 @@ h2.cosmoSharingSectionHead {
 .cosmoReadWriteInviteLink {
     display: block;
 }
+.cosmoSubscriptionInviteSection{
+    margin-top: 30px;
+}
 .cosmoOwnedCollectionDialog .cosmoSubscriptionInviteSection{
     display: none;
 }

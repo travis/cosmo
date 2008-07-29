@@ -12,9 +12,11 @@
 {"params": {"id": "detailViewLocationInput"},  "method": "click"}
 {"params": {"text": "Adams house", "id": "detailViewLocationInput"},  "method": "type"}
 {"params": {"text": "08\/06\/2007", "id": "detailViewStartDateInput"},  "method": "type"}
+{"method": "click", "params": {"id": "detailViewStartTimeInput"}}
 {"params": {"text": "12:00 AM", "id": "detailViewStartTimeInput"},  "method": "type"}
 {"params": {"milliseconds": "5000"},  "method": "waits.sleep"}
 {"params": {"text": "08\/06\/2007", "id": "detailViewEndDateInput"},  "method": "type"}
+{"method": "click", "params": {"id": "detailViewEndTimeInput"}}
 {"params": {"text": "5:00 PM", "id": "detailViewEndTimeInput"},  "method": "type"}
 {"params": {"milliseconds": "3000"},  "method": "waits.sleep"}
 {"params": {"option": "Tentative", "id": "detailViewStatusSelector"},  "method": "select"}

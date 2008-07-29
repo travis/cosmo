@@ -6,6 +6,7 @@
 {"params": {"milliseconds": 1500},  "method": "waits.sleep"}
 
 //make the end time == start time, making it a an @time event
+{"method": "click", "params": {"id": "detailViewEndTimeInput"}}
 {"params": {"text": "9:00 AM", "id": "detailViewEndTimeInput"},  "method": "type"}
 {"params": {"id": "detailViewSaveButton"},  "method": "click"}
 

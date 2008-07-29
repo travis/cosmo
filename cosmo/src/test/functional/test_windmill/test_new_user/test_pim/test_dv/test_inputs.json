@@ -6,5 +6,4 @@
 {"params": {"validator": "foobar", "id": "detailViewTitleInput"}, "method": "asserts.assertValue"}
 {"params": {"text": "foobar", "id": "detailViewLocationInput"}, "method": "type"}
 {"params": {"validator": "foobar", "id": "detailViewLocationInput"}, "method": "asserts.assertValue"}
-{"params": {"text": "foobar", "id": "detailViewNotesInput"}, "method": "type"}
-{"params": {"validator": "foobar", "id": "detailViewNotesInput"}, "method": "asserts.assertValue"}
+{"method": "click", "params": {"id": "detailViewSaveButton"}}

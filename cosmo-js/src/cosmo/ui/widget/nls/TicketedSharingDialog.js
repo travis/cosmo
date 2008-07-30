@@ -17,6 +17,7 @@
      iCal: "Apple iCal, Google",
      iCalLabel: "Apple iCal, Google",
      iCalSubscribeTitle: "Apple iCal, Google",
+     iCalInstructionsTitle: "Subscribe with Apple iCal or Google Calendar",
      iCalInstructions: "<a href='${webcalProtocol}' target='_blank'>${webcal}</a>"
          +"<p>Click on the above link to subscribe <b>view-only</b> to this collection with Apple iCal. "
          + "If that fails, from Apple iCal, <br/> go to <b>Calendar>>Subscribe...</b> and paste this link "

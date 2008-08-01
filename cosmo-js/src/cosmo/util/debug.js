@@ -32,17 +32,6 @@ cosmo.util.debug.aliasToDeprecatedFuncion = function (currentFunction, deprecate
     eval("window." + deprecatedName + ".prototype = p");
 };
 
-cosmo.util.debug.genericToString = function (){
-    var str = "";
-    for (var propName in this){
-        var prop = this[propName];
-        if (typeof prop != "function"){
-            str += propName + ": '" + prop + "'; ";
-        }
-    }
-    return str;
-};
-
 cosmo.util.debug.dumpIntoPopup = function (o) {
     var errorWin;
     var str = '';
@@ -94,10 +83,4 @@ function timeFunction(object, functionName){
        timer.end();
        return result;
    }
-};
-
-//deprecate old version sans namespace
-genericToString = function (){
-    dojo.deprecated("genericToString", "Use cosmo.util.debug.genericToString instead", "Version 0.6 Final Release");
-    return cosmo.util.debug.genericToString.apply(this, arguments);
 };

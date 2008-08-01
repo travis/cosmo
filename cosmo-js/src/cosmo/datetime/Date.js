@@ -33,7 +33,7 @@ dojo.require("dojox.date.posix");
 
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.timezone");
-dojo.require("cosmo.util.debug");
+dojo.require("cosmo.util");
 
 cosmo.datetime.Date = function () {
 
@@ -454,7 +454,7 @@ cosmo.datetime.Date.prototype.getTime = function() {
    return this.toUTC();
 };
 
-cosmo.datetime.Date.prototype.toString = cosmo.util.debug.genericToString;
+cosmo.datetime.Date.prototype.toString = cosmo.util.genericToString;
 
 cosmo.datetime.Date.prototype.clone = function(){
     var ret = new cosmo.datetime.Date(this.getFullYear(), this.getMonth(),

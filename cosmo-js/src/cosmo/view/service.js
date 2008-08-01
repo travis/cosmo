@@ -26,8 +26,6 @@ dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.util");
 dojo.require("cosmo.service.exception");
 
-dojo.require("cosmo.util.debug");
-
 cosmo.view.service = new function () {
     var self = this;
 

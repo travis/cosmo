@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Open Source Applications Foundation
+ * Copyright 2007-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
 */
 
+/**
+ * summary:
+ *      This module provides convenience functions for user preferences.
+ * description:
+ *      This module provides convenience functions for creating,
+ *      editing and deleting server side user preferences.
+ */
 dojo.provide("cosmo.account.preferences");
 
 dojo.require("cosmo.app.pim");
@@ -32,7 +39,7 @@ cosmo.account.preferences = new function () {
     this.setCookiePreference = function(key, val){
         return dojo.cookie(key, val, {path: "/"});
     };
-	
+
     this.getPreference = function(key, kwArgs){
 		return cosmo.app.pim.serv.getPreference(key, kwArgs);
     };
@@ -48,7 +55,7 @@ cosmo.account.preferences = new function () {
     this.deletePreference = function(key, kwArgs){
 		return cosmo.app.pim.serv.deletePreferences(key, kwArgs);
     };
-    
+
     this.getPreferences = function(kwArgs){
 		return cosmo.app.pim.serv.getPreferences(kwArgs);
     };

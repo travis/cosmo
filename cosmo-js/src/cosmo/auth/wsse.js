@@ -19,7 +19,15 @@
  *      http://www.xml.com/pub/a/2003/12/17/dive.html
  *      http://www.oasis-open.org/committees/wss/documents/WSS-Username-02-0223-merged.pdf
  * description:
- *      TODO: fill this in
+ *      This module provides an implementation of HTTP WSSE authentication
+ *      via a clean API that can be reused with other authentication mechanisms.
+ *      To use it, first set authentication credentials using
+ *      <code>cosmo.auth.wsse.setUsername</code> and
+ *      <code>cosmo.auth.wsse.setPassword</code>.
+ *      Next, get a Request object that can be passed to <code>dojo.xhrGet</code>
+ *      with <code>cosmo.auth.wsse.getAuthorizedRequest</code>.
+ *
+ *      This module does not address server side nonce timeouts.
  */
 
 dojo.provide("cosmo.auth.wsse");

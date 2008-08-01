@@ -33,7 +33,7 @@ cosmo.util.jsi18n.init = function(uri){
             if (cosmo.util.string.startsWith(dojo.trim(line), "#")){
                 continue;
             }
-            
+
             var arr = line.split("=");
             var key = arr[0];
             var value = arr[1];
@@ -54,4 +54,4 @@ cosmo.util.i18n.messageExists = function(str){
 }
 
 
-cosmo.util.i18n.getText = getText
+cosmo.util.i18n.getText = getText;

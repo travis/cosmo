@@ -12,6 +12,14 @@
  * limitations under the License.
  */
 
+/**
+ * summary:
+ *   This module chooses and provides a local storage provider.
+ * description:
+ *   This module chooses and provides a local storage provider.
+ *   If WHATWG dom storage is available, it will use that, otherwise
+ *   it will default to cookie storage.
+ */
 dojo.provide("cosmo.storage");
 dojo.require("cosmo.storage.Dom");
 dojo.require("cosmo.storage.Cookie");

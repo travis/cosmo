@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,17 @@
  * limitations under the License.
 */
 
-dojo.require("cosmo.util.i18n");
-
+/**
+ * summary:
+ *      This module provides general use convenience functions.
+ * description:
+ *      This module provides general use convenience functions including
+ *      the popular JavaScript-ism "bling," that is, $, and underscore
+ *      for string i18n.
+ */
 dojo.provide("cosmo.convenience");
+
+dojo.require("cosmo.util.i18n");
 
 dojo.global.$ = function (s) {
     return document.getElementById(s);

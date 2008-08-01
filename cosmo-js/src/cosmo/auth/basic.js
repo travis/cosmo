@@ -12,11 +12,17 @@
  * limitations under the License.
  */
 
- /**
+/**
  * summary:
  *      This module provides an implementation of HTTP Basic authentication
  * description:
- *      TODO: fill this in
+ *      This module provides an implementation of HTTP Basic authentication
+ *      via a clean API that can be reused with other authentication mechanisms.
+ *      To use it, first set authentication credentials using
+ *      <code>cosmo.auth.basic.setUsername</code> and
+ *      <code>cosmo.auth.basic.setPassword</code>.
+ *      Next, get a Request object that can be passed to <code>dojo.xhrGet</code>
+ *      with <code>cosmo.auth.basic.getAuthorizedRequest</code>.
  */
 
 dojo.provide("cosmo.auth.basic");

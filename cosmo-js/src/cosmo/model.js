@@ -16,14 +16,13 @@
 dojo.provide("cosmo.model");
 dojo.provide("cosmo.oldmodel");
 
-dojo.require("cosmo.util.debug");
 dojo.require("cosmo.util.hash");
 dojo.require("cosmo.datetime");
 dojo.require("cosmo.datetime.Date");
 
 cosmo.model.sortEvents = function(/*Array|cosmo.util.hash.Hash*/ events){
-// summary: Sorts a collection of events based on start date. 
-//          If the start dates are equal, longer events are  
+// summary: Sorts a collection of events based on start date.
+//          If the start dates are equal, longer events are
 //          sorted first
 
     var hash = events instanceof cosmo.util.hash.Hash;
@@ -35,11 +34,11 @@ cosmo.model.sortEvents = function(/*Array|cosmo.util.hash.Hash*/ events){
         var eventStamp = event.getEventStamp();
         var startDate = eventStamp.getStartDate();
         var endDate = eventStamp.getEndDate();
-        
+
         event.__startUTC = startDate.toUTC();
         event.__endUTC = endDate.toUTC();
     }
-    
+
     events.sort(cosmo.model._eventComparator);
 
     for (var x = 0; x < events.length; x++){

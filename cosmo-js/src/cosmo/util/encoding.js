@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Open Source Applications Foundation
+ * Copyright 2007-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
 */
 
-
+/**
+ * summary:
+ *      This module provides encoding utility functions.
+ * description:
+ *      This module provides encoding utility functions, in particular
+ *      a unicode compatible base64 encoding implementation.
+ */
 dojo.provide("cosmo.util.encoding");
 
 cosmo.util.encoding.base64Alphabet =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
     'abcdefghijklmnopqrstuvwxyz' +
-    '0123456789+/='
+    '0123456789+/=';
 
 cosmo.util.encoding.toBase64 = function(string){
     string = cosmo.util.encoding._utf8_encode(string);
@@ -57,7 +63,7 @@ cosmo.util.encoding.toBase64 = function(string){
 
     return out;
 
-}
+};
 
 cosmo.util.encoding.fromBase64 = function(string){
     var i = 0;

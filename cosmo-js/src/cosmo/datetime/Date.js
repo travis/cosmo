@@ -304,7 +304,7 @@ cosmo.datetime.Date.prototype.getTimezoneOffsetForGivenDate = function(date){
         }
     }
     return offsetMin;
-    
+
 }
 
 /**
@@ -338,7 +338,7 @@ cosmo.datetime.Date.prototype.getUserPrefTimezoneOffsetForGivenDate = function(d
             date.getFullYear(), date.getMonth(), date.getDate(),
             date.getHours(), date.getMinutes(), date.getSeconds());
     return offsetMin;
-    
+
 }
 /**
  * Formats the date in it's original timezone, using the strftime function
@@ -379,7 +379,7 @@ cosmo.datetime.Date.prototype.add = function(interv, incr) {
     var dt = dojo.date.add(new Date(this.toUTC()), interv, incr);
     // Get incremented Date
     // 'n', 'd', etc., string keys
-    
+
     // Update this date based on the new UTC
     this.updateFromUTC(dt.getTime());
 };
@@ -481,16 +481,16 @@ cosmo.datetime.Date.prototype.getCanonicalTzId = function(){
     if (!this.tzId){
         return null;
     }
-    
+
     var tz = cosmo.datetime.timezone.getTimezone(this.tzId);
-    
+
     if (!tz){
         return this.tzId;
     }
-    
+
     return tz.tzId;
 }
-    
+
 cosmo.datetime.Date.prototype.equals = function (/*cosmo.datetime.Date*/ that){
     return  that != null &&
             this.year == that.year &&
@@ -503,7 +503,7 @@ cosmo.datetime.Date.prototype.equals = function (/*cosmo.datetime.Date*/ that){
             this.getCanonicalTzId() == that.getCanonicalTzId() &&
             this.utc == that.utc;
 }
-    
+
 
 cosmo.datetime.Date.prototype.hash = function (){
     var hash =   this.year + ":"

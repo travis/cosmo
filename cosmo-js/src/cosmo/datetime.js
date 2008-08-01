@@ -14,7 +14,12 @@
  * limitations under the License.
 */
 
-
+/**
+ * summary:
+ *   This module provides constants used by datetime libraries;
+ * description:
+ *   This module provides constants used by datetime libraries;
+ */
 dojo.provide("cosmo.datetime");
 
 cosmo.datetime = new function () {

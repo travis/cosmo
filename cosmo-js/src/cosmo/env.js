@@ -21,6 +21,12 @@
  * @fileoverview provides information about the Cosmo environment.
  * @author Bobby Rullo br@osafoundation.org
  * @license Apache License 2.0
+ * summary:
+ *      This module provides quite a bit of global state.
+ * description:
+ *      This module provides quite a bit of global state.
+ *      Moving forward we should try to move all global state in the
+ *      system here, and avoid this kind of state whenever possible.
  */
 
 dojo.provide("cosmo.env");

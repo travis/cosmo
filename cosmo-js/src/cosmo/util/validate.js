@@ -13,6 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+/**
+ * summary:
+ *   This module provides utility functions for validating user input.
+ * description:
+ *   This module provides utility functions for validating user input.
+ */
 dojo.provide("cosmo.util.validate");
 
 dojo.require("cosmo.util.i18n");
@@ -29,7 +36,7 @@ cosmo.util.validate = new function () {
         // To require a 4 digit year entry, use this line instead:
         var pat = /^(\d{1,2})(\/|-)(\d{1,2})\2(\d{4})$/;
         var errMsg = '';
-        
+
         // Check format
         var matchArray = str.match(pat);
         if (!matchArray) {
@@ -49,7 +56,7 @@ cosmo.util.validate = new function () {
                 errMsg += _('App.Error.InvalidDayRange');
             }
             // Day 31 for correct months
-            if ((month == 4 || month == 6 || month == 9 || month == 11) 
+            if ((month == 4 || month == 6 || month == 9 || month == 11)
                 && day == 31) {
                 errMsg += Date.fullMonth[month-1] + ' does not have 31 days.\n';
             }
@@ -62,11 +69,11 @@ cosmo.util.validate = new function () {
             }
         }
         return errMsg;
-    }
+    };
     this.timeFormat = function (str) {
         var pat = /^(\d{1,2})(:)(\d{2})$/;
         var errMsg = '';
-        
+
         // Check format
         var matchArray = str.match(pat);
         if (!matchArray) {
@@ -83,7 +90,7 @@ cosmo.util.validate = new function () {
             }
         }
         return errMsg;
-    }
+    };
     /**
      * Makes sure the given text input has a given length
      * @return String, error message (empty if no err).
@@ -97,7 +104,7 @@ cosmo.util.validate = new function () {
             err = _('Signup.Error.MinLength') + ' (' + len + ')';
         }
         return err;
-    }
+    };
     /**
      * Makes sure the given text input is less than or equal to the given length
      * @return String, error message (empty if no err).
@@ -111,7 +118,7 @@ cosmo.util.validate = new function () {
             err = _('Signup.Error.MaxLength') + ' (' + len + ')';
         }
         return err;
-    }
+    };
     /**
      * Makes sure the given text input is not empty
      * @return String, error message (empty if no err).
@@ -123,7 +130,7 @@ cosmo.util.validate = new function () {
             err = _('Signup.Error.RequiredField');
         }
         return err;
-    }
+    };
     /**
      * Makes sure the given text input is a valid e-mail address
      * @return String, error message (empty if no err).
@@ -135,7 +142,7 @@ cosmo.util.validate = new function () {
             err = _('Signup.Error.ValidEMail');
         }
         return err;
-    }
+    };
     /**
      * Makes sure the given password field matches the other
      * @return String, error message (empty if no err).
@@ -148,15 +155,15 @@ cosmo.util.validate = new function () {
             err = _('Signup.Error.MatchPassword');
         }
         return err;
-    }
-    
+    };
+
     this.tosChecked = function(s) {
         var err = '';
         if (!s.checked){
             err = _('Signup.Error.TOS');
         }
         return err;
-    }
+    };
 
     this.match = function(s, r, error){
         var err = null;
@@ -165,17 +172,17 @@ cosmo.util.validate = new function () {
             err = error? _(error, val, r) : _('Validation.MatchRegExp', val, r);
         }
         return err;
-    }
+    };
 
     this.doesNotMatch = function(s, r, error){
         var err = null;
         var val = typeof s == 'object' ? s.value : s;
-        var m = val.match(r)
+        var m = val.match(r);
         if (m){
             err = error? _(error, val, m) : _('Validation.DoesNotMatchRegExp', [val, m]);
         }
         return err;
-    }
+    };
 
     // Make sure string contains only characters in BMP
     // Do this by checking for Unicode surrogate chars
@@ -188,8 +195,8 @@ cosmo.util.validate = new function () {
                 err = error? _(error, c, i) : _('Validation.NonBMPChar', c, i);
         }
         return err;
-    }
-    
+    };
+
     // Make sure string does not contain control chars (< U+0020)
     this.noControl = function(s, error){
         var err = null;
@@ -200,9 +207,8 @@ cosmo.util.validate = new function () {
                 err = error? _(error, c, i) : _('Validation.ControlChar', c, i);
         }
         return err;
-    }
-    
-}
+    };
+
+};
 
 cosmo.util.validate.constructor = null;
-Validate = cosmo.util.validate;

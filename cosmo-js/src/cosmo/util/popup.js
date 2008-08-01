@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/**
+ * summary:
+ *   This module provides utility functions for creating popup windows.
+ * description:
+ *   This module provides utility functions for creating popup windows.
+ */
 dojo.provide("cosmo.util.popup");
 
 cosmo.util.popup = new function () {
@@ -55,7 +61,7 @@ cosmo.util.popup = new function () {
           ' displayed because of your browser\'s pop-up blocker.\n' +
           'Please allow pop-ups from this Web site.');
         }
-    }
+    };
     /**
      * Sends the opener of the window to a new location
      * and closes the pop up.
@@ -64,5 +70,4 @@ cosmo.util.popup = new function () {
         location = url;
         self.win.window.close();
     };
-}
-
+};

@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
- /**
-  * Various functions to be used during development and debugging.
-  *
-  */
+/**
+ * summary:
+ *      This module provides various debugging tools.
+ * description:
+ *      This module provides various debugging tools including
+ *      a timer, deprecation tool, generic toString function and
+ *      popup dumper.
+ */
 
 dojo.provide("cosmo.util.debug");
 

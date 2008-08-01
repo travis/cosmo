@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
 */
 
 /**
- * Provides i18n support.
+ * summary:
+ *   This module provides i18n utility functions.
+ * description:
+ *   This module provides i18n utility functions. Ideally,
+ *   Dojo's i18n facilities should be used instead of this as much as possible,
+ *   but there are still cases where a globally available i18n oracle is useful.
  */
 
 dojo.provide("cosmo.util.i18n");
@@ -25,7 +30,7 @@ cosmo.util.i18n.getText = function () {
     if (!this._localtext) {
         this.setLocalizationMessages(cosmo.ui.conf.getLocalText());
     }
-    
+
     var args = Array.prototype.slice.apply(arguments);
     var key = args.shift();
     var str = this._localtext[key] || "[[" + key + "]]";
@@ -39,13 +44,10 @@ cosmo.util.i18n.setLocalizationMessages = function(messages){
     this._localtext = messages || {};
 };
 
-// Legacy
-var getText = cosmo.util.i18n.getText;
-
 cosmo.util.i18n.messageExists = function (str){
      if (cosmo.util.i18n._localtext[str]){
          return true;
      } else {
          return false;
      }
-}
+};

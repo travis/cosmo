@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+/**
+ * summary:
+ *      This module provides authentication utility functions.
+ * description:
+ *      This module provides authentication utility functions, and
+ *      is designed to be used by end users. A new authentication backend
+ *      can be used by setting the file local variable "am"
+ */
+
 dojo.provide("cosmo.util.auth");
 dojo.require("cosmo.auth.basic");
 

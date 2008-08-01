@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2007-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-dojo.provide("cosmo.account.settings");
 
+/**
+ * summary:
+ *      This module provides convenience functions for user settings.
+ * description:
+ *      This module provides convenience functions for creating,
+ *      editing and deleting server side user settings.
+ */
+dojo.provide("cosmo.account.settings");
 
 dojo.require("cosmo.env");
 dojo.require("cosmo.util.i18n");

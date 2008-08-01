@@ -14,9 +14,10 @@
 
  /**
  * summary:
- *      This module provides utility functions for working with XML
+ *   This module provides utility functions for working with XML
  * description:
- *      TODO: fill this in
+ *   This module provides utility functions for working with XML. Currently it provides
+ *   a cross-browser xpath api as well as a method for getting the current xml base property.
  */
 
 dojo.provide("cosmo.xml");

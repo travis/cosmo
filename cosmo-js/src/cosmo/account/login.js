@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 Open Source Applications Foundation
+ * Copyright 2006-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,12 @@
  * limitations under the License.
 */
 
+/**
+ * summary:
+ *      This module provides convenience functions for account login.
+ * description:
+ *      This module provides functions to handle login workflows.
+ */
 dojo.provide('cosmo.account.login');
 
 dojo.require("cosmo.env");

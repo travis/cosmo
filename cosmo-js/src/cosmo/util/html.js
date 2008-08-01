@@ -1,5 +1,5 @@
 /*
- * Copyright 2006 Open Source Applications Foundation
+ * Copyright 2006-2008 Open Source Applications Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
 */
 
+/**
+ * summary:
+ *      This module provides HTML utility functions.
+ * description:
+ *      This module provides utility functions for working with
+ *      HTML DOM elements.
+ */
 dojo.provide("cosmo.util.html");
 
 cosmo.util.html.createSelect = function (id, name, size,
@@ -43,7 +50,7 @@ cosmo.util.html.createSelect = function (id, name, size,
     else {
         options = selOptions;
         appendElem = parentNode;
-        sel.id = id
+        sel.id = id;
         sel.name = name;
         if (size) {
             sel.size = size;
@@ -113,7 +120,7 @@ cosmo.util.html.setSelect = function (sel, val) {
 cosmo.util.html.getSelectValue = function (selectElement){
     var index = selectElement.selectedIndex;
     return selectElement.options.item(index).value;
-}
+};
 
 cosmo.util.html.createInput = function (type, id, name,
     size, maxlength, value, className, parentNode) {
@@ -346,7 +353,7 @@ cosmo.util.html.enableDisableFormElem = function (elem, elemType,
     else {
         elem.disabled = disabled;
     }
-}
+};
 
 cosmo.util.html.enableFormElem = function (elem, elemType) {
     cosmo.util.html.enableDisableFormElem(elem, elemType, true);
@@ -383,7 +390,7 @@ cosmo.util.html.getElementTextContent = function (element){
         }
     }
     return content;
-}
+};
 
 cosmo.util.html.getFormValue =  function(form, fieldName){
         //summary: given a form and a field name returns the value of that field.
@@ -392,7 +399,7 @@ cosmo.util.html.getFormValue =  function(form, fieldName){
         var element = form[fieldName];
         var type = null;
         if (element.type){
-            type = element.type
+            type = element.type;
         } else if (element.length){
             type = element[0].type;
         }

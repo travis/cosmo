@@ -16,7 +16,9 @@
  * summary:
  *      This module provides utility functions for working with Atompub services
  * description:
- *      TODO: fill this in
+ *      This module provides utility functions for working with Atompub services.
+ *      In particular, it provide easy ways of navigating and retrieving information
+ *      about and contained in Atompub services.
  */
 dojo.provide("cosmo.atompub");
 dojo.require("dojox.data.dom");

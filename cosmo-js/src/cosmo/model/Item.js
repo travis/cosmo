@@ -22,7 +22,7 @@ dojo.require("dojox.uuid.generateTimeBasedUuid");
 
 
 cosmo.model.NEW_DATESTAMP = function(){return (new Date()).getTime()};
-cosmo.model.NEW_RANK = function(){return Math.round(cosmo.model.NEW_DATESTAMP()/10)/100};
+cosmo.model.NEW_RANK = function(){return Math.round(cosmo.model.NEW_DATESTAMP()/-10)/100};
 cosmo.model.NEW_OBJECT = function(){return {}};
 cosmo.model.NEW_ARRAY = function(){return []};
 

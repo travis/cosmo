@@ -34,7 +34,7 @@ LATER = cosmo.model.TRIAGE_LATER;
 // tests work
 function initNote(rankTweak){
     var note = new cosmo.model.Note();
-    note.setRank(note.getRank() + rankTweak);
+    note.setRank(note.getRank() - rankTweak);
     return note;
 }
 

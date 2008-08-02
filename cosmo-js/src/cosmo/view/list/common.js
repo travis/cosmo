@@ -227,7 +227,7 @@ cosmo.view.list.setSortAndDisplay = function (item) {
         tr = (tr - 50) * largeNumber + sr/1000;
     } else {
         // otherwise, just sort by reverse rank
-        tr = tr * largeNumber - rank;
+        tr = tr * largeNumber + rank;
     }
     setVals(cols.TRIAGE.name, tr, fm);
 

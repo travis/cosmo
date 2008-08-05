@@ -32,6 +32,7 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 public class ApplicationEntryController extends MultiActionController {
 
     private String loginView;
+    private String accountDeletedView;
     private String defaultLoggedInRedirect; 
     private CosmoSecurityManager securityManager;
     private UserService userService;
@@ -53,7 +54,14 @@ public class ApplicationEntryController extends MultiActionController {
 
         return new ModelAndView(loginView, getDefaultModel());
     }
-    
+
+    public ModelAndView accountDeleted(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        request.getSession().invalidate();
+
+        return new ModelAndView(accountDeletedView, getDefaultModel());
+    }
+
     public ModelAndView welcome(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         
@@ -90,6 +98,10 @@ public class ApplicationEntryController extends MultiActionController {
 
     public void setLoginView(String loginView) {
         this.loginView = loginView;
+    }
+
+    public void setAccountDeletedView(String accountDeletedView) {
+        this.accountDeletedView = accountDeletedView;
     }
 
     public String getDefaultLoggedInRedirect() {

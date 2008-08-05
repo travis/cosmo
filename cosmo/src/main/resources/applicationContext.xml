@@ -777,6 +777,7 @@
          /account/view=ROLE_ROOT,ROLE_USER
          /account/update=ROLE_ROOT,ROLE_USER
          /account/activate/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
+         /account/deleted=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/password/reset/*=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/password/recover=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT
          /account/activation/recover=ROLE_ANONYMOUS, ROLE_USER, ROLE_ROOT

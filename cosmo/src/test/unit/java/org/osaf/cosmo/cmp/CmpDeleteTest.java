@@ -93,4 +93,35 @@ public class CmpDeleteTest extends BaseCmpServletTestCase {
         assertTrue(response.getStatus() ==
                    MockHttpServletResponse.SC_NOT_FOUND);
     }
+
+    public void testDeleteAccount() throws Exception {
+        User u1 = testHelper.makeDummyUser();
+        userService.createUser(u1);
+
+        logInUser(u1);
+
+        MockHttpServletRequest request =
+            createMockRequest("DELETE", "/account");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertTrue(response.getStatus() ==
+                   MockHttpServletResponse.SC_NO_CONTENT);
+        User test = userService.getUser(u1.getUsername());
+        assertNull(test);
+    }
+    
+    public void testDeleteAccountOverlord() throws Exception {
+        User u1 = userService.getUser(User.USERNAME_OVERLORD);
+
+        logInUser(u1);
+
+        MockHttpServletRequest request =
+            createMockRequest("DELETE", "/account");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        servlet.service(request, response);
+
+        assertTrue(response.getStatus() ==
+                   MockHttpServletResponse.SC_FORBIDDEN);
+    }
 }

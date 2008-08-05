@@ -216,6 +216,10 @@ public class CmpServlet extends HttpServlet {
             processUserDelete(req, resp);
             return;
         }
+        if (req.getPathInfo().equals("/account")) {
+            processAccountDelete(req, resp);
+            return;
+        }
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
@@ -598,6 +602,24 @@ public class CmpServlet extends HttpServlet {
 
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }
+    }
+
+    /*
+     * Delegated to by {@link #doDelete} to handle account DELETE
+     * requests, deleting the account for the currently logged in
+     * user, setting the response status and headers, and writing the
+     * response content.
+     */
+    private void processAccountDelete(HttpServletRequest req,
+                                      HttpServletResponse resp)
+        throws ServletException, IOException {
+        User user = getLoggedInUser();
+        if (user.isOverlord()) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        userService.removeUser(user);
+        resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /*

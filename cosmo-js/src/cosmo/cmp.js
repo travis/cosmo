@@ -335,6 +335,16 @@ dojo.declare("cosmo.cmp.Cmp", null,
             return d;
         },
 
+        /**
+         * summary: Delete the current user.
+         * description: Delete the current user.
+         */
+        deleteAccount: function (/*Object*/ ioArgs){
+            var requestDict = this.getDefaultCMPRequest(ioArgs);
+            requestDict.url = this._baseUrl + "/account";
+            return dojo.xhrDelete(requestDict);
+        },
+
         /*
          * Anonymous operations:
          *      Credentials should not be provided with this request

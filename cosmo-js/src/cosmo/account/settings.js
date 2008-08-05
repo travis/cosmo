@@ -30,6 +30,7 @@ dojo.require("cosmo.cmp");
 dojo.require("cosmo.util.validate");
 dojo.require("cosmo.ui.widget.TabContainer");
 dojo.require("cosmo.ui.widget.Button");
+dojo.require("cosmo.ui.widget.AccountDeleter");
 dojo.require("cosmo.account.preferences");
 dojo.require("cosmo.ui.widget.About");
 
@@ -168,26 +169,38 @@ cosmo.account.settings = new function () {
             originalAboutBox = about;
             tabs.push({ label: tabLabel, content: tabContent });
 
-            var self = this; // For callback scope
             // Submit button and default Enter-key action
-            var f = function () { self.submitSave.apply(self); };
+            var saveFunction = dojo.hitch(this, function () { this.submitSave();});
 
-            var b = null; // For dialog buttons
-            var c = null; // For dialog content area
-            c = new cosmo.ui.widget.TabContainer({tabs: tabs});
-            o.content = c;
-            b = new cosmo.ui.widget.Button({
+            var tabContainer = new cosmo.ui.widget.TabContainer({tabs: tabs});
+            o.content = tabContainer;
+            var deleteButton = new cosmo.ui.widget.Button({
+                text:_('App.Button.DeleteAccount'),
+                id: "settingsDeleteAccount",
+                width:90, small: true, handleOnClick: function () {
+                    cosmo.app.hideDialog();
+                    var dialog = new dijit.Dialog({title: _('Account.Delete.DialogTitle')});
+                    dialog.setContent((new cosmo.ui.widget.AccountDeleter(
+                        {
+                            cancelCallback: function(){
+                                dialog.destroy();
+                                cosmo.account.settings.showDialog();
+                            }
+                        })).domNode);
+                    dialog.show();
+                }});
+            o.btnsLeft = [deleteButton];
+            var closeButton = new cosmo.ui.widget.Button({
                 text:_('App.Button.Close'),
                 id: "settingsAdvancedClose",
                 width:60, small: true, handleOnClick: function () {
                     cosmo.app.hideDialog(); } });
-            o.btnsLeft = [b];
-            b = new cosmo.ui.widget.Button({
+            var saveButton = new cosmo.ui.widget.Button({
                 text:_('App.Button.Save'),
                 id: "settingsAdvancedSave",
-                width:60, small: true, handleOnClick: f });
-            o.btnsRight = [b];
-            o.defaultAction = f;
+                width:60, small: true, handleOnClick: saveFunction });
+            o.btnsRight = [closeButton, saveButton];
+            o.defaultAction = saveFunction;
 
             cosmo.app.showDialog(o);
         }));
@@ -215,7 +228,7 @@ cosmo.account.settings = new function () {
                 pref, prefs[pref]));
         }
         // Start preferences setting
-        setPreferencesDeferred = new dojo.DeferredList(prefDeferreds);
+        var setPreferencesDeferred = new dojo.DeferredList(prefDeferreds);
 
         setPreferencesDeferred.addCallback(dojo.hitch(this, function () {
             // Validate the form input using each field's
